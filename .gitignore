@@ -1,0 +1,24 @@
+# ─── Secrets — MAI su GitHub ──────────────────────
+poi-love-app/.env
+poi-love-app/.env.local
+poi-love-app/.env.production
+plesk-media-server/config.php        # contiene JWT_SECRET e MEDIA_BASE_URL
+
+# ─── Node / Expo ──────────────────────────────────
+poi-love-app/node_modules/
+poi-love-app/.expo/
+poi-love-app/dist/
+poi-love-app/.metro-health-check*
+
+# ─── iOS / Android build ──────────────────────────
+poi-love-app/ios/
+poi-love-app/android/
+
+# ─── macOS ────────────────────────────────────────
+.DS_Store
+**/.DS_Store
+
+# ─── Editor ───────────────────────────────────────
+.vscode/
+.idea/
+*.swp

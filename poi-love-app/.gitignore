@@ -1,0 +1,14 @@
+node_modules/
+.expo/
+dist/
+web-build/
+.env
+*.local
+
+# iOS / Android nativi (generati da expo prebuild)
+ios/
+android/
+
+# OS
+.DS_Store
+Thumbs.db

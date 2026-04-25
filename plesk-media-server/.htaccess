@@ -1,0 +1,41 @@
+# POI•LOVE — Media Server .htaccess
+# Da mettere nella root della cartella /media/
+
+# ─── Sicurezza base ────────────────────────────────
+Options -Indexes
+ServerSignature Off
+
+# ─── Blocca accesso diretto ai file PHP tranne entry points ───
+<FilesMatch "^(upload|delete)\.php$">
+    Order Allow,Deny
+    Allow from all
+</FilesMatch>
+
+<FilesMatch "^(config|helpers)\.php$">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>
+
+# ─── Blocca accesso a file nascosti ───────────────
+<FilesMatch "^\.">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>
+
+# ─── Solo GET sugli upload statici ────────────────
+<Directory "uploads">
+    Options -Indexes -ExecCGI
+    <FilesMatch "\.php$">
+        Deny from all
+    </FilesMatch>
+</Directory>
+
+# ─── Cache header per immagini ────────────────────
+<FilesMatch "\.(jpg|jpeg|png|webp)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+</FilesMatch>
+
+# ─── MIME types ───────────────────────────────────
+AddType image/jpeg .jpg .jpeg
+AddType image/png  .png
+AddType image/webp .webp

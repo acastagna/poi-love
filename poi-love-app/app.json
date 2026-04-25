@@ -1,0 +1,75 @@
+{
+  "expo": {
+    "name": "POI•LOVE",
+    "slug": "poi-love",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "poilove",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/images/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#EAE4D8"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.poilove.app",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "POI•LOVE usa la tua posizione per mostrare i luoghi vicino a te.",
+        "NSLocationAlwaysUsageDescription": "POI•LOVE usa la tua posizione per mostrare i luoghi vicino a te.",
+        "NSPhotoLibraryUsageDescription": "Scegli foto per il tuo POI.",
+        "NSCameraUsageDescription": "Scatta una foto per il tuo POI."
+      },
+      "config": {
+        "googleMapsApiKey": "AIzaSyA8NN65J6s2Yf-FRfpbgVMZFMn1n8Q_zEM"
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#EAE4D8"
+      },
+      "package": "com.poilove.app",
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "READ_MEDIA_IMAGES",
+        "CAMERA"
+      ],
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyA8NN65J6s2Yf-FRfpbgVMZFMn1n8Q_zEM"
+        }
+      }
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "expo-location",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Scegli foto per il tuo POI.",
+          "cameraPermission": "Scatta una foto per il tuo POI."
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#EAE4D8",
+          "image": "./assets/images/splash.png",
+          "imageWidth": 200
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
