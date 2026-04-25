@@ -1,146 +1,62 @@
-# Cultural Bridge OS
+# Cultural Bridge OS: Community-Driven Mapping Framework
 
-## A framework for mapping what matters — anywhere in the world
+## Overview
 
----
+Cultural Bridge OS is an open-source initiative designed to document places that matter to communities—beyond what commercial mapping services capture. As the framework notes, "Google Maps knows where the McDonald's is. It does not know where the old man sits every morning and tells stories about the city before the war."
 
-### The problem
+## Key Components
 
-Google Maps knows where the McDonald's is. It does not know where the old man sits every morning and tells stories about the city before the war. It does not know the courtyard hidden behind the blue door, the spring that has no name but that everyone in the village knows, the market that only exists on Thursdays.
+**Data Structure**: The system uses nine core database tables managing user profiles, points of interest, a "love-based" reputation system, curated lists, cultural routes connecting historical sites across regions, and a card generation system for social sharing.
 
-Commercial maps are optimized for transactions. They measure stars, reviews, opening hours. What they cannot measure — and therefore ignore — is meaning. The meaning a place holds for the people who love it.
+**Reputation Model**: Rather than star ratings, the framework employs what creators call a "love metric"—measuring "the emotional resonance a place has for the person who discovered it and chose to share it."
 
-This gap is not a bug. It is structural. No algorithm trained on click-through rates will ever surface the things that make a territory alive. That knowledge lives in communities. And it disappears when communities lose the tools to record it.
+**Cultural Routes**: The framework includes layered historical pathways. In Albania's implementation, routes include the Via Egnatia (Roman-era), Serenissima Routes (medieval Venetian), Illyrian Paths, and Greek Colonial sites.
 
-**Cultural Bridge OS exists to give those tools back.**
+**Card & Sharing System**: Every POI can be exported as a composited image card in three formats (feed 4:5, stories 9:16, QR strip), with SHA-256 notarization and explicit user consent flags for future uses (NFT minting, printed publications). See `docs/card-system.md`.
 
----
+## Technical Architecture
 
-### What it is
+The system combines Supabase/PostgreSQL for database management, Google Maps Platform for base mapping, and AI (Claude/Gemini) for semantic analysis and content categorization. Media storage uses a dedicated Plesk server rather than third-party cloud services.
 
-Cultural Bridge OS is an open source framework for building community-driven maps of beloved places. It provides:
+### Database Schema
 
-- A **data architecture** designed for human meaning, not commercial relevance
-- A **reputation system** based on love, not stars
-- A **cultural routes layer** that connects places across historical and geographical contexts
-- A **multilingual foundation** built for territories where identity is expressed in more than one language
-- An **AI pipeline** for semantic understanding of place descriptions, automatic categorization, and future audio narration
+Nine tables with Row Level Security (RLS) enforced throughout:
 
-The first implementation is **POI•LOVE** — launched in Albania, June 2026.
+| Table | Purpose |
+|---|---|
+| `profiles` | Public user data, extends auth.users |
+| `pois` | Core POI data with geolocation and 3-state visibility |
+| `loves` | One love per user/POI — the reputation system |
+| `lists` | Personal curated collections (private or public) |
+| `poi_lists` | Many-to-many relationship between POIs and lists |
+| `media` | References to files hosted on Plesk media server |
+| `categories` | Multilingual (IT/SQ/EN) category lookup |
+| `cultural_routes` | Multilingual historical route lookup |
+| `card_generations` | Generated share cards with SHA-256 and consent tracking |
 
----
+### POI Visibility Model
 
-### Core principles
+POIs use a 3-state visibility enum rather than a boolean:
 
-**1. Community ownership**
-Data belongs to the community that creates it. No central authority decides what is worth mapping. The people who live in a place are its most accurate cartographers.
+- `private` — visible only to the author
+- `community` — visible to all authenticated POI•LOVE users
+- `suggested_google` — queued for Google Maps suggestion pipeline (future)
 
-**2. Open by design**
-The framework is MIT licensed. Any city, any country, any community can fork it, adapt it, and run it for their territory. POI•LOVE for Tirana is one instance. The framework is designed to become hundreds.
+### Mobile App
 
-**3. Inclusion through welcome**
-The name is not accidental. LOVE is the metric. Not popularity, not commercial value — the emotional resonance a place has for the person who discovered it and chose to share it. This creates a fundamentally different kind of map: one built on care rather than consumption.
+React Native (Expo SDK 52) with Expo Router v3, TypeScript. Google OAuth via Supabase Auth. Core flow: map view → tap to add POI → < 90 seconds from open to published.
 
-**4. Geographies the algorithms ignore**
-The framework is optimized for territories where commercial map coverage is thin: emerging economies, post-conflict regions, rural areas, diaspora communities mapping the homelands they left. These are precisely the places where community knowledge matters most and where it is most at risk of being lost.
+## Deployment Model
 
----
+The MIT-licensed framework is designed for replication. Communities can fork the codebase, configure local databases, translate category data, and customize cultural routes for their territories.
 
-### Architecture
+## Strategic Focus
 
-```
-┌─────────────────────────────────────────────────────┐
-│                   POI•LOVE App                       │
-│         iOS · Android · Web (Expo/React Native)      │
-└──────────────┬───────────────────────┬──────────────┘
-               │                       │
-    ┌──────────▼──────────┐  ┌────────▼────────────┐
-    │      Supabase        │  │   Google Maps        │
-    │  PostgreSQL + RLS    │  │   Platform           │
-    │  Auth + Realtime     │  │   SDK + Places +     │
-    │  Row Level Security  │  │   Geocoding          │
-    └──────────┬──────────┘  └─────────────────────┘
-               │
-    ┌──────────▼──────────┐  ┌─────────────────────┐
-    │   Plesk Media        │  │   AI Pipeline        │
-    │   Server             │  │   Claude + Gemini    │
-    │   Proprietary API    │  │   Categorization +   │
-    │   Photo storage      │  │   Semantic analysis  │
-    └─────────────────────┘  └─────────────────────┘
-```
-
-**Database (Supabase / PostgreSQL)**
-Seven core tables: `profiles`, `pois`, `loves`, `lists`, `poi_lists`, `categories`, `cultural_routes`. Row Level Security enforced at database level — a private list is private even if someone queries the API directly. The LOVE system uses a unique constraint on `(user_id, poi_id)` and updates the reputation counter via database trigger in real time.
-
-**Media storage (Plesk dedicated server)**
-All photos are stored on a dedicated server via proprietary API, not on third-party cloud storage. This is a deliberate architectural choice: it keeps operational costs predictable, keeps data under direct control, and removes dependency on services that may change pricing or terms. Files are served as WebP, compressed client-side before upload.
-
-**Maps (Google Maps Platform)**
-The map layer uses the Maps SDK for the base view, Places API for address autocomplete, and Geocoding API for coordinate-to-address resolution. Cultural routes are rendered as GeoJSON overlays — not static images, but interactive layers that respond to zoom and filter.
-
-**AI pipeline (Claude + Gemini)**
-Claude handles semantic understanding: given a 200-character POI description, it can suggest the most appropriate category, detect language, and in future versions generate the audio narration (POI•VOICE module). Gemini supports research and content enrichment tasks.
+Albania serves as the inaugural test case, chosen for its historical complexity, diaspora populations, and limited commercial map coverage—circumstances where community knowledge preservation becomes most critical.
 
 ---
 
-### Cultural routes
-
-One of the distinguishing features of Cultural Bridge OS is the cultural routes layer — a set of historical paths that connect places across national borders and centuries.
-
-The first four routes implemented for the Albanian context:
-
-| Route | Period | Territory |
-|-------|--------|-----------|
-| Via Egnatia | 146 BC (Roman) | Albania → Greece → Turkey |
-| Serenissima Routes | XIV–XVIII century | Albania → Croatia → Greece |
-| Illyrian Paths | Antiquity | Albania → Bosnia → Slovenia |
-| Greek Colonies | VII–IV century BC | Albania → Greece |
-
-A POI can be tagged to a cultural route. This creates a layer of historical meaning on top of the community layer: a café in Durrës becomes not just a café, but a point on the same road that Roman legions walked two thousand years ago.
-
-New instances of the framework can define their own routes — the Silk Road, the Camino de Santiago, the old Ottoman postal roads, the routes of the Trans-Saharan trade.
-
----
-
-### Forking the framework
-
-To deploy Cultural Bridge OS for a new territory:
-
-1. Clone the repository
-2. Apply `database/schema.sql` to a new Supabase project
-3. Configure the environment variables (Supabase URL + keys, Google Maps API key, Plesk server credentials)
-4. Translate `categories` and `cultural_routes` tables for your territory
-5. Add your cultural routes to the `cultural_routes` lookup table
-6. Deploy the Expo app with your territory's branding
-
-The framework handles everything else: auth, RLS, realtime LOVE updates, list management, media upload, map rendering.
-
----
-
-### Roadmap
-
-| Phase | Timeline | Feature |
-|-------|----------|---------|
-| Atto I | June 2026 | MVP iOS + Android, public launch Tirana |
-| Atto II | Q1 2027 | POI•VOICE — AI-generated audio guides in 3 languages |
-| Atto III | Q3 2027 | Il Libro dei Luoghi — curated editorial layer |
-| Atto IV | 2028+ | Payment infrastructure for local guides and experiences |
-
----
-
-### Why Albania first
-
-Albania is not an arbitrary choice. It is the ideal stress test for the framework:
-
-- High historical density (six civilizations in one territory: Illyrian, Greek, Roman, Byzantine, Ottoman, Venetian)
-- Low commercial map coverage (significant gaps in Google Maps data outside major cities)
-- Strong territorial identity in the local community
-- A large diaspora (Albania has one of the highest emigration rates in Europe) that maintains deep emotional connections to specific places in the homeland
-- A moment of rapid transformation where local knowledge risks being lost faster than it can be recorded
-
-If the framework works here, it works anywhere.
-
----
-
-*Cultural Bridge OS — MIT License*
-*[Alessandro Castagna](https://altrostile.net) · [321.al](https://321.al) · Tirana, Albania*
+*For implementation details, see:*
+- `database/schema.sql` — baseline schema
+- `database/migrations/` — incremental migrations
+- `docs/card-system.md` — Card & Sharing System specification
