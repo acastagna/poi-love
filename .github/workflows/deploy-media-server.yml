@@ -64,6 +64,7 @@ jobs:
         run: |
           rsync -avz --delete \
             --exclude='config.php' \
+            --exclude='poi/' \
             --exclude='.git' \
             --exclude='*.md' \
             -e "ssh -i ~/.ssh/deploy_key -p ${{ secrets.PLESK_PORT }} -o StrictHostKeyChecking=no" \
