@@ -1,0 +1,67 @@
+{
+  "_meta": {
+    "last_updated": "2026-04-26",
+    "version": "1.8",
+    "next_deadline": "2026-05-01",
+    "next_deadline_label": "Anthropic for Startups",
+    "launch_date": "Giugno 2026",
+    "launch_city": "Tirana"
+  },
+  "overview": {
+    "overall_pct": 52,
+    "weeks_to_launch": 5,
+    "db_tables": 9,
+    "license": "MIT"
+  },
+  "areas": [
+    { "id": "infra",   "pct": 100, "status": "done"    },
+    { "id": "app",     "pct": 10,  "status": "active"  },
+    { "id": "ux",      "pct": 20,  "status": "todo"    },
+    { "id": "launch",  "pct": 5,   "status": "active"  }
+  ],
+  "pie": [
+    { "id": "done",   "value": 42 },
+    { "id": "active", "value": 15 },
+    { "id": "todo",   "value": 43 }
+  ],
+  "tasks": [
+    { "id": "t1",  "group": "done",   "pct": 100, "time_est": 8,  "status": "done"   },
+    { "id": "t2",  "group": "done",   "pct": 100, "time_est": 6,  "status": "done"   },
+    { "id": "t3",  "group": "done",   "pct": 100, "time_est": 2,  "status": "done"   },
+    { "id": "t4",  "group": "done",   "pct": 100, "time_est": 2,  "status": "done"   },
+    { "id": "t5",  "group": "done",   "pct": 100, "time_est": 12, "status": "done"   },
+    { "id": "t6",  "group": "done",   "pct": 100, "time_est": 4,  "status": "done"   },
+    { "id": "t7",  "group": "sprint", "pct": 30,  "time_est": 3,  "status": "sprint" },
+    { "id": "t8",  "group": "sprint", "pct": 0,   "time_est": 6,  "status": "sprint" },
+    { "id": "t9",  "group": "next",   "pct": 0,   "time_est": 10, "status": "next"   },
+    { "id": "t10", "group": "next",   "pct": 0,   "time_est": 6,  "status": "next"   },
+    { "id": "t11", "group": "next",   "pct": 0,   "time_est": 6,  "status": "next"   },
+    { "id": "t12", "group": "future", "pct": 0,   "time_est": 3,  "status": "future" },
+    { "id": "t13", "group": "future", "pct": 0,   "time_est": 5,  "status": "future" },
+    { "id": "t14", "group": "future", "pct": 0,   "time_est": 4,  "status": "future" }
+  ],
+  "changelog": [
+    {
+      "date": "2026-04-26",
+      "note": "SESSIONE v1.8: Media server PHP live su media.poilove.com — PHP 8.3.30, GD WebP, cURL 7.88, EXIF, storage poi/ scrivibile, Supabase connesso. GitHub Actions deploy SSH automatico (chiave ED25519, 5 secrets). .user.ini PHP-FPM upload 10M. Branded 403 page. Candidatura Anthropic for Startups scritta (scadenza 1 Maggio)."
+    },
+    {
+      "date": "2026-04-26",
+      "note": "SESSIONE v1.7: GitHub push via API (token PAT) — migration 001, card-system.md, architecture.md, schema.sql v1.1. Migration applicata su Supabase (poi_visibility ENUM, card_generations, RLS). Fix funzioni DB senza search_path. Security Advisor: 0 errori. Infrastruttura 100%."
+    },
+    {
+      "date": "2026-04-25",
+      "note": "SESSIONE v1.6: Migration 001: poi_visibility ENUM + card_generations table + RLS. card-system.md spec completa (feed 4:5, stories 9:16, qr_strip, SHA-256, consent NFT/book). architecture.md aggiornato (9 tabelle)."
+    },
+    {
+      "date": "2026-04-24",
+      "note": "SESSIONE v1.4-1.5: Google OAuth attivo. Google Maps Platform configurata. SAL trilingue IT/SQ/EN. SAL-data.json creato come fonte di verità. Repository GitHub live con CI/CD. Schema Supabase 9 tabelle + RLS."
+    }
+  ],
+  "next_session_priorities": [
+    "Candidatura Anthropic for Startups (scadenza 1 Maggio — CRITICO)",
+    "Rebuild App Expo completa → push GitHub immediato ogni sessione",
+    "Connessione app al backend reale: Supabase live + media.poilove.com upload",
+    "Video demo per candidatura Anthropic"
+  ]
+}
