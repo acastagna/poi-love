@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>POI•LOVE — SAL</title>
+<script src="https://unpkg.com/@phosphor-icons/web@2.1.1/src/index.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+:root {
+  --red: #D42B2B;
+  --blue: #285EA7;
+  --bg: #EAE4D8;
+  --text: #1C1C1C;
+  --muted: #6B6B6B;
+  --white: #FFFFFF;
+  --green: #22C55E;
+  --yellow: #F59E0B;
+  --gray: #F5F0E8;
+  --border: rgba(0,0,0,0.08);
+  --shadow: 0 4px 24px rgba(0,0,0,0.07);
+  --r: 16px;
+}
+/* ── BROWSER BANNER ── */
+.browser-banner {
+  display:none;
+  background:#1C1C1C; color:rgba(255,255,255,0.9);
+  padding:11px 48px 11px 20px; text-align:center;
+  font-size:12px; font-weight:500; line-height:1.55;
+  position:relative; z-index:300;
+}
+.browser-banner strong { color:#F59E0B; }
+.bb-close {
+  position:absolute; top:50%; right:12px; transform:translateY(-50%);
+  background:none; border:none; color:rgba(255,255,255,0.45);
+  font-size:18px; cursor:pointer; line-height:1; padding:6px;
+}
+.bb-close:hover { color:var(--white); }
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html { scroll-behavior: smooth; }
+body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+
+/* ── HEADER ── */
+.header {
+  background:var(--white); border-bottom:1px solid var(--border);
+  padding:16px 40px; display:flex; align-items:center;
+  justify-content:space-between; position:sticky; top:0; z-index:100;
+  box-shadow:var(--shadow);
+}
+.header-logo { display:flex; align-items:center; gap:12px; }
+.header-logo img { height:34px; }
+.logo-text { font-weight:900; font-size:20px; color:var(--red); letter-spacing:-0.5px; }
+.hdr-badge {
+  background:var(--bg); border:1px solid var(--border);
+  border-radius:20px; padding:4px 12px;
+  font-size:10px; font-weight:700; color:var(--muted);
+  letter-spacing:0.7px; text-transform:uppercase;
+}
+.hdr-right { display:flex; align-items:center; gap:10px; }
+.hdr-date { font-size:12px; color:var(--muted); font-weight:500; }
+.status-pill {
+  display:flex; align-items:center; gap:6px;
+  background:#FFFBEB; border:1px solid #F59E0B;
+  border-radius:20px; padding:4px 12px;
+  font-size:10px; font-weight:700; color:#B45309;
+}
+.sdot { width:7px; height:7px; border-radius:50%; background:#F59E0B; animation:pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* ── LANGUAGE SWITCHER ── */
+.lang-switcher { display:flex; align-items:center; gap:4px; }
+.lang-btn {
+  width:34px; height:24px; border-radius:6px; border:2px solid transparent;
+  cursor:pointer; font-size:18px; display:flex; align-items:center;
+  justify-content:center; line-height:1; background:transparent;
+  transition:all 0.15s; opacity:0.45; padding:0;
+}
+.lang-btn:hover { opacity:0.8; background:var(--gray); }
+.lang-btn.active { opacity:1; border-color:var(--red); background:var(--gray); }
+@media (max-width:480px) { .lang-btn { width:28px; height:22px; font-size:16px; } }
+
+/* ── HERO ── */
+.hero {
+  background:linear-gradient(135deg, var(--red) 0%, #9B1C1C 100%);
+  padding:52px 40px; display:flex; align-items:center;
+  justify-content:space-between; gap:32px;
+  position:relative; overflow:hidden;
+}
+.hero::before { content:''; position:absolute; top:-80px; right:-80px; width:360px; height:360px; border-radius:50%; background:rgba(255,255,255,0.04); pointer-events:none; }
+.hero-text h1 { font-size:40px; font-weight:900; color:var(--white); line-height:1.1; letter-spacing:-1.5px; }
+.h1-main { display:block; }
+.h1-sub  { display:block; color:rgba(255,255,255,0.5); margin-top:2px; }
+.hero-text p { margin-top:12px; font-size:14px; color:rgba(255,255,255,0.72); line-height:1.75; max-width:460px; }
+.kpis { display:flex; gap:16px; flex-shrink:0; position:relative; z-index:1; }
+.kpi {
+  background:rgba(255,255,255,0.13); backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,0.2); border-radius:14px;
+  padding:18px 22px; text-align:center; min-width:100px;
+}
+.kpi-v { font-size:30px; font-weight:900; color:var(--white); line-height:1; }
+.kpi-l { margin-top:5px; font-size:9px; color:rgba(255,255,255,0.6); font-weight:700; text-transform:uppercase; letter-spacing:0.8px; }
+
+/* ── MAIN ── */
+.main { max-width:1200px; margin:0 auto; padding:40px; }
+.sec { margin-bottom:44px; }
+.sec-hdr { display:flex; align-items:center; gap:12px; margin-bottom:22px; }
+.sec-icon { width:38px; height:38px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:19px; flex-shrink:0; }
+.si-r { background:rgba(212,43,43,0.1); color:var(--red); }
+.si-b { background:rgba(40,94,167,0.1); color:var(--blue); }
+.si-g { background:rgba(34,197,94,0.1); color:var(--green); }
+.sec-ttl { font-size:20px; font-weight:800; }
+.sec-sub { font-size:12px; color:var(--muted); margin-top:2px; }
+
+/* ── PROGRESS CARDS ── */
+.pg-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:44px; }
+.pg-card {
+  background:var(--white); border-radius:var(--r); padding:22px;
+  box-shadow:var(--shadow); border:1px solid var(--border);
+  position:relative; overflow:hidden;
+}
+.pg-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
+.pg-card.c-g::before { background:var(--green); }
+.pg-card.c-y::before { background:var(--yellow); }
+.pg-card.c-m::before { background:#C0B0A0; }
+.pg-card.c-r::before { background:var(--red); }
+.pg-lbl { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-bottom:7px; }
+.pg-lbl.g { color:var(--green); } .pg-lbl.y { color:var(--yellow); }
+.pg-lbl.m { color:var(--muted); } .pg-lbl.r { color:var(--red); }
+.pg-title { font-size:13px; font-weight:700; line-height:1.35; }
+.pg-pct { font-size:36px; font-weight:900; line-height:1; margin-top:10px; }
+.pg-pct.g { color:var(--green); } .pg-pct.y { color:var(--yellow); }
+.pg-pct.m { color:#C0B0A0; } .pg-pct.r { color:var(--red); }
+.bar-track { margin-top:10px; height:5px; background:var(--bg); border-radius:3px; overflow:hidden; }
+.bar-fill { height:100%; border-radius:3px; transition:width 1.2s cubic-bezier(.4,0,.2,1); }
+.bf-g { background:var(--green); } .bf-y { background:var(--yellow); }
+.bf-m { background:#C0B0A0; } .bf-r { background:var(--red); }
+
+/* ── PIE CHART ── */
+.chart-card {
+  background:var(--white); border-radius:20px; box-shadow:var(--shadow);
+  border:1px solid var(--border); padding:32px;
+}
+.chart-ttl { font-size:17px; font-weight:800; margin-bottom:6px; }
+.chart-sub { font-size:12px; color:var(--muted); margin-bottom:28px; }
+.chart-layout { display:grid; grid-template-columns:1fr 320px; gap:40px; align-items:center; }
+.pie-wrap { position:relative; max-width:320px; margin:0 auto; width:100%; }
+.pie-wrap svg { width:100%; height:auto; overflow:visible; display:block; }
+.pie-slice { cursor:pointer; transition:transform 0.3s cubic-bezier(.34,1.56,.64,1); }
+.pie-slice:hover { filter:brightness(1.07); }
+.pie-slice.sel { filter:drop-shadow(0 6px 18px rgba(0,0,0,0.22)); }
+.leg-list { display:flex; flex-direction:column; gap:9px; }
+.leg-item {
+  display:flex; align-items:center; gap:11px; padding:11px 15px;
+  border-radius:12px; border:1px solid transparent;
+  cursor:pointer; transition:all 0.2s; background:var(--gray);
+}
+.leg-item:hover, .leg-item.act { border-color:var(--border); background:var(--white); box-shadow:0 2px 10px rgba(0,0,0,0.05); }
+.leg-dot { width:13px; height:13px; border-radius:4px; flex-shrink:0; }
+.leg-lbl { flex:1; font-size:13px; font-weight:600; }
+.leg-pct { font-size:15px; font-weight:800; }
+
+/* popup */
+.pie-popup {
+  position:absolute; background:var(--white);
+  border:1px solid var(--border); border-radius:14px;
+  padding:18px; box-shadow:0 12px 40px rgba(0,0,0,0.16);
+  width:240px; pointer-events:none;
+  opacity:0; transform:scale(0.92) translateY(6px);
+  transition:all 0.22s cubic-bezier(.34,1.56,.64,1);
+  z-index:200;
+}
+.pie-popup.vis { opacity:1; transform:scale(1) translateY(0); pointer-events:auto; }
+.pp-hdr { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+.pp-dot { width:11px; height:11px; border-radius:3px; flex-shrink:0; }
+.pp-ttl { font-size:14px; font-weight:800; }
+.pp-items { display:flex; flex-direction:column; gap:6px; }
+.pp-item { display:flex; align-items:flex-start; gap:7px; font-size:11px; color:var(--muted); line-height:1.45; }
+.pp-ic { flex-shrink:0; margin-top:1px; }
+.pie-overlay { position:fixed; inset:0; z-index:190; display:none; }
+.pie-overlay.act { display:block; }
+
+/* ── WORKSTREAM TABLE ── */
+.ws-card { background:var(--white); border-radius:20px; box-shadow:var(--shadow); border:1px solid var(--border); overflow:hidden; }
+.ws-row {
+  display:grid;
+  grid-template-columns:2fr 0.9fr 150px 80px 80px;
+  align-items:center; padding:14px 22px;
+  border-bottom:1px solid var(--border); gap:14px;
+  transition:background 0.12s;
+}
+.ws-row:last-child { border-bottom:none; }
+.ws-row:hover { background:var(--gray); }
+.ws-hdr {
+  background:var(--bg); font-size:9px; font-weight:700;
+  text-transform:uppercase; letter-spacing:0.9px; color:var(--muted);
+}
+.ws-hdr:hover { background:var(--bg); }
+.ws-name { display:flex; align-items:center; gap:10px; }
+.ws-ico { width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0; }
+.ws-tname { font-size:13px; font-weight:600; line-height:1.3; }
+.ws-tsub { font-size:10px; color:var(--muted); margin-top:2px; line-height:1.4; }
+.ws-phase { font-size:11px; font-weight:600; color:var(--muted); }
+.ws-time { font-size:11px; font-weight:700; color:var(--muted); white-space:nowrap; }
+.ws-time span { font-size:9px; font-weight:500; }
+.ws-prog { display:flex; align-items:center; gap:8px; }
+.ws-track { flex:1; height:7px; background:var(--bg); border-radius:4px; overflow:hidden; }
+.ws-fill { height:100%; border-radius:4px; transition:width 1.2s cubic-bezier(.4,0,.2,1); }
+.ws-pct { font-size:11px; font-weight:700; width:28px; text-align:right; }
+.badge { display:inline-flex; align-items:center; gap:3px; padding:3px 9px; border-radius:20px; font-size:9px; font-weight:700; white-space:nowrap; }
+.bd { background:#ECFDF5; color:#15803D; }
+.by { background:#FFFBEB; color:#B45309; }
+.bs { background:#FEF2F2; color:var(--red); }
+.bn { background:#EFF6FF; color:var(--blue); }
+.bf { background:var(--bg); color:var(--muted); }
+
+/* ── SPRINT ── */
+.sprint {
+  background:linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+  border-radius:20px; padding:32px; overflow:hidden;
+}
+.sp-hdr { display:flex; align-items:center; gap:14px; margin-bottom:20px; }
+.sp-ttl { font-size:18px; font-weight:900; color:var(--white); }
+.sp-sub { font-size:11px; color:rgba(255,255,255,0.4); margin-top:2px; }
+/* deadline cards — sempre visibili */
+.sp-deadlines { display:flex; gap:12px; margin-bottom:22px; }
+.sp-dl-card { flex:1; border-radius:13px; padding:14px 18px; }
+.sp-dl-critical { background:rgba(212,43,43,0.18); border:1px solid rgba(212,43,43,0.5); }
+.sp-dl-launch   { background:rgba(40,94,167,0.22);  border:1px solid rgba(40,94,167,0.45); }
+.sp-dl-lbl { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:rgba(255,255,255,0.45); margin-bottom:5px; }
+.sp-dl-date { font-size:22px; font-weight:900; line-height:1.1; }
+.sp-dl-critical .sp-dl-date { color:var(--red); }
+.sp-dl-launch   .sp-dl-date { color:#60A5FA; }
+/* grid scrollabile su mobile */
+.sp-grid-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; margin:0 -4px; padding:0 4px 4px; }
+.sp-grid { display:grid; grid-template-columns:repeat(7,minmax(84px,1fr)); gap:8px; }
+.sp-day { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:11px; padding:12px 8px; text-align:center; }
+.sp-day.today { background:rgba(212,43,43,0.2); border-color:var(--red); }
+.sp-day.dl    { background:rgba(212,43,43,0.1); border-color:rgba(212,43,43,0.4); }
+.sp-num  { font-size:20px; font-weight:900; color:var(--white); }
+.sp-lbl  { font-size:8px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:rgba(255,255,255,0.3); margin-bottom:6px; }
+.sp-task { font-size:9px; color:rgba(255,255,255,0.62); font-weight:500; line-height:1.5; margin-top:7px; }
+
+/* ── MILESTONES ── */
+.ms-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+.ms-card { background:var(--white); border-radius:var(--r); padding:20px; box-shadow:var(--shadow); border:1px solid var(--border); }
+.ms-date { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:var(--muted); margin-bottom:7px; }
+.ms-ttl { font-size:14px; font-weight:800; line-height:1.3; }
+.ms-desc { font-size:11px; color:var(--muted); margin-top:7px; line-height:1.55; }
+.ms-status { margin-top:13px; display:flex; align-items:center; gap:5px; font-size:10px; font-weight:700; }
+
+/* ── TECH GRID ── */
+.tech-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+.tech-card { background:var(--white); border-radius:var(--r); padding:16px; box-shadow:var(--shadow); border:1px solid var(--border); display:flex; align-items:center; gap:13px; }
+.tech-ico { width:40px; height:40px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+.tech-name { font-size:13px; font-weight:700; }
+.tech-role { font-size:10px; color:var(--muted); margin-top:2px; line-height:1.4; }
+.tech-info { flex:1; }
+
+/* ── CTA ── */
+.cta-box {
+  background:linear-gradient(135deg, var(--blue) 0%, #1a3f7a 100%);
+  border-radius:20px; padding:32px 40px;
+  display:flex; align-items:center; justify-content:space-between; gap:28px;
+}
+.cta-ttl { font-size:20px; font-weight:900; color:var(--white); }
+.cta-p { font-size:12px; color:rgba(255,255,255,0.68); margin-top:8px; max-width:520px; line-height:1.7; }
+.cta-btn {
+  background:var(--white); color:var(--blue); border:none; border-radius:11px;
+  padding:13px 28px; font-size:13px; font-weight:800; cursor:pointer;
+  text-decoration:none; display:inline-block;
+  transition:transform 0.15s, box-shadow 0.15s; flex-shrink:0;
+}
+.cta-btn:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.2); }
+
+/* ── FOOTER ── */
+.footer { background:var(--white); border-top:1px solid var(--border); padding:28px 40px; display:flex; align-items:center; justify-content:space-between; gap:20px; }
+.ft-brand { display:flex; align-items:center; gap:10px; flex-shrink:0; }
+.ft-brand img { height:26px; }
+.ft-brand-name { font-size:15px; font-weight:900; color:var(--red); letter-spacing:-0.3px; }
+.ft-links { display:flex; gap:24px; }
+.ft-links a { font-size:12px; color:var(--muted); text-decoration:none; font-weight:600; transition:color 0.15s; }
+.ft-links a:hover { color:var(--red); }
+.ft-copy { text-align:right; font-size:10px; color:var(--muted); line-height:1.7; }
+
+/* ══════════════
+   RESPONSIVE
+══════════════ */
+@media (max-width: 900px) {
+  .header { padding:14px 20px; }
+  .hdr-date { display:none; }
+  .hero { padding:36px 20px; flex-direction:column; gap:28px; }
+  .hero-text h1 { font-size:30px; }
+  .kpis { flex-wrap:wrap; gap:10px; }
+  .kpi { min-width:calc(50% - 6px); flex:1; }
+  .main { padding:24px 16px; }
+  .pg-grid { grid-template-columns:repeat(2,1fr); }
+  .chart-layout { grid-template-columns:1fr; gap:28px; }
+  .pie-wrap { max-width:260px; }
+  .ws-row { grid-template-columns:1fr auto; gap:10px; }
+  .ws-col-phase, .ws-col-prog, .ws-col-time { display:none; }
+  .ws-hdr { display:none; }
+  .ws-row { padding:14px 16px; }
+  .sprint { padding:24px 20px; }
+  .ms-grid { grid-template-columns:repeat(2,1fr); }
+  .tech-grid { grid-template-columns:repeat(2,1fr); }
+  .cta-box { flex-direction:column; padding:24px; }
+  /* footer mobile */
+  .footer { flex-direction:column; align-items:center; text-align:center; gap:16px; padding:24px 20px; }
+  .ft-brand { justify-content:center; }
+  .ft-copy { text-align:center; }
+  .ft-links { flex-wrap:wrap; justify-content:center; gap:16px; }
+}
+
+@media (max-width: 600px) {
+  /* header: logo riga 1, bandiere + pill riga 2 */
+  .header { flex-direction:column; align-items:stretch; gap:10px; padding:12px 16px; }
+  .header-logo { width:100%; }
+  .hdr-badge { display:none; }
+  .hdr-right { width:100%; justify-content:space-between; }
+  /* sprint deadlines stack verticale su schermi piccoli */
+  .sp-deadlines { flex-direction:column; }
+  .sp-dl-date { font-size:18px; }
+}
+
+@media (max-width: 480px) {
+  .kpis { gap:8px; }
+  .kpi { min-width:calc(50% - 5px); padding:14px 16px; }
+  .kpi-v { font-size:24px; }
+  .pg-grid { grid-template-columns:repeat(2,1fr); gap:10px; }
+  .pg-pct { font-size:28px; }
+  .ms-grid { grid-template-columns:1fr 1fr; }
+  .tech-grid { grid-template-columns:1fr; }
+  .pie-popup { width:200px; }
+  .chart-card { padding:20px; }
+}
+
+/* ── mobile card per workstream ── */
+@media (max-width: 900px) {
+  .ws-name-mobile { display:block; }
+  .ws-badge-time {
+    display:flex; flex-direction:column; align-items:flex-end; gap:5px;
+  }
+  .ws-time-mobile {
+    font-size:10px; color:var(--muted); font-weight:600;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- BROWSER BANNER (visibile solo in WebView Telegram/WhatsApp) -->
+<div class="browser-banner" id="browserBanner">
+  <span id="bbMsg">📱 Per la migliore esperienza, apri in <strong>Safari</strong> o <strong>Chrome</strong></span>
+  <button class="bb-close" onclick="document.getElementById('browserBanner').style.display='none'" aria-label="Chiudi">✕</button>
+</div>
+
+<header class="header">
+  <div class="header-logo">
+    <img src="https://poilove.com/img/logo-completo.svg" alt="POI•LOVE"
+      onerror="this.style.display='none';document.getElementById('lf').style.display='block'">
+    <span id="lf" class="logo-text" style="display:none">POI•LOVE</span>
+    <div class="hdr-badge" data-t="sal_badge">SAL — Stato Avanzamento Lavori</div>
+  </div>
+  <div class="hdr-right">
+    <div class="lang-switcher" id="langSwitcher">
+      <button class="lang-btn" data-lang="it" title="Italiano" onclick="switchLang('it')">🇮🇹</button>
+      <button class="lang-btn" data-lang="sq" title="Shqip" onclick="switchLang('sq')">🇦🇱</button>
+      <button class="lang-btn" data-lang="en" title="English" onclick="switchLang('en')">🇬🇧</button>
+    </div>
+    <span class="hdr-date" data-t="updated_date">Aggiornato: 24 Aprile 2026</span>
+    <div class="status-pill"><div class="sdot"></div><span data-t="status_pill">MVP in sviluppo</span></div>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-text">
+    <h1><span class="h1-main">POI•LOVE</span><span class="h1-sub" data-t="hero_sub">Stato del Progetto</span></h1>
+    <p data-t="hero_desc">Mappa comunitaria dei luoghi amati. Prima istanza: Albania · Tirana. Lancio previsto giugno 2026. Framework open source Cultural Bridge OS — Licenza MIT.</p>
+  </div>
+  <div class="kpis">
+    <div class="kpi"><div class="kpi-v">52%</div><div class="kpi-l" data-t="kpi_done">Completamento</div></div>
+    <div class="kpi"><div class="kpi-v">5</div><div class="kpi-l" data-t="kpi_weeks">Settimane al lancio</div></div>
+    <div class="kpi"><div class="kpi-v">9</div><div class="kpi-l" data-t="kpi_tables">Tabelle database</div></div>
+    <div class="kpi"><div class="kpi-v">MIT</div><div class="kpi-l" data-t="kpi_license">Licenza</div></div>
+  </div>
+</div>
+
+<main class="main">
+
+<!-- PROGRESS CARDS -->
+<div class="sec">
+  <div class="sec-hdr">
+    <div class="sec-icon si-r"><i class="ph ph-chart-bar"></i></div>
+    <div><div class="sec-ttl" data-t="area_title">Avanzamento per Area</div>
+    <div class="sec-sub" data-t="area_sub">Stato corrente delle 4 macro-aree di progetto</div></div>
+  </div>
+  <div class="pg-grid">
+    <div class="pg-card c-g">
+      <div class="pg-lbl g" data-t="lbl_done">✓ Completata</div>
+      <div class="pg-title" data-t="area1">Infrastruttura &amp; Backend</div>
+      <div class="pg-pct g">100%</div>
+      <div class="bar-track"><div class="bar-fill bf-g" data-target="90" style="width:0%"></div></div>
+    </div>
+    <div class="pg-card c-y">
+      <div class="pg-lbl y" data-t="lbl_active">↗ In corso</div>
+      <div class="pg-title" data-t="area2">App Mobile iOS/Android</div>
+      <div class="pg-pct y">10%</div>
+      <div class="bar-track"><div class="bar-fill bf-y" data-target="5" style="width:0%"></div></div>
+    </div>
+    <div class="pg-card c-m">
+      <div class="pg-lbl m" data-t="lbl_todo">○ Da avviare</div>
+      <div class="pg-title" data-t="area3">UX/UI &amp; Contenuti</div>
+      <div class="pg-pct m">20%</div>
+      <div class="bar-track"><div class="bar-fill bf-m" data-target="20" style="width:0%"></div></div>
+    </div>
+    <div class="pg-card c-r">
+      <div class="pg-lbl r" data-t="lbl_critical">⚡ Critico</div>
+      <div class="pg-title" data-t="area4">Lancio &amp; Distribuzione</div>
+      <div class="pg-pct r">0%</div>
+      <div class="bar-track"><div class="bar-fill bf-r" data-target="0" style="width:0%"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- PIE CHART -->
+<div class="sec chart-card">
+  <div class="chart-ttl" data-t="chart_title">Distribuzione del lavoro — tocca uno spicchio</div>
+  <div class="chart-sub" data-t="chart_sub">🟢 Verde = completato &nbsp;·&nbsp; 🟡 Giallo = in costruzione &nbsp;·&nbsp; 🔴 Rosso = da fare</div>
+  <div class="chart-layout">
+    <div class="pie-wrap" id="pieWrap">
+      <svg id="pieSvg" viewBox="-12 -12 224 224" xmlns="http://www.w3.org/2000/svg">
+        <g id="pieSlices"></g>
+        <circle cx="100" cy="100" r="54" fill="white"/>
+        <text x="100" y="94" text-anchor="middle" font-family="Inter" font-weight="900" font-size="21" fill="#1C1C1C" id="cPct">52%</text>
+        <text x="100" y="112" text-anchor="middle" font-family="Inter" font-weight="500" font-size="9.5" fill="#6B6B6B" id="cLbl" data-t="completed_lbl">completato</text>
+      </svg>
+      <div class="pie-popup" id="piePopup">
+        <div class="pp-hdr"><div class="pp-dot" id="ppDot"></div><div class="pp-ttl" id="ppTtl">—</div></div>
+        <div class="pp-items" id="ppItems"></div>
+      </div>
+    </div>
+    <div class="leg-list" id="legList"></div>
+  </div>
+</div>
+<div class="pie-overlay" id="pieOverlay"></div>
+
+<!-- DETTAGLIO ATTIVITÀ -->
+<div class="sec" style="margin-top:40px">
+  <div class="sec-hdr">
+    <div class="sec-icon si-b"><i class="ph ph-list-checks"></i></div>
+    <div><div class="sec-ttl" data-t="ws_title">Dettaglio Attività</div>
+    <div class="sec-sub" data-t="ws_sub">Stato, fase, tempo stimato e avanzamento di ogni deliverable</div></div>
+  </div>
+  <div class="ws-card">
+
+    <!-- HEADER ROW (desktop only) -->
+    <div class="ws-row ws-hdr">
+      <div data-t="col_activity">Attività</div>
+      <div class="ws-col-phase" data-t="col_phase">Fase</div>
+      <div class="ws-col-prog" data-t="col_progress">Progresso</div>
+      <div class="ws-col-time" data-t="col_time">Tempo stimato</div>
+      <div data-t="col_status">Stato</div>
+    </div>
+
+    <!-- ✅ COMPLETATI -->
+    <div class="ws-row">
+      <div class="ws-name">
+        <div class="ws-ico" style="background:#ECFDF5;color:#15803D"><i class="ph ph-github-logo"></i></div>
+        <div>
+          <div class="ws-tname" data-t="t1_name">Repository GitHub + Pages</div>
+          <div class="ws-tsub" data-t="t1_sub">acastagna/poi-love — Demo live attiva su GitHub Pages</div>
+          <div class="ws-time-mobile" data-t="t1_time_m">~8h — ✅ completato</div>
+        </div>
+      </div>
+      <div class="ws-phase ws-col-phase" data-t="t1_phase">Infrastruttura</div>
+      <div class="ws-prog ws-col-prog"><div class="ws-track"><div class="ws-fill" style="width:0%;background:#22C55E" data-target="100"></div></div><span class="ws-pct" style="color:#22C55E">100%</span></div>
+      <div class="ws-time ws-col-time">~8h <span data-t="done_lbl">completato</span></div>
+      <div class="ws-badge-time"><span class="badge bd"><i class="ph ph-check"></i> <span data-t="badge_done">Fatto</span></span></div>
+    </div>
+
+    <div class="ws-row">
+      <div class="ws-name">
+        <div class="ws-ico" style="background:#ECFDF5;color:#15803D"><i class="ph ph-database"></i></div>
+        <div>
+          <div class="ws-tname" data-t="t2_name">Schema Supabase — 8 tabelle + RLS</div>
+          <div class="ws-tsub" data-t="t2_sub">POIs, Profiles, Loves, Lists, Categories, Routes, Media + visibilità 3 stati</div>
+          <div class="ws-time-mobile" data-t="t2_time_m">~6h — ✅ completato</div>
+        </div>
+      </div>
+      <div class="ws-phase ws-col-phase" data-t="t2_phase">Backend</div>
+      <div class="ws-prog ws-col-prog"><div class="ws-track"><div class="ws-fill" style="width:0%;background:#22C55E" data-target="100"></div></div><span class="ws-pct" style="color:#22C55E">100%</span></div>
+      <div class="ws-time ws-col-time">~6h <span data-t="done_lbl">completato</span></div>
+      <div class="ws-badge-time"><span class="badge bd"><i class="ph ph-check"></i> <span data-t="badge_done">Fatto</span></span></div>
+    </div>
+
+    <div class="ws-row">
+      <div class="ws-name">
+        <div class="ws-ico" style="background:#ECFDF5;color:#15803D"><i class="ph ph-google-logo"></i></div>
+        <div>
+          <div class="ws-tname" data-t="t3_name">Google OAuth — Autenticazione utenti</div>
+          <div class="ws-tsub" data-t="t3_sub">Supabase Auth + Google Cloud Console configurati e attivi</div>
+          <div class="ws-time-mobile" data-t="t3_time_m">~2h — ✅ completato</div>
+        </div>
+      </div>
+      <div class="ws-phase ws-col-phase" data-t="t3_phase">Autenticazione</div>
+      <div class="ws-prog ws-col-prog"><div class="ws-track"><div class="ws-fill" style="width:0%;background:#22C55E" data-target="100"></div></div><span class="ws-pct" style="color:#22C55E">100%</span></div>
+      <div class="ws-time ws-col-time">~2h <span data-t="done_lbl">completato</span></div>
+      <div class="ws-badge-time"><span class="badge bd"><i class="ph ph-check"></i> <span data-t="badge_done">Fatto</span></span></div>
+    </div>
+
+    <div class="ws-row">
+      <div class="ws-name">
+        <div class="ws-ico" style="background:#ECFDF5;color:#15803D"><i class="ph ph-map-pin"></i></div>
+        <div>
+          <div class="ws-tname" data-t="t4_name">Google Maps Platform — 3 API configurate</div>
+          <div class="ws-tsub" data-t="t4_sub">Maps JS + Places + Geocoding — chiave ristretta ai domini autorizzati</div>
+          <div class="ws-time-mobile" data-t="t4_time_m">~2h — ✅ completato</div>
+        </div>
+      </div>
+      <div class="ws-phase ws-col-phase" data-t="t4_phase">Mappe</div>
+      <div class="ws-prog ws-col-prog"><div class="ws-track"><div class="ws-fill" style="width:0%;background:#22C55E" data-target="100"></div></div><span class="ws-pct" style="color:#22C55E">100%</span></div>
+      <div class="ws-time ws-col-time">~2h <span data-t="done_lbl">completato</span></div>
+      <div class="ws-badge-time"><span class="badge bd"><i class="ph ph-check"></i> <span data-t="badge_done">Fatto</span></span></div>
+    </div>
+
+    <div class="ws-row">
+      <div class="ws-name">
+        <div class="ws-ico" style="background:#ECFDF5;color:#15803D"><i class="ph ph-code"></i></div>
+        <div>
+          <div class="ws-tname" data-t="t5_name">Prototipo Web Interattivo</div>
+          <div class="ws-tsub" data-t="t5_sub">HTML5 navigabile — mappa + inserimento POI simulato + tutte le schermate</div>
+          <div class="ws-time-mobile" data-t="t5_time_m">~12h — ✅ completato</div>
+        </div>
+      </div>
+      <div class="ws-phase ws-col-phase" data-t="t5_phase">UX/UI</div>
+      <div class="ws-prog ws-col-prog"><div class="ws-track"><div class="ws-fill" style="width:0%;background:#22C55E" data-target="100"></div></div><span class="ws-pct" style="color:#22C55E">100%</span></div>
+      <div class="ws-time ws-col-time">~12h <span data-t="done_lbl">completato</span></div>
+      <div class="ws-badge-time"><span class="badge bd"><i class="ph ph-check"></i> <span data-t="badge_done">Fatto</span></span></div>
+    </div>
+
+    <div class="ws-row">
+      <div class="ws-name">
+        <div class="ws-ico" style="background:#ECFDF5;color:#15803D"><i class="ph ph-file-text"></i></div>
+        <div>
+          <div class="ws-tname" data-t="t6_name">Cultural Bridge OS — Architettura documentata</div>
+          <div class="ws-tsub" data-t="t6_sub">Framework open source, guida al fork, rotte culturali albanesi</div>
+          <div class="ws-time-mobile" data-t="t6_time_m">~4h — ✅ completato</div>
+        </div>
+      </div>
+      <div class="ws-phase ws-col-phase" data-t="t6_phase">Documentazione</div>
+      <div class="ws-prog ws-col-prog"><div class="ws-track"><div class="ws-fill" style="width:0%;background:#22C55E" data-target="100"></div></div><span class="ws-pct" style="color:#22C55E">100%</span></div>
+      <div class="ws-time ws-col-time">~4h <span data-t="done_lbl">completato</span></div>
+      <div class="ws-badge-time"><span class="badge bd"><i class="ph ph-check"></i> <span data-t="badge_done">Fatto</span></span></div>
+    </div>
+
+    <!-- 🟡 SPRINT -->
+    <div class="ws-row">
+      <div class="ws-name">
+        <div class="ws-ico" style="background:#FEF2F2;color:var(--red)"><i class="ph ph-cloud-arrow-up"></i></div>
+        <div>
+          <div class="ws-tname" data-t="t7_name">Plesk Media Server — API Upload Foto</div>
+          <div class="ws-tsub" data-t="t7_sub">Cartelle + endpoint PHP per upload massimo 3 foto per POI</div>
+          <div class="ws-time-mobile" data-t="t7_time_m">~3h — 🔴 sprint</div>
+        </div>
+      </div>
+      <div class="ws-phase ws-col-phase" data-t="t7_phase">Infrastruttura</div>
+      <div class="ws-prog ws-col-prog"><div class="ws-track"><div class="ws-fill" style="width:0%;background:#F59E0B" data-target="0"></div></div><span class="ws-pct" style="color:#F59E0B">0%</span></div>
+      <div class="ws-time ws-col-time">~3h</div>
+      <div class="ws-badge-time"><span class="badge bs"><i class="ph ph-lightning"></i> <span data-t="badge_sprint">Sprint</span></span></div>
+    </div>
+
+    <div class="ws-row">
+      <div class="ws-name">
+        <div class="ws-ico" style="background:#EFF6FF;color:var(--blue)"><i class="ph ph-device-mobile"></i></div>
+        <div>
+          <div class="ws-tname" data-t="t8_name">App Expo / React Native — Setup + Autenticazione</div>
+          <div class="ws-tsub" data-t="t8_sub">Navigazione, Google Sign-In, schermata mappa base con layer POI</div>
+          <div class="ws-time-mobile" data-t="t8_time_m">~6h — 🔴 sprint</div>
+        </div>
+      </div>
+      <div class="ws-phase ws-col-phase" data-t="t8_phase">App Mobile</div>
+      <div class="ws-prog ws-col-prog"><div class="ws-track"><div class="ws-fill" style="width:0%;background:var(--blue)" data-target="0"></div></div><span class="ws-pct" style="color:var(--blue)">0%</span></div>
+      <div class="ws-time ws-col-time">~6h</div>
+      <div class="ws-badge-time"><span class="badge bs"><i class="ph ph-lightning"></i> <span data-t="badge_sprint">Sprint</span></span></div>
+    </div>
+
+    <!-- 🔵 PROSSIMI -->
+    <div class="ws-row">
+      <div class="ws-name">
+        <div class="ws-ico" style="background:#EFF6FF;color:var(--blue)"><i class="ph ph-plus-circle"></i></div>
+        <div>
+          <div class="ws-tname" data-t="t9_name">Inserimento POI — Flusso Core &lt; 90 secondi</div>
+          <div class="ws-tsub" data-t="t9_sub">GPS automatico, 3 foto, 200 caratteri, 1 tag — cuore dell'esperienza</div>
+          <div class="ws-time-mobile" data-t="t9_time_m">~10h — 🔵 prossimo</div>
+        </div>
+      </div>
+      <div class="ws-phase ws-col-phase" data-t="t9_phase">App Mobile</div>
+      <div class="ws-prog ws-col-prog"><div class="ws-track"><div class="ws-fill" style="width:0%;background:#C0B0A0" data-target="0"></div></div><span class="ws-pct" style="color:#A09080">0%</span></div>
+      <div class="ws-time ws-col-time">~10h</div>
+      <div class="ws-badge-time"><span class="badge bn"><i class="ph ph-clock"></i> <span data-t="badge_next">Prossimo</span></span></div>
+    </div>
+
+    <div class="ws-row">
+      <div class="ws-name">
+        <div class="ws-ico" style="background:#EFF6FF;color:var(--blue)"><i class="ph ph-heart"></i></div>
+        <div>
+          <div class="ws-tname" data-t="t10_name">Sistema LOVE + Reputazione utenti</div>
+          <div class="ws-tsub" data-t="t10_sub">Il like è reputazione reale e visibile per chi condivide il POI</div>
+          <div class="ws-time-mobile" data-t="t10_time_m">~6h — 🔵 prossimo</div>
+        </div>
+      </div>
+      <div class="ws-phase ws-col-phase" data-t="t10_phase">App Mobile</div>
+      <div class="ws-prog ws-col-prog"><div class="ws-track"><div class="ws-fill" style="width:0%;background:#C0B0A0" data-target="0"></div></div><span class="ws-pct" style="color:#A09080">0%</span></div>
+      <div class="ws-time ws-col-time">~6h</div>
+      <div class="ws-badge-time"><span class="badge bn"><i class="ph ph-clock"></i> <span data-t="badge_next">Prossimo</span></span></div>
+    </div>
+
+    <div class="ws-row">
+      <div class="ws-name">
+        <div class="ws-ico" style="background:#EFF6FF;color:var(--blue)"><i class="ph ph-list"></i></div>
+        <div>
+          <div class="ws-tname" data-t="t11_name">Liste Personali — Pubbliche / Private</div>
+          <div class="ws-tsub" data-t="t11_sub">Condivisibili via link, gestite da Supabase RLS con permessi granulari</div>
+          <div class="ws-time-mobile" data-t="t11_time_m">~6h — 🔵 prossimo</div>
+        </div>
+      </div>
+      <div class="ws-phase ws-col-phase" data-t="t11_phase">App Mobile</div>
+      <div class="ws-prog ws-col-prog"><div class="ws-track"><div class="ws-fill" style="width:0%;background:#C0B0A0" data-target="0"></div></div><span class="ws-pct" style="color:#A09080">0%</span></div>
+      <div class="ws-time ws-col-time">~6h</div>
+      <div class="ws-badge-time"><span class="badge bn"><i class="ph ph-clock"></i> <span data-t="badge_next">Prossimo</span></span></div>
+    </div>
+
+    <!-- ⚪ FUTURO -->
+    <div class="ws-row">
+      <div class="ws-name">
+        <div class="ws-ico" style="background:var(--gray);color:var(--muted)"><i class="ph ph-shield-check"></i></div>
+        <div>
+          <div class="ws-tname" data-t="t12_name">Privacy Policy + Termini di Servizio</div>
+          <div class="ws-tsub" data-t="t12_sub">Obbligatori per App Store e Google Play — conformi al GDPR</div>
+          <div class="ws-time-mobile" data-t="t12_time_m">~3h — futuro</div>
+        </div>
+      </div>
+      <div class="ws-phase ws-col-phase" data-t="t12_phase">Legale</div>
+      <div class="ws-prog ws-col-prog"><div class="ws-track"><div class="ws-fill" style="width:0%;background:#C0B0A0" data-target="0"></div></div><span class="ws-pct" style="color:#A09080">0%</span></div>
+      <div class="ws-time ws-col-time">~3h</div>
+      <div class="ws-badge-time"><span class="badge bf"><i class="ph ph-hourglass"></i> <span data-t="badge_future">Futuro</span></span></div>
+    </div>
+
+    <div class="ws-row">
+      <div class="ws-name">
+        <div class="ws-ico" style="background:var(--gray);color:var(--muted)"><i class="ph ph-storefront"></i></div>
+        <div>
+          <div class="ws-tname" data-t="t13_name">App Store + Google Play — Submission</div>
+          <div class="ws-tsub" data-t="t13_sub">Screenshot, descrizioni, review Apple 1-3gg, Google 2-7gg</div>
+          <div class="ws-time-mobile" data-t="t13_time_m">~5h — futuro</div>
+        </div>
+      </div>
+      <div class="ws-phase ws-col-phase" data-t="t13_phase">Lancio</div>
+      <div class="ws-prog ws-col-prog"><div class="ws-track"><div class="ws-fill" style="width:0%;background:#C0B0A0" data-target="0"></div></div><span class="ws-pct" style="color:#A09080">0%</span></div>
+      <div class="ws-time ws-col-time">~5h</div>
+      <div class="ws-badge-time"><span class="badge bf"><i class="ph ph-hourglass"></i> <span data-t="badge_future">Futuro</span></span></div>
+    </div>
+
+    <div class="ws-row">
+      <div class="ws-name">
+        <div class="ws-ico" style="background:var(--gray);color:var(--muted)"><i class="ph ph-megaphone"></i></div>
+        <div>
+          <div class="ws-tname" data-t="t14_name">Campagna Lancio — Hacker News, Reddit, Twitter</div>
+          <div class="ws-tsub" data-t="t14_sub">Show HN post, r/opensource, thread Twitter founder story</div>
+          <div class="ws-time-mobile" data-t="t14_time_m">~4h — futuro</div>
+        </div>
+      </div>
+      <div class="ws-phase ws-col-phase" data-t="t14_phase">Marketing</div>
+      <div class="ws-prog ws-col-prog"><div class="ws-track"><div class="ws-fill" style="width:0%;background:#C0B0A0" data-target="0"></div></div><span class="ws-pct" style="color:#A09080">0%</span></div>
+      <div class="ws-time ws-col-time">~4h</div>
+      <div class="ws-badge-time"><span class="badge bf"><i class="ph ph-hourglass"></i> <span data-t="badge_future">Futuro</span></span></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- SPRINT CRITICO -->
+<div class="sec sprint">
+  <div class="sp-hdr">
+    <div style="width:40px;height:40px;background:rgba(212,43,43,0.22);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:19px;color:var(--red);flex-shrink:0">
+      <i class="ph ph-rocket-launch"></i>
+    </div>
+    <div>
+      <div class="sp-ttl" data-t="sprint_title">Sprint Critico — 7 Giorni</div>
+      <div class="sp-sub" data-t="sprint_sub">Piano d'azione per la candidatura Anthropic for Startups</div>
+    </div>
+  </div>
+  <!-- due scadenze sempre visibili -->
+  <div class="sp-deadlines">
+    <div class="sp-dl-card sp-dl-critical">
+      <div class="sp-dl-lbl" data-t="deadline_anthropic_lbl">⚡ Scadenza Anthropic</div>
+      <div class="sp-dl-date" data-t="deadline_anthropic_date">1 Maggio 2026</div>
+    </div>
+    <div class="sp-dl-card sp-dl-launch">
+      <div class="sp-dl-lbl" data-t="deadline_tirana_lbl">🚀 Lancio Tirana</div>
+      <div class="sp-dl-date" data-t="deadline_tirana_date">Giugno 2026</div>
+    </div>
+  </div>
+  <!-- griglia scrollabile su mobile -->
+  <div class="sp-grid-wrap">
+    <div class="sp-grid">
+      <div class="sp-day today">
+        <div class="sp-lbl" data-t="day_today">Oggi</div>
+        <div class="sp-num">24</div>
+        <div class="sp-task" data-t="day1_task">SAL Investitori + Form Anthropic</div>
+      </div>
+      <div class="sp-day">
+        <div class="sp-lbl" data-t="day_fri">Ven</div>
+        <div class="sp-num">25</div>
+        <div class="sp-task" data-t="day2_task">Hacker News Show HN post</div>
+      </div>
+      <div class="sp-day">
+        <div class="sp-lbl" data-t="day_sat">Sab</div>
+        <div class="sp-num">26</div>
+        <div class="sp-task" data-t="day3_task">Expo setup + Google Maps</div>
+      </div>
+      <div class="sp-day">
+        <div class="sp-lbl" data-t="day_sun">Dom</div>
+        <div class="sp-num">27</div>
+        <div class="sp-task" data-t="day4_task">Schermata Mappa + POI</div>
+      </div>
+      <div class="sp-day">
+        <div class="sp-lbl" data-t="day_mon">Lun</div>
+        <div class="sp-num">28</div>
+        <div class="sp-task" data-t="day5_task">Supabase Integration</div>
+      </div>
+      <div class="sp-day">
+        <div class="sp-lbl" data-t="day_tue">Mar</div>
+        <div class="sp-num">29</div>
+        <div class="sp-task" data-t="day6_task">Video demo + Plesk API</div>
+      </div>
+      <div class="sp-day dl">
+        <div class="sp-lbl" data-t="day_wed">Mer</div>
+        <div class="sp-num" style="color:var(--red)">30</div>
+        <div class="sp-task" style="color:rgba(255,110,110,0.9)" data-t="day7_task">Submit Anthropic 🚀</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MILESTONES -->
+<div class="sec">
+  <div class="sec-hdr">
+    <div class="sec-icon si-g"><i class="ph ph-flag-pennant"></i></div>
+    <div><div class="sec-ttl" data-t="ms_title">Milestone di Progetto</div>
+    <div class="sec-sub" data-t="ms_sub">Roadmap dal lancio di Tirana alla scalabilità globale</div></div>
+  </div>
+  <div class="ms-grid">
+    <div class="ms-card" style="border-top:3px solid var(--green)">
+      <div class="ms-date" data-t="ms1_date">✓ Completata</div>
+      <div class="ms-ttl" data-t="ms1_title">Prototipo Web + Infrastruttura</div>
+      <div class="ms-desc" data-t="ms1_desc">Demo live, database Supabase, autenticazione Google, API Maps configurate.</div>
+      <div class="ms-status" style="color:var(--green)"><i class="ph ph-check-circle"></i> <span data-t="ms1_status">Rilasciato</span></div>
+    </div>
+    <div class="ms-card" style="border-top:3px solid var(--red)">
+      <div class="ms-date" data-t="ms2_date">🎯 Giugno 2026</div>
+      <div class="ms-ttl" data-t="ms2_title">MVP App iOS + Android</div>
+      <div class="ms-desc" data-t="ms2_desc">Lancio pubblico a Tirana. Mappa, inserimento POI, liste, sistema LOVE.</div>
+      <div class="ms-status" style="color:var(--red)"><i class="ph ph-lightning"></i> <span data-t="ms2_status">In sviluppo</span></div>
+    </div>
+    <div class="ms-card" style="border-top:3px solid var(--blue)">
+      <div class="ms-date">Q1 2027</div>
+      <div class="ms-ttl" data-t="ms3_title">POI•VOICE — Audio Guide AI</div>
+      <div class="ms-desc" data-t="ms3_desc">Guide audio generate da Claude. Pipeline AI proprietaria. Nessun servizio terzo.</div>
+      <div class="ms-status" style="color:var(--blue)"><i class="ph ph-hourglass"></i> <span data-t="ms3_status">Pianificata</span></div>
+    </div>
+    <div class="ms-card" style="border-top:3px solid #7C3AED">
+      <div class="ms-date">Q3 2027</div>
+      <div class="ms-ttl" data-t="ms4_title">Il Libro dei Luoghi</div>
+      <div class="ms-desc" data-t="ms4_desc">Pubblicazione fisica dei luoghi più amati dalla community. Primo stream di ricavi.</div>
+      <div class="ms-status" style="color:#7C3AED"><i class="ph ph-book-open"></i> <span data-t="ms4_status">Roadmap</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- STACK TECNOLOGICO -->
+<div class="sec">
+  <div class="sec-hdr">
+    <div class="sec-icon si-b"><i class="ph ph-stack"></i></div>
+    <div><div class="sec-ttl" data-t="stack_title">Stack Tecnologico</div>
+    <div class="sec-sub" data-t="stack_sub">Ogni componente del sistema e il suo stato attuale</div></div>
+  </div>
+  <div class="tech-grid">
+    <div class="tech-card">
+      <div class="tech-ico" style="background:#ECFDF5;color:#15803D"><i class="ph ph-database"></i></div>
+      <div class="tech-info"><div class="tech-name">Supabase</div><div class="tech-role" data-t="tech1_role">PostgreSQL + RLS + Auth + Realtime</div></div>
+      <span class="badge bd" data-t="tech_active">Attivo</span>
+    </div>
+    <div class="tech-card">
+      <div class="tech-ico" style="background:#ECFDF5;color:#15803D"><i class="ph ph-map-pin"></i></div>
+      <div class="tech-info"><div class="tech-name">Google Maps Platform</div><div class="tech-role" data-t="tech2_role">Maps JS + Places + Geocoding API</div></div>
+      <span class="badge bd" data-t="tech_active">Attivo</span>
+    </div>
+    <div class="tech-card">
+      <div class="tech-ico" style="background:#ECFDF5;color:#15803D"><i class="ph ph-github-logo"></i></div>
+      <div class="tech-info"><div class="tech-name">GitHub + Pages</div><div class="tech-role" data-t="tech3_role">Repo pubblico + CI/CD + Demo live</div></div>
+      <span class="badge bd" data-t="tech_active">Attivo</span>
+    </div>
+    <div class="tech-card">
+      <div class="tech-ico" style="background:#FFFBEB;color:#B45309"><i class="ph ph-device-mobile"></i></div>
+      <div class="tech-info"><div class="tech-name">Expo / React Native</div><div class="tech-role" data-t="tech4_role">iOS + Android da un unico codebase</div></div>
+      <span class="badge bs" data-t="tech_start">Da avviare</span>
+    </div>
+    <div class="tech-card">
+      <div class="tech-ico" style="background:#FFFBEB;color:#B45309"><i class="ph ph-cloud-arrow-up"></i></div>
+      <div class="tech-info"><div class="tech-name">Plesk Media Server</div><div class="tech-role" data-t="tech5_role">Storage foto proprietario — API PHP custom</div></div>
+      <span class="badge bs" data-t="tech_config">Da configurare</span>
+    </div>
+    <div class="tech-card">
+      <div class="tech-ico" style="background:#EFF6FF;color:var(--blue)"><i class="ph ph-robot"></i></div>
+      <div class="tech-info"><div class="tech-name">Claude + Gemini</div><div class="tech-role" data-t="tech6_role">AI pipeline: enrichment, categorizzazione, audio guide future</div></div>
+      <span class="badge bn" data-t="tech_phase2">Fase 2</span>
+    </div>
+  </div>
+</div>
+
+<!-- ANTHROPIC CTA -->
+<div class="sec cta-box">
+  <div>
+    <div class="cta-ttl" data-t="cta_title">Candidatura Anthropic for Startups</div>
+    <div class="cta-p" data-t="cta_desc">6 mesi di crediti API gratuiti. Scadenza: 1 Maggio 2026. POI•LOVE usa Claude come core AI pipeline per categorizzazione POI, moderazione contenuti e future audio guide culturali (POI•VOICE). Il progetto è esattamente ciò che Anthropic supporta: open source, impatto sociale, geografie sottorappresentate sulle mappe commerciali.</div>
+  </div>
+  <a href="https://anthropic.com/startups" target="_blank" class="cta-btn" data-t="cta_btn">Apri il Form →</a>
+</div>
+
+<!-- LINK RAPIDI -->
+<div class="sec">
+  <div class="sec-hdr">
+    <div class="sec-icon si-r"><i class="ph ph-link"></i></div>
+    <div><div class="sec-ttl" data-t="links_title">Link Rapidi</div></div>
+  </div>
+  <div class="tech-grid">
+    <div class="tech-card">
+      <div class="tech-ico" style="background:var(--gray);color:var(--red)"><i class="ph ph-globe"></i></div>
+      <div class="tech-info"><div class="tech-name" data-t="link1_name">Demo Live</div><div class="tech-role">acastagna.github.io/poi-love</div></div>
+      <a href="https://acastagna.github.io/poi-love/" target="_blank" class="badge bd" style="text-decoration:none" data-t="open_link">Apri →</a>
+    </div>
+    <div class="tech-card">
+      <div class="tech-ico" style="background:var(--gray);color:var(--muted)"><i class="ph ph-github-logo"></i></div>
+      <div class="tech-info"><div class="tech-name">Repository GitHub</div><div class="tech-role">github.com/acastagna/poi-love</div></div>
+      <a href="https://github.com/acastagna/poi-love" target="_blank" class="badge bd" style="text-decoration:none" data-t="open_link">Apri →</a>
+    </div>
+    <div class="tech-card">
+      <div class="tech-ico" style="background:var(--gray);color:var(--muted)"><i class="ph ph-buildings"></i></div>
+      <div class="tech-info"><div class="tech-name" data-t="link3_name">Sito Ufficiale</div><div class="tech-role">poilove.com</div></div>
+      <a href="https://poilove.com" target="_blank" class="badge bd" style="text-decoration:none" data-t="open_link">Apri →</a>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<footer class="footer">
+  <div class="ft-brand">
+    <img src="https://poilove.com/img/logo-completo.svg" alt="POI•LOVE"
+      onerror="this.style.display='none';document.getElementById('ftLogoText').style.display='block'">
+    <span id="ftLogoText" class="ft-brand-name" style="display:none">POI•LOVE</span>
+  </div>
+  <div class="ft-links">
+    <a href="https://github.com/acastagna/poi-love" target="_blank">GitHub</a>
+    <a href="https://acastagna.github.io/poi-love/" target="_blank" data-t="link_demo">Demo Live</a>
+    <a href="https://poilove.com" target="_blank">poilove.com</a>
+  </div>
+  <div class="ft-copy">
+    <div>© 2026 Alessandro Castagna · 321.al · Tirana</div>
+    <div data-t="footer_copy">SAL — Documento per investitori e partner</div>
+  </div>
+</footer>
+
+<script>
+/* ═══════════════════════════════════════════
+   TRADUZIONI
+═══════════════════════════════════════════ */
+/* lingua: 1) pulsante cliccato (localStorage) 2) device 3) fallback en */
+let LANG = (() => {
+  const saved = localStorage.getItem('poilove_sal_lang');
+  if (saved) return saved;
+  const l = (navigator.language || 'en').toLowerCase();
+  if (l.startsWith('it')) return 'it';
+  if (l.startsWith('sq')) return 'sq';
+  return 'en';
+})();
+
+function switchLang(lang) {
+  LANG = lang;
+  tr = T[lang];
+  localStorage.setItem('poilove_sal_lang', lang);
+  applyTranslations();
+  updateLangButtons();
+  rebuildPieLegend();
+}
+
+function updateLangButtons() {
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === LANG);
+  });
+  document.documentElement.lang = LANG;
+}
+
+function applyTranslations() {
+  const tr = T[LANG];
+  document.querySelectorAll('[data-t]').forEach(el => {
+    const key = el.dataset.t;
+    if (tr[key] !== undefined) el.textContent = tr[key];
+  });
+}
+
+function rebuildPieLegend() {
+  /* applyTranslations() aggiorna già tutti i [data-t] inclusi legenda e cLbl.
+     Qui aggiorniamo SOLO il popup se uno spicchio è aperto. */
+  if (curSlice !== null) {
+    document.getElementById('ppTtl').textContent = T[LANG][PIE[curSlice].label_key];
+    const items = document.getElementById('ppItems');
+    items.innerHTML = '';
+    PIE[curSlice].items.forEach(it => {
+      const d = document.createElement('div');
+      d.className = 'pp-item';
+      d.innerHTML = `<span class="pp-ic" style="color:${PIE[curSlice].color}"><i class="ph ph-${it.done?'check-circle':'circle-dashed'}"></i></span><span>${resolveKey(it.key,LANG)}</span>`;
+      items.appendChild(d);
+    });
+  }
+}
+
+const T = {
+  it: {
+    sal_badge:'SAL — Stato Avanzamento Lavori', updated_date:'Aggiornato: 24 Aprile 2026',
+    status_pill:'MVP in sviluppo', hero_sub:'Stato del Progetto',
+    hero_desc:'Mappa comunitaria dei luoghi amati. Prima istanza: Albania · Tirana. Lancio previsto giugno 2026. Framework open source Cultural Bridge OS — Licenza MIT.',
+    kpi_done:'Completamento', kpi_weeks:'Settimane al lancio', kpi_tables:'Tabelle database', kpi_license:'Licenza',
+    area_title:'Avanzamento per Area', area_sub:'Stato corrente delle 4 macro-aree di progetto',
+    lbl_done:'✓ Completata', lbl_active:'↗ In corso', lbl_todo:'○ Da avviare', lbl_critical:'⚡ Critico',
+    area1:'Infrastruttura & Backend', area2:'App Mobile iOS/Android', area3:'UX/UI & Contenuti', area4:'Lancio & Distribuzione',
+    chart_title:'Distribuzione del lavoro — tocca uno spicchio',
+    chart_sub:'🟢 Verde = completato · 🟡 Giallo = in costruzione · 🔴 Rosso = da fare',
+    completed_lbl:'completato',
+    pie_done:'Completato', pie_active:'In costruzione', pie_todo:'Da fare',
+    ws_title:'Dettaglio Attività', ws_sub:'Stato, fase, tempo stimato e avanzamento di ogni deliverable',
+    col_activity:'Attività', col_phase:'Fase', col_progress:'Progresso', col_time:'Tempo stimato', col_status:'Stato',
+    t1_name:'Repository GitHub + Pages', t1_sub:'acastagna/poi-love — Demo live attiva su GitHub Pages', t1_phase:'Infrastruttura', t1_time_m:'~8h — ✅ completato',
+    t2_name:'Schema Supabase — 9 tabelle + RLS', t2_sub:'POIs, Profiles, Loves, Lists, Categories, Routes, Media, Card Generations + visibility 3 stati', t2_phase:'Backend', t2_time_m:'~6h — ✅ completato',
+    t3_name:'Google OAuth — Autenticazione utenti', t3_sub:'Supabase Auth + Google Cloud Console configurati e attivi', t3_phase:'Autenticazione', t3_time_m:'~2h — ✅ completato',
+    t4_name:'Google Maps Platform — 3 API configurate', t4_sub:'Maps JS + Places + Geocoding — chiave ristretta ai domini autorizzati', t4_phase:'Mappe', t4_time_m:'~2h — ✅ completato',
+    t5_name:'Prototipo Web Interattivo', t5_sub:'HTML5 navigabile — mappa + inserimento POI simulato + tutte le schermate', t5_phase:'UX/UI', t5_time_m:'~12h — ✅ completato',
+    t6_name:'Cultural Bridge OS — Architettura documentata', t6_sub:'Framework open source, guida al fork, rotte culturali albanesi', t6_phase:'Documentazione', t6_time_m:'~4h — ✅ completato',
+    t7_name:'Plesk Media Server — API Upload Foto', t7_sub:'Cartelle + endpoint PHP per upload massimo 3 foto per POI', t7_phase:'Infrastruttura', t7_time_m:'~3h — 🔴 sprint',
+    t8_name:'App Expo / React Native — Setup + Autenticazione', t8_sub:'Navigazione, Google Sign-In, schermata mappa base con layer POI', t8_phase:'App Mobile', t8_time_m:'~6h — 🔴 sprint',
+    t9_name:'Inserimento POI — Flusso Core < 90 secondi', t9_sub:'GPS automatico, 3 foto, 200 caratteri, 1 tag — cuore dell\'esperienza', t9_phase:'App Mobile', t9_time_m:'~10h — 🔵 prossimo',
+    t10_name:'Sistema LOVE + Reputazione utenti', t10_sub:'Il like è reputazione reale e visibile per chi condivide il POI', t10_phase:'App Mobile', t10_time_m:'~6h — 🔵 prossimo',
+    t11_name:'Liste Personali — Pubbliche / Private', t11_sub:'Condivisibili via link, gestite da Supabase RLS con permessi granulari', t11_phase:'App Mobile', t11_time_m:'~6h — 🔵 prossimo',
+    t12_name:'Privacy Policy + Termini di Servizio', t12_sub:'Obbligatori per App Store e Google Play — conformi al GDPR', t12_phase:'Legale', t12_time_m:'~3h — futuro',
+    t13_name:'App Store + Google Play — Submission', t13_sub:'Screenshot, descrizioni, review Apple 1-3gg, Google 2-7gg', t13_phase:'Lancio', t13_time_m:'~5h — futuro',
+    t14_name:'Campagna Lancio — Hacker News, Reddit, Twitter', t14_sub:'Show HN post, r/opensource, thread Twitter founder story', t14_phase:'Marketing', t14_time_m:'~4h — futuro',
+    done_lbl:'completato', badge_done:'Fatto', badge_sprint:'Sprint', badge_next:'Prossimo', badge_future:'Futuro',
+    deadline_anthropic_lbl:'⚡ Scadenza Anthropic', deadline_anthropic_date:'1 Maggio 2026',
+    deadline_tirana_lbl:'🚀 Lancio Tirana', deadline_tirana_date:'Giugno 2026',
+    browser_banner:'📱 Per la migliore esperienza, apri in <strong>Safari</strong> o <strong>Chrome</strong>',
+    sprint_title:'Sprint Critico — 7 Giorni', sprint_sub:'Piano d\'azione per la candidatura Anthropic for Startups',
+    day_today:'Oggi', day_fri:'Ven', day_sat:'Sab', day_sun:'Dom', day_mon:'Lun', day_tue:'Mar', day_wed:'Mer',
+    day1_task:'SAL Investitori + Form Anthropic', day2_task:'Hacker News Show HN post', day3_task:'Expo setup + Google Maps',
+    day4_task:'Schermata Mappa + POI', day5_task:'Supabase Integration', day6_task:'Video demo + Plesk API', day7_task:'Submit Anthropic 🚀',
+    ms_title:'Milestone di Progetto', ms_sub:'Roadmap dal lancio di Tirana alla scalabilità globale',
+    ms1_date:'✓ Completata', ms1_title:'Prototipo Web + Infrastruttura', ms1_desc:'Demo live, database Supabase, autenticazione Google, API Maps configurate.', ms1_status:'Rilasciato',
+    ms2_date:'🎯 Giugno 2026', ms2_title:'MVP App iOS + Android', ms2_desc:'Lancio pubblico a Tirana. Mappa, inserimento POI, liste, sistema LOVE.', ms2_status:'In sviluppo',
+    ms3_title:'POI•VOICE — Audio Guide AI', ms3_desc:'Guide audio generate da Claude. Pipeline AI proprietaria. Nessun servizio terzo.', ms3_status:'Pianificata',
+    ms4_title:'Il Libro dei Luoghi', ms4_desc:'Pubblicazione fisica dei luoghi più amati dalla community. Primo stream di ricavi.', ms4_status:'Roadmap',
+    stack_title:'Stack Tecnologico', stack_sub:'Ogni componente del sistema e il suo stato attuale',
+    tech1_role:'PostgreSQL + RLS + Auth + Realtime', tech2_role:'Maps JS + Places + Geocoding API',
+    tech3_role:'Repo pubblico + CI/CD + Demo live', tech4_role:'iOS + Android da un unico codebase',
+    tech5_role:'Storage foto proprietario — API PHP custom', tech6_role:'AI pipeline: enrichment, categorizzazione, audio guide future',
+    tech_active:'Attivo', tech_start:'Da avviare', tech_config:'Da configurare', tech_phase2:'Fase 2',
+    cta_title:'Candidatura Anthropic for Startups',
+    cta_desc:'6 mesi di crediti API gratuiti. Scadenza: 1 Maggio 2026. POI•LOVE usa Claude come core AI pipeline per categorizzazione POI, moderazione contenuti e future audio guide culturali (POI•VOICE). Open source, impatto sociale, geografie sottorappresentate.',
+    cta_btn:'Apri il Form →', links_title:'Link Rapidi', link1_name:'Demo Live', link3_name:'Sito Ufficiale',
+    open_link:'Apri →', link_demo:'Demo Live', footer_copy:'SAL — Documento per investitori e partner',
+  },
+  en: {
+    sal_badge:'Project Status Report', updated_date:'Updated: April 24, 2026',
+    status_pill:'MVP in development', hero_sub:'Project Status',
+    hero_desc:'Community map of beloved places. First instance: Albania · Tirana. Launch planned June 2026. Open source framework Cultural Bridge OS — MIT License.',
+    kpi_done:'Completion', kpi_weeks:'Weeks to launch', kpi_tables:'Database tables', kpi_license:'License',
+    area_title:'Progress by Area', area_sub:'Current status of the 4 main project areas',
+    lbl_done:'✓ Completed', lbl_active:'↗ In progress', lbl_todo:'○ Not started', lbl_critical:'⚡ Critical',
+    area1:'Infrastructure & Backend', area2:'Mobile App iOS/Android', area3:'UX/UI & Content', area4:'Launch & Distribution',
+    chart_title:'Work distribution — tap a slice',
+    chart_sub:'🟢 Green = completed · 🟡 Yellow = in progress · 🔴 Red = to do',
+    completed_lbl:'completed',
+    pie_done:'Completed', pie_active:'In progress', pie_todo:'To do',
+    ws_title:'Activity Detail', ws_sub:'Status, phase, estimated time and progress of each deliverable',
+    col_activity:'Activity', col_phase:'Phase', col_progress:'Progress', col_time:'Est. time', col_status:'Status',
+    t1_name:'GitHub Repository + Pages', t1_sub:'acastagna/poi-love — Live demo on GitHub Pages', t1_phase:'Infrastructure', t1_time_m:'~8h — ✅ done',
+    t2_name:'Supabase Schema — 9 tables + RLS', t2_sub:'POIs, Profiles, Loves, Lists, Categories, Routes, Media, Card Generations + 3-state visibility', t2_phase:'Backend', t2_time_m:'~6h — ✅ done',
+    t3_name:'Google OAuth — User authentication', t3_sub:'Supabase Auth + Google Cloud Console configured and active', t3_phase:'Authentication', t3_time_m:'~2h — ✅ done',
+    t4_name:'Google Maps Platform — 3 APIs configured', t4_sub:'Maps JS + Places + Geocoding — key restricted to authorized domains', t4_phase:'Maps', t4_time_m:'~2h — ✅ done',
+    t5_name:'Interactive Web Prototype', t5_sub:'Navigable HTML5 — map + simulated POI entry + all screens', t5_phase:'UX/UI', t5_time_m:'~12h — ✅ done',
+    t6_name:'Cultural Bridge OS — Architecture documented', t6_sub:'Open source framework, fork guide, Albanian cultural routes', t6_phase:'Documentation', t6_time_m:'~4h — ✅ done',
+    t7_name:'Plesk Media Server — Photo Upload API', t7_sub:'Folders + PHP endpoint for upload of up to 3 photos per POI', t7_phase:'Infrastructure', t7_time_m:'~3h — 🔴 sprint',
+    t8_name:'Expo / React Native App — Setup + Auth', t8_sub:'Navigation, Google Sign-In, base map screen with POI layer', t8_phase:'Mobile App', t8_time_m:'~6h — 🔴 sprint',
+    t9_name:'POI Entry — Core Flow < 90 seconds', t9_sub:'Auto GPS, 3 photos, 200 chars, 1 tag — heart of the experience', t9_phase:'Mobile App', t9_time_m:'~10h — 🔵 next',
+    t10_name:'LOVE System + User Reputation', t10_sub:'A like is real, visible reputation for whoever shares the POI', t10_phase:'Mobile App', t10_time_m:'~6h — 🔵 next',
+    t11_name:'Personal Lists — Public / Private', t11_sub:'Shareable via link, managed by Supabase RLS with granular permissions', t11_phase:'Mobile App', t11_time_m:'~6h — 🔵 next',
+    t12_name:'Privacy Policy + Terms of Service', t12_sub:'Required for App Store and Google Play — GDPR compliant', t12_phase:'Legal', t12_time_m:'~3h — future',
+    t13_name:'App Store + Google Play — Submission', t13_sub:'Screenshots, descriptions, Apple review 1-3d, Google 2-7d', t13_phase:'Launch', t13_time_m:'~5h — future',
+    t14_name:'Launch Campaign — Hacker News, Reddit, Twitter', t14_sub:'Show HN post, r/opensource, Twitter founder story thread', t14_phase:'Marketing', t14_time_m:'~4h — future',
+    done_lbl:'done', badge_done:'Done', badge_sprint:'Sprint', badge_next:'Next', badge_future:'Future',
+    deadline_anthropic_lbl:'⚡ Anthropic Deadline', deadline_anthropic_date:'May 1, 2026',
+    deadline_tirana_lbl:'🚀 Tirana Launch', deadline_tirana_date:'June 2026',
+    browser_banner:'📱 For the best experience, open in <strong>Safari</strong> or <strong>Chrome</strong>',
+    sprint_title:'Critical Sprint — 7 Days', sprint_sub:'Action plan for the Anthropic for Startups application',
+    day_today:'Today', day_fri:'Fri', day_sat:'Sat', day_sun:'Sun', day_mon:'Mon', day_tue:'Tue', day_wed:'Wed',
+    day1_task:'Investor SAL + Anthropic Form', day2_task:'Hacker News Show HN post', day3_task:'Expo setup + Google Maps',
+    day4_task:'Map Screen + POI', day5_task:'Supabase Integration', day6_task:'Video demo + Plesk API', day7_task:'Submit Anthropic 🚀',
+    ms_title:'Project Milestones', ms_sub:'Roadmap from Tirana launch to global scale',
+    ms1_date:'✓ Completed', ms1_title:'Web Prototype + Infrastructure', ms1_desc:'Live demo, Supabase database, Google auth, Maps APIs configured.', ms1_status:'Released',
+    ms2_date:'🎯 June 2026', ms2_title:'MVP App iOS + Android', ms2_desc:'Public launch in Tirana. Map, POI entry, lists, LOVE system.', ms2_status:'In development',
+    ms3_title:'POI•VOICE — AI Audio Guides', ms3_desc:'Audio guides generated by Claude. Proprietary AI pipeline. No third-party services.', ms3_status:'Planned',
+    ms4_title:'Il Libro dei Luoghi', ms4_desc:'Physical book of the most loved places from the community. First revenue stream.', ms4_status:'Roadmap',
+    stack_title:'Technology Stack', stack_sub:'Every system component and its current status',
+    tech1_role:'PostgreSQL + RLS + Auth + Realtime', tech2_role:'Maps JS + Places + Geocoding API',
+    tech3_role:'Public repo + CI/CD + Live demo', tech4_role:'iOS + Android from a single codebase',
+    tech5_role:'Proprietary photo storage — custom PHP API', tech6_role:'AI pipeline: enrichment, categorization, future audio guides',
+    tech_active:'Active', tech_start:'To start', tech_config:'To configure', tech_phase2:'Phase 2',
+    cta_title:'Anthropic for Startups Application',
+    cta_desc:'6 months of free API credits. Deadline: May 1, 2026. POI•LOVE uses Claude as a core AI pipeline for POI categorization, content moderation, and future cultural audio guides (POI•VOICE). Open source, social impact, underrepresented geographies.',
+    cta_btn:'Open the Form →', links_title:'Quick Links', link1_name:'Live Demo', link3_name:'Official Website',
+    open_link:'Open →', link_demo:'Live Demo', footer_copy:'Status Report — For investors and partners',
+  },
+  sq: {
+    sal_badge:'Raport i Progresit të Projektit', updated_date:'Përditësuar: 24 Prill 2026',
+    status_pill:'MVP në zhvillim', hero_sub:'Gjendja e Projektit',
+    hero_desc:'Hartë komunitare e vendeve të dashura. Rasti i parë: Shqipëri · Tiranë. Lansim i planifikuar qershor 2026. Kornizë me burim të hapur Cultural Bridge OS — Licencë MIT.',
+    kpi_done:'Përfundim', kpi_weeks:'Javë deri lansim', kpi_tables:'Tabela DB', kpi_license:'Licencë',
+    area_title:'Progres sipas Zonës', area_sub:'Gjendja aktuale e 4 zonave kryesore të projektit',
+    lbl_done:'✓ Përfunduar', lbl_active:'↗ Në progres', lbl_todo:'○ Nuk ka filluar', lbl_critical:'⚡ Kritike',
+    area1:'Infrastrukturë & Backend', area2:'App Mobile iOS/Android', area3:'UX/UI & Përmbajtje', area4:'Lansim & Shpërndarje',
+    chart_title:'Shpërndarja e punës — prek një segment',
+    chart_sub:'🟢 Gjelbër = përfunduar · 🟡 Verdhë = në ndërtim · 🔴 Kuq = për t\'u bërë',
+    completed_lbl:'përfunduar',
+    pie_done:'Përfunduar', pie_active:'Në ndërtim', pie_todo:'Për t\'u bërë',
+    ws_title:'Detajet e Aktiviteteve', ws_sub:'Gjendja, faza, koha e vlerësuar dhe progresi i çdo të dorëzueshmi',
+    col_activity:'Aktivitet', col_phase:'Fazë', col_progress:'Progres', col_time:'Kohë e vlerësuar', col_status:'Gjendje',
+    t1_name:'Depo GitHub + Pages', t1_sub:'acastagna/poi-love — Demo live aktive në GitHub Pages', t1_phase:'Infrastrukturë', t1_time_m:'~8h — ✅ kryer',
+    t2_name:'Skema Supabase — 9 tabela + RLS', t2_sub:'POIs, Profiles, Loves, Lists, Categories, Routes, Media, Card Generations + dukshmëria 3 gjendja', t2_phase:'Backend', t2_time_m:'~6h — ✅ kryer',
+    t3_name:'Google OAuth — Autentikimi i përdoruesve', t3_sub:'Supabase Auth + Google Cloud Console të konfiguruara dhe aktive', t3_phase:'Autentikim', t3_time_m:'~2h — ✅ kryer',
+    t4_name:'Google Maps Platform — 3 API të konfiguruara', t4_sub:'Maps JS + Places + Geocoding — çelës i kufizuar në domenet e autorizuara', t4_phase:'Harta', t4_time_m:'~2h — ✅ kryer',
+    t5_name:'Prototip Web Interaktiv', t5_sub:'HTML5 i lundrueshëm — hartë + futja e POI e simuluar + të gjitha ekranet', t5_phase:'UX/UI', t5_time_m:'~12h — ✅ kryer',
+    t6_name:'Cultural Bridge OS — Arkitekturë e dokumentuar', t6_sub:'Kornizë me burim të hapur, udhëzues fork, rrugë kulturore shqiptare', t6_phase:'Dokumentacion', t6_time_m:'~4h — ✅ kryer',
+    t7_name:'Plesk Media Server — API Upload Fotosh', t7_sub:'Dosje + pikë fundore PHP për ngarkimin e deri 3 fotove për POI', t7_phase:'Infrastrukturë', t7_time_m:'~3h — 🔴 sprint',
+    t8_name:'App Expo / React Native — Konfigurimi + Auth', t8_sub:'Navigimi, Google Sign-In, ekrani bazë i hartës me shtresë POI', t8_phase:'App Mobile', t8_time_m:'~6h — 🔴 sprint',
+    t9_name:'Futja e POI — Rrjedha Bazë < 90 sekonda', t9_sub:'GPS automatik, 3 foto, 200 karaktere, 1 etiketë — zemra e përvojës', t9_phase:'App Mobile', t9_time_m:'~10h — 🔵 tjetri',
+    t10_name:'Sistemi LOVE + Reputacioni i Përdoruesit', t10_sub:'Një pëlqim është reputacion real dhe i dukshëm për atë që ndan POI-në', t10_phase:'App Mobile', t10_time_m:'~6h — 🔵 tjetri',
+    t11_name:'Lista Personale — Publike / Private', t11_sub:'Të ndashme me link, të menaxhuara nga Supabase RLS', t11_phase:'App Mobile', t11_time_m:'~6h — 🔵 tjetri',
+    t12_name:'Politika e Privatësisë + Kushtet e Shërbimit', t12_sub:'Të detyrueshme për App Store dhe Google Play — konforme me GDPR', t12_phase:'Ligjore', t12_time_m:'~3h — e ardhshme',
+    t13_name:'App Store + Google Play — Dorëzim', t13_sub:'Pamje ekrani, përshkrime, rishikim Apple 1-3d, Google 2-7d', t13_phase:'Lansim', t13_time_m:'~5h — e ardhshme',
+    t14_name:'Fushatë Lansimi — Hacker News, Reddit, Twitter', t14_sub:'Show HN post, r/opensource, thread Twitter historia e themeluesit', t14_phase:'Marketing', t14_time_m:'~4h — e ardhshme',
+    done_lbl:'kryer', badge_done:'Kryer', badge_sprint:'Sprint', badge_next:'Tjetri', badge_future:'I ardhshëm',
+    deadline_anthropic_lbl:'⚡ Afati Anthropic', deadline_anthropic_date:'1 Maj 2026',
+    deadline_tirana_lbl:'🚀 Lansimi Tiranë', deadline_tirana_date:'Qershor 2026',
+    browser_banner:'📱 Për përvojën më të mirë, hapeni në <strong>Safari</strong> ose <strong>Chrome</strong>',
+    sprint_title:'Sprint Kritik — 7 Ditë', sprint_sub:'Plan veprimi për aplikimin Anthropic for Startups',
+    day_today:'Sot', day_fri:'Pre', day_sat:'Sht', day_sun:'Die', day_mon:'Hën', day_tue:'Mar', day_wed:'Mër',
+    day1_task:'SAL Investitorë + Formular Anthropic', day2_task:'Hacker News Show HN post', day3_task:'Expo setup + Google Maps',
+    day4_task:'Ekrani Hartës + POI', day5_task:'Integrim Supabase', day6_task:'Video demo + Plesk API', day7_task:'Dorëzo Anthropic 🚀',
+    ms_title:'Piketat e Projektit', ms_sub:'Rrugëtimi nga lansimi i Tiranës deri te shkallëzimi global',
+    ms1_date:'✓ Përfunduar', ms1_title:'Prototip Web + Infrastrukturë', ms1_desc:'Demo live, database Supabase, autentikim Google, API Maps të konfiguruara.', ms1_status:'Lëshuar',
+    ms2_date:'🎯 Qershor 2026', ms2_title:'MVP App iOS + Android', ms2_desc:'Lansim publik në Tiranë. Hartë, futja e POI, lista, sistemi LOVE.', ms2_status:'Në zhvillim',
+    ms3_title:'POI•VOICE — Audio Guida me AI', ms3_desc:'Audio guida të gjeneruara nga Claude. Pipeline AI pronësor. Asnjë shërbim i palëve të treta.', ms3_status:'E planifikuar',
+    ms4_title:'Libri i Vendeve', ms4_desc:'Botim fizik i vendeve më të dashura nga komuniteti. Rrjedha e parë e të ardhurave.', ms4_status:'Rrugëtim',
+    stack_title:'Stiva Teknologjike', stack_sub:'Çdo komponent i sistemit dhe gjendja e tij aktuale',
+    tech1_role:'PostgreSQL + RLS + Auth + Realtime', tech2_role:'Maps JS + Places + Geocoding API',
+    tech3_role:'Repo publik + CI/CD + Demo live', tech4_role:'iOS + Android nga një bazë kodi e vetme',
+    tech5_role:'Ruajtje foto pronësor — API PHP me porosi', tech6_role:'Pipeline AI: pasurimi, kategorizimi, audio guida të ardhshme',
+    tech_active:'Aktiv', tech_start:'Për t\'u nisur', tech_config:'Për t\'u konfiguruar', tech_phase2:'Faza 2',
+    cta_title:'Aplikim Anthropic for Startups',
+    cta_desc:'6 muaj kredite API falas. Afati: 1 Maj 2026. POI•LOVE përdor Claude si pipeline kryesor AI për kategorizimin e POI-ve, moderimin e përmbajtjes dhe audio guidat e ardhshme kulturore (POI•VOICE). Burim i hapur, ndikim social, gjeografi të nënpërfaqësuara.',
+    cta_btn:'Hap Formularin →', links_title:'Lidhje të Shpejta', link1_name:'Demo Live', link3_name:'Faqja Zyrtare',
+    open_link:'Hap →', link_demo:'Demo Live', footer_copy:'Raport Statusi — Për investitorë dhe partnerë',
+  }
+};
+
+// Applica traduzioni iniziali
+applyTranslations();
+updateLangButtons();
+let tr = T[LANG];
+
+/* ═══════════════════════════════════════════
+   GRAFICO A TORTA — SVG interattivo
+═══════════════════════════════════════════ */
+/* PIE usa chiavi di traduzione — si risolve dinamicamente al cambio lingua */
+const PIE = [
+  { id:'done',   color:'#22C55E', value:42, label_key:'pie_done',
+    items:[
+      {key:'t1_name',done:true},{key:'t2_name',done:true},{key:'t3_name',done:true},
+      {key:'t4_name',done:true},{key:'t5_name',done:true},{key:'t6_name',done:true}
+    ]
+  },
+  { id:'active', color:'#F59E0B', value:15, label_key:'pie_active',
+    items:[
+      {key:'t7_name',done:false},{key:'t8_name',done:false},
+      {key:'cta_title',done:false},
+      {key:'_video',done:false}  /* chiave speciale */
+    ]
+  },
+  { id:'todo',   color:'#D42B2B', value:43, label_key:'pie_todo',
+    items:[
+      {key:'t9_name',done:false},{key:'t10_name',done:false},{key:'t11_name',done:false},
+      {key:'t12_name',done:false},{key:'t13_name',done:false},{key:'t14_name',done:false}
+    ]
+  }
+];
+
+/* chiave speciale _video (non è in T perché è uguale in tutte) */
+function resolveKey(key, lang) {
+  if (key === '_video') return { it:'Video demo / animazione', sq:'Video demo / animacion', en:'Video demo / animation' }[lang] || 'Video demo';
+  return T[lang][key] || key;
+}
+
+const CX=100, CY=100, R=84, RI=53;
+function toXY(deg, r){ const a=(deg-90)*Math.PI/180; return {x:CX+r*Math.cos(a), y:CY+r*Math.sin(a)}; }
+function arc(s,e,rr){ const p1=toXY(s,rr), p2=toXY(e,rr), la=(e-s)>180?1:0; return `A ${rr} ${rr} 0 ${la} 1 ${p2.x} ${p2.y}`; }
+function slicePath(s,e){
+  const o1=toXY(s,R), o2=toXY(e,R), i2=toXY(e,RI), i1=toXY(s,RI);
+  const la=(e-s)>180?1:0;
+  return `M${o1.x} ${o1.y} A${R} ${R} 0 ${la} 1 ${o2.x} ${o2.y} L${i2.x} ${i2.y} A${RI} ${RI} 0 ${la} 0 ${i1.x} ${i1.y}Z`;
+}
+
+const svgG = document.getElementById('pieSlices');
+const legL = document.getElementById('legList');
+const popup = document.getElementById('piePopup');
+const overlay = document.getElementById('pieOverlay');
+const total = PIE.reduce((a,d)=>a+d.value,0);
+let curSlice = null, sa = 0;
+const slices=[], legs=[];
+
+PIE.forEach((seg,i)=>{
+  const span=(seg.value/total)*360, ea=sa+span, mid=sa+span/2;
+
+  // path
+  const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+  path.setAttribute('d', slicePath(sa,ea));
+  path.setAttribute('fill', seg.color);
+  path.classList.add('pie-slice');
+  path.addEventListener('click', e=>{e.stopPropagation(); toggle(i);});
+  svgG.appendChild(path);
+  slices.push(path);
+
+  // label
+  const lp=toXY(mid,(R+RI)/2);
+  const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+  t.setAttribute('x',lp.x); t.setAttribute('y',lp.y+4);
+  t.setAttribute('text-anchor','middle');
+  t.setAttribute('font-family','Inter'); t.setAttribute('font-weight','800');
+  t.setAttribute('font-size','11'); t.setAttribute('fill','white');
+  t.setAttribute('pointer-events','none');
+  t.textContent=seg.value+'%';
+  svgG.appendChild(t);
+
+  // legenda
+  const li=document.createElement('div');
+  li.className='leg-item'; li.dataset.index=i;
+  li.innerHTML=`<div class="leg-dot" style="background:${seg.color}"></div><div class="leg-lbl" data-t="${seg.label_key}">${T[LANG][seg.label_key]}</div><div class="leg-pct" style="color:${seg.color}">${seg.value}%</div>`;
+  li.addEventListener('click', e=>{e.stopPropagation(); toggle(i);});
+  legL.appendChild(li);
+  legs.push(li);
+
+  sa=ea;
+});
+
+function toggle(i){ curSlice===i ? close() : open(i); }
+
+function open(i){
+  // reset
+  slices.forEach(el=>{ el.classList.remove('sel'); el.style.transform=''; });
+  legs.forEach(el=>el.classList.remove('act'));
+  curSlice=i;
+  slices[i].classList.add('sel');
+  legs[i].classList.add('act');
+
+  // sposta spicchio
+  let s2=0;
+  for(let j=0;j<i;j++) s2+=(PIE[j].value/total)*360;
+  const sp=(PIE[i].value/total)*360, mid=s2+sp/2;
+  const rad=(mid-90)*Math.PI/180;
+  const dx=Math.cos(rad)*12, dy=Math.sin(rad)*12;
+  slices[i].style.transform=`translate(${dx}px,${dy}px)`;
+
+  // centro
+  document.getElementById('cPct').textContent=PIE[i].value+'%';
+  document.getElementById('cLbl').textContent=T[LANG][PIE[i].label_key];
+
+  // popup content — risolto con la lingua attiva
+  document.getElementById('ppDot').style.background=PIE[i].color;
+  document.getElementById('ppTtl').textContent=T[LANG][PIE[i].label_key];
+  const items=document.getElementById('ppItems');
+  items.innerHTML='';
+  PIE[i].items.forEach(it=>{
+    const d=document.createElement('div');
+    d.className='pp-item';
+    d.innerHTML=`<span class="pp-ic" style="color:${PIE[i].color}"><i class="ph ph-${it.done?'check-circle':'circle-dashed'}"></i></span><span>${resolveKey(it.key,LANG)}</span>`;
+    items.appendChild(d);
+  });
+
+  // posiziona popup
+  posPopup(i);
+  popup.classList.add('vis');
+  overlay.classList.add('act');
+}
+
+function posPopup(i){
+  const wrap=document.getElementById('pieWrap');
+  const wW=wrap.offsetWidth, wH=wrap.offsetHeight;
+  let s2=0;
+  for(let j=0;j<i;j++) s2+=(PIE[j].value/total)*360;
+  const sp=(PIE[i].value/total)*360, mid=s2+sp/2;
+  const rad=(mid-90)*Math.PI/180;
+  const sc=wW/200;
+  const px=(CX+(R+20)*Math.cos(rad))*sc;
+  const py=(CY+(R+20)*Math.sin(rad))*sc;
+  const pw=parseInt(getComputedStyle(popup).width)||240;
+  popup.style.left=Math.min(Math.max(px-pw/2, 4), wW-pw-4)+'px';
+  popup.style.top=Math.min(Math.max(py-20, 4), wH-20)+'px';
+  popup.style.transform='none';
+}
+
+function close(){
+  curSlice=null;
+  slices.forEach(el=>{ el.classList.remove('sel'); el.style.transform=''; });
+  legs.forEach(el=>el.classList.remove('act'));
+  popup.classList.remove('vis');
+  overlay.classList.remove('act');
+  document.getElementById('cPct').textContent='52%';
+  document.getElementById('cLbl').textContent=tr.completed_lbl;
+}
+
+overlay.addEventListener('click', close);
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') close(); });
+window.addEventListener('resize', ()=>{ if(curSlice!==null) posPopup(curSlice); });
+
+/* ═══════════════════════════════════════════
+   BROWSER BANNER — Telegram / WhatsApp
+═══════════════════════════════════════════ */
+(function(){
+  const ua = navigator.userAgent || '';
+  const isInApp = /FBAN|FBAV|Instagram|Twitter\/|Snapchat|TikTok|ByteDance/i.test(ua)
+               || /Telegram/i.test(ua)
+               || /WhatsApp/i.test(ua)
+               || (window.location.protocol === 'file:' && /AppleWebKit/i.test(ua) && !/Safari/i.test(ua));
+  if (!isInApp) return;
+  const banner = document.getElementById('browserBanner');
+  const msg    = document.getElementById('bbMsg');
+  const key    = 'browser_banner';
+  msg.innerHTML = T[LANG][key] || T['it'][key];
+  banner.style.display = 'block';
+})();
+
+/* ═══════════════
+   ANIMATE BARS
+═══════════════ */
+window.addEventListener('load', ()=>{
+  setTimeout(()=>{
+    document.querySelectorAll('[data-target]').forEach(el=>{
+      el.style.width=el.dataset.target+'%';
+    });
+  }, 500);
+});
+</script>
+</body>
+</html>
