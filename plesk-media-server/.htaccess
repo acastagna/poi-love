@@ -1,0 +1,87 @@
+# =============================================================================
+# POI•LOVE — media.poilove.com — Apache .htaccess
+# Cultural Bridge OS · MIT License
+# =============================================================================
+
+# ---------------------------------------------------------------------------
+# Sicurezza base
+# ---------------------------------------------------------------------------
+Options -Indexes -ExecCGI
+ServerSignature Off
+
+# Blocca accesso diretto alla cartella helpers/
+<FilesMatch "^(helpers|config\.php)">
+    Require all denied
+</FilesMatch>
+
+# Proteggi file sensibili
+<FilesMatch "\.(env|log|sql|md|json|sh|git)$">
+    Require all denied
+</FilesMatch>
+
+# Solo upload.php, delete.php, test.php sono pubblici
+<FilesMatch "^(upload|delete|test)\.php$">
+    Require all granted
+</FilesMatch>
+
+# ---------------------------------------------------------------------------
+# CORS — permetti richieste dall'app mobile e dal dominio web
+# ---------------------------------------------------------------------------
+<IfModule mod_headers.c>
+    Header always set Access-Control-Allow-Origin "*"
+    Header always set Access-Control-Allow-Methods "POST, DELETE, OPTIONS"
+    Header always set Access-Control-Allow-Headers "Authorization, Content-Type, X-Requested-With"
+    Header always set Access-Control-Max-Age "86400"
+
+    # Gestisci preflight OPTIONS senza passare a PHP
+    RewriteCond %{REQUEST_METHOD} OPTIONS
+    RewriteRule ^(.*)$ $1 [R=204,L]
+</IfModule>
+
+# ---------------------------------------------------------------------------
+# URL Rewriting (opzionale — per ora usiamo file diretti)
+# ---------------------------------------------------------------------------
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Risposta 204 alle preflight OPTIONS
+    RewriteCond %{REQUEST_METHOD} =OPTIONS
+    RewriteRule ^ - [R=204,L]
+</IfModule>
+
+# ---------------------------------------------------------------------------
+# PHP Settings (override Plesk defaults)
+# ---------------------------------------------------------------------------
+<IfModule mod_php.c>
+    # Max upload: 10MB per richiesta (3 foto ~3MB cad.)
+    php_value upload_max_filesize 10M
+    php_value post_max_size 12M
+    php_value max_execution_time 60
+    php_value memory_limit 128M
+</IfModule>
+
+# Versione FPM (Plesk usa spesso php-fpm)
+<IfModule mod_fcgid.c>
+    FcgidMaxRequestLen 12582912
+</IfModule>
+
+# ---------------------------------------------------------------------------
+# Sicurezza header aggiuntivi
+# ---------------------------------------------------------------------------
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "DENY"
+    Header always set X-XSS-Protection "1; mode=block"
+    # Non esporre server info
+    Header unset Server
+    Header unset X-Powered-By
+</IfModule>
+
+# ---------------------------------------------------------------------------
+# Cache per le immagini servite staticamente
+# ---------------------------------------------------------------------------
+<FilesMatch "\.(jpg|jpeg|png|webp|gif)$">
+    <IfModule mod_headers.c>
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </IfModule>
+</FilesMatch>
