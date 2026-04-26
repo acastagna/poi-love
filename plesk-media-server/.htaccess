@@ -6,7 +6,7 @@
 # ---------------------------------------------------------------------------
 # Sicurezza base
 # ---------------------------------------------------------------------------
-Options -Indexes -ExecCGI
+Options -Indexes
 ServerSignature Off
 
 # Blocca accesso diretto alla cartella helpers/
