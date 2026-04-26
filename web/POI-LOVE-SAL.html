@@ -335,6 +335,9 @@ body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); 
   .pie-popup { width:200px; }
   .chart-card { padding:20px; }
 }
+@media (max-width: 700px) {
+  .launch-phases-grid { grid-template-columns:1fr !important; }
+}
 
 /* ── mobile card per workstream ── */
 @media (max-width: 900px) {
@@ -381,9 +384,9 @@ body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); 
     <p data-t="hero_desc">Mappa comunitaria dei luoghi amati. Prima istanza: Albania · Tirana. Lancio previsto giugno 2026. Framework open source Cultural Bridge OS — Licenza MIT.</p>
   </div>
   <div class="kpis">
-    <div class="kpi"><div class="kpi-v">52%</div><div class="kpi-l" data-t="kpi_done">Completamento</div></div>
+    <div class="kpi"><div class="kpi-v">65%</div><div class="kpi-l" data-t="kpi_done">Completamento</div></div>
     <div class="kpi"><div class="kpi-v">5</div><div class="kpi-l" data-t="kpi_weeks">Settimane al lancio</div></div>
-    <div class="kpi"><div class="kpi-v">9</div><div class="kpi-l" data-t="kpi_tables">Tabelle database</div></div>
+    <div class="kpi"><div class="kpi-v">12</div><div class="kpi-l" data-t="kpi_tables">Tabelle database</div></div>
     <div class="kpi"><div class="kpi-v">MIT</div><div class="kpi-l" data-t="kpi_license">Licenza</div></div>
   </div>
 </div>
@@ -434,7 +437,7 @@ body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); 
       <svg id="pieSvg" viewBox="-12 -12 224 224" xmlns="http://www.w3.org/2000/svg">
         <g id="pieSlices"></g>
         <circle cx="100" cy="100" r="54" fill="white"/>
-        <text x="100" y="94" text-anchor="middle" font-family="Inter" font-weight="900" font-size="21" fill="#1C1C1C" id="cPct">52%</text>
+        <text x="100" y="94" text-anchor="middle" font-family="Inter" font-weight="900" font-size="21" fill="#1C1C1C" id="cPct">65%</text>
         <text x="100" y="112" text-anchor="middle" font-family="Inter" font-weight="500" font-size="9.5" fill="#6B6B6B" id="cLbl" data-t="completed_lbl">completato</text>
       </svg>
       <div class="pie-popup" id="piePopup">
@@ -822,13 +825,90 @@ body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); 
   </div>
 </div>
 
-<!-- ANTHROPIC CTA -->
+<!-- LAUNCH STRATEGY -->
+<div class="sec">
+  <div class="sec-hdr">
+    <div class="sec-icon si-r"><i class="ph ph-rocket-launch"></i></div>
+    <div>
+      <div class="sec-ttl" data-t="launch_title">Strategia di Lancio — 8 Giorni</div>
+      <div class="sec-sub" data-t="launch_sub">27 Apr → 8 Mag · 4 fasi · valutazione realistica</div>
+    </div>
+  </div>
+
+  <!-- CRITICAL ASSESSMENT BANNER -->
+  <div style="background:#FFF8E7;border:1px solid #F59E0B;border-radius:14px;padding:16px 20px;margin-bottom:22px;display:flex;gap:12px;align-items:flex-start">
+    <div style="font-size:18px;flex-shrink:0;margin-top:1px">⚠️</div>
+    <div>
+      <div style="font-size:13px;font-weight:700;color:#92400E;margin-bottom:4px" data-t="warn_title">Cosa può andare storto — senza filtri</div>
+      <div style="font-size:12px;color:#78350F;line-height:1.65" data-t="warn_body">L'app non è ancora testata su un device fisico. I video HeyGen richiedono tempo di produzione reale. 0 stelle GitHub oggi significa che la candidatura Claude for OSS usa l'exception clause, non il percorso standard. Il lancio del 1 Maggio funziona solo se bios, demo e video arrivano insieme — non in sequenza. Se uno slitta, slitta tutto.</div>
+    </div>
+  </div>
+
+  <!-- PHASES GRID -->
+  <div class="launch-phases-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px">
+
+    <!-- FASE 1 -->
+    <div style="background:#fff;border-radius:16px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,.07);border:1px solid var(--border);border-top:3px solid #285EA7">
+      <div style="font-size:10px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px" data-t="f1_phase">FASE 1 · 27–28 Apr</div>
+      <div style="font-size:15px;font-weight:800;margin-bottom:8px" data-t="f1_title">Identità</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:12px" data-t="f1_desc">Bio trilingue su LinkedIn, GitHub e X. Apertura Gmail, Instagram, TikTok. Avatar Liri per HeyGen. README upgrade GitHub.</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <span style="background:#EBF2FC;color:var(--blue);font-size:9px;font-weight:700;padding:3px 7px;border-radius:6px" data-t="f1_who_c">Claude</span>
+        <span style="background:#ECFDF5;color:#15803D;font-size:9px;font-weight:700;padding:3px 7px;border-radius:6px" data-t="f1_who_t">Tu</span>
+      </div>
+    </div>
+
+    <!-- FASE 2 -->
+    <div style="background:#fff;border-radius:16px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,.07);border:1px solid var(--border);border-top:3px solid #D48B2B">
+      <div style="font-size:10px;font-weight:700;color:#D48B2B;text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px" data-t="f2_phase">FASE 2 · 28–29 Apr</div>
+      <div style="font-size:15px;font-weight:800;margin-bottom:8px" data-t="f2_title">Contenuti</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:12px" data-t="f2_desc">Demo HTML5 live su GitHub Pages. Video HeyGen con script IT/SQ/EN. Revisione sito poilove.com con sezione demo. GIF da Expo Go su device fisico.</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <span style="background:#FFF8E7;color:#92400E;font-size:9px;font-weight:700;padding:3px 7px;border-radius:6px" data-t="f2_risk">⚠ rischio: video</span>
+      </div>
+    </div>
+
+    <!-- FASE 3 -->
+    <div style="background:#fff;border-radius:16px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,.07);border:1px solid var(--border);border-top:3px solid var(--red)">
+      <div style="font-size:10px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px" data-t="f3_phase">FASE 3 · 1 Maggio</div>
+      <div style="font-size:15px;font-weight:800;margin-bottom:8px" data-t="f3_title">🚀 Lancio Digitale</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:12px" data-t="f3_desc">Push alle 09:00 CET. README live con GIF + video. Post LinkedIn, thread X, TikTok/Instagram reel. Comunicato stampa a 5 testate tech IT + media albanesi.</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <span style="background:#FFF0F0;color:var(--red);font-size:9px;font-weight:700;padding:3px 7px;border-radius:6px" data-t="f3_note">Tutto insieme — non in sequenza</span>
+      </div>
+    </div>
+
+    <!-- FASE 4 -->
+    <div style="background:#fff;border-radius:16px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,.07);border:1px solid var(--border);border-top:3px solid var(--green)">
+      <div style="font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px" data-t="f4_phase">FASE 4 · 6 Maggio</div>
+      <div style="font-size:15px;font-weight:800;margin-bottom:8px" data-t="f4_title">Amplificazione</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:12px" data-t="f4_desc">Show HN mercoledì 09:00 CET — titolo senza Tirana. Reddit blast in 4 community. Articolo Dev.to/Medium. Email Anthropic Claude for OSS il 8 Maggio con i dati reali di trazione.</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <span style="background:#ECFDF5;color:#15803D;font-size:9px;font-weight:700;padding:3px 7px;border-radius:6px" data-t="f4_hn">HN = mercoledì, mai venerdì</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- WHY ROW -->
+  <div style="background:var(--bg);border-radius:12px;padding:14px 18px;margin-top:14px;display:flex;flex-direction:column;gap:8px">
+    <div style="display:flex;gap:10px;align-items:flex-start">
+      <span style="font-size:14px;flex-shrink:0">⚡</span>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6" data-t="why1">HN non il 1 Maggio. Il venerdì è il giorno peggiore — traffico basso, weekend. Il 1 Maggio serve per costruire la base (README, video, demo) così quando arriva HN il mercoledì c'è qualcosa da vedere.</div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:flex-start">
+      <span style="font-size:14px;flex-shrink:0">📊</span>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6" data-t="why2">Email Anthropic dopo la trazione. "Abbiamo appena lanciato e in 7 giorni abbiamo X stelle, Y visitatori alla demo, Z post su HN" è un'email completamente diversa da una scritta nel vuoto.</div>
+    </div>
+  </div>
+</div>
+
+<!-- CLAUDE FOR OSS CTA -->
 <div class="sec cta-box">
   <div>
-    <div class="cta-ttl" data-t="cta_title">Candidatura Anthropic for Startups</div>
-    <div class="cta-p" data-t="cta_desc">6 mesi di crediti API gratuiti. Scadenza: 1 Maggio 2026. POI•LOVE usa Claude come core AI pipeline per categorizzazione POI, moderazione contenuti e future audio guide culturali (POI•VOICE). Il progetto è esattamente ciò che Anthropic supporta: open source, impatto sociale, geografie sottorappresentate sulle mappe commerciali.</div>
+    <div class="cta-ttl" data-t="cta_title">Claude for OSS — 6 mesi gratuiti</div>
+    <div class="cta-p" data-t="cta_desc">Non è Anthropic for Startups. È il programma Claude for Open Source: 6 mesi di Claude Max gratuito per chi costruisce su Claude. Requisito standard: 5.000 stelle GitHub. Percorso alternativo: exception clause per progetti con missione culturale, MIT license, sviluppo attivo. POI•LOVE si candida subito via exception clause — senza aspettare le stelle. Scadenza: rolling, 10.000 posti totali.</div>
   </div>
-  <a href="https://anthropic.com/startups" target="_blank" class="cta-btn" data-t="cta_btn">Apri il Form →</a>
+  <a href="https://claude.ai/contact-sales/claude-for-oss" target="_blank" class="cta-btn" data-t="cta_btn">Candidati →</a>
 </div>
 
 <!-- LINK RAPIDI -->
@@ -931,7 +1011,7 @@ function rebuildPieLegend() {
 
 const T = {
   it: {
-    sal_badge:'SAL — Stato Avanzamento Lavori', updated_date:'Aggiornato: 24 Aprile 2026',
+    sal_badge:'SAL — Stato Avanzamento Lavori', updated_date:'Aggiornato: 26 Aprile 2026',
     status_pill:'MVP in sviluppo', hero_sub:'Stato del Progetto',
     hero_desc:'Mappa comunitaria dei luoghi amati. Prima istanza: Albania · Tirana. Lancio previsto giugno 2026. Framework open source Cultural Bridge OS — Licenza MIT.',
     kpi_done:'Completamento', kpi_weeks:'Settimane al lancio', kpi_tables:'Tabelle database', kpi_license:'Licenza',
@@ -976,9 +1056,27 @@ const T = {
     tech3_role:'Repo pubblico + CI/CD + Demo live', tech4_role:'iOS + Android da un unico codebase',
     tech5_role:'Storage foto proprietario — API PHP custom', tech6_role:'AI pipeline: enrichment, categorizzazione, audio guide future',
     tech_active:'Attivo', tech_start:'Da avviare', tech_config:'Da configurare', tech_phase2:'Fase 2',
-    cta_title:'Candidatura Anthropic for Startups',
-    cta_desc:'6 mesi di crediti API gratuiti. Scadenza: 1 Maggio 2026. POI•LOVE usa Claude come core AI pipeline per categorizzazione POI, moderazione contenuti e future audio guide culturali (POI•VOICE). Open source, impatto sociale, geografie sottorappresentate.',
-    cta_btn:'Apri il Form →', links_title:'Link Rapidi', link1_name:'Demo Live', link3_name:'Sito Ufficiale',
+    launch_title:'Strategia di Lancio — 8 Giorni',
+    launch_sub:'27 Apr → 8 Mag · 4 fasi · valutazione realistica',
+    warn_title:'Cosa può andare storto — senza filtri',
+    warn_body:'L\'app non è ancora testata su device fisico. I video HeyGen richiedono produzione reale. 0 stelle GitHub oggi = candidatura via exception clause, non percorso standard. Il lancio del 1 Maggio funziona solo se bios, demo e video arrivano insieme. Se uno slitta, slitta tutto.',
+    f1_phase:'FASE 1 · 27–28 Apr', f1_title:'Identità',
+    f1_desc:'Bio trilingue su LinkedIn, GitHub e X. Gmail, Instagram, TikTok. Avatar Liri per HeyGen. README upgrade.',
+    f1_who_c:'Claude', f1_who_t:'Tu',
+    f2_phase:'FASE 2 · 28–29 Apr', f2_title:'Contenuti',
+    f2_desc:'Demo HTML5 su GitHub Pages. Video HeyGen IT/SQ/EN. Revisione poilove.com. GIF da Expo Go su device.',
+    f2_risk:'⚠ rischio: video',
+    f3_phase:'FASE 3 · 1 Maggio', f3_title:'🚀 Lancio Digitale',
+    f3_desc:'Push alle 09:00 CET. README live con GIF + video. Post LinkedIn, thread X, TikTok/Instagram. Comunicato a 5 testate tech IT + media albanesi.',
+    f3_note:'Tutto insieme — non in sequenza',
+    f4_phase:'FASE 4 · 6 Maggio', f4_title:'Amplificazione',
+    f4_desc:'Show HN mercoledì 09:00 CET. Reddit blast 4 community. Articolo Dev.to. Email Anthropic 8 Maggio con dati reali.',
+    f4_hn:'HN = mercoledì, mai venerdì',
+    why1:'HN non il 1 Maggio. Il venerdì è il giorno peggiore — traffico basso, weekend. Il 1 Maggio serve per costruire la base così quando arriva HN il mercoledì c\'è qualcosa da vedere.',
+    why2:'"Abbiamo lanciato e in 7 giorni abbiamo X stelle, Y visitatori, Z commenti su HN" è un\'email completamente diversa da una scritta nel vuoto.',
+    cta_title:'Claude for OSS — 6 mesi gratuiti',
+    cta_desc:'Non è Anthropic for Startups. È il programma Claude for Open Source: 6 mesi di Claude Max gratuito. Requisito standard: 5.000 stelle GitHub. Percorso alternativo: exception clause per missione culturale, MIT license, sviluppo attivo. POI•LOVE si candida via exception clause — subito, senza aspettare le stelle. Scadenza: rolling, 10.000 posti totali.',
+    cta_btn:'Candidati →', links_title:'Link Rapidi', link1_name:'Demo Live', link3_name:'Sito Ufficiale',
     open_link:'Apri →', link_demo:'Demo Live', footer_copy:'SAL — Documento per investitori e partner',
   },
   en: {
@@ -1027,9 +1125,27 @@ const T = {
     tech3_role:'Public repo + CI/CD + Live demo', tech4_role:'iOS + Android from a single codebase',
     tech5_role:'Proprietary photo storage — custom PHP API', tech6_role:'AI pipeline: enrichment, categorization, future audio guides',
     tech_active:'Active', tech_start:'To start', tech_config:'To configure', tech_phase2:'Phase 2',
-    cta_title:'Anthropic for Startups Application',
-    cta_desc:'6 months of free API credits. Deadline: May 1, 2026. POI•LOVE uses Claude as a core AI pipeline for POI categorization, content moderation, and future cultural audio guides (POI•VOICE). Open source, social impact, underrepresented geographies.',
-    cta_btn:'Open the Form →', links_title:'Quick Links', link1_name:'Live Demo', link3_name:'Official Website',
+    launch_title:'Launch Strategy — 8 Days',
+    launch_sub:'Apr 27 → May 8 · 4 phases · realistic assessment',
+    warn_title:'What can go wrong — no filters',
+    warn_body:'The app hasn\'t been tested on a physical device yet. HeyGen videos require real production time. 0 GitHub stars today means the Claude for OSS application uses the exception clause, not the standard path. The May 1st launch only works if bios, demo and videos all land together — not in sequence. If one slips, everything slips.',
+    f1_phase:'PHASE 1 · Apr 27–28', f1_title:'Identity',
+    f1_desc:'Trilingual bios on LinkedIn, GitHub and X. Gmail, Instagram, TikTok setup. Liri avatar brief for HeyGen. GitHub README upgrade.',
+    f1_who_c:'Claude', f1_who_t:'You',
+    f2_phase:'PHASE 2 · Apr 28–29', f2_title:'Content',
+    f2_desc:'HTML5 demo live on GitHub Pages. HeyGen videos IT/SQ/EN. poilove.com revision with demo section. GIF from Expo Go on physical device.',
+    f2_risk:'⚠ risk: video production',
+    f3_phase:'PHASE 3 · May 1st', f3_title:'🚀 Digital Launch',
+    f3_desc:'Push at 09:00 CET. README live with GIF + video. LinkedIn post, X thread, TikTok/Instagram reel. Press release to 5 Italian tech outlets + Albanian media.',
+    f3_note:'All together — not in sequence',
+    f4_phase:'PHASE 4 · May 6th', f4_title:'Amplification',
+    f4_desc:'Show HN Wednesday 09:00 CET — global title, no Tirana. Reddit blast 4 communities. Dev.to article. Anthropic email May 8th with real traction data.',
+    f4_hn:'HN = Wednesday, never Friday',
+    why1:'HN not on May 1st. Friday is the worst day — low traffic, weekend. May 1st is to build the base (README, video, demo) so when HN Wednesday comes there\'s something to see.',
+    why2:'"We just launched and in 7 days we have X stars, Y demo visitors, Z HN comments" is a completely different email from one written in a vacuum.',
+    cta_title:'Claude for OSS — 6 months free',
+    cta_desc:'Not Anthropic for Startups. This is the Claude for Open Source program: 6 months of free Claude Max for OSS builders. Standard requirement: 5,000 GitHub stars. Alternative path: exception clause for cultural mission, MIT license, active development. POI•LOVE applies via exception clause — now, without waiting for stars. Deadline: rolling, 10,000 spots total.',
+    cta_btn:'Apply →', links_title:'Quick Links', link1_name:'Live Demo', link3_name:'Official Website',
     open_link:'Open →', link_demo:'Live Demo', footer_copy:'Status Report — For investors and partners',
   },
   sq: {
@@ -1078,9 +1194,27 @@ const T = {
     tech3_role:'Repo publik + CI/CD + Demo live', tech4_role:'iOS + Android nga një bazë kodi e vetme',
     tech5_role:'Ruajtje foto pronësor — API PHP me porosi', tech6_role:'Pipeline AI: pasurimi, kategorizimi, audio guida të ardhshme',
     tech_active:'Aktiv', tech_start:'Për t\'u nisur', tech_config:'Për t\'u konfiguruar', tech_phase2:'Faza 2',
-    cta_title:'Aplikim Anthropic for Startups',
-    cta_desc:'6 muaj kredite API falas. Afati: 1 Maj 2026. POI•LOVE përdor Claude si pipeline kryesor AI për kategorizimin e POI-ve, moderimin e përmbajtjes dhe audio guidat e ardhshme kulturore (POI•VOICE). Burim i hapur, ndikim social, gjeografi të nënpërfaqësuara.',
-    cta_btn:'Hap Formularin →', links_title:'Lidhje të Shpejta', link1_name:'Demo Live', link3_name:'Faqja Zyrtare',
+    launch_title:'Strategji Lansimi — 8 Ditë',
+    launch_sub:'27 Pri → 8 Maj · 4 faza · vlerësim realist',
+    warn_title:'Çfarë mund të shkojë keq — pa filtër',
+    warn_body:'Aplikacioni nuk është testuar ende në pajisje fizike. Videot HeyGen kërkojnë kohë reale prodhimi. 0 yje GitHub sot = aplikimi Claude for OSS me klauzolë përjashtimi, jo rruga standarde. Lansimi i 1 Majit funksionon vetëm nëse bio, demo dhe videot vijnë së bashku — jo në sekuencë. Nëse njëra rrëshqet, rrëshqet gjithçka.',
+    f1_phase:'FAZA 1 · 27–28 Pri', f1_title:'Identiteti',
+    f1_desc:'Bio trefishe në LinkedIn, GitHub dhe X. Gmail, Instagram, TikTok. Avatari Liri për HeyGen. README upgrade.',
+    f1_who_c:'Claude', f1_who_t:'Ti',
+    f2_phase:'FAZA 2 · 28–29 Pri', f2_title:'Përmbajtja',
+    f2_desc:'Demo HTML5 në GitHub Pages. Videot HeyGen IT/SQ/EN. Rishikim poilove.com. GIF nga Expo Go në pajisje fizike.',
+    f2_risk:'⚠ rrezik: prodhimi video',
+    f3_phase:'FAZA 3 · 1 Maj', f3_title:'🚀 Lansimi Dixhital',
+    f3_desc:'Push në orën 09:00 CET. README live me GIF + video. Post LinkedIn, fije X, TikTok/Instagram reel. Komunikatë shtypi për 5 media tech IT + media shqiptare.',
+    f3_note:'Gjithçka së bashku — jo në sekuencë',
+    f4_phase:'FAZA 4 · 6 Maj', f4_title:'Amplifikimi',
+    f4_desc:'Show HN të mërkurën 09:00 CET — titull global, pa Tiranë. Reddit blast 4 komunitete. Artikull Dev.to. Email Anthropic 8 Maj me të dhëna reale.',
+    f4_hn:'HN = e mërkurë, kurrë e premte',
+    why1:'HN jo më 1 Maj. E premtja është dita më e keqe — trafik i ulët, fundjavë. 1 Maji shërben për të ndërtuar bazën kështu që kur vjen HN e mërkurën ka diçka për të parë.',
+    why2:'"Sapo u lansua dhe në 7 ditë kemi X yje, Y vizitorë demo, Z komente HN" është një email krejtësisht ndryshe nga njëra e shkruar në boshllëk.',
+    cta_title:'Claude for OSS — 6 muaj falas',
+    cta_desc:'Jo Anthropic for Startups. Ky është programi Claude for Open Source: 6 muaj Claude Max falas. Kërkesë standarde: 5.000 yje GitHub. Rruga alternative: klauzolë përjashtimi për mision kulturor, licencë MIT, zhvillim aktiv. POI•LOVE aplikon me klauzolë përjashtimi — tani, pa pritur yjet. Afati: rolling, 10.000 vende gjithsej.',
+    cta_btn:'Apliko →', links_title:'Lidhje të Shpejta', link1_name:'Demo Live', link3_name:'Faqja Zyrtare',
     open_link:'Hap →', link_demo:'Demo Live', footer_copy:'Raport Statusi — Për investitorë dhe partnerë',
   }
 };
@@ -1095,20 +1229,20 @@ let tr = T[LANG];
 ═══════════════════════════════════════════ */
 /* PIE usa chiavi di traduzione — si risolve dinamicamente al cambio lingua */
 const PIE = [
-  { id:'done',   color:'#22C55E', value:42, label_key:'pie_done',
+  { id:'done',   color:'#22C55E', value:55, label_key:'pie_done',
     items:[
       {key:'t1_name',done:true},{key:'t2_name',done:true},{key:'t3_name',done:true},
       {key:'t4_name',done:true},{key:'t5_name',done:true},{key:'t6_name',done:true}
     ]
   },
-  { id:'active', color:'#F59E0B', value:15, label_key:'pie_active',
+  { id:'active', color:'#F59E0B', value:20, label_key:'pie_active',
     items:[
       {key:'t7_name',done:false},{key:'t8_name',done:false},
       {key:'cta_title',done:false},
       {key:'_video',done:false}  /* chiave speciale */
     ]
   },
-  { id:'todo',   color:'#D42B2B', value:43, label_key:'pie_todo',
+  { id:'todo',   color:'#D42B2B', value:25, label_key:'pie_todo',
     items:[
       {key:'t9_name',done:false},{key:'t10_name',done:false},{key:'t11_name',done:false},
       {key:'t12_name',done:false},{key:'t13_name',done:false},{key:'t14_name',done:false}
@@ -1235,7 +1369,7 @@ function close(){
   legs.forEach(el=>el.classList.remove('act'));
   popup.classList.remove('vis');
   overlay.classList.remove('act');
-  document.getElementById('cPct').textContent='52%';
+  document.getElementById('cPct').textContent='65%';
   document.getElementById('cLbl').textContent=tr.completed_lbl;
 }
 
