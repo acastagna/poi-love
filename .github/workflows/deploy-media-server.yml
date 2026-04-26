@@ -1,0 +1,93 @@
+# =============================================================================
+# POI•LOVE — GitHub Actions: Deploy media server → media.poilove.com
+# Trigger: push su main con modifiche in plesk-media-server/
+# Destinazione: media.poilove.com/httpdocs/ via SSH + rsync
+# Cultural Bridge OS · MIT License
+# =============================================================================
+#
+# SECRETS DA CONFIGURARE in GitHub → Settings → Secrets → Actions:
+#
+#   PLESK_HOST      → IP o hostname del server (es. 192.168.1.1 o srv.tuohost.com)
+#   PLESK_USER      → username SSH Plesk (es. poi-love o il tuo username hosting)
+#   PLESK_SSH_KEY   → chiave SSH privata (vedi istruzioni sotto)
+#   PLESK_PORT      → porta SSH (Plesk usa spesso 22, a volte 2222 o 8022)
+#   PLESK_PATH      → percorso assoluto httpdocs su server
+#                     es: /var/www/vhosts/poilove.com/media.poilove.com/httpdocs
+#
+# =============================================================================
+
+name: Deploy → media.poilove.com
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      # Si attiva SOLO se cambiano file del media server (non tutto il repo)
+      - 'plesk-media-server/**'
+      - '.github/workflows/deploy-media-server.yml'
+
+  # Permette di triggerare manualmente dal tab Actions su GitHub
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Sync a Plesk via SSH
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      # ------------------------------------------------------------------
+      # 1. Checkout del codice
+      # ------------------------------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ------------------------------------------------------------------
+      # 2. Setup SSH key
+      # ------------------------------------------------------------------
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.PLESK_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          # Aggiunge il server ai known_hosts (evita il prompt interattivo)
+          ssh-keyscan -p "${{ secrets.PLESK_PORT }}" -H "${{ secrets.PLESK_HOST }}" \
+            >> ~/.ssh/known_hosts 2>/dev/null
+
+      # ------------------------------------------------------------------
+      # 3. rsync — sincronizza plesk-media-server/ → httpdocs/
+      #    --exclude config.php → NON sovrascrive la config di produzione
+      #    che hai personalizzato con la tua anon key Supabase
+      # ------------------------------------------------------------------
+      - name: Deploy via rsync
+        run: |
+          rsync -avz --delete \
+            --exclude='config.php' \
+            --exclude='.git' \
+            --exclude='*.md' \
+            -e "ssh -i ~/.ssh/deploy_key -p ${{ secrets.PLESK_PORT }} -o StrictHostKeyChecking=no" \
+            plesk-media-server/ \
+            "${{ secrets.PLESK_USER }}@${{ secrets.PLESK_HOST }}:${{ secrets.PLESK_PATH }}/"
+
+      # ------------------------------------------------------------------
+      # 4. Verifica post-deploy: chiama test.php e controlla HTTP 200
+      # ------------------------------------------------------------------
+      - name: Health check
+        run: |
+          sleep 3
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            "https://media.poilove.com/test.php")
+          echo "Health check HTTP status: $STATUS"
+          if [ "$STATUS" != "200" ]; then
+            echo "::warning::test.php ha risposto $STATUS — verifica il server"
+          else
+            echo "::notice::Deploy OK — media.poilove.com risponde 200"
+          fi
+
+      # ------------------------------------------------------------------
+      # 5. Cleanup chiave SSH
+      # ------------------------------------------------------------------
+      - name: Cleanup SSH key
+        if: always()
+        run: rm -f ~/.ssh/deploy_key
