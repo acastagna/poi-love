@@ -2,6 +2,8 @@
 # Cultural Bridge OS · MIT License
 
 Options -Indexes
+ErrorDocument 403 /403.html
+ErrorDocument 404 /403.html
 
 # --- Blocca accesso diretto a config e helpers ---
 <FilesMatch "(^config\.php$)">
