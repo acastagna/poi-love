@@ -2,2086 +2,909 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>POI•LOVE — Prototipo MVP v3 · Cultural Bridge OS</title>
-<link rel="icon" href="https://poilove.com/img/favicon.svg">
-<!-- Phosphor Icons v2.1.1 (requisito di progetto) -->
-<script src="https://unpkg.com/@phosphor-icons/web@2.1.1/src/index.js" defer></script>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>POI•LOVE — Demo</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/@phosphor-icons/web@2.1.1/src/index.js"></script>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+:root{--red:#D42B2B;--blue:#285EA7;--bg:#EAE4D8;--card:#FDFAF5;--text:#1C1C1C;--muted:#6B6B6B;--border:rgba(0,0,0,0.09);--green:#22C55E}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:var(--bg)}
 
-/* ============================================================
-   DESIGN TOKENS — v3 · Cultural Bridge OS
-   Fix: header ripulito · filtri sotto search · form POI completo
-   ============================================================ */
-:root {
-  --red:        #D42B2B;
-  --red-dk:     #B81E27;
-  --red-lt:     #F0D0D0;
-  --blue:       #285EA7;
-  --blue-dk:    #1E4ABA;
-  --blue-lt:    #D0DCF0;
-  --gold:       #7A6B3A;
-  --gold-lt:    #EDE4C8;
-  --green:      #3A7A5A;
-  --green-lt:   #D0E8DC;
-  --bg:         #EAE4D8;
-  --bg-warm:    #E0D8C8;
-  --ink:        #1A1410;
-  --ink-soft:   #3A342C;
-  --stone:      #7A7060;
-  --stone-lt:   #B4AC9C;
-  --white:      #FFFFFF;
-  --cream:      #F7F3EC;
-  --cream-dk:   #EDE8DF;
+/* MAP */
+#map{position:fixed;inset:0;z-index:1}
+.leaflet-control-zoom{display:none}
+.leaflet-control-attribution{font-size:9px;opacity:.5}
 
-  --route-egnatia:     #8A7040;
-  --route-serenissima: #285EA7;
-  --route-illyrian:    #5A6A40;
-
-  --sh-xs: 0 1px 4px rgba(26,20,16,0.07);
-  --sh-sm: 0 2px 10px rgba(26,20,16,0.09);
-  --sh-md: 0 4px 24px rgba(26,20,16,0.13);
-  --sh-lg: 0 8px 48px rgba(26,20,16,0.20);
-  --sh-xl: 0 16px 64px rgba(26,20,16,0.28);
-
-  --r-xs: 6px;
-  --r-sm: 10px;
-  --r-md: 16px;
-  --r-lg: 22px;
-  --r-xl: 30px;
-
-  --font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
-  --font-serif: 'Georgia', 'Times New Roman', serif;
-}
-
-*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-button { font-family: var(--font); cursor: pointer; border: none; background: none; }
-input, textarea { font-family: var(--font); }
-
-/* ============================================================
-   STAGE
-   ============================================================ */
-body {
-  font-family: var(--font);
-  background: #0E0C08;
-  background-image:
-    radial-gradient(ellipse 70% 50% at 15% 70%, rgba(212,43,43,0.09) 0%, transparent 65%),
-    radial-gradient(ellipse 60% 60% at 85% 25%, rgba(40,94,167,0.09) 0%, transparent 65%),
-    radial-gradient(ellipse 80% 40% at 50% 50%, rgba(122,107,58,0.05) 0%, transparent 70%);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 32px 16px;
-  gap: 18px;
-}
-
-/* ============================================================
-   PHONE FRAME — iPhone 14 Pro
-   ============================================================ */
-.frame {
-  width: 390px;
-  height: 844px;
-  border-radius: 54px;
-  background: #080604;
-  box-shadow:
-    inset 0 0 0 1px rgba(255,255,255,0.05),
-    0 0 0 9px #120D08,
-    0 0 0 11px #2A2018,
-    var(--sh-xl),
-    0 40px 100px rgba(0,0,0,0.65);
-  position: relative;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-.dynamic-island {
-  position: absolute;
-  top: 14px; left: 50%;
-  transform: translateX(-50%);
-  width: 124px; height: 36px;
-  background: #000; border-radius: 18px;
-  z-index: 100;
-}
-
-/* ============================================================
-   APP SHELL
-   ============================================================ */
-.app {
-  position: absolute; inset: 0;
-  border-radius: 54px;
-  background: var(--bg);
-  overflow: hidden;
-  display: flex; flex-direction: column;
-}
-
-/* STATUS BAR */
-.status {
-  height: 58px; flex-shrink: 0;
-  display: flex; align-items: flex-end;
-  justify-content: space-between;
-  padding: 0 30px 8px;
-}
-.status-t { font-size: 15px; font-weight: 600; color: var(--ink); letter-spacing: -0.3px; }
-.status-i { display: flex; align-items: center; gap: 5px; }
-.status-i i { font-size: 15px; color: var(--ink); }
-
-/* ============================================================
-   HEADER — v3: solo wordmark al centro + 2 icon-btn a destra
-   Rimosso: home-btn (logo sinistra), profilo header (resta solo in bottom nav)
-   ============================================================ */
-.header {
-  height: 52px; flex-shrink: 0;
-  background: var(--bg);
-  display: flex; align-items: center;
-  justify-content: space-between;
-  padding: 0 12px 0 16px;
-  border-bottom: 1px solid rgba(26,20,16,0.06);
-}
-
-/* Wordmark — logo-completo.svg da poilove.com */
-.wordmark-wrap {
-  display: flex; align-items: center; height: 28px;
-}
-.wordmark-wrap .logo-completo {
-  height: 28px; width: auto; object-fit: contain;
-}
-.wordmark-fallback {
-  display: none; align-items: center; gap: 0;
-}
-.wf-poi  { font-size: 19px; font-weight: 900; color: var(--red-dk); letter-spacing: -0.4px; }
-.wf-dot  { font-size: 14px; font-weight: 900; color: var(--red); margin: 0 1px; }
-.wf-love { font-size: 19px; font-weight: 900; color: var(--red); letter-spacing: -0.4px; }
-
-.header-right { display: flex; gap: 2px; }
-.icon-btn {
-  width: 38px; height: 38px; border-radius: 19px;
-  display: flex; align-items: center; justify-content: center;
-  color: var(--ink-soft);
-  transition: background 0.12s;
-  -webkit-tap-highlight-color: transparent;
-}
-.icon-btn:active { background: var(--cream-dk); }
-.icon-btn i { font-size: 22px; }
-
-/* ============================================================
-   SEARCH BAR
-   ============================================================ */
-.search-wrap { flex-shrink: 0; padding: 7px 12px 6px; }
-.search-bar {
-  display: flex; align-items: center; gap: 8px;
-  background: var(--white); border-radius: var(--r-md);
-  padding: 9px 13px; box-shadow: var(--sh-sm);
-}
-.search-bar > i { font-size: 17px; color: var(--stone-lt); }
-.search-bar input {
-  flex: 1; border: none; outline: none; background: transparent;
-  font-size: 14px; color: var(--ink);
-}
-.search-bar input::placeholder { color: var(--stone-lt); }
-.search-bar .filter-i { background: none; color: var(--stone); }
-.search-bar .filter-i i { font-size: 17px; }
-
-/* ============================================================
-   FILTER STRIP — v3: spostata sotto la search bar (non più sulla mappa)
-   Scrollabile orizzontalmente, parte dell'app chrome
-   ============================================================ */
-.filter-strip {
-  flex-shrink: 0;
-  display: flex; gap: 6px;
-  padding: 0 12px 8px;
-  overflow-x: auto; scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-}
-.filter-strip::-webkit-scrollbar { display: none; }
-
-.chip {
-  display: flex; align-items: center; gap: 4px;
-  background: var(--white);
-  border-radius: 20px; padding: 5px 10px;
-  box-shadow: var(--sh-xs);
-  white-space: nowrap; cursor: pointer;
-  font-size: 11px; font-weight: 700; color: var(--stone);
-  border: 1.5px solid transparent;
-  transition: all 0.14s;
-  -webkit-tap-highlight-color: transparent;
-  letter-spacing: 0.1px; flex-shrink: 0;
-}
-.chip i { font-size: 12px; }
-.chip:active { transform: scale(0.95); }
-.chip.on { color: var(--white); box-shadow: none; }
-.chip.on.c-red   { background: var(--red);   border-color: var(--red); }
-.chip.on.c-gold  { background: var(--gold);  border-color: var(--gold); }
-.chip.on.c-blue  { background: var(--blue);  border-color: var(--blue); }
-.chip.on.c-green { background: var(--green); border-color: var(--green); }
-
-/* ============================================================
-   MAP AREA
-   ============================================================ */
-.map-area {
-  flex: 1; position: relative; overflow: hidden;
-  background: #D8CEBC;
-  transition: background 0.4s;
-}
-.map-area.satellite { background: #1A1F14; }
-
-.map-svg {
-  position: absolute; inset: 0;
-  width: 100%; height: 100%;
-  transition: transform 0.25s ease, filter 0.4s ease;
-  transform-origin: center center;
-}
-/* Satellite: simulazione visiva con filtro CSS */
-.map-svg.satellite {
-  filter: brightness(0.55) contrast(1.45) saturate(0.12) hue-rotate(200deg);
-}
-
-/* Tagline */
-.map-tagline {
-  position: absolute; top: 10px; left: 50%;
-  transform: translateX(-50%);
-  background: rgba(234,228,216,0.88);
-  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-  border-radius: 20px; padding: 5px 14px;
-  font-size: 12px; font-style: italic; color: var(--stone);
-  font-family: var(--font-serif); white-space: nowrap;
-  z-index: 7; border: 1px solid rgba(122,107,58,0.15);
-  pointer-events: none; letter-spacing: 0.1px;
-}
-.map-area.satellite .map-tagline {
-  background: rgba(10,14,8,0.72); color: rgba(200,210,180,0.8);
-  border-color: rgba(180,200,120,0.2);
-}
-
-/* Map controls — v3: aggiunto bottone satellite */
-.map-ctrl {
-  position: absolute; top: 10px; right: 10px;
-  display: flex; flex-direction: column; gap: 5px;
-  z-index: 8;
-}
-.map-btn {
-  width: 38px; height: 38px;
-  background: var(--white); border-radius: var(--r-sm);
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: var(--sh-sm); cursor: pointer;
-  transition: background 0.12s;
-  -webkit-tap-highlight-color: transparent;
-}
-.map-btn:active { background: var(--cream-dk); }
-.map-btn i { font-size: 18px; color: var(--ink-soft); }
-/* Bottone satellite attivo */
-.map-btn.sat-on { background: var(--blue); }
-.map-btn.sat-on i { color: var(--white); }
-
-/* My location dot */
-.my-loc {
-  position: absolute; width: 18px; height: 18px;
-  background: #3B7DE8; border-radius: 50%;
-  border: 3px solid white;
-  box-shadow: 0 2px 8px rgba(40,94,167,0.5);
-  transform: translate(-50%, -50%);
-  z-index: 7; animation: lpulse 3s infinite;
-}
-@keyframes lpulse {
-  0%,100% { box-shadow: 0 2px 8px rgba(40,94,167,0.5), 0 0 0 7px rgba(59,125,232,0.14); }
-  50%      { box-shadow: 0 2px 8px rgba(40,94,167,0.5), 0 0 0 13px rgba(59,125,232,0.05); }
-}
-
-/* POI Pins */
-.pin {
-  position: absolute; display: flex; flex-direction: column; align-items: center;
-  cursor: pointer; transform: translate(-50%, -100%); z-index: 6;
-  transition: transform 0.14s; -webkit-tap-highlight-color: transparent;
-}
-.pin:active { transform: translate(-50%, -102%) scale(0.90); }
-.pin.sel .bubble { box-shadow: 0 0 0 3px white, 0 3px 12px rgba(0,0,0,0.25); }
-.bubble {
-  border-radius: 20px; padding: 4px 9px 4px 6px;
-  display: flex; align-items: center; gap: 4px;
-  font-size: 11px; font-weight: 700;
-  white-space: nowrap; color: var(--white);
-  transition: box-shadow 0.14s; letter-spacing: 0.1px;
-}
-.bubble i { font-size: 12px; }
-.b-red   { background: var(--red);   box-shadow: 0 2px 8px rgba(212,43,43,0.44); }
-.b-blue  { background: var(--blue);  box-shadow: 0 2px 8px rgba(40,94,167,0.44); }
-.b-gold  { background: var(--gold);  box-shadow: 0 2px 8px rgba(122,107,58,0.38); }
-.b-green { background: var(--green); box-shadow: 0 2px 8px rgba(58,122,90,0.38); }
-.tail { width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; margin-top: -1px; }
-.t-red   { border-top: 6px solid var(--red); }
-.t-blue  { border-top: 6px solid var(--blue); }
-.t-gold  { border-top: 6px solid var(--gold); }
-.t-green { border-top: 6px solid var(--green); }
-
-/* Route tooltip */
-.route-tip {
-  position: absolute; background: var(--ink); color: var(--white);
-  border-radius: var(--r-md); padding: 10px 14px; width: 220px;
-  z-index: 15; pointer-events: none; opacity: 0;
-  transform: translateY(6px); transition: all 0.2s; box-shadow: var(--sh-md);
-}
-.route-tip.show { opacity: 1; transform: translateY(0); pointer-events: all; }
-.rt-name { font-size: 13px; font-weight: 700; margin-bottom: 3px; }
-.rt-period { font-size: 11px; color: var(--stone-lt); margin-bottom: 5px; }
-.rt-desc { font-size: 11px; color: rgba(255,255,255,0.7); line-height: 1.45; }
-.rt-close { position: absolute; top: 8px; right: 8px; cursor: pointer; color: var(--stone-lt); font-size: 14px; }
+/* HEADER */
+.header{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;pointer-events:none}
+.logo-pill{background:var(--red);color:#fff;font-size:13px;font-weight:800;padding:8px 16px;border-radius:20px;letter-spacing:.3px;pointer-events:all;box-shadow:0 4px 16px rgba(212,43,43,.35);cursor:pointer}
+.header-actions{display:flex;gap:8px;pointer-events:all}
+.hdr-btn{width:40px;height:40px;border-radius:20px;background:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 12px rgba(0,0,0,.12);font-size:16px;color:var(--muted);transition:transform .15s;font-family:inherit;font-weight:700;font-size:11px;color:var(--blue)}
+.hdr-btn:active{transform:scale(.94)}
 
 /* FAB */
-.fab {
-  position: absolute; bottom: 20px; right: 12px;
-  width: 52px; height: 52px; background: var(--red);
-  border-radius: 26px;
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 4px 18px rgba(212,43,43,0.45);
-  z-index: 9; transition: all 0.14s;
-  -webkit-tap-highlight-color: transparent;
-}
-.fab:active { transform: scale(0.92); box-shadow: 0 2px 8px rgba(212,43,43,0.38); }
-.fab i { font-size: 25px; color: white; }
+.fab{position:fixed;bottom:32px;left:50%;transform:translateX(-50%);z-index:200;width:64px;height:64px;border-radius:32px;background:var(--red);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 24px rgba(212,43,43,.45);transition:transform .2s;color:#fff;font-size:28px}
+.fab:active{transform:translateX(-50%) scale(.94)}
+.fab.open{transform:translateX(-50%) rotate(45deg)}
 
-/* POI Detail card */
-.poi-card {
-  position: absolute; bottom: 84px; left: 10px; right: 10px;
-  background: var(--white); border-radius: var(--r-xl);
-  padding: 14px; z-index: 12;
-  box-shadow: var(--sh-lg);
-  transform: translateY(14px); opacity: 0; pointer-events: none;
-  transition: all 0.22s cubic-bezier(0.32,0.72,0,1);
-}
-.poi-card.vis { transform: translateY(0); opacity: 1; pointer-events: all; }
-.pcard-top { display: flex; gap: 11px; margin-bottom: 11px; }
-.pcard-thumb {
-  width: 70px; height: 70px; border-radius: var(--r-md);
-  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
-}
-.pcard-thumb i { font-size: 30px; color: rgba(255,255,255,0.65); }
-.pcard-info { flex: 1; }
-.pcard-name { font-size: 15px; font-weight: 800; color: var(--ink); letter-spacing: -0.3px; margin-bottom: 4px; }
-.pcard-badges { display: flex; gap: 5px; margin-bottom: 5px; flex-wrap: wrap; }
-.pcard-tag {
-  display: inline-flex; align-items: center; gap: 3px;
-  background: var(--cream-dk); border-radius: 8px; padding: 2px 7px;
-  font-size: 10px; font-weight: 800; color: var(--stone);
-  text-transform: uppercase; letter-spacing: 0.5px;
-}
-.pcard-tag i { font-size: 10px; }
-.route-badge {
-  display: inline-flex; align-items: center; gap: 3px;
-  border-radius: 8px; padding: 2px 7px;
-  font-size: 10px; font-weight: 700; letter-spacing: 0.3px;
-}
-.rb-gold  { background: var(--gold-lt);  color: var(--gold); }
-.rb-blue  { background: var(--blue-lt);  color: var(--blue); }
-.pcard-desc { font-size: 12px; color: var(--stone); line-height: 1.5; font-style: italic; }
-.pcard-foot { display: flex; align-items: center; justify-content: space-between; }
-.love-stat { display: flex; align-items: center; gap: 5px; }
-.love-stat i { font-size: 16px; color: var(--red); }
-.love-stat span { font-size: 13px; font-weight: 800; color: var(--ink); }
-.pcard-actions { display: flex; gap: 6px; }
-.pa-btn {
-  display: flex; align-items: center; gap: 3px;
-  padding: 6px 11px; border-radius: 18px;
-  font-size: 12px; font-weight: 700;
-  transition: all 0.12s; -webkit-tap-highlight-color: transparent;
-}
-.pa-btn:active { transform: scale(0.95); }
-.pa-love  { background: var(--red);   color: white; }
-.pa-share { background: var(--cream-dk); color: var(--stone); }
-.pa-btn i { font-size: 12px; }
-.pcard-close {
-  position: absolute; top: 10px; right: 10px;
-  width: 22px; height: 22px; background: var(--cream-dk);
-  border-radius: 11px; display: flex; align-items: center; justify-content: center; cursor: pointer;
-}
-.pcard-close i { font-size: 12px; color: var(--stone); }
+/* MARKER */
+.poi-marker{display:flex;flex-direction:column;align-items:center;cursor:pointer;filter:drop-shadow(0 3px 8px rgba(0,0,0,.2))}
+.poi-bubble{width:36px;height:36px;border-radius:50%;background:var(--red);border:3px solid #fff;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;position:relative;transition:transform .2s}
+.poi-badge{position:absolute;top:-6px;right:-8px;background:var(--blue);color:#fff;font-size:8px;font-weight:800;border-radius:8px;padding:1px 4px;border:1.5px solid #fff;line-height:1.2}
+.poi-tail{width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:8px solid var(--red);margin-top:-2px}
 
-/* ============================================================
-   STORIE PANEL
-   ============================================================ */
-.stories-panel {
-  position: absolute; bottom: 0; left: 0; right: 0; height: 72%;
-  background: var(--cream); border-radius: var(--r-xl) var(--r-xl) 0 0;
-  z-index: 18; transform: translateY(100%);
-  transition: transform 0.35s cubic-bezier(0.32,0.72,0,1);
-  overflow: hidden; display: flex; flex-direction: column;
-}
-.stories-panel.open { transform: translateY(0); }
-.sp-drag { width: 36px; height: 4px; background: var(--cream-dk); border-radius: 2px; margin: 12px auto 0; flex-shrink: 0; }
-.sp-head {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 16px 10px; flex-shrink: 0;
-  border-bottom: 1px solid var(--cream-dk);
-}
-.sp-title { font-size: 17px; font-weight: 800; color: var(--ink); letter-spacing: -0.3px; }
-.sp-sub   { font-size: 12px; color: var(--stone); margin-top: 2px; }
-.sp-close-btn {
-  width: 30px; height: 30px; background: var(--cream-dk); border-radius: 15px;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; -webkit-tap-highlight-color: transparent;
-}
-.sp-close-btn i { font-size: 14px; color: var(--stone); }
-.sp-feed {
-  flex: 1; overflow-y: auto; padding: 12px 14px 20px;
-  display: flex; flex-direction: column; gap: 10px; scrollbar-width: none;
-}
-.sp-feed::-webkit-scrollbar { display: none; }
-.story-card {
-  background: var(--white); border-radius: var(--r-lg); overflow: hidden;
-  box-shadow: var(--sh-xs); cursor: pointer;
-  transition: transform 0.12s, box-shadow 0.12s;
-  -webkit-tap-highlight-color: transparent;
-}
-.story-card:active { transform: scale(0.98); box-shadow: none; }
-.sc-img { height: 90px; display: flex; align-items: center; justify-content: center; position: relative; }
-.sc-img i { font-size: 36px; color: rgba(255,255,255,0.55); }
-.sc-route-pill {
-  position: absolute; bottom: 8px; left: 10px;
-  border-radius: 10px; padding: 3px 8px;
-  font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; color: white;
-}
-.sc-body { padding: 11px 12px 12px; }
-.sc-name { font-size: 14px; font-weight: 800; color: var(--ink); letter-spacing: -0.25px; margin-bottom: 5px; }
-.sc-story { font-size: 13px; color: var(--stone); line-height: 1.55; font-style: italic; margin-bottom: 9px; font-family: var(--font-serif); }
-.sc-foot { display: flex; align-items: center; justify-content: space-between; }
-.sc-author { font-size: 11px; color: var(--stone-lt); font-weight: 600; }
-.sc-love { display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 800; color: var(--red); }
-.sc-love i { font-size: 13px; }
+/* OVERLAY / SHEETS */
+.sheet-overlay{position:fixed;inset:0;z-index:300;pointer-events:none}
+.sheet{position:absolute;bottom:0;left:0;right:0;background:var(--card);border-radius:24px 24px 0 0;padding:0 0 48px;box-shadow:0 -8px 40px rgba(0,0,0,.12);transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.72,0,1);pointer-events:all;max-height:94vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.sheet.open{transform:translateY(0)}
+.sheet-backdrop{position:absolute;inset:0;background:rgba(0,0,0,0);transition:background .35s;pointer-events:none}
+.sheet-backdrop.visible{background:rgba(0,0,0,.35);pointer-events:all}
+.handle{width:40px;height:4px;background:#C8BFB0;border-radius:2px;margin:12px auto 0}
 
-/* ============================================================
-   BOTTOM NAV
-   ============================================================ */
-.nav {
-  height: 82px; background: var(--white);
-  border-top: 1px solid var(--cream-dk);
-  display: flex; align-items: flex-start; padding-top: 8px; flex-shrink: 0;
-}
-.nav-item {
-  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
-  cursor: pointer; padding: 4px 0; -webkit-tap-highlight-color: transparent;
-}
-.nav-item i { font-size: 23px; color: var(--stone-lt); }
-.nav-item span { font-size: 10px; color: var(--stone-lt); font-weight: 700; letter-spacing: 0.15px; }
-.nav-item.on i   { color: var(--red); }
-.nav-item.on span { color: var(--red); }
-.nav-logo-wrap { width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; }
-.nav-logo-img { width: 26px; height: 26px; object-fit: contain; }
-.nav-logo-fb  { display: none; width: 26px; height: 26px; }
+/* DETAIL SHEET */
+.detail-photos{display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;scrollbar-width:none;margin-left:-20px;margin-right:-20px;padding:0 20px}
+.detail-photo{width:200px;height:150px;border-radius:12px;flex-shrink:0;background-size:cover;background-position:center;background-color:var(--bg)}
+.detail-tag{display:inline-flex;align-items:center;gap:4px;background:var(--bg);color:var(--muted);font-size:11px;font-weight:600;padding:4px 10px;border-radius:12px;margin-bottom:8px}
+.detail-name{font-size:22px;font-weight:800;color:var(--text);margin-bottom:8px;line-height:1.2}
+.detail-desc{font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:16px}
+.detail-footer{display:flex;align-items:center;justify-content:space-between}
+.author-row{display:flex;align-items:center;gap:8px}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--bg);overflow:hidden}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.author-name{font-size:13px;color:var(--muted);font-weight:500}
+.love-btn{display:flex;align-items:center;gap:6px;background:var(--bg);border:1.5px solid #D8D0C0;border-radius:24px;padding:10px 18px;cursor:pointer;font-family:inherit;transition:all .2s}
+.love-btn.loved{background:#FFF0F0;border-color:var(--red)}
+.love-btn .heart{font-size:18px;color:#C0B0A0;transition:all .2s}
+.love-btn.loved .heart{color:var(--red)}
+.love-btn .love-count{font-size:15px;font-weight:700;color:#8A7F74;transition:color .2s}
+.love-btn.loved .love-count{color:var(--red)}
+.detail-body{padding:16px 20px 0}
 
-/* ============================================================
-   OVERLAY
-   ============================================================ */
-.overlay {
-  position: absolute; inset: 0;
-  background: rgba(18,14,10,0.52);
-  z-index: 20; opacity: 0; pointer-events: none;
-  transition: opacity 0.3s; border-radius: 54px;
-}
-.overlay.open { opacity: 1; pointer-events: all; }
+/* ── ADD POI SHEET ── */
+.add-header{display:flex;align-items:flex-start;justify-content:space-between;padding:16px 20px 0}
+.add-header-left{}
+.add-title-text{font-size:20px;font-weight:800;color:var(--text);line-height:1.2}
+.add-subtitle{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.4}
+.timer-badge{display:flex;align-items:center;gap:5px;background:#FFF5F5;border:1px solid #F7C1C1;border-radius:20px;padding:5px 10px;font-size:12px;font-weight:700;color:var(--red);flex-shrink:0;margin-left:12px}
+.close-btn{width:28px;height:28px;border-radius:14px;background:#f0ece4;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:14px;margin-top:2px}
 
-/* ============================================================
-   BOTTOM SHEET — AGGIUNGI POI v3
-   Sezioni: Titolo · Posizione · Foto · Racconta · Categorie · Liste · Rotta · Visibilità
-   ============================================================ */
-.sheet {
-  position: absolute; bottom: 0; left: 0; right: 0;
-  background: var(--white); border-radius: var(--r-xl) var(--r-xl) 0 0;
-  z-index: 30; transform: translateY(100%);
-  transition: transform 0.36s cubic-bezier(0.32,0.72,0,1);
-  max-height: 92%; overflow-y: auto; scrollbar-width: none;
-}
-.sheet::-webkit-scrollbar { display: none; }
-.sheet.open { transform: translateY(0); }
+/* Congrats banner */
+.congrats-banner{background:#EAF3DE;border:1px solid #C0DD97;border-radius:10px;padding:8px 12px;font-size:12px;color:#3B6D11;font-weight:500;margin:10px 20px 0;line-height:1.4;display:none}
+.congrats-banner.show{display:block}
 
-.sh-drag { width: 36px; height: 4px; background: var(--cream-dk); border-radius: 2px; margin: 12px auto 0; }
+.add-body{padding:16px 20px 0}
+.section-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+.required-badge{background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:6px;letter-spacing:.3px}
+.section-hint{font-size:10px;font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0}
 
-.sh-head {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 14px 16px 8px;
-}
-.sh-title { font-size: 20px; font-weight: 800; color: var(--ink); letter-spacing: -0.4px; }
-.sh-subtitle { font-size: 12px; color: var(--stone); font-style: italic; margin-top: 1px; font-family: var(--font-serif); }
-.sh-meta { display: flex; align-items: center; gap: 7px; }
+/* Name input */
+.name-input{width:100%;background:#f5f0e8;border:1.5px solid #E0D8CC;border-radius:12px;padding:14px 16px;font-size:16px;font-family:inherit;color:var(--text);outline:none;transition:border-color .2s;margin-bottom:16px}
+.name-input:focus{border-color:var(--red)}
+.name-input::placeholder{color:#B0A090}
 
-/* Timer */
-.timer {
-  display: flex; align-items: center; gap: 4px;
-  background: var(--cream); border-radius: 16px; padding: 4px 9px;
-}
-.timer i { font-size: 13px; color: var(--stone-lt); }
-.tval { font-size: 12px; font-weight: 700; color: var(--stone); font-variant-numeric: tabular-nums; }
-.timer.tw .tval { color: #C06818; }
-.timer.tu i, .timer.tu .tval { color: var(--red); }
-.sh-close {
-  width: 30px; height: 30px; background: var(--cream); border-radius: 15px;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; -webkit-tap-highlight-color: transparent;
-}
-.sh-close:active { background: var(--cream-dk); }
-.sh-close i { font-size: 14px; color: var(--stone); }
+/* DOVE SI TROVA */
+.location-tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-bottom:10px;padding-bottom:2px}
+.loc-tab{flex-shrink:0;padding:8px 12px;border-radius:10px;border:1.5px solid #E0D8CC;background:#f5f0e8;font-size:11px;font-weight:600;color:#5C4D3A;cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap;font-family:inherit;transition:all .15s}
+.loc-tab.active{background:#EBF2FC;border-color:var(--blue);color:var(--blue)}
+.loc-result{background:#f5f0e8;border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.loc-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0}
+.loc-text{flex:1}
+.loc-street{font-size:13px;font-weight:600;color:var(--text)}
+.loc-coords{font-size:10px;color:var(--muted);margin-top:1px}
+.loc-text-input{width:100%;background:#f5f0e8;border:1.5px solid #E0D8CC;border-radius:10px;padding:10px 12px;font-size:13px;font-family:inherit;color:var(--text);outline:none;margin-bottom:16px}
+.loc-text-input::placeholder{color:#B0A090}
+.loc-map-hint{background:#EBF2FC;border-radius:10px;padding:10px 12px;font-size:12px;color:var(--blue);margin-bottom:16px;display:flex;align-items:center;gap:8px}
 
-/* Sezione generica */
-.sec { padding: 0 16px 14px; }
-.slabel {
-  font-size: 11px; font-weight: 800; color: var(--stone-lt);
-  text-transform: uppercase; letter-spacing: 0.9px; margin-bottom: 8px;
-  display: flex; align-items: center; gap: 5px;
-}
-.slabel em { font-style: normal; font-weight: 400; text-transform: none; letter-spacing: 0; color: var(--stone-lt); opacity: 0.7; }
-.slabel .req {
-  font-size: 9px; font-weight: 900; color: var(--red);
-  text-transform: uppercase; letter-spacing: 0.8px;
-  background: var(--red-lt); border-radius: 4px; padding: 1px 4px;
-}
-.sh-divider { height: 1px; background: var(--cream-dk); margin: 0 16px 14px; }
+/* VICINO A COSA */
+.nearby-input{width:100%;background:#f5f0e8;border:1.5px dashed #C8BFB0;border-radius:12px;padding:12px 16px;font-size:13px;font-family:inherit;color:var(--text);outline:none;margin-bottom:16px}
+.nearby-input::placeholder{color:#B0A090;font-style:italic}
 
-/* ============================================================
-   TITOLO — campo obbligatorio (unico per abilitare la CTA)
-   ============================================================ */
-.title-input-wrap {
-  background: var(--cream); border-radius: var(--r-md);
-  padding: 11px 12px;
-  border: 1.5px solid transparent;
-  transition: border-color 0.14s, background 0.14s;
-}
-.title-input-wrap:focus-within { border-color: var(--red); background: var(--white); }
-.poi-title-input {
-  width: 100%; border: none; outline: none; background: transparent;
-  font-size: 16px; font-weight: 700; color: var(--ink); letter-spacing: -0.3px;
-}
-.poi-title-input::placeholder { color: var(--stone-lt); font-weight: 400; font-size: 14px; }
+/* FOTO */
+.photo-row{display:flex;gap:10px;margin-bottom:6px}
+.photo-slot{width:calc(33.333% - 7px);aspect-ratio:1;border-radius:12px;background:#f5f0e8;border:1.5px dashed #C8BFB0;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.photo-slot.filled{border-style:solid;border-color:transparent}
+.photo-slot img{width:100%;height:100%;object-fit:cover}
+.photo-ico{font-size:22px;color:#A09080;margin-bottom:3px}
+.photo-lbl{font-size:9px;color:#A09080;font-weight:500}
+.photo-hint{font-size:10px;color:var(--muted);margin-bottom:16px;display:flex;align-items:center;gap:5px}
 
-/* ============================================================
-   POSIZIONE — 5 modalità di inserimento
-   ============================================================ */
-.loc-modes {
-  display: flex; gap: 6px; margin-bottom: 9px;
-  overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch;
-}
-.loc-modes::-webkit-scrollbar { display: none; }
-.loc-mode-btn {
-  display: flex; flex-direction: column; align-items: center; gap: 3px;
-  padding: 7px 10px; border-radius: var(--r-sm);
-  background: var(--cream); border: 1.5px solid var(--cream-dk);
-  cursor: pointer; flex-shrink: 0;
-  transition: all 0.13s; -webkit-tap-highlight-color: transparent;
-  min-width: 56px;
-}
-.loc-mode-btn:active { transform: scale(0.95); }
-.loc-mode-btn i { font-size: 18px; color: var(--stone-lt); }
-.loc-mode-btn span { font-size: 9px; font-weight: 700; color: var(--stone-lt); text-transform: uppercase; letter-spacing: 0.4px; text-align: center; line-height: 1.2; }
-.loc-mode-btn.active { background: var(--blue-lt); border-color: var(--blue); }
-.loc-mode-btn.active i { color: var(--blue); }
-.loc-mode-btn.active span { color: var(--blue); }
+/* RACCONTA */
+.racconta-input{width:100%;background:#f5f0e8;border:1.5px solid #E0D8CC;border-radius:12px;padding:14px 16px;font-size:14px;font-family:inherit;color:var(--text);outline:none;height:90px;resize:none;line-height:1.55;margin-bottom:4px;transition:border-color .2s}
+.racconta-input:focus{border-color:var(--red)}
+.racconta-input::placeholder{color:#B0A090;font-style:italic}
+.char-bar{display:flex;justify-content:flex-end;margin-bottom:16px}
+.char-count{font-size:11px;color:var(--muted)}
 
-/* Pannello posizione attivo */
-.loc-panel { display: none; }
-.loc-panel.show { display: block; }
+/* CATEGORIE */
+.cats-grid{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px}
+.cat-chip{padding:8px 13px;border-radius:20px;background:#f5f0e8;border:1.5px solid #E0D8CC;font-size:12px;font-weight:500;color:#5C4D3A;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .15s;font-family:inherit}
+.cat-chip.active{background:#FFF0F0;border-color:var(--red);color:var(--red)}
+.cat-chip.disabled{opacity:.4;pointer-events:none}
 
-/* GPS strip */
-.gps-strip {
-  background: rgba(40,94,167,0.07); border-radius: var(--r-md);
-  padding: 9px 12px; display: flex; align-items: center; gap: 9px;
-}
-.gps-strip i.mode-icon { font-size: 17px; color: var(--blue); flex-shrink: 0; }
-.gps-t { flex: 1; }
-.gps-addr  { font-size: 13px; font-weight: 600; color: var(--ink); }
-.gps-coord { font-size: 10px; color: var(--stone-lt); font-variant-numeric: tabular-nums; }
-.gps-dot {
-  width: 8px; height: 8px; background: var(--green); border-radius: 4px;
-  animation: gdot 2.2s infinite; flex-shrink: 0;
-}
-@keyframes gdot {
-  0%,100% { box-shadow: 0 0 0 3px rgba(58,122,90,0.22); }
-  50%      { box-shadow: 0 0 0 7px rgba(58,122,90,0.07); }
-}
+/* LISTE */
+.lists-row{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin-bottom:16px;padding-bottom:2px}
+.list-chip{flex-shrink:0;padding:8px 14px;border-radius:20px;background:#f5f0e8;border:1.5px solid #E0D8CC;font-size:12px;font-weight:600;color:#5C4D3A;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:inherit;transition:all .15s;white-space:nowrap}
+.list-chip.active{background:var(--blue);border-color:var(--blue);color:#fff}
 
-/* Input indirizzo / cerca luogo vicino */
-.loc-search-input {
-  width: 100%; background: var(--cream); border-radius: var(--r-md);
-  border: 1.5px solid var(--cream-dk); padding: 10px 12px;
-  font-size: 14px; color: var(--ink); outline: none;
-  transition: border-color 0.14s;
-}
-.loc-search-input:focus { border-color: var(--blue); background: var(--white); }
-.loc-search-input::placeholder { color: var(--stone-lt); }
+/* ROTTA STORICA */
+.rotta-trigger{background:#f5f0e8;border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;margin-bottom:6px;transition:background .15s}
+.rotta-trigger:hover{background:#ede8de}
+.rotta-ico{width:32px;height:32px;border-radius:8px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.rotta-info{flex:1}
+.rotta-name{font-size:13px;font-weight:600;color:var(--text)}
+.rotta-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.rotta-arrow{font-size:14px;color:var(--muted);transition:transform .2s}
+.rotta-arrow.open{transform:rotate(90deg)}
+.rotta-options{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;overflow:hidden;max-height:0;transition:max-height .3s ease}
+.rotta-options.open{max-height:300px}
+.rotta-opt{padding:10px 12px;border-radius:10px;background:#f5f0e8;border:1.5px solid #E0D8CC;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:10px}
+.rotta-opt.active{background:#FFF0F0;border-color:var(--red)}
+.rotta-opt-ico{font-size:16px}
+.rotta-opt-text{flex:1}
+.rotta-opt-name{font-size:13px;font-weight:600;color:var(--text)}
+.rotta-opt-desc{font-size:10px;color:var(--muted);margin-top:1px}
+.rotta-opt.active .rotta-opt-name{color:var(--red)}
+.rotta-none{font-size:12px;color:var(--muted);padding:8px 0;cursor:pointer;text-decoration:underline}
 
-/* Tap mappa / EXIF */
-.loc-info-strip {
-  background: var(--cream); border-radius: var(--r-md); padding: 9px 12px;
-  display: flex; align-items: center; gap: 9px;
-}
-.loc-info-strip i { font-size: 17px; color: var(--stone); flex-shrink: 0; }
-.loc-info-text { flex: 1; font-size: 12px; color: var(--stone); line-height: 1.45; }
+/* VISIBILITÀ */
+.vis-row{display:flex;gap:8px;margin-bottom:20px}
+.vis-chip{flex:1;padding:11px 8px;border-radius:12px;background:#f5f0e8;border:1.5px solid #E0D8CC;text-align:center;cursor:pointer;transition:all .15s}
+.vis-chip.active{background:#FFF8F8;border-color:var(--red)}
+.vis-label{font-size:12px;font-weight:600;color:#5C4D3A;display:block}
+.vis-chip.active .vis-label{color:var(--red)}
+.vis-desc{font-size:9px;color:var(--muted);margin-top:2px;display:block}
 
-/* ============================================================
-   FOTO — opzionali v3
-   Upload in produzione: POST multipart/form-data → https://[plesk-host]/api/v1/poi/upload
-   NON usare Cloudflare R2 né storage cloud terzo (config.json v4.1)
-   ============================================================ */
-.photo-row { display: flex; gap: 7px; }
-.photo-slot {
-  flex: 1; aspect-ratio: 1;
-  background: var(--cream); border-radius: var(--r-md);
-  border: 1.5px dashed var(--cream-dk);
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 3px; cursor: pointer; position: relative; overflow: hidden;
-  transition: all 0.14s; -webkit-tap-highlight-color: transparent;
-}
-.photo-slot:active { transform: scale(0.96); }
-.photo-slot i.cam { font-size: 22px; color: var(--stone-lt); }
-.photo-slot .sh { font-size: 10px; color: var(--stone-lt); font-weight: 600; }
-.photo-slot.filled { border: none; }
-.photo-slot.f1 { background: linear-gradient(145deg, #C4CEB8, #A8B498); }
-.photo-slot.f2 { background: linear-gradient(145deg, #CABAAA, #B4A898); }
-.photo-slot.f3 { background: linear-gradient(145deg, #B8C2C8, #9CAEB4); }
-.photo-slot.filled i.cam { display: none; }
-.photo-slot.filled .sh { display: none; }
-.slot-check {
-  display: none; position: absolute; top: 5px; right: 5px;
-  width: 18px; height: 18px; background: var(--red);
-  border-radius: 9px; align-items: center; justify-content: center;
-}
-.slot-check i { font-size: 10px; color: white; }
-.photo-slot.filled .slot-check { display: flex; }
-.main-lbl {
-  display: none; position: absolute; bottom: 5px; left: 5px;
-  background: rgba(0,0,0,0.45); border-radius: 4px;
-  padding: 2px 5px; font-size: 9px; color: white; font-weight: 800;
-  text-transform: uppercase; letter-spacing: 0.5px;
-}
-.photo-slot.filled .main-lbl { display: block; }
-/* Etichetta opzionale sotto le foto */
-.photo-opt-label {
-  margin-top: 6px; font-size: 11px; color: var(--stone-lt);
-  display: flex; align-items: center; gap: 4px; font-style: italic;
-}
-.photo-opt-label i { font-size: 12px; }
+/* SAVE AREA */
+.save-area{padding:0 20px}
+.save-btn{width:100%;background:var(--red);color:#fff;border:none;border-radius:16px;padding:18px;font-size:16px;font-weight:700;font-family:inherit;cursor:pointer;box-shadow:0 6px 20px rgba(212,43,43,.3);transition:all .2s;margin-bottom:8px}
+.save-btn:disabled{background:#C8BFB0;box-shadow:none;cursor:not-allowed}
+.save-hint{font-size:11px;color:var(--muted);text-align:center;margin-bottom:10px}
+.google-suggest-btn{width:100%;background:#f5f0e8;border:1.5px solid #E0D8CC;border-radius:12px;padding:12px;font-size:13px;font-weight:600;color:#5C4D3A;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .15s}
+.google-suggest-btn:hover{background:#ede8de}
 
-/* ============================================================
-   RACCONTA — textarea
-   ============================================================ */
-.textarea-wrap {
-  background: var(--cream); border-radius: var(--r-md);
-  padding: 11px 12px; border: 1.5px solid transparent;
-  transition: border-color 0.14s, background 0.14s;
-}
-.textarea-wrap:focus-within { border-color: var(--red); background: var(--white); }
-.poi-ta {
-  width: 100%; height: 68px; border: none; outline: none; background: transparent;
-  font-size: 14px; color: var(--ink); line-height: 1.55; resize: none;
-  font-family: var(--font-serif);
-}
-.poi-ta::placeholder { color: var(--stone-lt); font-family: var(--font); font-style: italic; }
-.char-bar {
-  display: flex; justify-content: flex-end;
-  margin-top: 5px; font-size: 11px; color: var(--stone-lt);
-  font-variant-numeric: tabular-nums; font-weight: 700;
-}
-.char-bar.w { color: #C06818; }
-.char-bar.f { color: var(--red); }
+/* SUCCESS */
+.success-overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+.success-overlay.show{opacity:1;pointer-events:all}
+.success-card{background:var(--card);border-radius:24px;padding:40px 32px;text-align:center;max-width:300px;transform:scale(.8);transition:transform .4s cubic-bezier(.34,1.56,.64,1)}
+.success-overlay.show .success-card{transform:scale(1)}
+.success-icon{width:64px;height:64px;border-radius:50%;background:#3B6D11;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:28px;color:#fff}
+.success-title{font-size:22px;font-weight:800;color:var(--text);margin-bottom:6px}
+.success-sub{font-size:14px;color:var(--muted);line-height:1.5;margin-bottom:24px}
+.success-close{background:var(--red);color:#fff;border:none;border-radius:12px;padding:14px 32px;font-size:15px;font-weight:600;font-family:inherit;cursor:pointer}
 
-/* ============================================================
-   CATEGORIE — multi-select fino a 3 · v3
-   ============================================================ */
-.cat-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-.cat-counter {
-  font-size: 11px; font-weight: 700;
-  color: var(--stone-lt); background: var(--cream);
-  border-radius: 10px; padding: 2px 8px;
-  transition: color 0.14s;
-}
-.cat-counter.full { color: var(--red); background: var(--red-lt); }
-.tag-grid { display: flex; flex-wrap: wrap; gap: 6px; }
-.tag {
-  display: flex; align-items: center; gap: 4px;
-  padding: 6px 10px; border-radius: 18px;
-  background: var(--cream); border: 1.5px solid var(--cream-dk);
-  cursor: pointer; font-size: 12px; font-weight: 700; color: var(--stone);
-  transition: all 0.13s; -webkit-tap-highlight-color: transparent;
-}
-.tag i { font-size: 12px; }
-.tag:active { transform: scale(0.94); }
-.tag.sel { background: var(--red); border-color: var(--red); color: white; box-shadow: 0 2px 8px rgba(212,43,43,0.28); }
-.tag.dis { opacity: 0.38; pointer-events: none; }
+/* TOAST */
+.toast{position:fixed;bottom:110px;left:50%;transform:translateX(-50%) translateY(20px);background:#1C1C1C;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:500;z-index:400;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-/* ============================================================
-   LISTE — default "Lista libera" + liste utente + nuova
-   ============================================================ */
-.lists-scroll {
-  display: flex; gap: 7px; overflow-x: auto; scrollbar-width: none;
-  -webkit-overflow-scrolling: touch; padding-bottom: 2px;
-}
-.lists-scroll::-webkit-scrollbar { display: none; }
-.list-pill {
-  display: flex; align-items: center; gap: 5px;
-  padding: 7px 12px; border-radius: 18px;
-  background: var(--cream); border: 1.5px solid var(--cream-dk);
-  cursor: pointer; flex-shrink: 0;
-  font-size: 12px; font-weight: 700; color: var(--stone);
-  transition: all 0.13s; -webkit-tap-highlight-color: transparent;
-  white-space: nowrap;
-}
-.list-pill i { font-size: 13px; }
-.list-pill:active { transform: scale(0.95); }
-.list-pill.sel {
-  background: var(--blue); border-color: var(--blue);
-  color: white; box-shadow: 0 2px 8px rgba(40,94,167,0.28);
-}
-.list-pill.new-list {
-  background: none; border-style: dashed; color: var(--blue); border-color: var(--blue-lt);
-}
-.list-pill.new-list i { color: var(--blue); }
+/* ONBOARDING */
+.onboarding{position:fixed;inset:0;z-index:600;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;transition:opacity .5s}
+.onboarding.hide{opacity:0;pointer-events:none}
+.ob-logo{width:80px;height:80px;border-radius:24px;background:var(--red);display:flex;align-items:center;justify-content:center;margin-bottom:20px;box-shadow:0 8px 32px rgba(212,43,43,.35)}
+.ob-title{font-size:32px;font-weight:900;color:var(--text);margin-bottom:6px}
+.ob-title span{color:var(--red)}
+.ob-sub{font-size:16px;color:var(--muted);text-align:center;line-height:1.6;margin-bottom:36px;max-width:300px}
+.ob-demo-badge{background:rgba(212,43,43,.1);color:var(--red);font-size:11px;font-weight:700;padding:4px 12px;border-radius:12px;margin-bottom:20px;letter-spacing:.5px;text-transform:uppercase}
+.lang-row{display:flex;gap:10px;margin-bottom:24px}
+.ob-lang{padding:8px 16px;border-radius:20px;border:1.5px solid #D8D0C0;background:#fff;font-size:13px;font-weight:600;cursor:pointer;color:#5C4D3A;transition:all .15s;font-family:inherit}
+.ob-lang.active{background:var(--bg);border-color:var(--red);color:var(--red)}
+.ob-enter{width:100%;max-width:320px;background:var(--red);color:#fff;border:none;border-radius:16px;padding:18px;font-size:17px;font-weight:700;font-family:inherit;cursor:pointer;box-shadow:0 6px 24px rgba(212,43,43,.35)}
+.ob-hint{font-size:12px;color:var(--muted);margin-top:14px;text-align:center;line-height:1.5}
 
-/* ============================================================
-   ROTTA CULTURALE — opzionale
-   ============================================================ */
-.route-connect {
-  background: var(--gold-lt); border-radius: var(--r-md);
-  padding: 10px 12px; display: flex; align-items: center; gap: 10px;
-  cursor: pointer; border: 1.5px solid rgba(122,107,58,0.15);
-  transition: all 0.14s; -webkit-tap-highlight-color: transparent;
+@media(min-width:600px){
+  .sheet{max-width:480px;left:50%;transform:translateX(-50%) translateY(100%);border-radius:24px;margin-bottom:20px}
+  .sheet.open{transform:translateX(-50%) translateY(0)}
 }
-.route-connect:active { background: #E4D9B8; }
-.route-connect i.rc-icon { font-size: 18px; color: var(--gold); flex-shrink: 0; }
-.rc-text { flex: 1; }
-.rc-label { font-size: 12px; font-weight: 700; color: var(--gold); }
-.rc-sub   { font-size: 11px; color: var(--gold); opacity: 0.7; }
-.rc-arrow { color: var(--gold); opacity: 0.6; font-size: 16px; }
-.route-connect.sel-route { border-color: var(--gold); }
-.route-connect.sel-route .rc-label { color: var(--ink); }
-
-/* ============================================================
-   VISIBILITÀ + CONDIVIDI — v3
-   ============================================================ */
-.visibility-row {
-  display: flex; align-items: center; gap: 8px;
-}
-/* Toggle pubblico/privato */
-.vis-toggle {
-  display: flex; align-items: center;
-  background: var(--cream); border-radius: 20px; padding: 3px;
-  border: 1.5px solid var(--cream-dk); flex: 1;
-  cursor: pointer; -webkit-tap-highlight-color: transparent;
-}
-.vis-opt {
-  flex: 1; display: flex; align-items: center; justify-content: center; gap: 5px;
-  padding: 6px 8px; border-radius: 16px;
-  font-size: 12px; font-weight: 700; color: var(--stone);
-  transition: all 0.16s;
-}
-.vis-opt i { font-size: 13px; }
-.vis-opt.active {
-  background: var(--white); color: var(--ink);
-  box-shadow: 0 1px 6px rgba(26,20,16,0.12);
-}
-.vis-opt.active.pub { color: var(--green); }
-.vis-opt.active.priv { color: var(--stone); }
-/* Bottone condividi */
-.share-btn {
-  display: flex; align-items: center; gap: 5px;
-  padding: 10px 14px; border-radius: 18px;
-  background: var(--cream); border: 1.5px solid var(--cream-dk);
-  font-size: 12px; font-weight: 700; color: var(--stone);
-  cursor: pointer; transition: all 0.13s;
-  -webkit-tap-highlight-color: transparent; flex-shrink: 0;
-}
-.share-btn i { font-size: 14px; }
-.share-btn:active { transform: scale(0.95); background: var(--cream-dk); }
-
-/* CTA */
-.cta-wrap { padding: 0 16px 32px; }
-.cta {
-  width: 100%; height: 52px; background: var(--red);
-  border-radius: var(--r-lg); display: flex; align-items: center; justify-content: center; gap: 7px;
-  box-shadow: 0 4px 18px rgba(212,43,43,0.32); transition: all 0.14s;
-  -webkit-tap-highlight-color: transparent;
-}
-.cta:active { transform: scale(0.98); box-shadow: 0 2px 8px rgba(212,43,43,0.28); }
-.cta.dis { background: var(--cream-dk); box-shadow: none; cursor: not-allowed; }
-.cta span { font-size: 15px; font-weight: 800; color: white; letter-spacing: 0.1px; }
-.cta.dis span { color: var(--stone-lt); }
-.cta i { font-size: 17px; color: white; }
-.cta.dis i { color: var(--stone-lt); }
-.cta-hint { margin-top: 6px; text-align: center; font-size: 11px; color: var(--stone-lt); }
-
-/* ============================================================
-   ROUTE SHEET (sub-panel per selezione rotta)
-   ============================================================ */
-.route-sheet {
-  position: absolute; bottom: 0; left: 0; right: 0;
-  background: var(--white); border-radius: var(--r-xl) var(--r-xl) 0 0;
-  z-index: 40; transform: translateY(100%);
-  transition: transform 0.32s cubic-bezier(0.32,0.72,0,1);
-  max-height: 60%;
-}
-.route-sheet.open { transform: translateY(0); }
-.rs-drag { width: 36px; height: 4px; background: var(--cream-dk); border-radius: 2px; margin: 12px auto 6px; }
-.rs-head { padding: 4px 16px 14px; border-bottom: 1px solid var(--cream-dk); }
-.rs-title { font-size: 16px; font-weight: 800; color: var(--ink); letter-spacing: -0.3px; }
-.rs-list { padding: 10px 12px 24px; display: flex; flex-direction: column; gap: 7px; overflow-y: auto; }
-
-/* ============================================================
-   SUCCESS SCREEN
-   ============================================================ */
-.success-ov {
-  position: absolute; inset: 0; background: rgba(18,14,10,0.65);
-  z-index: 50; display: flex; align-items: center; justify-content: center;
-  border-radius: 54px; opacity: 0; pointer-events: none; transition: opacity 0.3s;
-}
-.success-ov.open { opacity: 1; pointer-events: all; }
-.success-card {
-  background: var(--white); border-radius: var(--r-xl);
-  padding: 28px 20px; width: 308px; text-align: center; box-shadow: var(--sh-xl);
-}
-.s-icon {
-  width: 58px; height: 58px; background: rgba(212,43,43,0.09);
-  border-radius: 29px; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px;
-}
-.s-icon i { font-size: 28px; color: var(--red); }
-.s-title { font-size: 19px; font-weight: 800; color: var(--ink); letter-spacing: -0.4px; margin-bottom: 7px; }
-.s-sub { font-size: 13px; color: var(--stone); line-height: 1.55; margin-bottom: 14px; font-family: var(--font-serif); font-style: italic; }
-.s-meta { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
-.s-badge {
-  display: flex; align-items: center; gap: 5px;
-  font-size: 12px; color: var(--stone-lt); background: var(--cream);
-  border-radius: 14px; padding: 5px 10px;
-}
-.s-badge i { font-size: 13px; }
-.s-badge strong { color: var(--green); font-weight: 700; }
-.s-route-note {
-  background: var(--gold-lt); border-radius: var(--r-md); padding: 8px 12px;
-  font-size: 12px; color: var(--gold); margin-bottom: 16px;
-  display: none; align-items: center; gap: 6px; text-align: left;
-}
-.s-route-note.show { display: flex; }
-.s-route-note i { font-size: 14px; flex-shrink: 0; }
-.s-ok {
-  width: 100%; height: 46px; background: var(--red); border-radius: var(--r-lg);
-  font-size: 14px; font-weight: 800; color: white;
-  box-shadow: 0 3px 12px rgba(212,43,43,0.26); transition: transform 0.12s;
-}
-.s-ok:active { transform: scale(0.98); }
-
-/* ============================================================
-   DESKTOP LABEL
-   ============================================================ */
-.stage-label {
-  font-size: 11px; color: rgba(255,255,255,0.20); font-family: var(--font);
-  letter-spacing: 0.8px; text-transform: uppercase; text-align: center; line-height: 1.7;
-}
-.stage-label strong { color: rgba(255,255,255,0.35); }
-.stage-label a { color: rgba(122,107,58,0.55); text-decoration: none; }
-
-/* Pin drop animation */
-@keyframes pin-drop {
-  from { transform: translate(-50%, -70%) scale(0.5); opacity: 0; }
-  to   { transform: translate(-50%, -100%) scale(1); opacity: 1; }
-}
-
 </style>
 </head>
 <body>
 
-<div class="frame">
-  <div class="dynamic-island"></div>
-
-  <div class="app">
-
-    <!-- STATUS BAR -->
-    <div class="status">
-      <span class="status-t">9:41</span>
-      <div class="status-i">
-        <i class="ph-bold ph-signal-high"></i>
-        <i class="ph-bold ph-wifi-high"></i>
-        <i class="ph-bold ph-battery-full"></i>
-      </div>
-    </div>
-
-    <!-- ============================================================
-         HEADER v3 — solo wordmark al centro + liste + filtri
-         Rimosso: logo home-btn sinistra, profilo header (solo in nav)
-         ============================================================ -->
-    <div class="header">
-      <div class="wordmark-wrap">
-        <img class="logo-completo"
-             src="https://poilove.com/img/logo-completo.svg"
-             alt="POI•LOVE"
-             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-        <div class="wordmark-fallback">
-          <span class="wf-poi">POI</span>
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 191.35 191.35" style="width:18px;height:18px;margin:0 2px;">
-            <path d="M95.6,53.06c1.78-3.2,29.61-34.93,57.05-18.99-12.86-17.28-33.44-28.47-56.64-28.47s-42.21,10.36-55.14,26.53c26.16-12.14,53.01,17.81,54.73,20.92" fill="#d42b2b"/>
-            <path d="M95.71,162.36v.04s-.04.02-.11,0c-.07.02-.11.02-.11,0v-.04c-2.6-1.12-31.13-18.81-53.08-42.54,20.88,33.19,53.59,65.9,53.59,65.9,0,.91,33.85-33.3,54.67-67.37-22.2,24.46-52.3,42.86-54.97,44" fill="#d42b2b"/>
-            <path d="M146.17,115.26c24.73-27.24,28.7-50.32,11.78-68.58-2.89-3.12-5.94-5.62-9.08-7.45-9.9-5.76-21.04-5.06-33.1,2.07-9.45,5.59-16.33,13.46-17.23,14.96-.59,1.07-1.72,1.73-2.94,1.73s-2.35-.67-2.94-1.75c-1.65-2.71-18.5-21.2-37.13-21.2-3.71,0-7.49.73-11.24,2.47-3.82,1.77-7.48,4.54-10.88,8.22-17.3,18.73-12.79,42.58,13.43,70.92,19.16,20.71,42.95,36.08,48.77,39.5,6.05-3.5,31.23-19.6,50.56-40.89Z" fill="#eaa4a4"/>
-          </svg>
-          <span class="wf-love">LOVE</span>
-        </div>
-      </div>
-
-      <div class="header-right">
-        <button class="icon-btn" onclick="goNav('lists')" title="Le mie liste">
-          <i class="ph ph-list-bullets"></i>
-        </button>
-        <button class="icon-btn" onclick="toggleFilterPanel()" title="Filtri e impostazioni">
-          <i class="ph ph-sliders-horizontal"></i>
-        </button>
-      </div>
-    </div>
-
-    <!-- SEARCH BAR -->
-    <div class="search-wrap">
-      <div class="search-bar">
-        <i class="ph ph-magnifying-glass"></i>
-        <input type="text" placeholder="Cerca luoghi, storie, rotte…" id="searchInput">
-        <button class="filter-i" onclick="toggleFilterPanel()"><i class="ph ph-magnifying-glass"></i></button>
-      </div>
-    </div>
-
-    <!-- ============================================================
-         FILTER STRIP v3 — sotto la search bar (non più sulla mappa)
-         Scrollabile, parte dell'app chrome. Profilo solo in bottom nav.
-         ============================================================ -->
-    <div class="filter-strip" id="filterStrip">
-      <div class="chip on c-red" onclick="setLayer(this,'tutto')">
-        <i class="ph-bold ph-map-trifold"></i> Tutto
-      </div>
-      <div class="chip" onclick="setLayer(this,'storie')" id="chip-storie">
-        <i class="ph-bold ph-book-open"></i> Storie
-      </div>
-      <div class="chip" onclick="setLayer(this,'cibo')">
-        <i class="ph-bold ph-fork-knife"></i> Cibo
-      </div>
-      <div class="chip" onclick="setLayer(this,'natura')">
-        <i class="ph-bold ph-tree"></i> Natura
-      </div>
-      <div class="chip c-gold" onclick="setLayer(this,'rotte')">
-        <i class="ph-bold ph-path"></i> Rotte
-      </div>
-      <div class="chip" onclick="setLayer(this,'cultura')">
-        <i class="ph-bold ph-buildings"></i> Cultura
-      </div>
-      <div class="chip" onclick="setLayer(this,'love')">
-        <i class="ph-bold ph-heart"></i> Love
-      </div>
-    </div>
-
-    <!-- ============================================================
-         MAP AREA
-         ============================================================ -->
-    <div class="map-area" id="mapArea" onclick="handleMapClick(event)">
-
-      <!-- MAPPA SVG TIRANA — palette cartografica calda -->
-      <svg class="map-svg" id="mapSvg" viewBox="0 0 390 400"
-           xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
-
-        <rect width="390" height="400" fill="#DDD0BA"/>
-
-        <!-- Parchi -->
-        <rect  x="136" y="18" width="48" height="36" rx="7" fill="#B8CC9A"/>
-        <ellipse cx="76"  cy="288" rx="30" ry="22" fill="#B8CC9A"/>
-        <ellipse cx="318" cy="196" rx="26" ry="20" fill="#BAC89C"/>
-        <rect  x="268" y="330" width="60" height="48" rx="8" fill="#B4C898"/>
-
-        <!-- Lago Tirana -->
-        <ellipse cx="74" cy="350" rx="36" ry="25" fill="#A8C4D8"/>
-
-        <!-- Fiume Lana -->
-        <path d="M0,218 Q55,212 100,222 Q148,232 200,218 Q252,204 298,216 Q348,228 390,213"
-              stroke="#A8C4D8" stroke-width="5.5" fill="none" opacity="0.75"/>
-
-        <!-- Blocchi edilizi -->
-        <rect x="18"  y="18"  width="82" height="50"  rx="4" fill="#CABFA8"/>
-        <rect x="112" y="18"  width="20" height="34"  rx="3" fill="#CABFA8"/>
-        <rect x="188" y="14"  width="72" height="57"  rx="4" fill="#C4B9A2"/>
-        <rect x="278" y="18"  width="94" height="46"  rx="4" fill="#CABFA8"/>
-        <rect x="18"  y="90"  width="62" height="58"  rx="4" fill="#C0B49C"/>
-        <rect x="296" y="84"  width="76" height="56"  rx="4" fill="#C0B49C"/>
-        <rect x="18"  y="258" width="72" height="52"  rx="4" fill="#CABFA8"/>
-        <rect x="300" y="252" width="72" height="56"  rx="4" fill="#CABFA8"/>
-        <rect x="18"  y="334" width="44" height="56"  rx="4" fill="#C0B49C"/>
-        <rect x="136" y="302" width="52" height="42"  rx="4" fill="#C0B49C"/>
-        <rect x="206" y="308" width="56" height="42"  rx="4" fill="#C0B49C"/>
-
-        <!-- ROTTE CULTURALI -->
-        <!-- Via Egnatia — oro tratteggiata -->
-        <path id="egnatia-path"
-              d="M0,290 Q50,280 100,275 Q140,270 170,245 Q195,225 220,215 Q260,200 310,195 Q350,192 390,188"
-              stroke="#8A7040" stroke-width="3" fill="none"
-              stroke-dasharray="8,6" opacity="0.72" cursor="pointer"/>
-        <text x="65" y="270" font-size="8" fill="#8A7040" font-family="-apple-system,sans-serif"
-              font-weight="700" opacity="0.8" letter-spacing="0.5" transform="rotate(-5 65 270)">VIA EGNATIA · I sec. a.C.</text>
-
-        <!-- Rotte Serenissima — blu tratteggiata -->
-        <path id="serenissima-path"
-              d="M0,80 Q40,90 80,100 Q130,112 165,130 Q192,148 210,168 Q230,192 240,220"
-              stroke="#285EA7" stroke-width="2.5" fill="none"
-              stroke-dasharray="6,8" opacity="0.48" cursor="pointer"/>
-        <text x="26" y="86" font-size="7.5" fill="#285EA7" font-family="-apple-system,sans-serif"
-              font-weight="700" opacity="0.65" letter-spacing="0.4" transform="rotate(12 26 86)">ROTTE SERENISSIMA</text>
-
-        <!-- Strade principali -->
-        <rect x="184" y="0" width="14" height="400" fill="#C2B49A" opacity="0.92"/>
-        <rect x="0" y="166" width="390" height="11" fill="#C2B49A" opacity="0.92"/>
-        <line x1="90"  y1="0"   x2="191" y2="166" stroke="#C2B49A" stroke-width="8" opacity="0.72"/>
-        <line x1="298" y1="0"   x2="191" y2="166" stroke="#C2B49A" stroke-width="8" opacity="0.72"/>
-
-        <!-- Strade secondarie -->
-        <rect x="98"  y="0" width="5" height="400" fill="#CCBEA4" opacity="0.5"/>
-        <rect x="278" y="0" width="5" height="400" fill="#CCBEA4" opacity="0.5"/>
-        <rect x="0"   y="88"  width="390" height="5" fill="#CCBEA4" opacity="0.5"/>
-        <rect x="0"   y="258" width="390" height="5" fill="#CCBEA4" opacity="0.5"/>
-        <rect x="0"   y="328" width="390" height="5" fill="#CCBEA4" opacity="0.5"/>
-
-        <!-- Piazza Skanderbeg -->
-        <circle cx="191" cy="176" r="23" fill="#D4C8B0" stroke="#BAAA8E" stroke-width="1.5"/>
-        <circle cx="191" cy="176" r="12" fill="none" stroke="#BAAA8E" stroke-width="1" opacity="0.6"/>
-        <circle cx="191" cy="176" r="4"  fill="#BEB0A0" opacity="0.7"/>
-        <text x="191" y="180" text-anchor="middle" font-size="5.5" fill="#7A6C5A"
-              font-family="-apple-system,sans-serif" font-weight="700" letter-spacing="0.3">SKANDERBEG</text>
-
-        <!-- Rosa dei venti -->
-        <g transform="translate(360,370)">
-          <line x1="0" y1="-12" x2="0" y2="12" stroke="#9A8A70" stroke-width="1" opacity="0.5"/>
-          <line x1="-12" y1="0" x2="12" y2="0" stroke="#9A8A70" stroke-width="1" opacity="0.5"/>
-          <polygon points="0,-12 -4,-5 4,-5" fill="#9A8A70" opacity="0.6"/>
-          <text x="0" y="-14" text-anchor="middle" font-size="6" fill="#9A8A70"
-                font-family="-apple-system,sans-serif" font-weight="700" opacity="0.6">N</text>
-        </g>
-
-        <!-- Click trap rotte -->
-        <path d="M0,290 Q50,280 100,275 Q140,270 170,245 Q195,225 220,215 Q260,200 310,195 Q350,192 390,188"
-              stroke="transparent" stroke-width="16" fill="none"
-              onclick="showRouteTip('egnatia', 130, 250)" style="cursor:pointer;"/>
-        <path d="M0,80 Q40,90 80,100 Q130,112 165,130 Q192,148 210,168 Q230,192 240,220"
-              stroke="transparent" stroke-width="14" fill="none"
-              onclick="showRouteTip('serenissima', 110, 115)" style="cursor:pointer;"/>
-      </svg>
-
-      <!-- TAGLINE flottante sulla mappa -->
-      <div class="map-tagline">I luoghi che ami — ovunque sei</div>
-
-      <!-- ============================================================
-           MAP CONTROLS v3 — aggiunto satellite toggle
-           ============================================================ -->
-      <div class="map-ctrl">
-        <button class="map-btn" onclick="zoomIn()"     title="Zoom in"><i class="ph ph-plus"></i></button>
-        <button class="map-btn" onclick="zoomOut()"    title="Zoom out"><i class="ph ph-minus"></i></button>
-        <button class="map-btn" onclick="centerLoc()"  title="La mia posizione"><i class="ph ph-crosshair-simple"></i></button>
-        <!-- SATELLITE — nuovo in v3 -->
-        <button class="map-btn" id="satBtn" onclick="toggleSatellite()" title="Vista satellitare">
-          <i class="ph ph-globe-hemisphere-west"></i>
-        </button>
-      </div>
-
-      <!-- My location -->
-      <div class="my-loc" style="left:191px; top:230px;"></div>
-
-      <!-- POI Pins -->
-      <div class="pin" id="pin-bunkart2" style="left:195px; top:178px;" onclick="showPOI('bunkart2')">
-        <div class="bubble b-gold"><i class="ph-bold ph-buildings"></i>Bunkart 2</div>
-        <div class="tail t-gold"></div>
-      </div>
-      <div class="pin" id="pin-pazari" style="left:220px; top:148px;" onclick="showPOI('pazari')">
-        <div class="bubble b-red"><i class="ph-bold ph-fork-knife"></i>Pazari</div>
-        <div class="tail t-red"></div>
-      </div>
-      <div class="pin" id="pin-liqeni" style="left:74px; top:340px;" onclick="showPOI('liqeni')">
-        <div class="bubble b-green"><i class="ph-bold ph-tree"></i>Liqeni</div>
-        <div class="tail t-green"></div>
-      </div>
-      <div class="pin" id="pin-blloku" style="left:155px; top:210px;" onclick="showPOI('blloku')">
-        <div class="bubble b-red"><i class="ph-bold ph-heart"></i>Blloku</div>
-        <div class="tail t-red"></div>
-      </div>
-      <div class="pin" id="pin-egnatia_km" style="left:130px; top:258px;" onclick="showPOI('egnatia_km')">
-        <div class="bubble b-gold"><i class="ph-bold ph-path"></i>Egnatia</div>
-        <div class="tail t-gold"></div>
-      </div>
-
-      <!-- Route tip popup -->
-      <div class="route-tip" id="routeTip">
-        <div class="rt-name" id="rtName">—</div>
-        <div class="rt-period" id="rtPeriod">—</div>
-        <div class="rt-desc" id="rtDesc">—</div>
-        <button class="rt-close" onclick="closeRouteTip()"><i class="ph ph-x"></i></button>
-      </div>
-
-      <!-- FAB — aggiungi POI -->
-      <button class="fab" onclick="openSheet()" title="Aggiungi un POI">
-        <i class="ph-bold ph-plus"></i>
-      </button>
-
-      <!-- POI Detail card -->
-      <div class="poi-card" id="poiCard">
-        <div class="pcard-close" onclick="closeCard()"><i class="ph ph-x"></i></div>
-        <div class="pcard-top">
-          <div class="pcard-thumb" id="cardThumb">
-            <i class="ph" id="cardThumbIcon"></i>
-          </div>
-          <div class="pcard-info">
-            <div class="pcard-name" id="cardName">—</div>
-            <div class="pcard-badges">
-              <span class="pcard-tag"><i class="ph" id="cardTagIcon"></i><span id="cardTagText">—</span></span>
-              <span class="route-badge" id="cardRouteBadge" style="display:none;"></span>
-            </div>
-            <div class="pcard-desc" id="cardDesc">—</div>
-          </div>
-        </div>
-        <div class="pcard-foot">
-          <div class="love-stat">
-            <i class="ph-bold ph-heart"></i>
-            <span id="cardLoves">—</span>
-          </div>
-          <div class="pcard-actions">
-            <button class="pa-btn pa-love"  onclick="lovePOI()"><i class="ph-bold ph-heart"></i> Love</button>
-            <button class="pa-btn pa-share" onclick="sharePOI()"><i class="ph ph-share-network"></i></button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Stories Panel -->
-      <div class="stories-panel" id="storiesPanel">
-        <div class="sp-drag"></div>
-        <div class="sp-head">
-          <div>
-            <div class="sp-title">Storie della community</div>
-            <div class="sp-sub">Luoghi raccontati da chi li ha vissuti</div>
-          </div>
-          <button class="sp-close-btn" onclick="closeStories()"><i class="ph ph-x"></i></button>
-        </div>
-        <div class="sp-feed" id="storyFeed"></div>
-      </div>
-
-    </div><!-- /map-area -->
-
-    <!-- BOTTOM NAV — profilo è qui (non nell'header) -->
-    <div class="nav">
-      <div class="nav-item on" id="nav-home" onclick="goNav('home')">
-        <div class="nav-logo-wrap">
-          <img class="nav-logo-img"
-               src="https://poilove.com/img/logo.svg"
-               alt="Home"
-               onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-          <svg class="nav-logo-fb" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 191.35 191.35">
-            <path d="M95.6,53.06c1.78-3.2,29.61-34.93,57.05-18.99-12.86-17.28-33.44-28.47-56.64-28.47s-42.21,10.36-55.14,26.53c26.16-12.14,53.01,17.81,54.73,20.92" fill="#d42b2b"/>
-            <path d="M95.71,162.36v.04s-.04.02-.11,0v-.04c-2.6-1.12-31.13-18.81-53.08-42.54,20.88,33.19,53.59,65.9,53.59,65.9,0,.91,33.85-33.3,54.67-67.37-22.2,24.46-52.3,42.86-54.97,44" fill="#d42b2b"/>
-            <path d="M146.17,115.26c24.73-27.24,28.7-50.32,11.78-68.58-2.89-3.12-5.94-5.62-9.08-7.45-9.9-5.76-21.04-5.06-33.1,2.07-9.45,5.59-16.33,13.46-17.23,14.96-.59,1.07-1.72,1.73-2.94,1.73s-2.35-.67-2.94-1.75c-1.65-2.71-18.5-21.2-37.13-21.2-3.71,0-7.49.73-11.24,2.47-3.82,1.77-7.48,4.54-10.88,8.22-17.3,18.73-12.79,42.58,13.43,70.92,19.16,20.71,42.95,36.08,48.77,39.5,6.05-3.5,31.23-19.6,50.56-40.89Z" fill="#eaa4a4"/>
-          </svg>
-        </div>
-        <span>Mappa</span>
-      </div>
-      <div class="nav-item" id="nav-lists" onclick="goNav('lists')">
-        <i class="ph ph-list-bullets"></i>
-        <span>Liste</span>
-      </div>
-      <div class="nav-item" id="nav-loved" onclick="goNav('loved')">
-        <i class="ph ph-heart"></i>
-        <span>I miei LOVE</span>
-      </div>
-      <div class="nav-item" id="nav-profile" onclick="goNav('profile')">
-        <i class="ph ph-user-circle"></i>
-        <span>Profilo</span>
-      </div>
-    </div>
-
-    <!-- OVERLAY -->
-    <div class="overlay" id="overlay" onclick="closeAll()"></div>
-
-    <!-- ============================================================
-         BOTTOM SHEET — AGGIUNGI POI v3
-         Flusso: Titolo → Posizione → Foto → Racconta → Categorie → Liste → Rotta → Visibilità
-         ============================================================ -->
-    <div class="sheet" id="sheet">
-      <div class="sh-drag"></div>
-
-      <!-- Intestazione -->
-      <div class="sh-head">
-        <div>
-          <div class="sh-title">Salva questo posto</div>
-          <div class="sh-subtitle">Meno di 90 secondi. La community te ne sarà grata.</div>
-        </div>
-        <div class="sh-meta">
-          <div class="timer" id="timer">
-            <i class="ph ph-timer"></i>
-            <span class="tval" id="tval">0:00</span>
-          </div>
-          <button class="sh-close" onclick="closeSheet()"><i class="ph ph-x"></i></button>
-        </div>
-      </div>
-
-      <!-- ── SEZIONE 1: TITOLO (obbligatorio) ── -->
-      <div class="sec">
-        <div class="slabel">
-          Titolo
-          <span class="req">Obbligatorio</span>
-        </div>
-        <div class="title-input-wrap">
-          <input class="poi-title-input" id="poiTitle"
-                 type="text"
-                 placeholder="Come si chiama questo posto?"
-                 maxlength="80"
-                 oninput="onTitle(this.value)">
-        </div>
-      </div>
-
-      <div class="sh-divider"></div>
-
-      <!-- ── SEZIONE 2: POSIZIONE (5 modalità) ── -->
-      <div class="sec">
-        <div class="slabel">Dove si trova?</div>
-
-        <!-- Selettori modalità -->
-        <div class="loc-modes">
-          <button class="loc-mode-btn active" id="locMode-gps" onclick="switchLocMode('gps',this)">
-            <i class="ph ph-crosshair-simple"></i>
-            <span>GPS Live</span>
-          </button>
-          <button class="loc-mode-btn" id="locMode-exif" onclick="switchLocMode('exif',this)">
-            <i class="ph ph-image"></i>
-            <span>Foto EXIF</span>
-          </button>
-          <button class="loc-mode-btn" id="locMode-address" onclick="switchLocMode('address',this)">
-            <i class="ph ph-magnifying-glass"></i>
-            <span>Indirizzo</span>
-          </button>
-          <button class="loc-mode-btn" id="locMode-tap" onclick="switchLocMode('tap',this)">
-            <i class="ph ph-map-pin"></i>
-            <span>Tocca mappa</span>
-          </button>
-          <button class="loc-mode-btn" id="locMode-nearby" onclick="switchLocMode('nearby',this)">
-            <i class="ph ph-buildings"></i>
-            <span>Luogo vicino</span>
-          </button>
-        </div>
-
-        <!-- Pannello GPS -->
-        <div class="loc-panel show" id="locPanel-gps">
-          <div class="gps-strip">
-            <i class="ph ph-crosshair-simple mode-icon"></i>
-            <div class="gps-t">
-              <div class="gps-addr">Rruga Sami Frashëri, Tirana</div>
-              <div class="gps-coord">41.3275° N · 19.8187° E</div>
-            </div>
-            <div class="gps-dot"></div>
-          </div>
-        </div>
-
-        <!-- Pannello EXIF da foto -->
-        <div class="loc-panel" id="locPanel-exif">
-          <div class="loc-info-strip">
-            <i class="ph ph-image"></i>
-            <div class="loc-info-text">
-              Carica una foto: se contiene metadati GPS, la posizione verrà estratta automaticamente.
-            </div>
-          </div>
-        </div>
-
-        <!-- Pannello indirizzo -->
-        <div class="loc-panel" id="locPanel-address">
-          <input class="loc-search-input" type="text"
-                 placeholder="Cerca un indirizzo o un nome di luogo…">
-        </div>
-
-        <!-- Pannello tocca mappa -->
-        <div class="loc-panel" id="locPanel-tap">
-          <div class="loc-info-strip">
-            <i class="ph ph-map-pin"></i>
-            <div class="loc-info-text">
-              Chiudi questo pannello e tocca il punto esatto sulla mappa. La posizione verrà registrata.
-            </div>
-          </div>
-        </div>
-
-        <!-- Pannello luogo vicino -->
-        <div class="loc-panel" id="locPanel-nearby">
-          <input class="loc-search-input" type="text"
-                 placeholder="Cerca un luogo vicino a te…">
-        </div>
-
-      </div>
-
-      <div class="sh-divider"></div>
-
-      <!-- ── SEZIONE 3: FOTO (opzionali) ── -->
-      <div class="sec">
-        <div class="slabel">
-          Foto
-          <em>— opzionali, fino a 3</em>
-        </div>
-        <!-- Upload Plesk: POST multipart/form-data → https://[plesk-host]/api/v1/poi/upload  -->
-        <div class="photo-row">
-          <div class="photo-slot" id="sl0" onclick="togglePhoto(0)">
-            <i class="ph ph-camera cam"></i>
-            <span class="sh">Principale</span>
-            <div class="slot-check"><i class="ph ph-check"></i></div>
-            <div class="main-lbl">Cover</div>
-          </div>
-          <div class="photo-slot" id="sl1" onclick="togglePhoto(1)">
-            <i class="ph ph-camera cam"></i>
-            <span class="sh">Foto 2</span>
-            <div class="slot-check"><i class="ph ph-check"></i></div>
-            <div class="main-lbl">Foto 2</div>
-          </div>
-          <div class="photo-slot" id="sl2" onclick="togglePhoto(2)">
-            <i class="ph ph-camera cam"></i>
-            <span class="sh">Foto 3</span>
-            <div class="slot-check"><i class="ph ph-check"></i></div>
-            <div class="main-lbl">Foto 3</div>
-          </div>
-        </div>
-        <div class="photo-opt-label">
-          <i class="ph ph-info"></i>
-          Non sei sul posto? Puoi aggiungere foto in seguito.
-        </div>
-      </div>
-
-      <div class="sh-divider"></div>
-
-      <!-- ── SEZIONE 4: RACCONTA ── -->
-      <div class="sec">
-        <div class="slabel">Racconta <em>— max 200 caratteri</em></div>
-        <div class="textarea-wrap">
-          <textarea class="poi-ta" id="poiTa"
-                    placeholder="L'anima di questo posto… perché merita di essere ricordato?"
-                    maxlength="200"
-                    oninput="onText(this.value)"></textarea>
-          <div class="char-bar" id="charBar">0 / 200</div>
-        </div>
-      </div>
-
-      <div class="sh-divider"></div>
-
-      <!-- ── SEZIONE 5: CATEGORIE (multi-select, max 3) ── -->
-      <div class="sec">
-        <div class="cat-header">
-          <div class="slabel" style="margin-bottom:0;">Categorie</div>
-          <div class="cat-counter" id="catCounter">0 / 3</div>
-        </div>
-        <div style="height:8px;"></div>
-        <div class="tag-grid">
-          <div class="tag" onclick="pickTag(this,'Cibo')"><i class="ph ph-fork-knife"></i> Cibo</div>
-          <div class="tag" onclick="pickTag(this,'Lavoro')"><i class="ph ph-briefcase"></i> Lavoro</div>
-          <div class="tag" onclick="pickTag(this,'Pernottare')"><i class="ph ph-bed"></i> Pernottare</div>
-          <div class="tag" onclick="pickTag(this,'Natura')"><i class="ph ph-tree"></i> Natura</div>
-          <div class="tag" onclick="pickTag(this,'Festa')"><i class="ph ph-confetti"></i> Festa</div>
-          <div class="tag" onclick="pickTag(this,'Cultura')"><i class="ph ph-buildings"></i> Cultura</div>
-          <div class="tag" onclick="pickTag(this,'Pratico')"><i class="ph ph-wrench"></i> Pratico</div>
-          <div class="tag" onclick="pickTag(this,'Benessere')"><i class="ph ph-sun"></i> Benessere</div>
-          <div class="tag" onclick="pickTag(this,'Love')"><i class="ph ph-heart"></i> Love</div>
-          <div class="tag" onclick="pickTag(this,'Audioguida')"><i class="ph ph-headphones"></i> Audioguida</div>
-          <div class="tag" onclick="pickTag(this,'Open Source')"><i class="ph ph-code"></i> Open Source</div>
-        </div>
-      </div>
-
-      <div class="sh-divider"></div>
-
-      <!-- ── SEZIONE 6: LISTE ── -->
-      <div class="sec">
-        <div class="slabel">Aggiungi a una lista</div>
-        <div class="lists-scroll" id="listsScroll">
-          <!-- "Lista libera" è selezionata per default -->
-          <div class="list-pill sel" onclick="selectList(this,'libera')">
-            <i class="ph ph-globe-simple"></i>
-            Lista libera
-          </div>
-          <div class="list-pill" onclick="selectList(this,'tirana')">
-            <i class="ph ph-map-pin"></i>
-            Tirana Top
-          </div>
-          <div class="list-pill" onclick="selectList(this,'weekend')">
-            <i class="ph ph-calendar-blank"></i>
-            Weekend
-          </div>
-          <div class="list-pill" onclick="selectList(this,'food')">
-            <i class="ph ph-fork-knife"></i>
-            Dove mangio
-          </div>
-          <!-- Nuova lista -->
-          <div class="list-pill new-list" onclick="newList()">
-            <i class="ph ph-plus-circle"></i>
-            Nuova lista
-          </div>
-        </div>
-      </div>
-
-      <div class="sh-divider"></div>
-
-      <!-- ── SEZIONE 7: ROTTA CULTURALE (opzionale) ── -->
-      <div class="sec">
-        <div class="slabel">Rotta storica <em>— opzionale</em></div>
-        <div class="route-connect" id="routeConnect" onclick="pickRoute()">
-          <i class="ph ph-path rc-icon"></i>
-          <div class="rc-text">
-            <div class="rc-label" id="rcLabel">Collega a una rotta storica</div>
-            <div class="rc-sub"   id="rcSub">Via Egnatia · Serenissima · Illiriche · Greche</div>
-          </div>
-          <i class="ph ph-caret-right rc-arrow"></i>
-        </div>
-      </div>
-
-      <div class="sh-divider"></div>
-
-      <!-- ── SEZIONE 8: VISIBILITÀ + CONDIVIDI ── -->
-      <div class="sec">
-        <div class="slabel">Visibilità</div>
-        <div class="visibility-row">
-          <!-- Toggle pubblico / privato -->
-          <div class="vis-toggle" id="visToggle" onclick="toggleVisibility()">
-            <div class="vis-opt active pub" id="visOptPub">
-              <i class="ph ph-globe-simple"></i>
-              Pubblico
-            </div>
-            <div class="vis-opt priv" id="visOptPriv">
-              <i class="ph ph-lock-simple"></i>
-              Privato
-            </div>
-          </div>
-          <!-- Condividi -->
-          <button class="share-btn" onclick="shareDraft()">
-            <i class="ph ph-share-network"></i>
-            Condividi
-          </button>
-        </div>
-      </div>
-
-      <div class="sh-divider"></div>
-
-      <!-- ── CTA ── abilitata SOLO se il titolo non è vuoto -->
-      <div class="cta-wrap">
-        <button class="cta dis" id="ctaBtn" onclick="savePOI()">
-          <i class="ph-bold ph-map-pin"></i>
-          <span>Segna sulla mappa</span>
-        </button>
-        <div class="cta-hint" id="ctaHint">Inserisci il nome del posto per continuare</div>
-      </div>
-
-    </div><!-- /sheet -->
-
-    <!-- ============================================================
-         SUB-SHEET — Selezione rotta culturale
-         ============================================================ -->
-    <div class="route-sheet" id="routeSheet">
-      <div class="rs-drag"></div>
-      <div class="rs-head">
-        <div class="rs-title">Scegli la rotta storica</div>
-      </div>
-      <div class="rs-list" id="routeList"></div>
-    </div>
-
-    <!-- ============================================================
-         SUCCESS SCREEN
-         ============================================================ -->
-    <div class="success-ov" id="successOv">
-      <div class="success-card">
-        <div class="s-icon"><i class="ph-bold ph-map-pin"></i></div>
-        <div class="s-title">Ora è nella memoria</div>
-        <div class="s-sub">
-          "Un posto in più che la community può amare."
-        </div>
-        <div class="s-meta">
-          <div class="s-badge">
-            <i class="ph ph-timer"></i>
-            Inserito in <strong id="finalTime">—</strong>
-          </div>
-          <div class="s-badge" id="finalVis">
-            <i class="ph ph-globe-simple"></i>
-            <strong style="color:var(--blue)">Pubblico</strong>
-          </div>
-        </div>
-        <div class="s-route-note" id="routeNote">
-          <i class="ph ph-path"></i>
-          <span id="routeNoteText">—</span>
-        </div>
-        <button class="s-ok" onclick="closeSuccess()">Torna alla mappa</button>
-      </div>
-    </div>
-
-  </div><!-- /app -->
-</div><!-- /frame -->
-
-<!-- LABEL DESKTOP -->
-<div class="stage-label">
-  POI•LOVE · <strong>Prototipo MVP v3 · Cultural Bridge OS</strong><br>
-  <a href="https://poilove.com" target="_blank">poilove.com</a> · 321.al · AltroStile.NET · Lancio Tirana giugno 2026
+<!-- ONBOARDING -->
+<div class="onboarding" id="onboarding">
+  <div class="ob-logo">
+    <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+      <path d="M20 6C14 6 9 11 9 17c0 9 11 19 11 19s11-10 11-19c0-6-5-11-11-11z" fill="#fff"/>
+      <circle cx="20" cy="17" r="4" fill="#D42B2B"/>
+    </svg>
+  </div>
+  <div class="ob-demo-badge" id="ob-badge">🔴 Demo Interattiva</div>
+  <div class="ob-title"><span>POI•</span>LOVE</div>
+  <div class="ob-sub" id="ob-sub">La mappa dei luoghi che ami davvero. Non quella sponsorizzata.</div>
+  <div class="lang-row">
+    <button class="ob-lang active" onclick="setLang('it')">🇮🇹 IT</button>
+    <button class="ob-lang" onclick="setLang('sq')">🇦🇱 SQ</button>
+    <button class="ob-lang" onclick="setLang('en')">🇬🇧 EN</button>
+  </div>
+  <button class="ob-enter" id="ob-btn" onclick="enterApp()">Esplora la mappa →</button>
+  <div class="ob-hint" id="ob-hint">Tappa un ♥ per vedere un luogo.<br>Premi + per aggiungere il tuo.</div>
 </div>
 
-<!-- ============================================================
-     JAVASCRIPT — State & interactions v3
-     ============================================================ -->
-<script>
-'use strict';
+<!-- MAP -->
+<div id="map"></div>
 
-/* ================================================================
-   DATA
-   ================================================================ */
-const POI_DATA = {
-  bunkart2: {
-    name: 'Bunkart 2', tag: 'Cultura', tagIcon: 'ph-buildings',
-    route: 'Via Egnatia', routeClass: 'rb-gold',
-    desc: 'Enver Hoxha costruì 750.000 bunker. Questo era il suo, nel cuore della piazza. Oggi museo della memoria.',
-    loves: 247, bg: 'linear-gradient(145deg,#5A6A82,#3A4A62)'
-  },
-  pazari: {
-    name: 'Pazari i Ri', tag: 'Cibo', tagIcon: 'ph-fork-knife',
-    route: null,
-    desc: 'Mercato storico restaurato. Formaggio Feta, coriandolo, pomodori di montagna. La vita pubblica albanese.',
-    loves: 312, bg: 'linear-gradient(145deg,#8A5A3A,#6A3A20)'
-  },
-  liqeni: {
-    name: 'Liqeni i Tiranës', tag: 'Natura', tagIcon: 'ph-tree',
-    route: null,
-    desc: 'Lago artificiale a Sud della città. Sentiero alberato, pedalò, tramonto sull\'Adriatico lontano. Silenzio.',
-    loves: 189, bg: 'linear-gradient(145deg,#3A6A7A,#2A4A5A)'
-  },
-  blloku: {
-    name: 'Il Blloku', tag: 'Love', tagIcon: 'ph-heart',
-    route: 'Serenissima', routeClass: 'rb-blue',
-    desc: 'Ex zona riservata alla nomenklatura. Oggi capitale della vita notturna balcanica.',
-    loves: 429, bg: 'linear-gradient(145deg,#7A3A4A,#5A2030)'
-  },
-  egnatia_km: {
-    name: 'Via Egnatia — km 234', tag: 'Cultura', tagIcon: 'ph-path',
-    route: 'Via Egnatia', routeClass: 'rb-gold',
-    desc: 'Qui, sotto il manto stradale, dormono le pietre romane. Due millenni di passi da Roma a Costantinopoli.',
-    loves: 96, bg: 'linear-gradient(145deg,#7A6A40,#5A4A20)'
-  }
-};
+<!-- HEADER -->
+<div class="header">
+  <div class="logo-pill" onclick="location.reload()">POI•LOVE</div>
+  <div class="header-actions">
+    <button class="hdr-btn" onclick="cycleLang()" id="langToggle">IT</button>
+    <button class="hdr-btn" onclick="centerMap()"><i class="ph ph-crosshair-simple" style="font-size:18px"></i></button>
+    <button class="hdr-btn" onclick="window.location.href='itinerari.html'" title="Itinerari"><i class="ph ph-map-trifold" style="font-size:18px"></i></button>
+  </div>
+</div>
 
-const STORIES = [
-  {
-    name: 'Via Egnatia — km 234', tag: 'Cultura',
-    route: 'Via Egnatia', routeColor: '#8A7040',
-    story: 'Qui, sotto il manto di asfalto, dormono le pietre miliari romane. Due millenni di passi, da Roma fino a Bisanzio.',
-    author: 'Alessandro C.', loves: 96,
-    bg: 'linear-gradient(145deg,#7A6840,#5A4820)'
-  },
-  {
-    name: 'Pazari i Ri', tag: 'Cibo', route: null,
-    story: 'Non è un mercato. È il luogo dove gli albanesi discutono, ridono e litigano ogni mattina. La vita pubblica ha ancora un odore.',
-    author: 'Patrizia L.', loves: 312,
-    bg: 'linear-gradient(145deg,#8A5A3A,#6A3820)'
-  },
-  {
-    name: 'Blloku — La porta proibita', tag: 'Love',
-    route: 'Serenissima', routeColor: '#285EA7',
-    story: 'Per quarant\'anni fu la zona riservata ai gerarchi. Oggi è il cuore della notte tiranina. Ogni bar è una piccola libertà conquistata.',
-    author: 'M. Berisha', loves: 429,
-    bg: 'linear-gradient(145deg,#7A3A4A,#5A2030)'
-  },
-  {
-    name: 'Bunkart 2 — Sotto la piazza', tag: 'Cultura', route: null,
-    story: 'Enver Hoxha costruì 750.000 bunker. Questo era il suo. Oggi è un museo della memoria. Dove la paura è diventata arte pubblica.',
-    author: 'A. Duka', loves: 247,
-    bg: 'linear-gradient(145deg,#5A6A82,#3A4A62)'
-  }
-];
+<!-- FAB -->
+<button class="fab" id="fab" onclick="toggleAddSheet()">
+  <i class="ph ph-plus" style="font-size:28px"></i>
+</button>
 
-const ROUTES = [
-  { id: 'egnatia',     label: 'Via Egnatia',            sub: 'Romana · 146 a.C. · Durazzo → Costantinopoli', color: '#8A7040' },
-  { id: 'serenissima', label: 'Rotte della Serenissima', sub: 'Veneziana · XIV–XVIII sec. · Adriatico → Levante', color: '#285EA7' },
-  { id: 'illyrian',    label: 'Rotte Illiriche',         sub: 'Antichità · Adriatico orientale', color: '#5A6A40' },
-  { id: 'greek',       label: 'Colonie Greche',          sub: 'VII–IV sec. a.C. · Magna Grecia → Epiro', color: '#6A4A8A' }
-];
+<!-- SHEETS OVERLAY -->
+<div class="sheet-overlay" id="sheetOverlay">
+  <div class="sheet-backdrop" id="backdrop" onclick="closeAllSheets()"></div>
 
-const ROUTE_TIPS = {
-  egnatia: {
-    name: 'Via Egnatia', period: 'Romana · 146 a.C.',
-    desc: 'Prima grande via consolare d\'Oriente. Da Durazzo attraversava l\'Albania verso Costantinopoli. Ancora visibile sotto Tirana.'
-  },
-  serenissima: {
-    name: 'Rotte della Serenissima', period: 'XIV–XVIII secolo',
-    desc: 'I mercanti veneziani collegavano l\'Adriatico al Levante. L\'Albania era snodo cruciale tra Venezia e il Mar Egeo.'
-  }
-};
-
-/* ================================================================
-   STATE v3 — aggiunta visibilità, lista, tags multipli, titolo
-   ================================================================ */
-const S = {
-  title:    '',
-  photos:   [false, false, false],
-  text:     '',
-  tags:     [],          // array di tag (max 3)
-  route:    null,
-  list:     'libera',    // lista selezionata (default: libera)
-  isPublic: true,        // visibilità pubblica di default
-  elapsed:  0,
-  timerInt: null,
-  activePin: null,
-  satellite: false
-};
-
-/* ================================================================
-   TIMER
-   ================================================================ */
-function startTimer() {
-  const start = Date.now(); S.elapsed = 0;
-  clearInterval(S.timerInt);
-  const tvEl = document.getElementById('tval');
-  const tEl  = document.getElementById('timer');
-  S.timerInt = setInterval(() => {
-    S.elapsed = Math.floor((Date.now() - start) / 1000);
-    const m = Math.floor(S.elapsed / 60), s = S.elapsed % 60;
-    tvEl.textContent = `${m}:${String(s).padStart(2,'0')}`;
-    tEl.classList.toggle('tw', S.elapsed >= 60 && S.elapsed < 80);
-    tEl.classList.toggle('tu', S.elapsed >= 80);
-  }, 500);
-}
-function stopTimer() { clearInterval(S.timerInt); S.timerInt = null; }
-
-/* ================================================================
-   SHEET
-   ================================================================ */
-function openSheet() {
-  closeCard(); closeStories(); closeRouteTip();
-  document.getElementById('sheet').classList.add('open');
-  document.getElementById('overlay').classList.add('open');
-  document.getElementById('sheet').scrollTop = 0;
-  startTimer();
-}
-
-function closeSheet() {
-  document.getElementById('sheet').classList.remove('open');
-  document.getElementById('overlay').classList.remove('open');
-  document.getElementById('routeSheet').classList.remove('open');
-  stopTimer();
-  resetSheet();
-}
-
-function resetSheet() {
-  S.title = ''; S.photos = [false,false,false]; S.text = '';
-  S.tags = []; S.route = null; S.list = 'libera';
-  S.isPublic = true; S.elapsed = 0;
-
-  document.getElementById('poiTitle').value = '';
-  [0,1,2].forEach(i => {
-    const e = document.getElementById('sl'+i);
-    e.className = 'photo-slot';
-  });
-  document.getElementById('poiTa').value = '';
-  document.getElementById('charBar').textContent = '0 / 200';
-  document.getElementById('charBar').className = 'char-bar';
-  document.querySelectorAll('.tag').forEach(t => {
-    t.classList.remove('sel','dis');
-  });
-  document.getElementById('catCounter').textContent = '0 / 3';
-  document.getElementById('catCounter').className = 'cat-counter';
-  document.getElementById('tval').textContent = '0:00';
-  document.getElementById('timer').classList.remove('tw','tu');
-  document.getElementById('rcLabel').textContent = 'Collega a una rotta storica';
-  document.getElementById('rcSub').textContent = 'Via Egnatia · Serenissima · Illiriche · Greche';
-  document.getElementById('routeConnect').classList.remove('sel-route');
-
-  // Reset lista → "Lista libera"
-  document.querySelectorAll('.list-pill').forEach(p => p.classList.remove('sel'));
-  const freeList = document.querySelector('.list-pill[onclick*="libera"]');
-  if (freeList) freeList.classList.add('sel');
-
-  // Reset visibilità → pubblico
-  document.getElementById('visOptPub').classList.add('active');
-  document.getElementById('visOptPriv').classList.remove('active');
-
-  // Reset loc mode → GPS
-  switchLocMode('gps', document.getElementById('locMode-gps'));
-
-  updateCTA();
-}
-
-/* ================================================================
-   TITLE — unica condizione per abilitare la CTA
-   ================================================================ */
-function onTitle(v) {
-  S.title = v.trim();
-  updateCTA();
-}
-
-/* ================================================================
-   LOCATION MODES
-   ================================================================ */
-function switchLocMode(mode, btn) {
-  document.querySelectorAll('.loc-mode-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  document.querySelectorAll('.loc-panel').forEach(p => p.classList.remove('show'));
-  const panel = document.getElementById('locPanel-' + mode);
-  if (panel) panel.classList.add('show');
-}
-
-/* ================================================================
-   PHOTOS
-   ================================================================ */
-function togglePhoto(i) {
-  S.photos[i] = !S.photos[i];
-  const el = document.getElementById('sl'+i);
-  const fc = ['f1','f2','f3'][i];
-  el.classList.toggle('filled', S.photos[i]);
-  el.classList.toggle(fc, S.photos[i]);
-  // Non aggiorna CTA: le foto sono opzionali
-}
-
-/* ================================================================
-   TEXT
-   ================================================================ */
-function onText(v) {
-  S.text = v;
-  const len = v.length;
-  const el  = document.getElementById('charBar');
-  el.textContent = `${len} / 200`;
-  el.className = 'char-bar' + (len >= 200 ? ' f' : len >= 160 ? ' w' : '');
-}
-
-/* ================================================================
-   TAGS — multi-select fino a 3
-   ================================================================ */
-function pickTag(el, tag) {
-  const idx = S.tags.indexOf(tag);
-  if (idx > -1) {
-    // Deseleziona
-    S.tags.splice(idx, 1);
-    el.classList.remove('sel');
-  } else {
-    if (S.tags.length >= 3) return;  // limite raggiunto
-    S.tags.push(tag);
-    el.classList.add('sel');
-  }
-  // Aggiorna counter e disabilita se limite raggiunto
-  const n = S.tags.length;
-  const counter = document.getElementById('catCounter');
-  counter.textContent = `${n} / 3`;
-  counter.className = 'cat-counter' + (n >= 3 ? ' full' : '');
-
-  // Disabilita i tag non selezionati se limite raggiunto
-  document.querySelectorAll('.tag').forEach(t => {
-    if (!t.classList.contains('sel')) {
-      t.classList.toggle('dis', n >= 3);
-    }
-  });
-}
-
-/* ================================================================
-   LISTE
-   ================================================================ */
-function selectList(el, listId) {
-  document.querySelectorAll('.list-pill:not(.new-list)').forEach(p => p.classList.remove('sel'));
-  el.classList.add('sel');
-  S.list = listId;
-}
-
-function newList() {
-  // In produzione: apre form creazione lista
-  alert('Crea nuova lista — implementazione in produzione con Supabase');
-}
-
-/* ================================================================
-   VISIBILITÀ
-   ================================================================ */
-function toggleVisibility() {
-  S.isPublic = !S.isPublic;
-  document.getElementById('visOptPub').classList.toggle('active', S.isPublic);
-  document.getElementById('visOptPriv').classList.toggle('active', !S.isPublic);
-}
-
-function shareDraft() {
-  // In produzione: genera link condivisibile
-  const titleVal = S.title || 'questo posto';
-  alert(`Condividi "${titleVal}" — link condivisibile generato in produzione`);
-}
-
-/* ================================================================
-   CTA — abilitata SOLO se il titolo non è vuoto
-   ================================================================ */
-function updateCTA() {
-  const ok  = S.title.length > 0;
-  const btn  = document.getElementById('ctaBtn');
-  const hint = document.getElementById('ctaHint');
-  btn.classList.toggle('dis', !ok);
-  hint.textContent = ok ? '' : 'Inserisci il nome del posto per continuare';
-}
-
-/* ================================================================
-   ROUTE SHEET
-   ================================================================ */
-function pickRoute() {
-  const list = document.getElementById('routeList');
-  list.innerHTML = '';
-  ROUTES.forEach(r => {
-    const el = document.createElement('div');
-    el.style.cssText = `
-      display:flex; align-items:center; gap:10px; padding:11px 12px;
-      background:var(--cream); border-radius:var(--r-md); cursor:pointer;
-      border:1.5px solid var(--cream-dk); transition:all 0.14s;
-    `;
-    el.innerHTML = `
-      <div style="width:8px;height:8px;border-radius:4px;background:${r.color};flex-shrink:0;"></div>
-      <div style="flex:1;">
-        <div style="font-size:13px;font-weight:800;color:var(--ink);">${r.label}</div>
-        <div style="font-size:11px;color:var(--stone);margin-top:1px;">${r.sub}</div>
-      </div>
-      <i class="ph ph-caret-right" style="font-size:16px;color:var(--stone-lt);"></i>
-    `;
-    el.onclick = () => selectRoute(r);
-    list.appendChild(el);
-  });
-  document.getElementById('routeSheet').classList.add('open');
-}
-
-function closeRouteSheet() {
-  document.getElementById('routeSheet').classList.remove('open');
-}
-
-function selectRoute(r) {
-  S.route = r;
-  document.getElementById('rcLabel').textContent = r.label;
-  document.getElementById('rcSub').textContent = r.sub;
-  document.getElementById('routeConnect').classList.add('sel-route');
-  closeRouteSheet();
-}
-
-/* ================================================================
-   SAVE POI
-   ================================================================ */
-function savePOI() {
-  if (!S.title) return;
-  stopTimer();
-  closeSheet();
-
-  const m = Math.floor(S.elapsed / 60), s = S.elapsed % 60;
-  const timeStr = `${m}:${String(s).padStart(2,'0')}${S.elapsed <= 90 ? ' ✓' : ''}`;
-  document.getElementById('finalTime').textContent = timeStr;
-
-  // Visibilità nel success
-  const finalVis = document.getElementById('finalVis');
-  finalVis.innerHTML = S.isPublic
-    ? `<i class="ph ph-globe-simple"></i><strong style="color:var(--blue)">Pubblico</strong>`
-    : `<i class="ph ph-lock-simple"></i><strong style="color:var(--stone)">Privato</strong>`;
-
-  // Rotta
-  const rNote = document.getElementById('routeNote');
-  const rNoteText = document.getElementById('routeNoteText');
-  if (S.route) {
-    rNoteText.textContent = `Connesso a: ${S.route.label}`;
-    rNote.classList.add('show');
-  } else {
-    rNote.classList.remove('show');
-  }
-
-  document.getElementById('successOv').classList.add('open');
-}
-
-function closeSuccess() {
-  document.getElementById('successOv').classList.remove('open');
-  dropNewPin();
-}
-
-function dropNewPin() {
-  const area = document.getElementById('mapArea');
-  const pin  = document.createElement('div');
-  pin.className = 'pin';
-  pin.style.left = (175 + Math.random()*40) + 'px';
-  pin.style.top  = (196 + Math.random()*35) + 'px';
-  pin.style.animation = 'pin-drop 0.38s cubic-bezier(0.34,1.56,0.64,1)';
-  const label = S.tags[0] || S.title.substring(0,12) || 'Nuovo';
-  pin.innerHTML = `<div class="bubble b-red"><i class="ph-bold ph-star"></i>${label}</div><div class="tail t-red"></div>`;
-  area.appendChild(pin);
-}
-
-/* ================================================================
-   POI DETAIL
-   ================================================================ */
-function showPOI(id) {
-  const d = POI_DATA[id];
-  if (!d) return;
-  if (S.activePin) document.getElementById('pin-'+S.activePin)?.classList.remove('sel');
-  S.activePin = id;
-  document.getElementById('pin-'+id)?.classList.add('sel');
-
-  document.getElementById('cardName').textContent    = d.name;
-  document.getElementById('cardDesc').textContent    = d.desc;
-  document.getElementById('cardTagText').textContent = d.tag;
-  document.getElementById('cardTagIcon').className   = 'ph ' + d.tagIcon;
-  document.getElementById('cardLoves').textContent   = d.loves.toLocaleString('it-IT');
-  document.getElementById('cardThumb').style.background = d.bg;
-  document.getElementById('cardThumbIcon').className = 'ph ' + d.tagIcon;
-
-  const rb = document.getElementById('cardRouteBadge');
-  if (d.route) {
-    rb.textContent = '↗ ' + d.route;
-    rb.className = 'route-badge ' + (d.routeClass || 'rb-gold');
-    rb.style.display = 'inline-flex';
-  } else {
-    rb.style.display = 'none';
-  }
-  document.getElementById('poiCard').classList.add('vis');
-}
-
-function closeCard() {
-  document.getElementById('poiCard').classList.remove('vis');
-  if (S.activePin) {
-    document.getElementById('pin-'+S.activePin)?.classList.remove('sel');
-    S.activePin = null;
-  }
-}
-
-function lovePOI() {
-  if (!S.activePin || !POI_DATA[S.activePin]) return;
-  POI_DATA[S.activePin].loves++;
-  document.getElementById('cardLoves').textContent = POI_DATA[S.activePin].loves.toLocaleString('it-IT');
-  const b = document.querySelector('.pa-love');
-  b.style.transform = 'scale(0.86)';
-  setTimeout(() => b.style.transform = '', 150);
-}
-
-function sharePOI() { closeCard(); }
-
-/* ================================================================
-   ROUTE TOOLTIP
-   ================================================================ */
-function showRouteTip(routeId, x, y) {
-  const d = ROUTE_TIPS[routeId];
-  if (!d) return;
-  closeCard();
-  const tip = document.getElementById('routeTip');
-  document.getElementById('rtName').textContent   = d.name;
-  document.getElementById('rtPeriod').textContent = d.period;
-  document.getElementById('rtDesc').textContent   = d.desc;
-  tip.style.left = Math.min(Math.max(x - 110, 10), 160) + 'px';
-  tip.style.top  = Math.min(Math.max(y - 80, 10), 280) + 'px';
-  tip.classList.add('show');
-}
-
-function closeRouteTip() {
-  document.getElementById('routeTip').classList.remove('show');
-}
-
-/* ================================================================
-   STORIES
-   ================================================================ */
-function openStories() {
-  const feed = document.getElementById('storyFeed');
-  feed.innerHTML = '';
-  STORIES.forEach(st => {
-    const card = document.createElement('div');
-    card.className = 'story-card';
-    const routePill = st.route
-      ? `<div class="sc-route-pill" style="background:${st.routeColor};">${st.route}</div>`
-      : '';
-    card.innerHTML = `
-      <div class="sc-img" style="background:${st.bg};">
-        <i class="ph ph-map-pin"></i>${routePill}
-      </div>
-      <div class="sc-body">
-        <div class="sc-name">${st.name}</div>
-        <div class="sc-story">"${st.story}"</div>
-        <div class="sc-foot">
-          <span class="sc-author">${st.author}</span>
-          <div class="sc-love"><i class="ph-bold ph-heart"></i>${st.loves}</div>
+  <!-- DETAIL SHEET -->
+  <div class="sheet" id="detailSheet">
+    <div class="handle"></div>
+    <div class="detail-body">
+      <div class="detail-photos" id="detailPhotos"></div>
+      <div class="detail-tag" id="detailTag"></div>
+      <div class="detail-name" id="detailName"></div>
+      <div class="detail-desc" id="detailDesc"></div>
+      <div class="detail-footer">
+        <div class="author-row">
+          <div class="avatar"><img id="detailAvatar" src="" alt=""></div>
+          <div class="author-name" id="detailAuthor"></div>
         </div>
-      </div>`;
-    feed.appendChild(card);
-  });
-  document.getElementById('storiesPanel').classList.add('open');
-}
+        <button class="love-btn" id="loveBtn" onclick="toggleLove()">
+          <span class="heart">♥</span>
+          <span class="love-count" id="loveCount">0</span>
+        </button>
+      </div>
+    </div>
+  </div>
 
-function closeStories() {
-  document.getElementById('storiesPanel').classList.remove('open');
-}
+  <!-- ADD POI SHEET -->
+  <div class="sheet" id="addSheet">
+    <div class="handle"></div>
 
-/* ================================================================
-   LAYER FILTER
-   ================================================================ */
-const PIN_LAYERS = {
-  tutto:   ['bunkart2','pazari','liqeni','blloku','egnatia_km'],
-  storie:  [],
-  cibo:    ['pazari'],
-  natura:  ['liqeni'],
-  rotte:   ['egnatia_km','bunkart2','blloku'],
-  cultura: ['bunkart2','egnatia_km'],
-  love:    ['blloku']
+    <!-- Header -->
+    <div class="add-header">
+      <div class="add-header-left">
+        <div class="add-title-text" id="add-title">Salva questo posto</div>
+        <div class="add-subtitle" id="add-subtitle">Meno di 90 secondi. La community te ne sarà grata.</div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:8px;flex-shrink:0">
+        <div class="timer-badge" id="timerBadge">
+          <i class="ph ph-timer" style="font-size:13px"></i>
+          <span id="timerDisplay">0:00</span>
+        </div>
+        <button class="close-btn" onclick="closeAllSheets()">✕</button>
+      </div>
+    </div>
+
+    <!-- Congrats banner -->
+    <div class="congrats-banner" id="congratsBanner" id="congrats-msg">
+      🏆 Complimenti, vuoi fare un lavoro curato, grazie!
+    </div>
+
+    <div class="add-body">
+
+      <!-- TITOLO -->
+      <div class="section-lbl">
+        <span id="lbl-titolo">Titolo</span>
+        <span class="required-badge" id="lbl-obbl">OBBLIGATORIO</span>
+      </div>
+      <input type="text" class="name-input" id="poiName"
+        placeholder="Come si chiama questo posto?" maxlength="80"
+        oninput="onNameChange()">
+
+      <!-- DOVE SI TROVA -->
+      <div class="section-lbl" id="lbl-dove">Dove si trova?</div>
+      <div class="location-tabs" id="locTabs">
+        <button class="loc-tab active" onclick="setLocMode('gps')" id="lt-gps">
+          <i class="ph ph-crosshair-simple" style="font-size:12px"></i>
+          <span id="lt-gps-lbl">GPS Live</span>
+        </button>
+        <button class="loc-tab" onclick="setLocMode('exif')" id="lt-exif">
+          <i class="ph ph-image" style="font-size:12px"></i>
+          <span>Foto EXIF</span>
+        </button>
+        <button class="loc-tab" onclick="setLocMode('addr')" id="lt-addr">
+          <i class="ph ph-map-pin" style="font-size:12px"></i>
+          <span id="lt-addr-lbl">Indirizzo</span>
+        </button>
+        <button class="loc-tab" onclick="setLocMode('map')" id="lt-map">
+          <i class="ph ph-hand-tap" style="font-size:12px"></i>
+          <span id="lt-map-lbl">Tocca mappa</span>
+        </button>
+      </div>
+      <div id="locResult">
+        <!-- populated by setLocMode -->
+      </div>
+
+      <!-- VICINO A COSA -->
+      <div class="section-lbl" id="lbl-vicino">Vicino a cosa?
+        <span class="section-hint" id="lbl-vicino-hint">(opzionale)</span>
+      </div>
+      <input type="text" class="nearby-input" id="nearbyInput"
+        placeholder="Es. Vicino al teatro, al mercato..." maxlength="60">
+
+      <!-- FOTO -->
+      <div class="section-lbl">
+        <span id="lbl-foto">Foto</span>
+        <span class="section-hint" id="lbl-foto-hint">— opzionali, fino a 3</span>
+      </div>
+      <div class="photo-row" id="photoRow">
+        <div class="photo-slot" onclick="addPhoto(0)" id="ps0">
+          <div class="photo-ico"><i class="ph ph-camera"></i></div>
+          <div class="photo-lbl" id="pl0">Principale</div>
+        </div>
+        <div class="photo-slot" onclick="addPhoto(1)" id="ps1">
+          <div class="photo-ico"><i class="ph ph-image"></i></div>
+          <div class="photo-lbl" id="pl1">Foto 2</div>
+        </div>
+        <div class="photo-slot" onclick="addPhoto(2)" id="ps2">
+          <div class="photo-ico"><i class="ph ph-image"></i></div>
+          <div class="photo-lbl" id="pl2">Foto 3</div>
+        </div>
+      </div>
+      <div class="photo-hint">
+        <i class="ph ph-info" style="font-size:13px;color:var(--muted)"></i>
+        <span id="photo-hint-txt">Non sei sul posto? Puoi aggiungere foto in seguito.</span>
+      </div>
+
+      <!-- RACCONTA -->
+      <div class="section-lbl">
+        <span id="lbl-racconta">Racconta</span>
+        <span class="section-hint" id="lbl-racconta-hint">— max 200 caratteri</span>
+      </div>
+      <textarea class="racconta-input" id="poiDesc" maxlength="200"
+        oninput="updateCount()"
+        id="desc-placeholder"></textarea>
+      <div class="char-bar">
+        <span class="char-count" id="descCount">0 / 200</span>
+      </div>
+
+      <!-- CATEGORIE -->
+      <div class="section-lbl">
+        <span id="lbl-cat">Categorie</span>
+        <span class="section-hint" id="lbl-cat-hint">0 / 3</span>
+      </div>
+      <div class="cats-grid" id="catsGrid"></div>
+
+      <!-- AGGIUNGI A UNA LISTA -->
+      <div class="section-lbl" id="lbl-lista">Aggiungi a una lista</div>
+      <div class="lists-row" id="listsRow"></div>
+
+      <!-- ROTTA STORICA -->
+      <div class="section-lbl" id="lbl-rotta">Rotta storica
+        <span class="section-hint" id="lbl-rotta-hint">— opzionale</span>
+      </div>
+      <div class="rotta-trigger" onclick="toggleRotta()">
+        <div class="rotta-ico">〰️</div>
+        <div class="rotta-info">
+          <div class="rotta-name" id="rotta-trigger-name">Collega a una rotta storica</div>
+          <div class="rotta-sub" id="rotta-trigger-sub">Via Egnatia · Serenissima · Illiriche · Greche</div>
+        </div>
+        <div class="rotta-arrow" id="rottaArrow">›</div>
+      </div>
+      <div class="rotta-options" id="rottaOptions">
+        <div class="rotta-opt" id="ro-none" onclick="selectRotta('none')">
+          <div class="rotta-opt-ico">—</div>
+          <div class="rotta-opt-text">
+            <div class="rotta-opt-name" id="ro-none-name">Nessuna rotta</div>
+            <div class="rotta-opt-desc" id="ro-none-desc">POI libero, non collegato a percorsi storici</div>
+          </div>
+        </div>
+        <div class="rotta-opt" id="ro-egnatia" onclick="selectRotta('egnatia')">
+          <div class="rotta-opt-ico">🏛</div>
+          <div class="rotta-opt-text">
+            <div class="rotta-opt-name">Via Egnatia</div>
+            <div class="rotta-opt-desc">L'antica via romana che attraversava i Balcani</div>
+          </div>
+        </div>
+        <div class="rotta-opt" id="ro-serenissima" onclick="selectRotta('serenissima')">
+          <div class="rotta-opt-ico">⚓</div>
+          <div class="rotta-opt-text">
+            <div class="rotta-opt-name">Rotta Serenissima</div>
+            <div class="rotta-opt-desc">I porti e le rotte commerciali della Serenissima</div>
+          </div>
+        </div>
+        <div class="rotta-opt" id="ro-illiriche" onclick="selectRotta('illiriche')">
+          <div class="rotta-opt-ico">🏔</div>
+          <div class="rotta-opt-text">
+            <div class="rotta-opt-name">Terre Illiriche</div>
+            <div class="rotta-opt-desc">Siti e luoghi della civiltà illirica pre-romana</div>
+          </div>
+        </div>
+        <div class="rotta-opt" id="ro-greche" onclick="selectRotta('greche')">
+          <div class="rotta-opt-ico">🏺</div>
+          <div class="rotta-opt-text">
+            <div class="rotta-opt-name">Colonie Greche</div>
+            <div class="rotta-opt-desc">Le antiche colonie greche sulla costa adriatica</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VISIBILITÀ -->
+      <div class="section-lbl" id="lbl-vis">Visibilità</div>
+      <div class="vis-row">
+        <div class="vis-chip active" id="vis-pub" onclick="setVis('public')">
+          <span class="vis-label" id="vl-pub">🌍 Pubblico</span>
+          <span class="vis-desc" id="vd-pub">Visibile a tutti</span>
+        </div>
+        <div class="vis-chip" id="vis-priv" onclick="setVis('private')">
+          <span class="vis-label" id="vl-priv">🔒 Privato</span>
+          <span class="vis-desc" id="vd-priv">Solo tu</span>
+        </div>
+        <div class="vis-chip" id="vis-share" onclick="setVis('share')">
+          <span class="vis-label" id="vl-share">🔗 Condividi</span>
+          <span class="vis-desc" id="vd-share">Con link</span>
+        </div>
+      </div>
+
+    </div><!-- /add-body -->
+
+    <!-- SAVE AREA -->
+    <div class="save-area">
+      <button class="save-btn" id="saveBtn" onclick="savePOI()" disabled>
+        <span id="save-btn-txt">Segna sulla mappa</span>
+      </button>
+      <div class="save-hint" id="save-hint-txt">Inserisci il nome del posto per continuare</div>
+      <button class="google-suggest-btn" onclick="showToast('✓ Suggerito a Google Maps! Grazie per contribuire.')">
+        <svg width="16" height="16" viewBox="0 0 48 48" fill="none">
+          <path d="M44.5 20H24v8h11.8C34.7 33.9 29.8 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.3-6.3C34.9 4.8 29.8 3 24 3 12.4 3 3 12.4 3 24s9.4 21 21 21c10.8 0 20-7.8 20-21 0-1.3-.1-2.7-.5-4z" fill="#FFC107"/>
+          <path d="M7 14.7l7.3 5.4C16.1 15.5 19.8 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6.3-6.3C34.9 4.8 29.8 3 24 3c-7.5 0-14 4.1-17 10.7z" fill="#FF3D00"/>
+          <path d="M24 45c5.7 0 10.7-1.9 14.6-5.2l-6.8-5.7C29.8 35.7 27 37 24 37c-5.8 0-10.7-3.9-11.8-9l-7.3 5.6C7.9 40.8 15.4 45 24 45z" fill="#4CAF50"/>
+          <path d="M44.5 20H24v8h11.8c-.5 2.7-2 5-4.2 6.6l6.8 5.7c4.1-3.8 6.6-9.5 6.6-16.3 0-1.3-.1-2.7-.5-4z" fill="#1976D2"/>
+        </svg>
+        <span id="google-btn-txt">Consiglia a Google Maps</span>
+      </button>
+    </div>
+  </div><!-- /addSheet -->
+</div>
+
+<!-- SUCCESS -->
+<div class="success-overlay" id="successOverlay">
+  <div class="success-card">
+    <div class="success-icon">✓</div>
+    <div class="success-title" id="suc-title">POI aggiunto!</div>
+    <div class="success-sub" id="suc-sub">Ora visibile sulla mappa.<br>Grazie per condividere l'amore.</div>
+    <button class="success-close" onclick="closeSuccess()" id="suc-btn">Vai alla mappa</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DATI ─────────────────────────────────────────────────────────────────────
+const CATS = [
+  {id:'food',   emoji:'🍽', it:'Cibo',       sq:'Ushqim',  en:'Food'},
+  {id:'work',   emoji:'💼', it:'Lavoro',     sq:'Punë',    en:'Work'},
+  {id:'sleep',  emoji:'🏨', it:'Pernottare', sq:'Fjetje',  en:'Stay'},
+  {id:'nature', emoji:'🌿', it:'Natura',     sq:'Natyrë',  en:'Nature'},
+  {id:'party',  emoji:'🎉', it:'Festa',      sq:'Festë',   en:'Party'},
+  {id:'culture',emoji:'🎭', it:'Cultura',    sq:'Kulturë', en:'Culture'},
+  {id:'handy',  emoji:'🔧', it:'Pratico',    sq:'Praktik', en:'Handy'},
+  {id:'wellness',emoji:'✨',it:'Benessere',  sq:'Mirëqenie',en:'Wellness'},
+  {id:'love',   emoji:'♥', it:'Love',       sq:'Dashuri', en:'Love'},
+  {id:'audio',  emoji:'🎧', it:'Audioguida', sq:'Audioguide',en:'Audio'},
+  {id:'oss',    emoji:'</>', it:'Open Source',sq:'Open Source',en:'Open Source'},
+];
+
+const LISTS = [
+  {id:'free',    emoji:'🌐', it:'Lista libera', sq:'Listë e lirë',   en:'Free list'},
+  {id:'top',     emoji:'📍', it:'Tirana Top',   sq:'Tirana Top',     en:'Tirana Top'},
+  {id:'weekend', emoji:'📅', it:'Weekend',      sq:'Fundjavë',       en:'Weekend'},
+  {id:'hidden',  emoji:'🔍', it:'Segreti',      sq:'Sekrete',        en:'Hidden'},
+  {id:'food',    emoji:'🍽', it:'Da mangiare',  sq:'Ku hahet',       en:'Food spots'},
+];
+
+const POIS = [
+  {id:1,lat:41.3289,lng:19.8217,
+    name:{it:'Blloku — Il Cuore',sq:'Blloku — Zemra',en:'Blloku — Heart'},
+    desc:{it:'Il quartiere più vivace di Tirana. Un tempo riservato all\'élite comunista, oggi è il simbolo della libertà.',
+          sq:'Lagjja më e gjallë e Tiranës.',
+          en:'Once reserved for the communist elite, now the symbol of freedom.'},
+    cats:['culture','food'],photos:['https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Tirana_Albania.jpg/640px-Tirana_Albania.jpg'],
+    author:'@liri_tirana',avatar:'https://i.pravatar.cc/60?img=47',love_count:147,loved:false},
+  {id:2,lat:41.3297,lng:19.8199,
+    name:{it:'Piazza Skanderbeg',sq:'Sheshi Skënderbej',en:'Skanderbeg Square'},
+    desc:{it:'Il cuore pulsante di Tirana. Museo Nazionale, Moschea Et\'hem Bey, Torre dell\'Orologio.',
+          sq:'Muzeu Kombëtar, Xhamia e Et\'hem Beut, Kulla e Sahatit.',
+          en:'National Museum, Et\'hem Bey Mosque, Clock Tower. Magical at sunset.'},
+    cats:['history','culture'],photos:['https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Skanderbeg_Square_Tirana.jpg/640px-Skanderbeg_Square_Tirana.jpg'],
+    author:'@acastagna',avatar:'https://i.pravatar.cc/60?img=12',love_count:312,loved:false},
+  {id:3,lat:41.3265,lng:19.8239,
+    name:{it:'Bunk\'Art 2',sq:'Bunk\'Art 2',en:'Bunk\'Art 2'},
+    desc:{it:'Un bunker nucleare convertito in museo della Sigurimi. Un\'esperienza che cambia la prospettiva.',
+          sq:'Bunker bërthamor i kthyer në muze të Sigurimit.',
+          en:'Nuclear bunker turned Sigurimi museum. A perspective-changing experience.'},
+    cats:['culture','history'],photos:[],
+    author:'@kulturaTirana',avatar:'https://i.pravatar.cc/60?img=33',love_count:89,loved:false},
+  {id:4,lat:41.3312,lng:19.8185,
+    name:{it:'Parco Rinia',sq:'Parku Rinia',en:'Rinia Park'},
+    desc:{it:'Il polmone verde di Tirana. Al mattino presto con la luce radente è uno dei posti più belli.',
+          sq:'Mushkëritë e gjelbra të Tiranës.',
+          en:'Tirana\'s green lung. Early morning light makes it magical.'},
+    cats:['nature','wellness'],photos:[],
+    author:'@gjoni_art',avatar:'https://i.pravatar.cc/60?img=28',love_count:56,loved:false},
+  {id:5,lat:41.3273,lng:19.8154,
+    name:{it:'Pazari i Ri',sq:'Pazari i Ri',en:'New Bazaar'},
+    desc:{it:'Il bazar rinnovato di Tirana. Frutta, verdura, spezie, prodotti locali a prezzi onesti.',
+          sq:'Pazari i ripërtërirë. Fruta, perime, erëza me çmime të ndershme.',
+          en:'Tirana\'s renovated bazaar. Fresh produce and local goods at honest prices.'},
+    cats:['food','culture'],photos:[],
+    author:'@liri_tirana',avatar:'https://i.pravatar.cc/60?img=47',love_count:203,loved:false},
+  {id:6,lat:41.3345,lng:19.8228,
+    name:{it:'Lago Artificiale',sq:'Liqeni Artificial',en:'Artificial Lake'},
+    desc:{it:'Il lago artificiale con i suoi sentieri e la riva affacciata sulla città. Perfetto al tramonto.',
+          sq:'Liqeni artificial me shtigjet dhe pamjen nga qyteti.',
+          en:'The artificial lake with walking paths and city views. Perfect at sunset.'},
+    cats:['nature','wellness'],photos:[],
+    author:'@albania_walks',avatar:'https://i.pravatar.cc/60?img=55',love_count:178,loved:false},
+];
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let lang='it', map, markers=[], currentPOI=null;
+let selectedCats=[], selectedList='free', selectedRotta='', currentVis='public';
+let photosFilled=[false,false,false];
+let timerInterval=null, timerSec=0, rottaOpen=false;
+let addedPOIs=[];
+const demoPhotos=['https://picsum.photos/seed/t1/400/300','https://picsum.photos/seed/t2/400/300','https://picsum.photos/seed/t3/400/300'];
+const locModes={
+  gps:{street:'Rruga Sami Frashëri, Tirana',coords:'41.3275° N · 19.8187° E'},
+  exif:{street:'Analisi EXIF in corso...',coords:'Carica prima una foto'},
+  addr:{input:true},
+  map:{mapHint:true}
 };
 
-function setLayer(el, layer) {
-  document.querySelectorAll('.chip').forEach(c => {
-    c.classList.remove('on','c-red','c-gold','c-blue','c-green');
+// ── MAP ───────────────────────────────────────────────────────────────────────
+function initMap(){
+  map=L.map('map',{zoomControl:false}).setView([41.3289,19.8199],15);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+    {attribution:'© CARTO',subdomains:'abcd',maxZoom:19}).addTo(map);
+  renderMarkers();
+  let pt;
+  map.on('mousedown touchstart',function(e){pt=setTimeout(()=>openAddSheet(e.latlng),600)});
+  map.on('mouseup touchend mousemove',function(){clearTimeout(pt)});
+}
+
+function renderMarkers(){
+  markers.forEach(m=>map.removeLayer(m));
+  markers=[];
+  [...POIS,...addedPOIs].forEach(poi=>{
+    const ico=L.divIcon({
+      className:'',
+      html:`<div class="poi-marker"><div class="poi-bubble">♥${poi.love_count>0?`<div class="poi-badge">${poi.love_count>99?'99+':poi.love_count}</div>`:''}</div><div class="poi-tail"></div></div>`,
+      iconSize:[40,50],iconAnchor:[20,50]
+    });
+    markers.push(L.marker([poi.lat,poi.lng],{icon:ico}).addTo(map).on('click',()=>openDetail(poi.id)));
   });
-  el.classList.add('on');
-  const cc = { tutto:'c-red', storie:'c-red', cibo:'c-red', natura:'c-green', rotte:'c-gold', cultura:'c-blue', love:'c-red' };
-  el.classList.add(cc[layer] || 'c-red');
+}
 
-  if (layer === 'storie') { openStories(); return; }
+// ── DETAIL ────────────────────────────────────────────────────────────────────
+function openDetail(id){
+  const poi=[...POIS,...addedPOIs].find(p=>p.id===id);
+  if(!poi)return;
+  currentPOI=poi;
+  const ph=document.getElementById('detailPhotos');
+  ph.innerHTML='';
+  const photos=poi.photos?.length?poi.photos:[];
+  if(photos.length){
+    photos.forEach(url=>{
+      const d=document.createElement('div');
+      d.className='detail-photo';
+      d.style.backgroundImage=`url(${url})`;
+      ph.appendChild(d);
+    });
+  } else {
+    const d=document.createElement('div');
+    d.className='detail-photo';
+    d.style.background='linear-gradient(135deg,#d8cec0,#b8ae9e)';
+    ph.appendChild(d);
+  }
+  const cat=CATS.find(c=>poi.cats?.[0]===c.id);
+  document.getElementById('detailTag').innerHTML=cat?`${cat.emoji} ${cat[lang]}`:'📍';
+  document.getElementById('detailName').textContent=poi.name[lang]||poi.name.it;
+  document.getElementById('detailDesc').textContent=poi.desc[lang]||poi.desc.it;
+  document.getElementById('detailAuthor').textContent=poi.author;
+  document.getElementById('detailAvatar').src=poi.avatar;
+  document.getElementById('loveCount').textContent=poi.love_count;
+  document.getElementById('loveBtn').classList.toggle('loved',!!poi.loved);
+  openSheet('detailSheet');
+}
 
-  closeCard(); closeStories(); closeRouteTip();
-  const visible = PIN_LAYERS[layer] || PIN_LAYERS.tutto;
-  ['bunkart2','pazari','liqeni','blloku','egnatia_km'].forEach(id => {
-    const p = document.getElementById('pin-'+id);
-    if (p) p.style.display = visible.includes(id) ? 'flex' : 'none';
+function toggleLove(){
+  if(!currentPOI)return;
+  currentPOI.loved=!currentPOI.loved;
+  currentPOI.love_count+=currentPOI.loved?1:-1;
+  document.getElementById('loveBtn').classList.toggle('loved',currentPOI.loved);
+  document.getElementById('loveCount').textContent=currentPOI.love_count;
+  const btn=document.getElementById('loveBtn');
+  btn.style.transform='scale(1.2)';
+  setTimeout(()=>btn.style.transform='',200);
+  showToast(currentPOI.loved?'♥ LOVE aggiunto!':'LOVE rimosso');
+  renderMarkers();
+}
+
+// ── ADD POI ───────────────────────────────────────────────────────────────────
+function openAddSheet(latlng){
+  // Reset
+  document.getElementById('poiName').value='';
+  document.getElementById('poiDesc').value='';
+  document.getElementById('descCount').textContent='0 / 200';
+  selectedCats=[];selectedList='free';selectedRotta='';currentVis='public';
+  photosFilled=[false,false,false];
+  rottaOpen=false;
+  document.getElementById('rottaOptions').classList.remove('open');
+  document.getElementById('rottaArrow').classList.remove('open');
+  document.getElementById('congratsBanner').classList.remove('show');
+  updateSaveBtn();
+  setLocMode('gps',latlng);
+  renderCats();
+  renderLists();
+  setVis('public');
+  renderPhotoSlots();
+  applyAddLang();
+  startTimer();
+  openSheet('addSheet');
+}
+
+function toggleAddSheet(){
+  const s=document.getElementById('addSheet');
+  if(s.classList.contains('open')){closeAllSheets();}
+  else{openAddSheet(map.getCenter());}
+}
+
+// TIMER
+function startTimer(){
+  clearInterval(timerInterval);
+  timerSec=0;
+  updateTimer();
+  timerInterval=setInterval(()=>{
+    timerSec++;
+    updateTimer();
+    if(timerSec===90){
+      document.getElementById('congratsBanner').classList.add('show');
+    }
+  },1000);
+}
+
+function updateTimer(){
+  const m=Math.floor(timerSec/60);
+  const s=timerSec%60;
+  document.getElementById('timerDisplay').textContent=`${m}:${String(s).padStart(2,'0')}`;
+}
+
+// LOCATION MODE
+function setLocMode(mode,latlng){
+  document.querySelectorAll('.loc-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('lt-'+mode)?.classList.add('active');
+  const r=document.getElementById('locResult');
+  if(mode==='gps'){
+    const lat=latlng?latlng.lat.toFixed(4)+'° N':locModes.gps.coords.split(' ')[0];
+    const lng=latlng?latlng.lng.toFixed(4)+'° E':'19.8187° E';
+    r.innerHTML=`<div class="loc-result">
+      <div class="loc-dot"></div>
+      <div class="loc-text">
+        <div class="loc-street">Rruga Sami Frashëri, Tirana</div>
+        <div class="loc-coords">${latlng?latlng.lat.toFixed(4)+'° N · '+latlng.lng.toFixed(4)+'° E':'41.3275° N · 19.8187° E'}</div>
+      </div>
+    </div>`;
+  } else if(mode==='exif'){
+    r.innerHTML=`<div class="loc-result">
+      <div class="loc-dot" style="background:#BA7517"></div>
+      <div class="loc-text">
+        <div class="loc-street">Carica una foto con dati GPS</div>
+        <div class="loc-coords">Le coordinate EXIF verranno lette automaticamente</div>
+      </div>
+    </div>`;
+  } else if(mode==='addr'){
+    r.innerHTML=`<input type="text" class="loc-text-input" placeholder="Es. Via Ismail Qemali 32, Tirana...">`;
+  } else if(mode==='map'){
+    r.innerHTML=`<div class="loc-map-hint">
+      <i class="ph ph-hand-tap" style="font-size:18px"></i>
+      <span>Tieni premuto sulla mappa per posizionare il PIN nel punto esatto</span>
+    </div>`;
+  }
+}
+
+// PHOTOS
+function addPhoto(i){
+  if(photosFilled[i]){photosFilled[i]=false;}
+  else if(photosFilled.filter(Boolean).length<3){photosFilled[i]=true;}
+  renderPhotoSlots();
+}
+
+function renderPhotoSlots(){
+  const names=['Principale','Foto 2','Foto 3'];
+  for(let i=0;i<3;i++){
+    const s=document.getElementById('ps'+i);
+    if(photosFilled[i]){
+      s.className='photo-slot filled';
+      s.innerHTML=`<img src="${demoPhotos[i]}" style="border-radius:10px">`;
+    } else {
+      s.className='photo-slot';
+      s.innerHTML=`<div class="photo-ico"><i class="ph ph-${i===0?'camera':'image'}"></i></div><div class="photo-lbl">${names[i]}</div>`;
+    }
+  }
+}
+
+// CATEGORIES (max 3)
+function renderCats(){
+  const g=document.getElementById('catsGrid');
+  g.innerHTML='';
+  CATS.forEach(c=>{
+    const btn=document.createElement('button');
+    const active=selectedCats.includes(c.id);
+    const disabled=selectedCats.length>=3&&!active;
+    btn.className='cat-chip'+(active?' active':'')+(disabled?' disabled':'');
+    btn.innerHTML=`${c.emoji} ${c[lang]}`;
+    btn.onclick=()=>{
+      if(selectedCats.includes(c.id)){selectedCats=selectedCats.filter(x=>x!==c.id);}
+      else if(selectedCats.length<3){selectedCats.push(c.id);}
+      document.getElementById('lbl-cat-hint').textContent=`${selectedCats.length} / 3`;
+      renderCats();
+    };
+    g.appendChild(btn);
   });
 }
 
-/* ================================================================
-   SATELLITE VIEW — toggle CSS filter sulla mappa
-   ================================================================ */
-function toggleSatellite() {
-  S.satellite = !S.satellite;
-  const mapSvg  = document.getElementById('mapSvg');
-  const mapArea = document.getElementById('mapArea');
-  const satBtn  = document.getElementById('satBtn');
-  mapSvg.classList.toggle('satellite',  S.satellite);
-  mapArea.classList.toggle('satellite', S.satellite);
-  satBtn.classList.toggle('sat-on',     S.satellite);
-  satBtn.title = S.satellite ? 'Vista mappa' : 'Vista satellitare';
+// LISTS
+function renderLists(){
+  const r=document.getElementById('listsRow');
+  r.innerHTML='';
+  LISTS.forEach(l=>{
+    const btn=document.createElement('button');
+    btn.className='list-chip'+(selectedList===l.id?' active':'');
+    btn.innerHTML=`${l.emoji} ${l[lang]}`;
+    btn.onclick=()=>{selectedList=l.id;renderLists();};
+    r.appendChild(btn);
+  });
 }
 
-/* ================================================================
-   NAVIGATION
-   ================================================================ */
-function goNav(sec) {
-  ['home','lists','loved','profile'].forEach(id =>
-    document.getElementById('nav-'+id)?.classList.remove('on')
-  );
-  document.getElementById('nav-'+sec)?.classList.add('on');
+// ROTTA
+function toggleRotta(){
+  rottaOpen=!rottaOpen;
+  document.getElementById('rottaOptions').classList.toggle('open',rottaOpen);
+  document.getElementById('rottaArrow').classList.toggle('open',rottaOpen);
 }
 
-/* ================================================================
-   MAP ZOOM
-   ================================================================ */
-let zoom = 1;
-function zoomIn()    { zoom = Math.min(zoom+0.12, 1.6); applyZoom(); }
-function zoomOut()   { zoom = Math.max(zoom-0.12, 0.75); applyZoom(); }
-function centerLoc() { zoom = 1; applyZoom(); }
-function applyZoom() {
-  document.getElementById('mapSvg').style.transform = `scale(${zoom})`;
+function selectRotta(id){
+  selectedRotta=id==='none'?'':id;
+  document.querySelectorAll('.rotta-opt').forEach(el=>el.classList.remove('active'));
+  if(id!=='none')document.getElementById('ro-'+id)?.classList.add('active');
+  else document.getElementById('ro-none')?.classList.add('active');
+  // Update trigger label
+  if(selectedRotta){
+    const names={egnatia:'Via Egnatia',serenissima:'Rotta Serenissima',illiriche:'Terre Illiriche',greche:'Colonie Greche'};
+    document.getElementById('rotta-trigger-name').textContent=names[selectedRotta]||'Collega a una rotta storica';
+  } else {
+    document.getElementById('rotta-trigger-name').textContent='Collega a una rotta storica';
+  }
+  rottaOpen=false;
+  document.getElementById('rottaOptions').classList.remove('open');
+  document.getElementById('rottaArrow').classList.remove('open');
 }
 
-/* ================================================================
-   FILTER PANEL TOGGLE (placeholder per impostazioni filtri)
-   ================================================================ */
-function toggleFilterPanel() {
-  // Placeholder — in produzione: mostra pannello impostazioni filtri/profilo
+// VISIBILITY
+function setVis(v){
+  currentVis=v;
+  ['pub','priv','share'].forEach(k=>{
+    document.getElementById('vis-'+k).classList.toggle('active',
+      (v==='public'&&k==='pub')||(v==='private'&&k==='priv')||(v==='share'&&k==='share'));
+  });
 }
 
-/* ================================================================
-   CLOSE ALL
-   ================================================================ */
-function closeAll() {
-  closeSheet();
-  closeStories();
-  closeRouteTip();
-  closeCard();
+// SAVE
+function onNameChange(){
+  updateSaveBtn();
 }
 
-function handleMapClick(e) {
-  if (!e.target.closest('.pin') && !e.target.closest('.poi-card') && !e.target.closest('.route-tip'))
-    closeCard();
-  if (!e.target.closest('[onclick*="showRouteTip"]') && !e.target.closest('.route-tip'))
-    closeRouteTip();
+function updateSaveBtn(){
+  const name=document.getElementById('poiName').value.trim();
+  const btn=document.getElementById('saveBtn');
+  const hint=document.getElementById('save-hint-txt');
+  btn.disabled=!name;
+  hint.style.display=name?'none':'block';
 }
 
-/* ================================================================
-   INIT
-   ================================================================ */
-document.addEventListener('DOMContentLoaded', () => {
-  updateCTA();
-});
+function updateCount(){
+  const v=document.getElementById('poiDesc').value.length;
+  document.getElementById('descCount').textContent=`${v} / 200`;
+}
+
+function savePOI(){
+  const name=document.getElementById('poiName').value.trim();
+  if(!name)return;
+  const desc=document.getElementById('poiDesc').value.trim();
+  const center=map.getCenter();
+  addedPOIs.push({
+    id:Date.now(),
+    lat:center.lat+(Math.random()-.5)*.003,
+    lng:center.lng+(Math.random()-.5)*.003,
+    name:{it:name,sq:name,en:name},
+    desc:{it:desc||'Luogo aggiunto dalla community.',sq:desc||'Vend i komunitetit.',en:desc||'Community place.'},
+    cats:selectedCats,
+    photos:photosFilled.map((f,i)=>f?demoPhotos[i]:null).filter(Boolean),
+    author:'@tu',avatar:'https://i.pravatar.cc/60?img=1',
+    love_count:0,loved:false
+  });
+  clearInterval(timerInterval);
+  closeAllSheets();
+  renderMarkers();
+  setTimeout(()=>{
+    document.getElementById('successOverlay').classList.add('show');
+  },300);
+}
+
+function closeSuccess(){
+  document.getElementById('successOverlay').classList.remove('show');
+}
+
+// ── SHEET UTILS ───────────────────────────────────────────────────────────────
+function openSheet(id){
+  closeAllSheets(false);
+  document.getElementById(id).classList.add('open');
+  document.getElementById('backdrop').classList.add('visible');
+  document.getElementById('fab').classList.add('open');
+}
+
+function closeAllSheets(resetFab=true){
+  document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('open'));
+  document.getElementById('backdrop').classList.remove('visible');
+  if(resetFab)document.getElementById('fab').classList.remove('open');
+  clearInterval(timerInterval);
+}
+
+// ── LANGUAGE ─────────────────────────────────────────────────────────────────
+const OB={
+  it:{sub:'La mappa dei luoghi che ami davvero.\nNon quella sponsorizzata.',btn:'Esplora la mappa →',hint:'Tappa un ♥ per vedere un luogo.\nPremi + per aggiungere il tuo.'},
+  sq:{sub:'Harta e vendeve që i do me të vërtetë.\nJo ajo me sponsorizime.',btn:'Eksploro hartën →',hint:'Trokis ♥ për të parë një vend.\nShtyp + për të shtuar tëndin.'},
+  en:{sub:'The map of places you truly love.\nNot the sponsored one.',btn:'Explore the map →',hint:'Tap a ♥ to see a place.\nPress + to add yours.'},
+};
+
+function setLang(l){
+  lang=l;
+  document.querySelectorAll('.ob-lang').forEach(b=>b.classList.remove('active'));
+  document.querySelector(`.ob-lang[onclick="setLang('${l}')"]`)?.classList.add('active');
+  document.getElementById('ob-sub').textContent=OB[l].sub;
+  document.getElementById('ob-btn').textContent=OB[l].btn;
+  document.getElementById('ob-hint').textContent=OB[l].hint;
+  document.getElementById('langToggle').textContent=l.toUpperCase();
+  renderCats();renderLists();
+}
+
+function cycleLang(){
+  const ls=['it','sq','en'];
+  setLang(ls[(ls.indexOf(lang)+1)%3]);
+}
+
+function applyAddLang(){
+  const ph={it:'L\'anima di questo posto… perché merita di essere ricordato?',
+             sq:'Shpirti i këtij vendi… pse meriton të kujtohet?',
+             en:'The soul of this place… why does it deserve to be remembered?'};
+  document.getElementById('poiDesc').placeholder=ph[lang];
+}
+
+function enterApp(){
+  document.getElementById('onboarding').classList.add('hide');
+  setTimeout(()=>{document.getElementById('onboarding').style.display='none';},500);
+  showToast('♥ Tappa un luogo o tieni premuto sulla mappa');
+}
+
+function centerMap(){map.flyTo([41.3289,19.8199],15,{duration:1.2})}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+window.addEventListener('load',initMap);
 </script>
-
 </body>
 </html>
