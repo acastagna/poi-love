@@ -21,7 +21,7 @@ i.ph,i.ph-fill{line-height:1;pointer-events:none}
 button{touch-action:manipulation}
 
 /* ── MAP ── */
-#map{position:fixed;inset:0 0 66px 0;z-index:1;background:#e8e0d0}
+#map{position:fixed;inset:0 0 106px 0;z-index:1;background:#e8e0d0}
 .leaflet-control-zoom{display:none}
 .leaflet-control-attribution{font-size:9px;opacity:.3}
 
@@ -42,16 +42,16 @@ button{touch-action:manipulation}
 .mt-btn.route-active{background:#7C3AED;color:#fff}
 
 /* ── FAB ── */
-.fab{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:250;width:60px;height:60px;border-radius:30px;background:var(--red);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 22px rgba(212,43,43,.45);font-size:28px;color:#fff;transition:transform .25s,background .25s}
+.fab{position:fixed;bottom:120px;left:50%;transform:translateX(-50%);z-index:250;width:60px;height:60px;border-radius:30px;background:var(--red);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 22px rgba(212,43,43,.45);font-size:28px;color:#fff;transition:transform .25s,background .25s}
 .fab.open{transform:translateX(-50%) rotate(45deg)}
-.fab-menu{position:fixed;bottom:150px;left:50%;transform:translateX(-50%) translateY(10px);z-index:249;display:flex;flex-direction:column;gap:9px;align-items:center;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
+.fab-menu{position:fixed;bottom:190px;left:50%;transform:translateX(-50%) translateY(10px);z-index:249;display:flex;flex-direction:column;gap:9px;align-items:center;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
 .fab-menu.open{opacity:1;pointer-events:all;transform:translateX(-50%) translateY(0)}
 .fab-opt{background:var(--card);border:none;border-radius:22px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px;box-shadow:0 4px 18px rgba(0,0,0,.14);white-space:nowrap;transition:transform .15s}
 .fab-opt:active{transform:scale(.96)}
 .fab-opt-icon{width:30px;height:30px;border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
 
 /* ── BOTTOM NAV ── */
-.bottom-nav{position:fixed;bottom:10px;left:0;right:0;z-index:300;height:56px;background:var(--card);border-top:1px solid var(--border);display:flex;align-items:stretch;box-shadow:0 -3px 16px rgba(0,0,0,.08)}
+.bottom-nav{position:fixed;bottom:50px;left:0;right:0;z-index:300;height:56px;background:var(--card);border-top:1px solid var(--border);display:flex;align-items:stretch;box-shadow:0 -3px 16px rgba(0,0,0,.08)}
 .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:none;background:none;cursor:pointer;padding:4px 0;transition:opacity .15s}
 .nav-item i{font-size:22px;color:var(--muted);transition:color .15s}
 .nav-item .nav-lbl{font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.3px;transition:color .15s}
@@ -62,11 +62,13 @@ button{touch-action:manipulation}
 .nav-item.nav-sos{animation:sosPulse 2.2s ease-in-out infinite}
 @keyframes sosPulse{0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,0)}50%{box-shadow:0 0 0 6px rgba(220,38,38,.18)}}
 
-/* ── LANG STRIP (buffer anti-Siri) ── */
-#lang-strip{position:fixed;bottom:0;left:0;right:0;z-index:500;height:10px;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:8px;line-height:1;border-top:1px solid var(--border);user-select:none;pointer-events:none}
+/* ── CREDIT STRIP (buffer anti-Siri + credits) ── */
+#lang-strip{position:fixed;bottom:0;left:0;right:0;z-index:500;height:50px;background:linear-gradient(160deg,#D42B2B 0%,#7B1111 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;user-select:none;pointer-events:none;padding:0 16px}
+#lang-strip .cr-top{font-size:9px;font-weight:800;color:rgba(255,255,255,.95);letter-spacing:.4px;white-space:nowrap}
+#lang-strip .cr-bot{font-size:8px;font-weight:500;color:rgba(255,255,255,.65);letter-spacing:.2px;white-space:nowrap}
 
 /* ── VIEWS ── */
-.profile-view,.itin-view{position:fixed;inset:0 0 66px 0;z-index:100;background:var(--bg);overflow-y:auto;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.72,0,1);-webkit-overflow-scrolling:touch}
+.profile-view,.itin-view{position:fixed;inset:0 0 106px 0;z-index:100;background:var(--bg);overflow-y:auto;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.72,0,1);-webkit-overflow-scrolling:touch}
 .profile-view.active,.itin-view.active{transform:translateY(0)}
 
 /* ── SHEETS ── */
@@ -467,7 +469,7 @@ button{touch-action:manipulation}
 @keyframes voicePulse{0%,100%{box-shadow:0 0 0 0 rgba(212,43,43,0)}50%{box-shadow:0 0 0 5px rgba(212,43,43,.3)}}
 
 /* TOAST */
-.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:#1C1C1C;color:#fff;border-radius:20px;padding:10px 20px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
+.toast{position:fixed;bottom:120px;left:50%;transform:translateX(-50%) translateY(20px);background:#1C1C1C;color:#fff;border-radius:20px;padding:10px 20px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 /* HERO BG BUTTON */
@@ -582,8 +584,11 @@ button{touch-action:manipulation}
   </button>
 </nav>
 
-<!-- LANG STRIP — buffer anti-Siri -->
-<div id="lang-strip">🇮🇹</div>
+<!-- CREDIT STRIP — buffer anti-Siri -->
+<div id="lang-strip">
+  <div class="cr-top">POI•LOVE · Ideazione e Direzione Creativa: Alessandro Castagna · Sviluppo: AI-assisted (Claude / Anthropic)</div>
+  <div class="cr-bot">Progetto Open Source · github.com/acastagna/poi-love · Licenza MIT · © 2026 Alessandro Castagna</div>
+</div>
 
 <!-- ═══ PROFILE VIEW ═══ -->
 <div class="profile-view" id="profileView">
@@ -1327,8 +1332,6 @@ function applyLang(l){
   lang=l;
   const btn=document.getElementById('langBtn');
   if(btn)btn.textContent=LANG_FLAGS[l]||l.toUpperCase();
-  const strip=document.getElementById('lang-strip');
-  if(strip)strip.textContent=LANG_FLAGS[l]||l.toUpperCase();
   document.documentElement.lang=l;
   const t=T[l];
   document.querySelectorAll('[data-t]').forEach(el=>{
@@ -2001,6 +2004,7 @@ function toggleHeroBgPicker(e){
 }
 function setHeroBg(gradient){
   document.getElementById('profileHero').style.background=gradient;
+  document.getElementById('lang-strip').style.background=gradient;
   document.getElementById('heroBgPicker').classList.remove('open');
   showToast('🎨 Sfondo aggiornato');
 }
@@ -2013,7 +2017,9 @@ function setHeroBgImg(){
     'https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/Kotor_Montenegro_%281%29.jpg/800px-Kotor_Montenegro_%281%29.jpg',
   ];
   const url=imgs[Math.floor(Math.random()*imgs.length)];
-  document.getElementById('profileHero').style.background=`linear-gradient(rgba(0,0,0,.45),rgba(0,0,0,.65)),url('${url}') center/cover`;
+  const imgBg=`linear-gradient(rgba(0,0,0,.45),rgba(0,0,0,.65)),url('${url}') center/cover`;
+  document.getElementById('profileHero').style.background=imgBg;
+  document.getElementById('lang-strip').style.background=imgBg;
   showToast('🖼 Sfondo paesaggio aggiornato');
 }
 document.addEventListener('click',e=>{
