@@ -407,13 +407,27 @@ button{touch-action:manipulation}
 .poi-card-btn{width:24px;height:24px;border-radius:7px;border:none;background:#f5f0e8;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted);transition:all .15s}
 .pcb-del:active{background:#FEE2E2;color:var(--red)}
 
-/* ── Desktop: sezione POI al 70% larghezza, mappa a destra ── */
+/* ── Desktop: split 50/50 — mappa sinistra, contenuto destra ── */
 @media(min-width:1024px){
-  #map{right:30%;inset:0 30% 0 0}
-  .profile-view,.itin-view{width:70%;right:30%}
-  .nav-bar{width:70%;right:30%}
-  /* Sidebar destra fissa con mappa */
-  body::after{content:'';position:fixed;top:0;right:0;width:30%;height:100%;z-index:0;pointer-events:none}
+  /* Mappa: occupa la metà sinistra, altezza intera */
+  #map{inset:0 50% 0 0}
+
+  /* Pannelli contenuto: metà destra */
+  .profile-view,.itin-view{left:50%}
+  .nav-bar{left:50%;right:0}
+
+  /* Detail sheet overlay: ancorato alla metà destra */
+  #detailOv{left:50%;right:0;top:0;bottom:0}
+
+  /* POI board: 2 colonne nel pannello 50% */
+  .poi-board{grid-template-columns:repeat(2,1fr)!important}
+
+  /* Cover immagini: aspect-ratio controllato, mai sgranate */
+  .itin-cover-img{aspect-ratio:16/9;object-fit:cover;width:100%;display:block}
+  .poi-card-img{aspect-ratio:4/3!important}
+  .detail-photo{width:100%;height:auto;aspect-ratio:4/3;flex-shrink:0}
+
+  body::after{display:none}
 }
 
 /* PUBLIC TOGGLE BUTTON — verde */
@@ -497,6 +511,52 @@ button{touch-action:manipulation}
 
 /* Footer */
 .tlp-footer{text-align:center;font-size:11px;color:var(--muted);padding-bottom:20px}
+
+/* ── Cover images — mai sgranate, sempre con object-fit ── */
+/* Regola difensiva globale: qualsiasi <img> dentro un contenitore con aspect-ratio fisso */
+.detail-photo{object-fit:cover;background-size:cover;background-position:center}
+.poi-card-img{background-size:cover;background-position:center}
+img.cover-safe{object-fit:cover;width:100%;display:block}
+/* Tutte le img nelle card/cover non si stirano */
+.trip-cover img,.poi-card img,.detail-photos img,
+.level-env-card img,.photo-picker-thumb img,
+.pub-profile-view img:not(.g-avatar img):not(.profile-avatar img){
+  object-fit:cover;width:100%;height:100%;display:block
+}
+
+/* ── Modale Vanity URL + QR ── */
+.vanity-modal-ov{position:fixed;inset:0;z-index:900;display:none;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.55)}
+.vanity-modal-ov.open{display:flex}
+.vanity-modal{background:var(--card);border-radius:24px 24px 0 0;padding:0 0 40px;width:100%;max-width:540px;animation:slideUp .35s cubic-bezier(.32,.72,0,1)}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.vanity-modal-handle{width:44px;height:5px;background:#C8BFB0;border-radius:3px;margin:14px auto 18px}
+.vanity-modal-title{font-size:17px;font-weight:900;color:var(--text);padding:0 20px 12px;text-align:center}
+.vanity-modal-sub{font-size:12px;color:var(--muted);padding:0 20px 16px;text-align:center;line-height:1.5}
+.vanity-input-wrap{display:flex;align-items:center;gap:0;margin:0 20px 8px;border-radius:12px;border:2px solid var(--border);background:var(--bg);overflow:hidden;transition:border-color .2s}
+.vanity-input-wrap:focus-within{border-color:var(--red)}
+.vanity-at{padding:10px 4px 10px 14px;font-size:15px;font-weight:800;color:var(--red);flex-shrink:0}
+.vanity-in{flex:1;border:none;background:transparent;padding:10px 14px 10px 2px;font-size:15px;font-weight:700;font-family:inherit;color:var(--text);outline:none}
+.vanity-status{padding:0 20px 12px;font-size:12px;font-weight:700;min-height:18px}
+.vanity-status.ok{color:var(--green)}
+.vanity-status.err{color:var(--red)}
+.vanity-status.checking{color:var(--muted)}
+.vanity-save-btn{display:block;width:calc(100% - 40px);margin:4px 20px 16px;height:48px;border:none;border-radius:14px;background:var(--red);color:#fff;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;transition:opacity .2s}
+.vanity-save-btn:disabled{opacity:.4;cursor:default}
+/* QR section */
+.vanity-qr-sep{height:1px;background:var(--border);margin:0 20px 16px}
+.vanity-qr-row{display:flex;align-items:center;gap:16px;padding:0 20px}
+.vanity-qr-box{width:90px;height:90px;border-radius:12px;overflow:hidden;flex-shrink:0;background:#fff;display:flex;align-items:center;justify-content:center}
+.vanity-qr-box img{width:90px;height:90px;object-fit:cover}
+.vanity-qr-info{flex:1}
+.vanity-qr-label{font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px}
+.vanity-qr-url{font-size:11px;color:var(--muted);word-break:break-all;margin-bottom:10px}
+.vanity-qr-btns{display:flex;gap:7px}
+.vanity-qr-btn{height:32px;padding:0 12px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px;color:var(--text)}
+.vanity-qr-btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+
+/* Edit icon sulla vanity chip */
+.profile-vanity{position:relative}
+.profile-vanity-edit{position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:10px;color:var(--red)}
 
 /* PUBLIC PROFILE */
 .public-profile-view{display:none}
@@ -907,10 +967,11 @@ button{touch-action:manipulation}
         <div class="avatar-edit"><i class="ph ph-sparkle"></i></div>
       </div>
       <div class="profile-name" id="myProfileName">Alessandro C.</div>
-      <!-- Vanity URL — subito sotto il nome, cliccabile per copiare -->
+      <!-- Vanity URL — subito sotto il nome. Click = copia, icona matita = modifica -->
       <div class="profile-vanity" id="myVanityUrl" onclick="copyMyVanityUrl()" style="margin:4px auto 0">
         <i class="ph ph-at"></i>
         <span id="myVanityTxt">poilove.com/@tu</span>
+        <span class="profile-vanity-edit" onclick="event.stopPropagation();openVanityEdit()" title="Modifica handle"><i class="ph ph-pencil-simple"></i></span>
       </div>
       <!-- Bio opzionale -->
       <div class="profile-bio" id="myProfileBio" onclick="editProfileBio()" style="display:none"></div>
@@ -1844,14 +1905,14 @@ function syncProfileFromAuth() {
   if (pname) pname.textContent = name;
   const pav = document.querySelector('.profile-avatar img');
   if (pav && avatar) pav.src = avatar;
-  // Aggiorna o crea profilo in DB (upsert silenzioso)
+  // Upsert profilo — NON sovrascrive username se già impostato dall'utente
   sb.from('profiles').upsert({
     id: currentUser.id,
-    username: name,
     avatar_url: avatar,
     updated_at: new Date().toISOString()
-  }, { onConflict: 'id' }).then(() => {});
-  updateMyVanityUrl();
+  }, { onConflict: 'id', ignoreDuplicates: false }).then(() => {});
+  // Carica handle personalizzato dal DB (ha priorità sul nome Google)
+  loadMyVanityHandle();
   // Aggiorna email chip nel profilo
   const emailChip=document.getElementById('profEmailTxt');
   if(emailChip) emailChip.textContent=currentUser.email||'';
@@ -3642,12 +3703,21 @@ function requestAvatarGen(){
 /* ══════════════════════════════════════════
    VANITY URL
 ══════════════════════════════════════════ */
+/* ═══════════════════════════════════════
+   VANITY URL — handle programmabile + QR
+═══════════════════════════════════════ */
+
+// Handle salvato localmente dopo il login (dal DB profiles.username)
+let myVanityHandle = null;
+
 function getVanityHandle(user){
+  // Priorità: handle scelto dall'utente → fallback da metadati Google
+  if(myVanityHandle) return myVanityHandle;
   if(!user) return 'tu';
   const meta=user.user_metadata||{};
   const name=(meta.full_name||meta.name||user.email?.split('@')[0]||'utente')
-    .toLowerCase().replace(/\s+/g,'.').replace(/[^a-z0-9.]/g,'');
-  return name;
+    .toLowerCase().replace(/\s+/g,'.').replace(/[^a-z0-9._-]/g,'').substring(0,20);
+  return name||'explorer';
 }
 function buildVanityUrl(handle){
   return `poilove.com/@${handle}`;
@@ -3668,11 +3738,120 @@ function copyVanityUrl(){
   const url=`https://${el.textContent}`;
   navigator.clipboard?.writeText(url).then(()=>showToast('🔗 Link copiato!'));
 }
-/* ── Copia link profilo pubblico ── */
 function copyMyProfileLink(){
   const handle=getVanityHandle(currentUser);
   const url=`https://poilove.com/@${handle}`;
   navigator.clipboard?.writeText(url).then(()=>showToast('🔗 Link profilo copiato!'));
+}
+
+/* ── Modale edit vanity ── */
+let _vanityCheckTimer=null;
+let _vanityValid=false;
+
+function openVanityEdit(){
+  const handle=getVanityHandle(currentUser);
+  const input=document.getElementById('vanityIn');
+  if(input){ input.value=handle==='tu'?'':handle; }
+  document.getElementById('vanityStatus').textContent='';
+  document.getElementById('vanitySaveBtn').disabled=true;
+  _vanityValid=false;
+  // Aggiorna QR con handle attuale
+  refreshVanityQR(handle);
+  document.getElementById('vanityModalOv').classList.add('open');
+  setTimeout(()=>input?.focus(),300);
+}
+
+function closeVanityModal(){
+  document.getElementById('vanityModalOv').classList.remove('open');
+}
+
+function onVanityInput(val){
+  const clean=val.toLowerCase().replace(/[^a-z0-9._-]/g,'').substring(0,20);
+  const input=document.getElementById('vanityIn');
+  if(input.value!==clean) input.value=clean;
+  const statusEl=document.getElementById('vanityStatus');
+  const saveBtn=document.getElementById('vanitySaveBtn');
+  _vanityValid=false;
+  saveBtn.disabled=true;
+
+  if(clean.length<3){
+    statusEl.className='vanity-status err';
+    statusEl.textContent=clean.length?'Minimo 3 caratteri':'';
+    return;
+  }
+  if(/^[._-]/.test(clean)||/[._-]$/.test(clean)){
+    statusEl.className='vanity-status err';
+    statusEl.textContent='Non può iniziare o finire con . _ -';
+    return;
+  }
+
+  statusEl.className='vanity-status checking';
+  statusEl.textContent='Controllo disponibilità…';
+  refreshVanityQR(clean);
+
+  clearTimeout(_vanityCheckTimer);
+  _vanityCheckTimer=setTimeout(async()=>{
+    if(!sb){statusEl.className='vanity-status err';statusEl.textContent='Accedi per salvare un handle.';return;}
+    const{data,error}=await sb.from('profiles')
+      .select('id').ilike('username',clean).neq('id',currentUser?.id||'x').limit(1);
+    if(error){statusEl.className='vanity-status err';statusEl.textContent='Errore verifica.';return;}
+    if(data&&data.length>0){
+      statusEl.className='vanity-status err';
+      statusEl.textContent=`@${clean} è già preso.`;
+    } else {
+      statusEl.className='vanity-status ok';
+      statusEl.textContent=`✓ @${clean} è disponibile!`;
+      _vanityValid=true;
+      saveBtn.disabled=false;
+    }
+  },500);
+}
+
+async function saveVanityHandle(){
+  const handle=document.getElementById('vanityIn').value.trim().toLowerCase();
+  if(!_vanityValid||!currentUser||!sb) return;
+  const saveBtn=document.getElementById('vanitySaveBtn');
+  saveBtn.disabled=true;
+  saveBtn.textContent='Salvataggio…';
+  const{error}=await sb.from('profiles').update({username:handle}).eq('id',currentUser.id);
+  if(error){
+    showToast('Errore: '+error.message);
+    saveBtn.disabled=false;
+    saveBtn.textContent='Salva handle';
+    return;
+  }
+  myVanityHandle=handle;
+  updateMyVanityUrl();
+  showToast(`✅ Handle @${handle} salvato!`);
+  closeVanityModal();
+}
+
+function refreshVanityQR(handle){
+  const url=`https://poilove.com/@${handle}`;
+  const qrSize=180;
+  const qrApi=`https://api.qrserver.com/v1/create-qr-code/?size=${qrSize}x${qrSize}&data=${encodeURIComponent(url)}&color=D42B2B&bgcolor=ffffff&margin=1`;
+  const img=document.getElementById('vanityQrImg');
+  const urlEl=document.getElementById('vanityQrUrl');
+  if(img){ img.src=qrApi; img.style.display='block'; }
+  if(urlEl) urlEl.textContent=buildVanityUrl(handle);
+}
+
+function copyVanityLink(){
+  const url=`https://${document.getElementById('vanityQrUrl').textContent}`;
+  navigator.clipboard?.writeText(url).then(()=>showToast('🔗 Link copiato!'));
+}
+
+function downloadQR(){
+  const handle=getVanityHandle(currentUser);
+  const url=`https://poilove.com/@${handle}`;
+  const qrApi=`https://api.qrserver.com/v1/create-qr-code/?size=600x600&data=${encodeURIComponent(url)}&color=D42B2B&bgcolor=ffffff&margin=2`;
+  // Scarica come immagine
+  const a=document.createElement('a');
+  a.href=qrApi;
+  a.download=`poilove-qr-@${handle}.png`;
+  a.target='_blank';
+  a.click();
+  showToast('⬇️ QR scaricato per la stampa!');
 }
 
 /* ── Toggle visibilità campo profilo (email, ecc.) ── */
@@ -3776,16 +3955,24 @@ function editList(btn, currentName, currentVis){
 
 // Parsing vanity URL all'avvio — es. ?@nomeutente
 function checkVanityUrlOnLoad(){
-  const q=window.location.search;
-  const match=q.match(/[?&]@([^&]+)/);
+  // Supporta sia /@handle (routing .htaccess) che ?@handle (legacy)
+  const pathMatch=window.location.pathname.match(/^\/@([A-Za-z0-9._-]+)\/?$/);
+  const queryMatch=window.location.search.match(/[?&]@([^&]+)/);
+  const match=pathMatch||queryMatch;
   if(!match) return;
   const handle=decodeURIComponent(match[1]);
-  // Cerca utente per handle (username)
   if(sb){
     sb.from('profiles').select('*').ilike('username',handle).limit(1).then(({data})=>{
       if(data&&data[0]) openUserProfile(data[0]);
     });
   }
+}
+
+/* Carica l'handle salvato dal DB al login */
+async function loadMyVanityHandle(){
+  if(!currentUser||!sb) return;
+  const{data}=await sb.from('profiles').select('username').eq('id',currentUser.id).single();
+  if(data?.username){ myVanityHandle=data.username; updateMyVanityUrl(); }
 }
 
 /* ══════════════════════════════════════════
@@ -4969,6 +5156,35 @@ async function confirmPhotoPicker(){
       <button class="level-ai-btn" style="background:var(--card);border-color:var(--red);color:var(--red)" onclick="saveStopDetail()">
         <i class="ph ph-floppy-disk"></i> Salva modifiche
       </button>
+    </div>
+  </div>
+</div>
+<!-- ═══ MODALE: VANITY URL + QR CODE ═══ -->
+<div class="vanity-modal-ov" id="vanityModalOv" onclick="closeVanityModal()">
+  <div class="vanity-modal" onclick="event.stopPropagation()">
+    <div class="vanity-modal-handle"></div>
+    <div class="vanity-modal-title">Il tuo @handle</div>
+    <div class="vanity-modal-sub">Scegli il tuo indirizzo personale su POI•LOVE.<br>Potrà essere usato per QR code, biglietti da visita e condivisione.</div>
+    <div class="vanity-input-wrap">
+      <span class="vanity-at">@</span>
+      <input class="vanity-in" id="vanityIn" type="text" maxlength="20" placeholder="il-tuo-nome"
+        oninput="onVanityInput(this.value)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+    </div>
+    <div class="vanity-status" id="vanityStatus"></div>
+    <button class="vanity-save-btn" id="vanitySaveBtn" disabled onclick="saveVanityHandle()">Salva handle</button>
+    <div class="vanity-qr-sep"></div>
+    <div class="vanity-qr-row">
+      <div class="vanity-qr-box" id="vanityQrBox">
+        <img id="vanityQrImg" src="" alt="QR" style="display:none">
+      </div>
+      <div class="vanity-qr-info">
+        <div class="vanity-qr-label">QR del tuo profilo</div>
+        <div class="vanity-qr-url" id="vanityQrUrl">poilove.com/@...</div>
+        <div class="vanity-qr-btns">
+          <button class="vanity-qr-btn" onclick="copyVanityLink()"><i class="ph ph-link"></i> Copia link</button>
+          <button class="vanity-qr-btn primary" onclick="downloadQR()"><i class="ph ph-download-simple"></i> Scarica QR</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
