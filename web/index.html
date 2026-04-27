@@ -31,9 +31,9 @@ button{touch-action:manipulation}
 .tb-logo img{height:20px;filter:brightness(0) invert(1)}
 .tb-logo-txt{color:#fff;font-size:13px;font-weight:800;letter-spacing:.2px}
 .tb-right{display:flex;gap:7px;pointer-events:all}
-.tb-btn{height:34px;border-radius:17px;background:var(--card);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,.13);padding:0 12px;font-size:11px;font-weight:700;color:var(--blue);gap:5px;transition:transform .15s}
+.tb-btn{height:38px;border-radius:19px;background:var(--card);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,.13);padding:0 12px;font-size:18px;font-weight:700;color:var(--blue);gap:5px;transition:transform .15s}
 .tb-btn:active{transform:scale(.93)}
-.tb-btn.icon-only{width:34px;padding:0;color:var(--muted);font-size:18px}
+.tb-btn.icon-only{width:44px;height:44px;border-radius:22px;padding:0;color:var(--muted);font-size:22px}
 
 /* ── MAP TYPES ── */
 .map-types{position:fixed;top:56px;left:14px;z-index:200;display:flex;gap:5px}
@@ -56,6 +56,11 @@ button{touch-action:manipulation}
 .nav-item i{font-size:22px;color:var(--muted);transition:color .15s}
 .nav-item .nav-lbl{font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.3px;transition:color .15s}
 .nav-item.active i,.nav-item.active .nav-lbl{color:var(--red)}
+/* SOS nav item — pulsing red shadow */
+.nav-item.nav-sos i{color:#DC2626;font-size:24px}
+.nav-item.nav-sos .nav-lbl{color:#DC2626}
+.nav-item.nav-sos{animation:sosPulse 2.2s ease-in-out infinite}
+@keyframes sosPulse{0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,0)}50%{box-shadow:0 0 0 6px rgba(220,38,38,.18)}}
 
 /* ── VIEWS ── */
 .profile-view,.itin-view{position:fixed;inset:0 0 56px 0;z-index:100;background:var(--bg);overflow-y:auto;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.72,0,1);-webkit-overflow-scrolling:touch}
@@ -192,10 +197,11 @@ button{touch-action:manipulation}
 .gps-register-bar button{height:30px;padding:0 14px;border-radius:15px;background:var(--blue);border:none;color:#fff;font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;font-family:inherit}
 
 /* ── MARKER ── */
-.poi-marker{display:flex;flex-direction:column;align-items:center;cursor:pointer}
-.poi-bubble{width:36px;height:36px;border-radius:50%;background:var(--red);border:2.5px solid #fff;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;position:relative;box-shadow:0 2px 10px rgba(212,43,43,.4)}
+.poi-marker{display:flex;flex-direction:column;align-items:center;cursor:pointer;filter:drop-shadow(0 2px 6px rgba(212,43,43,.35))}
+.poi-bubble{width:36px;height:36px;border-radius:50%;background:var(--red);border:2.5px solid #fff;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;position:relative}
 .poi-badge{position:absolute;top:-6px;right:-6px;background:#fff;color:var(--red);font-size:8px;font-weight:900;border-radius:6px;padding:1px 4px;border:1px solid var(--red)}
 .poi-tail{width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:8px solid var(--red);margin-top:-1px}
+.poi-label{margin-top:3px;background:rgba(0,0,0,.72);backdrop-filter:blur(4px);color:#fff;font-size:9px;font-weight:700;border-radius:6px;padding:2px 6px;max-width:88px;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;letter-spacing:.2px;line-height:1.3}
 
 /* ── DETAIL SHEET ── */
 .detail-photos{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin-bottom:12px;padding-bottom:4px}
@@ -318,10 +324,7 @@ button{touch-action:manipulation}
 .u-action.danger{border-color:#FCA5A5;color:#DC2626}
 .u-action.danger:active{background:#FEE2E2}
 
-/* SOS BUTTON */
-.sos-btn{position:fixed;bottom:70px;right:14px;z-index:251;width:44px;height:44px;border-radius:22px;background:#fff;border:2px solid #DC2626;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 14px rgba(220,38,38,.35);transition:transform .15s}
-.sos-btn:active{transform:scale(.92)}
-.sos-btn i{font-size:20px;color:#DC2626}
+/* SOS — ora nel footer, non più floating */
 
 /* POST-SAVE MODAL */
 .save-modal-overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.6);display:none;align-items:flex-end;justify-content:center}
@@ -456,6 +459,9 @@ button{touch-action:manipulation}
 .poiai-input:focus{border-color:var(--blue)}
 .poiai-send{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--red),#E05858);border:none;color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 3px 10px rgba(212,43,43,.35);transition:transform .15s}
 .poiai-send:active{transform:scale(.92)}
+.poiai-voice-btn{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.3);color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
+.poiai-voice-btn.on{background:rgba(212,43,43,.5);border-color:rgba(212,43,43,.7);animation:voicePulse 1.4s ease-in-out infinite}
+@keyframes voicePulse{0%,100%{box-shadow:0 0 0 0 rgba(212,43,43,0)}50%{box-shadow:0 0 0 5px rgba(212,43,43,.3)}}
 
 /* TOAST */
 .toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%) translateY(20px);background:#1C1C1C;color:#fff;border-radius:20px;padding:10px 20px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
@@ -527,13 +533,13 @@ button{touch-action:manipulation}
 
 <!-- TOPBAR -->
 <div class="topbar">
-  <div class="tb-logo">
+  <div class="tb-logo" onclick="showTab('map')">
     <img src="https://poilove.com/img/logo-symbol.svg" onerror="this.style.display='none'" alt="">
     <span class="tb-logo-txt">POI•LOVE</span>
   </div>
-  <div class="tb-right">
-    <button class="tb-btn" onclick="centerMap()"><i class="ph ph-crosshair-simple"></i></button>
-    <button class="tb-btn icon-only" id="langBtn" onclick="cycleLang()">IT</button>
+  <div class="tb-right" id="tbRight">
+    <button class="tb-btn icon-only" onclick="centerMap()" title="Centra mappa"><i class="ph ph-crosshair-simple"></i></button>
+    <button class="tb-btn icon-only" id="langBtn" onclick="cycleLang()" title="Cambia lingua">🇮🇹</button>
   </div>
 </div>
 
@@ -543,11 +549,6 @@ button{touch-action:manipulation}
   <button class="mt-btn" onclick="setMapType('satellite',this)" data-t="mt_sat">Satellite</button>
   <button class="mt-btn" onclick="setMapType('routes',this)" data-t="mt_routes">Rotte Storiche</button>
 </div>
-
-<!-- SOS -->
-<button class="sos-btn" id="sosBtn" onclick="openSOS()" title="Sicurezza e segnalazioni">
-  <i class="ph-fill ph-shield-warning"></i>
-</button>
 
 <!-- FAB -->
 <button class="fab" id="fab" onclick="toggleFab()"><i class="ph ph-plus"></i></button>
@@ -572,6 +573,9 @@ button{touch-action:manipulation}
   </button>
   <button class="nav-item" id="nav-profile" onclick="showTab('profile')">
     <i class="ph ph-user-circle"></i><span class="nav-lbl" data-t="nav_profile">Profilo</span>
+  </button>
+  <button class="nav-item nav-sos" onclick="openSOS()" title="Sicurezza">
+    <i class="ph-fill ph-shield-warning"></i><span class="nav-lbl">Sicurezza</span>
   </button>
 </nav>
 
@@ -873,6 +877,7 @@ button{touch-action:manipulation}
         <div class="poiai-sub">Suggerisce, pianifica, aggiunge tappe</div>
       </div>
       <div class="poiai-badge">AI</div>
+      <button class="poiai-voice-btn" id="poiaiVoiceBtn" onclick="togglePoiAIVoice()" title="Rispondi a voce"><i class="ph ph-microphone"></i></button>
     </div>
     <div class="poiai-msgs" id="poiaiMsgs">
       <div class="poiai-msg ai">Ciao! Sono il tuo POI•AI Travel Advisor. Posso suggerire tappe, ristoranti, cultura locale — e aggiungerli direttamente ai tuoi itinerari. Su quale viaggio lavoriamo oggi? 🗺️</div>
@@ -1311,10 +1316,11 @@ let lang='it';
 const nl=(navigator.language||'').substring(0,2);
 if(nl==='sq')lang='sq'; else if(nl!=='it')lang='en';
 
+const LANG_FLAGS={it:'🇮🇹',sq:'🇦🇱',en:'🇬🇧'};
 function applyLang(l){
   lang=l;
   const btn=document.getElementById('langBtn');
-  if(btn)btn.textContent=l.toUpperCase();
+  if(btn)btn.textContent=LANG_FLAGS[l]||l.toUpperCase();
   document.documentElement.lang=l;
   const t=T[l];
   document.querySelectorAll('[data-t]').forEach(el=>{
@@ -1349,8 +1355,8 @@ function initMap(){
   POIS.forEach((p,i)=>{
     const icon=L.divIcon({
       className:'',
-      html:`<div class="poi-marker"><div class="poi-bubble"><i class="ph-fill ph-map-pin" style="font-size:15px;color:#fff;pointer-events:none"></i><div class="poi-badge">${p.love}</div></div><div class="poi-tail"></div></div>`,
-      iconSize:[36,46],iconAnchor:[18,46]
+      html:`<div class="poi-marker"><div class="poi-bubble"><i class="ph-fill ph-map-pin" style="font-size:15px;color:#fff;pointer-events:none"></i><div class="poi-badge">${p.love}</div></div><div class="poi-tail"></div><div class="poi-label">${p.name.length>11?p.name.substring(0,11)+'…':p.name}</div></div>`,
+      iconSize:[36,58],iconAnchor:[18,58]
     });
     L.marker([p.lat,p.lng],{icon}).addTo(map).on('click',()=>openDetail(i));
   });
@@ -1387,7 +1393,7 @@ function initMap(){
     lpPos=latlng; lpStarted=true;
     lpTimer=setTimeout(()=>{
       if(lpPos&&lpStarted){ openAddPOIAtCoords(lpPos.lat,lpPos.lng); }
-    },1500);
+    },750);
   }
   function cancelLP(){ clearTimeout(lpTimer); lpTimer=null; lpPos=null; lpStarted=false; }
   map.on('mousedown', e=>startLP(e.latlng));
@@ -1689,6 +1695,8 @@ function showTab(tab){
   fab.classList.remove('open');
   fabMenu.style.opacity=''; // pulisce qualsiasi inline style residuo
   document.querySelectorAll('.map-types')[0].style.display=onMap?'flex':'none';
+  const tbRight=document.getElementById('tbRight');
+  if(tbRight)tbRight.style.display=onMap?'flex':'none';
   if(tab==='map'&&map)setTimeout(()=>map.invalidateSize(),50);
   if(tab==='profile')togglePublicProfile(false);
 }
@@ -2167,8 +2175,8 @@ function savePOI(){
   if(map){
     const icon=L.divIcon({
       className:'',
-      html:`<div class="poi-marker"><div class="poi-bubble" style="background:var(--blue)"><i class="ph-fill ph-map-pin" style="font-size:15px;color:#fff;pointer-events:none"></i><div class="poi-badge">0</div></div><div class="poi-tail" style="border-top-color:var(--blue)"></div></div>`,
-      iconSize:[36,46],iconAnchor:[18,46]
+      html:`<div class="poi-marker"><div class="poi-bubble" style="background:var(--blue)"><i class="ph-fill ph-map-pin" style="font-size:15px;color:#fff;pointer-events:none"></i><div class="poi-badge">0</div></div><div class="poi-tail" style="border-top-color:var(--blue)"></div><div class="poi-label" style="background:rgba(40,94,167,.85)">${newPOI.name.length>11?newPOI.name.substring(0,11)+'…':newPOI.name}</div></div>`,
+      iconSize:[36,58],iconAnchor:[18,58]
     });
     L.marker([lat2,lng2],{icon}).addTo(map).on('click',()=>openDetail(idx));
   }
@@ -2805,7 +2813,36 @@ function sendPoiAIMsg(){
       </div>`;
     window._paiTrip='trip1';
     msgs.scrollTop=msgs.scrollHeight;
+    // Voice TTS — solo testo plain, no HTML
+    if(voiceOn){
+      const plain=resp.text.replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim();
+      speakText(plain);
+    }
   },800);
+}
+
+/* ══════════════════════════════════════════
+   POI•AI VOICE (Web Speech API)
+══════════════════════════════════════════ */
+let voiceOn=false;
+function togglePoiAIVoice(){
+  voiceOn=!voiceOn;
+  const btn=document.getElementById('poiaiVoiceBtn');
+  if(btn){
+    btn.classList.toggle('on',voiceOn);
+    btn.innerHTML=voiceOn?'<i class="ph-fill ph-microphone"></i>':'<i class="ph ph-microphone"></i>';
+  }
+  if(!voiceOn&&window.speechSynthesis)window.speechSynthesis.cancel();
+  showToast(voiceOn?'🎙️ Voce attivata':'🔇 Voce disattivata');
+}
+function speakText(text){
+  if(!window.speechSynthesis||!text)return;
+  window.speechSynthesis.cancel();
+  const utter=new SpeechSynthesisUtterance(text);
+  utter.lang=lang==='sq'?'sq-AL':lang==='en'?'en-US':'it-IT';
+  utter.rate=1.05;
+  utter.pitch=1;
+  window.speechSynthesis.speak(utter);
 }
 
 function addAISuggestionAsStop(tripId,placeName){
