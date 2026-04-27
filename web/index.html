@@ -103,6 +103,31 @@ button{touch-action:manipulation}
 .compagnia-stop{width:100%;height:44px;border-radius:14px;background:#FEE2E2;color:#DC2626;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;display:none}
 .compagnia-stop.vis{display:block}
 
+/* ── DEV MODE — Multi-Profilo ── */
+.dev-panel{background:rgba(40,94,167,.07);border:1.5px dashed rgba(40,94,167,.28);border-radius:16px;padding:14px 16px}
+.dev-panel-title{font-size:10px;font-weight:800;color:var(--blue);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.dev-profile-card{display:flex;align-items:center;gap:10px;padding:8px 4px;border-bottom:1px solid rgba(40,94,167,.1);cursor:pointer}
+.dev-profile-card:last-child{border-bottom:none}
+.dev-profile-card.active-dev{background:rgba(40,94,167,.08);border-radius:10px;padding:8px}
+.dev-profile-av{width:34px;height:34px;border-radius:17px;overflow:hidden;flex-shrink:0}
+.dev-profile-av img{width:100%;height:100%;object-fit:cover}
+.dev-profile-info{flex:1;min-width:0}
+.dev-profile-name{font-size:13px;font-weight:700;color:var(--text)}
+.dev-profile-email{font-size:10px;color:var(--muted)}
+.dev-add-profile-btn{width:100%;height:40px;border-radius:12px;border:1.5px dashed rgba(40,94,167,.35);background:transparent;color:var(--blue);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px;font-family:inherit;transition:background .15s}
+.dev-add-profile-btn:active{background:rgba(40,94,167,.08)}
+/* Token modal */
+#tokenModal{position:fixed;inset:0;z-index:9100;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:20px}
+#tokenModal.show{display:flex}
+.token-box{background:var(--card);border-radius:22px;padding:28px 24px;width:100%;max-width:300px;text-align:center}
+.token-title{font-size:16px;font-weight:800;color:var(--text);margin-bottom:6px}
+.token-sub{font-size:12px;color:var(--muted);margin-bottom:18px;line-height:1.5}
+.token-in{width:100%;height:50px;border-radius:14px;border:2px solid var(--border);background:#f5f2ec;padding:0 16px;font-size:20px;font-weight:700;letter-spacing:4px;text-align:center;font-family:monospace;outline:none;color:var(--text);transition:border-color .2s}
+.token-in:focus{border-color:var(--blue)}
+.token-btn{width:100%;height:46px;border-radius:14px;background:var(--blue);color:#fff;border:none;font-size:14px;font-weight:700;margin-top:12px;cursor:pointer;font-family:inherit;transition:opacity .15s}
+.token-btn:active{opacity:.85}
+.token-cancel{width:100%;height:36px;border-radius:14px;background:transparent;color:var(--muted);border:none;font-size:13px;margin-top:4px;cursor:pointer;font-family:inherit}
+
 /* ── CREDIT STRIP (buffer anti-Siri + credits) ── */
 #lang-strip{position:fixed;bottom:0;left:0;right:0;z-index:500;height:50px;background:linear-gradient(160deg,#D42B2B 0%,#7B1111 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;user-select:none;pointer-events:none;padding:0 16px}
 #lang-strip .cr-top{font-size:9px;font-weight:800;color:rgba(255,255,255,.95);letter-spacing:.4px;white-space:nowrap}
@@ -343,11 +368,22 @@ button{touch-action:manipulation}
 .pub-header{background:linear-gradient(160deg,#285EA7 0%,#1a3d6e 100%);padding:52px 20px 30px;text-align:center;position:relative}
 .back-btn{position:absolute;top:14px;left:14px;border:none;background:rgba(255,255,255,.2);border-radius:20px;padding:6px 12px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px}
 .back-profile-btn{position:absolute;top:14px;right:14px;border:none;background:rgba(255,255,255,.2);border-radius:20px;padding:6px 12px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px}
-/* Azioni profilo pubblico: Segui / Collegati / Blocca */
-.pub-actions{display:flex;gap:8px;justify-content:center;margin-top:14px;flex-wrap:wrap}
-.pub-action-btn{height:36px;padding:0 16px;border-radius:18px;border:none;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px;transition:all .18s}
+/* Azioni profilo pubblico: Segui / Collegati / Condividi pos. / Blocca */
+.pub-actions{display:flex;gap:7px;justify-content:center;margin-top:14px;flex-wrap:wrap;padding:0 8px}
+.pub-action-btn{height:36px;padding:0 14px;border-radius:18px;border:none;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px;transition:all .18s}
 .pub-action-btn.follow{background:#fff;color:var(--blue)}
 .pub-action-btn.follow.active{background:#EBF2FC;color:var(--blue);border:1.5px solid var(--blue)}
+/* Loc share duration picker */
+.loc-dur-picker{background:var(--card);border-radius:14px;padding:12px 16px;margin-top:10px;display:none;flex-direction:column;gap:6px;box-shadow:0 4px 20px rgba(0,0,0,.12)}
+.loc-dur-picker.open{display:flex}
+.loc-dur-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
+.loc-dur-opts{display:flex;gap:6px;flex-wrap:wrap}
+.loc-dur-opt{height:32px;padding:0 14px;border-radius:16px;border:1.5px solid var(--border);background:none;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--text);transition:all .15s}
+.loc-dur-opt:active,.loc-dur-opt.sel{background:var(--green);color:#fff;border-color:var(--green)}
+/* Vanity URL in profilo */
+.profile-vanity{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.12);border-radius:10px;padding:5px 10px;margin-top:8px;cursor:pointer}
+.profile-vanity span{font-size:11px;font-weight:700;color:rgba(255,255,255,.8)}
+.profile-vanity i{font-size:13px;color:rgba(255,255,255,.6)}
 .pub-action-btn.connect{background:rgba(255,255,255,.18);color:#fff;border:1.5px solid rgba(255,255,255,.4)}
 .pub-action-btn.connect.active{background:#fff;color:#16A34A}
 .pub-action-btn.block{background:rgba(220,38,38,.2);color:#FCA5A5;border:1.5px solid rgba(220,38,38,.3)}
@@ -714,12 +750,16 @@ button{touch-action:manipulation}
         </div>
         <div class="avatar-edit"><i class="ph ph-sparkle"></i></div>
       </div>
-      <div class="profile-name">Alessandro C.</div>
-      <div class="profile-email">it@altrostile.app</div>
+      <div class="profile-name" id="myProfileName">Alessandro C.</div>
+      <div class="profile-email" id="myProfileEmail">it@altrostile.app</div>
+      <div class="profile-vanity" id="myVanityUrl" onclick="copyMyVanityUrl()" style="margin:6px auto 0">
+        <i class="ph ph-link"></i>
+        <span id="myVanityTxt">poilove.com/demo?@tu</span>
+      </div>
       <div class="prof-badge" id="profBadge" onclick="changeAvatar()"></div>
       <div class="badge-label" id="badgeLabel"></div>
     </div>
-    <div class="profile-stats">
+    <div class="profile-stats" onclick="onProfileStatsTap()">
       <div class="stat-item">
         <i class="ph ph-map-pin"></i>
         <div class="stat-v" id="statPoi">12</div>
@@ -795,20 +835,20 @@ button{touch-action:manipulation}
           <button class="social-tab" onclick="showSocialTab('bloccati',this)">Bloccati <span style="background:#FEE2E2;color:#DC2626;border-radius:8px;padding:1px 6px;font-size:10px">1</span></button>
         </div>
         <div class="social-panel active" id="panel-seguiti">
-          <div class="user-row">
+          <div class="user-row" onclick="openUserRowProfile('Mirela K.',{email:'mirela@test.com',avatar_url:'https://ui-avatars.com/api/?name=Mirela+K&background=285EA7&color=fff&size=200'})" style="cursor:pointer">
             <div class="u-avatar"><img src="https://ui-avatars.com/api/?name=Mirela+K&background=285EA7&color=fff&size=80" alt=""></div>
             <div class="u-info"><div class="u-name">Mirela K.</div><div class="u-meta">18 POI · Tirana</div></div>
-            <button class="u-action" onclick="showToast('Smetti di seguire Mirela K.')">Segui già</button>
+            <button class="u-action" onclick="event.stopPropagation();showToast('Smetti di seguire Mirela K.')">Segui già</button>
           </div>
-          <div class="user-row">
+          <div class="user-row" onclick="openUserRowProfile('Arben S.',{email:'arben@test.com',avatar_url:'https://ui-avatars.com/api/?name=Arben+S&background=22C55E&color=fff&size=200'})" style="cursor:pointer">
             <div class="u-avatar"><img src="https://ui-avatars.com/api/?name=Arben+S&background=22C55E&color=fff&size=80" alt=""></div>
             <div class="u-info"><div class="u-name">Arben S.</div><div class="u-meta">7 POI · Shkodër</div></div>
-            <button class="u-action" onclick="showToast('Smetti di seguire Arben S.')">Segui già</button>
+            <button class="u-action" onclick="event.stopPropagation();showToast('Smetti di seguire Arben S.')">Segui già</button>
           </div>
-          <div class="user-row">
+          <div class="user-row" onclick="openUserRowProfile('Liri V.',{email:'liri@test.com',avatar_url:'https://ui-avatars.com/api/?name=Liri+V&background=D42B2B&color=fff&size=200'})" style="cursor:pointer">
             <div class="u-avatar"><img src="https://ui-avatars.com/api/?name=Liri+V&background=D42B2B&color=fff&size=80" alt=""></div>
             <div class="u-info"><div class="u-name">Liri V.</div><div class="u-meta">31 POI · Tirana</div></div>
-            <button class="u-action" onclick="showToast('Smetti di seguire Liri V.')">Segui già</button>
+            <button class="u-action" onclick="event.stopPropagation();showToast('Smetti di seguire Liri V.')">Segui già</button>
           </div>
         </div>
         <div class="social-panel" id="panel-follower">
@@ -878,8 +918,30 @@ button{touch-action:manipulation}
           </div>
         </div>
       </div>
+      <!-- DEV MODE PANEL — visibile solo con token 321PaLa -->
+      <div class="profile-sec" id="devModeSection" style="display:none">
+        <div class="dev-panel">
+          <div class="dev-panel-title"><i class="ph ph-flask"></i> Dev Mode — Multi-Profilo</div>
+          <div id="devProfilesList"></div>
+          <button class="dev-add-profile-btn" onclick="addDevProfile()">
+            <i class="ph ph-plus"></i> Nuovo profilo test
+          </button>
+        </div>
+      </div>
     </div><!-- /profile-body -->
   </div><!-- /#privateProfile -->
+
+  <!-- TOKEN MODAL -->
+  <div id="tokenModal">
+    <div class="token-box">
+      <div class="token-title"><i class="ph ph-key" style="color:var(--blue);font-size:24px;display:block;margin-bottom:8px"></i>Accesso sviluppatore</div>
+      <div class="token-sub">Inserisci il codice per sbloccare funzionalità avanzate di test</div>
+      <input class="token-in" id="tokenInput" type="password" placeholder="••••••" maxlength="10"
+        onkeydown="if(event.key==='Enter')verifyToken()"/>
+      <button class="token-btn" onclick="verifyToken()">Sblocca</button>
+      <button class="token-cancel" onclick="closeTokenModal()">Annulla</button>
+    </div>
+  </div>
 
   <!-- PUBLIC PROFILE -->
   <div id="publicProfile" class="public-profile-view">
@@ -895,11 +957,16 @@ button{touch-action:manipulation}
           <img src="https://ui-avatars.com/api/?name=Alessandro+C&background=285EA7&color=fff&size=200" alt="avatar"/>
         </div>
       </div>
-      <div class="profile-name">Alessandro C.</div>
-      <div class="profile-email">it@altrostile.app</div>
-      <div class="prof-badge" style="background:rgba(245,158,11,.2);color:#FDE68A;border-color:rgba(245,158,11,.3)">
+      <div class="profile-name" id="pubProfileName">Alessandro C.</div>
+      <div class="profile-email" id="pubProfileEmail">it@altrostile.app</div>
+      <!-- Vanity URL — cliccabile per copiare -->
+      <div class="profile-vanity" id="pubVanityUrl" onclick="copyVanityUrl()">
+        <i class="ph ph-link"></i>
+        <span id="pubVanityTxt">poilove.com/demo?@alessandrocastagna</span>
+      </div>
+      <div class="prof-badge" id="pubProfileBadge" style="background:rgba(245,158,11,.2);color:#FDE68A;border-color:rgba(245,158,11,.3)">
         <i class="ph-fill ph-star" style="color:#FDE68A"></i>
-        <span>Amatore · 87 love</span>
+        <span id="pubProfileBadgeTxt">Amatore · 87 love</span>
       </div>
       <div class="pub-actions">
         <button class="pub-action-btn follow" id="pubFollowBtn" onclick="togglePublicFollow()">
@@ -908,9 +975,23 @@ button{touch-action:manipulation}
         <button class="pub-action-btn connect" id="pubConnectBtn" onclick="togglePublicConnect()">
           <i class="ph ph-handshake"></i> <span id="pubConnectLbl">Collegati</span>
         </button>
+        <button class="pub-action-btn share-loc" id="pubShareLocBtn" onclick="toggleLocDurPicker()"
+          style="background:rgba(34,197,94,.2);color:#16A34A">
+          <i class="ph ph-navigation-arrow"></i> <span id="pubShareLocLbl">Condividi posizione</span>
+        </button>
         <button class="pub-action-btn block" id="pubBlockBtn" onclick="togglePublicBlock()">
           <i class="ph ph-prohibit"></i> <span id="pubBlockLbl">Blocca</span>
         </button>
+      </div>
+      <!-- Duration picker per condivisione posizione -->
+      <div class="loc-dur-picker" id="locDurPicker">
+        <div class="loc-dur-title">Per quanto condividi la tua posizione?</div>
+        <div class="loc-dur-opts">
+          <button class="loc-dur-opt" onclick="startLocShare('1h')">1 ora</button>
+          <button class="loc-dur-opt" onclick="startLocShare('1d')">1 giorno</button>
+          <button class="loc-dur-opt" onclick="startLocShare('1m')">1 mese</button>
+          <button class="loc-dur-opt" onclick="startLocShare('always')">Sempre</button>
+        </div>
       </div>
     </div>
     <div class="profile-stats">
@@ -1087,13 +1168,13 @@ button{touch-action:manipulation}
       <!-- RACCONTA + VOCE + AI -->
       <div class="sec-lbl">
         <span data-t="lbl_story">Racconta</span>
-        <span id="charCount" style="font-size:10px;color:var(--muted)">0 / 200</span>
+        <span id="charCount" style="font-size:10px;color:var(--muted)">0 / 1000</span>
       </div>
       <div class="story-actions">
         <button class="voice-btn" id="voiceBtn" onclick="toggleVoice()"><i class="ph ph-microphone"></i> <span id="voiceBtnLbl">Dett.</span></button>
-        <button class="ai-btn" onclick="aiSummarize()"><i class="ph ph-sparkle"></i> <span>AI → 200</span></button>
+        <button class="ai-btn" onclick="aiSummarize()"><i class="ph ph-sparkle"></i> <span>Riassumi</span></button>
       </div>
-      <textarea class="field-in field-ta" id="storyIn" placeholder="L'anima di questo posto…" maxlength="200" oninput="updateChar()"></textarea>
+      <textarea class="field-in field-ta" id="storyIn" placeholder="L'anima di questo posto… (fino a 1000 caratteri)" maxlength="1000" oninput="updateChar()"></textarea>
 
       <!-- CATEGORIE -->
       <div class="sec-lbl">
@@ -1311,6 +1392,7 @@ button{touch-action:manipulation}
         <div class="detail-actions">
           <button class="detail-action-btn da-nav" onclick="openNavigation()"><i class="ph ph-navigation-arrow"></i><span>Naviga</span></button>
           <button class="detail-action-btn" onclick="shareDetail()"><i class="ph ph-share-network"></i><span>Condividi</span></button>
+          <button class="detail-action-btn" id="editPoiBtn" onclick="openEditPOI()" style="display:none;background:#EBF2FC;border-color:var(--blue);color:var(--blue)"><i class="ph ph-pencil-simple"></i><span>Modifica</span></button>
         </div>
         <button class="love-btn" id="loveBtn" onclick="toggleLove()">
           <i class="ph ph-heart" id="loveHeart"></i>
@@ -1436,6 +1518,7 @@ function syncProfileFromAuth() {
     avatar_url: avatar,
     updated_at: new Date().toISOString()
   }, { onConflict: 'id' }).then(() => {});
+  updateMyVanityUrl();
 }
 
 // ── LOGIN ──
@@ -1503,6 +1586,9 @@ function openDBDetail(p) {
   document.getElementById('detailDesc').textContent = p.description || '';
   document.getElementById('detailAuthor').textContent = p.profiles?.username || 'Anonimo';
   document.getElementById('detailLoveCount').textContent = p.love_count || 0;
+  // Mostra "Modifica" solo se il POI appartiene all'utente corrente
+  const editBtn = document.getElementById('editPoiBtn');
+  if(editBtn) editBtn.style.display = (currentUser && currentUser.id === p.author_id) ? 'flex' : 'none';
   openSheet('detailOv', 'detailBg', 'detailSheet');
 }
 
@@ -2129,7 +2215,7 @@ function initVoice(){
   recognition.onresult=e=>{
     const transcript=Array.from(e.results).map(r=>r[0].transcript).join('');
     const ta=document.getElementById('storyIn');
-    ta.value=transcript.substring(0,200);updateChar();
+    ta.value=transcript.substring(0,1000);updateChar();
   };
   recognition.onend=()=>{isRecording=false;setVoiceBtnState(false)};
   recognition.onerror=()=>{isRecording=false;setVoiceBtnState(false)};
@@ -2287,6 +2373,12 @@ function closeAddPOI(){
   closeSheet('addPoiOv','addPoiBg','addPoiSheet');
   document.getElementById('acDrop').classList.remove('open');
   if(isRecording&&recognition){recognition.stop();isRecording=false;setVoiceBtnState(false);}
+  // Reset modalità editing
+  if(typeof editingPOIId!=='undefined'&&editingPOIId){
+    editingPOIId=null;
+    const sb2=document.getElementById('saveBtn');
+    if(sb2){sb2.textContent=T[lang]?.save_ready||'Salva questo posto';sb2.className='save-btn ready';}
+  }
 }
 function openAddStop(){closeFab();openSheet('addStopOv','addStopBg','addStopSheet')}
 function openAddList(){openSheet('addListOv','addListBg','addListSheet');setTimeout(()=>document.getElementById('newListName').focus(),350)}
@@ -2342,8 +2434,8 @@ function checkSave(){
 function updateChar(){
   const v=document.getElementById('storyIn').value.length;
   const el=document.getElementById('charCount');
-  if(el)el.textContent=`${v} / 200`;
-  el.style.color=v>180?'var(--red)':v>150?'var(--orange)':'var(--muted)';
+  if(el)el.textContent=`${v} / 1000`;
+  el.style.color=v>900?'var(--red)':v>700?'var(--orange)':'var(--muted)';
 }
 function setLocTab(btn,type){
   document.querySelectorAll('.loc-tab').forEach(t=>t.classList.remove('active'));
@@ -2609,6 +2701,10 @@ window.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('closeSosBtn').addEventListener('touchend', e=>{e.preventDefault();closeSheet('sosOv','sosBg','sosSheet');});
   document.getElementById('sosBg').addEventListener('click', ()=>closeSheet('sosOv','sosBg','sosSheet'));
   initSwipe('sosHandle','sosSheet','sosBg');
+  // Vanity URL on load (es. poilove.com/demo?@nomeutente)
+  checkVanityUrlOnLoad();
+  // Dev mode (token 321PaLa)
+  initDevMode();
 });
 
 /* ══════════════════════════════════════════
@@ -2661,6 +2757,27 @@ async function savePOI(){
   const photos=photoData.filter(Boolean);
   const filesSnapshot=photoFiles.filter(Boolean); // cattura prima del reset
   const addr=document.getElementById('locStreet')?.textContent||'';
+
+  // ── Modalità EDIT: aggiorna invece di creare ──
+  if(editingPOIId){
+    savePOIEdit({name,desc,cat:cats,lat:lat2,lng:lng2,address:addr,files:filesSnapshot})
+      .then(updated=>{ if(updated) loadPOIsFromDB(); });
+    const sec2=timerSec; clearInterval(timerInterval);
+    closeAddPOI();
+    if(nameIn)nameIn.value='';
+    const sEl=document.getElementById('storyIn'); if(sEl)sEl.value='';
+    photoData[0]=photoData[1]=photoData[2]=null;
+    photoFiles[0]=photoFiles[1]=photoFiles[2]=null;
+    [0,1,2].forEach(i=>{
+      const sl=document.getElementById('pslot-'+i);
+      if(sl){sl.classList.remove('has-photo');sl.innerHTML=i===0
+        ?`<i class="ph ph-camera"></i><span class="slot-lbl">Principale</span>`
+        :`<i class="ph ph-plus"></i><span class="slot-lbl">Foto ${i+1}</span>`;}
+    });
+    exifSuggestedName=''; exifCache=null;
+    return;
+  }
+
   // Marker immediato (UX ottimistica — blu = mio POI non ancora in DB)
   let tempMarker=null;
   if(map){
@@ -2829,6 +2946,215 @@ function selectEnv(idx){
 }
 function requestAvatarGen(){
   showToast('🎨 Ambiente selezionato — avatar generato da POI•AI');
+}
+
+/* ══════════════════════════════════════════
+   VANITY URL
+══════════════════════════════════════════ */
+function getVanityHandle(user){
+  if(!user) return 'tu';
+  const meta=user.user_metadata||{};
+  const name=(meta.full_name||meta.name||user.email?.split('@')[0]||'utente')
+    .toLowerCase().replace(/\s+/g,'.').replace(/[^a-z0-9.]/g,'');
+  return name;
+}
+function buildVanityUrl(handle){
+  return `poilove.com/demo?@${handle}`;
+}
+function updateMyVanityUrl(){
+  const handle=getVanityHandle(currentUser);
+  const el=document.getElementById('myVanityTxt');
+  if(el) el.textContent=buildVanityUrl(handle);
+}
+function copyMyVanityUrl(){
+  const handle=getVanityHandle(currentUser);
+  const url=`https://${buildVanityUrl(handle)}`;
+  navigator.clipboard?.writeText(url).then(()=>showToast('🔗 Link profilo copiato!'));
+}
+function copyVanityUrl(){
+  const el=document.getElementById('pubVanityTxt');
+  if(!el) return;
+  const url=`https://${el.textContent}`;
+  navigator.clipboard?.writeText(url).then(()=>showToast('🔗 Link copiato!'));
+}
+// Parsing vanity URL all'avvio — es. ?@nomeutente
+function checkVanityUrlOnLoad(){
+  const q=window.location.search;
+  const match=q.match(/[?&]@([^&]+)/);
+  if(!match) return;
+  const handle=decodeURIComponent(match[1]);
+  // Cerca utente per handle (username)
+  if(sb){
+    sb.from('profiles').select('*').ilike('username',handle).limit(1).then(({data})=>{
+      if(data&&data[0]) openUserProfile(data[0]);
+    });
+  }
+}
+
+/* ══════════════════════════════════════════
+   APRI PROFILO UTENTE GENERICO
+══════════════════════════════════════════ */
+let currentViewedUser=null; // profilo in visualizzazione
+let pubProfileIsOwn=false;  // true = sto vedendo il mio stesso profilo
+
+function openUserProfile(user, isOwn=false){
+  currentViewedUser=user;
+  pubProfileIsOwn=isOwn;
+  // Popola header
+  const meta=user.user_metadata||user; // supporta sia auth user che profile row
+  const name=meta.full_name||meta.name||user.username||user.email?.split('@')[0]||'Utente';
+  const email=user.email||'';
+  const avatar=meta.avatar_url||meta.picture||user.avatar_url||'';
+  const handle=user.username||getVanityHandle({user_metadata:meta,email});
+
+  const pubAvImg=document.querySelector('#publicProfile .profile-avatar img');
+  if(pubAvImg) pubAvImg.src=avatar||`https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=285EA7&color=fff&size=200`;
+  setEl('pubProfileName',name);
+  setEl('pubProfileEmail',email);
+  setEl('pubVanityTxt',buildVanityUrl(handle));
+
+  // Nascondi/mostra azioni in base a se è il proprio profilo
+  const actions=['pubFollowBtn','pubConnectBtn','pubShareLocBtn','pubBlockBtn','locDurPicker'];
+  actions.forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.style.display=isOwn?'none':'';
+  });
+  // Back button testo
+  const backEl=document.querySelector('#publicProfile .back-profile-btn span');
+  if(backEl) backEl.textContent=isOwn?'Torna al tuo profilo':'← Indietro';
+
+  // Carica POI pubblici dell'utente da Supabase
+  if(user.id&&sb){
+    sb.from('pois').select('id,name,photos,love_count,lat,lng')
+      .eq('author_id',user.id).eq('visibility','community')
+      .order('love_count',{ascending:false}).limit(12)
+      .then(({data})=>{
+        renderPubPOIBoard(data||[]);
+      });
+    // Stats reali
+    sb.from('pois').select('id',{count:'exact'}).eq('author_id',user.id).then(({count})=>{
+      const el=document.querySelector('#publicProfile .stat-v');
+      if(el&&count!=null) el.textContent=count;
+    });
+  }
+  showTab('profile');
+  togglePublicProfile(true);
+}
+
+function setEl(id,txt){const e=document.getElementById(id);if(e)e.textContent=txt;}
+
+function renderPubPOIBoard(pois){
+  const board=document.querySelector('#publicProfile .poi-board');
+  if(!board) return;
+  if(!pois.length){ board.innerHTML='<div style="padding:16px;font-size:12px;color:var(--muted)">Nessun POI pubblico ancora</div>'; return; }
+  board.innerHTML=pois.map(p=>{
+    const img=(Array.isArray(p.photos)?p.photos[0]:p.photos)||'https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Pyramid_of_Tirana_2022.jpg/320px-Pyramid_of_Tirana_2022.jpg';
+    return `<div class="poi-card" onclick="openDBDetail(${JSON.stringify(p).replace(/"/g,'&quot;')})">
+      <div class="poi-card-img" style="background-image:url('${img}')"></div>
+      <div class="poi-card-body"><div class="poi-card-name">${p.name}</div>
+      <div class="poi-card-footer"><div class="poi-card-love"><i class="ph-fill ph-heart"></i> ${p.love_count||0}</div></div></div>
+    </div>`;
+  }).join('');
+}
+
+// Rendi cliccabili le righe utente nelle connessioni
+function openUserRowProfile(name, meta={}){
+  openUserProfile({username:name,...meta});
+}
+
+/* ══════════════════════════════════════════
+   LOCATION SHARE (1-to-1 dal profilo)
+══════════════════════════════════════════ */
+let locShareChannel=null;
+function toggleLocDurPicker(){
+  document.getElementById('locDurPicker').classList.toggle('open');
+}
+function startLocShare(duration){
+  document.getElementById('locDurPicker').classList.remove('open');
+  if(!currentUser){ document.getElementById('authOverlay').style.display='flex'; return; }
+  if(!currentViewedUser){ showToast('Nessun utente selezionato'); return; }
+  const durLabels={it:{h:'1 ora',d:'1 giorno',m:'1 mese',always:'Sempre'},sq:{h:'1 orë',d:'1 ditë',m:'1 muaj',always:'Gjithmonë'},en:{h:'1 hour',d:'1 day',m:'1 month',always:'Always'}};
+  const labels=durLabels[lang]||durLabels.it;
+  const lbl={'1h':labels.h,'1d':labels.d,'1m':labels.m,'always':labels.always}[duration]||duration;
+  const shareId=`loc-${currentUser.id.substring(0,8)}-${(currentViewedUser.id||'guest').substring(0,8)}`;
+  if(locShareChannel) sb.removeChannel(locShareChannel);
+  locShareChannel=sb.channel(shareId);
+  locShareChannel.subscribe(status=>{
+    if(status==='SUBSCRIBED'){
+      // Broadcast posizione ogni 5s
+      navigator.geolocation?.watchPosition(pos=>{
+        locShareChannel.send({type:'broadcast',event:'loc',
+          payload:{lat:pos.coords.latitude,lng:pos.coords.longitude,
+            name:(currentUser.user_metadata?.full_name||'Tu'),
+            duration,ts:Date.now()}});
+      },{},{ enableHighAccuracy:true,maximumAge:5000 });
+      showToast(`📍 Posizione condivisa per ${lbl}`);
+      const btn=document.getElementById('pubShareLocBtn');
+      if(btn){btn.style.background='var(--green)';btn.style.color='#fff';}
+    }
+  });
+}
+
+/* ══════════════════════════════════════════
+   MODIFICA POI PROPRIO
+══════════════════════════════════════════ */
+let editingPOIId=null; // id del POI in editing
+
+function openEditPOI(){
+  if(!currentPOI||!currentPOI.id) return;
+  editingPOIId=currentPOI.id;
+  closeDetail();
+  // Pre-fill form
+  setTimeout(()=>{
+    openAddPOI();
+    const nameIn=document.getElementById('poiNameIn');
+    if(nameIn) nameIn.value=currentPOI.name||'';
+    const storyIn=document.getElementById('storyIn');
+    if(storyIn) storyIn.value=currentPOI.description||'';
+    // Coordinate
+    if(currentPOI.lat&&currentPOI.lng){
+      document.getElementById('locCoords').textContent=`${currentPOI.lat.toFixed(6)}, ${currentPOI.lng.toFixed(6)}`;
+      if(map) map.setView([currentPOI.lat,currentPOI.lng],16);
+    }
+    // Preview foto esistenti
+    const photos=Array.isArray(currentPOI.photos)?currentPOI.photos:(currentPOI.photos?[currentPOI.photos]:[]);
+    photos.forEach((url,i)=>{
+      if(i>2) return;
+      photoData[i]=url;
+      const slot=document.getElementById('pslot-'+i);
+      if(slot){
+        slot.classList.add('has-photo');
+        slot.innerHTML=`<div class="ph-preview" style="background-image:url('${url}')"></div><button class="ph-remove" onclick="removePhoto(event,${i})"><i class="ph ph-x"></i></button>`;
+      }
+    });
+    checkSave();
+    // Cambia il testo del pulsante salva
+    const saveBtn=document.getElementById('saveBtn');
+    if(saveBtn){ saveBtn.textContent='Aggiorna POI'; saveBtn.className='save-btn ready'; }
+    showToast('✏️ Modifica il tuo POI');
+  },350);
+}
+
+async function savePOIEdit(data){
+  if(!editingPOIId||!currentUser) return null;
+  const photoUrls=[];
+  for(const file of data.files||[]){
+    if(!file) continue;
+    const ext=file.name.split('.').pop();
+    const path=`${currentUser.id}/${Date.now()}_edit.${ext}`;
+    const {error:upErr}=await sb.storage.from('poi_photos').upload(path,file,{cacheControl:'3600',upsert:false});
+    if(!upErr){const {data:u}=sb.storage.from('poi_photos').getPublicUrl(path);photoUrls.push(u.publicUrl);}
+  }
+  // Mantieni foto esistenti se non è stato uploadato niente di nuovo
+  const finalPhotos=photoUrls.length?photoUrls:(Array.isArray(currentPOI?.photos)?currentPOI.photos:[]);
+  const {data:updated,error}=await sb.from('pois').update({
+    name:data.name,description:data.desc,category:data.cat,
+    address:data.address,photos:finalPhotos,updated_at:new Date().toISOString()
+  }).eq('id',editingPOIId).select().single();
+  if(error){console.error('editPOI:',error);showToast('Errore aggiornamento');return null;}
+  editingPOIId=null;
+  showToast('✅ POI aggiornato!');
+  return updated;
 }
 
 /* ══════════════════════════════════════════
@@ -3478,6 +3804,120 @@ function saveStop(){
   document.querySelectorAll('#stopCatChips .chip.sel').forEach(c=>c.classList.remove('sel'));
   closeSheet('addStopOv','addStopBg','addStopSheet');
   showToast(`✓ ${lang==='it'?'Tappa aggiunta':lang==='sq'?'Stacioni shtuar':'Stop added'}: ${name}`);
+}
+
+/* ══════════════════════════════════════════
+   DEV MODE — Multi-Profilo (token: 321PaLa)
+   Attivazione: 5 tap rapidi sulla stats bar
+══════════════════════════════════════════ */
+let devMode=false;
+let devProfiles=[];
+let activeDevProfileIdx=-1;
+
+function initDevMode(){
+  devMode=localStorage.getItem('poilove_dev')==='1';
+  const raw=localStorage.getItem('poilove_devprofiles');
+  devProfiles=raw?JSON.parse(raw):[];
+  if(devMode) showDevPanel();
+}
+
+function showDevPanel(){
+  const sec=document.getElementById('devModeSection');
+  if(sec) sec.style.display='';
+  renderDevProfiles();
+}
+
+function renderDevProfiles(){
+  const list=document.getElementById('devProfilesList');
+  if(!list) return;
+  if(!devProfiles.length){
+    list.innerHTML='<div style="font-size:12px;color:var(--muted);padding:8px 0">Nessun profilo test ancora.</div>';
+    return;
+  }
+  list.innerHTML=devProfiles.map((p,i)=>`
+    <div class="dev-profile-card${activeDevProfileIdx===i?' active-dev':''}" onclick="switchDevProfile(${i})">
+      <div class="dev-profile-av"><img src="https://ui-avatars.com/api/?name=${encodeURIComponent(p.name)}&background=${p.color||'285EA7'}&color=fff&size=80" alt=""></div>
+      <div class="dev-profile-info">
+        <div class="dev-profile-name">${p.name}${activeDevProfileIdx===i?' <span style=\'color:var(--green);font-size:10px\'>● attivo</span>':''}</div>
+        <div class="dev-profile-email">${p.email||''}</div>
+      </div>
+      <button style="background:none;border:none;color:var(--muted);cursor:pointer;padding:6px;flex-shrink:0" onclick="removeDevProfile(event,${i})"><i class="ph ph-x" style="font-size:13px"></i></button>
+    </div>
+  `).join('');
+}
+
+function addDevProfile(){
+  const name=prompt(lang==='it'?'Nome del profilo test:':lang==='sq'?'Emri i profilit të testit:':'Test profile name:');
+  if(!name||!name.trim()) return;
+  const emailDef=`${name.trim().toLowerCase().replace(/\s+/g,'.')}@test.poilove.com`;
+  const email=prompt(lang==='it'?'Email (facoltativa):':lang==='sq'?'Email (opsionale):':'Email (optional):',emailDef)||emailDef;
+  const palette=['285EA7','D42B2B','22C55E','7C3AED','F97316','0F172A','BE185D','0E7490'];
+  const color=palette[devProfiles.length%palette.length];
+  devProfiles.push({id:`dev_${Date.now()}`,name:name.trim(),email,color});
+  localStorage.setItem('poilove_devprofiles',JSON.stringify(devProfiles));
+  renderDevProfiles();
+  showToast(`✅ Profilo "${name.trim()}" creato`);
+}
+
+function removeDevProfile(e,idx){
+  e.stopPropagation();
+  const name=devProfiles[idx]?.name||'';
+  devProfiles.splice(idx,1);
+  if(activeDevProfileIdx>=devProfiles.length) activeDevProfileIdx=devProfiles.length-1;
+  localStorage.setItem('poilove_devprofiles',JSON.stringify(devProfiles));
+  renderDevProfiles();
+  showToast(`Profilo "${name}" rimosso`);
+}
+
+function switchDevProfile(idx){
+  activeDevProfileIdx=idx;
+  const p=devProfiles[idx];
+  openUserProfile({
+    id:p.id,
+    username:p.name,
+    email:p.email,
+    user_metadata:{full_name:p.name},
+    avatar_url:`https://ui-avatars.com/api/?name=${encodeURIComponent(p.name)}&background=${p.color||'285EA7'}&color=fff&size=200`
+  }, false);
+  renderDevProfiles();
+  showToast(`👤 ${p.name}`);
+}
+
+// ── Attivazione con 5 tap rapidi sulla stats bar ──
+let _ptaps=0, _ptimer=null;
+function onProfileStatsTap(){
+  _ptaps++;
+  clearTimeout(_ptimer);
+  _ptimer=setTimeout(()=>_ptaps=0,1000);
+  if(_ptaps>=5){
+    _ptaps=0;
+    if(devMode) showToast('Dev Mode attivo ✓ — tap 5× sulla tua email per disattivare');
+    else openTokenModal();
+  }
+}
+
+function openTokenModal(){
+  document.getElementById('tokenModal').classList.add('show');
+  setTimeout(()=>document.getElementById('tokenInput')?.focus(),150);
+}
+function closeTokenModal(){
+  document.getElementById('tokenModal').classList.remove('show');
+  const tin=document.getElementById('tokenInput');
+  if(tin) tin.value='';
+}
+function verifyToken(){
+  const v=document.getElementById('tokenInput')?.value||'';
+  if(v==='321PaLa'){
+    devMode=true;
+    localStorage.setItem('poilove_dev','1');
+    closeTokenModal();
+    showDevPanel();
+    showToast('🔓 Dev Mode attivato!');
+  } else {
+    showToast(lang==='it'?'Codice non valido':lang==='sq'?'Kod i pavlefshëm':'Invalid code');
+    document.getElementById('tokenInput').value='';
+    document.getElementById('tokenInput')?.focus();
+  }
 }
 </script>
 
