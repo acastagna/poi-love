@@ -217,12 +217,36 @@ button{touch-action:manipulation}
 .loc-tab{flex-shrink:0;padding:7px 11px;border-radius:9px;border:1.5px solid #E0D8CC;background:#f5f0e8;font-size:10px;font-weight:700;color:#5C4D3A;cursor:pointer;white-space:nowrap;font-family:inherit;transition:all .15s;display:flex;align-items:center;gap:5px}
 .loc-tab.active{background:#EBF2FC;border-color:var(--blue);color:var(--blue)}
 .loc-tab i{font-size:12px}
-.loc-result{background:#f5f0e8;border-radius:10px;padding:9px 12px;display:flex;align-items:center;gap:10px;margin-bottom:14px}
-.loc-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;animation:locpulse 2s infinite}
+/* ── Pannelli "Dove si trova" ── */
+.loc-panel{background:#f5f0e8;border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.loc-gps-loading{background:#EBF2FC}
+.loc-map-tip{position:relative;overflow:hidden}
+.loc-map-pulse{position:absolute;right:12px;width:28px;height:28px;border-radius:50%;border:2px solid var(--blue);animation:locpulse 1.5s ease-in-out infinite;opacity:.5}
+/* Input indirizzo */
+.loc-addr-in{width:100%;border:none;background:none;font-size:13px;font-family:inherit;color:var(--text);outline:none;padding:2px 0}
+.loc-addr-in::placeholder{color:var(--muted)}
+.loc-addr-drop{background:var(--card);border-radius:10px;margin-top:6px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.14);max-height:160px;overflow-y:auto;display:none}
+.loc-addr-drop.open{display:block}
+.loc-addr-item{display:flex;align-items:flex-start;gap:8px;padding:9px 12px;cursor:pointer;border-bottom:1px solid var(--border);font-size:12px}
+.loc-addr-item:last-child{border-bottom:none}
+.loc-addr-item:active{background:#f5f0e8}
+.loc-addr-item-name{font-weight:700;color:var(--text)}
+.loc-addr-item-sub{font-size:10px;color:var(--muted);margin-top:1px}
+/* Risultato (nascosto finché non c'è posizione) */
+.loc-result{background:#f5f0e8;border-radius:10px;padding:9px 12px;gap:10px;margin-bottom:8px;display:none}
+.loc-result.show{display:flex;align-items:flex-start}
 @keyframes locpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.4)}}
+.loc-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;margin-top:4px;animation:locpulse 2s infinite}
 .loc-street{font-size:13px;font-weight:600;color:var(--text)}
 .loc-coords{font-size:10px;color:var(--muted);margin-top:1px;font-family:monospace;cursor:pointer;text-decoration:underline dotted;text-underline-offset:2px}
-.loc-name{font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px}
+.loc-name{font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px}
+/* Link condivisione mini */
+.loc-share-mini{display:flex;align-items:center;gap:4px;margin-top:5px;font-size:10px;color:var(--muted);overflow:hidden}
+.loc-copy-mini{border:none;background:none;padding:0 2px;cursor:pointer;color:var(--muted);font-size:11px;flex-shrink:0}
+/* Suggerimento nome luogo → "Usa come nome POI" */
+.loc-name-hint{display:none;align-items:center;gap:6px;background:#EBF2FC;border-radius:8px;padding:7px 10px;margin-bottom:10px}
+.loc-name-hint.show{display:flex}
+/* Hint EXIF */
 .loc-hint{font-size:10px;color:var(--blue);margin-bottom:8px;display:none;align-items:center;gap:5px;background:#EBF2FC;border-radius:8px;padding:6px 10px}
 .loc-hint.show{display:flex}
 .loc-hint-name{font-weight:700;flex:1}
@@ -1392,20 +1416,68 @@ button{touch-action:manipulation}
         <button class="loc-tab" onclick="setLocTab(this,'addr')"><i class="ph ph-house"></i><span data-t="loc_addr">Indirizzo</span></button>
         <button class="loc-tab" onclick="setLocTab(this,'map')"><i class="ph ph-cursor"></i><span data-t="loc_map">Tocca mappa</span></button>
       </div>
-      <!-- EXIF location hint — appare quando una foto ha GPS -->
+      <!-- EXIF hint — appare quando la foto ha dati GPS -->
       <div class="loc-hint" id="locHint">
         <i class="ph ph-image" style="font-size:13px;flex-shrink:0"></i>
         <span class="loc-hint-name" id="locHintName"></span>
         <button class="loc-hint-accept" onclick="acceptExifName()" data-t="loc_hint_use">Usa come nome</button>
       </div>
-      <div class="loc-result" id="locResult">
-        <div class="loc-dot"></div>
-        <div style="flex:1">
-          <div class="loc-name" id="locName" style="display:none"></div>
-          <div class="loc-street" id="locStreet">Rruga Ismail Qemali, Tiranë</div>
-          <div class="loc-coords" id="locCoords" onclick="copyCoords(this)" title="Tap per copiare">41.3275, 19.8189</div>
+
+      <!-- GPS: spinner mentre rileva -->
+      <div class="loc-panel loc-gps-loading" id="locGpsLoading">
+        <i class="ph ph-spinner-gap" style="animation:spin 1s linear infinite;font-size:18px;color:var(--blue);flex-shrink:0"></i>
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--text)">Rilevamento GPS…</div>
+          <div style="font-size:10px;color:var(--muted)">Attendi qualche secondo</div>
         </div>
-        <i class="ph ph-copy" style="font-size:14px;color:var(--muted);flex-shrink:0" onclick="copyCoords(document.getElementById('locCoords'))"></i>
+      </div>
+
+      <!-- Indirizzo: campo di testo + risultati -->
+      <div class="loc-panel" id="locAddrPanel" style="display:none">
+        <i class="ph ph-magnifying-glass" style="font-size:15px;color:var(--muted);flex-shrink:0"></i>
+        <div style="flex:1">
+          <input type="text" class="loc-addr-in" id="locAddrIn"
+            placeholder="Es: Pazari i Ri, Tirana…"
+            oninput="onLocAddrInput(this.value)"
+            autocomplete="off">
+          <div class="loc-addr-drop" id="locAddrDrop"></div>
+        </div>
+      </div>
+
+      <!-- Mappa: istruzione tap -->
+      <div class="loc-panel loc-map-tip" id="locMapTip" style="display:none">
+        <i class="ph ph-cursor" style="font-size:18px;color:var(--blue);flex-shrink:0"></i>
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--text)">Tocca la mappa</div>
+          <div style="font-size:10px;color:var(--muted)">Un tocco breve imposta la posizione del POI</div>
+        </div>
+        <div class="loc-map-pulse"></div>
+      </div>
+
+      <!-- Risultato: mostrato da tutti i tab dopo aver ottenuto coordinate -->
+      <div class="loc-result" id="locResult">
+        <div class="loc-dot" id="locDot"></div>
+        <div style="flex:1;min-width:0">
+          <!-- Nome luogo (amenity/poi name da geocoder) -->
+          <div class="loc-name" id="locName" style="display:none"></div>
+          <!-- Via + città -->
+          <div class="loc-street" id="locStreet">Rruga Ismail Qemali, Tiranë</div>
+          <!-- Coordinate — cliccabili per copiare -->
+          <div class="loc-coords" id="locCoords" onclick="copyCoords(this)" title="Tap per copiare">41.3275, 19.8189</div>
+          <!-- Link condivisione inline -->
+          <div class="loc-share-mini" id="locShareMini">
+            <i class="ph ph-link" style="font-size:10px"></i>
+            <span id="locShareTxt" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">poilove.com?at=…</span>
+            <button class="loc-copy-mini" onclick="copyCoords(document.getElementById('locShareTxt'))"><i class="ph ph-copy"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Suggerimento: usa il nome del luogo come nome POI -->
+      <div class="loc-name-hint" id="locNameHint" style="display:none">
+        <i class="ph ph-sparkle" style="font-size:12px;color:var(--blue)"></i>
+        <span id="locNameHintTxt" style="flex:1;font-size:11px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+        <button class="loc-hint-accept" onclick="useDetectedName()">Usa come nome</button>
       </div>
 
       <!-- FOTO -->
@@ -2211,26 +2283,12 @@ function initMap(){
     L.marker([p.lat,p.lng],{icon}).addTo(map).on('click',()=>openDetail(i));
   });
 
-  // Detect GPS + reverse geocode completo
+  // Detect GPS — delega tutto a reverseGeocodeAndShow
   if(navigator.geolocation){
     navigator.geolocation.getCurrentPosition(pos=>{
       gpsPos={lat:pos.coords.latitude,lng:pos.coords.longitude};
-      document.getElementById('locCoords').textContent=`${gpsPos.lat.toFixed(4)}, ${gpsPos.lng.toFixed(4)}`;
-      updateShareLink(gpsPos.lat,gpsPos.lng);
-      // Reverse geocode per nome + via + nazione
-      fetch(`https://nominatim.openstreetmap.org/reverse?lat=${gpsPos.lat}&lon=${gpsPos.lng}&format=json`,{headers:{'Accept-Language':lang}})
-        .then(r=>r.json()).then(d=>{
-          if(!d||!d.address)return;
-          const name=(d.address.amenity||d.address.building||d.address.tourism||d.address.shop||'').trim();
-          const street=(d.address.road||d.address.pedestrian||d.address.path||'').trim();
-          const num=(d.address.house_number||'').trim();
-          const city=(d.address.city||d.address.town||d.address.village||'').trim();
-          const country=(d.address.country||'').trim();
-          const locName=document.getElementById('locName');
-          if(locName&&name){locName.textContent=name;locName.style.display='block';}
-          const streetFull=[street+(num?' '+num:''),city,country].filter(Boolean).join(', ');
-          document.getElementById('locStreet').textContent=streetFull||d.display_name.split(',').slice(0,2).join(',');
-        }).catch(()=>{document.getElementById('locStreet').textContent='Posizione GPS rilevata';});
+      // Se il form "Aggiungi POI" è aperto sul tab GPS, aggiorna UI
+      if(locActiveTab==='gps') reverseGeocodeAndShow(gpsPos.lat,gpsPos.lng);
     },()=>{});
   }
 
@@ -2918,10 +2976,162 @@ function updateChar(){
   if(el)el.textContent=`${v} / 1000`;
   el.style.color=v>900?'var(--red)':v>700?'var(--orange)':'var(--muted)';
 }
+let locActiveTab='gps'; // traccia tab attivo corrente
+let mapTapListenerActive=false;
+
 function setLocTab(btn,type){
   document.querySelectorAll('.loc-tab').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
-  if(type==='exif') applyExifToForm();
+  locActiveTab=type;
+
+  // Nascondi tutti i pannelli di input
+  document.getElementById('locGpsLoading').style.display='none';
+  document.getElementById('locAddrPanel').style.display='none';
+  document.getElementById('locMapTip').style.display='none';
+  // Rimuovi listener tap mappa precedente
+  if(mapTapListenerActive && map){
+    map.off('click',_mapTapLocHandler);
+    mapTapListenerActive=false;
+    map.getContainer().style.cursor='';
+  }
+
+  if(type==='gps'){
+    if(gpsPos){
+      // Abbiamo già il GPS — mostra subito
+      showLocResult(gpsPos.lat, gpsPos.lng);
+    } else {
+      // In attesa GPS
+      document.getElementById('locGpsLoading').style.display='flex';
+      document.getElementById('locResult').classList.remove('show');
+      navigator.geolocation?.getCurrentPosition(pos=>{
+        gpsPos={lat:pos.coords.latitude,lng:pos.coords.longitude};
+        if(locActiveTab==='gps') reverseGeocodeAndShow(gpsPos.lat,gpsPos.lng);
+      },()=>{
+        document.getElementById('locGpsLoading').style.display='none';
+        showToast('GPS non disponibile — usa un altro metodo');
+      });
+    }
+  } else if(type==='exif'){
+    applyExifToForm();
+  } else if(type==='addr'){
+    document.getElementById('locAddrPanel').style.display='flex';
+    setTimeout(()=>document.getElementById('locAddrIn')?.focus(),200);
+  } else if(type==='map'){
+    document.getElementById('locMapTip').style.display='flex';
+    // Attiva click sulla mappa per settare posizione
+    map.getContainer().style.cursor='crosshair';
+    map.on('click',_mapTapLocHandler);
+    mapTapListenerActive=true;
+  }
+}
+
+function _mapTapLocHandler(e){
+  const {lat,lng}=e.latlng;
+  map.off('click',_mapTapLocHandler);
+  mapTapListenerActive=false;
+  map.getContainer().style.cursor='';
+  document.getElementById('locMapTip').style.display='none';
+  reverseGeocodeAndShow(lat,lng);
+  showToast('📍 Posizione impostata sulla mappa');
+}
+
+// Reverse geocode + aggiorna UI
+function reverseGeocodeAndShow(lat,lng){
+  document.getElementById('locCoords').textContent=`${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+  const linkTxt=`poilove.com?at=${lat.toFixed(5)},${lng.toFixed(5)}`;
+  const shareTxtEl=document.getElementById('locShareTxt');
+  if(shareTxtEl) shareTxtEl.textContent=linkTxt;
+  updateShareLink(lat,lng);
+  if(map) map.setView([lat,lng],17);
+  // Mostra risultato subito
+  document.getElementById('locResult').classList.add('show');
+  document.getElementById('locGpsLoading').style.display='none';
+  document.getElementById('locStreet').textContent='…';
+  // Reverse geocode per indirizzo e nome
+  fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`,
+    {headers:{'Accept-Language':lang}})
+    .then(r=>r.json()).then(d=>{
+      if(!d?.address) return;
+      const amenity=(d.address.amenity||d.address.building||d.address.tourism||d.address.shop||d.address.historic||'').trim();
+      const street=(d.address.road||d.address.pedestrian||d.address.path||'').trim();
+      const num=(d.address.house_number||'').trim();
+      const city=(d.address.city||d.address.town||d.address.village||'').trim();
+      const country=(d.address.country||'').trim();
+      const locNameEl=document.getElementById('locName');
+      // Mostra nome struttura se c'è
+      if(amenity && locNameEl){
+        locNameEl.textContent=amenity;
+        locNameEl.style.display='block';
+        // Suggerisci come nome POI
+        showLocNameHint(amenity);
+      } else if(locNameEl){
+        locNameEl.style.display='none';
+      }
+      const streetFull=[street+(num?' '+num:''),city,country].filter(Boolean).join(', ');
+      document.getElementById('locStreet').textContent=streetFull||d.display_name.split(',').slice(0,2).join(',');
+    }).catch(()=>{
+      document.getElementById('locStreet').textContent='Posizione rilevata';
+    });
+}
+
+function showLocResult(lat,lng){
+  // Shortcut: mostra risultato con reverse geocode
+  reverseGeocodeAndShow(lat,lng);
+}
+
+function showLocNameHint(name){
+  const hint=document.getElementById('locNameHint');
+  const txt=document.getElementById('locNameHintTxt');
+  if(!hint||!txt) return;
+  txt.textContent=`"${name}" — usa come nome?`;
+  hint.classList.add('show');
+}
+
+function useDetectedName(){
+  const txt=document.getElementById('locNameHintTxt')?.textContent||'';
+  const name=txt.replace(/^"/,'').replace(/".*$/,'');
+  if(name){
+    const nameIn=document.getElementById('poiNameIn');
+    if(nameIn){nameIn.value=name;checkSave();}
+  }
+  document.getElementById('locNameHint').classList.remove('show');
+}
+
+// Input ricerca indirizzo nel tab "Indirizzo"
+let addrSearchTimer;
+function onLocAddrInput(val){
+  clearTimeout(addrSearchTimer);
+  const drop=document.getElementById('locAddrDrop');
+  if(!drop) return;
+  if(val.length<3){drop.classList.remove('open');return;}
+  const lat=gpsPos?gpsPos.lat:CENTER[0];
+  const lng=gpsPos?gpsPos.lng:CENTER[1];
+  addrSearchTimer=setTimeout(()=>{
+    fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(val)}&format=json&limit=5&lat=${lat}&lon=${lng}&addressdetails=1`,
+      {headers:{'Accept-Language':lang}})
+      .then(r=>r.json()).then(results=>{
+        if(!results.length){drop.classList.remove('open');return;}
+        drop.innerHTML=results.slice(0,5).map(r=>{
+          const name=r.display_name.split(',')[0];
+          const sub=r.display_name.split(',').slice(1,3).join(',').trim();
+          const lat2=parseFloat(r.lat),lng2=parseFloat(r.lon);
+          return `<div class="loc-addr-item" onclick="selectLocAddr('${name.replace(/'/g,"\\'")}',${lat2},${lng2})">
+            <i class="ph ph-map-pin" style="font-size:13px;color:var(--blue);flex-shrink:0;margin-top:2px"></i>
+            <div><div class="loc-addr-item-name">${name}</div><div class="loc-addr-item-sub">${sub}</div></div>
+          </div>`;
+        }).join('');
+        drop.classList.add('open');
+      }).catch(()=>{});
+  },350);
+}
+
+function selectLocAddr(name,lat,lng){
+  document.getElementById('locAddrIn').value=name;
+  document.getElementById('locAddrDrop').classList.remove('open');
+  reverseGeocodeAndShow(lat,lng);
+  // Suggerisci come nome POI
+  const nameIn=document.getElementById('poiNameIn');
+  if(nameIn&&!nameIn.value.trim()){nameIn.value=name;checkSave();}
 }
 function toggleCat(btn){
   const chips=btn.closest('.chips');
@@ -3208,26 +3418,8 @@ window.addEventListener('DOMContentLoaded',()=>{
 ══════════════════════════════════════════ */
 function openAddPOIAtCoords(lat,lng){
   openAddPOI();
-  // Pre-compila coordinate
-  document.getElementById('locCoords').textContent=`${lat.toFixed(4)}, ${lng.toFixed(4)}`;
-  updateShareLink(lat,lng);
-  if(map)map.setView([lat,lng],17);
-  // Reverse geocode → pre-compila nome e indirizzo
-  fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`,{headers:{'Accept-Language':lang}})
-    .then(r=>r.json()).then(d=>{
-      if(!d||!d.display_name)return;
-      const parts=d.display_name.split(',');
-      const name=parts[0].trim();
-      const street=(d.address?.road||d.address?.pedestrian||'').trim();
-      const city=(d.address?.city||d.address?.town||d.address?.village||'').trim();
-      const country=(d.address?.country||'').trim();
-      const locName=document.getElementById('locName');
-      if(locName){locName.textContent=name;locName.style.display='block';}
-      const locStreet=document.getElementById('locStreet');
-      if(locStreet)locStreet.textContent=[street,city,country].filter(Boolean).join(', ');
-      const nameIn=document.getElementById('poiNameIn');
-      if(nameIn&&!nameIn.value.trim()){nameIn.value=name;checkSave();}
-    }).catch(()=>{});
+  // Aggiorna tab GPS + UI tramite reverseGeocodeAndShow
+  reverseGeocodeAndShow(lat,lng);
   showToast(lang==='it'?'📍 Coordinate dalla mappa':lang==='sq'?'📍 Koordinatat nga harta':'📍 Coordinates from map');
 }
 
