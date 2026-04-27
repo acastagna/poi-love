@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/@phosphor-icons/web@2.1.1/src/index.js"></script>
+<script src="https://unpkg.com/exifr@7.1.3/dist/lite.umd.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 :root{
@@ -73,8 +74,14 @@ button{touch-action:manipulation}
 .sh-close{width:32px;height:32px;border-radius:16px;background:#ede7dc;border:none;cursor:pointer;font-size:17px;color:var(--muted);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;pointer-events:all}
 .sh-body{padding:14px 20px 0}
 .sh-timer{display:flex;align-items:center;gap:5px;background:#FFF5F5;border:1px solid #F7C1C1;border-radius:20px;padding:5px 10px;font-size:12px;font-weight:700;color:var(--red);flex-shrink:0}
-.congrats{background:#EAF3DE;border:1px solid #C0DD97;border-radius:10px;padding:8px 12px;font-size:12px;color:#3B6D11;font-weight:500;margin:8px 20px 0;line-height:1.4;display:none}
-.congrats.show{display:block}
+.congrats{border-radius:12px;padding:12px 16px;font-size:13px;font-weight:600;margin:10px 20px 0;line-height:1.6;display:none;gap:10px;align-items:flex-start}
+.congrats.show{display:flex}
+.congrats.fast{background:#EAF3DE;border:1.5px solid #C0DD97;color:#3B6D11}
+.congrats.slow{background:#FFF7F0;border:1.5px solid #FDDAB8;color:#92400E}
+.congrats-icon{font-size:28px;flex-shrink:0;line-height:1}
+.congrats-text{flex:1}
+.congrats-title{font-size:14px;font-weight:800;margin-bottom:2px}
+.congrats-sub{font-size:11px;opacity:.8;line-height:1.5}
 .sec-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:7px;display:flex;align-items:center;justify-content:space-between}
 .req-badge{background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:5px}
 .field-in{width:100%;background:#f5f0e8;border:1.5px solid #E0D8CC;border-radius:11px;padding:12px 14px;font-size:15px;font-family:inherit;color:var(--text);outline:none;margin-bottom:4px;transition:border-color .2s}
@@ -110,7 +117,12 @@ button{touch-action:manipulation}
 .loc-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;animation:locpulse 2s infinite}
 @keyframes locpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.4)}}
 .loc-street{font-size:13px;font-weight:600;color:var(--text)}
-.loc-coords{font-size:10px;color:var(--muted);margin-top:1px;font-family:monospace}
+.loc-coords{font-size:10px;color:var(--muted);margin-top:1px;font-family:monospace;cursor:pointer;text-decoration:underline dotted;text-underline-offset:2px}
+.loc-name{font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px}
+.loc-hint{font-size:10px;color:var(--blue);margin-bottom:8px;display:none;align-items:center;gap:5px;background:#EBF2FC;border-radius:8px;padding:6px 10px}
+.loc-hint.show{display:flex}
+.loc-hint-name{font-weight:700;flex:1}
+.loc-hint-accept{border:none;background:none;color:var(--blue);font-size:11px;font-weight:700;cursor:pointer;padding:0;font-family:inherit;text-decoration:underline}
 
 /* PHOTOS */
 .photo-row{display:flex;gap:8px;margin-bottom:14px}
@@ -501,7 +513,10 @@ button{touch-action:manipulation}
     <div class="sh-head">
       <div>
         <div class="sh-title" data-t="add_title">Salva questo posto</div>
-        <div class="sh-sub" data-t="add_sub">Aggiungi un luogo che ami</div>
+        <div class="sh-sub" style="color:var(--red);font-weight:700;font-size:11px;margin-top:3px;display:flex;align-items:center;gap:4px">
+          <i class="ph ph-lightning" style="font-size:11px"></i>
+          <span data-t="add_challenge">Riesci in 60 secondi?</span>
+        </div>
       </div>
       <div style="display:flex;align-items:center;gap:8px">
         <div class="sh-timer" id="timerBadge"><i class="ph ph-timer" style="font-size:13px"></i> <span id="timerTime">0:00</span></div>
@@ -509,8 +524,11 @@ button{touch-action:manipulation}
       </div>
     </div>
     <div class="congrats" id="congratsBanner">
-      <i class="ph-fill ph-trophy" style="color:#D97706"></i>
-      <span data-t="congrats">Complimenti! Sotto i 90 secondi.</span>
+      <div class="congrats-icon" id="congratsIcon"></div>
+      <div class="congrats-text">
+        <div class="congrats-title" id="congratsTitle"></div>
+        <div class="congrats-sub" id="congratsSub"></div>
+      </div>
     </div>
     <div class="sh-body">
 
@@ -533,12 +551,20 @@ button{touch-action:manipulation}
         <button class="loc-tab" onclick="setLocTab(this,'addr')"><i class="ph ph-house"></i><span data-t="loc_addr">Indirizzo</span></button>
         <button class="loc-tab" onclick="setLocTab(this,'map')"><i class="ph ph-cursor"></i><span data-t="loc_map">Tocca mappa</span></button>
       </div>
+      <!-- EXIF location hint — appare quando una foto ha GPS -->
+      <div class="loc-hint" id="locHint">
+        <i class="ph ph-image" style="font-size:13px;flex-shrink:0"></i>
+        <span class="loc-hint-name" id="locHintName"></span>
+        <button class="loc-hint-accept" onclick="acceptExifName()" data-t="loc_hint_use">Usa come nome</button>
+      </div>
       <div class="loc-result" id="locResult">
         <div class="loc-dot"></div>
-        <div>
+        <div style="flex:1">
+          <div class="loc-name" id="locName" style="display:none"></div>
           <div class="loc-street" id="locStreet">Rruga Ismail Qemali, Tiranë</div>
-          <div class="loc-coords" id="locCoords">41.3275, 19.8189</div>
+          <div class="loc-coords" id="locCoords" onclick="copyCoords(this)" title="Tap per copiare">41.3275, 19.8189</div>
         </div>
+        <i class="ph ph-copy" style="font-size:14px;color:var(--muted);flex-shrink:0" onclick="copyCoords(document.getElementById('locCoords'))"></i>
       </div>
 
       <!-- FOTO -->
@@ -796,9 +822,9 @@ function generateAvatar(){
    TRANSLATIONS
 ══════════════════════════════════════════ */
 const T={
-  it:{nav_map:'Mappa',nav_itin:'Itinerari',nav_profile:'Profilo',mt_street:'Stradale',mt_sat:'Satellite',mt_routes:'Rotte Storiche',fab_poi:'Segna un luogo',fab_itin:'Tappa Itinerario',add_title:'Salva questo posto',add_sub:'Aggiungi un luogo che ami',congrats:'Sotto i 90 secondi! Grazie.',lbl_name:'Nome del posto',req:'OBBLIGATORIO',lbl_where:'Dove si trova',loc_gps:'GPS Live',loc_exif:'Foto EXIF',loc_addr:'Indirizzo',loc_map:'Tocca mappa',lbl_photos:'Foto',ph_main:'Principale',ph_2:'Foto 2',ph_3:'Foto 3',ph_hint:'Non sei sul posto? Puoi aggiungere foto in seguito.',lbl_story:'Racconta',lbl_cat:'Categorie',lbl_list:'Aggiungi a una lista',lbl_route:'Rotta Storica',route_none:'Nessuna rotta storica',lbl_vis:'Visibilità',vis_pub_btn:'Pubblico',vis_prv_btn:'Privato',vis_share_btn:'Condividi',save_disabled:'Inserisci il nome per continuare',save_ready:'Segna sulla mappa',google_suggest:'Consiglia a Google Maps',stop_title:'Tappa Itinerario',stop_sub:'Senza foto. Pianifica ora, racconta quando ci sei.',stop_lbl_name:'Nome della tappa',stop_lbl_cat:'Categoria',stop_lbl_vis:'Visibilità Itinerario',itin_pub:'Pubblico',itin_prv:'Privato',stop_lbl_date:'Data prevista',stop_save:'Aggiungi tappa',stat_poi:'POI',stat_love:'Love',stat_list:'Liste',prof_lists:'Le mie liste',prof_new_list:'Nuova lista',prof_tags:'I miei tag',prof_new_tag:'Aggiungi',prof_my_poi:'I miei POI',prof_add_poi:'Aggiungi',prof_pub_toggle:'Come mi vedono gli altri',itin_h:'Itinerari di Viaggio',itin_desc:'Pianifica le tue tappe prima di partire. Trova compagni di viaggio. Trasforma ogni tappa in un POI quando sei sul posto.',itin_open:'Apri Itinerari',itin_note:'Demo con mappa, mini-calendario, GPS live e compagni.',back:'Indietro',},
-  sq:{nav_map:'Harta',nav_itin:'Itinerare',nav_profile:'Profili',mt_street:'Rrugore',mt_sat:'Satelitor',mt_routes:'Rrugët Historike',fab_poi:'Shëno një vend',fab_itin:'Stacion Itinerarit',add_title:'Ruaj këtë vend',add_sub:'Shto një vend që e do',congrats:'Nën 90 sekonda! Faleminderit.',lbl_name:'Emri i vendit',req:'E DETYRUESHME',lbl_where:'Ku ndodhet',loc_gps:'GPS Live',loc_exif:'EXIF Foto',loc_addr:'Adresë',loc_map:'Prek hartën',lbl_photos:'Foto',ph_main:'Kryesore',ph_2:'Foto 2',ph_3:'Foto 3',ph_hint:'Nuk jeni aty? Mund të shtoni foto më vonë.',lbl_story:'Trego',lbl_cat:'Kategori',lbl_list:'Shto në listë',lbl_route:'Rrugë Historike',route_none:'Asnjë rrugë historike',lbl_vis:'Dukshmëria',vis_pub_btn:'Publik',vis_prv_btn:'Privat',vis_share_btn:'Nda',save_disabled:'Fut emrin për të vazhduar',save_ready:'Shëno në hartë',google_suggest:'Sugjeroni te Google Maps',stop_title:'Stacion Itinerarit',stop_sub:'Pa foto. Planifiko tani, trego kur je aty.',stop_lbl_name:'Emri i stacionit',stop_lbl_cat:'Kategori',stop_lbl_vis:'Dukshmëria Itinerarit',itin_pub:'Publik',itin_prv:'Privat',stop_lbl_date:'Data e planifikuar',stop_save:'Shto stacionin',stat_poi:'POI',stat_love:'Love',stat_list:'Lista',prof_lists:'Listat e mia',prof_new_list:'Listë e re',prof_tags:'Etiketat e mia',prof_new_tag:'Shto',prof_my_poi:'POI-të e mia',prof_add_poi:'Shto',prof_pub_toggle:'Si më shohin të tjerët',itin_h:'Itinerare Udhëtimi',itin_desc:'Planifikoni stacionet para nisjes. Gjeni shokë udhëtimi.',itin_open:'Hap Itineraret',itin_note:'Demo me hartë, mini-kalendar, GPS live.',back:'Kthehu',},
-  en:{nav_map:'Map',nav_itin:'Itineraries',nav_profile:'Profile',mt_street:'Street',mt_sat:'Satellite',mt_routes:'Historic Routes',fab_poi:'Mark a place',fab_itin:'Itinerary Stop',add_title:'Save this place',add_sub:'Add a place you love',congrats:'Under 90 seconds! Thank you.',lbl_name:'Place name',req:'REQUIRED',lbl_where:'Where is it',loc_gps:'GPS Live',loc_exif:'Photo EXIF',loc_addr:'Address',loc_map:'Tap map',lbl_photos:'Photos',ph_main:'Main',ph_2:'Photo 2',ph_3:'Photo 3',ph_hint:"Not there yet? You can add photos later.",lbl_story:'Tell your story',lbl_cat:'Categories',lbl_list:'Add to a list',lbl_route:'Historic Route',route_none:'No historic route',lbl_vis:'Visibility',vis_pub_btn:'Public',vis_prv_btn:'Private',vis_share_btn:'Share',save_disabled:'Enter the name to continue',save_ready:'Mark on map',google_suggest:'Suggest to Google Maps',stop_title:'Itinerary Stop',stop_sub:"No photos. Plan now, tell the story when you're there.",stop_lbl_name:'Stop name',stop_lbl_cat:'Category',stop_lbl_vis:'Itinerary Visibility',itin_pub:'Public',itin_prv:'Private',stop_lbl_date:'Planned date',stop_save:'Add stop',stat_poi:'POI',stat_love:'Love',stat_list:'Lists',prof_lists:'My lists',prof_new_list:'New list',prof_tags:'My tags',prof_new_tag:'Add',prof_my_poi:'My POIs',prof_add_poi:'Add',prof_pub_toggle:'How others see me',itin_h:'Travel Itineraries',itin_desc:'Plan your stops before you leave. Find travel companions.',itin_open:'Open Itineraries',itin_note:'Demo with map, mini-calendar, live GPS and companions.',back:'Back',}
+  it:{nav_map:'Mappa',nav_itin:'Itinerari',nav_profile:'Profilo',mt_street:'Stradale',mt_sat:'Satellite',mt_routes:'Rotte Storiche',fab_poi:'Segna un luogo',fab_itin:'Tappa Itinerario',add_title:'Salva questo posto',add_sub:'Aggiungi un luogo che ami',add_challenge:'Riesci in 60 secondi?',loc_hint_use:'Usa come nome',congrats:'',lbl_name:'Nome del posto',req:'OBBLIGATORIO',lbl_where:'Dove si trova',loc_gps:'GPS Live',loc_exif:'Foto EXIF',loc_addr:'Indirizzo',loc_map:'Tocca mappa',lbl_photos:'Foto',ph_main:'Principale',ph_2:'Foto 2',ph_3:'Foto 3',ph_hint:'Non sei sul posto? Puoi aggiungere foto in seguito.',lbl_story:'Racconta',lbl_cat:'Categorie',lbl_list:'Aggiungi a una lista',lbl_route:'Rotta Storica',route_none:'Nessuna rotta storica',lbl_vis:'Visibilità',vis_pub_btn:'Pubblico',vis_prv_btn:'Privato',vis_share_btn:'Condividi',save_disabled:'Inserisci il nome per continuare',save_ready:'Segna sulla mappa',google_suggest:'Consiglia a Google Maps',stop_title:'Tappa Itinerario',stop_sub:'Senza foto. Pianifica ora, racconta quando ci sei.',stop_lbl_name:'Nome della tappa',stop_lbl_cat:'Categoria',stop_lbl_vis:'Visibilità Itinerario',itin_pub:'Pubblico',itin_prv:'Privato',stop_lbl_date:'Data prevista',stop_save:'Aggiungi tappa',stat_poi:'POI',stat_love:'Love',stat_list:'Liste',prof_lists:'Le mie liste',prof_new_list:'Nuova lista',prof_tags:'I miei tag',prof_new_tag:'Aggiungi',prof_my_poi:'I miei POI',prof_add_poi:'Aggiungi',prof_pub_toggle:'Come mi vedono gli altri',itin_h:'Itinerari di Viaggio',itin_desc:'Pianifica le tue tappe prima di partire. Trova compagni di viaggio. Trasforma ogni tappa in un POI quando sei sul posto.',itin_open:'Apri Itinerari',itin_note:'Demo con mappa, mini-calendario, GPS live e compagni.',back:'Indietro',},
+  sq:{nav_map:'Harta',nav_itin:'Itinerare',nav_profile:'Profili',mt_street:'Rrugore',mt_sat:'Satelitor',mt_routes:'Rrugët Historike',fab_poi:'Shëno një vend',fab_itin:'Stacion Itinerarit',add_title:'Ruaj këtë vend',add_sub:'Shto një vend që e do',add_challenge:'Arrin brenda 60 sekondave?',loc_hint_use:'Përdor si emër',congrats:'',lbl_name:'Emri i vendit',req:'E DETYRUESHME',lbl_where:'Ku ndodhet',loc_gps:'GPS Live',loc_exif:'EXIF Foto',loc_addr:'Adresë',loc_map:'Prek hartën',lbl_photos:'Foto',ph_main:'Kryesore',ph_2:'Foto 2',ph_3:'Foto 3',ph_hint:'Nuk jeni aty? Mund të shtoni foto më vonë.',lbl_story:'Trego',lbl_cat:'Kategori',lbl_list:'Shto në listë',lbl_route:'Rrugë Historike',route_none:'Asnjë rrugë historike',lbl_vis:'Dukshmëria',vis_pub_btn:'Publik',vis_prv_btn:'Privat',vis_share_btn:'Nda',save_disabled:'Fut emrin për të vazhduar',save_ready:'Shëno në hartë',google_suggest:'Sugjeroni te Google Maps',stop_title:'Stacion Itinerarit',stop_sub:'Pa foto. Planifiko tani, trego kur je aty.',stop_lbl_name:'Emri i stacionit',stop_lbl_cat:'Kategori',stop_lbl_vis:'Dukshmëria Itinerarit',itin_pub:'Publik',itin_prv:'Privat',stop_lbl_date:'Data e planifikuar',stop_save:'Shto stacionin',stat_poi:'POI',stat_love:'Love',stat_list:'Lista',prof_lists:'Listat e mia',prof_new_list:'Listë e re',prof_tags:'Etiketat e mia',prof_new_tag:'Shto',prof_my_poi:'POI-të e mia',prof_add_poi:'Shto',prof_pub_toggle:'Si më shohin të tjerët',itin_h:'Itinerare Udhëtimi',itin_desc:'Planifikoni stacionet para nisjes. Gjeni shokë udhëtimi.',itin_open:'Hap Itineraret',itin_note:'Demo me hartë, mini-kalendar, GPS live.',back:'Kthehu',},
+  en:{nav_map:'Map',nav_itin:'Itineraries',nav_profile:'Profile',mt_street:'Street',mt_sat:'Satellite',mt_routes:'Historic Routes',fab_poi:'Mark a place',fab_itin:'Itinerary Stop',add_title:'Save this place',add_sub:'Add a place you love',add_challenge:'Can you do it in 60 seconds?',loc_hint_use:'Use as name',congrats:'',lbl_name:'Place name',req:'REQUIRED',lbl_where:'Where is it',loc_gps:'GPS Live',loc_exif:'Photo EXIF',loc_addr:'Address',loc_map:'Tap map',lbl_photos:'Photos',ph_main:'Main',ph_2:'Photo 2',ph_3:'Photo 3',ph_hint:"Not there yet? You can add photos later.",lbl_story:'Tell your story',lbl_cat:'Categories',lbl_list:'Add to a list',lbl_route:'Historic Route',route_none:'No historic route',lbl_vis:'Visibility',vis_pub_btn:'Public',vis_prv_btn:'Private',vis_share_btn:'Share',save_disabled:'Enter the name to continue',save_ready:'Mark on map',google_suggest:'Suggest to Google Maps',stop_title:'Itinerary Stop',stop_sub:"No photos. Plan now, tell the story when you're there.",stop_lbl_name:'Stop name',stop_lbl_cat:'Category',stop_lbl_vis:'Itinerary Visibility',itin_pub:'Public',itin_prv:'Private',stop_lbl_date:'Planned date',stop_save:'Add stop',stat_poi:'POI',stat_love:'Love',stat_list:'Lists',prof_lists:'My lists',prof_new_list:'New list',prof_tags:'My tags',prof_new_tag:'Add',prof_my_poi:'My POIs',prof_add_poi:'Add',prof_pub_toggle:'How others see me',itin_h:'Travel Itineraries',itin_desc:'Plan your stops before you leave. Find travel companions.',itin_open:'Open Itineraries',itin_note:'Demo with map, mini-calendar, live GPS and companions.',back:'Back',}
 };
 
 const LANGS=['it','sq','en'];
@@ -848,13 +874,26 @@ function initMap(){
     L.marker([p.lat,p.lng],{icon}).addTo(map).on('click',()=>openDetail(i));
   });
 
-  // Detect GPS
+  // Detect GPS + reverse geocode completo
   if(navigator.geolocation){
     navigator.geolocation.getCurrentPosition(pos=>{
       gpsPos={lat:pos.coords.latitude,lng:pos.coords.longitude};
-      document.getElementById('locStreet').textContent='Posizione GPS rilevata';
       document.getElementById('locCoords').textContent=`${gpsPos.lat.toFixed(4)}, ${gpsPos.lng.toFixed(4)}`;
       updateShareLink(gpsPos.lat,gpsPos.lng);
+      // Reverse geocode per nome + via + nazione
+      fetch(`https://nominatim.openstreetmap.org/reverse?lat=${gpsPos.lat}&lon=${gpsPos.lng}&format=json`,{headers:{'Accept-Language':lang}})
+        .then(r=>r.json()).then(d=>{
+          if(!d||!d.address)return;
+          const name=(d.address.amenity||d.address.building||d.address.tourism||d.address.shop||'').trim();
+          const street=(d.address.road||d.address.pedestrian||d.address.path||'').trim();
+          const num=(d.address.house_number||'').trim();
+          const city=(d.address.city||d.address.town||d.address.village||'').trim();
+          const country=(d.address.country||'').trim();
+          const locName=document.getElementById('locName');
+          if(locName&&name){locName.textContent=name;locName.style.display='block';}
+          const streetFull=[street+(num?' '+num:''),city,country].filter(Boolean).join(', ');
+          document.getElementById('locStreet').textContent=streetFull||d.display_name.split(',').slice(0,2).join(',');
+        }).catch(()=>{document.getElementById('locStreet').textContent='Posizione GPS rilevata';});
     },()=>{});
   }
 
@@ -976,9 +1015,10 @@ function copyDetailLink(){
 }
 
 /* ══════════════════════════════════════════
-   PHOTOS
+   PHOTOS + EXIF GPS
 ══════════════════════════════════════════ */
 const photoData=[null,null,null];
+let exifSuggestedName='';
 function triggerPhoto(idx){
   document.getElementById('photoInput'+idx).click();
 }
@@ -994,6 +1034,74 @@ function handlePhoto(input,idx){
     showToast(lang==='sq'?'Foto shtuar!':lang==='en'?'Photo added!':'Foto aggiunta!');
   };
   reader.readAsDataURL(file);
+  // EXIF GPS extraction (solo per la foto principale)
+  if(idx===0&&typeof exifr!=='undefined'){
+    exifr.gps(file).then(gps=>{
+      if(!gps||!gps.latitude)return;
+      const lat=gps.latitude,lng=gps.longitude;
+      // Aggiorna coordinate
+      document.getElementById('locCoords').textContent=`${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+      updateShareLink(lat,lng);
+      if(map)map.setView([lat,lng],17);
+      // Reverse geocode → nome luogo
+      fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`,{headers:{'Accept-Language':lang}})
+        .then(r=>r.json()).then(d=>{
+          if(!d||!d.display_name)return;
+          const parts=d.display_name.split(',');
+          const name=parts[0].trim();
+          const street=(d.address?.road||d.address?.pedestrian||'').trim();
+          const city=(d.address?.city||d.address?.town||d.address?.village||'').trim();
+          const country=(d.address?.country||'').trim();
+          // Mostra nome, via, nazione nel loc-result
+          const locName=document.getElementById('locName');
+          if(locName){locName.textContent=name;locName.style.display='block';}
+          const locStreet=document.getElementById('locStreet');
+          if(locStreet)locStreet.textContent=[street,city,country].filter(Boolean).join(', ');
+          // Hint autocomplete nome
+          exifSuggestedName=name;
+          const hint=document.getElementById('locHint');
+          const hintName=document.getElementById('locHintName');
+          if(hint&&hintName){
+            hintName.textContent=`📍 ${name}`;
+            hint.classList.add('show');
+            // Se il campo nome è vuoto, pre-compila automaticamente
+            const nameIn=document.getElementById('poiNameIn');
+            if(nameIn&&!nameIn.value.trim()){
+              nameIn.value=name;checkSave();
+            }
+          }
+        }).catch(()=>{});
+    }).catch(()=>{});
+  }
+}
+function acceptExifName(){
+  if(!exifSuggestedName)return;
+  document.getElementById('poiNameIn').value=exifSuggestedName;
+  document.getElementById('locHint').classList.remove('show');
+  checkSave();
+  showToast(`Nome: "${exifSuggestedName}"`);
+}
+function removePhoto(e,idx){
+  e.stopPropagation();
+  photoData[idx]=null;
+  const slot=document.getElementById('pslot-'+idx);
+  slot.classList.remove('has-photo');
+  slot.innerHTML=idx===0
+    ?`<i class="ph ph-camera"></i><span class="slot-lbl">Principale</span>`
+    :`<i class="ph ph-plus"></i><span class="slot-lbl">Foto ${idx+1}</span>`;
+  document.getElementById('photoInput'+idx).value='';
+  if(idx===0){
+    document.getElementById('locHint').classList.remove('show');
+    document.getElementById('locName').style.display='none';
+    exifSuggestedName='';
+  }
+}
+
+/* COPY COORDS */
+function copyCoords(el){
+  const txt=el.textContent;
+  if(navigator.clipboard){navigator.clipboard.writeText(txt).then(()=>showToast('Coordinate copiate!'));}
+  else showToast(txt);
 }
 function removePhoto(e,idx){
   e.stopPropagation();
@@ -1114,32 +1222,57 @@ function initSwipe(handleId,sheetId,bgId){
 }
 
 /* ══════════════════════════════════════════
-   TIMER
+   TIMER (60 secondi — sfida!)
 ══════════════════════════════════════════ */
+const TIMER_GOAL=60;
 let timerInterval,timerSec=0;
+
+function showCongrats(sec){
+  const banner=document.getElementById('congratsBanner');
+  const icon=document.getElementById('congratsIcon');
+  const title=document.getElementById('congratsTitle');
+  const sub=document.getElementById('congratsSub');
+  const fast=sec<=TIMER_GOAL;
+  banner.className='congrats show '+(fast?'fast':'slow');
+  if(fast){
+    icon.innerHTML='<i class="ph-duotone ph-trophy" style="font-size:28px;color:#D97706"></i>';
+    title.textContent=lang==='sq'?`Bravo! ${sec} sekonda`
+      :lang==='en'?`Bravo! ${sec} seconds`
+      :`Bravo, sei un razzo! ${sec} secondi`;
+    sub.textContent=lang==='sq'?'Ke shënuar me dashuri vendin tënd!'
+      :lang==='en'?'You mapped this place in record time!'
+      :'Hai mappato questo luogo con amore e velocità. Grazie!';
+  } else {
+    icon.innerHTML='<i class="ph-duotone ph-chalkboard-teacher" style="font-size:28px;color:#92400E"></i>';
+    title.textContent=lang==='sq'?`Faleminderit! ${sec} sekonda`
+      :lang==='en'?`Thank you! ${sec} seconds`
+      :`Grazie dell'impegno! ${sec} secondi`;
+    sub.textContent=lang==='sq'?'Keni marrë kohën tuaj për të hartografuar me dashuri këtë vend.'
+      :lang==='en'?'You took extra time to lovingly map this place. That dedication matters.'
+      :'Ti sei preso del tempo in più per mappare amorevolmente questo luogo. Ogni secondo vale.';
+  }
+}
+
 function openAddPOI(){
   closeFab();
   openSheet('addPoiOv','addPoiBg','addPoiSheet');
   timerSec=0;
   document.getElementById('timerTime').textContent='0:00';
-  document.getElementById('congratsBanner').classList.remove('show');
+  document.getElementById('congratsBanner').className='congrats';
   document.getElementById('saveBtn').className='save-btn';
   document.getElementById('gpsRegisterBar').style.background='';
   document.getElementById('gpsRegisterBar').style.borderColor='';
-  if(gpsRegistered){
-    document.getElementById('googleSuggestBtn').classList.add('active');
-  } else {
-    document.getElementById('googleSuggestBtn').classList.remove('active');
-  }
+  if(gpsRegistered){document.getElementById('googleSuggestBtn').classList.add('active');}
+  else{document.getElementById('googleSuggestBtn').classList.remove('active');}
   clearInterval(timerInterval);
   timerInterval=setInterval(()=>{
     timerSec++;
     const m=Math.floor(timerSec/60),s=timerSec%60;
     document.getElementById('timerTime').textContent=`${m}:${String(s).padStart(2,'0')}`;
-    if(timerSec===90){
-      document.getElementById('congratsBanner').classList.add('show');
-      clearInterval(timerInterval);
-    }
+    // Colora il timer quando si avvicina ai 60s
+    const badge=document.getElementById('timerBadge');
+    if(timerSec>=50&&timerSec<60)badge.style.background='#FFF3CD';
+    else if(timerSec>=60){badge.style.background='#FFF0F0';showCongrats(timerSec);clearInterval(timerInterval);}
   },1000);
 }
 function closeAddPOI(){
