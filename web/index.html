@@ -103,6 +103,34 @@ button{touch-action:manipulation}
 .compagnia-stop{width:100%;height:44px;border-radius:14px;background:#FEE2E2;color:#DC2626;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;display:none}
 .compagnia-stop.vis{display:block}
 
+/* ── PHOTO PICKER (Unsplash + Upload) ── */
+#photoPickerOv{position:fixed;inset:0;z-index:8500;background:rgba(0,0,0,.55);display:none;align-items:flex-end;justify-content:center}
+#photoPickerOv.show{display:flex}
+.photo-picker-sheet{width:100%;max-width:480px;background:var(--card);border-radius:22px 22px 0 0;padding:0 0 env(safe-area-inset-bottom,0);max-height:90vh;display:flex;flex-direction:column;overflow:hidden}
+.photo-picker-handle{width:40px;height:4px;background:rgba(0,0,0,.15);border-radius:2px;margin:10px auto 0}
+.photo-picker-head{padding:12px 16px 8px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.photo-picker-head-title{font-size:14px;font-weight:800;color:var(--text);flex:1}
+.photo-picker-search-row{display:flex;gap:8px;padding:10px 16px;background:var(--card);flex-shrink:0}
+.photo-picker-search{flex:1;height:40px;border-radius:20px;border:1.5px solid var(--border);background:#f5f2ec;padding:0 14px;font-size:13px;color:var(--text);font-family:inherit;outline:none}
+.photo-picker-search:focus{border-color:var(--blue)}
+.photo-picker-go{height:40px;border-radius:20px;background:var(--blue);color:#fff;border:none;padding:0 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0;transition:opacity .15s}
+.photo-picker-go:active{opacity:.8}
+.photo-picker-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:0 12px 12px;overflow-y:auto;flex:1}
+.photo-picker-thumb{aspect-ratio:1;border-radius:12px;overflow:hidden;cursor:pointer;position:relative;background:#e8e4dc;border:2.5px solid transparent;transition:border-color .15s,transform .15s}
+.photo-picker-thumb:active{transform:scale(.97)}
+.photo-picker-thumb.selected{border-color:var(--blue)}
+.photo-picker-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.photo-picker-thumb .ph-spinner{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--muted);animation:spin 1s linear infinite}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.photo-picker-upload-btn{margin:4px 12px 10px;height:46px;border-radius:14px;border:1.5px dashed var(--border);background:transparent;color:var(--muted);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:inherit;transition:background .15s,color .15s;flex-shrink:0}
+.photo-picker-upload-btn:active{background:var(--bg);color:var(--text)}
+.photo-picker-confirm{margin:0 12px 12px;height:48px;border-radius:16px;background:var(--blue);color:#fff;border:none;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;transition:opacity .15s;flex-shrink:0;display:none}
+.photo-picker-confirm.show{display:block}
+.photo-picker-confirm:active{opacity:.85}
+.photo-picker-loading{grid-column:1/-1;text-align:center;padding:30px;color:var(--muted);font-size:12px}
+/* Attribution Unsplash */
+.unsplash-attr{font-size:9px;color:rgba(255,255,255,.7);position:absolute;bottom:3px;left:5px;right:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;pointer-events:none}
+
 /* ── DEV MODE — Multi-Profilo ── */
 .dev-panel{background:rgba(40,94,167,.07);border:1.5px dashed rgba(40,94,167,.28);border-radius:16px;padding:14px 16px}
 .dev-panel-title{font-size:10px;font-weight:800;color:var(--blue);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px}
@@ -1574,39 +1602,73 @@ function addDBMarker(p) {
 }
 
 function openDBDetail(p) {
-  // Popola il detail sheet con dati reali
-  const photos = Array.isArray(p.photos) ? p.photos : (p.photos ? [p.photos] : []);
-  const photoUrl = photos[0] || 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Pyramid_of_Tirana_2022.jpg/400px-Pyramid_of_Tirana_2022.jpg';
   currentPOI = { ...p, idx: -1 };
-  // Usa il detail sheet esistente
-  document.getElementById('detailPhoto').src = photoUrl;
+  // ── Foto: scroll orizzontale con tutti gli scatti ──
+  const photos = Array.isArray(p.photos) ? p.photos : (p.photos ? [p.photos] : []);
+  const ph = document.getElementById('detailPhotos');
+  ph.innerHTML = '';
+  if (photos.length > 0) {
+    photos.forEach(url => {
+      const d = document.createElement('div');
+      d.className = 'detail-photo';
+      d.style.backgroundImage = `url('${url}')`;
+      ph.appendChild(d);
+    });
+  } else {
+    const d = document.createElement('div');
+    d.className = 'detail-no-photo';
+    d.innerHTML = '<i class="ph ph-image-broken"></i>';
+    ph.appendChild(d);
+  }
+  // ── Metadati ──
+  document.getElementById('detailTag').innerHTML = `<i class="ph ph-tag" style="font-size:11px"></i> ${p.category || 'Luogo'}`;
   document.getElementById('detailName').textContent = p.name;
-  document.getElementById('detailCat').textContent = p.category || '';
   document.getElementById('detailAddr').textContent = p.address || '';
   document.getElementById('detailDesc').textContent = p.description || '';
   document.getElementById('detailAuthor').textContent = p.profiles?.username || 'Anonimo';
   document.getElementById('detailLoveCount').textContent = p.love_count || 0;
+  // Coordinate nel detail
+  const coordEl = document.getElementById('detailCoordsText');
+  if (coordEl && p.lat && p.lng) coordEl.textContent = `${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}`;
   // Mostra "Modifica" solo se il POI appartiene all'utente corrente
   const editBtn = document.getElementById('editPoiBtn');
-  if(editBtn) editBtn.style.display = (currentUser && currentUser.id === p.author_id) ? 'flex' : 'none';
+  if (editBtn) editBtn.style.display = (currentUser && currentUser.id === p.author_id) ? 'flex' : 'none';
   openSheet('detailOv', 'detailBg', 'detailSheet');
 }
 
 // ── SAVE POI reale ──
 async function savePOIToDB(data) {
-  if (!currentUser) { showToast('Accedi per salvare'); document.getElementById('authOverlay').style.display = 'flex'; return null; }
-  // Upload foto su Storage
+  if (!currentUser) {
+    showToast('⚠️ Accedi per salvare il POI');
+    document.getElementById('authOverlay').style.display = 'flex';
+    return null;
+  }
+  // Assicura che il profilo esista prima di inserire (FK: pois.author_id → profiles.id)
+  await sb.from('profiles').upsert({
+    id: currentUser.id,
+    username: currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || currentUser.email?.split('@')[0] || 'Utente',
+    avatar_url: currentUser.user_metadata?.avatar_url || '',
+    updated_at: new Date().toISOString()
+  }, { onConflict: 'id' });
+
+  // Upload foto su Storage (con fallback silenzioso se bucket non raggiungibile)
   const photoUrls = [];
   for (const file of data.files || []) {
     if (!file) continue;
-    const ext = file.name.split('.').pop();
-    const path = `${currentUser.id}/${Date.now()}_${Math.random().toString(36).substr(2,6)}.${ext}`;
-    const { error: upErr } = await sb.storage.from('poi_photos').upload(path, file, { cacheControl: '3600', upsert: false });
-    if (!upErr) {
+    try {
+      const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+      const path = `${currentUser.id}/${Date.now()}_${Math.random().toString(36).substr(2,6)}.${ext}`;
+      const { error: upErr } = await sb.storage.from('poi_photos').upload(path, file, { cacheControl: '3600', upsert: false });
+      if (upErr) { console.warn('Photo upload skip:', upErr.message); continue; }
       const { data: urlData } = sb.storage.from('poi_photos').getPublicUrl(path);
       photoUrls.push(urlData.publicUrl);
-    }
+    } catch(e) { console.warn('Photo upload error:', e); }
   }
+  // Includi URL Unsplash scelti (non file reali, già URL stringa)
+  for (const url of data.unsplashUrls || []) {
+    if (url) photoUrls.push(url);
+  }
+
   const { data: poi, error } = await sb.from('pois').insert({
     author_id: currentUser.id,
     name: data.name,
@@ -1619,7 +1681,12 @@ async function savePOIToDB(data) {
     visibility: 'community',
     love_count: 0
   }).select().single();
-  if (error) { console.error('savePOI:', error); showToast('Errore salvataggio'); return null; }
+
+  if (error) {
+    console.error('savePOI DB error:', error);
+    showToast(`❌ ${error.message || 'Errore salvataggio POI'}`);
+    return null;
+  }
   return poi;
 }
 
@@ -2066,7 +2133,8 @@ const photoFiles=[null,null,null]; // File object reali per upload Supabase
 let exifSuggestedName='';
 let exifCache=null; // { lat, lng, name, street } — ultimo risultato EXIF disponibile
 function triggerPhoto(idx){
-  document.getElementById('photoInput'+idx).click();
+  // Apre il Photo Picker (Unsplash + Upload) invece del file input diretto
+  openPhotoPicker(idx);
 }
 function handlePhoto(input,idx){
   const file=input.files[0];
@@ -2189,17 +2257,6 @@ function copyCoords(el){
   const txt=el.textContent;
   if(navigator.clipboard){navigator.clipboard.writeText(txt).then(()=>showToast('Coordinate copiate!'));}
   else showToast(txt);
-}
-function removePhoto(e,idx){
-  e.stopPropagation();
-  photoData[idx]=null;
-  photoFiles[idx]=null;
-  const slot=document.getElementById('pslot-'+idx);
-  slot.classList.remove('has-photo');
-  slot.innerHTML=idx===0
-    ?`<i class="ph ph-camera" id="picon-0"></i><span class="slot-lbl" id="plbl-0">Principale</span>`
-    :`<i class="ph ph-plus"></i><span class="slot-lbl">Foto ${idx+1}</span>`;
-  document.getElementById('photoInput'+idx).value='';
 }
 
 /* ══════════════════════════════════════════
@@ -2775,6 +2832,7 @@ async function savePOI(){
         :`<i class="ph ph-plus"></i><span class="slot-lbl">Foto ${i+1}</span>`;}
     });
     exifSuggestedName=''; exifCache=null;
+    window._unsplashSlots={};
     return;
   }
 
@@ -2793,7 +2851,8 @@ async function savePOI(){
   if(statEl)statEl.textContent=parseInt(statEl.textContent||0)+1;
   // Salva in DB in background (non blocca UI)
   if(currentUser){
-    savePOIToDB({name,desc,cat:cats,lat:lat2,lng:lng2,address:addr,files:filesSnapshot})
+    const unsplashSnap=window._unsplashSlots?Object.values(window._unsplashSlots).filter(Boolean):[];
+    savePOIToDB({name,desc,cat:cats,lat:lat2,lng:lng2,address:addr,files:filesSnapshot,unsplashUrls:unsplashSnap})
       .then(savedPOI=>{
         if(savedPOI&&tempMarker){
           // Rimuovi marker temporaneo, aggiungi quello reale con ID
@@ -2827,6 +2886,7 @@ async function savePOI(){
   const locNameEl=document.getElementById('locName');
   if(locNameEl)locNameEl.style.display='none';
   exifSuggestedName=''; exifCache=null;
+  window._unsplashSlots={}; // reset URL Unsplash scelti
   // Apri modal congratulazioni dopo breve ritardo (attendi chiusura sheet)
   setTimeout(()=>openSaveModal(name,lat2,lng2,sec),320);
 }
@@ -3561,14 +3621,8 @@ const TRIP_COVERS={
 };
 const _coverIdx={trip1:0,trip2:0};
 function changeTripCover(tripId){
-  const t=TRIPS[tripId]; if(!t)return;
-  const pool=TRIP_COVERS[tripId]||TRIP_COVERS.trip1;
-  _coverIdx[tripId]=(_coverIdx[tripId]+1)%pool.length;
-  const newUrl=pool[_coverIdx[tripId]];
-  t.cover=newUrl;
-  const coverEl=document.querySelector(`#tc-${tripId} .trip-cover`);
-  if(coverEl)coverEl.style.backgroundImage=`url('${newUrl}')`;
-  showToast('🖼 Cover aggiornata ('+(_coverIdx[tripId]+1)+'/'+pool.length+')');
+  // Apre il Photo Picker per scegliere cover (Unsplash + upload)
+  openTripCoverPicker(tripId);
 }
 function openNewTrip(){
   showToast(lang==='it'?'Crea nuovo viaggio — disponibile nell\'app':lang==='sq'?'Udhëtim i ri — aktiv në aplikacion':'New trip — available in app');
@@ -3919,7 +3973,201 @@ function verifyToken(){
     document.getElementById('tokenInput')?.focus();
   }
 }
+
+/* ══════════════════════════════════════════
+   PHOTO PICKER — Unsplash Source + Upload
+   Unsplash Source: senza API key, keyword-based
+   Usato per: slot foto POI (0/1/2) e cover itinerario
+══════════════════════════════════════════ */
+let photoPickerSlot=null;       // 0|1|2 = slot POI, 'trip:ID' = cover itinerario
+let photoPickerSelected=null;   // { url, type:'unsplash'|'upload', file? }
+let photoPickerUnsplashUrls=[]; // URL correnti in griglia
+
+// Apre il picker per uno slot POI (0, 1, 2)
+function openPhotoPicker(slot){
+  photoPickerSlot=slot;
+  photoPickerSelected=null;
+  photoPickerUnsplashUrls=[];
+  document.getElementById('photoPickerConfirm').classList.remove('show');
+  document.getElementById('photoPickerGrid').innerHTML=
+    '<div class="photo-picker-loading">Inserisci una parola chiave e cerca 🔍</div>';
+  // Pre-popola query col nome del POI se disponibile
+  const poiName=document.getElementById('poiNameIn')?.value?.trim()||'';
+  const search=document.getElementById('photoPickerSearch');
+  if(search) search.value=poiName||(slot===0?'luogo bello':'viaggi');
+  // Titolo localizzato
+  const titles={0:lang==='it'?'Foto principale':lang==='sq'?'Foto kryesore':'Main Photo',
+    1:lang==='it'?'Foto 2':lang==='sq'?'Foto 2':'Photo 2',
+    2:lang==='it'?'Foto 3':lang==='sq'?'Foto 3':'Photo 3'};
+  document.getElementById('photoPickerTitle').textContent=titles[slot]||'Foto';
+  document.getElementById('photoPickerOv').classList.add('show');
+  // Se c'è già un nome, carica subito i risultati
+  if(poiName) setTimeout(searchUnsplash,100);
+}
+
+// Apre il picker per la cover di un itinerario
+function openTripCoverPicker(tripId){
+  photoPickerSlot='trip:'+tripId;
+  photoPickerSelected=null;
+  photoPickerUnsplashUrls=[];
+  document.getElementById('photoPickerConfirm').classList.remove('show');
+  const t=TRIPS[tripId];
+  const dest=(t?.dest||t?.name||'viaggio').split(',')[0];
+  const search=document.getElementById('photoPickerSearch');
+  if(search) search.value=dest;
+  document.getElementById('photoPickerTitle').textContent=
+    lang==='it'?'Cover itinerario':lang==='sq'?'Kopertina e itinerarit':'Trip Cover';
+  document.getElementById('photoPickerOv').classList.add('show');
+  setTimeout(searchUnsplash,100);
+}
+
+function closePhotoPicker(){
+  document.getElementById('photoPickerOv').classList.remove('show');
+  photoPickerSlot=null;
+  photoPickerSelected=null;
+}
+
+// Cerca su Unsplash Source (no API key) — 9 risultati con &sig=N
+function searchUnsplash(){
+  const q=document.getElementById('photoPickerSearch')?.value?.trim();
+  if(!q){showToast('Inserisci un termine di ricerca');return;}
+  const grid=document.getElementById('photoPickerGrid');
+  grid.innerHTML='<div class="photo-picker-loading"><i class="ph ph-spinner-gap" style="animation:spin 1s linear infinite;display:block;font-size:28px;margin-bottom:8px"></i>Carico immagini Unsplash…</div>';
+  photoPickerSelected=null;
+  document.getElementById('photoPickerConfirm').classList.remove('show');
+  // Genera 9 URL Unsplash Source con sig diversi → 9 foto distinte per la stessa query
+  const baseQ=encodeURIComponent(q);
+  const sigs=[1,2,3,4,5,6,7,8,9];
+  photoPickerUnsplashUrls=sigs.map(s=>`https://source.unsplash.com/400x400/?${baseQ}&sig=${Date.now()%10000+s}`);
+  // Render griglia con lazy loading
+  grid.innerHTML=photoPickerUnsplashUrls.map((url,i)=>`
+    <div class="photo-picker-thumb" id="ppt-${i}" onclick="selectUnsplashPhoto(${i},'${url}')">
+      <img src="${url}" alt="" loading="lazy" onload="this.parentNode.querySelector('.ph-spinner')?.remove()"
+        onerror="this.parentNode.innerHTML='<span style=\'color:var(--muted);font-size:10px;padding:6px\'>—</span>'">
+      <i class="ph ph-spinner-gap ph-spinner" style="position:absolute;inset:0;margin:auto;font-size:22px;color:var(--muted);animation:spin 1s linear infinite"></i>
+      <div class="unsplash-attr">Unsplash</div>
+    </div>
+  `).join('');
+}
+
+function selectUnsplashPhoto(idx, url){
+  // Deseleziona tutti
+  document.querySelectorAll('.photo-picker-thumb').forEach(t=>t.classList.remove('selected'));
+  document.getElementById('ppt-'+idx)?.classList.add('selected');
+  photoPickerSelected={url, type:'unsplash'};
+  document.getElementById('photoPickerConfirm').classList.add('show');
+}
+
+function triggerPickerUpload(){
+  document.getElementById('photoPickerFileIn').click();
+}
+
+function handlePickerUpload(input){
+  const file=input.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    photoPickerSelected={url:e.target.result, type:'upload', file};
+    // Mostra anteprima nella griglia (in cima)
+    const grid=document.getElementById('photoPickerGrid');
+    const prev=`<div class="photo-picker-thumb selected" id="ppt-upload" style="grid-column:1/-1;aspect-ratio:16/7;border-color:var(--green)">
+      <img src="${e.target.result}" alt="" style="width:100%;height:100%;object-fit:cover">
+      <div class="unsplash-attr" style="color:#fff;background:rgba(34,197,94,.7);border-radius:4px;padding:1px 4px">📁 Tua foto</div>
+    </div>`;
+    document.querySelectorAll('.photo-picker-thumb').forEach(t=>t.classList.remove('selected'));
+    grid.insertAdjacentHTML('afterbegin',prev);
+    document.getElementById('photoPickerConfirm').classList.add('show');
+    showToast(lang==='it'?'Foto caricata — premi Usa questa foto':'Photo loaded — press Use this photo');
+  };
+  reader.readAsDataURL(file);
+}
+
+async function confirmPhotoPicker(){
+  if(!photoPickerSelected) return;
+  const {url, type, file}=photoPickerSelected;
+
+  if(typeof photoPickerSlot==='string' && photoPickerSlot.startsWith('trip:')){
+    // ── Cover itinerario ──
+    const tripId=photoPickerSlot.replace('trip:','');
+    const t=TRIPS[tripId];
+    if(t){
+      t.cover=url;
+      const coverEl=document.querySelector(`#tc-${tripId} .trip-cover`);
+      if(coverEl) coverEl.style.backgroundImage=`url('${url}')`;
+      showToast('🖼 Cover aggiornata!');
+    }
+    closePhotoPicker();
+    return;
+  }
+
+  // ── Slot foto POI ──
+  const idx=photoPickerSlot;
+  if(typeof idx!=='number'){closePhotoPicker();return;}
+
+  if(type==='upload' && file){
+    // File reale → salva nel slot normale
+    photoFiles[idx]=file;
+    photoData[idx]=url;
+  } else {
+    // URL Unsplash → salva come URL string (nessun upload Storage necessario)
+    photoFiles[idx]=null; // nessun file da uploadare
+    photoData[idx]=url;
+    // Aggiungi a un array separato di unsplashUrls
+    if(!window._unsplashSlots) window._unsplashSlots={};
+    window._unsplashSlots[idx]=url;
+  }
+
+  // Aggiorna UI slot
+  const slot=document.getElementById('pslot-'+idx);
+  if(slot){
+    slot.classList.add('has-photo');
+    slot.innerHTML=`<div class="ph-preview" style="background-image:url('${url}')"></div><button class="ph-remove" onclick="removePhoto(event,${idx})"><i class="ph ph-x"></i></button>`;
+  }
+  checkSave();
+  closePhotoPicker();
+  showToast(lang==='it'?'✅ Foto selezionata!':lang==='sq'?'✅ Foto e zgjedhur!':'✅ Photo selected!');
+
+  // EXIF: prova estrazione se file reale
+  if(file){
+    exifr?.gps(file).then(gps=>{
+      if(gps?.latitude&&!exifCache){
+        exifCache={lat:gps.latitude,lng:gps.longitude,name:'',street:''};
+        showToast('📍 GPS trovato nella foto — apri tab EXIF per applicarlo');
+      }
+    }).catch(()=>{});
+  }
+}
 </script>
+
+<!-- ═══ PHOTO PICKER (Unsplash + Upload) ═══ -->
+<div id="photoPickerOv" onclick="if(event.target===this)closePhotoPicker()">
+  <div class="photo-picker-sheet">
+    <div class="photo-picker-handle"></div>
+    <div class="photo-picker-head">
+      <div class="photo-picker-head-title">
+        <i class="ph ph-images" style="color:var(--blue);margin-right:5px"></i>
+        <span id="photoPickerTitle">Scegli una foto</span>
+      </div>
+      <button style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:22px;padding:0" onclick="closePhotoPicker()"><i class="ph ph-x"></i></button>
+    </div>
+    <div class="photo-picker-search-row">
+      <input class="photo-picker-search" id="photoPickerSearch" type="text" placeholder="Cerca su Unsplash…"
+        onkeydown="if(event.key==='Enter'){event.preventDefault();searchUnsplash()}"/>
+      <button class="photo-picker-go" onclick="searchUnsplash()">Cerca</button>
+    </div>
+    <div class="photo-picker-grid" id="photoPickerGrid">
+      <div class="photo-picker-loading">Inserisci una parola chiave e cerca 🔍</div>
+    </div>
+    <button class="photo-picker-upload-btn" onclick="triggerPickerUpload()">
+      <i class="ph ph-upload-simple" style="font-size:16px"></i>
+      <span id="photoPickerUploadLbl">Carica dal tuo dispositivo</span>
+    </button>
+    <input type="file" id="photoPickerFileIn" accept="image/*" style="display:none" onchange="handlePickerUpload(this)">
+    <button class="photo-picker-confirm" id="photoPickerConfirm" onclick="confirmPhotoPicker()">
+      Usa questa foto
+    </button>
+  </div>
+</div>
 
 <!-- ═══ AVATAR POPUP ═══ -->
 <div class="av-popup-overlay" id="avPopupOv" onclick="if(event.target===this)closeAvPopup()">
