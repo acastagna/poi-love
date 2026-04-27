@@ -6,905 +6,1241 @@
 <title>POI•LOVE — Demo</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/@phosphor-icons/web@2.1.1/src/index.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-:root{--red:#D42B2B;--blue:#285EA7;--bg:#EAE4D8;--card:#FDFAF5;--text:#1C1C1C;--muted:#6B6B6B;--border:rgba(0,0,0,0.09);--green:#22C55E}
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:var(--bg)}
+:root{
+  --red:#D42B2B;--blue:#285EA7;--bg:#EAE4D8;
+  --card:#FDFAF5;--text:#1C1C1C;--muted:#6B6B6B;
+  --border:rgba(0,0,0,.09);--green:#22C55E;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;font-family:'Inter',sans-serif}
+html,body{height:100%;overflow:hidden;background:var(--bg)}
 
-/* MAP */
-#map{position:fixed;inset:0;z-index:1}
+/* ── MAP ── */
+#map{position:fixed;inset:0 0 56px 0;z-index:1}
 .leaflet-control-zoom{display:none}
-.leaflet-control-attribution{font-size:9px;opacity:.5}
+.leaflet-control-attribution{font-size:9px;opacity:.35;bottom:64px!important}
 
-/* HEADER */
-.header{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;pointer-events:none}
-.logo-pill{background:var(--red);color:#fff;font-size:13px;font-weight:800;padding:8px 16px;border-radius:20px;letter-spacing:.3px;pointer-events:all;box-shadow:0 4px 16px rgba(212,43,43,.35);cursor:pointer}
-.header-actions{display:flex;gap:8px;pointer-events:all}
-.hdr-btn{width:40px;height:40px;border-radius:20px;background:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 12px rgba(0,0,0,.12);font-size:16px;color:var(--muted);transition:transform .15s;font-family:inherit;font-weight:700;font-size:11px;color:var(--blue)}
-.hdr-btn:active{transform:scale(.94)}
+/* ── TOP BAR ── */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:300;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px;pointer-events:none;
+}
+.tb-logo{
+  pointer-events:all;
+  height:32px;background:var(--red);border-radius:16px;
+  padding:0 12px;display:flex;align-items:center;gap:6px;
+  box-shadow:0 3px 14px rgba(212,43,43,.38);cursor:pointer;
+}
+.tb-logo img{height:20px;filter:brightness(0) invert(1)}
+.tb-logo-txt{color:#fff;font-size:13px;font-weight:800;letter-spacing:.2px}
+.tb-right{display:flex;gap:7px;pointer-events:all}
+.tb-btn{
+  height:36px;border-radius:18px;background:var(--card);border:none;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 10px rgba(0,0,0,.13);padding:0 12px;
+  font-size:11px;font-weight:700;color:var(--blue);gap:5px;
+  white-space:nowrap;transition:transform .15s
+}
+.tb-btn:active{transform:scale(.93)}
+.tb-btn.icon-only{width:36px;padding:0;color:var(--muted)}
 
-/* FAB */
-.fab{position:fixed;bottom:32px;left:50%;transform:translateX(-50%);z-index:200;width:64px;height:64px;border-radius:32px;background:var(--red);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 24px rgba(212,43,43,.45);transition:transform .2s;color:#fff;font-size:28px}
-.fab:active{transform:translateX(-50%) scale(.94)}
+/* ── MAP TYPE SELECTOR ── */
+.map-types{
+  position:fixed;top:56px;left:14px;z-index:200;
+  display:flex;gap:5px;
+}
+.mt-btn{
+  height:28px;padding:0 10px;border-radius:8px;
+  background:var(--card);border:none;cursor:pointer;
+  font-size:10px;font-weight:700;color:var(--muted);
+  box-shadow:0 2px 8px rgba(0,0,0,.1);transition:all .15s
+}
+.mt-btn.active{background:var(--blue);color:#fff}
+.mt-btn.route-active{background:#7C3AED;color:#fff}
+
+/* ── FAB ── */
+.fab{
+  position:fixed;bottom:70px;left:50%;transform:translateX(-50%);
+  z-index:250;width:60px;height:60px;border-radius:30px;
+  background:var(--red);border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 6px 22px rgba(212,43,43,.45);
+  font-size:26px;color:#fff;transition:transform .25s,background .25s
+}
 .fab.open{transform:translateX(-50%) rotate(45deg)}
+.fab-menu{
+  position:fixed;bottom:140px;left:50%;transform:translateX(-50%);
+  z-index:249;display:flex;flex-direction:column;gap:9px;align-items:center;
+  opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;
+  transform:translateX(-50%) translateY(10px);
+}
+.fab-menu.open{opacity:1;pointer-events:all;transform:translateX(-50%) translateY(0)}
+.fab-opt{
+  background:var(--card);border:none;border-radius:22px;
+  padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;
+  display:flex;align-items:center;gap:8px;
+  box-shadow:0 4px 18px rgba(0,0,0,.14);white-space:nowrap;
+  transition:transform .15s
+}
+.fab-opt:active{transform:scale(.96)}
+.fab-opt-icon{width:28px;height:28px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
 
-/* MARKER */
-.poi-marker{display:flex;flex-direction:column;align-items:center;cursor:pointer;filter:drop-shadow(0 3px 8px rgba(0,0,0,.2))}
-.poi-bubble{width:36px;height:36px;border-radius:50%;background:var(--red);border:3px solid #fff;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;position:relative;transition:transform .2s}
-.poi-badge{position:absolute;top:-6px;right:-8px;background:var(--blue);color:#fff;font-size:8px;font-weight:800;border-radius:8px;padding:1px 4px;border:1.5px solid #fff;line-height:1.2}
-.poi-tail{width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:8px solid var(--red);margin-top:-2px}
+/* ── BOTTOM NAV ── */
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;z-index:300;
+  height:56px;background:var(--card);border-top:1px solid var(--border);
+  display:flex;align-items:stretch;box-shadow:0 -3px 16px rgba(0,0,0,.08);
+}
+.nav-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:3px;border:none;background:none;
+  cursor:pointer;transition:opacity .15s;padding:4px 0;
+}
+.nav-item .nav-icon{font-size:20px;line-height:1;color:var(--muted);transition:color .15s}
+.nav-item .nav-lbl{font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.3px;transition:color .15s}
+.nav-item.active .nav-icon,.nav-item.active .nav-lbl{color:var(--red)}
 
-/* OVERLAY / SHEETS */
-.sheet-overlay{position:fixed;inset:0;z-index:300;pointer-events:none}
-.sheet{position:absolute;bottom:0;left:0;right:0;background:var(--card);border-radius:24px 24px 0 0;padding:0 0 48px;box-shadow:0 -8px 40px rgba(0,0,0,.12);transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.72,0,1);pointer-events:all;max-height:94vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
-.sheet.open{transform:translateY(0)}
+/* ── SHEETS ── */
+.sheet-overlay{position:fixed;inset:0;z-index:400;pointer-events:none}
 .sheet-backdrop{position:absolute;inset:0;background:rgba(0,0,0,0);transition:background .35s;pointer-events:none}
-.sheet-backdrop.visible{background:rgba(0,0,0,.35);pointer-events:all}
-.handle{width:40px;height:4px;background:#C8BFB0;border-radius:2px;margin:12px auto 0}
+.sheet-backdrop.vis{background:rgba(0,0,0,.42);pointer-events:all}
+.sheet{
+  position:absolute;bottom:0;left:0;right:0;background:var(--card);
+  border-radius:24px 24px 0 0;padding:0 0 52px;
+  transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.72,0,1);
+  pointer-events:all;max-height:94vh;overflow-y:auto;-webkit-overflow-scrolling:touch
+}
+.sheet.open{transform:translateY(0)}
+.sh-handle{width:40px;height:4px;background:#C8BFB0;border-radius:2px;margin:12px auto 0}
+.sh-head{display:flex;align-items:flex-start;justify-content:space-between;padding:14px 20px 0}
+.sh-title{font-size:19px;font-weight:800;color:var(--text);line-height:1.2}
+.sh-sub{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.4}
+.sh-close{
+  width:28px;height:28px;border-radius:14px;background:#f0ece4;
+  border:none;cursor:pointer;font-size:15px;color:var(--muted);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px
+}
+.sh-body{padding:14px 20px 0}
+.sh-timer{
+  display:flex;align-items:center;gap:5px;background:#FFF5F5;
+  border:1px solid #F7C1C1;border-radius:20px;padding:5px 10px;
+  font-size:12px;font-weight:700;color:var(--red);flex-shrink:0
+}
+.congrats{
+  background:#EAF3DE;border:1px solid #C0DD97;border-radius:10px;
+  padding:8px 12px;font-size:12px;color:#3B6D11;font-weight:500;
+  margin:8px 20px 0;line-height:1.4;display:none
+}
+.congrats.show{display:block}
+.sec-lbl{
+  font-size:10px;font-weight:700;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.6px;margin-bottom:7px;
+  display:flex;align-items:center;justify-content:space-between
+}
+.req-badge{background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:5px}
+.field-in{
+  width:100%;background:#f5f0e8;border:1.5px solid #E0D8CC;
+  border-radius:11px;padding:12px 14px;font-size:15px;
+  font-family:inherit;color:var(--text);outline:none;margin-bottom:14px;
+  transition:border-color .2s
+}
+.field-in:focus{border-color:var(--red)}
+.field-in::placeholder{color:#B0A090}
+.field-ta{resize:none;height:72px;font-size:13px}
 
-/* DETAIL SHEET */
-.detail-photos{display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;scrollbar-width:none;margin-left:-20px;margin-right:-20px;padding:0 20px}
-.detail-photo{width:200px;height:150px;border-radius:12px;flex-shrink:0;background-size:cover;background-position:center;background-color:var(--bg)}
-.detail-tag{display:inline-flex;align-items:center;gap:4px;background:var(--bg);color:var(--muted);font-size:11px;font-weight:600;padding:4px 10px;border-radius:12px;margin-bottom:8px}
-.detail-name{font-size:22px;font-weight:800;color:var(--text);margin-bottom:8px;line-height:1.2}
-.detail-desc{font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:16px}
-.detail-footer{display:flex;align-items:center;justify-content:space-between}
-.author-row{display:flex;align-items:center;gap:8px}
-.avatar{width:32px;height:32px;border-radius:50%;background:var(--bg);overflow:hidden}
-.avatar img{width:100%;height:100%;object-fit:cover}
-.author-name{font-size:13px;color:var(--muted);font-weight:500}
-.love-btn{display:flex;align-items:center;gap:6px;background:var(--bg);border:1.5px solid #D8D0C0;border-radius:24px;padding:10px 18px;cursor:pointer;font-family:inherit;transition:all .2s}
-.love-btn.loved{background:#FFF0F0;border-color:var(--red)}
-.love-btn .heart{font-size:18px;color:#C0B0A0;transition:all .2s}
-.love-btn.loved .heart{color:var(--red)}
-.love-btn .love-count{font-size:15px;font-weight:700;color:#8A7F74;transition:color .2s}
-.love-btn.loved .love-count{color:var(--red)}
-.detail-body{padding:16px 20px 0}
-
-/* ── ADD POI SHEET ── */
-.add-header{display:flex;align-items:flex-start;justify-content:space-between;padding:16px 20px 0}
-.add-header-left{}
-.add-title-text{font-size:20px;font-weight:800;color:var(--text);line-height:1.2}
-.add-subtitle{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.4}
-.timer-badge{display:flex;align-items:center;gap:5px;background:#FFF5F5;border:1px solid #F7C1C1;border-radius:20px;padding:5px 10px;font-size:12px;font-weight:700;color:var(--red);flex-shrink:0;margin-left:12px}
-.close-btn{width:28px;height:28px;border-radius:14px;background:#f0ece4;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:14px;margin-top:2px}
-
-/* Congrats banner */
-.congrats-banner{background:#EAF3DE;border:1px solid #C0DD97;border-radius:10px;padding:8px 12px;font-size:12px;color:#3B6D11;font-weight:500;margin:10px 20px 0;line-height:1.4;display:none}
-.congrats-banner.show{display:block}
-
-.add-body{padding:16px 20px 0}
-.section-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
-.required-badge{background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:6px;letter-spacing:.3px}
-.section-hint{font-size:10px;font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0}
-
-/* Name input */
-.name-input{width:100%;background:#f5f0e8;border:1.5px solid #E0D8CC;border-radius:12px;padding:14px 16px;font-size:16px;font-family:inherit;color:var(--text);outline:none;transition:border-color .2s;margin-bottom:16px}
-.name-input:focus{border-color:var(--red)}
-.name-input::placeholder{color:#B0A090}
-
-/* DOVE SI TROVA */
-.location-tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-bottom:10px;padding-bottom:2px}
-.loc-tab{flex-shrink:0;padding:8px 12px;border-radius:10px;border:1.5px solid #E0D8CC;background:#f5f0e8;font-size:11px;font-weight:600;color:#5C4D3A;cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap;font-family:inherit;transition:all .15s}
+/* LOCATION TABS */
+.loc-tabs{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;margin-bottom:8px}
+.loc-tab{
+  flex-shrink:0;padding:7px 11px;border-radius:9px;
+  border:1.5px solid #E0D8CC;background:#f5f0e8;
+  font-size:10px;font-weight:700;color:#5C4D3A;cursor:pointer;
+  white-space:nowrap;font-family:inherit;transition:all .15s
+}
 .loc-tab.active{background:#EBF2FC;border-color:var(--blue);color:var(--blue)}
-.loc-result{background:#f5f0e8;border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.loc-result{
+  background:#f5f0e8;border-radius:10px;padding:9px 12px;
+  display:flex;align-items:center;gap:10px;margin-bottom:14px
+}
 .loc-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0}
-.loc-text{flex:1}
 .loc-street{font-size:13px;font-weight:600;color:var(--text)}
 .loc-coords{font-size:10px;color:var(--muted);margin-top:1px}
-.loc-text-input{width:100%;background:#f5f0e8;border:1.5px solid #E0D8CC;border-radius:10px;padding:10px 12px;font-size:13px;font-family:inherit;color:var(--text);outline:none;margin-bottom:16px}
-.loc-text-input::placeholder{color:#B0A090}
-.loc-map-hint{background:#EBF2FC;border-radius:10px;padding:10px 12px;font-size:12px;color:var(--blue);margin-bottom:16px;display:flex;align-items:center;gap:8px}
 
-/* VICINO A COSA */
-.nearby-input{width:100%;background:#f5f0e8;border:1.5px dashed #C8BFB0;border-radius:12px;padding:12px 16px;font-size:13px;font-family:inherit;color:var(--text);outline:none;margin-bottom:16px}
-.nearby-input::placeholder{color:#B0A090;font-style:italic}
-
-/* FOTO */
-.photo-row{display:flex;gap:10px;margin-bottom:6px}
-.photo-slot{width:calc(33.333% - 7px);aspect-ratio:1;border-radius:12px;background:#f5f0e8;border:1.5px dashed #C8BFB0;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
-.photo-slot.filled{border-style:solid;border-color:transparent}
-.photo-slot img{width:100%;height:100%;object-fit:cover}
-.photo-ico{font-size:22px;color:#A09080;margin-bottom:3px}
-.photo-lbl{font-size:9px;color:#A09080;font-weight:500}
-.photo-hint{font-size:10px;color:var(--muted);margin-bottom:16px;display:flex;align-items:center;gap:5px}
-
-/* RACCONTA */
-.racconta-input{width:100%;background:#f5f0e8;border:1.5px solid #E0D8CC;border-radius:12px;padding:14px 16px;font-size:14px;font-family:inherit;color:var(--text);outline:none;height:90px;resize:none;line-height:1.55;margin-bottom:4px;transition:border-color .2s}
-.racconta-input:focus{border-color:var(--red)}
-.racconta-input::placeholder{color:#B0A090;font-style:italic}
-.char-bar{display:flex;justify-content:flex-end;margin-bottom:16px}
-.char-count{font-size:11px;color:var(--muted)}
-
-/* CATEGORIE */
-.cats-grid{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px}
-.cat-chip{padding:8px 13px;border-radius:20px;background:#f5f0e8;border:1.5px solid #E0D8CC;font-size:12px;font-weight:500;color:#5C4D3A;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .15s;font-family:inherit}
-.cat-chip.active{background:#FFF0F0;border-color:var(--red);color:var(--red)}
-.cat-chip.disabled{opacity:.4;pointer-events:none}
-
-/* LISTE */
-.lists-row{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin-bottom:16px;padding-bottom:2px}
-.list-chip{flex-shrink:0;padding:8px 14px;border-radius:20px;background:#f5f0e8;border:1.5px solid #E0D8CC;font-size:12px;font-weight:600;color:#5C4D3A;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:inherit;transition:all .15s;white-space:nowrap}
-.list-chip.active{background:var(--blue);border-color:var(--blue);color:#fff}
-
-/* ROTTA STORICA */
-.rotta-trigger{background:#f5f0e8;border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;margin-bottom:6px;transition:background .15s}
-.rotta-trigger:hover{background:#ede8de}
-.rotta-ico{width:32px;height:32px;border-radius:8px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
-.rotta-info{flex:1}
-.rotta-name{font-size:13px;font-weight:600;color:var(--text)}
-.rotta-sub{font-size:11px;color:var(--muted);margin-top:1px}
-.rotta-arrow{font-size:14px;color:var(--muted);transition:transform .2s}
-.rotta-arrow.open{transform:rotate(90deg)}
-.rotta-options{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;overflow:hidden;max-height:0;transition:max-height .3s ease}
-.rotta-options.open{max-height:300px}
-.rotta-opt{padding:10px 12px;border-radius:10px;background:#f5f0e8;border:1.5px solid #E0D8CC;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:10px}
-.rotta-opt.active{background:#FFF0F0;border-color:var(--red)}
-.rotta-opt-ico{font-size:16px}
-.rotta-opt-text{flex:1}
-.rotta-opt-name{font-size:13px;font-weight:600;color:var(--text)}
-.rotta-opt-desc{font-size:10px;color:var(--muted);margin-top:1px}
-.rotta-opt.active .rotta-opt-name{color:var(--red)}
-.rotta-none{font-size:12px;color:var(--muted);padding:8px 0;cursor:pointer;text-decoration:underline}
-
-/* VISIBILITÀ */
-.vis-row{display:flex;gap:8px;margin-bottom:20px}
-.vis-chip{flex:1;padding:11px 8px;border-radius:12px;background:#f5f0e8;border:1.5px solid #E0D8CC;text-align:center;cursor:pointer;transition:all .15s}
-.vis-chip.active{background:#FFF8F8;border-color:var(--red)}
-.vis-label{font-size:12px;font-weight:600;color:#5C4D3A;display:block}
-.vis-chip.active .vis-label{color:var(--red)}
-.vis-desc{font-size:9px;color:var(--muted);margin-top:2px;display:block}
-
-/* SAVE AREA */
-.save-area{padding:0 20px}
-.save-btn{width:100%;background:var(--red);color:#fff;border:none;border-radius:16px;padding:18px;font-size:16px;font-weight:700;font-family:inherit;cursor:pointer;box-shadow:0 6px 20px rgba(212,43,43,.3);transition:all .2s;margin-bottom:8px}
-.save-btn:disabled{background:#C8BFB0;box-shadow:none;cursor:not-allowed}
-.save-hint{font-size:11px;color:var(--muted);text-align:center;margin-bottom:10px}
-.google-suggest-btn{width:100%;background:#f5f0e8;border:1.5px solid #E0D8CC;border-radius:12px;padding:12px;font-size:13px;font-weight:600;color:#5C4D3A;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .15s}
-.google-suggest-btn:hover{background:#ede8de}
-
-/* SUCCESS */
-.success-overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
-.success-overlay.show{opacity:1;pointer-events:all}
-.success-card{background:var(--card);border-radius:24px;padding:40px 32px;text-align:center;max-width:300px;transform:scale(.8);transition:transform .4s cubic-bezier(.34,1.56,.64,1)}
-.success-overlay.show .success-card{transform:scale(1)}
-.success-icon{width:64px;height:64px;border-radius:50%;background:#3B6D11;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:28px;color:#fff}
-.success-title{font-size:22px;font-weight:800;color:var(--text);margin-bottom:6px}
-.success-sub{font-size:14px;color:var(--muted);line-height:1.5;margin-bottom:24px}
-.success-close{background:var(--red);color:#fff;border:none;border-radius:12px;padding:14px 32px;font-size:15px;font-weight:600;font-family:inherit;cursor:pointer}
-
-/* TOAST */
-.toast{position:fixed;bottom:110px;left:50%;transform:translateX(-50%) translateY(20px);background:#1C1C1C;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:500;z-index:400;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-
-/* ONBOARDING */
-.onboarding{position:fixed;inset:0;z-index:600;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;transition:opacity .5s}
-.onboarding.hide{opacity:0;pointer-events:none}
-.ob-logo{width:80px;height:80px;border-radius:24px;background:var(--red);display:flex;align-items:center;justify-content:center;margin-bottom:20px;box-shadow:0 8px 32px rgba(212,43,43,.35)}
-.ob-title{font-size:32px;font-weight:900;color:var(--text);margin-bottom:6px}
-.ob-title span{color:var(--red)}
-.ob-sub{font-size:16px;color:var(--muted);text-align:center;line-height:1.6;margin-bottom:36px;max-width:300px}
-.ob-demo-badge{background:rgba(212,43,43,.1);color:var(--red);font-size:11px;font-weight:700;padding:4px 12px;border-radius:12px;margin-bottom:20px;letter-spacing:.5px;text-transform:uppercase}
-.lang-row{display:flex;gap:10px;margin-bottom:24px}
-.ob-lang{padding:8px 16px;border-radius:20px;border:1.5px solid #D8D0C0;background:#fff;font-size:13px;font-weight:600;cursor:pointer;color:#5C4D3A;transition:all .15s;font-family:inherit}
-.ob-lang.active{background:var(--bg);border-color:var(--red);color:var(--red)}
-.ob-enter{width:100%;max-width:320px;background:var(--red);color:#fff;border:none;border-radius:16px;padding:18px;font-size:17px;font-weight:700;font-family:inherit;cursor:pointer;box-shadow:0 6px 24px rgba(212,43,43,.35)}
-.ob-hint{font-size:12px;color:var(--muted);margin-top:14px;text-align:center;line-height:1.5}
-
-@media(min-width:600px){
-  .sheet{max-width:480px;left:50%;transform:translateX(-50%) translateY(100%);border-radius:24px;margin-bottom:20px}
-  .sheet.open{transform:translateX(-50%) translateY(0)}
+/* PHOTOS */
+.photo-row{display:flex;gap:8px;margin-bottom:14px}
+.photo-slot{
+  flex:1;aspect-ratio:1;border-radius:10px;background:#f5f0e8;
+  border:1.5px dashed #C8BFB0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:3px;cursor:pointer;
+  font-size:18px;transition:border-color .15s;position:relative;overflow:hidden
 }
+.photo-slot:active{border-color:var(--red)}
+.photo-slot .slot-lbl{font-size:9px;font-weight:700;color:var(--muted)}
+.photo-hint{font-size:10px;color:var(--muted);font-style:italic;margin-bottom:14px;line-height:1.4}
+
+/* CHIPS */
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.chip{
+  padding:6px 12px;border-radius:12px;border:1.5px solid #E0D8CC;
+  background:#f5f0e8;font-size:11px;font-weight:600;color:#5C4D3A;
+  cursor:pointer;transition:all .15s;font-family:inherit
+}
+.chip.sel{background:#FFF0F0;border-color:var(--red);color:var(--red)}
+.chip.sel-b{background:#EBF2FC;border-color:var(--blue);color:var(--blue)}
+.list-scroll{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;margin-bottom:14px}
+
+/* ROUTE COLLAPSE */
+.route-trigger{
+  width:100%;text-align:left;background:#f5f0e8;border:1.5px solid #E0D8CC;
+  border-radius:11px;padding:11px 14px;font-size:13px;font-weight:600;
+  color:var(--text);cursor:pointer;font-family:inherit;margin-bottom:8px;
+  display:flex;align-items:center;justify-content:space-between
+}
+.route-options{display:none;flex-direction:column;gap:5px;margin-bottom:14px}
+.route-options.open{display:flex}
+.route-opt{
+  padding:9px 12px;border-radius:9px;border:1.5px solid #E0D8CC;
+  background:#f5f0e8;font-size:12px;font-weight:600;color:var(--text);
+  cursor:pointer;font-family:inherit;text-align:left;transition:all .15s
+}
+.route-opt.sel{background:#F3EDF8;border-color:#7C3AED;color:#7C3AED}
+
+/* VISIBILITY */
+.vis-row{display:flex;gap:7px;margin-bottom:16px}
+.vis-opt{
+  flex:1;padding:10px 6px;border-radius:10px;border:1.5px solid #E0D8CC;
+  background:#f5f0e8;font-size:11px;font-weight:700;color:var(--muted);
+  cursor:pointer;font-family:inherit;text-align:center;transition:all .15s;line-height:1.3
+}
+.vis-opt.sel{background:#FFF0F0;border-color:var(--red);color:var(--red)}
+
+/* SAVE BUTTON */
+.save-btn{
+  width:100%;padding:14px;background:#C8BFB0;color:#fff;
+  border:none;border-radius:13px;font-size:15px;font-weight:700;
+  cursor:not-allowed;font-family:inherit;margin-top:4px;transition:background .2s
+}
+.save-btn.ready{background:var(--red);cursor:pointer}
+.google-btn{
+  width:100%;padding:11px;background:#fff;border:1.5px solid #E0D8CC;
+  border-radius:13px;font-size:13px;font-weight:600;color:var(--muted);
+  cursor:pointer;font-family:inherit;margin-top:8px;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:border-color .15s
+}
+.google-btn:hover{border-color:#4285F4;color:#4285F4}
+
+/* ── MARKER ── */
+.poi-marker{display:flex;flex-direction:column;align-items:center;cursor:pointer}
+.poi-bubble{
+  width:34px;height:34px;border-radius:50%;background:var(--red);
+  border:2.5px solid #fff;display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:13px;position:relative;
+  box-shadow:0 2px 10px rgba(212,43,43,.4)
+}
+.poi-badge{
+  position:absolute;top:-6px;right:-8px;background:var(--blue);
+  color:#fff;font-size:8px;font-weight:800;border-radius:7px;
+  padding:1px 4px;border:1.5px solid #fff;line-height:1.2
+}
+.poi-tail{width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:8px solid var(--red);margin-top:-2px}
+
+/* ── DETAIL SHEET ── */
+.detail-photos{display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;scrollbar-width:none;margin-left:-20px;margin-right:-20px;padding:0 20px}
+.detail-photo{width:200px;height:140px;border-radius:12px;flex-shrink:0;background-size:cover;background-position:center;background-color:var(--bg)}
+.detail-tag{display:inline-flex;align-items:center;gap:4px;background:var(--bg);color:var(--muted);font-size:10px;font-weight:700;padding:3px 9px;border-radius:10px;margin-bottom:6px}
+.detail-name{font-size:21px;font-weight:800;color:var(--text);margin-bottom:7px;line-height:1.2}
+.detail-desc{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:14px}
+.detail-footer{display:flex;align-items:center;justify-content:space-between}
+.author-row{display:flex;align-items:center;gap:8px}
+.g-avatar{width:30px;height:30px;border-radius:50%;background:var(--bg);overflow:hidden;border:1.5px solid var(--border)}
+.g-avatar img{width:100%;height:100%;object-fit:cover}
+.author-name{font-size:12px;color:var(--muted);font-weight:500}
+.love-btn{
+  display:flex;align-items:center;gap:6px;background:var(--bg);
+  border:1.5px solid #D8D0C0;border-radius:22px;padding:9px 16px;
+  cursor:pointer;font-family:inherit;transition:all .2s
+}
+.love-btn.loved{background:#FFF0F0;border-color:var(--red)}
+.love-btn .heart{font-size:17px;color:#C0B0A0;transition:all .2s}
+.love-btn.loved .heart{color:var(--red)}
+.love-cnt{font-size:14px;font-weight:700;color:#8A7F74;transition:color .2s}
+.love-btn.loved .love-cnt{color:var(--red)}
+
+/* ── PROFILE TAB ── */
+.profile-view{
+  position:fixed;inset:0 0 56px 0;z-index:10;background:var(--bg);
+  overflow-y:auto;-webkit-overflow-scrolling:touch;display:none
+}
+.profile-view.active{display:block}
+.profile-header{
+  background:linear-gradient(160deg,var(--red) 0%,#9B1C1C 100%);
+  padding:64px 20px 28px;text-align:center;position:relative
+}
+.profile-logo{
+  position:absolute;top:14px;left:16px;
+  height:28px;background:rgba(255,255,255,.15);border-radius:14px;
+  padding:0 10px;display:flex;align-items:center;gap:6px;
+}
+.profile-logo img{height:16px;filter:brightness(0) invert(1)}
+.profile-logo-txt{color:rgba(255,255,255,.9);font-size:11px;font-weight:800}
+.profile-avatar{
+  width:80px;height:80px;border-radius:50%;
+  border:3px solid rgba(255,255,255,.4);margin:0 auto 12px;
+  overflow:hidden;background:rgba(255,255,255,.2);
+}
+.profile-avatar img{width:100%;height:100%;object-fit:cover}
+.profile-name{font-size:20px;font-weight:800;color:#fff;margin-bottom:3px}
+.profile-email{font-size:12px;color:rgba(255,255,255,.65)}
+.profile-stats{display:flex;gap:0;background:var(--card);margin:0 20px;border-radius:14px;box-shadow:0 4px 16px rgba(0,0,0,.1);margin-top:-20px;overflow:hidden}
+.stat-item{flex:1;padding:14px 10px;text-align:center;border-right:1px solid var(--border)}
+.stat-item:last-child{border-right:none}
+.stat-v{font-size:20px;font-weight:900;color:var(--text);line-height:1}
+.stat-l{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:3px}
+.profile-body{padding:20px}
+.profile-sec{margin-bottom:24px}
+.prof-sec-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.prof-sec-action{font-size:11px;font-weight:700;color:var(--blue);text-transform:none;letter-spacing:0;cursor:pointer;background:none;border:none;font-family:inherit}
+
+/* LIST ITEMS */
+.list-item{
+  background:var(--card);border-radius:12px;padding:12px 14px;
+  margin-bottom:8px;display:flex;align-items:center;gap:12px;
+  box-shadow:0 1px 6px rgba(0,0,0,.05)
+}
+.list-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.list-info{flex:1}
+.list-name{font-size:13px;font-weight:700;color:var(--text)}
+.list-meta{font-size:10px;color:var(--muted);margin-top:2px}
+.list-vis{font-size:9px;font-weight:700;padding:2px 7px;border-radius:6px}
+.lv-pub{background:#EBF2FC;color:var(--blue)}
+.lv-prv{background:var(--bg);color:var(--muted)}
+
+/* TAG CHIPS */
+.tag-chip{
+  padding:6px 12px;border-radius:12px;background:var(--card);
+  border:1.5px solid var(--border);font-size:11px;font-weight:700;
+  color:var(--text);display:inline-block;margin:0 5px 5px 0;
+  cursor:pointer;transition:all .15s
+}
+.tag-chip:hover{border-color:var(--red);color:var(--red)}
+
+/* POI BOARD */
+.poi-board{display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;margin:0 -20px;padding-left:20px;padding-right:20px}
+.poi-card{
+  flex-shrink:0;width:200px;background:var(--card);border-radius:14px;
+  overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.07);
+}
+.poi-card-img{width:100%;height:110px;background-size:cover;background-position:center;background-color:var(--bg);position:relative}
+.poi-card-img-overlay{
+  position:absolute;bottom:6px;left:6px;
+  background:rgba(253,250,245,.9);backdrop-filter:blur(4px);
+  border-radius:8px;padding:3px 8px;font-size:9px;font-weight:700;color:var(--muted)
+}
+.poi-card-body{padding:10px 12px}
+.poi-card-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px;line-height:1.2}
+.poi-card-desc{font-size:10px;color:var(--muted);line-height:1.4;margin-bottom:8px}
+.poi-card-footer{display:flex;align-items:center;justify-content:space-between}
+.poi-card-love{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:var(--red)}
+.poi-card-actions{display:flex;gap:5px}
+.poi-card-btn{padding:3px 7px;border-radius:6px;border:none;font-size:9px;font-weight:700;cursor:pointer;font-family:inherit}
+.pcb-edit{background:#EBF2FC;color:var(--blue)}
+.pcb-del{background:#FFF0F0;color:var(--red)}
+.pcb-vis{background:var(--bg);color:var(--muted)}
+
+/* ── ITINERARY PANEL ── */
+.itin-view{
+  position:fixed;inset:0 0 56px 0;z-index:10;
+  background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;display:none
+}
+.itin-view.active{display:block}
+
+/* INFO PILL */
+.info-pill{
+  background:#EBF2FC;border-radius:10px;padding:9px 12px;
+  font-size:11px;color:var(--blue);line-height:1.5;margin-bottom:12px
+}
+
+/* ── ANIMATIONS ── */
+@keyframes gpspulse{0%,100%{transform:scale(1)}50%{transform:scale(1.3)}}
 </style>
 </head>
 <body>
 
-<!-- ONBOARDING -->
-<div class="onboarding" id="onboarding">
-  <div class="ob-logo">
-    <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-      <path d="M20 6C14 6 9 11 9 17c0 9 11 19 11 19s11-10 11-19c0-6-5-11-11-11z" fill="#fff"/>
-      <circle cx="20" cy="17" r="4" fill="#D42B2B"/>
-    </svg>
-  </div>
-  <div class="ob-demo-badge" id="ob-badge">🔴 Demo Interattiva</div>
-  <div class="ob-title"><span>POI•</span>LOVE</div>
-  <div class="ob-sub" id="ob-sub">La mappa dei luoghi che ami davvero. Non quella sponsorizzata.</div>
-  <div class="lang-row">
-    <button class="ob-lang active" onclick="setLang('it')">🇮🇹 IT</button>
-    <button class="ob-lang" onclick="setLang('sq')">🇦🇱 SQ</button>
-    <button class="ob-lang" onclick="setLang('en')">🇬🇧 EN</button>
-  </div>
-  <button class="ob-enter" id="ob-btn" onclick="enterApp()">Esplora la mappa →</button>
-  <div class="ob-hint" id="ob-hint">Tappa un ♥ per vedere un luogo.<br>Premi + per aggiungere il tuo.</div>
-</div>
-
-<!-- MAP -->
+<!-- MAP (always rendered, hidden by z-index when profile/itin active) -->
 <div id="map"></div>
 
-<!-- HEADER -->
-<div class="header">
-  <div class="logo-pill" onclick="location.reload()">POI•LOVE</div>
-  <div class="header-actions">
-    <button class="hdr-btn" onclick="cycleLang()" id="langToggle">IT</button>
-    <button class="hdr-btn" onclick="centerMap()"><i class="ph ph-crosshair-simple" style="font-size:18px"></i></button>
-    <button class="hdr-btn" onclick="window.location.href='itinerari.html'" title="Itinerari"><i class="ph ph-map-trifold" style="font-size:18px"></i></button>
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="tb-logo" onclick="showTab('map')">
+    <img src="https://poilove.com/img/logo-completo.svg"
+         onerror="this.style.display='none';document.getElementById('tbLogoTxt').style.display='block'"
+         alt="POI•LOVE">
+    <span id="tbLogoTxt" class="tb-logo-txt" style="display:none">POI•LOVE</span>
   </div>
+  <div class="tb-right">
+    <button class="tb-btn" onclick="cycleLang()" id="langBtn">IT</button>
+    <button class="tb-btn icon-only" onclick="centerMap()" title="Centrar">🎯</button>
+  </div>
+</div>
+
+<!-- MAP TYPE SELECTOR -->
+<div class="map-types" id="mapTypes">
+  <button class="mt-btn active" onclick="setMapType('street',this)" id="mtStreet" data-t="mt_street">Stradale</button>
+  <button class="mt-btn" onclick="setMapType('satellite',this)" id="mtSat" data-t="mt_sat">Satellite</button>
+  <button class="mt-btn" onclick="setMapType('routes',this)" id="mtRoutes" data-t="mt_routes">Rotte Storiche</button>
+</div>
+
+<!-- FAB MENU -->
+<div class="fab-menu" id="fabMenu">
+  <button class="fab-opt" onclick="openAddPOI()">
+    <div class="fab-opt-icon" style="background:#FFF0F0;color:var(--red)">📍</div>
+    <span data-t="fab_poi">Segna un luogo</span>
+  </button>
+  <button class="fab-opt" onclick="openAddStop()">
+    <div class="fab-opt-icon" style="background:#EBF2FC;color:var(--blue)">🗺</div>
+    <span data-t="fab_itin">Tappa Itinerario</span>
+  </button>
 </div>
 
 <!-- FAB -->
-<button class="fab" id="fab" onclick="toggleAddSheet()">
-  <i class="ph ph-plus" style="font-size:28px"></i>
-</button>
+<button class="fab" id="fab" onclick="toggleFab()">+</button>
 
-<!-- SHEETS OVERLAY -->
-<div class="sheet-overlay" id="sheetOverlay">
-  <div class="sheet-backdrop" id="backdrop" onclick="closeAllSheets()"></div>
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-item active" id="nav-map" onclick="showTab('map')">
+    <div class="nav-icon">🗺</div>
+    <div class="nav-lbl" data-t="nav_map">Mappa</div>
+  </button>
+  <button class="nav-item" id="nav-itin" onclick="showTab('itin')">
+    <div class="nav-icon">🧭</div>
+    <div class="nav-lbl" data-t="nav_itin">Itinerari</div>
+  </button>
+  <button class="nav-item" id="nav-profile" onclick="showTab('profile')">
+    <div class="nav-icon">👤</div>
+    <div class="nav-lbl" data-t="nav_profile">Profilo</div>
+  </button>
+</nav>
 
-  <!-- DETAIL SHEET -->
-  <div class="sheet" id="detailSheet">
-    <div class="handle"></div>
-    <div class="detail-body">
-      <div class="detail-photos" id="detailPhotos"></div>
-      <div class="detail-tag" id="detailTag"></div>
-      <div class="detail-name" id="detailName"></div>
-      <div class="detail-desc" id="detailDesc"></div>
-      <div class="detail-footer">
-        <div class="author-row">
-          <div class="avatar"><img id="detailAvatar" src="" alt=""></div>
-          <div class="author-name" id="detailAuthor"></div>
-        </div>
-        <button class="love-btn" id="loveBtn" onclick="toggleLove()">
-          <span class="heart">♥</span>
-          <span class="love-count" id="loveCount">0</span>
-        </button>
-      </div>
+<!-- ═══════════════════════════════════════
+     PROFILE VIEW
+════════════════════════════════════════ -->
+<div class="profile-view" id="profileView">
+  <div class="profile-header">
+    <div class="profile-logo">
+      <img src="https://poilove.com/img/logo-completo.svg"
+           onerror="this.style.display='none'" alt="POI•LOVE">
+      <span class="profile-logo-txt">POI•LOVE</span>
+    </div>
+    <div class="profile-avatar">
+      <img src="https://lh3.googleusercontent.com/a/default-user=s200" alt="avatar"
+           onerror="this.style.background='var(--red)';this.style.content='A'"/>
+    </div>
+    <div class="profile-name">Alessandro C.</div>
+    <div class="profile-email">it@altrostile.app</div>
+  </div>
+
+  <div class="profile-stats">
+    <div class="stat-item">
+      <div class="stat-v">12</div>
+      <div class="stat-l" data-t="stat_poi">POI</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-v">87</div>
+      <div class="stat-l" data-t="stat_love">Love ricevuti</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-v">3</div>
+      <div class="stat-l" data-t="stat_list">Liste</div>
     </div>
   </div>
 
-  <!-- ADD POI SHEET -->
-  <div class="sheet" id="addSheet">
-    <div class="handle"></div>
+  <div class="profile-body">
 
-    <!-- Header -->
-    <div class="add-header">
-      <div class="add-header-left">
-        <div class="add-title-text" id="add-title">Salva questo posto</div>
-        <div class="add-subtitle" id="add-subtitle">Meno di 90 secondi. La community te ne sarà grata.</div>
+    <!-- LISTE PERSONALI -->
+    <div class="profile-sec">
+      <div class="prof-sec-lbl">
+        <span data-t="prof_lists">Le mie liste</span>
+        <button class="prof-sec-action" data-t="prof_new_list">+ Nuova lista</button>
       </div>
-      <div style="display:flex;align-items:flex-start;gap:8px;flex-shrink:0">
-        <div class="timer-badge" id="timerBadge">
-          <i class="ph ph-timer" style="font-size:13px"></i>
-          <span id="timerDisplay">0:00</span>
+      <div class="list-item">
+        <div class="list-dot" style="background:var(--red)"></div>
+        <div class="list-info">
+          <div class="list-name" data-t="list1">Tirana Top</div>
+          <div class="list-meta" data-t="list1m">8 POI · condivisa con link</div>
         </div>
-        <button class="close-btn" onclick="closeAllSheets()">✕</button>
+        <span class="list-vis lv-pub" data-t="vis_shared">Condivisa</span>
+      </div>
+      <div class="list-item">
+        <div class="list-dot" style="background:var(--blue)"></div>
+        <div class="list-info">
+          <div class="list-name" data-t="list2">Segreti Balcani</div>
+          <div class="list-meta" data-t="list2m">3 POI · privata</div>
+        </div>
+        <span class="list-vis lv-prv" data-t="vis_prv">Privata</span>
+      </div>
+      <div class="list-item">
+        <div class="list-dot" style="background:var(--green)"></div>
+        <div class="list-info">
+          <div class="list-name" data-t="list3">Food Spots</div>
+          <div class="list-meta" data-t="list3m">4 POI · pubblica</div>
+        </div>
+        <span class="list-vis lv-pub" data-t="vis_pub">Pubblica</span>
       </div>
     </div>
 
-    <!-- Congrats banner -->
-    <div class="congrats-banner" id="congratsBanner" id="congrats-msg">
-      🏆 Complimenti, vuoi fare un lavoro curato, grazie!
+    <!-- TAG PERSONALI -->
+    <div class="profile-sec">
+      <div class="prof-sec-lbl">
+        <span data-t="prof_tags">I miei tag</span>
+        <button class="prof-sec-action" data-t="prof_new_tag">+ Aggiungi</button>
+      </div>
+      <div>
+        <span class="tag-chip" data-t="tag1">Gioielli nascosti</span>
+        <span class="tag-chip" data-t="tag2">Architettura</span>
+        <span class="tag-chip" data-t="tag3">Artigianato</span>
+        <span class="tag-chip" data-t="tag4">Luoghi dell'anima</span>
+        <span class="tag-chip" data-t="tag5">Vista panoramica</span>
+      </div>
     </div>
 
-    <div class="add-body">
-
-      <!-- TITOLO -->
-      <div class="section-lbl">
-        <span id="lbl-titolo">Titolo</span>
-        <span class="required-badge" id="lbl-obbl">OBBLIGATORIO</span>
+    <!-- I MIEI POI — BACHECA -->
+    <div class="profile-sec">
+      <div class="prof-sec-lbl">
+        <span data-t="prof_my_poi">I miei POI</span>
+        <button class="prof-sec-action" onclick="showTab('map')" data-t="prof_add_poi">+ Aggiungi</button>
       </div>
-      <input type="text" class="name-input" id="poiName"
-        placeholder="Come si chiama questo posto?" maxlength="80"
-        oninput="onNameChange()">
+      <div class="poi-board">
+
+        <div class="poi-card">
+          <div class="poi-card-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Mosque_of_Ethem_Bey.jpg/320px-Mosque_of_Ethem_Bey.jpg')">
+            <div class="poi-card-img-overlay">🔒 Privato</div>
+          </div>
+          <div class="poi-card-body">
+            <div class="poi-card-name" data-t="poi1n">Xhamia Et'hem Beut</div>
+            <div class="poi-card-desc" data-t="poi1d">Moschea ottomana sopravvissuta al comunismo. Straordinaria.</div>
+            <div class="poi-card-footer">
+              <div class="poi-card-love">❤️ 24</div>
+              <div class="poi-card-actions">
+                <button class="poi-card-btn pcb-edit" data-t="pca_edit">Modifica</button>
+                <button class="poi-card-btn pcb-vis" onclick="togglePOIVis(this)" data-t="pca_vis">Pubblica</button>
+                <button class="poi-card-btn pcb-del" data-t="pca_del">Elimina</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="poi-card">
+          <div class="poi-card-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Blloku_Tirana.jpg/320px-Blloku_Tirana.jpg')">
+            <div class="poi-card-img-overlay">🌍 Pubblico</div>
+          </div>
+          <div class="poi-card-body">
+            <div class="poi-card-name" data-t="poi2n">Blloku — Il cuore pulsante</div>
+            <div class="poi-card-desc" data-t="poi2d">Quartiere liberato nel '91. Caffè, storia, energia.</div>
+            <div class="poi-card-footer">
+              <div class="poi-card-love">❤️ 41</div>
+              <div class="poi-card-actions">
+                <button class="poi-card-btn pcb-edit" data-t="pca_edit2">Modifica</button>
+                <button class="poi-card-btn pcb-vis" onclick="togglePOIVis(this)" data-t="pca_vis2">Privato</button>
+                <button class="poi-card-btn pcb-del" data-t="pca_del2">Elimina</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="poi-card">
+          <div class="poi-card-img" style="background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:32px">
+            🏺
+            <div class="poi-card-img-overlay">🔗 Link</div>
+          </div>
+          <div class="poi-card-body">
+            <div class="poi-card-name" data-t="poi3n">Piramida di Tirana</div>
+            <div class="poi-card-desc" data-t="poi3d">Monumento al passato, cantiere del futuro.</div>
+            <div class="poi-card-footer">
+              <div class="poi-card-love">❤️ 18</div>
+              <div class="poi-card-actions">
+                <button class="poi-card-btn pcb-edit" data-t="pca_edit3">Modifica</button>
+                <button class="poi-card-btn pcb-vis" onclick="togglePOIVis(this)" data-t="pca_vis3">Pubblica</button>
+                <button class="poi-card-btn pcb-del" data-t="pca_del3">Elimina</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /poi-board -->
+    </div>
+
+  </div><!-- /profile-body -->
+</div><!-- /profile-view -->
+
+<!-- ═══════════════════════════════════════
+     ITINERARY VIEW (link to separate page)
+════════════════════════════════════════ -->
+<div class="itin-view" id="itinView">
+  <div style="padding:70px 20px 20px;text-align:center">
+    <div style="background:var(--card);border-radius:20px;padding:32px 24px;box-shadow:0 4px 20px rgba(0,0,0,.08)">
+      <img src="https://poilove.com/img/logo-completo.svg" style="height:28px;margin-bottom:16px"
+           onerror="this.style.display='none'" alt="POI•LOVE">
+      <div style="font-size:22px;font-weight:900;color:var(--text);margin-bottom:8px" data-t="itin_h">Itinerari di Viaggio</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:20px" data-t="itin_desc">Pianifica le tue tappe prima di partire. Trova compagni di viaggio. Trasforma ogni tappa in un POI quando sei sul posto.</div>
+      <a href="itinerari.html" style="display:inline-block;background:var(--blue);color:#fff;border-radius:12px;padding:12px 24px;font-size:14px;font-weight:700;text-decoration:none;margin-bottom:12px" data-t="itin_open">Apri Itinerari →</a>
+      <div style="font-size:11px;color:var(--muted);line-height:1.5" data-t="itin_note">Demo completa con mappa, mini-calendario, GPS live e compagni di viaggio.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SHEET: ADD POI (full flow)
+════════════════════════════════════════ -->
+<div class="sheet-overlay" id="addPoiOv">
+  <div class="sheet-backdrop" id="addPoiBg" onclick="closeAddPOI()"></div>
+  <div class="sheet" id="addPoiSheet">
+    <div class="sh-handle"></div>
+    <div class="sh-head">
+      <div>
+        <div class="sh-title" data-t="add_title">Salva questo posto</div>
+        <div class="sh-sub" data-t="add_sub">Aggiungi un luogo che ami</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="sh-timer" id="timerBadge">⏱ 0:00</div>
+        <button class="sh-close" onclick="closeAddPOI()">✕</button>
+      </div>
+    </div>
+    <div class="congrats" id="congratsBanner">🏆 <span data-t="congrats">Complimenti, vuoi fare un lavoro curato, grazie!</span></div>
+
+    <div class="sh-body">
+      <!-- NOME -->
+      <div class="sec-lbl"><span data-t="lbl_name">Nome del posto</span><span class="req-badge" data-t="req">OBBLIGATORIO</span></div>
+      <input class="field-in" type="text" id="poiNameIn" data-t-ph="ph_name" placeholder="Come si chiama questo posto?" oninput="checkSave()"/>
 
       <!-- DOVE SI TROVA -->
-      <div class="section-lbl" id="lbl-dove">Dove si trova?</div>
-      <div class="location-tabs" id="locTabs">
-        <button class="loc-tab active" onclick="setLocMode('gps')" id="lt-gps">
-          <i class="ph ph-crosshair-simple" style="font-size:12px"></i>
-          <span id="lt-gps-lbl">GPS Live</span>
-        </button>
-        <button class="loc-tab" onclick="setLocMode('exif')" id="lt-exif">
-          <i class="ph ph-image" style="font-size:12px"></i>
-          <span>Foto EXIF</span>
-        </button>
-        <button class="loc-tab" onclick="setLocMode('addr')" id="lt-addr">
-          <i class="ph ph-map-pin" style="font-size:12px"></i>
-          <span id="lt-addr-lbl">Indirizzo</span>
-        </button>
-        <button class="loc-tab" onclick="setLocMode('map')" id="lt-map">
-          <i class="ph ph-hand-tap" style="font-size:12px"></i>
-          <span id="lt-map-lbl">Tocca mappa</span>
-        </button>
+      <div class="sec-lbl" style="margin-top:2px" data-t="lbl_where">Dove si trova</div>
+      <div class="loc-tabs">
+        <button class="loc-tab active" onclick="setLocTab(this,'gps')" data-t="loc_gps">📡 GPS Live</button>
+        <button class="loc-tab" onclick="setLocTab(this,'exif')" data-t="loc_exif">📷 Foto EXIF</button>
+        <button class="loc-tab" onclick="setLocTab(this,'addr')" data-t="loc_addr">📮 Indirizzo</button>
+        <button class="loc-tab" onclick="setLocTab(this,'map')" data-t="loc_map">🗺 Tocca mappa</button>
       </div>
-      <div id="locResult">
-        <!-- populated by setLocMode -->
+      <div class="loc-result" id="locResult">
+        <div class="loc-dot"></div>
+        <div>
+          <div class="loc-street" id="locStreet">Rruga Ismail Qemali, Tiranë</div>
+          <div class="loc-coords" id="locCoords">41.3275, 19.8189</div>
+        </div>
       </div>
 
       <!-- VICINO A COSA -->
-      <div class="section-lbl" id="lbl-vicino">Vicino a cosa?
-        <span class="section-hint" id="lbl-vicino-hint">(opzionale)</span>
-      </div>
-      <input type="text" class="nearby-input" id="nearbyInput"
-        placeholder="Es. Vicino al teatro, al mercato..." maxlength="60">
+      <div class="sec-lbl" data-t="lbl_near">Vicino a cosa?</div>
+      <input class="field-in" type="text" data-t-ph="ph_near" placeholder="es. Piazza Skanderbeg, Palazzo della Cultura…" style="margin-bottom:14px"/>
 
       <!-- FOTO -->
-      <div class="section-lbl">
-        <span id="lbl-foto">Foto</span>
-        <span class="section-hint" id="lbl-foto-hint">— opzionali, fino a 3</span>
+      <div class="sec-lbl"><span data-t="lbl_photos">Foto</span></div>
+      <div class="photo-row">
+        <div class="photo-slot" onclick="selectPhoto(this,0)"><span>📷</span><span class="slot-lbl" data-t="ph_main">Principale</span></div>
+        <div class="photo-slot" onclick="selectPhoto(this,1)"><span>+</span><span class="slot-lbl" data-t="ph_2">Foto 2</span></div>
+        <div class="photo-slot" onclick="selectPhoto(this,2)"><span>+</span><span class="slot-lbl" data-t="ph_3">Foto 3</span></div>
       </div>
-      <div class="photo-row" id="photoRow">
-        <div class="photo-slot" onclick="addPhoto(0)" id="ps0">
-          <div class="photo-ico"><i class="ph ph-camera"></i></div>
-          <div class="photo-lbl" id="pl0">Principale</div>
-        </div>
-        <div class="photo-slot" onclick="addPhoto(1)" id="ps1">
-          <div class="photo-ico"><i class="ph ph-image"></i></div>
-          <div class="photo-lbl" id="pl1">Foto 2</div>
-        </div>
-        <div class="photo-slot" onclick="addPhoto(2)" id="ps2">
-          <div class="photo-ico"><i class="ph ph-image"></i></div>
-          <div class="photo-lbl" id="pl2">Foto 3</div>
-        </div>
-      </div>
-      <div class="photo-hint">
-        <i class="ph ph-info" style="font-size:13px;color:var(--muted)"></i>
-        <span id="photo-hint-txt">Non sei sul posto? Puoi aggiungere foto in seguito.</span>
-      </div>
+      <div class="photo-hint" data-t="ph_hint">Non sei sul posto? Puoi aggiungere foto in seguito.</div>
 
       <!-- RACCONTA -->
-      <div class="section-lbl">
-        <span id="lbl-racconta">Racconta</span>
-        <span class="section-hint" id="lbl-racconta-hint">— max 200 caratteri</span>
-      </div>
-      <textarea class="racconta-input" id="poiDesc" maxlength="200"
-        oninput="updateCount()"
-        id="desc-placeholder"></textarea>
-      <div class="char-bar">
-        <span class="char-count" id="descCount">0 / 200</span>
-      </div>
+      <div class="sec-lbl"><span data-t="lbl_story">Racconta</span><span id="charCount" style="font-size:10px;font-weight:500;color:var(--muted)">0 / 200</span></div>
+      <textarea class="field-in field-ta" id="storyIn" data-t-ph="ph_story" placeholder="L'anima di questo posto… perché merita di essere ricordato?" maxlength="200" oninput="updateChar()"></textarea>
 
       <!-- CATEGORIE -->
-      <div class="section-lbl">
-        <span id="lbl-cat">Categorie</span>
-        <span class="section-hint" id="lbl-cat-hint">0 / 3</span>
+      <div class="sec-lbl"><span data-t="lbl_cat">Categorie</span><span id="catCount" style="font-size:10px;color:var(--muted)">0 / 3</span></div>
+      <div class="chips" id="catChips">
+        <button class="chip" onclick="toggleCat(this)" data-t="cat1">Cibo</button>
+        <button class="chip" onclick="toggleCat(this)" data-t="cat2">Lavoro</button>
+        <button class="chip" onclick="toggleCat(this)" data-t="cat3">Pernottare</button>
+        <button class="chip" onclick="toggleCat(this)" data-t="cat4">Natura</button>
+        <button class="chip" onclick="toggleCat(this)" data-t="cat5">Festa</button>
+        <button class="chip" onclick="toggleCat(this)" data-t="cat6">Cultura</button>
+        <button class="chip" onclick="toggleCat(this)" data-t="cat7">Pratico</button>
+        <button class="chip" onclick="toggleCat(this)" data-t="cat8">Benessere</button>
+        <button class="chip" onclick="toggleCat(this)" data-t="cat9">Love</button>
+        <button class="chip" onclick="toggleCat(this)" data-t="cat10">Audioguida</button>
+        <button class="chip" onclick="toggleCat(this)" data-t="cat11">Open Source</button>
       </div>
-      <div class="cats-grid" id="catsGrid"></div>
 
       <!-- AGGIUNGI A UNA LISTA -->
-      <div class="section-lbl" id="lbl-lista">Aggiungi a una lista</div>
-      <div class="lists-row" id="listsRow"></div>
+      <div class="sec-lbl" data-t="lbl_list">Aggiungi a una lista</div>
+      <div class="list-scroll">
+        <button class="chip sel-b" onclick="toggleList(this)" data-t="lst0">Lista libera</button>
+        <button class="chip" onclick="toggleList(this)" data-t="lst1">Tirana Top</button>
+        <button class="chip" onclick="toggleList(this)" data-t="lst2">Weekend</button>
+        <button class="chip" onclick="toggleList(this)" data-t="lst3">Segreti</button>
+        <button class="chip" onclick="toggleList(this)" data-t="lst4">Food spots</button>
+      </div>
 
       <!-- ROTTA STORICA -->
-      <div class="section-lbl" id="lbl-rotta">Rotta storica
-        <span class="section-hint" id="lbl-rotta-hint">— opzionale</span>
-      </div>
-      <div class="rotta-trigger" onclick="toggleRotta()">
-        <div class="rotta-ico">〰️</div>
-        <div class="rotta-info">
-          <div class="rotta-name" id="rotta-trigger-name">Collega a una rotta storica</div>
-          <div class="rotta-sub" id="rotta-trigger-sub">Via Egnatia · Serenissima · Illiriche · Greche</div>
-        </div>
-        <div class="rotta-arrow" id="rottaArrow">›</div>
-      </div>
-      <div class="rotta-options" id="rottaOptions">
-        <div class="rotta-opt" id="ro-none" onclick="selectRotta('none')">
-          <div class="rotta-opt-ico">—</div>
-          <div class="rotta-opt-text">
-            <div class="rotta-opt-name" id="ro-none-name">Nessuna rotta</div>
-            <div class="rotta-opt-desc" id="ro-none-desc">POI libero, non collegato a percorsi storici</div>
-          </div>
-        </div>
-        <div class="rotta-opt" id="ro-egnatia" onclick="selectRotta('egnatia')">
-          <div class="rotta-opt-ico">🏛</div>
-          <div class="rotta-opt-text">
-            <div class="rotta-opt-name">Via Egnatia</div>
-            <div class="rotta-opt-desc">L'antica via romana che attraversava i Balcani</div>
-          </div>
-        </div>
-        <div class="rotta-opt" id="ro-serenissima" onclick="selectRotta('serenissima')">
-          <div class="rotta-opt-ico">⚓</div>
-          <div class="rotta-opt-text">
-            <div class="rotta-opt-name">Rotta Serenissima</div>
-            <div class="rotta-opt-desc">I porti e le rotte commerciali della Serenissima</div>
-          </div>
-        </div>
-        <div class="rotta-opt" id="ro-illiriche" onclick="selectRotta('illiriche')">
-          <div class="rotta-opt-ico">🏔</div>
-          <div class="rotta-opt-text">
-            <div class="rotta-opt-name">Terre Illiriche</div>
-            <div class="rotta-opt-desc">Siti e luoghi della civiltà illirica pre-romana</div>
-          </div>
-        </div>
-        <div class="rotta-opt" id="ro-greche" onclick="selectRotta('greche')">
-          <div class="rotta-opt-ico">🏺</div>
-          <div class="rotta-opt-text">
-            <div class="rotta-opt-name">Colonie Greche</div>
-            <div class="rotta-opt-desc">Le antiche colonie greche sulla costa adriatica</div>
-          </div>
-        </div>
+      <div class="sec-lbl" data-t="lbl_route">Rotta Storica</div>
+      <button class="route-trigger" onclick="toggleRoutes(this)">
+        <span id="routeLabel" data-t="route_none">Nessuna rotta storica</span>
+        <span id="routeArrow">▾</span>
+      </button>
+      <div class="route-options" id="routeOptions">
+        <button class="route-opt sel" onclick="selectRoute(this,'none')" data-t="r0">Nessuna rotta</button>
+        <button class="route-opt" onclick="selectRoute(this,'egnatia')" data-t="r1">Via Egnatia</button>
+        <button class="route-opt" onclick="selectRoute(this,'serenissima')" data-t="r2">Rotta Serenissima</button>
+        <button class="route-opt" onclick="selectRoute(this,'illiria')" data-t="r3">Terre Illiriche</button>
+        <button class="route-opt" onclick="selectRoute(this,'greche')" data-t="r4">Colonie Greche</button>
       </div>
 
       <!-- VISIBILITÀ -->
-      <div class="section-lbl" id="lbl-vis">Visibilità</div>
+      <div class="sec-lbl" data-t="lbl_vis">Visibilità</div>
       <div class="vis-row">
-        <div class="vis-chip active" id="vis-pub" onclick="setVis('public')">
-          <span class="vis-label" id="vl-pub">🌍 Pubblico</span>
-          <span class="vis-desc" id="vd-pub">Visibile a tutti</span>
-        </div>
-        <div class="vis-chip" id="vis-priv" onclick="setVis('private')">
-          <span class="vis-label" id="vl-priv">🔒 Privato</span>
-          <span class="vis-desc" id="vd-priv">Solo tu</span>
-        </div>
-        <div class="vis-chip" id="vis-share" onclick="setVis('share')">
-          <span class="vis-label" id="vl-share">🔗 Condividi</span>
-          <span class="vis-desc" id="vd-share">Con link</span>
-        </div>
+        <button class="vis-opt sel" onclick="setVis(this)" data-t="vis_pub_btn">🌍 Pubblico</button>
+        <button class="vis-opt" onclick="setVis(this)" data-t="vis_prv_btn">🔒 Privato</button>
+        <button class="vis-opt" onclick="setVis(this)" data-t="vis_share_btn">🔗 Condividi</button>
       </div>
 
-    </div><!-- /add-body -->
-
-    <!-- SAVE AREA -->
-    <div class="save-area">
-      <button class="save-btn" id="saveBtn" onclick="savePOI()" disabled>
-        <span id="save-btn-txt">Segna sulla mappa</span>
-      </button>
-      <div class="save-hint" id="save-hint-txt">Inserisci il nome del posto per continuare</div>
-      <button class="google-suggest-btn" onclick="showToast('✓ Suggerito a Google Maps! Grazie per contribuire.')">
-        <svg width="16" height="16" viewBox="0 0 48 48" fill="none">
-          <path d="M44.5 20H24v8h11.8C34.7 33.9 29.8 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.3-6.3C34.9 4.8 29.8 3 24 3 12.4 3 3 12.4 3 24s9.4 21 21 21c10.8 0 20-7.8 20-21 0-1.3-.1-2.7-.5-4z" fill="#FFC107"/>
-          <path d="M7 14.7l7.3 5.4C16.1 15.5 19.8 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6.3-6.3C34.9 4.8 29.8 3 24 3c-7.5 0-14 4.1-17 10.7z" fill="#FF3D00"/>
-          <path d="M24 45c5.7 0 10.7-1.9 14.6-5.2l-6.8-5.7C29.8 35.7 27 37 24 37c-5.8 0-10.7-3.9-11.8-9l-7.3 5.6C7.9 40.8 15.4 45 24 45z" fill="#4CAF50"/>
-          <path d="M44.5 20H24v8h11.8c-.5 2.7-2 5-4.2 6.6l6.8 5.7c4.1-3.8 6.6-9.5 6.6-16.3 0-1.3-.1-2.7-.5-4z" fill="#1976D2"/>
-        </svg>
-        <span id="google-btn-txt">Consiglia a Google Maps</span>
+      <!-- SAVE -->
+      <button class="save-btn" id="saveBtn" data-t="save_disabled">Inserisci il nome per continuare</button>
+      <button class="google-btn" onclick="openGoogleMaps()">
+        <svg width="16" height="16" viewBox="0 0 48 48"><path fill="#4285F4" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#34A853" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#EA4335" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        <span data-t="google_suggest">Consiglia a Google Maps</span>
       </button>
     </div>
-  </div><!-- /addSheet -->
-</div>
-
-<!-- SUCCESS -->
-<div class="success-overlay" id="successOverlay">
-  <div class="success-card">
-    <div class="success-icon">✓</div>
-    <div class="success-title" id="suc-title">POI aggiunto!</div>
-    <div class="success-sub" id="suc-sub">Ora visibile sulla mappa.<br>Grazie per condividere l'amore.</div>
-    <button class="success-close" onclick="closeSuccess()" id="suc-btn">Vai alla mappa</button>
   </div>
 </div>
 
-<!-- TOAST -->
-<div class="toast" id="toast"></div>
+<!-- ═══════════════════════════════════════
+     SHEET: ADD ITINERARY STOP (lightweight)
+════════════════════════════════════════ -->
+<div class="sheet-overlay" id="addStopOv">
+  <div class="sheet-backdrop" id="addStopBg" onclick="closeAddStop()"></div>
+  <div class="sheet" id="addStopSheet">
+    <div class="sh-handle"></div>
+    <div class="sh-head">
+      <div>
+        <div class="sh-title" data-t="stop_title">Tappa Itinerario</div>
+        <div class="sh-sub" data-t="stop_sub">Senza foto. Pianifica ora, racconta quando ci sei.</div>
+      </div>
+      <button class="sh-close" onclick="closeAddStop()">✕</button>
+    </div>
+    <div class="sh-body">
+      <div class="sec-lbl"><span data-t="stop_lbl_name">Nome della tappa</span><span class="req-badge">!</span></div>
+      <input class="field-in" type="text" data-t-ph="stop_ph_name" placeholder="es. Castello di Shkodër"/>
+
+      <div class="sec-lbl" data-t="stop_lbl_cat">Categoria / Tag</div>
+      <div class="chips">
+        <button class="chip" onclick="toggleCat(this)">Cultura</button>
+        <button class="chip" onclick="toggleCat(this)">Natura</button>
+        <button class="chip" onclick="toggleCat(this)">Cibo</button>
+        <button class="chip" onclick="toggleCat(this)">Pratico</button>
+        <button class="chip" onclick="toggleCat(this)">Benessere</button>
+      </div>
+
+      <div class="sec-lbl" data-t="stop_lbl_itin">Itinerario</div>
+      <div class="chips">
+        <button class="chip sel-b" onclick="toggleList(this)" data-t="itin1">Alla scoperta di Tirana</button>
+        <button class="chip" onclick="toggleList(this)" data-t="itin2">Costa Adriatica Sud</button>
+        <button class="chip" onclick="toggleList(this)" data-t="itin_new">+ Nuovo itinerario</button>
+      </div>
+
+      <div class="sec-lbl" data-t="stop_lbl_route">Rotta Storica</div>
+      <button class="route-trigger" onclick="toggleRoutes(this)" style="margin-bottom:14px">
+        <span data-t="route_none2">Nessuna rotta storica</span><span>▾</span>
+      </button>
+
+      <div class="sec-lbl" data-t="stop_lbl_vis">Visibilità Itinerario</div>
+      <div class="vis-row" style="margin-bottom:6px">
+        <button class="vis-opt sel" onclick="setVis(this)" data-t="itin_pub">🌍 Pubblico</button>
+        <button class="vis-opt" onclick="setVis(this)" data-t="itin_prv">🔒 Privato</button>
+      </div>
+      <div class="info-pill" id="visHintStop" data-t="itin_vis_hint">
+        🌍 Pubblico = chiunque può unirsi all'itinerario. Puoi bloccare singoli partecipanti.
+      </div>
+
+      <div class="sec-lbl" data-t="stop_lbl_date">Data prevista</div>
+      <input class="field-in" type="date" style="margin-bottom:16px"/>
+
+      <button class="save-btn ready" onclick="closeAddStop()" data-t="stop_save">Aggiungi tappa</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SHEET: POI DETAIL
+════════════════════════════════════════ -->
+<div class="sheet-overlay" id="detailOv">
+  <div class="sheet-backdrop" id="detailBg" onclick="closeDetail()"></div>
+  <div class="sheet" id="detailSheet">
+    <div class="sh-handle"></div>
+    <div style="padding:12px 20px 0">
+      <div class="detail-photos" id="detailPhotos"></div>
+      <div class="detail-tag" id="detailTag">🍕 Cibo</div>
+      <div class="detail-name" id="detailName">—</div>
+      <div class="detail-desc" id="detailDesc">—</div>
+      <div class="detail-footer">
+        <div class="author-row">
+          <div class="g-avatar">
+            <img src="https://lh3.googleusercontent.com/a/default-user=s80" alt="avatar"
+                 onerror="this.style.background='var(--red)'"/>
+          </div>
+          <div class="author-name" id="detailAuthor">Alessandro C.</div>
+        </div>
+        <button class="love-btn" id="loveBtn" onclick="toggleLove()">
+          <span class="heart" id="loveHeart">♥</span>
+          <span class="love-cnt" id="loveCnt">24</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
-// ── DATI ─────────────────────────────────────────────────────────────────────
-const CATS = [
-  {id:'food',   emoji:'🍽', it:'Cibo',       sq:'Ushqim',  en:'Food'},
-  {id:'work',   emoji:'💼', it:'Lavoro',     sq:'Punë',    en:'Work'},
-  {id:'sleep',  emoji:'🏨', it:'Pernottare', sq:'Fjetje',  en:'Stay'},
-  {id:'nature', emoji:'🌿', it:'Natura',     sq:'Natyrë',  en:'Nature'},
-  {id:'party',  emoji:'🎉', it:'Festa',      sq:'Festë',   en:'Party'},
-  {id:'culture',emoji:'🎭', it:'Cultura',    sq:'Kulturë', en:'Culture'},
-  {id:'handy',  emoji:'🔧', it:'Pratico',    sq:'Praktik', en:'Handy'},
-  {id:'wellness',emoji:'✨',it:'Benessere',  sq:'Mirëqenie',en:'Wellness'},
-  {id:'love',   emoji:'♥', it:'Love',       sq:'Dashuri', en:'Love'},
-  {id:'audio',  emoji:'🎧', it:'Audioguida', sq:'Audioguide',en:'Audio'},
-  {id:'oss',    emoji:'</>', it:'Open Source',sq:'Open Source',en:'Open Source'},
-];
-
-const LISTS = [
-  {id:'free',    emoji:'🌐', it:'Lista libera', sq:'Listë e lirë',   en:'Free list'},
-  {id:'top',     emoji:'📍', it:'Tirana Top',   sq:'Tirana Top',     en:'Tirana Top'},
-  {id:'weekend', emoji:'📅', it:'Weekend',      sq:'Fundjavë',       en:'Weekend'},
-  {id:'hidden',  emoji:'🔍', it:'Segreti',      sq:'Sekrete',        en:'Hidden'},
-  {id:'food',    emoji:'🍽', it:'Da mangiare',  sq:'Ku hahet',       en:'Food spots'},
-];
-
-const POIS = [
-  {id:1,lat:41.3289,lng:19.8217,
-    name:{it:'Blloku — Il Cuore',sq:'Blloku — Zemra',en:'Blloku — Heart'},
-    desc:{it:'Il quartiere più vivace di Tirana. Un tempo riservato all\'élite comunista, oggi è il simbolo della libertà.',
-          sq:'Lagjja më e gjallë e Tiranës.',
-          en:'Once reserved for the communist elite, now the symbol of freedom.'},
-    cats:['culture','food'],photos:['https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Tirana_Albania.jpg/640px-Tirana_Albania.jpg'],
-    author:'@liri_tirana',avatar:'https://i.pravatar.cc/60?img=47',love_count:147,loved:false},
-  {id:2,lat:41.3297,lng:19.8199,
-    name:{it:'Piazza Skanderbeg',sq:'Sheshi Skënderbej',en:'Skanderbeg Square'},
-    desc:{it:'Il cuore pulsante di Tirana. Museo Nazionale, Moschea Et\'hem Bey, Torre dell\'Orologio.',
-          sq:'Muzeu Kombëtar, Xhamia e Et\'hem Beut, Kulla e Sahatit.',
-          en:'National Museum, Et\'hem Bey Mosque, Clock Tower. Magical at sunset.'},
-    cats:['history','culture'],photos:['https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Skanderbeg_Square_Tirana.jpg/640px-Skanderbeg_Square_Tirana.jpg'],
-    author:'@acastagna',avatar:'https://i.pravatar.cc/60?img=12',love_count:312,loved:false},
-  {id:3,lat:41.3265,lng:19.8239,
-    name:{it:'Bunk\'Art 2',sq:'Bunk\'Art 2',en:'Bunk\'Art 2'},
-    desc:{it:'Un bunker nucleare convertito in museo della Sigurimi. Un\'esperienza che cambia la prospettiva.',
-          sq:'Bunker bërthamor i kthyer në muze të Sigurimit.',
-          en:'Nuclear bunker turned Sigurimi museum. A perspective-changing experience.'},
-    cats:['culture','history'],photos:[],
-    author:'@kulturaTirana',avatar:'https://i.pravatar.cc/60?img=33',love_count:89,loved:false},
-  {id:4,lat:41.3312,lng:19.8185,
-    name:{it:'Parco Rinia',sq:'Parku Rinia',en:'Rinia Park'},
-    desc:{it:'Il polmone verde di Tirana. Al mattino presto con la luce radente è uno dei posti più belli.',
-          sq:'Mushkëritë e gjelbra të Tiranës.',
-          en:'Tirana\'s green lung. Early morning light makes it magical.'},
-    cats:['nature','wellness'],photos:[],
-    author:'@gjoni_art',avatar:'https://i.pravatar.cc/60?img=28',love_count:56,loved:false},
-  {id:5,lat:41.3273,lng:19.8154,
-    name:{it:'Pazari i Ri',sq:'Pazari i Ri',en:'New Bazaar'},
-    desc:{it:'Il bazar rinnovato di Tirana. Frutta, verdura, spezie, prodotti locali a prezzi onesti.',
-          sq:'Pazari i ripërtërirë. Fruta, perime, erëza me çmime të ndershme.',
-          en:'Tirana\'s renovated bazaar. Fresh produce and local goods at honest prices.'},
-    cats:['food','culture'],photos:[],
-    author:'@liri_tirana',avatar:'https://i.pravatar.cc/60?img=47',love_count:203,loved:false},
-  {id:6,lat:41.3345,lng:19.8228,
-    name:{it:'Lago Artificiale',sq:'Liqeni Artificial',en:'Artificial Lake'},
-    desc:{it:'Il lago artificiale con i suoi sentieri e la riva affacciata sulla città. Perfetto al tramonto.',
-          sq:'Liqeni artificial me shtigjet dhe pamjen nga qyteti.',
-          en:'The artificial lake with walking paths and city views. Perfect at sunset.'},
-    cats:['nature','wellness'],photos:[],
-    author:'@albania_walks',avatar:'https://i.pravatar.cc/60?img=55',love_count:178,loved:false},
-];
-
-// ── STATE ─────────────────────────────────────────────────────────────────────
-let lang='it', map, markers=[], currentPOI=null;
-let selectedCats=[], selectedList='free', selectedRotta='', currentVis='public';
-let photosFilled=[false,false,false];
-let timerInterval=null, timerSec=0, rottaOpen=false;
-let addedPOIs=[];
-const demoPhotos=['https://picsum.photos/seed/t1/400/300','https://picsum.photos/seed/t2/400/300','https://picsum.photos/seed/t3/400/300'];
-const locModes={
-  gps:{street:'Rruga Sami Frashëri, Tirana',coords:'41.3275° N · 19.8187° E'},
-  exif:{street:'Analisi EXIF in corso...',coords:'Carica prima una foto'},
-  addr:{input:true},
-  map:{mapHint:true}
+/* ══════════════════════════════════
+   TRANSLATIONS
+══════════════════════════════════ */
+const T = {
+  it:{
+    nav_map:'Mappa', nav_itin:'Itinerari', nav_profile:'Profilo',
+    mt_street:'Stradale', mt_sat:'Satellite', mt_routes:'Rotte Storiche',
+    fab_poi:'Segna un luogo', fab_itin:'Tappa Itinerario',
+    add_title:'Salva questo posto', add_sub:'Aggiungi un luogo che ami',
+    congrats:'Complimenti, vuoi fare un lavoro curato, grazie!',
+    lbl_name:'Nome del posto', req:'OBBLIGATORIO',
+    ph_name:'Come si chiama questo posto?',
+    lbl_where:'Dove si trova',
+    loc_gps:'📡 GPS Live', loc_exif:'📷 Foto EXIF', loc_addr:'📮 Indirizzo', loc_map:'🗺 Tocca mappa',
+    lbl_near:'Vicino a cosa?', ph_near:'es. Piazza Skanderbeg, Palazzo della Cultura…',
+    lbl_photos:'Foto', ph_main:'Principale', ph_2:'Foto 2', ph_3:'Foto 3',
+    ph_hint:'Non sei sul posto? Puoi aggiungere foto in seguito.',
+    lbl_story:'Racconta', ph_story:'L\'anima di questo posto… perché merita di essere ricordato?',
+    lbl_cat:'Categorie',
+    cat1:'Cibo',cat2:'Lavoro',cat3:'Pernottare',cat4:'Natura',cat5:'Festa',
+    cat6:'Cultura',cat7:'Pratico',cat8:'Benessere',cat9:'Love',cat10:'Audioguida',cat11:'Open Source',
+    lbl_list:'Aggiungi a una lista',
+    lst0:'Lista libera',lst1:'Tirana Top',lst2:'Weekend',lst3:'Segreti',lst4:'Food spots',
+    lbl_route:'Rotta Storica', route_none:'Nessuna rotta storica', route_none2:'Nessuna rotta storica',
+    r0:'Nessuna rotta',r1:'Via Egnatia',r2:'Rotta Serenissima',r3:'Terre Illiriche',r4:'Colonie Greche',
+    lbl_vis:'Visibilità',
+    vis_pub_btn:'🌍 Pubblico', vis_prv_btn:'🔒 Privato', vis_share_btn:'🔗 Condividi',
+    save_disabled:'Inserisci il nome per continuare', save_ready:'Segna sulla mappa',
+    google_suggest:'Consiglia a Google Maps',
+    stop_title:'Tappa Itinerario', stop_sub:'Senza foto. Pianifica ora, racconta quando ci sei.',
+    stop_lbl_name:'Nome della tappa', stop_ph_name:'es. Castello di Shkodër',
+    stop_lbl_cat:'Categoria / Tag', stop_lbl_itin:'Itinerario',
+    itin1:'Alla scoperta di Tirana', itin2:'Costa Adriatica Sud', itin_new:'+ Nuovo itinerario',
+    stop_lbl_route:'Rotta Storica',
+    stop_lbl_vis:'Visibilità Itinerario',
+    itin_pub:'🌍 Pubblico', itin_prv:'🔒 Privato',
+    itin_vis_hint:'🌍 Pubblico = chiunque può unirsi all\'itinerario. Puoi bloccare singoli partecipanti.',
+    stop_lbl_date:'Data prevista', stop_save:'Aggiungi tappa',
+    stat_poi:'POI', stat_love:'Love ricevuti', stat_list:'Liste',
+    prof_lists:'Le mie liste', prof_new_list:'+ Nuova lista',
+    list1:'Tirana Top', list1m:'8 POI · condivisa con link',
+    list2:'Segreti Balcani', list2m:'3 POI · privata',
+    list3:'Food Spots', list3m:'4 POI · pubblica',
+    vis_shared:'Condivisa', vis_prv:'Privata', vis_pub:'Pubblica',
+    prof_tags:'I miei tag', prof_new_tag:'+ Aggiungi',
+    tag1:'Gioielli nascosti',tag2:'Architettura',tag3:'Artigianato',tag4:'Luoghi dell\'anima',tag5:'Vista panoramica',
+    prof_my_poi:'I miei POI', prof_add_poi:'+ Aggiungi',
+    poi1n:'Xhamia Et\'hem Beut', poi1d:'Moschea ottomana sopravvissuta al comunismo.',
+    poi2n:'Blloku — Il cuore pulsante', poi2d:'Quartiere liberato nel \'91.',
+    poi3n:'Piramida di Tirana', poi3d:'Monumento al passato, cantiere del futuro.',
+    pca_edit:'Modifica', pca_vis:'Pubblica', pca_del:'Elimina',
+    pca_edit2:'Modifica', pca_vis2:'Privato', pca_del2:'Elimina',
+    pca_edit3:'Modifica', pca_vis3:'Pubblica', pca_del3:'Elimina',
+    itin_h:'Itinerari di Viaggio',
+    itin_desc:'Pianifica le tue tappe prima di partire. Trova compagni di viaggio. Trasforma ogni tappa in un POI quando sei sul posto.',
+    itin_open:'Apri Itinerari →',
+    itin_note:'Demo completa con mappa, mini-calendario, GPS live e compagni di viaggio.',
+  },
+  sq:{
+    nav_map:'Harta', nav_itin:'Itinerare', nav_profile:'Profili',
+    mt_street:'Rrugore', mt_sat:'Satelitor', mt_routes:'Rrugët Historike',
+    fab_poi:'Shëno një vend', fab_itin:'Stacion Itinerarit',
+    add_title:'Ruaj këtë vend', add_sub:'Shto një vend që e do',
+    congrats:'Urime, doni të bëni punë me kujdes, faleminderit!',
+    lbl_name:'Emri i vendit', req:'E DETYRUESHME',
+    ph_name:'Si quhet ky vend?',
+    lbl_where:'Ku ndodhet',
+    loc_gps:'📡 GPS Live', loc_exif:'📷 EXIF Foto', loc_addr:'📮 Adresë', loc_map:'🗺 Prek hartën',
+    lbl_near:'Pranë çfarë?', ph_near:'p.sh. Sheshi Skënderbej, Pallati i Kulturës…',
+    lbl_photos:'Foto', ph_main:'Kryesore', ph_2:'Foto 2', ph_3:'Foto 3',
+    ph_hint:'Nuk jeni aty? Mund të shtoni foto më vonë.',
+    lbl_story:'Trego', ph_story:'Shpirti i këtij vendi… pse meriton të kujtohet?',
+    lbl_cat:'Kategori',
+    cat1:'Ushqim',cat2:'Punë',cat3:'Fjetje',cat4:'Natyrë',cat5:'Festë',
+    cat6:'Kulturë',cat7:'Praktik',cat8:'Mirëqenie',cat9:'Love',cat10:'Audioguide',cat11:'Open Source',
+    lbl_list:'Shto në listë',
+    lst0:'Listë e lirë',lst1:'Tiranë Top',lst2:'Fundjavë',lst3:'Sekrete',lst4:'Vende ushqimi',
+    lbl_route:'Rrugë Historike', route_none:'Asnjë rrugë historike', route_none2:'Asnjë rrugë historike',
+    r0:'Asnjë rrugë',r1:'Via Egnatia',r2:'Rruga Serenissima',r3:'Tokat Ilire',r4:'Kolonitë Greke',
+    lbl_vis:'Dukshmëria',
+    vis_pub_btn:'🌍 Publik', vis_prv_btn:'🔒 Privat', vis_share_btn:'🔗 Nda',
+    save_disabled:'Fut emrin për të vazhduar', save_ready:'Shëno në hartë',
+    google_suggest:'Sugjeroni te Google Maps',
+    stop_title:'Stacion Itinerarit', stop_sub:'Pa foto. Planifiko tani, trego kur je aty.',
+    stop_lbl_name:'Emri i stacionit', stop_ph_name:'p.sh. Kalaja e Shkodrës',
+    stop_lbl_cat:'Kategori / Etiketë', stop_lbl_itin:'Itinerar',
+    itin1:'Zbulimi i Tiranës', itin2:'Bregu Adriatik Jugor', itin_new:'+ Itinerar i ri',
+    stop_lbl_route:'Rrugë Historike',
+    stop_lbl_vis:'Dukshmëria Itinerarit',
+    itin_pub:'🌍 Publik', itin_prv:'🔒 Privat',
+    itin_vis_hint:'🌍 Publik = kushdo mund të bashkohet. Mund të bllokoni pjesëmarrës individualë.',
+    stop_lbl_date:'Data e planifikuar', stop_save:'Shto stacionin',
+    stat_poi:'POI', stat_love:'Love të marra', stat_list:'Lista',
+    prof_lists:'Listat e mia', prof_new_list:'+ Listë e re',
+    list1:'Tiranë Top', list1m:'8 POI · ndarë me link',
+    list2:'Sekretet Ballkanike', list2m:'3 POI · private',
+    list3:'Vende Ushqimi', list3m:'4 POI · publike',
+    vis_shared:'Ndarë', vis_prv:'Private', vis_pub:'Publike',
+    prof_tags:'Etiketat e mia', prof_new_tag:'+ Shto',
+    tag1:'Guri të fshehur',tag2:'Arkitekturë',tag3:'Artizanat',tag4:'Vende shpirtërore',tag5:'Pamje panoramike',
+    prof_my_poi:'POI-të e mia', prof_add_poi:'+ Shto',
+    poi1n:'Xhamia e Et\'hem Beut', poi1d:'Xhami otomane e mbijetuar nga komunizmi.',
+    poi2n:'Blloku — Zemra Pulsuese', poi2d:'Lagjja e çliruar në \'91.',
+    poi3n:'Piramida e Tiranës', poi3d:'Monument i së shkuarës, shantier i së ardhmes.',
+    pca_edit:'Modifiko', pca_vis:'Publike', pca_del:'Fshi',
+    pca_edit2:'Modifiko', pca_vis2:'Private', pca_del2:'Fshi',
+    pca_edit3:'Modifiko', pca_vis3:'Publike', pca_del3:'Fshi',
+    itin_h:'Itinerare Udhëtimi',
+    itin_desc:'Planifikoni stacionet tuaja para nisjes. Gjeni shokë udhëtimi. Kthejeni çdo stacion në POI kur jeni aty.',
+    itin_open:'Hap Itineraret →',
+    itin_note:'Demo e plotë me hartë, mini-kalendar, GPS live dhe shokë udhëtimi.',
+  },
+  en:{
+    nav_map:'Map', nav_itin:'Itineraries', nav_profile:'Profile',
+    mt_street:'Street', mt_sat:'Satellite', mt_routes:'Historic Routes',
+    fab_poi:'Mark a place', fab_itin:'Itinerary Stop',
+    add_title:'Save this place', add_sub:'Add a place you love',
+    congrats:'Great, you want to do careful work, thank you!',
+    lbl_name:'Place name', req:'REQUIRED',
+    ph_name:'What is this place called?',
+    lbl_where:'Where is it',
+    loc_gps:'📡 GPS Live', loc_exif:'📷 Photo EXIF', loc_addr:'📮 Address', loc_map:'🗺 Tap map',
+    lbl_near:'Near what?', ph_near:'e.g. Skanderbeg Square, Palace of Culture…',
+    lbl_photos:'Photos', ph_main:'Main', ph_2:'Photo 2', ph_3:'Photo 3',
+    ph_hint:'Not there yet? You can add photos later.',
+    lbl_story:'Tell your story', ph_story:'The soul of this place… why does it deserve to be remembered?',
+    lbl_cat:'Categories',
+    cat1:'Food',cat2:'Work',cat3:'Stay',cat4:'Nature',cat5:'Party',
+    cat6:'Culture',cat7:'Practical',cat8:'Wellness',cat9:'Love',cat10:'Audio guide',cat11:'Open Source',
+    lbl_list:'Add to a list',
+    lst0:'Free list',lst1:'Tirana Top',lst2:'Weekend',lst3:'Secrets',lst4:'Food spots',
+    lbl_route:'Historic Route', route_none:'No historic route', route_none2:'No historic route',
+    r0:'No route',r1:'Via Egnatia',r2:'Serenissima Route',r3:'Illyrian Lands',r4:'Greek Colonies',
+    lbl_vis:'Visibility',
+    vis_pub_btn:'🌍 Public', vis_prv_btn:'🔒 Private', vis_share_btn:'🔗 Share',
+    save_disabled:'Enter the name to continue', save_ready:'Mark on map',
+    google_suggest:'Suggest to Google Maps',
+    stop_title:'Itinerary Stop', stop_sub:'No photos. Plan now, tell the story when you\'re there.',
+    stop_lbl_name:'Stop name', stop_ph_name:'e.g. Shkodër Castle',
+    stop_lbl_cat:'Category / Tag', stop_lbl_itin:'Itinerary',
+    itin1:'Discovering Tirana', itin2:'Southern Adriatic Coast', itin_new:'+ New itinerary',
+    stop_lbl_route:'Historic Route',
+    stop_lbl_vis:'Itinerary Visibility',
+    itin_pub:'🌍 Public', itin_prv:'🔒 Private',
+    itin_vis_hint:'🌍 Public = anyone can join your itinerary. You can block individual participants.',
+    stop_lbl_date:'Planned date', stop_save:'Add stop',
+    stat_poi:'POI', stat_love:'Loves received', stat_list:'Lists',
+    prof_lists:'My lists', prof_new_list:'+ New list',
+    list1:'Tirana Top', list1m:'8 POI · shared via link',
+    list2:'Balkan Secrets', list2m:'3 POI · private',
+    list3:'Food Spots', list3m:'4 POI · public',
+    vis_shared:'Shared', vis_prv:'Private', vis_pub:'Public',
+    prof_tags:'My tags', prof_new_tag:'+ Add',
+    tag1:'Hidden gems',tag2:'Architecture',tag3:'Crafts',tag4:'Soul places',tag5:'Panoramic view',
+    prof_my_poi:'My POIs', prof_add_poi:'+ Add',
+    poi1n:'Et\'hem Bey Mosque', poi1d:'Ottoman mosque that survived communism.',
+    poi2n:'Blloku — The Beating Heart', poi2d:'Neighborhood liberated in \'91.',
+    poi3n:'Tirana Pyramid', poi3d:'Monument to the past, construction site for the future.',
+    pca_edit:'Edit', pca_vis:'Make Public', pca_del:'Delete',
+    pca_edit2:'Edit', pca_vis2:'Make Private', pca_del2:'Delete',
+    pca_edit3:'Edit', pca_vis3:'Make Public', pca_del3:'Delete',
+    itin_h:'Travel Itineraries',
+    itin_desc:'Plan your stops before you leave. Find travel companions. Turn each stop into a POI when you get there.',
+    itin_open:'Open Itineraries →',
+    itin_note:'Full demo with map, mini-calendar, live GPS and travel companions.',
+  }
 };
 
-// ── MAP ───────────────────────────────────────────────────────────────────────
-function initMap(){
-  map=L.map('map',{zoomControl:false}).setView([41.3289,19.8199],15);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-    {attribution:'© CARTO',subdomains:'abcd',maxZoom:19}).addTo(map);
-  renderMarkers();
-  let pt;
-  map.on('mousedown touchstart',function(e){pt=setTimeout(()=>openAddSheet(e.latlng),600)});
-  map.on('mouseup touchend mousemove',function(){clearTimeout(pt)});
+/* ══════════════════════════════════
+   LANG
+══════════════════════════════════ */
+const LANGS = ['it','sq','en'];
+let lang = LANGS.includes((navigator.language||'').substring(0,2)) ? (navigator.language||'').substring(0,2) : 'en';
+if(navigator.language&&navigator.language.startsWith('it')) lang='it';
+if(navigator.language&&navigator.language.startsWith('sq')) lang='sq';
+
+function applyLang(l){
+  lang=l;
+  document.getElementById('langBtn').textContent=l.toUpperCase();
+  const t=T[l];
+  document.querySelectorAll('[data-t]').forEach(el=>{
+    const k=el.dataset.t;
+    if(t[k]!==undefined) el.textContent=t[k];
+  });
+  document.querySelectorAll('[data-t-ph]').forEach(el=>{
+    const k=el.dataset.tPh;
+    if(t[k]!==undefined) el.placeholder=t[k];
+  });
+}
+function cycleLang(){
+  const i=(LANGS.indexOf(lang)+1)%LANGS.length;
+  applyLang(LANGS[i]);
 }
 
-function renderMarkers(){
-  markers.forEach(m=>map.removeLayer(m));
-  markers=[];
-  [...POIS,...addedPOIs].forEach(poi=>{
-    const ico=L.divIcon({
+/* ══════════════════════════════════
+   MAP
+══════════════════════════════════ */
+let map, tileStreet, tileSat, routeLayer;
+const CENTER = [41.3275,19.8189];
+
+const POIS = [
+  {lat:41.3264,lng:19.8193,icon:'🏡',name:'Blloku',tag:'Cultura',desc:'Quartiere liberato nel \'91. Caffè, storia, energia.',love:41,photos:['https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Blloku_Tirana.jpg/320px-Blloku_Tirana.jpg']},
+  {lat:41.3275,lng:19.8212,icon:'🕌',name:"Xhamia Et'hem Beut",tag:'Cultura',desc:'Moschea ottomana sopravvissuta al comunismo. Straordinaria.',love:24,photos:['https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Mosque_of_Ethem_Bey.jpg/320px-Mosque_of_Ethem_Bey.jpg']},
+  {lat:41.3293,lng:19.8180,icon:'🏛',name:'Piramida di Tirana',tag:'Cultura',desc:'Monumento al passato, cantiere del futuro.',love:18,photos:[]},
+  {lat:41.3236,lng:19.8162,icon:'🛒',name:'Pazari i Ri',tag:'Cibo',desc:'Il mercato più bello dei Balcani. Odori, colori, vita.',love:56,photos:[]},
+  {lat:41.3319,lng:19.8137,icon:'🌅',name:'Lago Artificiale',tag:'Natura',desc:'Il posto più bello per concludere il viaggio.',love:33,photos:[]}
+];
+
+// Via Egnatia approximate coordinates through Albania
+const EGNATIA = [[41.33,19.81],[41.32,19.82],[41.31,19.84],[41.29,19.87],[41.27,19.90]];
+
+function initMap(){
+  map = L.map('map',{zoomControl:false}).setView(CENTER,14);
+  tileStreet = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+    {attribution:'© OpenStreetMap © CARTO',maxZoom:19}).addTo(map);
+  tileSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    {attribution:'© Esri',maxZoom:19});
+  routeLayer = L.polyline(EGNATIA,{color:'#7C3AED',weight:4,opacity:.7,dashArray:'10 6'});
+
+  POIS.forEach(p=>{
+    const icon = L.divIcon({
       className:'',
-      html:`<div class="poi-marker"><div class="poi-bubble">♥${poi.love_count>0?`<div class="poi-badge">${poi.love_count>99?'99+':poi.love_count}</div>`:''}</div><div class="poi-tail"></div></div>`,
-      iconSize:[40,50],iconAnchor:[20,50]
+      html:`<div class="poi-marker"><div class="poi-bubble"><span style="font-size:14px">${p.icon}</span><div class="poi-badge">${p.love}</div></div><div class="poi-tail"></div></div>`,
+      iconSize:[34,44],iconAnchor:[17,44]
     });
-    markers.push(L.marker([poi.lat,poi.lng],{icon:ico}).addTo(map).on('click',()=>openDetail(poi.id)));
+    L.marker([p.lat,p.lng],{icon}).addTo(map).on('click',()=>openDetail(p));
+  });
+
+  map.on('click', e=>{
+    if(fabMenuOpen){ closeFab(); }
   });
 }
 
-// ── DETAIL ────────────────────────────────────────────────────────────────────
-function openDetail(id){
-  const poi=[...POIS,...addedPOIs].find(p=>p.id===id);
-  if(!poi)return;
-  currentPOI=poi;
-  const ph=document.getElementById('detailPhotos');
-  ph.innerHTML='';
-  const photos=poi.photos?.length?poi.photos:[];
-  if(photos.length){
-    photos.forEach(url=>{
+function setMapType(type,btn){
+  document.querySelectorAll('.mt-btn').forEach(b=>{b.classList.remove('active','route-active')});
+  if(type==='street'){
+    btn.classList.add('active');
+    tileSat.remove();
+    routeLayer.remove();
+    tileStreet.addTo(map);
+  } else if(type==='satellite'){
+    btn.classList.add('active');
+    tileStreet.remove();
+    routeLayer.remove();
+    tileSat.addTo(map);
+  } else if(type==='routes'){
+    btn.classList.add('route-active');
+    tileSat.remove();
+    tileStreet.addTo(map);
+    routeLayer.addTo(map);
+    map.fitBounds(routeLayer.getBounds().pad(.3));
+  }
+}
+
+function centerMap(){
+  map.setView(CENTER,14);
+}
+
+/* ══════════════════════════════════
+   TABS
+══════════════════════════════════ */
+function showTab(tab){
+  // views
+  document.getElementById('profileView').classList.toggle('active', tab==='profile');
+  document.getElementById('itinView').classList.toggle('active', tab==='itin');
+  document.getElementById('mapTypes').style.display = tab==='map'?'flex':'none';
+  document.getElementById('fab').style.display = tab==='map'?'flex':'none';
+  document.getElementById('fabMenu').classList.remove('open');
+  document.getElementById('fab').classList.remove('open');
+  fabMenuOpen=false;
+  // nav
+  ['map','itin','profile'].forEach(t=>{
+    document.getElementById('nav-'+t).classList.toggle('active',t===tab);
+  });
+}
+
+/* ══════════════════════════════════
+   FAB
+══════════════════════════════════ */
+let fabMenuOpen=false;
+function toggleFab(){
+  fabMenuOpen=!fabMenuOpen;
+  document.getElementById('fab').classList.toggle('open',fabMenuOpen);
+  document.getElementById('fabMenu').classList.toggle('open',fabMenuOpen);
+}
+function closeFab(){
+  fabMenuOpen=false;
+  document.getElementById('fab').classList.remove('open');
+  document.getElementById('fabMenu').classList.remove('open');
+}
+
+/* ══════════════════════════════════
+   SHEETS
+══════════════════════════════════ */
+function openSheet(ov,bg,sh){
+  closeFab();
+  document.getElementById(ov).style.pointerEvents='all';
+  document.getElementById(bg).classList.add('vis');
+  setTimeout(()=>document.getElementById(sh).classList.add('open'),10);
+}
+function closeSheet(ov,bg,sh){
+  document.getElementById(sh).classList.remove('open');
+  document.getElementById(bg).classList.remove('vis');
+  setTimeout(()=>document.getElementById(ov).style.pointerEvents='none',380);
+}
+
+let timerInterval=null;
+function openAddPOI(){
+  openSheet('addPoiOv','addPoiBg','addPoiSheet');
+  document.getElementById('poiNameIn').value='';
+  document.getElementById('charCount').textContent='0 / 200';
+  document.getElementById('storyIn').value='';
+  document.getElementById('saveBtn').className='save-btn';
+  document.getElementById('saveBtn').textContent=T[lang].save_disabled;
+  document.getElementById('congratsBanner').classList.remove('show');
+  let secs=0;
+  if(timerInterval) clearInterval(timerInterval);
+  timerInterval=setInterval(()=>{
+    secs++;
+    const m=Math.floor(secs/60), s=secs%60;
+    document.getElementById('timerBadge').textContent=`⏱ ${m}:${s<10?'0':''}${s}`;
+    if(secs===90) document.getElementById('congratsBanner').classList.add('show');
+  },1000);
+}
+function closeAddPOI(){
+  if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
+  closeSheet('addPoiOv','addPoiBg','addPoiSheet');
+}
+function openAddStop(){openSheet('addStopOv','addStopBg','addStopSheet')}
+function closeAddStop(){closeSheet('addStopOv','addStopBg','addStopSheet')}
+
+function openDetail(p){
+  const photos=document.getElementById('detailPhotos');
+  photos.innerHTML='';
+  if(p.photos&&p.photos.length){
+    p.photos.forEach(url=>{
       const d=document.createElement('div');
       d.className='detail-photo';
       d.style.backgroundImage=`url(${url})`;
-      ph.appendChild(d);
+      photos.appendChild(d);
     });
-  } else {
-    const d=document.createElement('div');
-    d.className='detail-photo';
-    d.style.background='linear-gradient(135deg,#d8cec0,#b8ae9e)';
-    ph.appendChild(d);
   }
-  const cat=CATS.find(c=>poi.cats?.[0]===c.id);
-  document.getElementById('detailTag').innerHTML=cat?`${cat.emoji} ${cat[lang]}`:'📍';
-  document.getElementById('detailName').textContent=poi.name[lang]||poi.name.it;
-  document.getElementById('detailDesc').textContent=poi.desc[lang]||poi.desc.it;
-  document.getElementById('detailAuthor').textContent=poi.author;
-  document.getElementById('detailAvatar').src=poi.avatar;
-  document.getElementById('loveCount').textContent=poi.love_count;
-  document.getElementById('loveBtn').classList.toggle('loved',!!poi.loved);
-  openSheet('detailSheet');
+  document.getElementById('detailTag').textContent='📍 '+p.tag;
+  document.getElementById('detailName').textContent=p.name;
+  document.getElementById('detailDesc').textContent=p.desc;
+  document.getElementById('loveCnt').textContent=p.love;
+  document.getElementById('loveBtn').classList.remove('loved');
+  document.getElementById('loveHeart').textContent='♥';
+  openSheet('detailOv','detailBg','detailSheet');
 }
+function closeDetail(){closeSheet('detailOv','detailBg','detailSheet')}
 
+let loved=false;
 function toggleLove(){
-  if(!currentPOI)return;
-  currentPOI.loved=!currentPOI.loved;
-  currentPOI.love_count+=currentPOI.loved?1:-1;
-  document.getElementById('loveBtn').classList.toggle('loved',currentPOI.loved);
-  document.getElementById('loveCount').textContent=currentPOI.love_count;
-  const btn=document.getElementById('loveBtn');
-  btn.style.transform='scale(1.2)';
-  setTimeout(()=>btn.style.transform='',200);
-  showToast(currentPOI.loved?'♥ LOVE aggiunto!':'LOVE rimosso');
-  renderMarkers();
+  loved=!loved;
+  document.getElementById('loveBtn').classList.toggle('loved',loved);
+  document.getElementById('loveHeart').textContent=loved?'♥':'♥';
+  const cnt=document.getElementById('loveCnt');
+  cnt.textContent=parseInt(cnt.textContent)+(loved?1:-1);
 }
 
-// ── ADD POI ───────────────────────────────────────────────────────────────────
-function openAddSheet(latlng){
-  // Reset
-  document.getElementById('poiName').value='';
-  document.getElementById('poiDesc').value='';
-  document.getElementById('descCount').textContent='0 / 200';
-  selectedCats=[];selectedList='free';selectedRotta='';currentVis='public';
-  photosFilled=[false,false,false];
-  rottaOpen=false;
-  document.getElementById('rottaOptions').classList.remove('open');
-  document.getElementById('rottaArrow').classList.remove('open');
-  document.getElementById('congratsBanner').classList.remove('show');
-  updateSaveBtn();
-  setLocMode('gps',latlng);
-  renderCats();
-  renderLists();
-  setVis('public');
-  renderPhotoSlots();
-  applyAddLang();
-  startTimer();
-  openSheet('addSheet');
-}
-
-function toggleAddSheet(){
-  const s=document.getElementById('addSheet');
-  if(s.classList.contains('open')){closeAllSheets();}
-  else{openAddSheet(map.getCenter());}
-}
-
-// TIMER
-function startTimer(){
-  clearInterval(timerInterval);
-  timerSec=0;
-  updateTimer();
-  timerInterval=setInterval(()=>{
-    timerSec++;
-    updateTimer();
-    if(timerSec===90){
-      document.getElementById('congratsBanner').classList.add('show');
-    }
-  },1000);
-}
-
-function updateTimer(){
-  const m=Math.floor(timerSec/60);
-  const s=timerSec%60;
-  document.getElementById('timerDisplay').textContent=`${m}:${String(s).padStart(2,'0')}`;
-}
-
-// LOCATION MODE
-function setLocMode(mode,latlng){
-  document.querySelectorAll('.loc-tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('lt-'+mode)?.classList.add('active');
-  const r=document.getElementById('locResult');
-  if(mode==='gps'){
-    const lat=latlng?latlng.lat.toFixed(4)+'° N':locModes.gps.coords.split(' ')[0];
-    const lng=latlng?latlng.lng.toFixed(4)+'° E':'19.8187° E';
-    r.innerHTML=`<div class="loc-result">
-      <div class="loc-dot"></div>
-      <div class="loc-text">
-        <div class="loc-street">Rruga Sami Frashëri, Tirana</div>
-        <div class="loc-coords">${latlng?latlng.lat.toFixed(4)+'° N · '+latlng.lng.toFixed(4)+'° E':'41.3275° N · 19.8187° E'}</div>
-      </div>
-    </div>`;
-  } else if(mode==='exif'){
-    r.innerHTML=`<div class="loc-result">
-      <div class="loc-dot" style="background:#BA7517"></div>
-      <div class="loc-text">
-        <div class="loc-street">Carica una foto con dati GPS</div>
-        <div class="loc-coords">Le coordinate EXIF verranno lette automaticamente</div>
-      </div>
-    </div>`;
-  } else if(mode==='addr'){
-    r.innerHTML=`<input type="text" class="loc-text-input" placeholder="Es. Via Ismail Qemali 32, Tirana...">`;
-  } else if(mode==='map'){
-    r.innerHTML=`<div class="loc-map-hint">
-      <i class="ph ph-hand-tap" style="font-size:18px"></i>
-      <span>Tieni premuto sulla mappa per posizionare il PIN nel punto esatto</span>
-    </div>`;
-  }
-}
-
-// PHOTOS
-function addPhoto(i){
-  if(photosFilled[i]){photosFilled[i]=false;}
-  else if(photosFilled.filter(Boolean).length<3){photosFilled[i]=true;}
-  renderPhotoSlots();
-}
-
-function renderPhotoSlots(){
-  const names=['Principale','Foto 2','Foto 3'];
-  for(let i=0;i<3;i++){
-    const s=document.getElementById('ps'+i);
-    if(photosFilled[i]){
-      s.className='photo-slot filled';
-      s.innerHTML=`<img src="${demoPhotos[i]}" style="border-radius:10px">`;
-    } else {
-      s.className='photo-slot';
-      s.innerHTML=`<div class="photo-ico"><i class="ph ph-${i===0?'camera':'image'}"></i></div><div class="photo-lbl">${names[i]}</div>`;
-    }
-  }
-}
-
-// CATEGORIES (max 3)
-function renderCats(){
-  const g=document.getElementById('catsGrid');
-  g.innerHTML='';
-  CATS.forEach(c=>{
-    const btn=document.createElement('button');
-    const active=selectedCats.includes(c.id);
-    const disabled=selectedCats.length>=3&&!active;
-    btn.className='cat-chip'+(active?' active':'')+(disabled?' disabled':'');
-    btn.innerHTML=`${c.emoji} ${c[lang]}`;
-    btn.onclick=()=>{
-      if(selectedCats.includes(c.id)){selectedCats=selectedCats.filter(x=>x!==c.id);}
-      else if(selectedCats.length<3){selectedCats.push(c.id);}
-      document.getElementById('lbl-cat-hint').textContent=`${selectedCats.length} / 3`;
-      renderCats();
-    };
-    g.appendChild(btn);
-  });
-}
-
-// LISTS
-function renderLists(){
-  const r=document.getElementById('listsRow');
-  r.innerHTML='';
-  LISTS.forEach(l=>{
-    const btn=document.createElement('button');
-    btn.className='list-chip'+(selectedList===l.id?' active':'');
-    btn.innerHTML=`${l.emoji} ${l[lang]}`;
-    btn.onclick=()=>{selectedList=l.id;renderLists();};
-    r.appendChild(btn);
-  });
-}
-
-// ROTTA
-function toggleRotta(){
-  rottaOpen=!rottaOpen;
-  document.getElementById('rottaOptions').classList.toggle('open',rottaOpen);
-  document.getElementById('rottaArrow').classList.toggle('open',rottaOpen);
-}
-
-function selectRotta(id){
-  selectedRotta=id==='none'?'':id;
-  document.querySelectorAll('.rotta-opt').forEach(el=>el.classList.remove('active'));
-  if(id!=='none')document.getElementById('ro-'+id)?.classList.add('active');
-  else document.getElementById('ro-none')?.classList.add('active');
-  // Update trigger label
-  if(selectedRotta){
-    const names={egnatia:'Via Egnatia',serenissima:'Rotta Serenissima',illiriche:'Terre Illiriche',greche:'Colonie Greche'};
-    document.getElementById('rotta-trigger-name').textContent=names[selectedRotta]||'Collega a una rotta storica';
-  } else {
-    document.getElementById('rotta-trigger-name').textContent='Collega a una rotta storica';
-  }
-  rottaOpen=false;
-  document.getElementById('rottaOptions').classList.remove('open');
-  document.getElementById('rottaArrow').classList.remove('open');
-}
-
-// VISIBILITY
-function setVis(v){
-  currentVis=v;
-  ['pub','priv','share'].forEach(k=>{
-    document.getElementById('vis-'+k).classList.toggle('active',
-      (v==='public'&&k==='pub')||(v==='private'&&k==='priv')||(v==='share'&&k==='share'));
-  });
-}
-
-// SAVE
-function onNameChange(){
-  updateSaveBtn();
-}
-
-function updateSaveBtn(){
-  const name=document.getElementById('poiName').value.trim();
+/* ══════════════════════════════════
+   ADD POI LOGIC
+══════════════════════════════════ */
+function checkSave(){
+  const v=document.getElementById('poiNameIn').value.trim();
   const btn=document.getElementById('saveBtn');
-  const hint=document.getElementById('save-hint-txt');
-  btn.disabled=!name;
-  hint.style.display=name?'none':'block';
+  btn.className='save-btn'+(v?' ready':'');
+  btn.textContent=v?T[lang].save_ready:T[lang].save_disabled;
+}
+function updateChar(){
+  const l=document.getElementById('storyIn').value.length;
+  document.getElementById('charCount').textContent=l+' / 200';
+}
+let catSel=0;
+function toggleCat(el){
+  const max=3;
+  if(el.classList.contains('sel')){el.classList.remove('sel');catSel--;}
+  else if(catSel<max){el.classList.add('sel');catSel++;}
+  document.getElementById('catCount').textContent=catSel+' / 3';
+}
+function toggleList(el){
+  document.querySelectorAll('#addPoiSheet .list-scroll .chip').forEach(c=>c.classList.remove('sel-b'));
+  el.classList.add('sel-b');
+}
+function toggleRoutes(btn){
+  const opts=btn.nextElementSibling;
+  const open=opts.classList.toggle('open');
+  btn.querySelector('#routeArrow, span:last-child').textContent=open?'▴':'▾';
+}
+function selectRoute(el,val){
+  document.querySelectorAll('.route-opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+  const label=document.getElementById('routeLabel');
+  if(label) label.textContent=el.textContent;
+  el.closest('.route-options').classList.remove('open');
+}
+function setLocTab(tab,type){
+  document.querySelectorAll('.loc-tab').forEach(t=>t.classList.remove('active'));
+  tab.classList.add('active');
+}
+function setVis(el){
+  el.closest('.vis-row').querySelectorAll('.vis-opt').forEach(v=>v.classList.remove('sel'));
+  el.classList.add('sel');
+  // Update hint for itinerary stop
+  const hint=document.getElementById('visHintStop');
+  if(hint){
+    hint.textContent = el.dataset.t==='itin_pub'
+      ? T[lang].itin_vis_hint
+      : '🔒 Privato = visibile solo con link. Ogni partecipante richiede approvazione del creatore.';
+  }
+}
+function selectPhoto(slot,idx){
+  slot.innerHTML='<span style="font-size:22px">✅</span><span class="slot-lbl" style="color:var(--green)">Aggiunto</span>';
+  slot.style.borderColor='var(--green)';
+  slot.style.background='#F0FDF4';
 }
 
-function updateCount(){
-  const v=document.getElementById('poiDesc').value.length;
-  document.getElementById('descCount').textContent=`${v} / 200`;
-}
-
-function savePOI(){
-  const name=document.getElementById('poiName').value.trim();
-  if(!name)return;
-  const desc=document.getElementById('poiDesc').value.trim();
+/* ══════════════════════════════════
+   GOOGLE MAPS
+══════════════════════════════════ */
+function openGoogleMaps(){
   const center=map.getCenter();
-  addedPOIs.push({
-    id:Date.now(),
-    lat:center.lat+(Math.random()-.5)*.003,
-    lng:center.lng+(Math.random()-.5)*.003,
-    name:{it:name,sq:name,en:name},
-    desc:{it:desc||'Luogo aggiunto dalla community.',sq:desc||'Vend i komunitetit.',en:desc||'Community place.'},
-    cats:selectedCats,
-    photos:photosFilled.map((f,i)=>f?demoPhotos[i]:null).filter(Boolean),
-    author:'@tu',avatar:'https://i.pravatar.cc/60?img=1',
-    love_count:0,loved:false
-  });
-  clearInterval(timerInterval);
-  closeAllSheets();
-  renderMarkers();
-  setTimeout(()=>{
-    document.getElementById('successOverlay').classList.add('show');
-  },300);
+  // Google Maps "Aggiungi un luogo mancante" URL
+  const url=`https://maps.google.com/maps?q=${center.lat},${center.lng}&ll=${center.lat},${center.lng}&z=17&action=INTERESTED_PLACE_LISTING`;
+  window.open(url,'_blank');
 }
 
-function closeSuccess(){
-  document.getElementById('successOverlay').classList.remove('show');
+/* ══════════════════════════════════
+   PROFILE
+══════════════════════════════════ */
+function togglePOIVis(btn){
+  const t=T[lang];
+  if(btn.textContent===t.pca_vis||btn.textContent==='Make Public'||btn.textContent==='Publike'){
+    btn.textContent=T[lang].pca_vis2||'Privato';
+    btn.closest('.poi-card').querySelector('.poi-card-img-overlay').textContent='🌍 Pubblico';
+  } else {
+    btn.textContent=T[lang].pca_vis||'Pubblica';
+    btn.closest('.poi-card').querySelector('.poi-card-img-overlay').textContent='🔒 Privato';
+  }
 }
 
-// ── SHEET UTILS ───────────────────────────────────────────────────────────────
-function openSheet(id){
-  closeAllSheets(false);
-  document.getElementById(id).classList.add('open');
-  document.getElementById('backdrop').classList.add('visible');
-  document.getElementById('fab').classList.add('open');
-}
-
-function closeAllSheets(resetFab=true){
-  document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('open'));
-  document.getElementById('backdrop').classList.remove('visible');
-  if(resetFab)document.getElementById('fab').classList.remove('open');
-  clearInterval(timerInterval);
-}
-
-// ── LANGUAGE ─────────────────────────────────────────────────────────────────
-const OB={
-  it:{sub:'La mappa dei luoghi che ami davvero.\nNon quella sponsorizzata.',btn:'Esplora la mappa →',hint:'Tappa un ♥ per vedere un luogo.\nPremi + per aggiungere il tuo.'},
-  sq:{sub:'Harta e vendeve që i do me të vërtetë.\nJo ajo me sponsorizime.',btn:'Eksploro hartën →',hint:'Trokis ♥ për të parë një vend.\nShtyp + për të shtuar tëndin.'},
-  en:{sub:'The map of places you truly love.\nNot the sponsored one.',btn:'Explore the map →',hint:'Tap a ♥ to see a place.\nPress + to add yours.'},
-};
-
-function setLang(l){
-  lang=l;
-  document.querySelectorAll('.ob-lang').forEach(b=>b.classList.remove('active'));
-  document.querySelector(`.ob-lang[onclick="setLang('${l}')"]`)?.classList.add('active');
-  document.getElementById('ob-sub').textContent=OB[l].sub;
-  document.getElementById('ob-btn').textContent=OB[l].btn;
-  document.getElementById('ob-hint').textContent=OB[l].hint;
-  document.getElementById('langToggle').textContent=l.toUpperCase();
-  renderCats();renderLists();
-}
-
-function cycleLang(){
-  const ls=['it','sq','en'];
-  setLang(ls[(ls.indexOf(lang)+1)%3]);
-}
-
-function applyAddLang(){
-  const ph={it:'L\'anima di questo posto… perché merita di essere ricordato?',
-             sq:'Shpirti i këtij vendi… pse meriton të kujtohet?',
-             en:'The soul of this place… why does it deserve to be remembered?'};
-  document.getElementById('poiDesc').placeholder=ph[lang];
-}
-
-function enterApp(){
-  document.getElementById('onboarding').classList.add('hide');
-  setTimeout(()=>{document.getElementById('onboarding').style.display='none';},500);
-  showToast('♥ Tappa un luogo o tieni premuto sulla mappa');
-}
-
-function centerMap(){map.flyTo([41.3289,19.8199],15,{duration:1.2})}
-
-function showToast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2500);
-}
-
-window.addEventListener('load',initMap);
+/* ══════════════════════════════════
+   INIT
+══════════════════════════════════ */
+window.addEventListener('DOMContentLoaded',()=>{
+  initMap();
+  applyLang(lang);
+});
 </script>
 </body>
 </html>
