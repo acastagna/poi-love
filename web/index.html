@@ -266,8 +266,8 @@ button{touch-action:manipulation}
 .poi-card-btn{width:22px;height:22px;border-radius:6px;border:none;background:#f5f0e8;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted);transition:all .15s}
 .pcb-del:active{background:#FEE2E2;color:var(--red)}
 
-/* PUBLIC TOGGLE BUTTON — grande e chiaro */
-.pub-toggle-card{background:linear-gradient(135deg,var(--blue) 0%,#1a3d6e 100%);border-radius:14px;padding:16px 18px;cursor:pointer;display:flex;align-items:center;gap:14px;border:none;width:100%;text-align:left;margin-bottom:24px;box-shadow:0 4px 16px rgba(40,94,167,.35);transition:transform .15s}
+/* PUBLIC TOGGLE BUTTON — verde */
+.pub-toggle-card{background:linear-gradient(135deg,#16A34A 0%,#14532d 100%);border-radius:14px;padding:16px 18px;cursor:pointer;display:flex;align-items:center;gap:14px;border:none;width:100%;text-align:left;margin-bottom:24px;box-shadow:0 4px 16px rgba(22,163,74,.35);transition:transform .15s}
 .pub-toggle-card:active{transform:scale(.98)}
 .pub-toggle-icon{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;flex-shrink:0}
 .pub-toggle-text{flex:1}
@@ -275,12 +275,31 @@ button{touch-action:manipulation}
 .pub-toggle-sub{font-size:11px;color:rgba(255,255,255,.7);line-height:1.4}
 .pub-toggle-arrow{color:rgba(255,255,255,.6);font-size:18px;flex-shrink:0}
 
+/* AVATAR LIVELLO — sezione trasformazione */
+.avatar-level-section{padding:0 20px 20px;background:var(--card)}
+.level-section-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.level-env-row{display:flex;gap:8px}
+.level-env-card{flex:1;border-radius:12px;overflow:hidden;cursor:pointer;border:2.5px solid transparent;transition:all .2s;position:relative}
+.level-env-card.active{border-color:var(--red)}
+.level-env-card img{width:100%;aspect-ratio:1;object-fit:cover;display:block}
+.level-env-label{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.65));color:#fff;font-size:9px;font-weight:700;padding:12px 6px 5px;text-align:center}
+.level-env-card.active::after{content:'✓';position:absolute;top:5px;right:6px;background:var(--red);color:#fff;border-radius:50%;width:16px;height:16px;font-size:9px;font-weight:900;display:flex;align-items:center;justify-content:center}
+.level-ai-btn{width:100%;margin-top:10px;padding:9px;background:#EBF2FC;border:1.5px dashed var(--blue);border-radius:10px;font-size:11px;font-weight:700;color:var(--blue);cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px}
+
 /* PUBLIC PROFILE */
 .public-profile-view{display:none}
 .pub-header{background:linear-gradient(160deg,#285EA7 0%,#1a3d6e 100%);padding:52px 20px 30px;text-align:center;position:relative}
 .back-btn{position:absolute;top:14px;left:14px;border:none;background:rgba(255,255,255,.2);border-radius:20px;padding:6px 12px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px}
 .back-profile-btn{position:absolute;top:14px;right:14px;border:none;background:rgba(255,255,255,.2);border-radius:20px;padding:6px 12px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px}
-.pub-follow-btn{background:#fff;color:var(--blue);border:none;border-radius:20px;padding:8px 20px;font-size:13px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+/* Azioni profilo pubblico: Segui / Collegati / Blocca */
+.pub-actions{display:flex;gap:8px;justify-content:center;margin-top:14px;flex-wrap:wrap}
+.pub-action-btn{height:36px;padding:0 16px;border-radius:18px;border:none;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px;transition:all .18s}
+.pub-action-btn.follow{background:#fff;color:var(--blue)}
+.pub-action-btn.follow.active{background:#EBF2FC;color:var(--blue);border:1.5px solid var(--blue)}
+.pub-action-btn.connect{background:rgba(255,255,255,.18);color:#fff;border:1.5px solid rgba(255,255,255,.4)}
+.pub-action-btn.connect.active{background:#fff;color:#16A34A}
+.pub-action-btn.block{background:rgba(220,38,38,.2);color:#FCA5A5;border:1.5px solid rgba(220,38,38,.3)}
+.pub-action-btn.block.active{background:#DC2626;color:#fff}
 
 /* FOLLOWERS / BLOCCATI */
 .social-tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:14px}
@@ -328,8 +347,74 @@ button{touch-action:manipulation}
 .sos-option i{font-size:20px;flex-shrink:0}
 .sos-moderation-note{background:#EBF2FC;border-radius:10px;padding:12px;font-size:11px;color:var(--blue);line-height:1.6;margin-top:8px}
 
-/* ITIN VIEW */
+/* ── ITIN VIEW ── */
 .itin-view{background:var(--bg)}
+.itin-topbar{position:sticky;top:0;z-index:10;background:var(--bg);padding:52px 20px 12px;display:flex;align-items:center;justify-content:space-between}
+.itin-title{font-size:22px;font-weight:900;color:var(--text)}
+.itin-new-btn{height:34px;padding:0 14px;border-radius:17px;background:var(--red);border:none;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px}
+/* Ricerca destinazione */
+.itin-search-wrap{padding:0 20px 14px;position:relative}
+.itin-search{width:100%;background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:11px 14px 11px 38px;font-size:13px;font-family:inherit;outline:none;color:var(--text)}
+.itin-search:focus{border-color:var(--blue)}
+.itin-search-icon{position:absolute;left:32px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--muted);pointer-events:none}
+.itin-ac-drop{position:absolute;top:100%;left:20px;right:20px;background:var(--card);border:1.5px solid var(--blue);border-radius:11px;box-shadow:0 8px 24px rgba(0,0,0,.14);z-index:20;overflow:hidden;display:none}
+.itin-ac-drop.open{display:block}
+/* Trip cards */
+.itin-cards{padding:0 20px;display:flex;flex-direction:column;gap:14px;padding-bottom:20px}
+.trip-card{border-radius:18px;overflow:hidden;background:var(--card);box-shadow:0 4px 20px rgba(0,0,0,.09);cursor:pointer;transition:transform .18s}
+.trip-card:active{transform:scale(.98)}
+.trip-cover{height:140px;background-size:cover;background-position:center;position:relative}
+.trip-cover-overlay{position:absolute;inset:0;background:linear-gradient(transparent 30%,rgba(0,0,0,.62))}
+.trip-cover-badge{position:absolute;top:12px;left:12px;background:rgba(255,255,255,.22);backdrop-filter:blur(8px);border-radius:10px;padding:4px 10px;font-size:10px;font-weight:800;color:#fff;display:flex;align-items:center;gap:5px}
+.trip-cover-dates{position:absolute;bottom:10px;left:14px;font-size:11px;font-weight:700;color:rgba(255,255,255,.85)}
+.trip-cover-vis{position:absolute;top:12px;right:12px;font-size:11px;font-weight:700;color:#fff;background:rgba(255,255,255,.2);border-radius:8px;padding:3px 8px}
+.trip-body{padding:14px 16px 16px}
+.trip-name{font-size:17px;font-weight:900;color:var(--text);margin-bottom:6px}
+.trip-meta{display:flex;gap:14px;font-size:11px;color:var(--muted);margin-bottom:12px}
+.trip-meta span{display:flex;align-items:center;gap:4px}
+.trip-footer{display:flex;align-items:center;gap:8px}
+.trip-companions{display:flex}
+.trip-comp-av{width:24px;height:24px;border-radius:50%;border:2px solid var(--card);overflow:hidden;margin-left:-6px}
+.trip-comp-av:first-child{margin-left:0}
+.trip-comp-av img{width:100%;height:100%;object-fit:cover}
+.trip-open-btn{margin-left:auto;height:30px;padding:0 14px;background:var(--blue);color:#fff;border:none;border-radius:15px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit}
+/* Timeline stops (dentro il trip detail) */
+.trip-detail{display:none;padding:0 20px 16px}
+.trip-detail.open{display:block}
+.trip-detail-header{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin:12px 0 10px}
+.stop-row{display:flex;gap:10px;margin-bottom:12px;position:relative}
+.stop-row::before{content:'';position:absolute;left:13px;top:30px;width:2px;height:calc(100% + 4px);background:var(--border)}
+.stop-row:last-child::before{display:none}
+.stop-dot{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;z-index:1}
+.stop-info{flex:1;background:#f5f0e8;border-radius:10px;padding:10px 12px}
+.stop-name{font-size:13px;font-weight:700;color:var(--text)}
+.stop-date{font-size:10px;color:var(--muted);margin-top:2px}
+.stop-status{font-size:9px;font-weight:700;padding:2px 7px;border-radius:5px;margin-top:4px;display:inline-block}
+.stop-status.planned{background:#EBF2FC;color:var(--blue)}
+.stop-status.done{background:#DCFCE7;color:#16A34A}
+/* Mini calendario compatto */
+.mini-cal{background:var(--card);border-radius:12px;padding:12px 14px;margin-bottom:14px}
+.mini-cal-header{display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:800;color:var(--text);margin-bottom:8px}
+.mini-cal-days{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center}
+.cal-day-lbl{font-size:8px;color:var(--muted);font-weight:700;padding:3px 0}
+.cal-day{font-size:10px;padding:4px 2px;border-radius:6px;cursor:pointer;transition:background .12s}
+.cal-day:hover{background:#f5f0e8}
+.cal-day.trip-day{background:#EBF2FC;color:var(--blue);font-weight:700}
+.cal-day.today{background:var(--red);color:#fff;font-weight:900}
+.cal-day.stop-day{background:#DCFCE7;color:#16A34A;font-weight:700}
+/* Chat Liri */
+.liri-chat-section{margin:0 20px 20px;background:var(--card);border-radius:16px;overflow:hidden}
+.liri-chat-header{background:linear-gradient(135deg,var(--blue),#1a3d6e);padding:12px 16px;display:flex;align-items:center;gap:10px}
+.liri-avatar{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:18px}
+.liri-chat-title{color:#fff;font-size:13px;font-weight:800}
+.liri-chat-sub{color:rgba(255,255,255,.7);font-size:10px}
+.liri-chat-msgs{padding:12px 14px;min-height:80px;max-height:200px;overflow-y:auto}
+.liri-msg{margin-bottom:10px}
+.liri-msg.liri{background:#EBF2FC;border-radius:0 12px 12px 12px;padding:8px 12px;font-size:12px;color:var(--text);line-height:1.5;max-width:85%}
+.liri-msg.user{background:#FFF0F0;border-radius:12px 12px 0 12px;padding:8px 12px;font-size:12px;color:var(--text);line-height:1.5;max-width:85%;margin-left:auto}
+.liri-chat-input{display:flex;gap:8px;padding:10px 14px;border-top:1px solid var(--border)}
+.liri-input{flex:1;background:#f5f0e8;border:none;border-radius:20px;padding:8px 14px;font-size:12px;font-family:inherit;outline:none;color:var(--text)}
+.liri-send-btn{width:34px;height:34px;border-radius:17px;background:var(--blue);border:none;color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 
 /* TOAST */
 .toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%) translateY(20px);background:#1C1C1C;color:#fff;border-radius:20px;padding:10px 20px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
@@ -384,7 +469,7 @@ button{touch-action:manipulation}
     <i class="ph-fill ph-map-trifold"></i><span class="nav-lbl" data-t="nav_map">Mappa</span>
   </button>
   <button class="nav-item" id="nav-itin" onclick="showTab('itin')">
-    <i class="ph-duotone ph-navigation" id="iconItin"></i><span class="nav-lbl" data-t="nav_itin">Itinerari</span>
+    <i class="ph-fill ph-navigation"></i><span class="nav-lbl" data-t="nav_itin">Itinerari</span>
   </button>
   <button class="nav-item" id="nav-profile" onclick="showTab('profile')">
     <i class="ph ph-user-circle"></i><span class="nav-lbl" data-t="nav_profile">Profilo</span>
@@ -405,6 +490,20 @@ button{touch-action:manipulation}
       <div class="profile-email">it@altrostile.app</div>
       <div class="prof-badge" id="profBadge" onclick="generateAvatar()"></div>
       <div class="badge-label" id="badgeLabel"></div>
+    </div>
+    <!-- AVATAR TRANSFORMATION — ambienti per livello -->
+    <div class="avatar-level-section">
+      <div class="level-section-lbl">
+        <span><i class="ph ph-sparkle" style="color:var(--red);margin-right:3px"></i> Scegli il tuo ambiente — <span id="levelNameLbl">Amatore</span></span>
+        <span style="color:var(--muted);font-weight:400;font-size:9px">AI genererà il tuo avatar</span>
+      </div>
+      <div class="level-env-row" id="levelEnvRow">
+        <!-- Popolato dinamicamente da JS in base al livello -->
+      </div>
+      <button class="level-ai-btn" onclick="requestAvatarGen()">
+        <i class="ph-duotone ph-magic-wand" style="font-size:15px"></i>
+        Genera 3 avatar AI con questo ambiente
+      </button>
     </div>
     <div class="profile-stats">
       <div class="stat-item">
@@ -573,8 +672,17 @@ button{touch-action:manipulation}
         <i class="ph-fill ph-star" style="color:#FDE68A"></i>
         <span>Amatore · 87 love</span>
       </div>
-      <br>
-      <button class="pub-follow-btn"><i class="ph ph-user-plus"></i> Segui</button>
+      <div class="pub-actions">
+        <button class="pub-action-btn follow" id="pubFollowBtn" onclick="togglePublicFollow()">
+          <i class="ph ph-user-plus"></i> <span id="pubFollowLbl">Segui</span>
+        </button>
+        <button class="pub-action-btn connect" id="pubConnectBtn" onclick="togglePublicConnect()">
+          <i class="ph ph-handshake"></i> <span id="pubConnectLbl">Collegati</span>
+        </button>
+        <button class="pub-action-btn block" id="pubBlockBtn" onclick="togglePublicBlock()">
+          <i class="ph ph-prohibit"></i> <span id="pubBlockLbl">Blocca</span>
+        </button>
+      </div>
     </div>
     <div class="profile-stats">
       <div class="stat-item"><i class="ph ph-map-pin"></i><div class="stat-v">7</div><div class="stat-l">POI pub.</div></div>
@@ -601,18 +709,172 @@ button{touch-action:manipulation}
 
 <!-- ═══ ITINERARY VIEW ═══ -->
 <div class="itin-view" id="itinView">
-  <div style="padding:70px 20px 20px;text-align:center">
-    <div style="background:var(--card);border-radius:20px;padding:32px 24px;box-shadow:0 4px 20px rgba(0,0,0,.08)">
-      <img src="https://poilove.com/img/logo-completo.svg" style="height:26px;margin-bottom:16px" onerror="this.style.display='none'" alt="">
-      <div style="font-size:22px;font-weight:900;color:var(--text);margin-bottom:8px" data-t="itin_h">Itinerari di Viaggio</div>
-      <div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:20px" data-t="itin_desc">Pianifica le tue tappe prima di partire. Trova compagni di viaggio. Trasforma ogni tappa in un POI quando sei sul posto.</div>
-      <a href="itinerari.html" style="display:inline-flex;align-items:center;gap:8px;background:var(--blue);color:#fff;border-radius:12px;padding:12px 24px;font-size:14px;font-weight:700;text-decoration:none;margin-bottom:12px">
-        <i class="ph ph-route" style="font-size:17px"></i>
-        <span data-t="itin_open">Apri Itinerari</span>
-      </a>
-      <div style="font-size:11px;color:var(--muted)" data-t="itin_note">Demo con mappa, mini-calendario, GPS live e compagni.</div>
+
+  <!-- Topbar -->
+  <div class="itin-topbar">
+    <div class="itin-title"><i class="ph-fill ph-navigation" style="color:var(--red);font-size:20px;margin-right:6px"></i>Itinerari</div>
+    <button class="itin-new-btn" onclick="openNewTrip()">
+      <i class="ph ph-plus" style="font-size:14px"></i> Nuovo
+    </button>
+  </div>
+
+  <!-- Ricerca destinazione -->
+  <div class="itin-search-wrap">
+    <i class="ph ph-magnifying-glass itin-search-icon"></i>
+    <input class="itin-search" id="itinSearchIn" type="text"
+      placeholder="Cerca destinazione… es. Sarajevo, Bosnia"
+      oninput="onItinSearch(this.value)" autocomplete="off"/>
+    <div class="itin-ac-drop" id="itinAcDrop"></div>
+  </div>
+
+  <!-- Trip cards -->
+  <div class="itin-cards" id="itinCards">
+
+    <!-- TRIP 1 — Tirana attiva -->
+    <div class="trip-card">
+      <div class="trip-cover" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Pyramid_of_Tirana_2022.jpg/800px-Pyramid_of_Tirana_2022.jpg')">
+        <div class="trip-cover-overlay"></div>
+        <div class="trip-cover-badge"><i class="ph-fill ph-map-pin" style="font-size:11px"></i> Albania</div>
+        <div class="trip-cover-dates">14 – 18 Giu 2026</div>
+        <div class="trip-cover-vis"><i class="ph ph-globe" style="font-size:10px"></i> Pubblico</div>
+      </div>
+      <div class="trip-body">
+        <div class="trip-name">Alla scoperta di Tirana</div>
+        <div class="trip-meta">
+          <span><i class="ph ph-map-pin"></i> 5 tappe</span>
+          <span><i class="ph ph-users"></i> 3 compagni</span>
+          <span><i class="ph ph-heart" style="color:var(--red)"></i> 24 love</span>
+        </div>
+        <div class="trip-footer">
+          <div class="trip-companions">
+            <div class="trip-comp-av"><img src="https://ui-avatars.com/api/?name=Mirela+K&background=285EA7&color=fff&size=48" alt=""></div>
+            <div class="trip-comp-av"><img src="https://ui-avatars.com/api/?name=Liri+V&background=D42B2B&color=fff&size=48" alt=""></div>
+            <div class="trip-comp-av"><img src="https://ui-avatars.com/api/?name=Arben+S&background=22C55E&color=fff&size=48" alt=""></div>
+          </div>
+          <button class="trip-open-btn" onclick="toggleTripDetail('trip1')">
+            <i class="ph ph-caret-down" id="trip1Arrow"></i> Dettaglio
+          </button>
+        </div>
+      </div>
+      <!-- DETAIL ESPANDIBILE -->
+      <div class="trip-detail" id="trip1">
+        <!-- Mini calendario -->
+        <div class="trip-detail-header">Calendario viaggio</div>
+        <div class="mini-cal" id="miniCal1"></div>
+        <!-- Timeline tappe -->
+        <div class="trip-detail-header">Tappe pianificate</div>
+        <div class="stop-row">
+          <div class="stop-dot" style="background:#DCFCE7"><i class="ph-fill ph-check" style="color:#16A34A;font-size:12px"></i></div>
+          <div class="stop-info">
+            <div class="stop-name">Arrivo a Tirana — Rinas Airport</div>
+            <div class="stop-date">Dom 14 Giu · 10:30</div>
+            <span class="stop-status done">✓ Completata</span>
+          </div>
+        </div>
+        <div class="stop-row">
+          <div class="stop-dot" style="background:#EBF2FC"><i class="ph ph-building-columns" style="color:var(--blue);font-size:12px"></i></div>
+          <div class="stop-info">
+            <div class="stop-name">Xhamia Et'hem Beut</div>
+            <div class="stop-date">Lun 15 Giu · mattina</div>
+            <span class="stop-status planned">→ Pianificata</span>
+          </div>
+        </div>
+        <div class="stop-row">
+          <div class="stop-dot" style="background:#FFF7F0"><i class="ph ph-fork-knife" style="color:var(--orange);font-size:12px"></i></div>
+          <div class="stop-info">
+            <div class="stop-name">Pazari i Ri — Pranzo locale</div>
+            <div class="stop-date">Lun 15 Giu · 13:00</div>
+            <span class="stop-status planned">→ Pianificata</span>
+          </div>
+        </div>
+        <div class="stop-row">
+          <div class="stop-dot" style="background:#f5f0e8"><i class="ph ph-triangle" style="color:#7C3AED;font-size:12px"></i></div>
+          <div class="stop-info">
+            <div class="stop-name">Piramida di Tirana</div>
+            <div class="stop-date">Mar 16 Giu · pomeriggio</div>
+            <span class="stop-status planned">→ Pianificata</span>
+          </div>
+        </div>
+        <div class="stop-row">
+          <div class="stop-dot" style="background:#f0fdf4"><i class="ph ph-tree" style="color:#16A34A;font-size:12px"></i></div>
+          <div class="stop-info">
+            <div class="stop-name">Liqeni Artificial — tramonto</div>
+            <div class="stop-date">Mer 17 Giu · 19:00</div>
+            <span class="stop-status planned">→ Pianificata</span>
+          </div>
+        </div>
+        <button class="itin-new-btn" style="width:100%;justify-content:center;margin-top:4px;margin-bottom:12px;background:#f5f0e8;color:var(--blue);font-size:12px" onclick="openAddStop()">
+          <i class="ph ph-plus"></i> Aggiungi tappa
+        </button>
+      </div>
+    </div>
+
+    <!-- TRIP 2 -->
+    <div class="trip-card">
+      <div class="trip-cover" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/New_Bazaar_Tirana.jpg/800px-New_Bazaar_Tirana.jpg')">
+        <div class="trip-cover-overlay"></div>
+        <div class="trip-cover-badge"><i class="ph-fill ph-map-pin" style="font-size:11px"></i> Balcani</div>
+        <div class="trip-cover-dates">Set 2026 — TBD</div>
+        <div class="trip-cover-vis"><i class="ph ph-lock-simple" style="font-size:10px"></i> Privato</div>
+      </div>
+      <div class="trip-body">
+        <div class="trip-name">Rotta dei Balcani Occidentali</div>
+        <div class="trip-meta">
+          <span><i class="ph ph-map-pin"></i> 12 tappe</span>
+          <span><i class="ph ph-users"></i> 1 compagno</span>
+          <span><i class="ph ph-calendar"></i> In pianificazione</span>
+        </div>
+        <div class="trip-footer">
+          <div class="trip-companions">
+            <div class="trip-comp-av"><img src="https://ui-avatars.com/api/?name=Liri+V&background=D42B2B&color=fff&size=48" alt=""></div>
+          </div>
+          <button class="trip-open-btn" onclick="toggleTripDetail('trip2')">
+            <i class="ph ph-caret-down" id="trip2Arrow"></i> Dettaglio
+          </button>
+        </div>
+      </div>
+      <div class="trip-detail" id="trip2">
+        <div class="trip-detail-header">Destinazioni pianificate</div>
+        <div class="stop-row">
+          <div class="stop-dot" style="background:#EBF2FC"><i class="ph ph-map-pin" style="color:var(--blue);font-size:12px"></i></div>
+          <div class="stop-info"><div class="stop-name">Sarajevo, Bosnia</div><div class="stop-date">Data da definire</div><span class="stop-status planned">→ Pianificata</span></div>
+        </div>
+        <div class="stop-row">
+          <div class="stop-dot" style="background:#EBF2FC"><i class="ph ph-map-pin" style="color:var(--blue);font-size:12px"></i></div>
+          <div class="stop-info"><div class="stop-name">Mostar, Bosnia</div><div class="stop-date">Data da definire</div><span class="stop-status planned">→ Pianificata</span></div>
+        </div>
+        <div class="stop-row">
+          <div class="stop-dot" style="background:#EBF2FC"><i class="ph ph-map-pin" style="color:var(--blue);font-size:12px"></i></div>
+          <div class="stop-info"><div class="stop-name">Kotor, Montenegro</div><div class="stop-date">Data da definire</div><span class="stop-status planned">→ Pianificata</span></div>
+        </div>
+        <button class="itin-new-btn" style="width:100%;justify-content:center;margin-top:4px;margin-bottom:12px;background:#f5f0e8;color:var(--blue);font-size:12px" onclick="openAddStop()">
+          <i class="ph ph-plus"></i> Aggiungi tappa
+        </button>
+      </div>
+    </div>
+
+  </div><!-- /itin-cards -->
+
+  <!-- CHAT LIRI — AI Travel Advisor -->
+  <div class="liri-chat-section">
+    <div class="liri-chat-header">
+      <div class="liri-avatar">🌍</div>
+      <div>
+        <div class="liri-chat-title">Liri — Travel Advisor AI</div>
+        <div class="liri-chat-sub">Chiedi consigli su destinazioni, tappe, cultura locale</div>
+      </div>
+    </div>
+    <div class="liri-chat-msgs" id="liriMsgs">
+      <div class="liri-msg liri">Ciao! Sono Liri, la tua guida AI per i Balcani e non solo. Hai domande sul tuo viaggio a Tirana? Posso suggerire tappe, ristoranti, orari e molto altro. 🗺️</div>
+    </div>
+    <div class="liri-chat-input">
+      <input class="liri-input" id="liriInput" type="text"
+        placeholder="es. Cosa vedere a Tirana in 3 giorni?"
+        onkeydown="if(event.key==='Enter')sendLiriMsg()"/>
+      <button class="liri-send-btn" onclick="sendLiriMsg()"><i class="ph ph-paper-plane-tilt"></i></button>
     </div>
   </div>
+
 </div>
 
 <!-- ═══ SHEET: ADD POI ═══ -->
@@ -1015,6 +1277,8 @@ function renderBadge(loves){
   el.innerHTML=`<span style="font-size:14px">${b.hat}</span><span>${b.label} · ${loves} love</span>`;
   const lbl=document.getElementById('badgeLabel');
   if(lbl)lbl.textContent=b.label;
+  // Aggiorna anche gli ambienti del livello
+  renderLevelEnvs(b.label);
 }
 let currentLoves=87;
 
@@ -1916,6 +2180,201 @@ function showSocialTab(tab,btn){
   btn.classList.add('active');
   const panel=document.getElementById('panel-'+tab);
   if(panel)panel.classList.add('active');
+}
+
+/* ══════════════════════════════════════════
+   AVATAR LIVELLI — ambienti per livello
+══════════════════════════════════════════ */
+const LEVEL_ENVS={
+  Amatore:[
+    {img:'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=200&h=200&fit=crop',lbl:'Caffè urbano'},
+    {img:'https://images.unsplash.com/photo-1519999482648-25049ddd37b1?w=200&h=200&fit=crop',lbl:'Mercato locale'},
+    {img:'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=200&h=200&fit=crop',lbl:'Skyline città'},
+  ],
+  Viaggiatore:[
+    {img:'https://images.unsplash.com/photo-1474487548417-781cb71495f3?w=200&h=200&fit=crop',lbl:'Stazione ferroviaria'},
+    {img:'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=200&h=200&fit=crop',lbl:'Porto adriatico'},
+    {img:'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=200&h=200&fit=crop',lbl:'Strada dei Balcani'},
+  ],
+  Avventuriero:[
+    {img:'https://images.unsplash.com/photo-1537652874768-8b91ca0c029f?w=200&h=200&fit=crop',lbl:'Rovine antiche'},
+    {img:'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=200&h=200&fit=crop',lbl:'Foresta profonda'},
+    {img:'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=200&h=200&fit=crop',lbl:'Vetta alpina'},
+  ],
+  Galattico:[
+    {img:'https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=200&h=200&fit=crop',lbl:'Cosmo'},
+    {img:'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=200&h=200&fit=crop',lbl:'Aurora boreale'},
+    {img:'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=200&h=200&fit=crop',lbl:'Isola sospesa'},
+  ],
+};
+let selectedEnvIdx=0;
+function renderLevelEnvs(levelName){
+  const envs=LEVEL_ENVS[levelName]||LEVEL_ENVS['Amatore'];
+  const row=document.getElementById('levelEnvRow');
+  const lbl=document.getElementById('levelNameLbl');
+  if(lbl)lbl.textContent=levelName;
+  if(!row)return;
+  row.innerHTML=envs.map((e,i)=>`
+    <div class="level-env-card${i===selectedEnvIdx?' active':''}" onclick="selectEnv(${i})">
+      <img src="${e.img}" alt="${e.lbl}" loading="lazy"/>
+      <div class="level-env-label">${e.lbl}</div>
+    </div>`).join('');
+}
+function selectEnv(idx){
+  selectedEnvIdx=idx;
+  const badge=getBadge(currentLoves);
+  renderLevelEnvs(badge.label);
+  showToast('Ambiente selezionato!');
+}
+function requestAvatarGen(){
+  showToast('🎨 Generazione avatar AI — disponibile post-lancio');
+}
+
+/* ══════════════════════════════════════════
+   PROFILO PUBBLICO — Segui / Collegati / Blocca
+══════════════════════════════════════════ */
+let pubFollowing=false,pubConnected=false,pubBlocked=false;
+function togglePublicFollow(){
+  pubFollowing=!pubFollowing;
+  const btn=document.getElementById('pubFollowBtn');
+  const lbl=document.getElementById('pubFollowLbl');
+  btn.classList.toggle('active',pubFollowing);
+  btn.querySelector('i').className=pubFollowing?'ph ph-user-check':'ph ph-user-plus';
+  if(lbl)lbl.textContent=pubFollowing
+    ?(lang==='it'?'Segui già':lang==='sq'?'Ndjekës':'Following')
+    :(lang==='it'?'Segui':lang==='sq'?'Ndiq':'Follow');
+  showToast(pubFollowing
+    ?(lang==='it'?'Stai seguendo Alessandro C.':lang==='sq'?'Po ndjek Alessandro C.':'Now following Alessandro C.')
+    :(lang==='it'?'Non segui più Alessandro C.':lang==='sq'?'Nuk ndjek më':'Unfollowed Alessandro C.'));
+}
+function togglePublicConnect(){
+  pubConnected=!pubConnected;
+  const btn=document.getElementById('pubConnectBtn');
+  const lbl=document.getElementById('pubConnectLbl');
+  btn.classList.toggle('active',pubConnected);
+  btn.querySelector('i').className=pubConnected?'ph ph-check-circle':'ph ph-handshake';
+  if(lbl)lbl.textContent=pubConnected
+    ?(lang==='it'?'Amico':lang==='sq'?'Mik':'Friend')
+    :(lang==='it'?'Collegati':lang==='sq'?'Lidhu':'Connect');
+  showToast(pubConnected
+    ?(lang==='it'?'Richiesta di amicizia inviata!':lang==='sq'?'Kërkesë miqësie dërguar!':'Friend request sent!')
+    :(lang==='it'?'Richiesta ritirata':lang==='sq'?'Kërkesa u tërhoq':'Request withdrawn'));
+}
+function togglePublicBlock(){
+  pubBlocked=!pubBlocked;
+  const btn=document.getElementById('pubBlockBtn');
+  const lbl=document.getElementById('pubBlockLbl');
+  btn.classList.toggle('active',pubBlocked);
+  if(lbl)lbl.textContent=pubBlocked
+    ?(lang==='it'?'Bloccato':lang==='sq'?'Bllokuar':'Blocked')
+    :(lang==='it'?'Blocca':lang==='sq'?'Blloko':'Block');
+  if(pubBlocked){
+    pubFollowing=false;pubConnected=false;
+    document.getElementById('pubFollowBtn').classList.remove('active');
+    document.getElementById('pubConnectBtn').classList.remove('active');
+    showToast(lang==='it'?'Utente bloccato. Non vedrà più i tuoi contenuti.':lang==='sq'?'Përdoruesi u bllokua.':'User blocked.');
+  } else {
+    showToast(lang==='it'?'Utente sbloccato':lang==='sq'?'Përdoruesi u zhbllokua':'User unblocked');
+  }
+}
+
+/* ══════════════════════════════════════════
+   ITINERARI — trip detail + mini cal + Liri + search
+══════════════════════════════════════════ */
+function toggleTripDetail(id){
+  const el=document.getElementById(id);
+  const arrow=document.getElementById(id+'Arrow');
+  if(!el)return;
+  el.classList.toggle('open');
+  if(arrow)arrow.className=el.classList.contains('open')?'ph ph-caret-up':'ph ph-caret-down';
+  if(el.classList.contains('open')&&id==='trip1') renderMiniCal('miniCal1',2026,5,14,18);
+}
+function renderMiniCal(elId,year,month,startDay,endDay){
+  const el=document.getElementById(elId);
+  if(!el)return;
+  const today=new Date();
+  const months=['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
+  const days=['L','M','M','G','V','S','D'];
+  const firstDow=new Date(year,month,1).getDay();
+  const offset=(firstDow===0?6:firstDow-1);
+  const daysInMonth=new Date(year,month+1,0).getDate();
+  let html=`<div class="mini-cal-header"><span>${months[month]} ${year}</span></div>
+  <div class="mini-cal-days">${days.map(d=>`<div class="cal-day-lbl">${d}</div>`).join('')}`;
+  for(let i=0;i<offset;i++)html+=`<div></div>`;
+  for(let d=1;d<=daysInMonth;d++){
+    let cls='cal-day';
+    if(today.getDate()===d&&today.getMonth()===month&&today.getFullYear()===year)cls+=' today';
+    else if(d>=startDay&&d<=endDay)cls+=' trip-day';
+    // mark specific stops
+    if(d===14)cls+=' stop-day';
+    html+=`<div class="${cls}">${d}</div>`;
+  }
+  html+='</div>';
+  el.innerHTML=html;
+}
+function openNewTrip(){
+  showToast(lang==='it'?'Crea nuovo viaggio — disponibile nell\'app':lang==='sq'?'Udhëtim i ri — aktiv në aplikacion':'New trip — active in app');
+}
+
+/* ITINERARY SEARCH */
+let itinAcTimer;
+function onItinSearch(val){
+  clearTimeout(itinAcTimer);
+  const drop=document.getElementById('itinAcDrop');
+  if(val.length<2){drop.classList.remove('open');return;}
+  itinAcTimer=setTimeout(()=>{
+    const lat=gpsPos?gpsPos.lat:CENTER[0],lng=gpsPos?gpsPos.lng:CENTER[1];
+    fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(val)}&format=json&limit=5&lat=${lat}&lon=${lng}&addressdetails=1`,{headers:{'Accept-Language':lang}})
+      .then(r=>r.json()).then(results=>{
+        if(!results.length){drop.classList.remove('open');return;}
+        drop.innerHTML=results.slice(0,5).map(r=>`
+          <div class="ac-item" onclick="selectItinDest('${r.display_name.split(',')[0].replace(/'/g,"\\'")}')">
+            <i class="ph ph-map-pin"></i>
+            <div>
+              <div class="ac-item-name">${r.display_name.split(',')[0]}</div>
+              <div class="ac-item-addr">${r.display_name.split(',').slice(1,3).join(',').trim()}</div>
+            </div>
+          </div>`).join('');
+        drop.classList.add('open');
+      }).catch(()=>{});
+  },400);
+}
+function selectItinDest(name){
+  document.getElementById('itinSearchIn').value=name;
+  document.getElementById('itinAcDrop').classList.remove('open');
+  showToast(`🌍 Destinazione: ${name}`);
+}
+document.addEventListener('click',e=>{
+  if(!e.target.closest('#itinAcDrop')&&!e.target.closest('#itinSearchIn'))
+    document.getElementById('itinAcDrop')?.classList.remove('open');
+});
+
+/* LIRI CHAT */
+const LIRI_RESPONSES=[
+  'Ottima scelta! Tirana ha una scena culturale vivacissima. Ti consiglio di visitare il Blloku di mattina presto, quando è ancora tranquillo. 🏙️',
+  'Il Pazari i Ri è il mio posto preferito per pranzo. Prova il "ëmbëlsirë" — i dolci locali sono incredibili! 🍯',
+  'Per gli itinerari nei Balcani, considera di includere Berat e Gjirokastër — entrambe sono patrimonio UNESCO. Vale assolutamente il viaggio! 🏛️',
+  'Il periodo migliore per visitare la regione è aprile-giugno o settembre-ottobre. Evita agosto — molto caldo e affollato.',
+  'Per i compagni di viaggio, nella sezione "Trova compagni" puoi cercare utenti con itinerari simili al tuo. Sono già 47 persone che vanno a Tirana a giugno! 👥',
+  'La valuta locale è il Lek albanese (ALL). Con 1 euro prendi circa 108 Lek. Il contante è ancora molto usato fuori dal centro. 💶',
+];
+let liriRespIdx=0;
+function sendLiriMsg(){
+  const input=document.getElementById('liriInput');
+  const msgs=document.getElementById('liriMsgs');
+  const text=input.value.trim();
+  if(!text)return;
+  // Messaggio utente
+  msgs.innerHTML+=`<div class="liri-msg user">${text}</div>`;
+  input.value='';
+  msgs.scrollTop=msgs.scrollHeight;
+  // Risposta Liri dopo breve delay
+  setTimeout(()=>{
+    const resp=LIRI_RESPONSES[liriRespIdx%LIRI_RESPONSES.length];
+    liriRespIdx++;
+    msgs.innerHTML+=`<div class="liri-msg liri">${resp}</div>`;
+    msgs.scrollTop=msgs.scrollHeight;
+  },800);
 }
 
 /* ══════════════════════════════════════════
