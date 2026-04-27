@@ -6,595 +6,327 @@
 <title>POI•LOVE — Demo</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<!-- Phosphor Icons v2.1.1 — suite ufficiale del progetto -->
 <script src="https://unpkg.com/@phosphor-icons/web@2.1.1/src/index.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 :root{
-  --red:#D42B2B; --blue:#285EA7; --bg:#EAE4D8;
-  --card:#FDFAF5; --text:#1C1C1C; --muted:#6B6B6B;
-  --border:rgba(0,0,0,.09); --green:#22C55E;
+  --red:#D42B2B;--blue:#285EA7;--bg:#EAE4D8;
+  --card:#FDFAF5;--text:#1C1C1C;--muted:#6B6B6B;
+  --border:rgba(0,0,0,.09);--green:#22C55E;--orange:#F97316;
 }
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;font-family:'Inter',sans-serif}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;font-family:'Inter',sans-serif;touch-action:manipulation}
 html,body{height:100%;overflow:hidden;background:var(--bg)}
-i.ph,i.ph-fill{line-height:1}
+i.ph,i.ph-fill{line-height:1;pointer-events:none}
+button{touch-action:manipulation}
 
 /* ── MAP ── */
-#map{position:fixed;inset:0 0 56px 0;z-index:1}
+#map{position:fixed;inset:0 0 56px 0;z-index:1;background:#e8e0d0}
 .leaflet-control-zoom{display:none}
 .leaflet-control-attribution{font-size:9px;opacity:.3}
 
-/* ── TOP BAR ── */
-.topbar{
-  position:fixed;top:0;left:0;right:0;z-index:300;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:10px 14px;pointer-events:none;
-}
-.tb-logo{
-  pointer-events:all;
-  height:34px;background:var(--red);border-radius:17px;
-  padding:0 12px;display:flex;align-items:center;gap:6px;
-  box-shadow:0 3px 14px rgba(212,43,43,.38);cursor:pointer;
-}
+/* ── TOPBAR ── */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:300;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;pointer-events:none}
+.tb-logo{pointer-events:all;height:34px;background:var(--red);border-radius:17px;padding:0 12px;display:flex;align-items:center;gap:6px;box-shadow:0 3px 14px rgba(212,43,43,.38);cursor:pointer}
 .tb-logo img{height:20px;filter:brightness(0) invert(1)}
 .tb-logo-txt{color:#fff;font-size:13px;font-weight:800;letter-spacing:.2px}
 .tb-right{display:flex;gap:7px;pointer-events:all}
-.tb-btn{
-  height:34px;border-radius:17px;background:var(--card);border:none;
-  cursor:pointer;display:flex;align-items:center;justify-content:center;
-  box-shadow:0 2px 10px rgba(0,0,0,.13);padding:0 12px;
-  font-size:11px;font-weight:700;color:var(--blue);gap:5px;transition:transform .15s
-}
+.tb-btn{height:34px;border-radius:17px;background:var(--card);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,.13);padding:0 12px;font-size:11px;font-weight:700;color:var(--blue);gap:5px;transition:transform .15s}
 .tb-btn:active{transform:scale(.93)}
 .tb-btn.icon-only{width:34px;padding:0;color:var(--muted);font-size:18px}
 
-/* ── MAP TYPE SELECTOR ── */
-.map-types{
-  position:fixed;top:56px;left:14px;z-index:200;
-  display:flex;gap:5px;
-}
-.mt-btn{
-  height:28px;padding:0 10px;border-radius:8px;
-  background:var(--card);border:none;cursor:pointer;
-  font-size:10px;font-weight:700;color:var(--muted);
-  box-shadow:0 2px 8px rgba(0,0,0,.1);transition:all .15s
-}
+/* ── MAP TYPES ── */
+.map-types{position:fixed;top:56px;left:14px;z-index:200;display:flex;gap:5px}
+.mt-btn{height:28px;padding:0 10px;border-radius:8px;background:var(--card);border:none;cursor:pointer;font-size:10px;font-weight:700;color:var(--muted);box-shadow:0 2px 8px rgba(0,0,0,.1);transition:all .15s}
 .mt-btn.active{background:var(--blue);color:#fff}
 .mt-btn.route-active{background:#7C3AED;color:#fff}
 
 /* ── FAB ── */
-.fab{
-  position:fixed;bottom:70px;left:50%;transform:translateX(-50%);
-  z-index:250;width:60px;height:60px;border-radius:30px;
-  background:var(--red);border:none;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:0 6px 22px rgba(212,43,43,.45);
-  font-size:28px;color:#fff;transition:transform .25s,background .25s
-}
+.fab{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);z-index:250;width:60px;height:60px;border-radius:30px;background:var(--red);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 22px rgba(212,43,43,.45);font-size:28px;color:#fff;transition:transform .25s,background .25s}
 .fab.open{transform:translateX(-50%) rotate(45deg)}
-.fab-menu{
-  position:fixed;bottom:140px;left:50%;transform:translateX(-50%) translateY(10px);
-  z-index:249;display:flex;flex-direction:column;gap:9px;align-items:center;
-  opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;
-}
+.fab-menu{position:fixed;bottom:140px;left:50%;transform:translateX(-50%) translateY(10px);z-index:249;display:flex;flex-direction:column;gap:9px;align-items:center;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
 .fab-menu.open{opacity:1;pointer-events:all;transform:translateX(-50%) translateY(0)}
-.fab-opt{
-  background:var(--card);border:none;border-radius:22px;
-  padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;
-  display:flex;align-items:center;gap:8px;
-  box-shadow:0 4px 18px rgba(0,0,0,.14);white-space:nowrap;transition:transform .15s
-}
+.fab-opt{background:var(--card);border:none;border-radius:22px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px;box-shadow:0 4px 18px rgba(0,0,0,.14);white-space:nowrap;transition:transform .15s}
 .fab-opt:active{transform:scale(.96)}
-.fab-opt-icon{
-  width:30px;height:30px;border-radius:15px;
-  display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0
-}
+.fab-opt-icon{width:30px;height:30px;border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
 
 /* ── BOTTOM NAV ── */
-.bottom-nav{
-  position:fixed;bottom:0;left:0;right:0;z-index:300;
-  height:56px;background:var(--card);border-top:1px solid var(--border);
-  display:flex;align-items:stretch;box-shadow:0 -3px 16px rgba(0,0,0,.08);
-}
-.nav-item{
-  flex:1;display:flex;flex-direction:column;align-items:center;
-  justify-content:center;gap:3px;border:none;background:none;
-  cursor:pointer;padding:4px 0;transition:opacity .15s
-}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:300;height:56px;background:var(--card);border-top:1px solid var(--border);display:flex;align-items:stretch;box-shadow:0 -3px 16px rgba(0,0,0,.08)}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:none;background:none;cursor:pointer;padding:4px 0;transition:opacity .15s}
 .nav-item i{font-size:22px;color:var(--muted);transition:color .15s}
 .nav-item .nav-lbl{font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.3px;transition:color .15s}
 .nav-item.active i,.nav-item.active .nav-lbl{color:var(--red)}
+
+/* ── VIEWS ── */
+.profile-view,.itin-view{position:fixed;inset:0 0 56px 0;z-index:100;background:var(--bg);overflow-y:auto;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.72,0,1);-webkit-overflow-scrolling:touch}
+.profile-view.active,.itin-view.active{transform:translateY(0)}
 
 /* ── SHEETS ── */
 .sheet-overlay{position:fixed;inset:0;z-index:400;pointer-events:none}
 .sheet-backdrop{position:absolute;inset:0;background:rgba(0,0,0,0);transition:background .35s;pointer-events:none}
 .sheet-backdrop.vis{background:rgba(0,0,0,.42);pointer-events:all}
-.sheet{
-  position:absolute;bottom:0;left:0;right:0;background:var(--card);
-  border-radius:24px 24px 0 0;padding:0 0 52px;
-  transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.72,0,1);
-  pointer-events:all;max-height:94vh;overflow-y:auto;-webkit-overflow-scrolling:touch
-}
+.sheet{position:absolute;bottom:0;left:0;right:0;background:var(--card);border-radius:24px 24px 0 0;padding:0 0 52px;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.72,0,1);pointer-events:all;max-height:94vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .sheet.open{transform:translateY(0)}
-.sh-handle{width:40px;height:4px;background:#C8BFB0;border-radius:2px;margin:12px auto 0}
+.sh-handle{width:44px;height:5px;background:#C8BFB0;border-radius:3px;margin:14px auto 4px;cursor:grab;flex-shrink:0}
 .sh-head{display:flex;align-items:flex-start;justify-content:space-between;padding:14px 20px 0}
 .sh-title{font-size:19px;font-weight:800;color:var(--text);line-height:1.2}
 .sh-sub{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.4}
-.sh-close{
-  width:28px;height:28px;border-radius:14px;background:#f0ece4;
-  border:none;cursor:pointer;font-size:16px;color:var(--muted);
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px
-}
+.sh-close{width:32px;height:32px;border-radius:16px;background:#ede7dc;border:none;cursor:pointer;font-size:17px;color:var(--muted);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;pointer-events:all}
 .sh-body{padding:14px 20px 0}
-.sh-timer{
-  display:flex;align-items:center;gap:5px;background:#FFF5F5;
-  border:1px solid #F7C1C1;border-radius:20px;padding:5px 10px;
-  font-size:12px;font-weight:700;color:var(--red);flex-shrink:0
-}
-.congrats{
-  background:#EAF3DE;border:1px solid #C0DD97;border-radius:10px;
-  padding:8px 12px;font-size:12px;color:#3B6D11;font-weight:500;
-  margin:8px 20px 0;line-height:1.4;display:none
-}
+.sh-timer{display:flex;align-items:center;gap:5px;background:#FFF5F5;border:1px solid #F7C1C1;border-radius:20px;padding:5px 10px;font-size:12px;font-weight:700;color:var(--red);flex-shrink:0}
+.congrats{background:#EAF3DE;border:1px solid #C0DD97;border-radius:10px;padding:8px 12px;font-size:12px;color:#3B6D11;font-weight:500;margin:8px 20px 0;line-height:1.4;display:none}
 .congrats.show{display:block}
-.sec-lbl{
-  font-size:10px;font-weight:700;color:var(--muted);
-  text-transform:uppercase;letter-spacing:.6px;margin-bottom:7px;
-  display:flex;align-items:center;justify-content:space-between
-}
+.sec-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:7px;display:flex;align-items:center;justify-content:space-between}
 .req-badge{background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:5px}
-.field-in{
-  width:100%;background:#f5f0e8;border:1.5px solid #E0D8CC;
-  border-radius:11px;padding:12px 14px;font-size:15px;
-  font-family:inherit;color:var(--text);outline:none;margin-bottom:14px;transition:border-color .2s
-}
+.field-in{width:100%;background:#f5f0e8;border:1.5px solid #E0D8CC;border-radius:11px;padding:12px 14px;font-size:15px;font-family:inherit;color:var(--text);outline:none;margin-bottom:4px;transition:border-color .2s}
 .field-in:focus{border-color:var(--red)}
 .field-in::placeholder{color:#B0A090}
-.field-ta{resize:none;height:72px;font-size:13px}
+.field-ta{resize:none;height:80px;font-size:13px;margin-bottom:4px}
+
+/* AUTOCOMPLETE */
+.autocomplete-wrap{position:relative;margin-bottom:14px}
+.autocomplete-drop{position:absolute;top:100%;left:0;right:0;background:var(--card);border:1.5px solid var(--red);border-radius:11px;box-shadow:0 8px 24px rgba(0,0,0,.14);z-index:10;overflow:hidden;display:none}
+.autocomplete-drop.open{display:block}
+.ac-item{padding:11px 14px;font-size:13px;font-weight:500;color:var(--text);cursor:pointer;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:9px}
+.ac-item:last-child{border-bottom:none}
+.ac-item:active{background:#f5f0e8}
+.ac-item i{font-size:14px;color:var(--blue);flex-shrink:0}
+.ac-item-name{font-weight:600;font-size:13px}
+.ac-item-addr{font-size:11px;color:var(--muted);margin-top:1px}
+
+/* VOICE */
+.story-wrap{position:relative;margin-bottom:14px}
+.story-actions{display:flex;gap:6px;margin-bottom:7px;align-items:center;justify-content:flex-end}
+.voice-btn{height:30px;padding:0 11px;border-radius:15px;border:1.5px solid #E0D8CC;background:#f5f0e8;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .2s}
+.voice-btn.recording{background:#FFF0F0;border-color:var(--red);color:var(--red);animation:pulse 1s infinite}
+.ai-btn{height:30px;padding:0 11px;border-radius:15px;border:1.5px solid #E0D8CC;background:#f5f0e8;font-size:12px;font-weight:700;color:var(--blue);cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .2s}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
 
 /* LOCATION TABS */
 .loc-tabs{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;margin-bottom:8px}
-.loc-tab{
-  flex-shrink:0;padding:7px 11px;border-radius:9px;
-  border:1.5px solid #E0D8CC;background:#f5f0e8;
-  font-size:10px;font-weight:700;color:#5C4D3A;cursor:pointer;
-  white-space:nowrap;font-family:inherit;transition:all .15s;
-  display:flex;align-items:center;gap:5px
-}
+.loc-tab{flex-shrink:0;padding:7px 11px;border-radius:9px;border:1.5px solid #E0D8CC;background:#f5f0e8;font-size:10px;font-weight:700;color:#5C4D3A;cursor:pointer;white-space:nowrap;font-family:inherit;transition:all .15s;display:flex;align-items:center;gap:5px}
 .loc-tab.active{background:#EBF2FC;border-color:var(--blue);color:var(--blue)}
 .loc-tab i{font-size:12px}
-.loc-result{
-  background:#f5f0e8;border-radius:10px;padding:9px 12px;
-  display:flex;align-items:center;gap:10px;margin-bottom:14px
-}
-.loc-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0}
+.loc-result{background:#f5f0e8;border-radius:10px;padding:9px 12px;display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.loc-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;animation:locpulse 2s infinite}
+@keyframes locpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.4)}}
 .loc-street{font-size:13px;font-weight:600;color:var(--text)}
-.loc-coords{font-size:10px;color:var(--muted);margin-top:1px}
+.loc-coords{font-size:10px;color:var(--muted);margin-top:1px;font-family:monospace}
 
 /* PHOTOS */
 .photo-row{display:flex;gap:8px;margin-bottom:14px}
-.photo-slot{
-  flex:1;aspect-ratio:1;border-radius:10px;background:#f5f0e8;
-  border:1.5px dashed #C8BFB0;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:4px;cursor:pointer;
-  font-size:20px;transition:border-color .15s;color:var(--muted);
-}
-.photo-slot:active{border-color:var(--red)}
+.photo-slot{flex:1;aspect-ratio:1;border-radius:10px;background:#f5f0e8;border:1.5px dashed #C8BFB0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;font-size:20px;transition:all .2s;color:var(--muted);overflow:hidden;position:relative}
+.photo-slot:active{border-color:var(--red);transform:scale(.97)}
 .photo-slot .slot-lbl{font-size:9px;font-weight:700;color:var(--muted)}
+.photo-slot.has-photo{border-style:solid;border-color:var(--green)}
+.photo-slot .ph-preview{position:absolute;inset:0;background-size:cover;background-position:center;border-radius:9px}
+.photo-slot .ph-remove{position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;background:rgba(0,0,0,.5);border:none;cursor:pointer;color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center}
 .photo-hint{font-size:10px;color:var(--muted);font-style:italic;margin-bottom:14px;line-height:1.4}
 
 /* CHIPS */
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
-.chip{
-  padding:6px 12px;border-radius:12px;border:1.5px solid #E0D8CC;
-  background:#f5f0e8;font-size:11px;font-weight:600;color:#5C4D3A;
-  cursor:pointer;transition:all .15s;font-family:inherit
-}
+.chip{padding:6px 12px;border-radius:12px;border:1.5px solid #E0D8CC;background:#f5f0e8;font-size:11px;font-weight:600;color:#5C4D3A;cursor:pointer;transition:all .15s;font-family:inherit}
 .chip.sel{background:#FFF0F0;border-color:var(--red);color:var(--red)}
 .chip.sel-b{background:#EBF2FC;border-color:var(--blue);color:var(--blue)}
+.chip.chip-add{border-style:dashed;color:var(--blue)}
 .list-scroll{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;margin-bottom:14px}
 
+/* TAG INLINE INPUT */
+.tag-chips-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.tag-chip-inline{padding:5px 10px;border-radius:10px;background:#f5f0e8;border:1.5px solid #E0D8CC;font-size:11px;font-weight:600;color:#5C4D3A;cursor:default;display:inline-flex;align-items:center;gap:4px}
+.tag-chip-rm{border:none;background:none;cursor:pointer;color:var(--muted);font-size:10px;padding:0}
+.tag-in-field{width:120px;padding:5px 10px;border-radius:10px;border:1.5px solid var(--blue);background:#EBF2FC;font-size:11px;font-family:inherit;outline:none;color:var(--text)}
+
 /* ROUTE */
-.route-trigger{
-  width:100%;text-align:left;background:#f5f0e8;border:1.5px solid #E0D8CC;
-  border-radius:11px;padding:11px 14px;font-size:13px;font-weight:600;
-  color:var(--text);cursor:pointer;font-family:inherit;margin-bottom:8px;
-  display:flex;align-items:center;justify-content:space-between
-}
-.route-options{display:none;flex-direction:column;gap:5px;margin-bottom:14px}
+.route-trigger{width:100%;text-align:left;background:#f5f0e8;border:1.5px solid #E0D8CC;border-radius:11px;padding:11px 14px;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;font-family:inherit;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+.route-options{display:none;flex-direction:column;gap:7px;margin-bottom:14px}
 .route-options.open{display:flex}
-.route-opt{
-  padding:9px 12px;border-radius:9px;border:1.5px solid #E0D8CC;
-  background:#f5f0e8;font-size:12px;font-weight:600;color:var(--text);
-  cursor:pointer;font-family:inherit;text-align:left;transition:all .15s
-}
-.route-opt.sel{background:#F3EDF8;border-color:#7C3AED;color:#7C3AED}
+.route-opt{padding:0;border-radius:11px;border:1.5px solid #E0D8CC;background:#f5f0e8;font-size:12px;font-weight:600;color:var(--text);cursor:pointer;font-family:inherit;text-align:left;transition:all .15s;overflow:hidden;min-height:60px;display:flex;align-items:center}
+.route-opt-img{width:60px;height:60px;flex-shrink:0;background-size:cover;background-position:center;background-color:#d0c8b8}
+.route-opt-label{padding:10px 12px;flex:1}
+.route-opt.sel{border-color:#7C3AED;background:#F3EDF8}
+.route-opt.sel .route-opt-label{color:#7C3AED}
+.route-opt:first-child{min-height:40px}
+.route-opt:first-child .route-opt-img{display:none}
 
 /* VISIBILITY */
-.vis-row{display:flex;gap:7px;margin-bottom:16px}
-.vis-opt{
-  flex:1;padding:10px 6px;border-radius:10px;border:1.5px solid #E0D8CC;
-  background:#f5f0e8;font-size:11px;font-weight:700;color:var(--muted);
-  cursor:pointer;font-family:inherit;text-align:center;transition:all .15s;line-height:1.3;
-  display:flex;flex-direction:column;align-items:center;gap:3px
-}
+.vis-row{display:flex;gap:7px;margin-bottom:8px}
+.vis-opt{flex:1;padding:10px 6px;border-radius:10px;border:1.5px solid #E0D8CC;background:#f5f0e8;font-size:11px;font-weight:700;color:var(--muted);cursor:pointer;font-family:inherit;text-align:center;transition:all .15s;line-height:1.3;display:flex;flex-direction:column;align-items:center;gap:3px;pointer-events:all}
 .vis-opt i{font-size:16px}
-.vis-opt.sel{background:#FFF0F0;border-color:var(--red);color:var(--red)}
-.vis-hint{
-  background:#EBF2FC;border-radius:10px;padding:9px 12px;
-  font-size:11px;color:var(--blue);line-height:1.5;margin-bottom:14px
-}
+.vis-opt.sel-pub{background:rgba(34,197,94,.12);border-color:var(--green);color:var(--green)}
+.vis-opt.sel-prv{background:rgba(212,43,43,.12);border-color:var(--red);color:var(--red)}
+.vis-opt.sel-share{background:rgba(249,115,22,.12);border-color:var(--orange);color:var(--orange)}
+.share-link-row{display:none;align-items:center;gap:8px;background:#FFF7F0;border:1.5px solid var(--orange);border-radius:10px;padding:10px 12px;margin-bottom:14px}
+.share-link-row.show{display:flex}
+.share-link-txt{font-size:11px;color:var(--orange);font-family:monospace;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.share-copy-btn{border:none;background:none;cursor:pointer;color:var(--orange);font-size:16px;flex-shrink:0}
+.vis-hint{background:#EBF2FC;border-radius:10px;padding:9px 12px;font-size:11px;color:var(--blue);line-height:1.5;margin-bottom:14px}
 
 /* SAVE / GOOGLE */
-.save-btn{
-  width:100%;padding:14px;background:#C8BFB0;color:#fff;
-  border:none;border-radius:13px;font-size:15px;font-weight:700;
-  cursor:not-allowed;font-family:inherit;margin-top:4px;transition:background .2s
-}
+.save-btn{width:100%;padding:14px;background:#C8BFB0;color:#fff;border:none;border-radius:13px;font-size:15px;font-weight:700;cursor:not-allowed;font-family:inherit;margin-top:4px;transition:background .2s}
 .save-btn.ready{background:var(--red);cursor:pointer}
-.google-btn{
-  width:100%;padding:11px;background:#fff;border:1.5px solid #E0D8CC;
-  border-radius:13px;font-size:13px;font-weight:600;color:var(--muted);
-  cursor:pointer;font-family:inherit;margin-top:8px;
-  display:flex;align-items:center;justify-content:center;gap:8px;transition:border-color .15s
-}
-.google-btn:hover{border-color:#4285F4;color:#4285F4}
+.google-btn{width:100%;padding:11px;background:#fff;border:1.5px solid #E0D8CC;border-radius:13px;font-size:13px;font-weight:600;color:#aaa;cursor:default;font-family:inherit;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;opacity:.5}
+.google-btn.active{color:#4285F4;border-color:#4285F4;opacity:1;cursor:pointer}
+.google-btn.active:active{transform:scale(.98)}
+
+/* REGISTER GPS */
+.gps-register-bar{background:#EBF2FC;border:1.5px solid var(--blue);border-radius:10px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.gps-register-bar .gps-info{font-size:11px;color:var(--blue);line-height:1.4}
+.gps-register-bar button{height:30px;padding:0 14px;border-radius:15px;background:var(--blue);border:none;color:#fff;font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;font-family:inherit}
 
 /* ── MARKER ── */
 .poi-marker{display:flex;flex-direction:column;align-items:center;cursor:pointer}
-.poi-bubble{
-  width:36px;height:36px;border-radius:50%;background:var(--red);
-  border:2.5px solid #fff;display:flex;align-items:center;justify-content:center;
-  color:#fff;font-size:16px;position:relative;
-  box-shadow:0 2px 10px rgba(212,43,43,.4)
-}
-.poi-badge{
-  position:absolute;top:-6px;right:-8px;background:var(--blue);
-  color:#fff;font-size:8px;font-weight:800;border-radius:7px;
-  padding:1px 4px;border:1.5px solid #fff;line-height:1.2
-}
-.poi-tail{width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:8px solid var(--red);margin-top:-2px}
+.poi-bubble{width:36px;height:36px;border-radius:50%;background:var(--red);border:2.5px solid #fff;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;position:relative;box-shadow:0 2px 10px rgba(212,43,43,.4)}
+.poi-badge{position:absolute;top:-6px;right:-6px;background:#fff;color:var(--red);font-size:8px;font-weight:900;border-radius:6px;padding:1px 4px;border:1px solid var(--red)}
+.poi-tail{width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:8px solid var(--red);margin-top:-1px}
 
 /* ── DETAIL SHEET ── */
-.detail-photos{display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;scrollbar-width:none;margin-left:-20px;margin-right:-20px;padding:0 20px}
-.detail-photo{width:200px;height:140px;border-radius:12px;flex-shrink:0;background-size:cover;background-position:center;background-color:var(--bg)}
-.detail-no-photo{
-  width:60px;height:60px;border-radius:12px;background:var(--bg);
-  display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--muted)
-}
-.detail-tag{display:inline-flex;align-items:center;gap:4px;background:var(--bg);color:var(--muted);font-size:10px;font-weight:700;padding:3px 9px;border-radius:10px;margin-bottom:6px}
-.detail-name{font-size:21px;font-weight:800;color:var(--text);margin-bottom:8px;line-height:1.2}
-.detail-loc{display:flex;align-items:center;gap:6px;margin-bottom:4px}
-.detail-loc i{font-size:14px;color:var(--muted);flex-shrink:0}
-.detail-loc-text{font-size:12px;color:var(--muted)}
-.detail-coords{display:flex;align-items:center;gap:6px;margin-bottom:12px}
-.detail-coords i{font-size:12px;color:var(--muted)}
-.detail-coords span{font-size:10px;color:var(--muted);font-family:'Courier New',monospace}
-.detail-desc{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:14px}
-.detail-footer{display:flex;align-items:center;justify-content:space-between}
-.detail-actions{display:flex;gap:6px}
-.detail-action-btn{
-  padding:9px 13px;border-radius:10px;border:none;cursor:pointer;
-  font-size:12px;font-weight:700;font-family:inherit;
-  display:flex;align-items:center;gap:5px;transition:opacity .15s
-}
-.da-nav{background:#EBF2FC;color:var(--blue)}
-.da-share{background:var(--bg);color:var(--muted)}
-.author-row{display:flex;align-items:center;gap:8px}
-.g-avatar{width:30px;height:30px;border-radius:50%;background:var(--bg);overflow:hidden;border:1.5px solid var(--border)}
+.detail-photos{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin-bottom:12px;padding-bottom:4px}
+.detail-photo{width:180px;height:120px;border-radius:12px;background-size:cover;background-position:center;flex-shrink:0}
+.detail-no-photo{width:100%;height:100px;border-radius:12px;background:#f0ebe0;display:flex;align-items:center;justify-content:center;font-size:32px;color:#C8BFB0}
+.detail-tag{display:inline-flex;align-items:center;gap:4px;background:var(--bg);border-radius:8px;padding:4px 9px;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:6px}
+.detail-name{font-size:22px;font-weight:900;color:var(--text);line-height:1.2;margin-bottom:8px}
+.detail-loc{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);margin-bottom:4px}
+.detail-coords{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);font-family:monospace;margin-bottom:10px}
+.detail-share-link{font-size:11px;color:var(--orange);font-family:monospace;margin-bottom:12px;display:flex;align-items:center;gap:6px;background:#FFF7F0;border-radius:8px;padding:7px 10px}
+.detail-desc{font-size:14px;color:var(--text);line-height:1.6;margin-bottom:16px}
+.detail-footer{display:flex;align-items:center;gap:10px}
+.detail-actions{display:flex;gap:7px;flex:1}
+.detail-action-btn{height:38px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px;padding:0 12px;color:var(--text);transition:all .15s}
+.detail-action-btn:active{transform:scale(.96)}
+.da-nav{background:var(--blue);color:#fff;border-color:var(--blue)}
+.love-btn{height:38px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px;padding:0 14px;color:var(--muted);transition:all .2s;flex-shrink:0}
+.love-btn.loved{background:#FFF0F0;border-color:var(--red);color:var(--red)}
+.author-row{display:flex;align-items:center;gap:10px;padding:12px 0 0}
+.g-avatar{width:34px;height:34px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid var(--border)}
 .g-avatar img{width:100%;height:100%;object-fit:cover}
-.author-name{font-size:12px;color:var(--muted);font-weight:500}
-.love-btn{
-  display:flex;align-items:center;gap:6px;background:var(--bg);
-  border:1.5px solid #D8D0C0;border-radius:22px;padding:9px 16px;
-  cursor:pointer;font-family:inherit;transition:all .2s
-}
-.love-btn.loved{background:#FFF0F0;border-color:var(--red)}
-.love-btn i{font-size:17px;color:#C0B0A0;transition:all .2s}
-.love-btn.loved i{color:var(--red)}
-.love-cnt{font-size:14px;font-weight:700;color:#8A7F74;transition:color .2s}
-.love-btn.loved .love-cnt{color:var(--red)}
+.author-name{font-size:13px;font-weight:700;color:var(--text);flex:1}
 
-/* ── PROFILE VIEW ── */
-.profile-view{
-  position:fixed;inset:0 0 56px 0;z-index:10;background:var(--bg);
-  overflow-y:auto;-webkit-overflow-scrolling:touch;display:none
-}
-.profile-view.active{display:block}
-
-/* Profile Hero */
-.profile-hero{
-  background:linear-gradient(160deg,var(--red) 0%,#7B1111 100%);
-  padding:72px 20px 44px;text-align:center;position:relative
-}
-.profile-avatar-wrap{
-  position:relative;width:84px;height:84px;margin:0 auto 12px;cursor:pointer
-}
-.profile-avatar{
-  width:84px;height:84px;border-radius:50%;
-  border:3px solid rgba(255,255,255,.5);overflow:hidden;
-  background:rgba(255,255,255,.2)
-}
+/* ── PROFILE ── */
+.profile-hero{background:linear-gradient(160deg,#D42B2B 0%,#7B1111 100%);padding:52px 20px 44px;position:relative;text-align:center;min-height:200px}
+.profile-avatar-wrap{display:inline-block;position:relative;cursor:pointer;margin-bottom:10px}
+.profile-avatar{width:80px;height:80px;border-radius:50%;overflow:hidden;border:3px solid rgba(255,255,255,.4);margin:0 auto}
 .profile-avatar img{width:100%;height:100%;object-fit:cover}
-.avatar-edit{
-  position:absolute;bottom:0;right:0;
-  width:26px;height:26px;border-radius:50%;
-  background:var(--red);border:2px solid #fff;
-  display:flex;align-items:center;justify-content:center;
-  font-size:13px;color:#fff;cursor:pointer;
-  box-shadow:0 2px 6px rgba(0,0,0,.25)
-}
-.profile-name{font-size:20px;font-weight:800;color:#fff;margin-bottom:3px}
-.profile-email{font-size:12px;color:rgba(255,255,255,.6);margin-bottom:10px}
-/* Badge pill */
-.prof-badge{
-  display:inline-flex;align-items:center;gap:6px;
-  border-radius:20px;padding:5px 12px;font-size:12px;font-weight:700;
-  border:1.5px solid rgba(255,255,255,.25);margin-bottom:8px
-}
-.prof-badge i{font-size:14px}
-/* AI avatar teaser */
-.gen-avatar-btn{
-  display:inline-flex;align-items:center;gap:5px;
-  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);
-  border-radius:12px;padding:5px 11px;font-size:10px;font-weight:600;
-  color:rgba(255,255,255,.7);cursor:pointer;font-family:inherit;margin-top:2px
-}
-.gen-avatar-btn i{font-size:12px}
-/* Profile public toggle */
-.pub-profile-toggle{
-  position:absolute;top:12px;right:14px;
-  background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);
-  border-radius:10px;padding:5px 9px;font-size:10px;font-weight:700;
-  color:rgba(255,255,255,.85);cursor:pointer;font-family:inherit;
-  display:flex;align-items:center;gap:5px
-}
-.pub-profile-toggle i{font-size:13px}
-
-/* Stats bar */
-.profile-stats{
-  display:flex;background:var(--card);margin:0 20px;
-  border-radius:14px;box-shadow:0 4px 16px rgba(0,0,0,.12);
-  margin-top:-24px;overflow:hidden;position:relative;z-index:2
-}
-.stat-item{
-  flex:1;padding:14px 8px;text-align:center;
-  border-right:1px solid var(--border);position:relative
-}
+.avatar-edit{position:absolute;bottom:0;right:0;width:24px;height:24px;border-radius:50%;background:var(--red);border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff}
+.profile-name{font-size:18px;font-weight:900;color:#fff;margin-bottom:2px}
+.profile-email{font-size:11px;color:rgba(255,255,255,.65);margin-bottom:10px}
+.prof-badge{display:inline-flex;align-items:center;gap:6px;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:700;border:1.5px solid rgba(255,255,255,.25);cursor:pointer;margin-bottom:10px}
+.badge-label{font-size:10px;color:rgba(255,255,255,.5);margin-top:2px}
+.profile-stats{display:flex;background:var(--card);margin:-24px 16px 0;border-radius:14px;box-shadow:0 4px 16px rgba(0,0,0,.1);position:relative;z-index:2;overflow:hidden}
+.stat-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:14px 8px;gap:3px;border-right:1px solid var(--border)}
 .stat-item:last-child{border-right:none}
-.stat-item i{font-size:14px;color:var(--muted);display:block;margin-bottom:3px}
-.stat-v{font-size:20px;font-weight:900;color:var(--text);line-height:1}
-.stat-l{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:3px}
-
-/* Profile body */
-.profile-body{padding:20px}
+.stat-item i{font-size:16px;color:var(--muted)}
+.stat-v{font-size:18px;font-weight:900;color:var(--text)}
+.stat-l{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+.profile-body{padding:24px 16px 80px}
 .profile-sec{margin-bottom:24px}
-.prof-sec-lbl{
-  font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;
-  letter-spacing:.7px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between
-}
-.prof-sec-action{
-  font-size:11px;font-weight:700;color:var(--blue);text-transform:none;letter-spacing:0;
-  cursor:pointer;background:none;border:none;font-family:inherit;
-  display:flex;align-items:center;gap:4px
-}
-.prof-sec-action i{font-size:13px}
-
-/* List items */
-.list-item{
-  background:var(--card);border-radius:12px;padding:12px 14px;
-  margin-bottom:8px;display:flex;align-items:center;gap:12px;
-  box-shadow:0 1px 6px rgba(0,0,0,.05)
-}
+.prof-sec-lbl{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.prof-sec-add{border:none;background:none;font-size:11px;font-weight:700;color:var(--blue);cursor:pointer;display:flex;align-items:center;gap:4px}
+.list-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer}
+.list-item:last-child{border-bottom:none}
 .list-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
 .list-info{flex:1}
-.list-name{font-size:13px;font-weight:700;color:var(--text)}
-.list-meta{font-size:10px;color:var(--muted);margin-top:2px}
-.list-vis{font-size:9px;font-weight:700;padding:2px 7px;border-radius:6px}
-.lv-pub{background:#EBF2FC;color:var(--blue)}
-.lv-prv{background:var(--bg);color:var(--muted)}
-
-/* Tag chips */
-.tag-chip{
-  padding:6px 12px;border-radius:12px;background:var(--card);
-  border:1.5px solid var(--border);font-size:11px;font-weight:700;
-  color:var(--text);display:inline-block;margin:0 5px 5px 0;cursor:pointer;transition:all .15s
-}
-.tag-chip:hover,.tag-chip.active{border-color:var(--red);color:var(--red)}
-.tag-input-wrap{display:inline-flex;align-items:center;gap:6px;margin:0 0 5px;vertical-align:top}
-.tag-input{
-  padding:6px 10px;border-radius:12px;border:1.5px dashed var(--red);
-  background:#FFF0F0;font-size:11px;font-weight:600;color:var(--red);
-  outline:none;font-family:inherit;width:130px
-}
-
-/* POI Board */
-.poi-board{
-  display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;
-  padding-bottom:4px;margin:0 -20px;padding-left:20px;padding-right:20px
-}
-.poi-card{
-  flex-shrink:0;width:200px;background:var(--card);border-radius:14px;
-  overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.07);
-}
-.poi-card-img{width:100%;height:110px;background-size:cover;background-position:center;background-color:var(--bg);position:relative}
-.poi-card-vis{
-  position:absolute;top:6px;left:6px;
-  background:rgba(253,250,245,.92);backdrop-filter:blur(4px);
-  border-radius:8px;padding:3px 8px;font-size:9px;font-weight:700;
-  color:var(--muted);display:flex;align-items:center;gap:4px
-}
-.poi-card-vis i{font-size:11px}
-.poi-card-body{padding:10px 12px}
-.poi-card-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px;line-height:1.2}
-.poi-card-desc{font-size:10px;color:var(--muted);line-height:1.4;margin-bottom:8px}
-.poi-card-footer{display:flex;align-items:center;justify-content:space-between}
-.poi-card-love{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:var(--red)}
-.poi-card-love i{font-size:13px}
+.list-name{font-size:14px;font-weight:700;color:var(--text)}
+.list-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.list-vis{font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px}
+.lv-pub{background:#DCFCE7;color:#15803D}
+.lv-prv{background:#FEE2E2;color:#DC2626}
+.tags-cloud{display:flex;flex-wrap:wrap;gap:6px}
+.tag-chip{padding:5px 10px;border-radius:10px;background:#f5f0e8;border:1.5px solid #E0D8CC;font-size:11px;font-weight:600;color:#5C4D3A;cursor:default}
+.tag-input-wrap{display:inline-block}
+.tag-input{border:1.5px solid var(--blue);border-radius:10px;padding:5px 10px;font-size:11px;font-family:inherit;background:#EBF2FC;color:var(--text);outline:none;width:120px}
+.add-tag-btn{padding:5px 10px;border-radius:10px;border:1.5px dashed var(--blue);background:none;font-size:11px;font-weight:700;color:var(--blue);cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px}
+.poi-board{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.poi-card{border-radius:12px;background:var(--card);overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.07);border:1px solid var(--border)}
+.poi-card-img{height:80px;background-size:cover;background-position:center;background-color:#e8e2d8;position:relative}
+.poi-card-vis{position:absolute;bottom:4px;left:4px;background:rgba(0,0,0,.5);border-radius:6px;padding:2px 6px;font-size:9px;font-weight:700;color:#fff;display:flex;align-items:center;gap:3px}
+.poi-card-body{padding:8px}
+.poi-card-name{font-size:12px;font-weight:800;color:var(--text);margin-bottom:2px}
+.poi-card-desc{font-size:10px;color:var(--muted);line-height:1.4}
+.poi-card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:6px}
+.poi-card-love{font-size:10px;font-weight:700;color:var(--red);display:flex;align-items:center;gap:3px}
 .poi-card-actions{display:flex;gap:4px}
-.poi-card-btn{
-  padding:3px 7px;border-radius:6px;border:none;font-size:9px;
-  font-weight:700;cursor:pointer;font-family:inherit;
-  display:flex;align-items:center;gap:3px
-}
-.poi-card-btn i{font-size:10px}
-.pcb-edit{background:#EBF2FC;color:var(--blue)}
-.pcb-del{background:#FFF0F0;color:var(--red)}
-.pcb-vis{background:var(--bg);color:var(--muted)}
+.poi-card-btn{width:22px;height:22px;border-radius:6px;border:none;background:#f5f0e8;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted);transition:all .15s}
+.pcb-del:active{background:#FEE2E2;color:var(--red)}
 
-/* ── PUBLIC PROFILE VIEW ── */
-.public-profile-view{display:none;padding-bottom:20px}
-.public-profile-view.active{display:block}
-.pub-header{
-  background:linear-gradient(160deg,#285EA7 0%,#0D3A6B 100%);
-  padding:72px 20px 44px;text-align:center;position:relative
-}
-.pub-header .back-btn{
-  position:absolute;top:12px;left:14px;
-  background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);
-  border-radius:10px;padding:5px 9px;font-size:10px;font-weight:700;
-  color:rgba(255,255,255,.85);cursor:pointer;font-family:inherit;
-  display:flex;align-items:center;gap:5px
-}
-.pub-header .back-btn i{font-size:13px}
-.pub-follow-btn{
-  display:inline-flex;align-items:center;gap:6px;margin-top:10px;
-  background:#fff;color:var(--blue);border:none;border-radius:12px;
-  padding:8px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit
-}
-.pub-follow-btn i{font-size:15px}
+/* PUBLIC PROFILE */
+.public-profile-view{display:none}
+.pub-header{background:linear-gradient(160deg,#285EA7 0%,#1a3d6e 100%);padding:52px 20px 30px;text-align:center}
+.back-btn{position:absolute;top:14px;left:14px;border:none;background:rgba(255,255,255,.2);border-radius:20px;padding:6px 12px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px}
+.pub-follow-btn{background:#fff;color:var(--blue);border:none;border-radius:20px;padding:8px 20px;font-size:13px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
 
-/* Itinerary panel */
-.itin-view{
-  position:fixed;inset:0 0 56px 0;z-index:10;
-  background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;display:none
-}
-.itin-view.active{display:block}
+/* ITIN VIEW */
+.itin-view{background:var(--bg)}
 
-/* Toast */
-.toast{
-  position:fixed;bottom:70px;left:50%;transform:translateX(-50%) translateY(20px);
-  z-index:600;background:var(--text);color:#fff;border-radius:12px;
-  padding:10px 18px;font-size:13px;font-weight:600;
-  opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap
-}
+/* TOAST */
+.toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%) translateY(20px);background:#1C1C1C;color:#fff;border-radius:20px;padding:10px 20px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-
-/* Animations */
-@keyframes gpspulse{0%,100%{transform:scale(1)}50%{transform:scale(1.3)}}
 </style>
 </head>
 <body>
 
-<!-- MAP -->
+<!-- ═══ MAP ═══ -->
 <div id="map"></div>
 
-<!-- TOP BAR -->
+<!-- TOPBAR -->
 <div class="topbar">
-  <div class="tb-logo" onclick="showTab('map')">
-    <img src="https://poilove.com/img/logo-completo.svg"
-         onerror="this.style.display='none';document.getElementById('tbLogoTxt').style.display='block'"
-         alt="POI•LOVE">
-    <span id="tbLogoTxt" class="tb-logo-txt" style="display:none">POI•LOVE</span>
+  <div class="tb-logo">
+    <img src="https://poilove.com/img/logo-symbol.svg" onerror="this.style.display='none'" alt="">
+    <span class="tb-logo-txt">POI•LOVE</span>
   </div>
   <div class="tb-right">
-    <button class="tb-btn" onclick="cycleLang()" id="langBtn">IT</button>
-    <button class="tb-btn icon-only" onclick="centerMap()" title="Localizzami">
-      <i class="ph ph-locate"></i>
-    </button>
+    <button class="tb-btn" onclick="centerMap()"><i class="ph ph-crosshair-simple"></i></button>
+    <button class="tb-btn icon-only" id="langBtn" onclick="cycleLang()">IT</button>
   </div>
 </div>
 
-<!-- MAP TYPE SELECTOR -->
+<!-- MAP TYPES -->
 <div class="map-types" id="mapTypes">
   <button class="mt-btn active" onclick="setMapType('street',this)" data-t="mt_street">Stradale</button>
   <button class="mt-btn" onclick="setMapType('satellite',this)" data-t="mt_sat">Satellite</button>
   <button class="mt-btn" onclick="setMapType('routes',this)" data-t="mt_routes">Rotte Storiche</button>
 </div>
 
-<!-- FAB MENU -->
+<!-- FAB -->
+<button class="fab" id="fab" onclick="toggleFab()"><i class="ph ph-plus"></i></button>
 <div class="fab-menu" id="fabMenu">
   <button class="fab-opt" onclick="openAddPOI()">
-    <div class="fab-opt-icon" style="background:#FFF0F0;color:var(--red)">
-      <i class="ph-fill ph-map-pin"></i>
-    </div>
+    <div class="fab-opt-icon" style="background:#FFF0F0;color:var(--red)"><i class="ph-fill ph-map-pin"></i></div>
     <span data-t="fab_poi">Segna un luogo</span>
   </button>
   <button class="fab-opt" onclick="openAddStop()">
-    <div class="fab-opt-icon" style="background:#EBF2FC;color:var(--blue)">
-      <i class="ph ph-path"></i>
-    </div>
+    <div class="fab-opt-icon" style="background:#EBF2FC;color:var(--blue)"><i class="ph ph-path"></i></div>
     <span data-t="fab_itin">Tappa Itinerario</span>
   </button>
 </div>
 
-<!-- FAB -->
-<button class="fab" id="fab" onclick="toggleFab()">
-  <i class="ph ph-plus"></i>
-</button>
-
 <!-- BOTTOM NAV -->
 <nav class="bottom-nav">
   <button class="nav-item active" id="nav-map" onclick="showTab('map')">
-    <i class="ph ph-map-trifold"></i>
-    <div class="nav-lbl" data-t="nav_map">Mappa</div>
+    <i class="ph-fill ph-map-trifold"></i><span class="nav-lbl" data-t="nav_map">Mappa</span>
   </button>
   <button class="nav-item" id="nav-itin" onclick="showTab('itin')">
-    <i class="ph ph-route"></i>
-    <div class="nav-lbl" data-t="nav_itin">Itinerari</div>
+    <i class="ph ph-route"></i><span class="nav-lbl" data-t="nav_itin">Itinerari</span>
   </button>
   <button class="nav-item" id="nav-profile" onclick="showTab('profile')">
-    <i class="ph ph-user-circle"></i>
-    <div class="nav-lbl" data-t="nav_profile">Profilo</div>
+    <i class="ph ph-user-circle"></i><span class="nav-lbl" data-t="nav_profile">Profilo</span>
   </button>
 </nav>
 
-<!-- ═══════════════════════════════════════
-     PROFILE VIEW
-════════════════════════════════════════ -->
+<!-- ═══ PROFILE VIEW ═══ -->
 <div class="profile-view" id="profileView">
-
-  <!-- Private profile (default) -->
   <div id="privateProfile">
     <div class="profile-hero">
-      <!-- Toggle pubblica/privata -->
-      <button class="pub-profile-toggle" onclick="togglePublicProfile(true)">
-        <i class="ph ph-eye"></i>
-        <span data-t="prof_pub_toggle">Come mi vedono gli altri</span>
-      </button>
-
-      <!-- Avatar -->
       <div class="profile-avatar-wrap" onclick="changeAvatar()">
         <div class="profile-avatar">
-          <img id="profileAvatarImg"
-               src="https://ui-avatars.com/api/?name=Alessandro+C&background=D42B2B&color=fff&size=200"
-               alt="avatar"/>
+          <img src="https://ui-avatars.com/api/?name=Alessandro+C&background=D42B2B&color=fff&size=200" alt="avatar"/>
         </div>
-        <div class="avatar-edit">
-          <i class="ph ph-camera"></i>
-        </div>
+        <div class="avatar-edit"><i class="ph ph-camera"></i></div>
       </div>
-
-      <div class="profile-name" id="profileName">Alessandro C.</div>
+      <div class="profile-name">Alessandro C.</div>
       <div class="profile-email">it@altrostile.app</div>
-
-      <!-- Badge livello -->
-      <div class="prof-badge" id="profBadge" style="background:rgba(245,158,11,.2);color:#FDE68A;border-color:rgba(245,158,11,.3)">
-        <i class="ph-fill ph-star" style="color:#FDE68A"></i>
-        <span id="badgeLabel">Amatore</span>
-        <span style="opacity:.7">· 87 love</span>
-      </div>
-
-      <!-- AI avatar teaser -->
-      <br>
-      <button class="gen-avatar-btn" onclick="generateAvatar()">
-        <i class="ph ph-sparkle"></i>
-        <span data-t="gen_avatar">Genera avatar AI</span>
-        <span style="opacity:.5;font-size:9px"> — prossimamente</span>
-      </button>
+      <div class="prof-badge" id="profBadge" onclick="generateAvatar()"></div>
+      <div class="badge-label" id="badgeLabel"></div>
     </div>
-
-    <!-- Stats bar floating -->
     <div class="profile-stats">
       <div class="stat-item">
         <i class="ph ph-map-pin"></i>
@@ -612,140 +344,101 @@ i.ph,i.ph-fill{line-height:1}
         <div class="stat-l" data-t="stat_list">Liste</div>
       </div>
     </div>
-
     <div class="profile-body">
-
-      <!-- LISTE PERSONALI -->
+      <div class="profile-sec">
+        <div class="prof-sec-lbl">
+          <span data-t="prof_pub_toggle">Come mi vedono gli altri</span>
+          <button class="prof-sec-add" onclick="togglePublicProfile(true)">
+            <i class="ph ph-eye"></i> <span>Anteprima</span>
+          </button>
+        </div>
+      </div>
       <div class="profile-sec">
         <div class="prof-sec-lbl">
           <span data-t="prof_lists">Le mie liste</span>
-          <button class="prof-sec-action" onclick="openAddList()">
-            <i class="ph ph-plus-circle"></i>
-            <span data-t="prof_new_list">Nuova lista</span>
+          <button class="prof-sec-add" onclick="openAddList()">
+            <i class="ph ph-plus"></i> <span data-t="prof_new_list">Nuova lista</span>
           </button>
         </div>
         <div id="listsContainer">
-          <div class="list-item" data-list-id="1">
+          <div class="list-item">
             <div class="list-dot" style="background:var(--red)"></div>
-            <div class="list-info">
-              <div class="list-name">Tirana Top</div>
-              <div class="list-meta">8 POI · condivisa con link</div>
-            </div>
-            <span class="list-vis lv-pub">Condivisa</span>
-          </div>
-          <div class="list-item" data-list-id="2">
-            <div class="list-dot" style="background:var(--blue)"></div>
-            <div class="list-info">
-              <div class="list-name">Segreti Balcani</div>
-              <div class="list-meta">3 POI · privata</div>
-            </div>
-            <span class="list-vis lv-prv">Privata</span>
-          </div>
-          <div class="list-item" data-list-id="3">
-            <div class="list-dot" style="background:var(--green)"></div>
-            <div class="list-info">
-              <div class="list-name">Food Spots</div>
-              <div class="list-meta">4 POI · pubblica</div>
-            </div>
+            <div class="list-info"><div class="list-name">Lista libera</div><div class="list-meta">5 POI</div></div>
             <span class="list-vis lv-pub">Pubblica</span>
+          </div>
+          <div class="list-item">
+            <div class="list-dot" style="background:var(--blue)"></div>
+            <div class="list-info"><div class="list-name">Tirana Top</div><div class="list-meta">4 POI</div></div>
+            <span class="list-vis lv-pub">Pubblica</span>
+          </div>
+          <div class="list-item">
+            <div class="list-dot" style="background:#7C3AED"></div>
+            <div class="list-info"><div class="list-name">Segreti</div><div class="list-meta">3 POI</div></div>
+            <span class="list-vis lv-prv">Privata</span>
           </div>
         </div>
       </div>
-
-      <!-- TAG PERSONALI -->
       <div class="profile-sec">
         <div class="prof-sec-lbl">
           <span data-t="prof_tags">I miei tag</span>
-          <button class="prof-sec-action" onclick="showTagInput()">
-            <i class="ph ph-plus"></i>
-            <span data-t="prof_new_tag">Aggiungi</span>
-          </button>
+          <button class="add-tag-btn" onclick="showTagInput()"><i class="ph ph-plus"></i> <span data-t="prof_new_tag">Aggiungi</span></button>
         </div>
-        <div id="tagsContainer">
-          <span class="tag-chip">Gioielli nascosti</span>
-          <span class="tag-chip">Architettura</span>
-          <span class="tag-chip">Artigianato</span>
-          <span class="tag-chip">Luoghi dell'anima</span>
-          <span class="tag-chip">Vista panoramica</span>
+        <div class="tags-cloud" id="tagsContainer">
+          <span class="tag-chip">storia</span>
+          <span class="tag-chip">gastronomia</span>
+          <span class="tag-chip">fotografia</span>
+          <span class="tag-chip">balcani</span>
+          <span class="tag-chip">benessere</span>
         </div>
       </div>
-
-      <!-- I MIEI POI — BACHECA -->
       <div class="profile-sec">
         <div class="prof-sec-lbl">
           <span data-t="prof_my_poi">I miei POI</span>
-          <button class="prof-sec-action" onclick="showTab('map');openAddPOI()">
-            <i class="ph ph-plus"></i>
-            <span data-t="prof_add_poi">Aggiungi</span>
-          </button>
+          <button class="prof-sec-add" onclick="openAddPOI()"><i class="ph ph-plus"></i> <span data-t="prof_add_poi">Aggiungi</span></button>
         </div>
-        <div class="poi-board" id="poiBoardPrivate">
+        <div class="poi-board" id="poiBoard">
           <div class="poi-card" id="pcard-1">
-            <div class="poi-card-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Mosque_of_Ethem_Bey.jpg/320px-Mosque_of_Ethem_Bey.jpg')">
-              <div class="poi-card-vis"><i class="ph ph-lock-simple"></i> Privato</div>
+            <div class="poi-card-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/New_Bazaar_Tirana.jpg/320px-New_Bazaar_Tirana.jpg')">
+              <div class="poi-card-vis"><i class="ph ph-globe"></i> Pubblico</div>
             </div>
             <div class="poi-card-body">
-              <div class="poi-card-name">Xhamia Et'hem Beut</div>
-              <div class="poi-card-desc">Moschea ottomana sopravvissuta al comunismo. Straordinaria.</div>
+              <div class="poi-card-name">Pazari i Ri</div>
+              <div class="poi-card-desc">Il mercato più bello dei Balcani.</div>
               <div class="poi-card-footer">
-                <div class="poi-card-love"><i class="ph-fill ph-heart"></i> 24</div>
+                <div class="poi-card-love"><i class="ph-fill ph-heart"></i> 56</div>
                 <div class="poi-card-actions">
-                  <button class="poi-card-btn pcb-edit" onclick="editPOI('pcard-1')"><i class="ph ph-pencil-simple"></i></button>
-                  <button class="poi-card-btn pcb-vis" onclick="togglePOIVis(this,'pcard-1')"><i class="ph ph-globe"></i></button>
+                  <button class="poi-card-btn" onclick="editPOI('pcard-1')"><i class="ph ph-pencil-simple"></i></button>
                   <button class="poi-card-btn pcb-del" onclick="deletePOI('pcard-1')"><i class="ph ph-trash"></i></button>
                 </div>
               </div>
             </div>
           </div>
-
           <div class="poi-card" id="pcard-2">
             <div class="poi-card-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Blloku_Tirana.jpg/320px-Blloku_Tirana.jpg')">
-              <div class="poi-card-vis"><i class="ph ph-globe"></i> Pubblico</div>
+              <div class="poi-card-vis"><i class="ph ph-lock-simple"></i> Privato</div>
             </div>
             <div class="poi-card-body">
-              <div class="poi-card-name">Blloku — Il cuore pulsante</div>
-              <div class="poi-card-desc">Quartiere liberato nel '91. Caffè, storia, energia.</div>
+              <div class="poi-card-name">Blloku</div>
+              <div class="poi-card-desc">Quartiere liberato nel '91.</div>
               <div class="poi-card-footer">
                 <div class="poi-card-love"><i class="ph-fill ph-heart"></i> 41</div>
                 <div class="poi-card-actions">
-                  <button class="poi-card-btn pcb-edit" onclick="editPOI('pcard-2')"><i class="ph ph-pencil-simple"></i></button>
-                  <button class="poi-card-btn pcb-vis" onclick="togglePOIVis(this,'pcard-2')"><i class="ph ph-lock-simple"></i></button>
+                  <button class="poi-card-btn" onclick="editPOI('pcard-2')"><i class="ph ph-pencil-simple"></i></button>
                   <button class="poi-card-btn pcb-del" onclick="deletePOI('pcard-2')"><i class="ph ph-trash"></i></button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="poi-card" id="pcard-3">
-            <div class="poi-card-img" style="background:#E0D8CC;display:flex;align-items:center;justify-content:center;font-size:36px;color:var(--muted)">
-              <i class="ph ph-buildings"></i>
-              <div class="poi-card-vis"><i class="ph ph-link"></i> Link</div>
-            </div>
-            <div class="poi-card-body">
-              <div class="poi-card-name">Piramida di Tirana</div>
-              <div class="poi-card-desc">Monumento al passato, cantiere del futuro.</div>
-              <div class="poi-card-footer">
-                <div class="poi-card-love"><i class="ph-fill ph-heart"></i> 18</div>
-                <div class="poi-card-actions">
-                  <button class="poi-card-btn pcb-edit" onclick="editPOI('pcard-3')"><i class="ph ph-pencil-simple"></i></button>
-                  <button class="poi-card-btn pcb-vis" onclick="togglePOIVis(this,'pcard-3')"><i class="ph ph-globe"></i></button>
-                  <button class="poi-card-btn pcb-del" onclick="deletePOI('pcard-3')"><i class="ph ph-trash"></i></button>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-
     </div><!-- /profile-body -->
   </div><!-- /#privateProfile -->
 
-  <!-- PUBLIC PROFILE VIEW (come mi vedono gli altri) -->
+  <!-- PUBLIC PROFILE -->
   <div id="publicProfile" class="public-profile-view">
-    <div class="pub-header">
+    <div class="pub-header" style="position:relative">
       <button class="back-btn" onclick="togglePublicProfile(false)">
-        <i class="ph ph-arrow-left"></i>
-        <span data-t="back">Indietro</span>
+        <i class="ph ph-arrow-left"></i> <span data-t="back">Indietro</span>
       </button>
       <div class="profile-avatar-wrap" style="cursor:default">
         <div class="profile-avatar">
@@ -759,162 +452,125 @@ i.ph,i.ph-fill{line-height:1}
         <span>Amatore · 87 love</span>
       </div>
       <br>
-      <button class="pub-follow-btn">
-        <i class="ph ph-user-plus"></i>
-        <span>Segui</span>
-      </button>
+      <button class="pub-follow-btn"><i class="ph ph-user-plus"></i> Segui</button>
     </div>
-
     <div class="profile-stats">
-      <div class="stat-item">
-        <i class="ph ph-map-pin"></i>
-        <div class="stat-v">7</div>
-        <div class="stat-l">POI pub.</div>
-      </div>
-      <div class="stat-item">
-        <i class="ph-fill ph-heart" style="color:var(--red)"></i>
-        <div class="stat-v">87</div>
-        <div class="stat-l">Love tot.</div>
-      </div>
-      <div class="stat-item">
-        <i class="ph ph-route"></i>
-        <div class="stat-v">2</div>
-        <div class="stat-l">Itinerari</div>
-      </div>
+      <div class="stat-item"><i class="ph ph-map-pin"></i><div class="stat-v">7</div><div class="stat-l">POI pub.</div></div>
+      <div class="stat-item"><i class="ph-fill ph-heart" style="color:var(--red)"></i><div class="stat-v">87</div><div class="stat-l">Love tot.</div></div>
+      <div class="stat-item"><i class="ph ph-route"></i><div class="stat-v">2</div><div class="stat-l">Itinerari</div></div>
     </div>
-
     <div class="profile-body">
       <div class="profile-sec">
         <div class="prof-sec-lbl">POI pubblici</div>
         <div class="poi-board">
           <div class="poi-card">
             <div class="poi-card-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Blloku_Tirana.jpg/320px-Blloku_Tirana.jpg')"></div>
-            <div class="poi-card-body">
-              <div class="poi-card-name">Blloku</div>
-              <div class="poi-card-desc">Quartiere liberato nel '91. Caffè, storia, energia.</div>
-              <div class="poi-card-footer">
-                <div class="poi-card-love"><i class="ph-fill ph-heart"></i> 41</div>
-              </div>
-            </div>
+            <div class="poi-card-body"><div class="poi-card-name">Blloku</div><div class="poi-card-footer"><div class="poi-card-love"><i class="ph-fill ph-heart"></i> 41</div></div></div>
           </div>
           <div class="poi-card">
-            <div class="poi-card-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Pazari_i_Ri_Tirana.jpg/320px-Pazari_i_Ri_Tirana.jpg')"></div>
-            <div class="poi-card-body">
-              <div class="poi-card-name">Pazari i Ri</div>
-              <div class="poi-card-desc">Il mercato più bello dei Balcani.</div>
-              <div class="poi-card-footer">
-                <div class="poi-card-love"><i class="ph-fill ph-heart"></i> 56</div>
-              </div>
-            </div>
+            <div class="poi-card-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/New_Bazaar_Tirana.jpg/320px-New_Bazaar_Tirana.jpg')"></div>
+            <div class="poi-card-body"><div class="poi-card-name">Pazari i Ri</div><div class="poi-card-footer"><div class="poi-card-love"><i class="ph-fill ph-heart"></i> 56</div></div></div>
           </div>
-        </div>
-      </div>
-      <div class="profile-sec">
-        <div class="prof-sec-lbl">Itinerari pubblici</div>
-        <div class="list-item">
-          <div class="list-dot" style="background:var(--blue)"></div>
-          <div class="list-info">
-            <div class="list-name">Alla scoperta di Tirana</div>
-            <div class="list-meta">5 tappe · 14–18 Giu 2026 · 3 interessati</div>
-          </div>
-          <i class="ph ph-arrow-right" style="color:var(--muted)"></i>
         </div>
       </div>
     </div>
-  </div><!-- /#publicProfile -->
-
+  </div>
 </div><!-- /profile-view -->
 
-<!-- ═══════════════════════════════════════
-     ITINERARY VIEW
-════════════════════════════════════════ -->
+<!-- ═══ ITINERARY VIEW ═══ -->
 <div class="itin-view" id="itinView">
   <div style="padding:70px 20px 20px;text-align:center">
     <div style="background:var(--card);border-radius:20px;padding:32px 24px;box-shadow:0 4px 20px rgba(0,0,0,.08)">
-      <img src="https://poilove.com/img/logo-completo.svg" style="height:26px;margin-bottom:16px"
-           onerror="this.style.display='none'" alt="POI•LOVE">
+      <img src="https://poilove.com/img/logo-completo.svg" style="height:26px;margin-bottom:16px" onerror="this.style.display='none'" alt="">
       <div style="font-size:22px;font-weight:900;color:var(--text);margin-bottom:8px" data-t="itin_h">Itinerari di Viaggio</div>
       <div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:20px" data-t="itin_desc">Pianifica le tue tappe prima di partire. Trova compagni di viaggio. Trasforma ogni tappa in un POI quando sei sul posto.</div>
       <a href="itinerari.html" style="display:inline-flex;align-items:center;gap:8px;background:var(--blue);color:#fff;border-radius:12px;padding:12px 24px;font-size:14px;font-weight:700;text-decoration:none;margin-bottom:12px">
         <i class="ph ph-route" style="font-size:17px"></i>
         <span data-t="itin_open">Apri Itinerari</span>
       </a>
-      <div style="font-size:11px;color:var(--muted);line-height:1.5" data-t="itin_note">Demo con mappa, mini-calendario, GPS live e compagni di viaggio.</div>
+      <div style="font-size:11px;color:var(--muted)" data-t="itin_note">Demo con mappa, mini-calendario, GPS live e compagni.</div>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════
-     SHEET: ADD POI
-════════════════════════════════════════ -->
+<!-- ═══ SHEET: ADD POI ═══ -->
 <div class="sheet-overlay" id="addPoiOv">
-  <div class="sheet-backdrop" id="addPoiBg" onclick="closeAddPOI()"></div>
+  <div class="sheet-backdrop" id="addPoiBg"></div>
   <div class="sheet" id="addPoiSheet">
-    <div class="sh-handle"></div>
+    <div class="sh-handle" id="addPoiHandle"></div>
     <div class="sh-head">
       <div>
         <div class="sh-title" data-t="add_title">Salva questo posto</div>
         <div class="sh-sub" data-t="add_sub">Aggiungi un luogo che ami</div>
       </div>
       <div style="display:flex;align-items:center;gap:8px">
-        <div class="sh-timer" id="timerBadge"><i class="ph ph-timer"></i> 0:00</div>
-        <button class="sh-close" onclick="closeAddPOI()"><i class="ph ph-x"></i></button>
+        <div class="sh-timer" id="timerBadge"><i class="ph ph-timer" style="font-size:13px"></i> <span id="timerTime">0:00</span></div>
+        <button class="sh-close" id="closeAddPoiBtn"><i class="ph ph-x"></i></button>
       </div>
     </div>
     <div class="congrats" id="congratsBanner">
       <i class="ph-fill ph-trophy" style="color:#D97706"></i>
-      <span data-t="congrats">Complimenti, vuoi fare un lavoro curato, grazie!</span>
+      <span data-t="congrats">Complimenti! Sotto i 90 secondi.</span>
     </div>
     <div class="sh-body">
-      <div class="sec-lbl"><span data-t="lbl_name">Nome del posto</span><span class="req-badge" data-t="req">OBBLIGATORIO</span></div>
-      <input class="field-in" type="text" id="poiNameIn" placeholder="Come si chiama questo posto?" oninput="checkSave()"/>
 
+      <!-- NOME con autocomplete -->
+      <div class="sec-lbl"><span data-t="lbl_name">Nome del posto</span><span class="req-badge" data-t="req">OBBLIGATORIO</span></div>
+      <div class="autocomplete-wrap">
+        <input class="field-in" type="text" id="poiNameIn"
+          placeholder="Come si chiama questo posto?"
+          oninput="onNameInput(this.value)"
+          onfocus="onNameFocus()"
+          autocomplete="off"/>
+        <div class="autocomplete-drop" id="acDrop"></div>
+      </div>
+
+      <!-- DOVE SI TROVA -->
       <div class="sec-lbl" data-t="lbl_where">Dove si trova</div>
       <div class="loc-tabs">
-        <button class="loc-tab active" onclick="setLocTab(this,'gps')">
-          <i class="ph ph-crosshair-simple"></i><span data-t="loc_gps">GPS Live</span>
-        </button>
-        <button class="loc-tab" onclick="setLocTab(this,'exif')">
-          <i class="ph ph-image"></i><span data-t="loc_exif">Foto EXIF</span>
-        </button>
-        <button class="loc-tab" onclick="setLocTab(this,'addr')">
-          <i class="ph ph-house"></i><span data-t="loc_addr">Indirizzo</span>
-        </button>
-        <button class="loc-tab" onclick="setLocTab(this,'map')">
-          <i class="ph ph-cursor"></i><span data-t="loc_map">Tocca mappa</span>
-        </button>
+        <button class="loc-tab active" onclick="setLocTab(this,'gps')"><i class="ph ph-crosshair-simple"></i><span data-t="loc_gps">GPS Live</span></button>
+        <button class="loc-tab" onclick="setLocTab(this,'exif')"><i class="ph ph-image"></i><span data-t="loc_exif">Foto EXIF</span></button>
+        <button class="loc-tab" onclick="setLocTab(this,'addr')"><i class="ph ph-house"></i><span data-t="loc_addr">Indirizzo</span></button>
+        <button class="loc-tab" onclick="setLocTab(this,'map')"><i class="ph ph-cursor"></i><span data-t="loc_map">Tocca mappa</span></button>
       </div>
       <div class="loc-result" id="locResult">
         <div class="loc-dot"></div>
         <div>
-          <div class="loc-street">Rruga Ismail Qemali, Tiranë</div>
-          <div class="loc-coords">41.3275, 19.8189</div>
+          <div class="loc-street" id="locStreet">Rruga Ismail Qemali, Tiranë</div>
+          <div class="loc-coords" id="locCoords">41.3275, 19.8189</div>
         </div>
       </div>
 
-      <div class="sec-lbl" data-t="lbl_near">Vicino a cosa?</div>
-      <input class="field-in" type="text" placeholder="es. Piazza Skanderbeg…" style="margin-bottom:14px"/>
-
+      <!-- FOTO -->
       <div class="sec-lbl"><span data-t="lbl_photos">Foto</span></div>
       <div class="photo-row">
-        <div class="photo-slot" onclick="selectPhoto(this,0)">
-          <i class="ph ph-camera"></i><span class="slot-lbl" data-t="ph_main">Principale</span>
+        <div class="photo-slot" id="pslot-0" onclick="triggerPhoto(0)">
+          <i class="ph ph-camera" id="picon-0"></i><span class="slot-lbl" id="plbl-0" data-t="ph_main">Principale</span>
         </div>
-        <div class="photo-slot" onclick="selectPhoto(this,1)">
-          <i class="ph ph-plus"></i><span class="slot-lbl" data-t="ph_2">Foto 2</span>
+        <div class="photo-slot" id="pslot-1" onclick="triggerPhoto(1)">
+          <i class="ph ph-plus" id="picon-1"></i><span class="slot-lbl" id="plbl-1" data-t="ph_2">Foto 2</span>
         </div>
-        <div class="photo-slot" onclick="selectPhoto(this,2)">
-          <i class="ph ph-plus"></i><span class="slot-lbl" data-t="ph_3">Foto 3</span>
+        <div class="photo-slot" id="pslot-2" onclick="triggerPhoto(2)">
+          <i class="ph ph-plus" id="picon-2"></i><span class="slot-lbl" id="plbl-2" data-t="ph_3">Foto 3</span>
         </div>
       </div>
+      <input type="file" id="photoInput0" accept="image/*" style="display:none" onchange="handlePhoto(this,0)">
+      <input type="file" id="photoInput1" accept="image/*" style="display:none" onchange="handlePhoto(this,1)">
+      <input type="file" id="photoInput2" accept="image/*" style="display:none" onchange="handlePhoto(this,2)">
       <div class="photo-hint" data-t="ph_hint">Non sei sul posto? Puoi aggiungere foto in seguito.</div>
 
+      <!-- RACCONTA + VOCE + AI -->
       <div class="sec-lbl">
         <span data-t="lbl_story">Racconta</span>
         <span id="charCount" style="font-size:10px;color:var(--muted)">0 / 200</span>
       </div>
+      <div class="story-actions">
+        <button class="voice-btn" id="voiceBtn" onclick="toggleVoice()"><i class="ph ph-microphone"></i> <span id="voiceBtnLbl">Dett.</span></button>
+        <button class="ai-btn" onclick="aiSummarize()"><i class="ph ph-sparkle"></i> <span>AI → 200</span></button>
+      </div>
       <textarea class="field-in field-ta" id="storyIn" placeholder="L'anima di questo posto…" maxlength="200" oninput="updateChar()"></textarea>
 
+      <!-- CATEGORIE -->
       <div class="sec-lbl">
         <span data-t="lbl_cat">Categorie</span>
         <span id="catCount" style="font-size:10px;color:var(--muted)">0 / 3</span>
@@ -930,45 +586,81 @@ i.ph,i.ph-fill{line-height:1}
         <button class="chip" onclick="toggleCat(this)">Benessere</button>
         <button class="chip" onclick="toggleCat(this)">Love</button>
         <button class="chip" onclick="toggleCat(this)">Audioguida</button>
-        <button class="chip" onclick="toggleCat(this)">Open Source</button>
       </div>
 
+      <!-- LISTE + NUOVA LISTA -->
       <div class="sec-lbl" data-t="lbl_list">Aggiungi a una lista</div>
-      <div class="list-scroll">
+      <div style="display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;margin-bottom:14px" id="sheetListScroll">
         <button class="chip sel-b" onclick="toggleList(this)">Lista libera</button>
         <button class="chip" onclick="toggleList(this)">Tirana Top</button>
         <button class="chip" onclick="toggleList(this)">Segreti</button>
-        <button class="chip" onclick="toggleList(this)">Food spots</button>
+        <button class="chip chip-add" onclick="openAddList()"><i class="ph ph-plus" style="font-size:11px"></i> Nuova</button>
       </div>
 
+      <!-- TAG INLINE -->
+      <div class="sec-lbl">
+        <span>Tag</span>
+        <button class="add-tag-btn" style="font-size:10px" onclick="showSheetTagInput()"><i class="ph ph-plus"></i> Tag</button>
+      </div>
+      <div class="tag-chips-wrap" id="sheetTagsContainer">
+        <span class="tag-chip-inline">storia<button class="tag-chip-rm" onclick="removeSheetTag(this)"><i class="ph ph-x"></i></button></span>
+        <span class="tag-chip-inline">cultura<button class="tag-chip-rm" onclick="removeSheetTag(this)"><i class="ph ph-x"></i></button></span>
+      </div>
+
+      <!-- ROTTE STORICHE -->
       <div class="sec-lbl" data-t="lbl_route">Rotta Storica</div>
       <button class="route-trigger" onclick="toggleRoutes(this)">
         <span id="routeLabel" data-t="route_none">Nessuna rotta storica</span>
         <i class="ph ph-caret-down" id="routeArrow"></i>
       </button>
       <div class="route-options" id="routeOptions">
-        <button class="route-opt sel" onclick="selectRoute(this,'none')">Nessuna rotta</button>
-        <button class="route-opt" onclick="selectRoute(this,'egnatia')">Via Egnatia</button>
-        <button class="route-opt" onclick="selectRoute(this,'serenissima')">Rotta Serenissima</button>
-        <button class="route-opt" onclick="selectRoute(this,'illiria')">Terre Illiriche</button>
-        <button class="route-opt" onclick="selectRoute(this,'greche')">Colonie Greche</button>
+        <button class="route-opt sel" onclick="selectRoute(this,'none')">
+          <div class="route-opt-label">Nessuna rotta</div>
+        </button>
+        <button class="route-opt" onclick="selectRoute(this,'egnatia')">
+          <div class="route-opt-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Via_Egnatia_near_Kavala.jpg/320px-Via_Egnatia_near_Kavala.jpg')"></div>
+          <div class="route-opt-label">Via Egnatia<br><span style="font-weight:400;font-size:10px;color:var(--muted)">Roma → Bisanzio · 146 a.C.</span></div>
+        </button>
+        <button class="route-opt" onclick="selectRoute(this,'serenissima')">
+          <div class="route-opt-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Venezia_-_Palazzo_Ducale.jpg/320px-Venezia_-_Palazzo_Ducale.jpg')"></div>
+          <div class="route-opt-label">Rotta Serenissima<br><span style="font-weight:400;font-size:10px;color:var(--muted)">Venezia · Adriatico · XV sec.</span></div>
+        </button>
+        <button class="route-opt" onclick="selectRoute(this,'illiria')">
+          <div class="route-opt-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Butrint_Roman_theater.jpg/320px-Butrint_Roman_theater.jpg')"></div>
+          <div class="route-opt-label">Terre Illiriche<br><span style="font-weight:400;font-size:10px;color:var(--muted)">Popoli antichi dei Balcani</span></div>
+        </button>
+        <button class="route-opt" onclick="selectRoute(this,'greche')">
+          <div class="route-opt-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Apollonia_Albania.jpg/320px-Apollonia_Albania.jpg')"></div>
+          <div class="route-opt-label">Colonie Greche<br><span style="font-weight:400;font-size:10px;color:var(--muted)">Apollonia · Epidamno · VII a.C.</span></div>
+        </button>
       </div>
 
+      <!-- VISIBILITÀ -->
       <div class="sec-lbl" data-t="lbl_vis">Visibilità</div>
-      <div class="vis-row">
-        <button class="vis-opt sel" onclick="setVis(this,'poi')">
+      <div class="vis-row" id="poiVisRow">
+        <button class="vis-opt sel-pub" onclick="setVis(this,'poi','pub')">
           <i class="ph ph-globe"></i><span data-t="vis_pub_btn">Pubblico</span>
         </button>
-        <button class="vis-opt" onclick="setVis(this,'poi')">
+        <button class="vis-opt" onclick="setVis(this,'poi','prv')">
           <i class="ph ph-lock-simple"></i><span data-t="vis_prv_btn">Privato</span>
         </button>
-        <button class="vis-opt" onclick="setVis(this,'poi')">
+        <button class="vis-opt" onclick="setVis(this,'poi','share')">
           <i class="ph ph-link"></i><span data-t="vis_share_btn">Condividi</span>
         </button>
       </div>
+      <div class="share-link-row" id="shareLinkRow">
+        <i class="ph ph-link" style="color:var(--orange);flex-shrink:0"></i>
+        <span class="share-link-txt" id="shareLinkTxt">https://poilove.com/p/41.3275,19.8189</span>
+        <button class="share-copy-btn" onclick="copyShareLink()"><i class="ph ph-copy"></i></button>
+      </div>
 
+      <!-- REGISTRA GPS + GOOGLE -->
+      <div class="gps-register-bar" id="gpsRegisterBar">
+        <div class="gps-info" id="gpsRegisterInfo">Registra la tua posizione per attivare "Consiglia a Google Maps"</div>
+        <button onclick="registerGPS()">Registra</button>
+      </div>
       <button class="save-btn" id="saveBtn" data-t="save_disabled">Inserisci il nome per continuare</button>
-      <button class="google-btn" onclick="openGoogleMaps()">
+      <button class="google-btn" id="googleSuggestBtn" onclick="openGoogleMapsContrib()">
         <svg width="16" height="16" viewBox="0 0 48 48"><path fill="#4285F4" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#34A853" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#EA4335" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
         <span data-t="google_suggest">Consiglia a Google Maps</span>
       </button>
@@ -976,309 +668,139 @@ i.ph,i.ph-fill{line-height:1}
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════
-     SHEET: ADD ITINERARY STOP
-════════════════════════════════════════ -->
+<!-- ═══ SHEET: ADD STOP ═══ -->
 <div class="sheet-overlay" id="addStopOv">
-  <div class="sheet-backdrop" id="addStopBg" onclick="closeAddStop()"></div>
+  <div class="sheet-backdrop" id="addStopBg"></div>
   <div class="sheet" id="addStopSheet">
-    <div class="sh-handle"></div>
+    <div class="sh-handle" id="addStopHandle"></div>
     <div class="sh-head">
       <div>
         <div class="sh-title" data-t="stop_title">Tappa Itinerario</div>
         <div class="sh-sub" data-t="stop_sub">Senza foto. Pianifica ora, racconta quando ci sei.</div>
       </div>
-      <button class="sh-close" onclick="closeAddStop()"><i class="ph ph-x"></i></button>
+      <button class="sh-close" id="closeAddStopBtn"><i class="ph ph-x"></i></button>
     </div>
     <div class="sh-body">
       <div class="sec-lbl"><span data-t="stop_lbl_name">Nome della tappa</span><span class="req-badge">!</span></div>
-      <input class="field-in" type="text" placeholder="es. Castello di Shkodër"/>
-
+      <input class="field-in" type="text" placeholder="es. Castello di Shkodër" style="margin-bottom:14px"/>
       <div class="sec-lbl" data-t="stop_lbl_cat">Categoria</div>
       <div class="chips">
         <button class="chip" onclick="toggleCat(this)">Cultura</button>
         <button class="chip" onclick="toggleCat(this)">Natura</button>
         <button class="chip" onclick="toggleCat(this)">Cibo</button>
         <button class="chip" onclick="toggleCat(this)">Pratico</button>
-        <button class="chip" onclick="toggleCat(this)">Benessere</button>
       </div>
-
-      <div class="sec-lbl" data-t="stop_lbl_itin">Itinerario</div>
-      <div class="chips">
-        <button class="chip sel-b" onclick="toggleList(this)">Alla scoperta di Tirana</button>
-        <button class="chip" onclick="toggleList(this)">Costa Adriatica Sud</button>
-        <button class="chip" onclick="toggleList(this)">+ Nuovo itinerario</button>
-      </div>
-
-      <div class="sec-lbl" data-t="stop_lbl_route">Rotta Storica</div>
-      <button class="route-trigger" onclick="toggleRoutes(this)" style="margin-bottom:14px">
-        <span>Nessuna rotta storica</span><i class="ph ph-caret-down"></i>
-      </button>
-
       <div class="sec-lbl" data-t="stop_lbl_vis">Visibilità Itinerario</div>
-      <div class="vis-row" style="margin-bottom:6px">
-        <button class="vis-opt sel" onclick="setStopVis(this,'pub')">
-          <i class="ph ph-globe"></i><span data-t="itin_pub">Pubblico</span>
-        </button>
-        <button class="vis-opt" onclick="setStopVis(this,'prv')">
-          <i class="ph ph-lock-simple"></i><span data-t="itin_prv">Privato</span>
-        </button>
+      <div class="vis-row">
+        <button class="vis-opt sel-pub" onclick="setVis(this,'stop','pub')"><i class="ph ph-globe"></i><span data-t="itin_pub">Pubblico</span></button>
+        <button class="vis-opt" onclick="setVis(this,'stop','prv')"><i class="ph ph-lock-simple"></i><span data-t="itin_prv">Privato</span></button>
       </div>
-      <div class="vis-hint" id="visHintStop" data-t="itin_vis_hint">
-        Pubblico = chiunque può unirsi. Puoi bloccare singoli partecipanti.
-      </div>
-
       <div class="sec-lbl" data-t="stop_lbl_date">Data prevista</div>
       <input class="field-in" type="date" style="margin-bottom:16px"/>
-
-      <button class="save-btn ready" onclick="closeAddStop();showToast('✓ Tappa aggiunta!')">
+      <button class="save-btn ready" onclick="closeSheet('addStopOv','addStopBg','addStopSheet');showToast('✓ Tappa aggiunta!')">
         <span data-t="stop_save">Aggiungi tappa</span>
       </button>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════
-     SHEET: ADD LIST
-════════════════════════════════════════ -->
+<!-- ═══ SHEET: ADD LIST ═══ -->
 <div class="sheet-overlay" id="addListOv">
-  <div class="sheet-backdrop" id="addListBg" onclick="closeAddList()"></div>
+  <div class="sheet-backdrop" id="addListBg"></div>
   <div class="sheet" id="addListSheet">
-    <div class="sh-handle"></div>
+    <div class="sh-handle" id="addListHandle"></div>
     <div class="sh-head">
-      <div>
-        <div class="sh-title">Nuova Lista</div>
-        <div class="sh-sub">Crea una raccolta personale di luoghi</div>
-      </div>
-      <button class="sh-close" onclick="closeAddList()"><i class="ph ph-x"></i></button>
+      <div><div class="sh-title">Nuova Lista</div><div class="sh-sub">Crea una raccolta personale</div></div>
+      <button class="sh-close" id="closeAddListBtn"><i class="ph ph-x"></i></button>
     </div>
     <div class="sh-body">
       <div class="sec-lbl">Nome della lista</div>
-      <input class="field-in" type="text" id="newListName" placeholder="es. Tramontisé da Favola"/>
+      <input class="field-in" type="text" id="newListName" placeholder="es. Tramonti da Favola" style="margin-bottom:14px"/>
       <div class="sec-lbl">Visibilità</div>
       <div class="vis-row" style="margin-bottom:20px">
-        <button class="vis-opt sel" onclick="setVis(this,'list')">
-          <i class="ph ph-globe"></i><span>Pubblica</span>
-        </button>
-        <button class="vis-opt" onclick="setVis(this,'list')">
-          <i class="ph ph-lock-simple"></i><span>Privata</span>
-        </button>
-        <button class="vis-opt" onclick="setVis(this,'list')">
-          <i class="ph ph-link"></i><span>Link</span>
-        </button>
+        <button class="vis-opt sel-pub" onclick="setVis(this,'list','pub')"><i class="ph ph-globe"></i><span>Pubblica</span></button>
+        <button class="vis-opt" onclick="setVis(this,'list','prv')"><i class="ph ph-lock-simple"></i><span>Privata</span></button>
+        <button class="vis-opt" onclick="setVis(this,'list','share')"><i class="ph ph-link"></i><span>Link</span></button>
       </div>
       <button class="save-btn ready" onclick="saveNewList()">Crea lista</button>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════
-     SHEET: POI DETAIL (arricchito)
-════════════════════════════════════════ -->
+<!-- ═══ SHEET: DETAIL POI ═══ -->
 <div class="sheet-overlay" id="detailOv">
-  <div class="sheet-backdrop" id="detailBg" onclick="closeDetail()"></div>
+  <div class="sheet-backdrop" id="detailBg"></div>
   <div class="sheet" id="detailSheet">
-    <div class="sh-handle"></div>
-    <div style="padding:12px 20px 0">
-      <!-- Foto scroll -->
+    <div class="sh-handle" id="detailHandle"></div>
+    <div style="padding:4px 20px 0">
       <div class="detail-photos" id="detailPhotos"></div>
-      <!-- Tag categoria -->
       <div class="detail-tag" id="detailTag"><i class="ph ph-tag" style="font-size:11px"></i> Cultura</div>
-      <!-- Nome POI -->
       <div class="detail-name" id="detailName">—</div>
-      <!-- Indirizzo -->
-      <div class="detail-loc" id="detailLoc">
-        <i class="ph ph-map-pin"></i>
-        <span class="detail-loc-text" id="detailAddress">—</span>
+      <div class="detail-loc"><i class="ph ph-map-pin"></i><span id="detailAddress">—</span></div>
+      <div class="detail-coords"><i class="ph ph-crosshair-simple"></i><span id="detailCoordsText">—</span></div>
+      <div class="detail-share-link" id="detailShareLink">
+        <i class="ph ph-link" style="color:var(--orange)"></i>
+        <span id="detailShareLinkTxt" style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+        <button style="border:none;background:none;cursor:pointer;color:var(--orange)" onclick="copyDetailLink()"><i class="ph ph-copy"></i></button>
       </div>
-      <!-- Coordinate -->
-      <div class="detail-coords" id="detailCoordsRow">
-        <i class="ph ph-crosshair-simple"></i>
-        <span id="detailCoordsText">—</span>
-      </div>
-      <!-- Descrizione -->
       <div class="detail-desc" id="detailDesc">—</div>
-      <!-- Footer azioni -->
       <div class="detail-footer" style="margin-bottom:10px">
         <div class="detail-actions">
-          <button class="detail-action-btn da-nav" onclick="openNavigation()">
-            <i class="ph ph-navigation-arrow"></i>
-            <span>Naviga</span>
-          </button>
-          <button class="detail-action-btn da-share">
-            <i class="ph ph-share-network"></i>
-            <span>Condividi</span>
-          </button>
+          <button class="detail-action-btn da-nav" onclick="openNavigation()"><i class="ph ph-navigation-arrow"></i><span>Naviga</span></button>
+          <button class="detail-action-btn" onclick="shareDetail()"><i class="ph ph-share-network"></i><span>Condividi</span></button>
         </div>
         <button class="love-btn" id="loveBtn" onclick="toggleLove()">
           <i class="ph ph-heart" id="loveHeart"></i>
           <span class="love-cnt" id="loveCnt">24</span>
         </button>
       </div>
-      <!-- Autore -->
       <div class="author-row" style="padding-top:8px;border-top:1px solid var(--border)">
-        <div class="g-avatar">
-          <img src="https://ui-avatars.com/api/?name=Alessandro+C&background=D42B2B&color=fff&size=80" alt="avatar"/>
-        </div>
-        <div class="author-name" id="detailAuthor">Alessandro C.</div>
-        <button class="google-btn" onclick="openGoogleMaps()" style="margin:0;padding:6px 10px;font-size:11px;flex:1;max-width:180px">
-          <svg width="12" height="12" viewBox="0 0 48 48"><path fill="#4285F4" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#34A853" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#EA4335" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-          Consiglia a Google
-        </button>
+        <div class="g-avatar"><img src="https://ui-avatars.com/api/?name=A&background=D42B2B&color=fff&size=80" alt="" id="detailAuthorAvatar"/></div>
+        <div class="author-name" id="detailAuthor">—</div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toastMsg"></div>
 
 <script>
-/* ══════════════════════════════════════
+/* ══════════════════════════════════════════
    BADGE SYSTEM
-══════════════════════════════════════ */
-const BADGES = [
-  {min:0,    max:1000,  label:'Amatore',     icon:'ph-fill ph-star',       hat:'🎩',style:'background:rgba(245,158,11,.2);color:#FDE68A;border-color:rgba(245,158,11,.3)'},
-  {min:1001, max:10000, label:'Viaggiatore',  icon:'ph-fill ph-airplane-tilt',hat:'🪖',style:'background:rgba(5,150,105,.2);color:#6EE7B7;border-color:rgba(5,150,105,.3)'},
-  {min:10001,max:70000, label:'Avventuriero', icon:'ph-fill ph-mountains',   hat:'⛑',style:'background:rgba(234,88,12,.2);color:#FED7AA;border-color:rgba(234,88,12,.3)'},
-  {min:70001,max:Infinity,label:'Galattico',  icon:'ph-fill ph-planet',      hat:'👾',style:'background:rgba(124,58,237,.2);color:#DDD6FE;border-color:rgba(124,58,237,.3)'},
+══════════════════════════════════════════ */
+const BADGES=[
+  {min:0,    max:1000,  label:'Amatore',     icon:'ph-fill ph-star',          hat:'🎩',style:'background:rgba(245,158,11,.2);color:#FDE68A;border-color:rgba(245,158,11,.3)'},
+  {min:1001, max:10000, label:'Viaggiatore',  icon:'ph-fill ph-airplane-tilt', hat:'🪖',style:'background:rgba(5,150,105,.2);color:#6EE7B7;border-color:rgba(5,150,105,.3)'},
+  {min:10001,max:70000, label:'Avventuriero', icon:'ph-fill ph-mountains',      hat:'⛑',style:'background:rgba(234,88,12,.2);color:#FED7AA;border-color:rgba(234,88,12,.3)'},
+  {min:70001,max:Infinity,label:'Galattico',  icon:'ph-fill ph-planet',         hat:'👾',style:'background:rgba(124,58,237,.2);color:#DDD6FE;border-color:rgba(124,58,237,.3)'},
 ];
-function getBadge(loves){
-  return BADGES.find(b=>loves>=b.min&&loves<=b.max)||BADGES[0];
-}
+function getBadge(n){return BADGES.find(b=>n>=b.min&&n<=b.max)||BADGES[0]}
 function renderBadge(loves){
   const b=getBadge(loves);
   const el=document.getElementById('profBadge');
   if(!el)return;
-  el.innerHTML=`<i class="${b.icon}"></i><span>${b.label}</span><span style="opacity:.7">· ${loves} love</span>`;
   el.setAttribute('style',b.style+';display:inline-flex;align-items:center;gap:6px;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:700;border:1.5px solid rgba(255,255,255,.25)');
-  document.getElementById('badgeLabel').textContent=b.label;
+  // Use textContent-safe approach: build without innerHTML for live icon
+  el.innerHTML=`<span style="font-size:14px">${b.hat}</span><span>${b.label} · ${loves} love</span>`;
+  const lbl=document.getElementById('badgeLabel');
+  if(lbl)lbl.textContent=b.label;
 }
 let currentLoves=87;
-renderBadge(currentLoves);
 
 function generateAvatar(){
   const b=getBadge(currentLoves);
   showToast(`${b.hat} Avatar "${b.label}" — disponibile post-lancio`);
 }
 
-/* ══════════════════════════════════════
+/* ══════════════════════════════════════════
    TRANSLATIONS
-══════════════════════════════════════ */
+══════════════════════════════════════════ */
 const T={
-  it:{
-    nav_map:'Mappa',nav_itin:'Itinerari',nav_profile:'Profilo',
-    mt_street:'Stradale',mt_sat:'Satellite',mt_routes:'Rotte Storiche',
-    fab_poi:'Segna un luogo',fab_itin:'Tappa Itinerario',
-    add_title:'Salva questo posto',add_sub:'Aggiungi un luogo che ami',
-    congrats:'Complimenti, vuoi fare un lavoro curato, grazie!',
-    lbl_name:'Nome del posto',req:'OBBLIGATORIO',
-    lbl_where:'Dove si trova',
-    loc_gps:'GPS Live',loc_exif:'Foto EXIF',loc_addr:'Indirizzo',loc_map:'Tocca mappa',
-    lbl_near:'Vicino a cosa?',lbl_photos:'Foto',
-    ph_main:'Principale',ph_2:'Foto 2',ph_3:'Foto 3',
-    ph_hint:'Non sei sul posto? Puoi aggiungere foto in seguito.',
-    lbl_story:'Racconta',lbl_cat:'Categorie',lbl_list:'Aggiungi a una lista',
-    lbl_route:'Rotta Storica',route_none:'Nessuna rotta storica',
-    lbl_vis:'Visibilità',
-    vis_pub_btn:'Pubblico',vis_prv_btn:'Privato',vis_share_btn:'Condividi',
-    save_disabled:'Inserisci il nome per continuare',save_ready:'Segna sulla mappa',
-    google_suggest:'Consiglia a Google Maps',
-    stop_title:'Tappa Itinerario',stop_sub:'Senza foto. Pianifica ora, racconta quando ci sei.',
-    stop_lbl_name:'Nome della tappa',stop_lbl_cat:'Categoria',stop_lbl_itin:'Itinerario',
-    stop_lbl_route:'Rotta Storica',stop_lbl_vis:'Visibilità Itinerario',
-    itin_pub:'Pubblico',itin_prv:'Privato',
-    itin_vis_hint:'Pubblico = chiunque può unirsi. Puoi bloccare singoli partecipanti.',
-    stop_lbl_date:'Data prevista',stop_save:'Aggiungi tappa',
-    stat_poi:'POI',stat_love:'Love',stat_list:'Liste',
-    prof_lists:'Le mie liste',prof_new_list:'Nuova lista',
-    prof_tags:'I miei tag',prof_new_tag:'Aggiungi',
-    prof_my_poi:'I miei POI',prof_add_poi:'Aggiungi',
-    prof_pub_toggle:'Come mi vedono gli altri',
-    gen_avatar:'Genera avatar AI',
-    itin_h:'Itinerari di Viaggio',
-    itin_desc:'Pianifica le tue tappe prima di partire. Trova compagni di viaggio. Trasforma ogni tappa in un POI quando sei sul posto.',
-    itin_open:'Apri Itinerari',
-    itin_note:'Demo con mappa, mini-calendario, GPS live e compagni di viaggio.',
-    back:'Indietro',
-  },
-  sq:{
-    nav_map:'Harta',nav_itin:'Itinerare',nav_profile:'Profili',
-    mt_street:'Rrugore',mt_sat:'Satelitor',mt_routes:'Rrugët Historike',
-    fab_poi:'Shëno një vend',fab_itin:'Stacion Itinerarit',
-    add_title:'Ruaj këtë vend',add_sub:'Shto një vend që e do',
-    congrats:'Urime, doni të bëni punë me kujdes!',
-    lbl_name:'Emri i vendit',req:'E DETYRUESHME',
-    lbl_where:'Ku ndodhet',
-    loc_gps:'GPS Live',loc_exif:'EXIF Foto',loc_addr:'Adresë',loc_map:'Prek hartën',
-    lbl_near:'Pranë çfarë?',lbl_photos:'Foto',
-    ph_main:'Kryesore',ph_2:'Foto 2',ph_3:'Foto 3',
-    ph_hint:'Nuk jeni aty? Mund të shtoni foto më vonë.',
-    lbl_story:'Trego',lbl_cat:'Kategori',lbl_list:'Shto në listë',
-    lbl_route:'Rrugë Historike',route_none:'Asnjë rrugë historike',
-    lbl_vis:'Dukshmëria',
-    vis_pub_btn:'Publik',vis_prv_btn:'Privat',vis_share_btn:'Nda',
-    save_disabled:'Fut emrin për të vazhduar',save_ready:'Shëno në hartë',
-    google_suggest:'Sugjeroni te Google Maps',
-    stop_title:'Stacion Itinerarit',stop_sub:'Pa foto. Planifiko tani, trego kur je aty.',
-    stop_lbl_name:'Emri i stacionit',stop_lbl_cat:'Kategori',stop_lbl_itin:'Itinerar',
-    stop_lbl_route:'Rrugë Historike',stop_lbl_vis:'Dukshmëria Itinerarit',
-    itin_pub:'Publik',itin_prv:'Privat',
-    itin_vis_hint:'Publik = kushdo mund të bashkohet. Mund të bllokoni pjesëmarrës.',
-    stop_lbl_date:'Data e planifikuar',stop_save:'Shto stacionin',
-    stat_poi:'POI',stat_love:'Love',stat_list:'Lista',
-    prof_lists:'Listat e mia',prof_new_list:'Listë e re',
-    prof_tags:'Etiketat e mia',prof_new_tag:'Shto',
-    prof_my_poi:'POI-të e mia',prof_add_poi:'Shto',
-    prof_pub_toggle:'Si më shohin të tjerët',
-    gen_avatar:'Gjenero avatar AI',
-    itin_h:'Itinerare Udhëtimi',
-    itin_desc:'Planifikoni stacionet para nisjes. Gjeni shokë udhëtimi. Kthejeni çdo stacion në POI kur jeni aty.',
-    itin_open:'Hap Itineraret',
-    itin_note:'Demo me hartë, mini-kalendar, GPS live dhe shokë udhëtimi.',
-    back:'Kthehu',
-  },
-  en:{
-    nav_map:'Map',nav_itin:'Itineraries',nav_profile:'Profile',
-    mt_street:'Street',mt_sat:'Satellite',mt_routes:'Historic Routes',
-    fab_poi:'Mark a place',fab_itin:'Itinerary Stop',
-    add_title:'Save this place',add_sub:'Add a place you love',
-    congrats:'Great, you want to do careful work, thank you!',
-    lbl_name:'Place name',req:'REQUIRED',
-    lbl_where:'Where is it',
-    loc_gps:'GPS Live',loc_exif:'Photo EXIF',loc_addr:'Address',loc_map:'Tap map',
-    lbl_near:'Near what?',lbl_photos:'Photos',
-    ph_main:'Main',ph_2:'Photo 2',ph_3:'Photo 3',
-    ph_hint:'Not there yet? You can add photos later.',
-    lbl_story:'Tell your story',lbl_cat:'Categories',lbl_list:'Add to a list',
-    lbl_route:'Historic Route',route_none:'No historic route',
-    lbl_vis:'Visibility',
-    vis_pub_btn:'Public',vis_prv_btn:'Private',vis_share_btn:'Share',
-    save_disabled:'Enter the name to continue',save_ready:'Mark on map',
-    google_suggest:'Suggest to Google Maps',
-    stop_title:'Itinerary Stop',stop_sub:'No photos. Plan now, tell the story when you\'re there.',
-    stop_lbl_name:'Stop name',stop_lbl_cat:'Category',stop_lbl_itin:'Itinerary',
-    stop_lbl_route:'Historic Route',stop_lbl_vis:'Itinerary Visibility',
-    itin_pub:'Public',itin_prv:'Private',
-    itin_vis_hint:'Public = anyone can join. You can block individual participants.',
-    stop_lbl_date:'Planned date',stop_save:'Add stop',
-    stat_poi:'POI',stat_love:'Love',stat_list:'Lists',
-    prof_lists:'My lists',prof_new_list:'New list',
-    prof_tags:'My tags',prof_new_tag:'Add',
-    prof_my_poi:'My POIs',prof_add_poi:'Add',
-    prof_pub_toggle:'How others see me',
-    gen_avatar:'Generate AI avatar',
-    itin_h:'Travel Itineraries',
-    itin_desc:'Plan your stops before you leave. Find travel companions. Turn each stop into a POI when you get there.',
-    itin_open:'Open Itineraries',
-    itin_note:'Demo with map, mini-calendar, live GPS and travel companions.',
-    back:'Back',
-  }
+  it:{nav_map:'Mappa',nav_itin:'Itinerari',nav_profile:'Profilo',mt_street:'Stradale',mt_sat:'Satellite',mt_routes:'Rotte Storiche',fab_poi:'Segna un luogo',fab_itin:'Tappa Itinerario',add_title:'Salva questo posto',add_sub:'Aggiungi un luogo che ami',congrats:'Sotto i 90 secondi! Grazie.',lbl_name:'Nome del posto',req:'OBBLIGATORIO',lbl_where:'Dove si trova',loc_gps:'GPS Live',loc_exif:'Foto EXIF',loc_addr:'Indirizzo',loc_map:'Tocca mappa',lbl_photos:'Foto',ph_main:'Principale',ph_2:'Foto 2',ph_3:'Foto 3',ph_hint:'Non sei sul posto? Puoi aggiungere foto in seguito.',lbl_story:'Racconta',lbl_cat:'Categorie',lbl_list:'Aggiungi a una lista',lbl_route:'Rotta Storica',route_none:'Nessuna rotta storica',lbl_vis:'Visibilità',vis_pub_btn:'Pubblico',vis_prv_btn:'Privato',vis_share_btn:'Condividi',save_disabled:'Inserisci il nome per continuare',save_ready:'Segna sulla mappa',google_suggest:'Consiglia a Google Maps',stop_title:'Tappa Itinerario',stop_sub:'Senza foto. Pianifica ora, racconta quando ci sei.',stop_lbl_name:'Nome della tappa',stop_lbl_cat:'Categoria',stop_lbl_vis:'Visibilità Itinerario',itin_pub:'Pubblico',itin_prv:'Privato',stop_lbl_date:'Data prevista',stop_save:'Aggiungi tappa',stat_poi:'POI',stat_love:'Love',stat_list:'Liste',prof_lists:'Le mie liste',prof_new_list:'Nuova lista',prof_tags:'I miei tag',prof_new_tag:'Aggiungi',prof_my_poi:'I miei POI',prof_add_poi:'Aggiungi',prof_pub_toggle:'Come mi vedono gli altri',itin_h:'Itinerari di Viaggio',itin_desc:'Pianifica le tue tappe prima di partire. Trova compagni di viaggio. Trasforma ogni tappa in un POI quando sei sul posto.',itin_open:'Apri Itinerari',itin_note:'Demo con mappa, mini-calendario, GPS live e compagni.',back:'Indietro',},
+  sq:{nav_map:'Harta',nav_itin:'Itinerare',nav_profile:'Profili',mt_street:'Rrugore',mt_sat:'Satelitor',mt_routes:'Rrugët Historike',fab_poi:'Shëno një vend',fab_itin:'Stacion Itinerarit',add_title:'Ruaj këtë vend',add_sub:'Shto një vend që e do',congrats:'Nën 90 sekonda! Faleminderit.',lbl_name:'Emri i vendit',req:'E DETYRUESHME',lbl_where:'Ku ndodhet',loc_gps:'GPS Live',loc_exif:'EXIF Foto',loc_addr:'Adresë',loc_map:'Prek hartën',lbl_photos:'Foto',ph_main:'Kryesore',ph_2:'Foto 2',ph_3:'Foto 3',ph_hint:'Nuk jeni aty? Mund të shtoni foto më vonë.',lbl_story:'Trego',lbl_cat:'Kategori',lbl_list:'Shto në listë',lbl_route:'Rrugë Historike',route_none:'Asnjë rrugë historike',lbl_vis:'Dukshmëria',vis_pub_btn:'Publik',vis_prv_btn:'Privat',vis_share_btn:'Nda',save_disabled:'Fut emrin për të vazhduar',save_ready:'Shëno në hartë',google_suggest:'Sugjeroni te Google Maps',stop_title:'Stacion Itinerarit',stop_sub:'Pa foto. Planifiko tani, trego kur je aty.',stop_lbl_name:'Emri i stacionit',stop_lbl_cat:'Kategori',stop_lbl_vis:'Dukshmëria Itinerarit',itin_pub:'Publik',itin_prv:'Privat',stop_lbl_date:'Data e planifikuar',stop_save:'Shto stacionin',stat_poi:'POI',stat_love:'Love',stat_list:'Lista',prof_lists:'Listat e mia',prof_new_list:'Listë e re',prof_tags:'Etiketat e mia',prof_new_tag:'Shto',prof_my_poi:'POI-të e mia',prof_add_poi:'Shto',prof_pub_toggle:'Si më shohin të tjerët',itin_h:'Itinerare Udhëtimi',itin_desc:'Planifikoni stacionet para nisjes. Gjeni shokë udhëtimi.',itin_open:'Hap Itineraret',itin_note:'Demo me hartë, mini-kalendar, GPS live.',back:'Kthehu',},
+  en:{nav_map:'Map',nav_itin:'Itineraries',nav_profile:'Profile',mt_street:'Street',mt_sat:'Satellite',mt_routes:'Historic Routes',fab_poi:'Mark a place',fab_itin:'Itinerary Stop',add_title:'Save this place',add_sub:'Add a place you love',congrats:'Under 90 seconds! Thank you.',lbl_name:'Place name',req:'REQUIRED',lbl_where:'Where is it',loc_gps:'GPS Live',loc_exif:'Photo EXIF',loc_addr:'Address',loc_map:'Tap map',lbl_photos:'Photos',ph_main:'Main',ph_2:'Photo 2',ph_3:'Photo 3',ph_hint:"Not there yet? You can add photos later.",lbl_story:'Tell your story',lbl_cat:'Categories',lbl_list:'Add to a list',lbl_route:'Historic Route',route_none:'No historic route',lbl_vis:'Visibility',vis_pub_btn:'Public',vis_prv_btn:'Private',vis_share_btn:'Share',save_disabled:'Enter the name to continue',save_ready:'Mark on map',google_suggest:'Suggest to Google Maps',stop_title:'Itinerary Stop',stop_sub:"No photos. Plan now, tell the story when you're there.",stop_lbl_name:'Stop name',stop_lbl_cat:'Category',stop_lbl_vis:'Itinerary Visibility',itin_pub:'Public',itin_prv:'Private',stop_lbl_date:'Planned date',stop_save:'Add stop',stat_poi:'POI',stat_love:'Love',stat_list:'Lists',prof_lists:'My lists',prof_new_list:'New list',prof_tags:'My tags',prof_new_tag:'Add',prof_my_poi:'My POIs',prof_add_poi:'Add',prof_pub_toggle:'How others see me',itin_h:'Travel Itineraries',itin_desc:'Plan your stops before you leave. Find travel companions.',itin_open:'Open Itineraries',itin_note:'Demo with map, mini-calendar, live GPS and companions.',back:'Back',}
 };
 
-/* ══════════════════════════════════════
-   LANG
-══════════════════════════════════════ */
 const LANGS=['it','sq','en'];
 let lang='it';
 const nl=(navigator.language||'').substring(0,2);
@@ -1286,139 +808,334 @@ if(nl==='sq')lang='sq'; else if(nl!=='it')lang='en';
 
 function applyLang(l){
   lang=l;
-  document.getElementById('langBtn').textContent=l.toUpperCase();
+  const btn=document.getElementById('langBtn');
+  if(btn)btn.textContent=l.toUpperCase();
   document.documentElement.lang=l;
   const t=T[l];
   document.querySelectorAll('[data-t]').forEach(el=>{
     const k=el.dataset.t;if(t[k]!==undefined)el.textContent=t[k];
   });
 }
-function cycleLang(){
-  applyLang(LANGS[(LANGS.indexOf(lang)+1)%LANGS.length]);
-}
+function cycleLang(){applyLang(LANGS[(LANGS.indexOf(lang)+1)%LANGS.length])}
 
-/* ══════════════════════════════════════
+/* ══════════════════════════════════════════
    MAP
-══════════════════════════════════════ */
+══════════════════════════════════════════ */
 const CENTER=[41.3275,19.8189];
 const POIS=[
-  {lat:41.3264,lng:19.8193,cat:'Cultura',name:'Blloku',
-   desc:'Quartiere liberato nel \'91. Caffè, storia, energia vibrante.',
-   address:'Rruga Ismail Qemali, Tiranë',love:41,
-   photos:['https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Blloku_Tirana.jpg/400px-Blloku_Tirana.jpg'],
-   author:'Alessandro C.'},
-  {lat:41.3275,lng:19.8212,cat:'Cultura',name:"Xhamia Et'hem Beut",
-   desc:'Moschea ottomana del 1823, sopravvissuta al comunismo. Capolavoro di tilework e arte religiosa.',
-   address:'Sheshi Skënderbej, Tiranë',love:24,
-   photos:['https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Mosque_of_Ethem_Bey.jpg/400px-Mosque_of_Ethem_Bey.jpg'],
-   author:'Alessandro C.'},
-  {lat:41.3293,lng:19.8180,cat:'Cultura',name:'Piramida di Tirana',
-   desc:'Costruita nel 1988 come museo per Enver Hoxha. Oggi spazio culturale in trasformazione.',
-   address:'Bulevardi Dëshmorët e Kombit, Tiranë',love:18,
-   photos:['https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Pyramid_of_Tirana_2022.jpg/400px-Pyramid_of_Tirana_2022.jpg'],
-   author:'Liri V.'},
-  {lat:41.3236,lng:19.8162,cat:'Cibo',name:'Pazari i Ri',
-   desc:'Il mercato più autentico dei Balcani. Odori di spezie, colori vivaci, vita vera.',
-   address:'Rruga Luigj Gurakuqi, Tiranë',love:56,
-   photos:['https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/New_Bazaar_Tirana.jpg/400px-New_Bazaar_Tirana.jpg'],
-   author:'Mirela K.'},
-  {lat:41.3320,lng:19.8242,cat:'Natura',name:'Liqeni Artificial',
-   desc:'Il lago artificiale è il polmone verde di Tirana. Al tramonto è pura magia.',
-   address:'Parku Kombëtar, Tiranë',love:33,
-   photos:[],
-   author:'Arben S.'},
+  {lat:41.3264,lng:19.8193,cat:'Cultura',name:'Blloku',desc:"Quartiere liberato nel '91. Caffè, storia, energia vibrante.",address:'Rruga Ismail Qemali, Tiranë',love:41,photos:['https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Blloku_Tirana.jpg/400px-Blloku_Tirana.jpg'],author:'Alessandro C.'},
+  {lat:41.3275,lng:19.8212,cat:'Cultura',name:"Xhamia Et'hem Beut",desc:'Moschea ottomana del 1823. Capolavoro di tilework.',address:'Sheshi Skënderbej, Tiranë',love:24,photos:['https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Mosque_of_Ethem_Bey.jpg/400px-Mosque_of_Ethem_Bey.jpg'],author:'Alessandro C.'},
+  {lat:41.3293,lng:19.8180,cat:'Cultura',name:'Piramida di Tirana',desc:"Costruita nel 1988 come museo per Enver Hoxha. Oggi spazio culturale.",address:'Bulevardi Dëshmorët e Kombit, Tiranë',love:18,photos:['https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Pyramid_of_Tirana_2022.jpg/400px-Pyramid_of_Tirana_2022.jpg'],author:'Liri V.'},
+  {lat:41.3236,lng:19.8162,cat:'Cibo',name:'Pazari i Ri',desc:'Il mercato più autentico dei Balcani. Odori di spezie, vita vera.',address:'Rruga Luigj Gurakuqi, Tiranë',love:56,photos:['https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/New_Bazaar_Tirana.jpg/400px-New_Bazaar_Tirana.jpg'],author:'Mirela K.'},
+  {lat:41.3320,lng:19.8242,cat:'Natura',name:'Liqeni Artificial',desc:'Il lago artificiale è il polmone verde di Tirana. Al tramonto è pura magia.',address:'Parku Kombëtar, Tiranë',love:33,photos:[],author:'Arben S.'},
 ];
 
 let map,tileStreet,tileSat,routeLayer,currentPOI;
+let gpsPos=null,gpsRegistered=false;
 
 function initMap(){
-  map=L.map('map',{zoomControl:false}).setView(CENTER,15);
-  tileStreet=L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(map);
+  map=L.map('map',{zoomControl:false,attributionControl:true}).setView(CENTER,15);
+  tileStreet=L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
   tileSat=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19});
+  routeLayer=L.polyline([[41.35,19.60],[41.34,19.70],[41.33,19.78],[41.3275,19.8189],[41.32,19.86],[41.30,19.95]],{color:'#7C3AED',weight:4,opacity:.75,dashArray:'10,7'});
 
   POIS.forEach((p,i)=>{
     const icon=L.divIcon({
       className:'',
-      html:`<div class="poi-marker">
-        <div class="poi-bubble">
-          <i class="ph-fill ph-map-pin" style="font-size:15px;color:#fff"></i>
-          <div class="poi-badge">${p.love}</div>
-        </div>
-        <div class="poi-tail"></div>
-      </div>`,
+      html:`<div class="poi-marker"><div class="poi-bubble"><i class="ph-fill ph-map-pin" style="font-size:15px;color:#fff;pointer-events:none"></i><div class="poi-badge">${p.love}</div></div><div class="poi-tail"></div></div>`,
       iconSize:[36,46],iconAnchor:[18,46]
     });
     L.marker([p.lat,p.lng],{icon}).addTo(map).on('click',()=>openDetail(i));
   });
 
-  // Via Egnatia historical overlay
-  routeLayer=L.polyline([
-    [41.35,19.60],[41.34,19.70],[41.33,19.78],[41.3275,19.8189],[41.32,19.86],[41.30,19.95]
-  ],{color:'#7C3AED',weight:3,opacity:.7,dashArray:'8,6'});
+  // Detect GPS
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(pos=>{
+      gpsPos={lat:pos.coords.latitude,lng:pos.coords.longitude};
+      document.getElementById('locStreet').textContent='Posizione GPS rilevata';
+      document.getElementById('locCoords').textContent=`${gpsPos.lat.toFixed(4)}, ${gpsPos.lng.toFixed(4)}`;
+      updateShareLink(gpsPos.lat,gpsPos.lng);
+    },()=>{});
+  }
+
+  setTimeout(()=>map.invalidateSize(),200);
 }
 
 function setMapType(type,btn){
-  document.querySelectorAll('.mt-btn').forEach(b=>{b.classList.remove('active','route-active')});
+  document.querySelectorAll('.mt-btn').forEach(b=>b.classList.remove('active','route-active'));
   if(type==='street'){tileStreet.addTo(map);tileSat.remove();routeLayer.remove();btn.classList.add('active')}
   if(type==='satellite'){tileSat.addTo(map);tileStreet.remove();routeLayer.remove();btn.classList.add('active')}
   if(type==='routes'){tileStreet.addTo(map);tileSat.remove();routeLayer.addTo(map);btn.classList.add('route-active')}
 }
+function centerMap(){if(map)map.setView(CENTER,15)}
 
-function centerMap(){map.setView(CENTER,15)}
+/* ══════════════════════════════════════════
+   GPS REGISTER
+══════════════════════════════════════════ */
+function registerGPS(){
+  const bar=document.getElementById('gpsRegisterBar');
+  const info=document.getElementById('gpsRegisterInfo');
+  const googleBtn=document.getElementById('googleSuggestBtn');
+  if(gpsPos){
+    gpsRegistered=true;
+    info.textContent=`✓ ${gpsPos.lat.toFixed(4)}, ${gpsPos.lng.toFixed(4)}`;
+    bar.style.background='#DCFCE7';bar.style.borderColor='#22C55E';
+    bar.querySelector('button').style.display='none';
+    googleBtn.classList.add('active');
+    showToast('Posizione registrata!');
+  } else {
+    navigator.geolocation.getCurrentPosition(pos=>{
+      gpsPos={lat:pos.coords.latitude,lng:pos.coords.longitude};
+      gpsRegistered=true;
+      info.textContent=`✓ ${gpsPos.lat.toFixed(4)}, ${gpsPos.lng.toFixed(4)}`;
+      bar.style.background='#DCFCE7';bar.style.borderColor='#22C55E';
+      bar.querySelector('button').style.display='none';
+      googleBtn.classList.add('active');
+      showToast('Posizione registrata!');
+    },()=>showToast('GPS non disponibile'));
+  }
+}
+function openGoogleMapsContrib(){
+  if(!gpsRegistered){showToast('Prima registra la posizione GPS');return;}
+  const lat=gpsPos?gpsPos.lat:CENTER[0],lng=gpsPos?gpsPos.lng:CENTER[1];
+  const name=encodeURIComponent(document.getElementById('poiNameIn').value||'POI•LOVE');
+  window.open(`https://maps.google.com/maps?q=${lat},${lng}&ll=${lat},${lng}&spn=0.002,0.002&t=m&z=18&q=${name}`,'_blank');
+}
 
-/* ══════════════════════════════════════
+/* ══════════════════════════════════════════
+   AUTOCOMPLETE (Nominatim)
+══════════════════════════════════════════ */
+let acTimer;
+function onNameFocus(){
+  if(!document.getElementById('poiNameIn').value && gpsPos){
+    const lat=gpsPos.lat,lng=gpsPos.lng;
+    fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`,{headers:{'Accept-Language':lang}})
+      .then(r=>r.json()).then(d=>{
+        if(d&&d.display_name){
+          const parts=d.display_name.split(',');
+          const suggestion=parts[0].trim();
+          showAcSuggestion([{name:suggestion,addr:parts.slice(1,3).join(',').trim(),lat,lng}]);
+        }
+      }).catch(()=>{});
+  }
+}
+function onNameInput(val){
+  clearTimeout(acTimer);
+  checkSave();
+  if(val.length<2){document.getElementById('acDrop').classList.remove('open');return;}
+  const lat=gpsPos?gpsPos.lat:CENTER[0],lng=gpsPos?gpsPos.lng:CENTER[1];
+  acTimer=setTimeout(()=>{
+    fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(val)}&format=json&limit=5&lat=${lat}&lon=${lng}&addressdetails=1`,{headers:{'Accept-Language':lang}})
+      .then(r=>r.json()).then(results=>{
+        showAcSuggestion(results.slice(0,5).map(r=>({
+          name:r.display_name.split(',')[0],
+          addr:r.display_name.split(',').slice(1,3).join(',').trim(),
+          lat:parseFloat(r.lat),lng:parseFloat(r.lon)
+        })));
+      }).catch(()=>{});
+  },400);
+}
+function showAcSuggestion(items){
+  const drop=document.getElementById('acDrop');
+  if(!items.length){drop.classList.remove('open');return;}
+  drop.innerHTML=items.map(item=>`
+    <div class="ac-item" onclick="selectAcItem('${item.name.replace(/'/g,"\\'")}',${item.lat},${item.lng})">
+      <i class="ph ph-map-pin"></i>
+      <div><div class="ac-item-name">${item.name}</div><div class="ac-item-addr">${item.addr}</div></div>
+    </div>`).join('');
+  drop.classList.add('open');
+}
+function selectAcItem(name,lat,lng){
+  document.getElementById('poiNameIn').value=name;
+  document.getElementById('acDrop').classList.remove('open');
+  document.getElementById('locCoords').textContent=`${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+  updateShareLink(lat,lng);
+  checkSave();
+  if(map)map.setView([lat,lng],17);
+}
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.autocomplete-wrap'))
+    document.getElementById('acDrop').classList.remove('open');
+});
+
+/* ══════════════════════════════════════════
+   SHARE LINK
+══════════════════════════════════════════ */
+function updateShareLink(lat,lng){
+  const link=`https://poilove.com/p/${lat.toFixed(4)},${lng.toFixed(4)}`;
+  document.getElementById('shareLinkTxt').textContent=link;
+  document.getElementById('detailShareLinkTxt').textContent=link;
+}
+function copyShareLink(){
+  const txt=document.getElementById('shareLinkTxt').textContent;
+  navigator.clipboard?navigator.clipboard.writeText(txt).then(()=>showToast('Link copiato!')):showToast(txt);
+}
+function copyDetailLink(){
+  const txt=document.getElementById('detailShareLinkTxt').textContent;
+  navigator.clipboard?navigator.clipboard.writeText(txt).then(()=>showToast('Link copiato!')):showToast(txt);
+}
+
+/* ══════════════════════════════════════════
+   PHOTOS
+══════════════════════════════════════════ */
+const photoData=[null,null,null];
+function triggerPhoto(idx){
+  document.getElementById('photoInput'+idx).click();
+}
+function handlePhoto(input,idx){
+  const file=input.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    photoData[idx]=e.target.result;
+    const slot=document.getElementById('pslot-'+idx);
+    slot.classList.add('has-photo');
+    slot.innerHTML=`<div class="ph-preview" style="background-image:url('${e.target.result}')"></div><button class="ph-remove" onclick="removePhoto(event,${idx})"><i class="ph ph-x"></i></button>`;
+    showToast(lang==='sq'?'Foto shtuar!':lang==='en'?'Photo added!':'Foto aggiunta!');
+  };
+  reader.readAsDataURL(file);
+}
+function removePhoto(e,idx){
+  e.stopPropagation();
+  photoData[idx]=null;
+  const slot=document.getElementById('pslot-'+idx);
+  slot.classList.remove('has-photo');
+  slot.innerHTML=idx===0
+    ?`<i class="ph ph-camera" id="picon-0"></i><span class="slot-lbl" id="plbl-0">Principale</span>`
+    :`<i class="ph ph-plus"></i><span class="slot-lbl">Foto ${idx+1}</span>`;
+  document.getElementById('photoInput'+idx).value='';
+}
+
+/* ══════════════════════════════════════════
+   VOICE (Web Speech API)
+══════════════════════════════════════════ */
+let recognition=null,isRecording=false;
+function initVoice(){
+  const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SpeechRecognition)return;
+  recognition=new SpeechRecognition();
+  recognition.continuous=false;recognition.interimResults=true;
+  recognition.lang=lang==='sq'?'sq-AL':lang==='en'?'en-US':'it-IT';
+  recognition.onresult=e=>{
+    const transcript=Array.from(e.results).map(r=>r[0].transcript).join('');
+    const ta=document.getElementById('storyIn');
+    ta.value=transcript.substring(0,200);updateChar();
+  };
+  recognition.onend=()=>{isRecording=false;setVoiceBtnState(false)};
+  recognition.onerror=()=>{isRecording=false;setVoiceBtnState(false)};
+}
+function setVoiceBtnState(rec){
+  const btn=document.getElementById('voiceBtn');
+  const lbl=document.getElementById('voiceBtnLbl');
+  if(rec){btn.classList.add('recording');lbl.textContent=lang==='it'?'Stop':lang==='sq'?'Ndaloj':'Stop';}
+  else{btn.classList.remove('recording');lbl.textContent=lang==='it'?'Dett.':lang==='sq'?'Diktim':'Dict.';}
+}
+function toggleVoice(){
+  if(!recognition){showToast(lang==='it'?'Voce non supportata su questo browser':lang==='sq'?'Zëri nuk mbështetet':'Voice not supported');return;}
+  if(isRecording){recognition.stop();isRecording=false;setVoiceBtnState(false);}
+  else{recognition.lang=lang==='sq'?'sq-AL':lang==='en'?'en-US':'it-IT';recognition.start();isRecording=true;setVoiceBtnState(true);}
+}
+
+/* ══════════════════════════════════════════
+   AI SUMMARIZE (smart truncation, free)
+══════════════════════════════════════════ */
+function aiSummarize(){
+  const ta=document.getElementById('storyIn');
+  const text=ta.value.trim();
+  if(!text){showToast(lang==='it'?'Scrivi prima qualcosa':lang==='sq'?'Shkruaj diçka':'Write something first');return;}
+  if(text.length<=200){showToast('Già sotto i 200 caratteri!');return;}
+  // Cut at last sentence boundary before 200
+  const cut=text.substring(0,200);
+  const lastDot=Math.max(cut.lastIndexOf('.'),cut.lastIndexOf('!'),cut.lastIndexOf('?'));
+  const result=lastDot>80?cut.substring(0,lastDot+1):cut.substring(0,cut.lastIndexOf(' '))||cut;
+  ta.value=result.trim();
+  updateChar();
+  showToast(lang==='it'?'Testo sintetizzato a 200 caratteri':lang==='sq'?'Tekst i shkurtuar':' Summarized to 200 chars');
+}
+
+/* ══════════════════════════════════════════
    TABS
-══════════════════════════════════════ */
+══════════════════════════════════════════ */
 function showTab(tab){
-  // Map elements
-  const mapEls=['map','mapTypes','fab','fabMenu'];
-  mapEls.forEach(id=>{
-    const el=document.getElementById(id);
-    if(el)el.style.zIndex=(tab==='map'?parseInt(el.style.zIndex||10)+1:'');
-  });
-
   document.getElementById('profileView').classList.toggle('active',tab==='profile');
   document.getElementById('itinView').classList.toggle('active',tab==='itin');
-
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  const nm=document.getElementById('nav-'+tab);
-  if(nm)nm.classList.add('active');
-
-  // Show/hide map UI
+  const nm=document.getElementById('nav-'+tab);if(nm)nm.classList.add('active');
   const onMap=tab==='map';
   document.getElementById('fab').style.display=onMap?'flex':'none';
   document.getElementById('fabMenu').style.opacity='0';
   document.getElementById('fabMenu').classList.remove('open');
   document.getElementById('fab').classList.remove('open');
   document.querySelectorAll('.map-types')[0].style.display=onMap?'flex':'none';
-
+  if(tab==='map'&&map)setTimeout(()=>map.invalidateSize(),50);
   if(tab==='profile')togglePublicProfile(false);
 }
 
-/* ══════════════════════════════════════
+/* ══════════════════════════════════════════
    FAB
-══════════════════════════════════════ */
+══════════════════════════════════════════ */
 function toggleFab(){
   document.getElementById('fab').classList.toggle('open');
   document.getElementById('fabMenu').classList.toggle('open');
 }
+function closeFab(){
+  document.getElementById('fab').classList.remove('open');
+  document.getElementById('fabMenu').classList.remove('open');
+}
 
-/* ══════════════════════════════════════
-   SHEETS
-══════════════════════════════════════ */
+/* ══════════════════════════════════════════
+   SHEETS — generic open/close + swipe
+══════════════════════════════════════════ */
+function openSheet(ovId,bgId,sheetId){
+  document.getElementById(bgId).classList.add('vis');
+  document.getElementById(sheetId).classList.add('open');
+}
+function closeSheet(ovId,bgId,sheetId){
+  document.getElementById(bgId).classList.remove('vis');
+  document.getElementById(sheetId).classList.remove('open');
+}
+function initSwipe(handleId,sheetId,bgId){
+  const handle=document.getElementById(handleId);
+  const sheet=document.getElementById(sheetId);
+  if(!handle||!sheet)return;
+  let startY=0,startScrollTop=0,dragging=false;
+  handle.addEventListener('touchstart',e=>{startY=e.touches[0].clientY;startScrollTop=sheet.scrollTop;dragging=true;},{passive:true});
+  handle.addEventListener('touchmove',e=>{
+    if(!dragging)return;
+    const dy=e.touches[0].clientY-startY;
+    if(dy>0)sheet.style.transform=`translateY(${dy}px)`;
+  },{passive:true});
+  handle.addEventListener('touchend',e=>{
+    if(!dragging)return;dragging=false;
+    const dy=e.changedTouches[0].clientY-startY;
+    if(dy>80){sheet.style.transform='';closeSheet(null,bgId,sheetId);}
+    else sheet.style.transform='';
+  },{passive:true});
+}
+
+/* ══════════════════════════════════════════
+   TIMER
+══════════════════════════════════════════ */
 let timerInterval,timerSec=0;
 function openAddPOI(){
   closeFab();
-  document.getElementById('addPoiBg').classList.add('vis');
-  document.getElementById('addPoiSheet').classList.add('open');
-  timerSec=0;document.getElementById('timerBadge').innerHTML='<i class="ph ph-timer"></i> 0:00';
+  openSheet('addPoiOv','addPoiBg','addPoiSheet');
+  timerSec=0;
+  document.getElementById('timerTime').textContent='0:00';
   document.getElementById('congratsBanner').classList.remove('show');
   document.getElementById('saveBtn').className='save-btn';
+  document.getElementById('gpsRegisterBar').style.background='';
+  document.getElementById('gpsRegisterBar').style.borderColor='';
+  if(gpsRegistered){
+    document.getElementById('googleSuggestBtn').classList.add('active');
+  } else {
+    document.getElementById('googleSuggestBtn').classList.remove('active');
+  }
   clearInterval(timerInterval);
   timerInterval=setInterval(()=>{
     timerSec++;
     const m=Math.floor(timerSec/60),s=timerSec%60;
-    document.getElementById('timerBadge').innerHTML=`<i class="ph ph-timer"></i> ${m}:${String(s).padStart(2,'0')}`;
+    document.getElementById('timerTime').textContent=`${m}:${String(s).padStart(2,'0')}`;
     if(timerSec===90){
       document.getElementById('congratsBanner').classList.add('show');
       clearInterval(timerInterval);
@@ -1427,42 +1144,24 @@ function openAddPOI(){
 }
 function closeAddPOI(){
   clearInterval(timerInterval);
-  document.getElementById('addPoiBg').classList.remove('vis');
-  document.getElementById('addPoiSheet').classList.remove('open');
+  closeSheet('addPoiOv','addPoiBg','addPoiSheet');
+  document.getElementById('acDrop').classList.remove('open');
+  if(isRecording&&recognition){recognition.stop();isRecording=false;setVoiceBtnState(false);}
 }
-function openAddStop(){
-  closeFab();
-  document.getElementById('addStopBg').classList.add('vis');
-  document.getElementById('addStopSheet').classList.add('open');
-}
-function closeAddStop(){
-  document.getElementById('addStopBg').classList.remove('vis');
-  document.getElementById('addStopSheet').classList.remove('open');
-}
-function openAddList(){
-  document.getElementById('addListBg').classList.add('vis');
-  document.getElementById('addListSheet').classList.add('open');
-  setTimeout(()=>document.getElementById('newListName').focus(),300);
-}
-function closeAddList(){
-  document.getElementById('addListBg').classList.remove('vis');
-  document.getElementById('addListSheet').classList.remove('open');
-}
+function openAddStop(){closeFab();openSheet('addStopOv','addStopBg','addStopSheet')}
+function openAddList(){openSheet('addListOv','addListBg','addListSheet');setTimeout(()=>document.getElementById('newListName').focus(),350)}
+
+/* ══════════════════════════════════════════
+   DETAIL
+══════════════════════════════════════════ */
 function openDetail(idx){
   const p=POIS[idx];currentPOI=p;
-  // Photos
-  const ph=document.getElementById('detailPhotos');
-  ph.innerHTML='';
+  const ph=document.getElementById('detailPhotos');ph.innerHTML='';
   if(p.photos&&p.photos.length>0){
-    p.photos.forEach(url=>{
-      const d=document.createElement('div');
-      d.className='detail-photo';d.style.backgroundImage=`url('${url}')`;ph.appendChild(d);
-    });
+    p.photos.forEach(url=>{const d=document.createElement('div');d.className='detail-photo';d.style.backgroundImage=`url('${url}')`;ph.appendChild(d);});
   } else {
-    const d=document.createElement('div');
-    d.className='detail-no-photo';d.innerHTML='<i class="ph ph-image-broken"></i>';ph.appendChild(d);
+    const d=document.createElement('div');d.className='detail-no-photo';d.innerHTML='<i class="ph ph-image-broken"></i>';ph.appendChild(d);
   }
-  // Content
   document.getElementById('detailTag').innerHTML=`<i class="ph ph-tag" style="font-size:11px"></i> ${p.cat}`;
   document.getElementById('detailName').textContent=p.name;
   document.getElementById('detailAddress').textContent=p.address||'Tiranë, Albania';
@@ -1472,41 +1171,28 @@ function openDetail(idx){
   document.getElementById('loveBtn').classList.remove('loved');
   document.getElementById('loveHeart').className='ph ph-heart';
   document.getElementById('detailAuthor').textContent=p.author||'—';
-  // Open
-  document.getElementById('detailBg').classList.add('vis');
-  document.getElementById('detailSheet').classList.add('open');
+  updateShareLink(p.lat,p.lng);
+  openSheet('detailOv','detailBg','detailSheet');
 }
-function closeDetail(){
-  document.getElementById('detailBg').classList.remove('vis');
-  document.getElementById('detailSheet').classList.remove('open');
-}
+function closeDetail(){closeSheet('detailOv','detailBg','detailSheet')}
 function toggleLove(){
-  const btn=document.getElementById('loveBtn');
-  const heart=document.getElementById('loveHeart');
-  const cnt=document.getElementById('loveCnt');
+  const btn=document.getElementById('loveBtn'),heart=document.getElementById('loveHeart'),cnt=document.getElementById('loveCnt');
   const loved=btn.classList.toggle('loved');
   heart.className=loved?'ph-fill ph-heart':'ph ph-heart';
   cnt.textContent=parseInt(cnt.textContent)+(loved?1:-1);
 }
 function openNavigation(){
-  if(currentPOI){
-    window.open(`https://maps.google.com/maps?daddr=${currentPOI.lat},${currentPOI.lng}&directionsmode=walking`,'_blank');
-  }
+  if(currentPOI)window.open(`https://maps.google.com/maps?daddr=${currentPOI.lat},${currentPOI.lng}&directionsmode=walking`,'_blank');
 }
-function openGoogleMaps(){
-  const c=map?map.getCenter():{lat:CENTER[0],lng:CENTER[1]};
-  const lat=c.lat||CENTER[0],lng=c.lng||CENTER[1];
-  window.open(`https://maps.google.com/maps?q=${lat},${lng}&ll=${lat},${lng}&z=17&action=INTERESTED_PLACE_LISTING`,'_blank');
+function shareDetail(){
+  const txt=document.getElementById('detailShareLinkTxt').textContent;
+  if(navigator.share)navigator.share({title:document.getElementById('detailName').textContent,url:txt});
+  else navigator.clipboard&&navigator.clipboard.writeText(txt).then(()=>showToast('Link copiato!'));
 }
 
-function closeFab(){
-  document.getElementById('fab').classList.remove('open');
-  document.getElementById('fabMenu').classList.remove('open');
-}
-
-/* ══════════════════════════════════════
+/* ══════════════════════════════════════════
    FORM HELPERS
-══════════════════════════════════════ */
+══════════════════════════════════════════ */
 function checkSave(){
   const v=document.getElementById('poiNameIn').value.trim().length>0;
   const btn=document.getElementById('saveBtn');
@@ -1515,7 +1201,9 @@ function checkSave(){
 }
 function updateChar(){
   const v=document.getElementById('storyIn').value.length;
-  document.getElementById('charCount').textContent=`${v} / 200`;
+  const el=document.getElementById('charCount');
+  if(el)el.textContent=`${v} / 200`;
+  el.style.color=v>180?'var(--red)':v>150?'var(--orange)':'var(--muted)';
 }
 function setLocTab(btn,type){
   document.querySelectorAll('.loc-tab').forEach(t=>t.classList.remove('active'));
@@ -1525,162 +1213,167 @@ function toggleCat(btn){
   const chips=btn.closest('.chips');
   const sel=chips?chips.querySelectorAll('.sel').length:0;
   if(btn.classList.contains('sel')){btn.classList.remove('sel');return;}
-  if(sel<3)btn.classList.add('sel');
+  if(sel<3){btn.classList.add('sel');}
   const cnt=document.getElementById('catCount');
-  if(cnt)cnt.textContent=`${chips?chips.querySelectorAll('.sel').length:0} / 3`;
+  if(cnt&&chips)cnt.textContent=`${chips.querySelectorAll('.sel').length} / 3`;
 }
 function toggleList(btn){
-  document.querySelectorAll('.list-scroll .chip, .chips .chip').forEach(c=>{
-    if(c!==btn&&c.classList.contains('sel-b'))c.classList.remove('sel-b');
-  });
   btn.classList.toggle('sel-b');
 }
 function toggleRoutes(btn){
   const opts=btn.nextElementSibling;
-  const arrow=btn.querySelector('i');
+  if(!opts)return;
   opts.classList.toggle('open');
+  const arrow=btn.querySelector('i');
   if(arrow)arrow.style.transform=opts.classList.contains('open')?'rotate(180deg)':'';
 }
 function selectRoute(btn,id){
   document.querySelectorAll('.route-opt').forEach(o=>o.classList.remove('sel'));
   btn.classList.add('sel');
   const lbl=document.getElementById('routeLabel');
-  if(lbl)lbl.textContent=btn.textContent;
+  if(lbl)lbl.textContent=btn.querySelector('.route-opt-label').firstChild.textContent.trim();
   btn.closest('.route-options').classList.remove('open');
+  const arrow=document.getElementById('routeArrow');
+  if(arrow)arrow.style.transform='';
 }
-function setVis(btn,ctx){
+function setVis(btn,ctx,type){
   const row=btn.closest('.vis-row');
-  row.querySelectorAll('.vis-opt').forEach(o=>o.classList.remove('sel'));
-  btn.classList.add('sel');
-}
-function setStopVis(btn,type){
-  const row=btn.closest('.vis-row');
-  row.querySelectorAll('.vis-opt').forEach(o=>o.classList.remove('sel'));
-  btn.classList.add('sel');
-  const hint=document.getElementById('visHintStop');
-  if(hint){
-    if(type==='pub')hint.textContent=T[lang].itin_vis_hint;
-    else hint.textContent=lang==='it'?'Privato = solo chi ha il link può vedere e partecipare, previa approvazione.':lang==='sq'?'Privat = vetëm ata me link mund të shohin dhe bashkohen, me miratim.':'Private = only those with the link can view and join, subject to approval.';
+  row.querySelectorAll('.vis-opt').forEach(o=>o.classList.remove('sel-pub','sel-prv','sel-share'));
+  if(type==='pub')btn.classList.add('sel-pub');
+  else if(type==='prv')btn.classList.add('sel-prv');
+  else btn.classList.add('sel-share');
+  // Share link
+  if(ctx==='poi'){
+    const row2=document.getElementById('shareLinkRow');
+    if(row2)row2.classList.toggle('show',type==='share');
   }
 }
-function selectPhoto(slot,idx){
-  slot.style.borderColor='var(--red)';
-  slot.innerHTML=`<i class="ph-fill ph-check-circle" style="font-size:22px;color:var(--green)"></i><span class="slot-lbl">Foto ${idx+1}</span>`;
-  showToast(lang==='it'?'Foto aggiunta!':lang==='sq'?'Foto shtuar!':'Photo added!');
-}
 
-/* ══════════════════════════════════════
-   PROFILE
-══════════════════════════════════════ */
+/* ══════════════════════════════════════════
+   TAGS IN SHEET
+══════════════════════════════════════════ */
+function showSheetTagInput(){
+  const container=document.getElementById('sheetTagsContainer');
+  const ex=container.querySelector('.tag-in-field');
+  if(ex){ex.focus();return;}
+  const inp=document.createElement('input');
+  inp.className='tag-in-field';inp.placeholder='Tag…';inp.maxLength=30;
+  inp.onkeydown=e=>{
+    if(e.key==='Enter'&&inp.value.trim()){addSheetTag(inp.value.trim());inp.value='';}
+    if(e.key==='Escape')inp.remove();
+  };
+  inp.onblur=()=>{if(!inp.value.trim())inp.remove();};
+  container.appendChild(inp);
+  setTimeout(()=>inp.focus(),50);
+}
+function addSheetTag(text){
+  const container=document.getElementById('sheetTagsContainer');
+  const chip=document.createElement('span');
+  chip.className='tag-chip-inline';
+  chip.innerHTML=`${text}<button class="tag-chip-rm" onclick="removeSheetTag(this)"><i class="ph ph-x"></i></button>`;
+  container.insertBefore(chip,container.lastChild);
+}
+function removeSheetTag(btn){btn.closest('.tag-chip-inline').remove()}
+
+/* ══════════════════════════════════════════
+   PROFILE HELPERS
+══════════════════════════════════════════ */
 function changeAvatar(){
-  showToast(lang==='it'?'Funzione attiva nell\'app':lang==='sq'?'Funksion aktiv në aplikacion':'Feature active in the app');
+  showToast(lang==='it'?'Funzione attiva nell\'app':lang==='sq'?'Funksion aktiv në aplikacion':'Feature active in app');
 }
 function togglePublicProfile(show){
   document.getElementById('privateProfile').style.display=show?'none':'block';
   document.getElementById('publicProfile').style.display=show?'block':'none';
 }
-
-/* TAG ADD */
 function showTagInput(){
   const container=document.getElementById('tagsContainer');
-  // Remove existing input if present
-  const ex=container.querySelector('.tag-input-wrap');
-  if(ex){ex.remove();return;}
-  const wrap=document.createElement('span');
-  wrap.className='tag-input-wrap';
-  wrap.innerHTML=`<input class="tag-input" placeholder="Nuovo tag…" maxlength="30" autofocus onkeydown="handleTagKey(event,this)">`;
+  const ex=container.querySelector('.tag-input');if(ex){ex.focus();return;}
+  const wrap=document.createElement('span');wrap.className='tag-input-wrap';
+  wrap.innerHTML=`<input class="tag-input" placeholder="Nuovo tag…" maxlength="30" autofocus>`;
   container.appendChild(wrap);
-  setTimeout(()=>wrap.querySelector('input').focus(),50);
-}
-function handleTagKey(e,input){
-  if(e.key==='Enter'){addTag(input.value);input.closest('.tag-input-wrap').remove();}
-  if(e.key==='Escape'){input.closest('.tag-input-wrap').remove();}
+  const inp=wrap.querySelector('input');
+  inp.onkeydown=e=>{
+    if(e.key==='Enter'&&inp.value.trim()){addTag(inp.value.trim());inp.value='';}
+    if(e.key==='Escape')wrap.remove();
+  };
+  inp.onblur=()=>{if(!inp.value.trim())wrap.remove();};
+  setTimeout(()=>inp.focus(),50);
 }
 function addTag(text){
   const t=text.trim();if(!t)return;
   const container=document.getElementById('tagsContainer');
-  const chip=document.createElement('span');
-  chip.className='tag-chip';chip.textContent=t;
+  const chip=document.createElement('span');chip.className='tag-chip';chip.textContent=t;
   container.insertBefore(chip,container.lastElementChild);
   showToast(`+ Tag "${t}"`);
 }
-
-/* LIST ADD */
 function saveNewList(){
   const name=document.getElementById('newListName').value.trim();
   if(!name){showToast('Inserisci un nome');return;}
-  const container=document.getElementById('listsContainer');
   const colors=['#D42B2B','#285EA7','#22C55E','#D48B2B','#7C3AED'];
+  const container=document.getElementById('listsContainer');
   const color=colors[container.children.length%colors.length];
-  const item=document.createElement('div');
-  item.className='list-item';
-  item.innerHTML=`
-    <div class="list-dot" style="background:${color}"></div>
-    <div class="list-info">
-      <div class="list-name">${name}</div>
-      <div class="list-meta">0 POI · pubblica</div>
-    </div>
-    <span class="list-vis lv-pub">Pubblica</span>`;
+  const item=document.createElement('div');item.className='list-item';
+  item.innerHTML=`<div class="list-dot" style="background:${color}"></div><div class="list-info"><div class="list-name">${name}</div><div class="list-meta">0 POI</div></div><span class="list-vis lv-pub">Pubblica</span>`;
   container.appendChild(item);
-  // Update stat
-  const statEl=document.getElementById('statList');
-  if(statEl)statEl.textContent=parseInt(statEl.textContent)+1;
-  closeAddList();
-  showToast(`+ Lista "${name}" creata!`);
+  const statEl=document.getElementById('statList');if(statEl)statEl.textContent=parseInt(statEl.textContent)+1;
+  // Add to sheet list scroll
+  const scroll=document.getElementById('sheetListScroll');
+  if(scroll){const chip=document.createElement('button');chip.className='chip';chip.textContent=name;chip.onclick=function(){toggleList(this)};scroll.insertBefore(chip,scroll.lastElementChild);}
+  closeSheet('addListOv','addListBg','addListSheet');
+  showToast(`+ Lista "${name}"`);
   document.getElementById('newListName').value='';
 }
-
-/* POI BOARD ACTIONS */
 function deletePOI(id){
-  const card=document.getElementById(id);
-  if(!card)return;
-  card.style.opacity='0';card.style.transform='scale(.9)';
-  card.style.transition='all .3s';
-  setTimeout(()=>{
-    card.remove();
-    const statEl=document.getElementById('statPoi');
-    if(statEl)statEl.textContent=Math.max(0,parseInt(statEl.textContent)-1);
-    showToast('POI eliminato');
-  },300);
+  const card=document.getElementById(id);if(!card)return;
+  card.style.opacity='0';card.style.transform='scale(.9)';card.style.transition='all .3s';
+  setTimeout(()=>{card.remove();const s=document.getElementById('statPoi');if(s)s.textContent=Math.max(0,parseInt(s.textContent)-1);showToast('POI eliminato');},300);
 }
-function editPOI(id){
-  showToast(lang==='it'?'Modifica attiva nell\'app':lang==='sq'?'Redaktim aktiv në app':'Edit active in app');
-}
-function togglePOIVis(btn,id){
-  const card=document.getElementById(id);
-  if(!card)return;
-  const visEl=card.querySelector('.poi-card-vis');
-  const isPrivate=visEl.innerHTML.includes('ph-lock-simple');
-  if(isPrivate){
-    visEl.innerHTML='<i class="ph ph-globe"></i> Pubblico';
-    btn.innerHTML='<i class="ph ph-lock-simple"></i>';
-  } else {
-    visEl.innerHTML='<i class="ph ph-lock-simple"></i> Privato';
-    btn.innerHTML='<i class="ph ph-globe"></i>';
-  }
-  showToast(isPrivate?'POI reso pubblico':'POI reso privato');
-}
+function editPOI(id){showToast(lang==='it'?"Modifica attiva nell'app":lang==='sq'?'Redaktim aktiv':'Edit active in app')}
 
-/* ══════════════════════════════════════
+/* ══════════════════════════════════════════
    TOAST
-══════════════════════════════════════ */
+══════════════════════════════════════════ */
 let toastTimer;
 function showToast(msg){
   const el=document.getElementById('toastMsg');
   el.textContent=msg;el.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>el.classList.remove('show'),2200);
+  toastTimer=setTimeout(()=>el.classList.remove('show'),2400);
 }
 
-/* ══════════════════════════════════════
+/* ══════════════════════════════════════════
    INIT
-══════════════════════════════════════ */
+══════════════════════════════════════════ */
 window.addEventListener('DOMContentLoaded',()=>{
+  // Map
   initMap();
+  // Lang
   applyLang(lang);
+  // Badge
   renderBadge(currentLoves);
-  // Start on map tab
-  document.getElementById('fab').style.display='flex';
+  // Voice
+  initVoice();
+  // Close buttons — explicit event listeners (fix mobile Safari)
+  document.getElementById('closeAddPoiBtn').addEventListener('click', closeAddPOI);
+  document.getElementById('closeAddPoiBtn').addEventListener('touchend', e=>{e.preventDefault();closeAddPOI()});
+  document.getElementById('closeAddStopBtn').addEventListener('click', ()=>closeSheet('addStopOv','addStopBg','addStopSheet'));
+  document.getElementById('closeAddStopBtn').addEventListener('touchend', e=>{e.preventDefault();closeSheet('addStopOv','addStopBg','addStopSheet')});
+  document.getElementById('closeAddListBtn').addEventListener('click', ()=>closeSheet('addListOv','addListBg','addListSheet'));
+  document.getElementById('closeAddListBtn').addEventListener('touchend', e=>{e.preventDefault();closeSheet('addListOv','addListBg','addListSheet')});
+  // Backdrop close
+  document.getElementById('addPoiBg').addEventListener('click',closeAddPOI);
+  document.getElementById('addStopBg').addEventListener('click',()=>closeSheet('addStopOv','addStopBg','addStopSheet'));
+  document.getElementById('addListBg').addEventListener('click',()=>closeSheet('addListOv','addListBg','addListSheet'));
+  document.getElementById('detailBg').addEventListener('click',closeDetail);
+  // Swipe to close
+  initSwipe('addPoiHandle','addPoiSheet','addPoiBg');
+  initSwipe('addStopHandle','addStopSheet','addStopBg');
+  initSwipe('addListHandle','addListSheet','addListBg');
+  initSwipe('detailHandle','detailSheet','detailBg');
+  // Default share link
+  updateShareLink(CENTER[0],CENTER[1]);
+  // Visibility default state
+  document.querySelectorAll('.vis-opt.sel-pub').forEach(el=>{});
 });
 </script>
 </body>
