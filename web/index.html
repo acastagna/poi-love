@@ -412,6 +412,68 @@ button{touch-action:manipulation}
 .level-env-card.active::after{content:'✓';position:absolute;top:5px;right:6px;background:var(--red);color:#fff;border-radius:50%;width:16px;height:16px;font-size:9px;font-weight:900;display:flex;align-items:center;justify-content:center}
 .level-ai-btn{width:100%;margin-top:10px;padding:9px;background:#EBF2FC;border:1.5px dashed var(--blue);border-radius:10px;font-size:11px;font-weight:700;color:var(--blue);cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px}
 
+/* ══════════════════════════════════════════
+   TRIP LANDING PAGE — /trip/slug
+══════════════════════════════════════════ */
+.trip-landing-view{position:fixed;inset:0;z-index:9999;background:#EAE4D8;overflow-y:auto;-webkit-overflow-scrolling:touch}
+
+/* Hero */
+.tlp-hero{position:relative;min-height:60vh;display:flex;flex-direction:column;justify-content:flex-end;background:linear-gradient(160deg,#1a3d6e,#285EA7);background-size:cover;background-position:center}
+.tlp-hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.15) 0%,rgba(0,0,0,.55) 60%,rgba(0,0,0,.78) 100%);z-index:0}
+.tlp-hero-top{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:18px 20px;z-index:1}
+.tlp-logo{height:28px;filter:brightness(0) invert(1)}
+.tlp-open-app{background:var(--red);color:#fff;border-radius:20px;padding:7px 16px;font-size:12px;font-weight:800;text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:opacity .15s}
+.tlp-open-app:hover{opacity:.88}
+.tlp-hero-content{position:relative;z-index:1;padding:20px 24px 32px}
+.tlp-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(212,43,43,.9);color:#fff;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;margin-bottom:10px}
+.tlp-title{font-size:clamp(22px,5vw,36px);font-weight:900;color:#fff;line-height:1.2;margin-bottom:10px;text-shadow:0 2px 12px rgba(0,0,0,.4)}
+.tlp-dates{font-size:13px;color:rgba(255,255,255,.85);display:flex;align-items:center;gap:6px;margin-bottom:14px}
+.tlp-companions{display:flex;align-items:center;gap:-6px}
+.tlp-comp-av{width:34px;height:34px;border-radius:50%;border:2.5px solid rgba(255,255,255,.7);overflow:hidden;margin-left:-8px;flex-shrink:0}
+.tlp-comp-av:first-child{margin-left:0}
+.tlp-comp-av img{width:100%;height:100%;object-fit:cover}
+.tlp-comp-more{background:rgba(255,255,255,.2);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+
+/* Body */
+.tlp-body{max-width:680px;margin:0 auto;padding:28px 20px 60px}
+.tlp-desc-block{background:var(--card);border-radius:14px;padding:18px 20px;margin-bottom:24px;border:1px solid var(--border)}
+.tlp-desc{font-size:14px;color:var(--text);line-height:1.7;margin:0}
+.tlp-section{margin-bottom:28px}
+.tlp-section-lbl{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+
+/* Tappe */
+.tlp-stops{display:flex;flex-direction:column;gap:0}
+.tlp-stop{display:flex;gap:14px;align-items:flex-start;padding:14px 0;border-bottom:1px solid var(--border);position:relative}
+.tlp-stop:last-child{border-bottom:none}
+.tlp-stop-line{position:absolute;left:19px;top:42px;bottom:-14px;width:2px;background:var(--border);z-index:0}
+.tlp-stop:last-child .tlp-stop-line{display:none}
+.tlp-stop-icon{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;position:relative;z-index:1}
+.tlp-stop-icon.done{background:#DCFCE7;color:#16A34A}
+.tlp-stop-info{flex:1;min-width:0}
+.tlp-stop-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px}
+.tlp-stop-date{font-size:11px;color:var(--muted)}
+.tlp-stop-done-badge{font-size:9px;font-weight:700;background:#DCFCE7;color:#16A34A;border-radius:6px;padding:1px 6px;margin-left:6px;vertical-align:middle}
+
+/* POI grid */
+.tlp-poi-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media(min-width:500px){.tlp-poi-grid{grid-template-columns:repeat(3,1fr)}}
+.tlp-poi-card{border-radius:12px;overflow:hidden;background:var(--card);border:1px solid var(--border);cursor:pointer}
+.tlp-poi-card-img{aspect-ratio:4/3;background-size:cover;background-position:center;background-color:#e8e2d8}
+.tlp-poi-card-body{padding:8px 10px}
+.tlp-poi-card-name{font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px}
+.tlp-poi-card-love{font-size:10px;color:var(--red);font-weight:700}
+
+/* CTA */
+.tlp-cta-block{background:linear-gradient(135deg,var(--red),#9B1C1C);border-radius:18px;padding:28px 24px;text-align:center;margin-bottom:24px}
+.tlp-cta-text{color:rgba(255,255,255,.9);font-size:14px;margin-bottom:16px;line-height:1.5}
+.tlp-cta-btn{display:inline-flex;align-items:center;gap:7px;background:#fff;color:var(--red);font-size:14px;font-weight:800;padding:12px 24px;border-radius:24px;text-decoration:none;margin-bottom:10px;transition:transform .15s}
+.tlp-cta-btn:hover{transform:scale(1.03)}
+.tlp-share-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;background:rgba(255,255,255,.18);color:#fff;border:1.5px solid rgba(255,255,255,.4);border-radius:20px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s;margin-top:4px}
+.tlp-share-btn:hover{background:rgba(255,255,255,.28)}
+
+/* Footer */
+.tlp-footer{text-align:center;font-size:11px;color:var(--muted);padding-bottom:20px}
+
 /* PUBLIC PROFILE */
 .public-profile-view{display:none}
 .pub-header{background:linear-gradient(160deg,#285EA7 0%,#1a3d6e 100%);padding:52px 20px 30px;text-align:center;position:relative}
@@ -1168,6 +1230,62 @@ button{touch-action:manipulation}
     </div>
   </div>
 </div><!-- /profile-view -->
+
+<!-- ═══ TRIP LANDING PAGE — /trip/slug ═══ -->
+<div id="tripLanding" class="trip-landing-view" style="display:none">
+  <!-- Hero -->
+  <div class="tlp-hero" id="tlpHero">
+    <div class="tlp-hero-overlay"></div>
+    <div class="tlp-hero-top">
+      <img src="https://poilove.com/img/logo-horizontal.svg" alt="POI•LOVE" class="tlp-logo" onerror="this.style.display='none'">
+      <a href="/" class="tlp-open-app">Apri l'app <i class="ph ph-arrow-right"></i></a>
+    </div>
+    <div class="tlp-hero-content">
+      <div class="tlp-badge" id="tlpBadge"><i class="ph-fill ph-map-pin"></i> Destinazione</div>
+      <h1 class="tlp-title" id="tlpTitle">Titolo Itinerario</h1>
+      <div class="tlp-dates" id="tlpDates"><i class="ph ph-calendar"></i> Date</div>
+      <!-- Companions -->
+      <div class="tlp-companions" id="tlpCompanions"></div>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="tlp-body">
+    <!-- Descrizione -->
+    <div class="tlp-desc-block" id="tlpDescBlock" style="display:none">
+      <p class="tlp-desc" id="tlpDesc"></p>
+    </div>
+
+    <!-- Tappe -->
+    <div class="tlp-section">
+      <div class="tlp-section-lbl"><i class="ph ph-path"></i> Tappe del viaggio</div>
+      <div class="tlp-stops" id="tlpStops"></div>
+    </div>
+
+    <!-- POI lungo la rotta -->
+    <div class="tlp-section" id="tlpPoisSection" style="display:none">
+      <div class="tlp-section-lbl"><i class="ph-fill ph-heart" style="color:var(--red)"></i> POI•LOVE lungo la rotta</div>
+      <div class="tlp-poi-grid" id="tlpPoiGrid"></div>
+    </div>
+
+    <!-- CTA -->
+    <div class="tlp-cta-block">
+      <p class="tlp-cta-text">Vuoi seguire questo itinerario o pianificarne uno simile?</p>
+      <a href="/" class="tlp-cta-btn">
+        <i class="ph-fill ph-heart"></i> Apri POI•LOVE
+      </a>
+      <button class="tlp-share-btn" onclick="shareTripLanding()">
+        <i class="ph ph-share-network"></i> Condividi
+      </button>
+    </div>
+
+    <!-- Footer -->
+    <div class="tlp-footer">
+      <div>Creato con <strong>POI•LOVE</strong> · Open Source</div>
+      <div style="margin-top:4px;opacity:.6;font-size:10px">Cultural Bridge OS · 321.AL · Alessandro Castagna©</div>
+    </div>
+  </div>
+</div><!-- /trip-landing -->
 
 <!-- ═══ ITINERARY VIEW ═══ -->
 <div class="itin-view" id="itinView">
@@ -2276,6 +2394,109 @@ function copyDetailLink(){
    ?at=lat,lng   → centra la mappa e mostra il pin
    (compatibilità vecchi link /p/lat,lng gestita via .htaccess)
 ══════════════════════════════════════════ */
+/* ══════════════════════════════════════════
+   TRIP LANDING PAGE — rileva /trip/slug e monta la vista pubblica
+══════════════════════════════════════════ */
+function checkTripLandingPage(){
+  const path = window.location.pathname;
+  const match = path.match(/^\/trip\/([A-Za-z0-9_\-]+)\/?$/);
+  if(!match) return false;
+  const slug = match[1];
+
+  // Cerca il trip per shareId
+  const trip = Object.values(TRIPS).find(t => t.shareId === slug);
+
+  // Popola e mostra la landing page
+  const landing = document.getElementById('tripLanding');
+  if(!landing) return false;
+
+  // ── Hero ──
+  const hero = document.getElementById('tlpHero');
+  if(hero && trip?.cover) hero.style.backgroundImage = `url('${trip.cover}')`;
+
+  const titleEl = document.getElementById('tlpTitle');
+  if(titleEl) titleEl.textContent = trip ? trip.name : slug.replace(/-/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+
+  const badgeEl = document.getElementById('tlpBadge');
+  if(badgeEl) badgeEl.innerHTML = `<i class="ph-fill ph-map-pin"></i> ${trip?.badge || trip?.dest || 'Viaggio'}`;
+
+  const datesEl = document.getElementById('tlpDates');
+  if(datesEl && trip?.dates) datesEl.innerHTML = `<i class="ph ph-calendar"></i> ${trip.dates}`;
+
+  // ── Companions ──
+  const compEl = document.getElementById('tlpCompanions');
+  if(compEl && trip?.companions){
+    const bgs=['285EA7','D42B2B','22C55E','F97316'];
+    const shown = trip.companions.slice(0,5);
+    const extra = trip.companions.length - shown.length;
+    compEl.innerHTML = shown.map((n,i)=>
+      `<div class="tlp-comp-av"><img src="https://ui-avatars.com/api/?name=${encodeURIComponent(n)}&background=${bgs[i%4]}&color=fff&size=68" alt="${n}"></div>`
+    ).join('') + (extra>0 ? `<div class="tlp-comp-av tlp-comp-more">+${extra}</div>` : '');
+  }
+
+  // ── Tappe ──
+  const stopsEl = document.getElementById('tlpStops');
+  if(stopsEl && trip?.stops){
+    stopsEl.innerHTML = trip.stops.map((s,i)=>{
+      const isDone = s.status==='done';
+      const iconClass = s.icon || 'ph ph-map-pin';
+      const iconBg = s.iconBg || '#EBF2FC';
+      const iconColor = s.iconColor || 'var(--blue)';
+      return `
+        <div class="tlp-stop">
+          ${i < trip.stops.length-1 ? '<div class="tlp-stop-line"></div>' : ''}
+          <div class="tlp-stop-icon${isDone?' done':''}" style="background:${isDone?'#DCFCE7':iconBg};color:${isDone?'#16A34A':iconColor}">
+            <i class="${isDone?'ph-fill ph-check':iconClass}"></i>
+          </div>
+          <div class="tlp-stop-info">
+            <div class="tlp-stop-name">${s.name}${isDone?'<span class="tlp-stop-done-badge">✓ fatto</span>':''}</div>
+            <div class="tlp-stop-date">${s.date||''}</div>
+          </div>
+        </div>`;
+    }).join('');
+  } else if(stopsEl) {
+    stopsEl.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:12px 0">Tappe non ancora disponibili</div>';
+  }
+
+  // ── Cerca POI vicini dalla mappa (opzionale, caricamento async) ──
+  // (richiede Supabase inizializzato — viene chiamato dopo init)
+  window._pendingTripSlug = slug;
+
+  // ── Meta tags SEO / OG ──
+  const tripName = trip ? trip.name : slug;
+  document.title = `${tripName} · POI•LOVE`;
+  _setMeta('og:title', tripName + ' · POI•LOVE');
+  _setMeta('og:description', trip?.dest ? `Itinerario a ${trip.dest} · ${trip.dates||''}` : 'Itinerario su POI•LOVE');
+  if(trip?.cover) _setMeta('og:image', trip.cover);
+  _setMeta('og:url', window.location.href);
+  _setMeta('twitter:card', 'summary_large_image');
+
+  // ── Mostra landing, nascondi app ──
+  landing.style.display = 'block';
+  // Nascondi elementi app sottostanti
+  ['map','navBar','profileView','itinView'].forEach(id=>{
+    const el = document.getElementById(id) || document.querySelector('.'+id);
+    if(el) el.style.display='none';
+  });
+  document.body.style.overflow = 'auto';
+  document.documentElement.style.overflow = 'auto';
+
+  return true;
+}
+
+function _setMeta(property, content){
+  let el = document.querySelector(`meta[property="${property}"]`) ||
+           document.querySelector(`meta[name="${property}"]`);
+  if(!el){ el=document.createElement('meta'); el.setAttribute(property.startsWith('og:')||property.startsWith('twitter:')?'property':'name',property); document.head.appendChild(el); }
+  el.setAttribute('content', content);
+}
+
+function shareTripLanding(){
+  const url = window.location.href;
+  if(navigator.share){ navigator.share({title:document.title,url}).catch(()=>{}); }
+  else { navigator.clipboard?.writeText(url).then(()=>showToast('🔗 Link copiato!')); }
+}
+
 function handleDeepLink(){
   const params = new URLSearchParams(window.location.search);
   const poiId = params.get('poi');
@@ -2926,6 +3147,9 @@ function showToast(msg){
    INIT
 ══════════════════════════════════════════ */
 window.addEventListener('DOMContentLoaded',()=>{
+  // ── Trip/List landing page — controlla prima di tutto il resto ──
+  if(checkTripLandingPage()) return; // non inizializzare l'app, mostra solo la landing
+
   // Auth overlay — visibile di default fino a verifica sessione
   // (getSession() lo nasconde se utente già loggato — vedi sopra)
   // Per demo in locale senza backend attivo, commenta la riga seguente:
