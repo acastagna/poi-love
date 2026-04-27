@@ -361,60 +361,98 @@ button{touch-action:manipulation}
 .itin-ac-drop.open{display:block}
 /* Trip cards */
 .itin-cards{padding:0 20px;display:flex;flex-direction:column;gap:14px;padding-bottom:20px}
-.trip-card{border-radius:18px;overflow:hidden;background:var(--card);box-shadow:0 4px 20px rgba(0,0,0,.09);cursor:pointer;transition:transform .18s}
-.trip-card:active{transform:scale(.98)}
-.trip-cover{height:140px;background-size:cover;background-position:center;position:relative}
-.trip-cover-overlay{position:absolute;inset:0;background:linear-gradient(transparent 30%,rgba(0,0,0,.62))}
+.trip-card{border-radius:18px;overflow:hidden;background:var(--card);box-shadow:0 4px 20px rgba(0,0,0,.09)}
+.trip-cover{height:150px;background-size:cover;background-position:center;position:relative}
+.trip-cover-overlay{position:absolute;inset:0;background:linear-gradient(transparent 25%,rgba(0,0,0,.68))}
 .trip-cover-badge{position:absolute;top:12px;left:12px;background:rgba(255,255,255,.22);backdrop-filter:blur(8px);border-radius:10px;padding:4px 10px;font-size:10px;font-weight:800;color:#fff;display:flex;align-items:center;gap:5px}
-.trip-cover-dates{position:absolute;bottom:10px;left:14px;font-size:11px;font-weight:700;color:rgba(255,255,255,.85)}
-.trip-cover-vis{position:absolute;top:12px;right:12px;font-size:11px;font-weight:700;color:#fff;background:rgba(255,255,255,.2);border-radius:8px;padding:3px 8px}
-.trip-body{padding:14px 16px 16px}
-.trip-name{font-size:17px;font-weight:900;color:var(--text);margin-bottom:6px}
-.trip-meta{display:flex;gap:14px;font-size:11px;color:var(--muted);margin-bottom:12px}
+.trip-cover-dates{position:absolute;bottom:10px;left:14px;font-size:11px;font-weight:700;color:rgba(255,255,255,.9)}
+.trip-cover-change{position:absolute;top:12px;right:12px;background:rgba(0,0,0,.35);border:none;color:#fff;border-radius:8px;padding:4px 8px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px}
+/* Visibility + share bar */
+.trip-vis-bar{display:flex;align-items:center;gap:6px;padding:10px 14px;border-bottom:1px solid var(--border)}
+.trip-vis-btn{height:26px;padding:0 10px;border-radius:13px;border:1.5px solid var(--border);background:none;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--muted);transition:all .15s;display:flex;align-items:center;gap:4px}
+.trip-vis-btn.active-pub{background:#DCFCE7;border-color:#16A34A;color:#16A34A}
+.trip-vis-btn.active-friends{background:#EBF2FC;border-color:var(--blue);color:var(--blue)}
+.trip-vis-btn.active-prv{background:#f5f0e8;border-color:#C8BFB0;color:var(--muted)}
+.trip-share-btn{margin-left:auto;height:26px;padding:0 10px;border-radius:13px;background:var(--red);border:none;color:#fff;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px}
+/* Trip body */
+.trip-body{padding:12px 16px 14px}
+.trip-name{font-size:17px;font-weight:900;color:var(--text);margin-bottom:5px}
+.trip-meta{display:flex;gap:12px;font-size:11px;color:var(--muted);margin-bottom:10px;flex-wrap:wrap}
 .trip-meta span{display:flex;align-items:center;gap:4px}
 .trip-footer{display:flex;align-items:center;gap:8px}
 .trip-companions{display:flex}
 .trip-comp-av{width:24px;height:24px;border-radius:50%;border:2px solid var(--card);overflow:hidden;margin-left:-6px}
 .trip-comp-av:first-child{margin-left:0}
 .trip-comp-av img{width:100%;height:100%;object-fit:cover}
-.trip-open-btn{margin-left:auto;height:30px;padding:0 14px;background:var(--blue);color:#fff;border:none;border-radius:15px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit}
-/* Timeline stops (dentro il trip detail) */
-.trip-detail{display:none;padding:0 20px 16px}
+.trip-open-btn{margin-left:auto;height:30px;padding:0 14px;background:var(--blue);color:#fff;border:none;border-radius:15px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px}
+/* Trip detail espandibile */
+.trip-detail{display:none;border-top:1px solid var(--border)}
 .trip-detail.open{display:block}
-.trip-detail-header{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin:12px 0 10px}
-.stop-row{display:flex;gap:10px;margin-bottom:12px;position:relative}
-.stop-row::before{content:'';position:absolute;left:13px;top:30px;width:2px;height:calc(100% + 4px);background:var(--border)}
-.stop-row:last-child::before{display:none}
-.stop-dot{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;z-index:1}
-.stop-info{flex:1;background:#f5f0e8;border-radius:10px;padding:10px 12px}
-.stop-name{font-size:13px;font-weight:700;color:var(--text)}
+.trip-detail-section{padding:12px 16px 0}
+.trip-detail-header{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+/* Mappa itinerario */
+.itin-map{height:180px;border-radius:12px;overflow:hidden;margin-bottom:14px;border:1px solid var(--border)}
+/* Timeline tappe */
+.stops-list{padding-bottom:8px}
+.stop-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:10px;position:relative;transition:opacity .2s}
+.stop-row.suspended{opacity:.45}
+.stop-row.dragging{opacity:.4;background:#f5f0e8;border-radius:10px}
+.stop-row.drag-over{border-top:2px solid var(--blue)}
+.stop-row::before{content:'';position:absolute;left:22px;top:30px;width:2px;height:calc(100% + 2px);background:var(--border);z-index:0}
+.stop-row:last-of-type::before{display:none}
+.stop-drag-handle{color:#C8BFB0;font-size:16px;cursor:grab;padding:6px 2px;flex-shrink:0;touch-action:none;z-index:1}
+.stop-drag-handle:active{cursor:grabbing}
+.stop-dot{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;z-index:1;flex-shrink:0}
+.stop-info{flex:1;background:#f5f0e8;border-radius:10px;padding:9px 11px;min-width:0}
+.stop-name{font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .stop-date{font-size:10px;color:var(--muted);margin-top:2px}
-.stop-status{font-size:9px;font-weight:700;padding:2px 7px;border-radius:5px;margin-top:4px;display:inline-block}
+.stop-status{font-size:9px;font-weight:700;padding:2px 6px;border-radius:5px;margin-top:4px;display:inline-block}
 .stop-status.planned{background:#EBF2FC;color:var(--blue)}
 .stop-status.done{background:#DCFCE7;color:#16A34A}
-/* Mini calendario compatto */
-.mini-cal{background:var(--card);border-radius:12px;padding:12px 14px;margin-bottom:14px}
+.stop-status.suspended{background:#f5f0e8;color:var(--muted)}
+.stop-actions{display:flex;flex-direction:column;gap:4px;flex-shrink:0}
+.stop-act-btn{width:24px;height:24px;border-radius:6px;border:none;background:#f5f0e8;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted);transition:all .15s}
+.stop-act-btn:hover,.stop-act-btn:active{background:#ede7dc}
+.stop-act-btn.act-pause.paused{background:#FFF7F0;color:var(--orange)}
+.stop-act-btn.act-del{color:#DC2626}
+.stop-act-btn.act-del:hover{background:#FEE2E2}
+/* Mini calendario modificabile */
+.mini-cal{background:var(--card);border-radius:12px;padding:12px 14px;margin-bottom:14px;border:1px solid var(--border)}
 .mini-cal-header{display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:800;color:var(--text);margin-bottom:8px}
+.mini-cal-nav{background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;padding:2px 6px;border-radius:6px}
+.mini-cal-nav:hover{background:#f5f0e8}
 .mini-cal-days{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center}
 .cal-day-lbl{font-size:8px;color:var(--muted);font-weight:700;padding:3px 0}
-.cal-day{font-size:10px;padding:4px 2px;border-radius:6px;cursor:pointer;transition:background .12s}
+.cal-day{font-size:10px;padding:5px 2px;border-radius:6px;cursor:pointer;transition:background .12s;user-select:none}
 .cal-day:hover{background:#f5f0e8}
 .cal-day.trip-day{background:#EBF2FC;color:var(--blue);font-weight:700}
 .cal-day.today{background:var(--red);color:#fff;font-weight:900}
 .cal-day.stop-day{background:#DCFCE7;color:#16A34A;font-weight:700}
-/* Chat Liri */
-.liri-chat-section{margin:0 20px 20px;background:var(--card);border-radius:16px;overflow:hidden}
-.liri-chat-header{background:linear-gradient(135deg,var(--blue),#1a3d6e);padding:12px 16px;display:flex;align-items:center;gap:10px}
-.liri-avatar{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:18px}
-.liri-chat-title{color:#fff;font-size:13px;font-weight:800}
-.liri-chat-sub{color:rgba(255,255,255,.7);font-size:10px}
-.liri-chat-msgs{padding:12px 14px;min-height:80px;max-height:200px;overflow-y:auto}
-.liri-msg{margin-bottom:10px}
-.liri-msg.liri{background:#EBF2FC;border-radius:0 12px 12px 12px;padding:8px 12px;font-size:12px;color:var(--text);line-height:1.5;max-width:85%}
-.liri-msg.user{background:#FFF0F0;border-radius:12px 12px 0 12px;padding:8px 12px;font-size:12px;color:var(--text);line-height:1.5;max-width:85%;margin-left:auto}
-.liri-chat-input{display:flex;gap:8px;padding:10px 14px;border-top:1px solid var(--border)}
-.liri-input{flex:1;background:#f5f0e8;border:none;border-radius:20px;padding:8px 14px;font-size:12px;font-family:inherit;outline:none;color:var(--text)}
-.liri-send-btn{width:34px;height:34px;border-radius:17px;background:var(--blue);border:none;color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cal-day.selecting{background:#FFF0F0;color:var(--red);font-weight:700}
+/* POI•AI Travel Advisor */
+.poiai-section{margin:0 20px 28px;background:var(--card);border-radius:18px;overflow:hidden;box-shadow:0 4px 20px rgba(40,94,167,.12)}
+.poiai-header{background:linear-gradient(135deg,#0F172A 0%,#1e3a5f 50%,#285EA7 100%);padding:14px 16px;display:flex;align-items:center;gap:12px}
+.poiai-avatar-wrap{position:relative;flex-shrink:0}
+.poiai-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--red),#FF6B35);display:flex;align-items:center;justify-content:center;border:2.5px solid rgba(255,255,255,.35);box-shadow:0 0 0 4px rgba(212,43,43,.25)}
+.poiai-avatar-dot{position:absolute;bottom:1px;right:1px;width:10px;height:10px;background:#22C55E;border-radius:50%;border:2px solid #1e3a5f}
+.poiai-header-text{flex:1}
+.poiai-title{color:#fff;font-size:14px;font-weight:900;letter-spacing:.2px}
+.poiai-sub{color:rgba(255,255,255,.6);font-size:10px;margin-top:1px}
+.poiai-badge{background:rgba(212,43,43,.3);border:1px solid rgba(212,43,43,.5);border-radius:6px;padding:2px 7px;font-size:9px;font-weight:800;color:#FCA5A5;letter-spacing:.3px}
+.poiai-msgs{padding:12px 14px;min-height:100px;max-height:260px;overflow-y:auto;display:flex;flex-direction:column;gap:10px}
+.poiai-msg{max-width:90%}
+.poiai-msg.ai{background:#EBF2FC;border-radius:0 12px 12px 12px;padding:10px 12px;font-size:12px;color:var(--text);line-height:1.6}
+.poiai-msg.user{background:linear-gradient(135deg,var(--red),#E05858);border-radius:12px 12px 0 12px;padding:10px 12px;font-size:12px;color:#fff;line-height:1.5;margin-left:auto}
+.poiai-place-chip{display:inline-flex;align-items:center;gap:5px;background:#DCFCE7;border:1px solid #16A34A;border-radius:8px;padding:4px 9px;font-size:10px;font-weight:700;color:#16A34A;cursor:pointer;margin-top:6px;margin-right:4px;transition:all .15s}
+.poiai-place-chip:active{transform:scale(.96)}
+.poiai-trip-selector{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.poiai-trip-chip{padding:4px 10px;border-radius:8px;border:1.5px solid var(--border);background:#f5f0e8;font-size:10px;font-weight:700;color:var(--muted);cursor:pointer;transition:all .15s}
+.poiai-trip-chip.sel{background:#EBF2FC;border-color:var(--blue);color:var(--blue)}
+.poiai-input-bar{display:flex;gap:8px;padding:10px 14px;border-top:1px solid var(--border);background:#fafaf8}
+.poiai-input{flex:1;background:#f5f0e8;border:1.5px solid transparent;border-radius:20px;padding:9px 14px;font-size:12px;font-family:inherit;outline:none;color:var(--text);transition:border-color .2s}
+.poiai-input:focus{border-color:var(--blue)}
+.poiai-send{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--red),#E05858);border:none;color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 3px 10px rgba(212,43,43,.35);transition:transform .15s}
+.poiai-send:active{transform:scale(.92)}
 
 /* TOAST */
 .toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%) translateY(20px);background:#1C1C1C;color:#fff;border-radius:20px;padding:10px 20px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
@@ -727,151 +765,39 @@ button{touch-action:manipulation}
     <div class="itin-ac-drop" id="itinAcDrop"></div>
   </div>
 
-  <!-- Trip cards -->
-  <div class="itin-cards" id="itinCards">
+  <!-- Trip cards — renderizzati da JS (renderTripCards) -->
+  <div class="itin-cards" id="itinCards"></div>
 
-    <!-- TRIP 1 — Tirana attiva -->
-    <div class="trip-card">
-      <div class="trip-cover" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Pyramid_of_Tirana_2022.jpg/800px-Pyramid_of_Tirana_2022.jpg')">
-        <div class="trip-cover-overlay"></div>
-        <div class="trip-cover-badge"><i class="ph-fill ph-map-pin" style="font-size:11px"></i> Albania</div>
-        <div class="trip-cover-dates">14 – 18 Giu 2026</div>
-        <div class="trip-cover-vis"><i class="ph ph-globe" style="font-size:10px"></i> Pubblico</div>
+  <!-- POI•AI Travel Advisor -->
+  <div class="poiai-section">
+    <div class="poiai-header">
+      <div class="poiai-avatar-wrap">
+        <div class="poiai-avatar">
+          <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="13" cy="13" r="13" fill="url(#poiag)"/>
+            <path d="M7 13 C7 9.686 9.686 7 13 7 C16.314 7 19 9.686 19 13" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+            <circle cx="13" cy="16.5" r="3.2" fill="white"/>
+            <circle cx="9.5" cy="11.5" r="1.1" fill="white"/>
+            <circle cx="16.5" cy="11.5" r="1.1" fill="white"/>
+            <defs><linearGradient id="poiag" x1="0" y1="0" x2="26" y2="26" gradientUnits="userSpaceOnUse"><stop stop-color="#D42B2B"/><stop offset="1" stop-color="#285EA7"/></linearGradient></defs>
+          </svg>
+        </div>
+        <div class="poiai-avatar-dot"></div>
       </div>
-      <div class="trip-body">
-        <div class="trip-name">Alla scoperta di Tirana</div>
-        <div class="trip-meta">
-          <span><i class="ph ph-map-pin"></i> 5 tappe</span>
-          <span><i class="ph ph-users"></i> 3 compagni</span>
-          <span><i class="ph ph-heart" style="color:var(--red)"></i> 24 love</span>
-        </div>
-        <div class="trip-footer">
-          <div class="trip-companions">
-            <div class="trip-comp-av"><img src="https://ui-avatars.com/api/?name=Mirela+K&background=285EA7&color=fff&size=48" alt=""></div>
-            <div class="trip-comp-av"><img src="https://ui-avatars.com/api/?name=Liri+V&background=D42B2B&color=fff&size=48" alt=""></div>
-            <div class="trip-comp-av"><img src="https://ui-avatars.com/api/?name=Arben+S&background=22C55E&color=fff&size=48" alt=""></div>
-          </div>
-          <button class="trip-open-btn" onclick="toggleTripDetail('trip1')">
-            <i class="ph ph-caret-down" id="trip1Arrow"></i> Dettaglio
-          </button>
-        </div>
+      <div class="poiai-header-text">
+        <div class="poiai-title">POI•AI Travel Advisor</div>
+        <div class="poiai-sub">Suggerisce, pianifica, aggiunge tappe</div>
       </div>
-      <!-- DETAIL ESPANDIBILE -->
-      <div class="trip-detail" id="trip1">
-        <!-- Mini calendario -->
-        <div class="trip-detail-header">Calendario viaggio</div>
-        <div class="mini-cal" id="miniCal1"></div>
-        <!-- Timeline tappe -->
-        <div class="trip-detail-header">Tappe pianificate</div>
-        <div class="stop-row">
-          <div class="stop-dot" style="background:#DCFCE7"><i class="ph-fill ph-check" style="color:#16A34A;font-size:12px"></i></div>
-          <div class="stop-info">
-            <div class="stop-name">Arrivo a Tirana — Rinas Airport</div>
-            <div class="stop-date">Dom 14 Giu · 10:30</div>
-            <span class="stop-status done">✓ Completata</span>
-          </div>
-        </div>
-        <div class="stop-row">
-          <div class="stop-dot" style="background:#EBF2FC"><i class="ph ph-building-columns" style="color:var(--blue);font-size:12px"></i></div>
-          <div class="stop-info">
-            <div class="stop-name">Xhamia Et'hem Beut</div>
-            <div class="stop-date">Lun 15 Giu · mattina</div>
-            <span class="stop-status planned">→ Pianificata</span>
-          </div>
-        </div>
-        <div class="stop-row">
-          <div class="stop-dot" style="background:#FFF7F0"><i class="ph ph-fork-knife" style="color:var(--orange);font-size:12px"></i></div>
-          <div class="stop-info">
-            <div class="stop-name">Pazari i Ri — Pranzo locale</div>
-            <div class="stop-date">Lun 15 Giu · 13:00</div>
-            <span class="stop-status planned">→ Pianificata</span>
-          </div>
-        </div>
-        <div class="stop-row">
-          <div class="stop-dot" style="background:#f5f0e8"><i class="ph ph-triangle" style="color:#7C3AED;font-size:12px"></i></div>
-          <div class="stop-info">
-            <div class="stop-name">Piramida di Tirana</div>
-            <div class="stop-date">Mar 16 Giu · pomeriggio</div>
-            <span class="stop-status planned">→ Pianificata</span>
-          </div>
-        </div>
-        <div class="stop-row">
-          <div class="stop-dot" style="background:#f0fdf4"><i class="ph ph-tree" style="color:#16A34A;font-size:12px"></i></div>
-          <div class="stop-info">
-            <div class="stop-name">Liqeni Artificial — tramonto</div>
-            <div class="stop-date">Mer 17 Giu · 19:00</div>
-            <span class="stop-status planned">→ Pianificata</span>
-          </div>
-        </div>
-        <button class="itin-new-btn" style="width:100%;justify-content:center;margin-top:4px;margin-bottom:12px;background:#f5f0e8;color:var(--blue);font-size:12px" onclick="openAddStop()">
-          <i class="ph ph-plus"></i> Aggiungi tappa
-        </button>
-      </div>
+      <div class="poiai-badge">AI</div>
     </div>
-
-    <!-- TRIP 2 -->
-    <div class="trip-card">
-      <div class="trip-cover" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/New_Bazaar_Tirana.jpg/800px-New_Bazaar_Tirana.jpg')">
-        <div class="trip-cover-overlay"></div>
-        <div class="trip-cover-badge"><i class="ph-fill ph-map-pin" style="font-size:11px"></i> Balcani</div>
-        <div class="trip-cover-dates">Set 2026 — TBD</div>
-        <div class="trip-cover-vis"><i class="ph ph-lock-simple" style="font-size:10px"></i> Privato</div>
-      </div>
-      <div class="trip-body">
-        <div class="trip-name">Rotta dei Balcani Occidentali</div>
-        <div class="trip-meta">
-          <span><i class="ph ph-map-pin"></i> 12 tappe</span>
-          <span><i class="ph ph-users"></i> 1 compagno</span>
-          <span><i class="ph ph-calendar"></i> In pianificazione</span>
-        </div>
-        <div class="trip-footer">
-          <div class="trip-companions">
-            <div class="trip-comp-av"><img src="https://ui-avatars.com/api/?name=Liri+V&background=D42B2B&color=fff&size=48" alt=""></div>
-          </div>
-          <button class="trip-open-btn" onclick="toggleTripDetail('trip2')">
-            <i class="ph ph-caret-down" id="trip2Arrow"></i> Dettaglio
-          </button>
-        </div>
-      </div>
-      <div class="trip-detail" id="trip2">
-        <div class="trip-detail-header">Destinazioni pianificate</div>
-        <div class="stop-row">
-          <div class="stop-dot" style="background:#EBF2FC"><i class="ph ph-map-pin" style="color:var(--blue);font-size:12px"></i></div>
-          <div class="stop-info"><div class="stop-name">Sarajevo, Bosnia</div><div class="stop-date">Data da definire</div><span class="stop-status planned">→ Pianificata</span></div>
-        </div>
-        <div class="stop-row">
-          <div class="stop-dot" style="background:#EBF2FC"><i class="ph ph-map-pin" style="color:var(--blue);font-size:12px"></i></div>
-          <div class="stop-info"><div class="stop-name">Mostar, Bosnia</div><div class="stop-date">Data da definire</div><span class="stop-status planned">→ Pianificata</span></div>
-        </div>
-        <div class="stop-row">
-          <div class="stop-dot" style="background:#EBF2FC"><i class="ph ph-map-pin" style="color:var(--blue);font-size:12px"></i></div>
-          <div class="stop-info"><div class="stop-name">Kotor, Montenegro</div><div class="stop-date">Data da definire</div><span class="stop-status planned">→ Pianificata</span></div>
-        </div>
-        <button class="itin-new-btn" style="width:100%;justify-content:center;margin-top:4px;margin-bottom:12px;background:#f5f0e8;color:var(--blue);font-size:12px" onclick="openAddStop()">
-          <i class="ph ph-plus"></i> Aggiungi tappa
-        </button>
-      </div>
+    <div class="poiai-msgs" id="poiaiMsgs">
+      <div class="poiai-msg ai">Ciao! Sono il tuo POI•AI Travel Advisor. Posso suggerire tappe, ristoranti, cultura locale — e aggiungerli direttamente ai tuoi itinerari. Su quale viaggio lavoriamo oggi? 🗺️</div>
     </div>
-
-  </div><!-- /itin-cards -->
-
-  <!-- CHAT LIRI — AI Travel Advisor -->
-  <div class="liri-chat-section">
-    <div class="liri-chat-header">
-      <div class="liri-avatar">🌍</div>
-      <div>
-        <div class="liri-chat-title">Liri — Travel Advisor AI</div>
-        <div class="liri-chat-sub">Chiedi consigli su destinazioni, tappe, cultura locale</div>
-      </div>
-    </div>
-    <div class="liri-chat-msgs" id="liriMsgs">
-      <div class="liri-msg liri">Ciao! Sono Liri, la tua guida AI per i Balcani e non solo. Hai domande sul tuo viaggio a Tirana? Posso suggerire tappe, ristoranti, orari e molto altro. 🗺️</div>
-    </div>
-    <div class="liri-chat-input">
-      <input class="liri-input" id="liriInput" type="text"
-        placeholder="es. Cosa vedere a Tirana in 3 giorni?"
-        onkeydown="if(event.key==='Enter')sendLiriMsg()"/>
-      <button class="liri-send-btn" onclick="sendLiriMsg()"><i class="ph ph-paper-plane-tilt"></i></button>
+    <div class="poiai-input-bar">
+      <input class="poiai-input" id="poiaiInput" type="text"
+        placeholder="es. Dove mangiare a Tirana con vista?"
+        onkeydown="if(event.key==='Enter')sendPoiAIMsg()"/>
+      <button class="poiai-send" onclick="sendPoiAIMsg()"><i class="ph ph-paper-plane-tilt"></i></button>
     </div>
   </div>
 
@@ -2012,6 +1938,8 @@ window.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('closeAddStopBtn').addEventListener('touchend', e=>{e.preventDefault();closeSheet('addStopOv','addStopBg','addStopSheet');});
   // Render tag iniziali (vuoto ma pronto)
   renderStopTags();
+  // Render trip cards
+  renderTripCards();
   // SOS close button
   document.getElementById('closeSosBtn').addEventListener('click', ()=>closeSheet('sosOv','sosBg','sosSheet'));
   document.getElementById('closeSosBtn').addEventListener('touchend', e=>{e.preventDefault();closeSheet('sosOv','sosBg','sosSheet');});
@@ -2281,42 +2209,317 @@ function togglePublicBlock(){
 /* ══════════════════════════════════════════
    ITINERARI — trip detail + mini cal + Liri + search
 ══════════════════════════════════════════ */
-function toggleTripDetail(id){
-  const el=document.getElementById(id);
-  const arrow=document.getElementById(id+'Arrow');
-  if(!el)return;
-  el.classList.toggle('open');
-  if(arrow)arrow.className=el.classList.contains('open')?'ph ph-caret-up':'ph ph-caret-down';
-  if(el.classList.contains('open')&&id==='trip1') renderMiniCal('miniCal1',2026,5,14,18);
+/* ══════════════════════════════════════════
+   TRIPS — Data Model
+══════════════════════════════════════════ */
+const TRIPS={
+  trip1:{
+    id:'trip1', name:'Alla scoperta di Tirana', dest:'Tirana, Albania',
+    cover:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Pyramid_of_Tirana_2022.jpg/800px-Pyramid_of_Tirana_2022.jpg',
+    badge:'Albania', dates:'14 – 18 Giu 2026',
+    calYear:2026, calMonth:5, calStart:14, calEnd:18,
+    visibility:'pub', shareId:'tirana-jun2026',
+    companions:['Mirela K','Liri V','Arben S'], stopIdSeq:6,
+    stops:[
+      {id:'s1',name:'Arrivo — Rinas Airport',date:'Dom 14 Giu · 10:30',status:'done',icon:'ph-fill ph-check',iconBg:'#DCFCE7',iconColor:'#16A34A',suspended:false},
+      {id:'s2',name:"Xhamia Et'hem Beut",date:'Lun 15 Giu · mattina',status:'planned',icon:'ph ph-building-columns',iconBg:'#EBF2FC',iconColor:'var(--blue)',suspended:false},
+      {id:'s3',name:'Pazari i Ri — Pranzo',date:'Lun 15 Giu · 13:00',status:'planned',icon:'ph ph-fork-knife',iconBg:'#FFF7F0',iconColor:'var(--orange)',suspended:false},
+      {id:'s4',name:'Piramida di Tirana',date:'Mar 16 Giu · pomeriggio',status:'planned',icon:'ph ph-triangle',iconBg:'#f5f0e8',iconColor:'#7C3AED',suspended:false},
+      {id:'s5',name:'Liqeni Artificial — tramonto',date:'Mer 17 Giu · 19:00',status:'planned',icon:'ph ph-tree',iconBg:'#f0fdf4',iconColor:'#16A34A',suspended:false},
+    ]
+  },
+  trip2:{
+    id:'trip2', name:'Rotta dei Balcani Occidentali', dest:'Balcani',
+    cover:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Mostar_stari_most.jpg/800px-Mostar_stari_most.jpg',
+    badge:'Balcani', dates:'Set 2026 — TBD',
+    calYear:2026, calMonth:8, calStart:5, calEnd:25,
+    visibility:'prv', shareId:'balkans-sep2026',
+    companions:['Liri V'], stopIdSeq:4,
+    stops:[
+      {id:'s1',name:'Sarajevo, Bosnia',date:'Data da definire',status:'planned',icon:'ph ph-map-pin',iconBg:'#EBF2FC',iconColor:'var(--blue)',suspended:false},
+      {id:'s2',name:'Mostar, Bosnia',date:'Data da definire',status:'planned',icon:'ph ph-map-pin',iconBg:'#EBF2FC',iconColor:'var(--blue)',suspended:false},
+      {id:'s3',name:'Kotor, Montenegro',date:'Data da definire',status:'planned',icon:'ph ph-map-pin',iconBg:'#EBF2FC',iconColor:'var(--blue)',suspended:false},
+    ]
+  }
+};
+
+const CAL_STATE={};
+const itinMaps={};
+let dragSrcTrip=null, dragSrcIdx=null;
+let activeTripId='trip1';
+
+/* ── RENDER TRIP CARDS ── */
+function renderTripCards(){
+  const container=document.getElementById('itinCards');
+  if(!container)return;
+  container.innerHTML=Object.values(TRIPS).map(t=>renderTripCardHTML(t)).join('');
 }
-function renderMiniCal(elId,year,month,startDay,endDay){
-  const el=document.getElementById(elId);
+
+function renderTripCardHTML(t){
+  const compsHtml=t.companions.slice(0,4).map((n,i)=>{
+    const bg=['285EA7','D42B2B','22C55E','F97316'];
+    return `<div class="trip-comp-av"><img src="https://ui-avatars.com/api/?name=${encodeURIComponent(n)}&background=${bg[i%4]}&color=fff&size=48" alt=""></div>`;
+  }).join('');
+  const visClass={pub:'active-pub',friends:'active-friends',prv:'active-prv'};
+  return `
+  <div class="trip-card" id="tc-${t.id}">
+    <div class="trip-cover" style="background-image:url('${t.cover}')">
+      <div class="trip-cover-overlay"></div>
+      <div class="trip-cover-badge"><i class="ph-fill ph-map-pin" style="font-size:11px"></i> ${t.badge}</div>
+      <div class="trip-cover-dates">${t.dates}</div>
+      <button class="trip-cover-change" onclick="changeTripCover('${t.id}')"><i class="ph ph-image" style="font-size:10px"></i> Cover</button>
+    </div>
+    <div class="trip-vis-bar">
+      <button class="trip-vis-btn${t.visibility==='pub'?' active-pub':''}" onclick="setTripVis('${t.id}','pub')"><i class="ph ph-globe"></i> Pubblico</button>
+      <button class="trip-vis-btn${t.visibility==='friends'?' active-friends':''}" onclick="setTripVis('${t.id}','friends')"><i class="ph ph-users"></i> Amici</button>
+      <button class="trip-vis-btn${t.visibility==='prv'?' active-prv':''}" onclick="setTripVis('${t.id}','prv')"><i class="ph ph-lock-simple"></i> Privato</button>
+      <button class="trip-share-btn" onclick="shareTripLink('${t.id}')"><i class="ph ph-share-network"></i> Link</button>
+    </div>
+    <div class="trip-body">
+      <div class="trip-name">${t.name}</div>
+      <div class="trip-meta">
+        <span><i class="ph ph-map-pin"></i> <span id="stopcount-${t.id}">${t.stops.length}</span> tappe</span>
+        <span><i class="ph ph-users"></i> ${t.companions.length} compagni</span>
+        <span><i class="ph ph-heart" style="color:var(--red)"></i> ${t.id==='trip1'?'24':'—'}</span>
+      </div>
+      <div class="trip-footer">
+        <div class="trip-companions">${compsHtml}</div>
+        <button class="trip-open-btn" onclick="toggleTripDetail('${t.id}')">
+          <i class="ph ph-caret-down" id="${t.id}Arrow"></i> Dettaglio
+        </button>
+      </div>
+    </div>
+    <div class="trip-detail" id="td-${t.id}">
+      <div class="trip-detail-section">
+        <div class="trip-detail-header">Calendario viaggio</div>
+        <div class="mini-cal" id="miniCal-${t.id}"></div>
+        <div class="trip-detail-header">Mappa itinerario</div>
+        <div class="itin-map" id="itin-map-${t.id}"></div>
+        <div class="trip-detail-header">Tappe pianificate</div>
+        <div class="stops-list" id="stops-${t.id}">${renderTripStopsHTML(t)}</div>
+        <button class="itin-new-btn" style="width:100%;justify-content:center;margin:4px 0 16px;background:#f5f0e8;color:var(--blue);font-size:12px" onclick="addNewStop('${t.id}')">
+          <i class="ph ph-plus"></i> Aggiungi tappa
+        </button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderTripStopsHTML(t){
+  if(!t.stops.length)return`<div style="text-align:center;padding:20px 0;font-size:12px;color:var(--muted)">Nessuna tappa ancora — aggiungine una!</div>`;
+  return t.stops.map((s,i)=>{
+    const susp=s.suspended||s.status==='suspended';
+    return `
+    <div class="stop-row${susp?' suspended':''}" id="srow-${t.id}-${s.id}"
+      draggable="true"
+      ondragstart="dragStart(event,'${t.id}',${i})"
+      ondragover="dragOver(event)"
+      ondrop="dropStop(event,'${t.id}',${i})"
+      ondragend="dragEnd(event)">
+      <span class="stop-drag-handle"><i class="ph ph-dots-six-vertical"></i></span>
+      <div class="stop-dot" style="background:${s.iconBg}"><i class="${s.icon}" style="color:${s.iconColor};font-size:12px"></i></div>
+      <div class="stop-info">
+        <div class="stop-name">${s.name}</div>
+        <div class="stop-date">${s.date}</div>
+        <span class="stop-status ${susp?'suspended':s.status}">${susp?'⏸ Sospesa':s.status==='done'?'✓ Completata':'→ Pianificata'}</span>
+      </div>
+      <div class="stop-actions">
+        <button class="stop-act-btn act-pause${susp?' paused':''}" title="${susp?'Riprendi':'Sospendi'}" onclick="suspendStop('${t.id}','${s.id}')"><i class="ph ${susp?'ph-play':'ph-pause'}"></i></button>
+        <button class="stop-act-btn act-edit" title="Modifica" onclick="editStop('${t.id}','${s.id}')"><i class="ph ph-pencil-simple"></i></button>
+        <button class="stop-act-btn act-del" title="Elimina" onclick="deleteStop('${t.id}','${s.id}')"><i class="ph ph-trash"></i></button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ── TOGGLE DETAIL ── */
+function toggleTripDetail(tripId){
+  const detail=document.getElementById('td-'+tripId);
+  const arrow=document.getElementById(tripId+'Arrow');
+  if(!detail)return;
+  const wasOpen=detail.classList.contains('open');
+  detail.classList.toggle('open');
+  if(arrow)arrow.className=wasOpen?'ph ph-caret-down':'ph ph-caret-up';
+  if(!wasOpen){
+    const t=TRIPS[tripId];
+    if(t){
+      if(!CAL_STATE[tripId])CAL_STATE[tripId]={year:t.calYear,month:t.calMonth};
+      renderMiniCal(tripId);
+      setTimeout(()=>initItinMap(tripId),180);
+    }
+  }
+}
+
+/* ── MINI-CALENDAR ── */
+function renderMiniCal(tripId){
+  const el=document.getElementById('miniCal-'+tripId);
   if(!el)return;
-  const today=new Date();
-  const months=['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
-  const days=['L','M','M','G','V','S','D'];
+  const t=TRIPS[tripId];
+  const cs=CAL_STATE[tripId]||{year:t.calYear,month:t.calMonth};
+  const {year,month}=cs;
+  const MONTHS=['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
+  const DAYS=['L','M','M','G','V','S','D'];
   const firstDow=new Date(year,month,1).getDay();
-  const offset=(firstDow===0?6:firstDow-1);
+  const offset=firstDow===0?6:firstDow-1;
   const daysInMonth=new Date(year,month+1,0).getDate();
-  let html=`<div class="mini-cal-header"><span>${months[month]} ${year}</span></div>
-  <div class="mini-cal-days">${days.map(d=>`<div class="cal-day-lbl">${d}</div>`).join('')}`;
+  const today=new Date();
+  let html=`
+    <div class="mini-cal-header" style="margin-bottom:0;padding-bottom:8px">
+      <button class="mini-cal-nav" onclick="calNav('${tripId}',-1)"><i class="ph ph-caret-left"></i></button>
+      <span>${MONTHS[month]} ${year}</span>
+      <button class="mini-cal-nav" onclick="calNav('${tripId}',1)"><i class="ph ph-caret-right"></i></button>
+    </div>
+    <div class="mini-cal-days">${DAYS.map(d=>`<div class="cal-day-lbl">${d}</div>`).join('')}`;
   for(let i=0;i<offset;i++)html+=`<div></div>`;
   for(let d=1;d<=daysInMonth;d++){
     let cls='cal-day';
-    if(today.getDate()===d&&today.getMonth()===month&&today.getFullYear()===year)cls+=' today';
-    else if(d>=startDay&&d<=endDay)cls+=' trip-day';
-    // mark specific stops
-    if(d===14)cls+=' stop-day';
-    html+=`<div class="${cls}">${d}</div>`;
+    const isToday=today.getDate()===d&&today.getMonth()===month&&today.getFullYear()===year;
+    const inRange=d>=t.calStart&&d<=t.calEnd&&month===t.calMonth&&year===t.calYear;
+    if(isToday)cls+=' today';
+    else if(inRange)cls+=' trip-day';
+    if(inRange&&d===t.calStart)cls+=' stop-day';
+    html+=`<div class="${cls}" onclick="toggleCalDay('${tripId}',${year},${month},${d})">${d}</div>`;
   }
   html+='</div>';
   el.innerHTML=html;
 }
-function openNewTrip(){
-  showToast(lang==='it'?'Crea nuovo viaggio — disponibile nell\'app':lang==='sq'?'Udhëtim i ri — aktiv në aplikacion':'New trip — active in app');
+function calNav(tripId,dir){
+  if(!CAL_STATE[tripId])CAL_STATE[tripId]={year:TRIPS[tripId].calYear,month:TRIPS[tripId].calMonth};
+  const cs=CAL_STATE[tripId];
+  cs.month+=dir;
+  if(cs.month>11){cs.month=0;cs.year++;}
+  if(cs.month<0){cs.month=11;cs.year--;}
+  renderMiniCal(tripId);
+}
+function toggleCalDay(tripId,year,month,day){
+  const MONTHS=['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
+  showToast(`📅 ${day} ${MONTHS[month]} ${year} — aggiornato`);
 }
 
-/* ITINERARY SEARCH */
+/* ── ITIN MAP (Leaflet) ── */
+function initItinMap(tripId){
+  const el=document.getElementById('itin-map-'+tripId);
+  if(!el||itinMaps[tripId])return;
+  const stopCoords={
+    trip1:[[41.3275,19.8189],[41.3400,19.8200],[41.3310,19.8240],[41.3269,19.8133],[41.3222,19.8091]],
+    trip2:[[43.8476,18.3564],[43.3438,17.8072],[42.4237,18.7710]]
+  };
+  const center=tripId==='trip1'?[41.33,19.82]:[43.2,18.5];
+  const m=L.map(el,{zoomControl:false,attributionControl:false,dragging:true,scrollWheelZoom:false,touchZoom:true});
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{maxZoom:18}).addTo(m);
+  m.setView(center,tripId==='trip1'?13:7);
+  const sc=stopCoords[tripId]||[];
+  const t=TRIPS[tripId];
+  t.stops.forEach((s,i)=>{
+    if(!sc[i])return;
+    const bg=s.status==='done'?'#16A34A':'#D42B2B';
+    L.marker(sc[i],{
+      icon:L.divIcon({className:'',html:`<div style="width:22px;height:22px;border-radius:50%;background:${bg};border:2.5px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff;font-weight:900">${i+1}</div>`,iconSize:[22,22],iconAnchor:[11,11]})
+    }).addTo(m).bindPopup(`<b>${s.name}</b>`);
+  });
+  if(sc.length>1){try{m.fitBounds(sc,{padding:[24,24],maxZoom:14});}catch(e){}}
+  itinMaps[tripId]=m;
+}
+
+/* ── STOP ACTIONS ── */
+function deleteStop(tripId,stopId){
+  const t=TRIPS[tripId]; if(!t)return;
+  const idx=t.stops.findIndex(s=>s.id===stopId);
+  if(idx<0)return;
+  const name=t.stops[idx].name;
+  if(!confirm(`Eliminare "${name}"?`))return;
+  t.stops.splice(idx,1);
+  refreshStops(tripId);
+  showToast(`🗑 "${name}" eliminata`);
+}
+function suspendStop(tripId,stopId){
+  const t=TRIPS[tripId]; if(!t)return;
+  const s=t.stops.find(x=>x.id===stopId); if(!s)return;
+  s.suspended=!s.suspended;
+  refreshStops(tripId);
+  showToast(s.suspended?'⏸ Tappa sospesa':'▶ Tappa ripristinata');
+}
+function editStop(tripId,stopId){
+  const t=TRIPS[tripId]; if(!t)return;
+  const s=t.stops.find(x=>x.id===stopId); if(!s)return;
+  showToast(`✏️ Modifica "${s.name}" — disponibile nell'app`);
+}
+function refreshStops(tripId){
+  const el=document.getElementById('stops-'+tripId);
+  const cnt=document.getElementById('stopcount-'+tripId);
+  const t=TRIPS[tripId]; if(!el||!t)return;
+  el.innerHTML=renderTripStopsHTML(t);
+  if(cnt)cnt.textContent=t.stops.length;
+}
+function addNewStop(tripId){
+  activeTripId=tripId;
+  closeFab();
+  openSheet('addStopOv','addStopBg','addStopSheet');
+}
+
+/* ── DRAG & DROP ── */
+function dragStart(e,tripId,idx){
+  dragSrcTrip=tripId; dragSrcIdx=idx;
+  e.dataTransfer.effectAllowed='move';
+  e.dataTransfer.setData('text/plain',String(idx));
+  setTimeout(()=>{ const r=document.getElementById('srow-'+tripId+'-'+TRIPS[tripId].stops[idx]?.id); if(r)r.classList.add('dragging'); },0);
+}
+function dragOver(e){
+  e.preventDefault();
+  e.dataTransfer.dropEffect='move';
+  document.querySelectorAll('.stop-row.drag-over').forEach(el=>el.classList.remove('drag-over'));
+  if(e.currentTarget.classList.contains('stop-row'))e.currentTarget.classList.add('drag-over');
+}
+function dropStop(e,tripId,toIdx){
+  e.preventDefault();
+  document.querySelectorAll('.stop-row.drag-over').forEach(el=>el.classList.remove('drag-over'));
+  if(dragSrcTrip!==tripId||dragSrcIdx===null||dragSrcIdx===toIdx){dragSrcTrip=null;dragSrcIdx=null;return;}
+  const t=TRIPS[tripId];
+  const [moved]=t.stops.splice(dragSrcIdx,1);
+  t.stops.splice(toIdx,0,moved);
+  refreshStops(tripId);
+  dragSrcTrip=null; dragSrcIdx=null;
+  showToast('↕ Ordine tappe aggiornato');
+}
+function dragEnd(e){
+  document.querySelectorAll('.stop-row.dragging,.stop-row.drag-over').forEach(el=>el.classList.remove('dragging','drag-over'));
+}
+
+/* ── VISIBILITY & SHARE ── */
+function setTripVis(tripId,vis){
+  const t=TRIPS[tripId]; if(!t)return;
+  t.visibility=vis;
+  const card=document.getElementById('tc-'+tripId); if(!card)return;
+  const btns=card.querySelectorAll('.trip-vis-btn');
+  const order=['pub','friends','prv'];
+  const cls=['active-pub','active-friends','active-prv'];
+  btns.forEach((btn,i)=>{cls.forEach(c=>btn.classList.remove(c));});
+  const idx=order.indexOf(vis);
+  if(btns[idx])btns[idx].classList.add(cls[idx]);
+  const lbl=vis==='pub'?'Pubblico':vis==='friends'?'Amici':'Privato';
+  showToast(`👁 Visibilità: ${lbl}`);
+}
+function shareTripLink(tripId){
+  const t=TRIPS[tripId]; if(!t)return;
+  if(t.visibility==='prv'){showToast('⚠️ Viaggio privato — cambia visibilità per condividere');return;}
+  const link=`https://poilove.com/trip/${t.shareId}`;
+  navigator.clipboard?navigator.clipboard.writeText(link).then(()=>showToast(`🔗 Link copiato!`)):showToast(`🔗 ${link}`);
+}
+function changeTripCover(tripId){
+  const t=TRIPS[tripId]; if(!t)return;
+  const q=encodeURIComponent(t.dest+' travel landscape');
+  const n=Date.now()%1000;
+  const newUrl=`https://source.unsplash.com/800x400/?${q}&sig=${n}`;
+  t.cover=newUrl;
+  const coverEl=document.querySelector(`#tc-${tripId} .trip-cover`);
+  if(coverEl)coverEl.style.backgroundImage=`url('${newUrl}')`;
+  showToast('🖼 Cover aggiornata da Unsplash');
+}
+function openNewTrip(){
+  showToast(lang==='it'?'Crea nuovo viaggio — disponibile nell\'app':lang==='sq'?'Udhëtim i ri — aktiv në aplikacion':'New trip — available in app');
+}
+
+/* ── ITINERARY SEARCH ── */
 let itinAcTimer;
 function onItinSearch(val){
   clearTimeout(itinAcTimer);
@@ -2328,7 +2531,7 @@ function onItinSearch(val){
       .then(r=>r.json()).then(results=>{
         if(!results.length){drop.classList.remove('open');return;}
         drop.innerHTML=results.slice(0,5).map(r=>`
-          <div class="ac-item" onclick="selectItinDest('${r.display_name.split(',')[0].replace(/'/g,"\\'")}')">
+          <div class="ac-item" onclick="selectItinDest('${r.display_name.split(',')[0].replace(/'/g,"\\'")}','${r.lat}','${r.lon}')">
             <i class="ph ph-map-pin"></i>
             <div>
               <div class="ac-item-name">${r.display_name.split(',')[0]}</div>
@@ -2339,42 +2542,66 @@ function onItinSearch(val){
       }).catch(()=>{});
   },400);
 }
-function selectItinDest(name){
+function selectItinDest(name,lat,lng){
   document.getElementById('itinSearchIn').value=name;
   document.getElementById('itinAcDrop').classList.remove('open');
-  showToast(`🌍 Destinazione: ${name}`);
+  showToast(`🌍 ${name} — crea un nuovo viaggio nell'app`);
 }
 document.addEventListener('click',e=>{
   if(!e.target.closest('#itinAcDrop')&&!e.target.closest('#itinSearchIn'))
     document.getElementById('itinAcDrop')?.classList.remove('open');
 });
 
-/* LIRI CHAT */
-const LIRI_RESPONSES=[
-  'Ottima scelta! Tirana ha una scena culturale vivacissima. Ti consiglio di visitare il Blloku di mattina presto, quando è ancora tranquillo. 🏙️',
-  'Il Pazari i Ri è il mio posto preferito per pranzo. Prova il "ëmbëlsirë" — i dolci locali sono incredibili! 🍯',
-  'Per gli itinerari nei Balcani, considera di includere Berat e Gjirokastër — entrambe sono patrimonio UNESCO. Vale assolutamente il viaggio! 🏛️',
-  'Il periodo migliore per visitare la regione è aprile-giugno o settembre-ottobre. Evita agosto — molto caldo e affollato.',
-  'Per i compagni di viaggio, nella sezione "Trova compagni" puoi cercare utenti con itinerari simili al tuo. Sono già 47 persone che vanno a Tirana a giugno! 👥',
-  'La valuta locale è il Lek albanese (ALL). Con 1 euro prendi circa 108 Lek. Il contante è ancora molto usato fuori dal centro. 💶',
+/* ══════════════════════════════════════════
+   POI•AI TRAVEL ADVISOR
+══════════════════════════════════════════ */
+const POIAI_RESPONSES=[
+  {text:'Ottima domanda! A Tirana ci sono posti incredibili con vista panoramica. Eccone tre:',places:['Ballkoni i Qytetit','Mullixhiu Restaurant','Uka Farm & Winery']},
+  {text:'Per Sarajevo in 2 giorni, le tappe imperdibili sono:',places:['Baščaršija','Ponte Latino','Tunnel della Speranza']},
+  {text:'Il Blloku a Tirana è perfetto per la sera. Ti suggerisco:',places:['Komiteti – Kafe Muzeum','Radio Bar Tirana','Sky Club Roof Bar']},
+  {text:'In Montenegro non perdere queste gemme:',places:['Città Vecchia di Kotor','Perast sul Lago','Parco Naz. del Durmitor']},
+  {text:'Cultura albanese autentica? Ecco le mie scelte:',places:['Berat Città UNESCO','Gjirokastër Fortezza','Bunker Art 2']},
 ];
-let liriRespIdx=0;
-function sendLiriMsg(){
-  const input=document.getElementById('liriInput');
-  const msgs=document.getElementById('liriMsgs');
+let poiaiRespIdx=0;
+
+function sendPoiAIMsg(){
+  const input=document.getElementById('poiaiInput');
+  const msgs=document.getElementById('poiaiMsgs');
   const text=input.value.trim();
   if(!text)return;
-  // Messaggio utente
-  msgs.innerHTML+=`<div class="liri-msg user">${text}</div>`;
+  msgs.innerHTML+=`<div class="poiai-msg user">${text}</div>`;
   input.value='';
   msgs.scrollTop=msgs.scrollHeight;
-  // Risposta Liri dopo breve delay
   setTimeout(()=>{
-    const resp=LIRI_RESPONSES[liriRespIdx%LIRI_RESPONSES.length];
-    liriRespIdx++;
-    msgs.innerHTML+=`<div class="liri-msg liri">${resp}</div>`;
+    const resp=POIAI_RESPONSES[poiaiRespIdx%POIAI_RESPONSES.length];
+    poiaiRespIdx++;
+    const tripSel=Object.values(TRIPS).map((t,i)=>`<button class="poiai-trip-chip${i===0?' sel':''}" onclick="document.querySelectorAll('.poiai-trip-chip').forEach(b=>b.classList.remove('sel'));this.classList.add('sel');window._paiTrip='${t.id}'">${t.name.split(' ').slice(0,3).join(' ')}</button>`).join('');
+    const chips=resp.places.map(p=>`<button class="poiai-place-chip" onclick="addAISuggestionAsStop(window._paiTrip||'trip1','${p.replace(/'/g,"\\'")}')"><i class="ph ph-plus-circle"></i> ${p}</button>`).join('');
+    msgs.innerHTML+=`
+      <div class="poiai-msg ai">
+        ${resp.text}
+        <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px">${chips}</div>
+        <div style="margin-top:8px;font-size:10px;color:var(--muted)"><i class="ph ph-arrow-down"></i> Seleziona il viaggio:</div>
+        <div class="poiai-trip-selector">${tripSel}</div>
+      </div>`;
+    window._paiTrip='trip1';
     msgs.scrollTop=msgs.scrollHeight;
   },800);
+}
+
+function addAISuggestionAsStop(tripId,placeName){
+  if(!tripId||!TRIPS[tripId]){showToast('Seleziona prima un viaggio');return;}
+  const t=TRIPS[tripId];
+  t.stopIdSeq=(t.stopIdSeq||10)+1;
+  t.stops.push({
+    id:'s'+t.stopIdSeq, name:placeName, date:'Data da definire',
+    status:'planned', icon:'ph ph-sparkle', iconBg:'#FFF5F5', iconColor:'var(--red)', suspended:false
+  });
+  refreshStops(tripId);
+  // Apri il dettaglio del trip se chiuso
+  const detail=document.getElementById('td-'+tripId);
+  if(detail&&!detail.classList.contains('open'))toggleTripDetail(tripId);
+  showToast(`✨ "${placeName}" → "${t.name}"`);
 }
 
 /* ══════════════════════════════════════════
