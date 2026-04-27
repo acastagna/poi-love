@@ -1394,7 +1394,7 @@ function syncProfileFromAuth() {
 async function signInWithGoogle() {
   const { error } = await sb.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo: window.location.href }
+    options: { redirectTo: 'https://poilove.com/demo' }
   });
   if (error) showToast('Errore: ' + error.message);
 }
@@ -1404,7 +1404,7 @@ async function sendMagicLink() {
   if (!email || !email.includes('@')) { showToast('Inserisci una email valida'); return; }
   const { error } = await sb.auth.signInWithOtp({
     email,
-    options: { emailRedirectTo: window.location.href }
+    options: { emailRedirectTo: 'https://poilove.com/demo' }
   });
   if (error) showToast('Errore: ' + error.message);
   else {
