@@ -125,13 +125,19 @@ button{touch-action:manipulation}
 .loc-hint-accept{border:none;background:none;color:var(--blue);font-size:11px;font-weight:700;cursor:pointer;padding:0;font-family:inherit;text-decoration:underline}
 
 /* PHOTOS */
-.photo-row{display:flex;gap:8px;margin-bottom:14px}
-.photo-slot{flex:1;aspect-ratio:1;border-radius:10px;background:#f5f0e8;border:1.5px dashed #C8BFB0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;font-size:20px;transition:all .2s;color:var(--muted);overflow:hidden;position:relative}
+.photo-row{display:flex;gap:10px;margin-bottom:14px}
+/* Mobile: 3 slot uguali in una riga */
+.photo-slot{flex:1;aspect-ratio:1;border-radius:16px;background:#f5f0e8;border:1.5px dashed #C8BFB0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;font-size:20px;transition:all .2s;color:var(--muted);overflow:hidden;position:relative}
+/* Desktop: cornice 350×350 px */
+@media(min-width:480px){
+  .photo-slot{flex:0 0 350px;height:350px;border-radius:16px}
+  .photo-row{overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
+}
 .photo-slot:active{border-color:var(--red);transform:scale(.97)}
 .photo-slot .slot-lbl{font-size:9px;font-weight:700;color:var(--muted)}
 .photo-slot.has-photo{border-style:solid;border-color:var(--green)}
-.photo-slot .ph-preview{position:absolute;inset:0;background-size:cover;background-position:center;border-radius:9px}
-.photo-slot .ph-remove{position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;background:rgba(0,0,0,.5);border:none;cursor:pointer;color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center}
+.photo-slot .ph-preview{position:absolute;inset:0;background-size:cover;background-position:center;border-radius:14px}
+.photo-slot .ph-remove{position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.55);border:none;cursor:pointer;color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center}
 .photo-hint{font-size:10px;color:var(--muted);font-style:italic;margin-bottom:14px;line-height:1.4}
 
 /* CHIPS */
@@ -811,23 +817,61 @@ button{touch-action:manipulation}
       <button class="sh-close" id="closeAddStopBtn"><i class="ph ph-x"></i></button>
     </div>
     <div class="sh-body">
+
+      <!-- Nome tappa + autocomplete Nominatim -->
       <div class="sec-lbl"><span data-t="stop_lbl_name">Nome della tappa</span><span class="req-badge">!</span></div>
-      <input class="field-in" type="text" placeholder="es. Castello di Shkodër" style="margin-bottom:14px"/>
+      <div class="autocomplete-wrap" style="margin-bottom:14px">
+        <input class="field-in" type="text" id="stopNameIn"
+          placeholder="es. Castello di Shkodër, Albania"
+          oninput="onStopNameInput(this.value)"
+          onfocus="onStopNameFocus()"
+          autocomplete="off" style="margin-bottom:0"/>
+        <div class="autocomplete-drop" id="stopAcDrop"></div>
+      </div>
+
+      <!-- Categoria -->
       <div class="sec-lbl" data-t="stop_lbl_cat">Categoria</div>
-      <div class="chips">
+      <div class="chips" id="stopCatChips">
         <button class="chip" onclick="toggleCat(this)">Cultura</button>
         <button class="chip" onclick="toggleCat(this)">Natura</button>
         <button class="chip" onclick="toggleCat(this)">Cibo</button>
         <button class="chip" onclick="toggleCat(this)">Pratico</button>
+        <button class="chip" onclick="toggleCat(this)">Arte</button>
+        <button class="chip" onclick="toggleCat(this)">Sport</button>
       </div>
+
+      <!-- Lista -->
+      <div class="sec-lbl">Lista <span style="font-weight:400;color:var(--muted)">(facoltativo)</span></div>
+      <div class="list-scroll" id="stopListScroll">
+        <button class="chip sel-b" onclick="toggleList(this)">Tirana 2026</button>
+        <button class="chip" onclick="toggleList(this)">Da fare</button>
+        <button class="chip" onclick="toggleList(this)">Preferiti</button>
+        <button class="chip chip-add" onclick="openAddList()"><i class="ph ph-plus" style="font-size:11px"></i> Nuova</button>
+      </div>
+
+      <!-- Tag persistenti -->
+      <div class="sec-lbl" style="justify-content:space-between">
+        <span>Tag</span>
+        <button class="chip chip-add" style="font-size:10px;padding:3px 9px" onclick="showStopTagInput()">
+          <i class="ph ph-plus" style="font-size:10px"></i> Aggiungi
+        </button>
+      </div>
+      <div class="tag-chips-wrap" id="stopTagsContainer">
+        <!-- tag persistenti caricati da JS -->
+      </div>
+
+      <!-- Visibilità -->
       <div class="sec-lbl" data-t="stop_lbl_vis">Visibilità Itinerario</div>
       <div class="vis-row">
         <button class="vis-opt sel-pub" onclick="setVis(this,'stop','pub')"><i class="ph ph-globe"></i><span data-t="itin_pub">Pubblico</span></button>
         <button class="vis-opt" onclick="setVis(this,'stop','prv')"><i class="ph ph-lock-simple"></i><span data-t="itin_prv">Privato</span></button>
       </div>
+
+      <!-- Data prevista -->
       <div class="sec-lbl" data-t="stop_lbl_date">Data prevista</div>
-      <input class="field-in" type="date" style="margin-bottom:16px"/>
-      <button class="save-btn ready" onclick="closeSheet('addStopOv','addStopBg','addStopSheet');showToast('✓ Tappa aggiunta!')">
+      <input class="field-in" type="date" id="stopDateIn" style="margin-bottom:16px"/>
+
+      <button class="save-btn ready" onclick="saveStop()">
         <span data-t="stop_save">Aggiungi tappa</span>
       </button>
     </div>
@@ -1074,8 +1118,12 @@ function initMap(){
   function cancelLP(){ clearTimeout(lpTimer); lpTimer=null; lpPos=null; lpStarted=false; }
   map.on('mousedown', e=>startLP(e.latlng));
   map.on('touchstart', e=>{ if(e.originalEvent.touches.length===1) startLP(e.latlng); },{passive:true});
-  map.on('mouseup mousemove contextmenu', cancelLP);
+  // mouseup (rilascio) e mousemove (spostamento) cancellano. NON contextmenu:
+  // su mobile il browser triggera contextmenu durante il long-press, cancellandolo.
+  map.on('mouseup mousemove', cancelLP);
   map.on('touchend touchmove', cancelLP);
+  // Previeni il menu contestuale nativo (destra desktop + long-press mobile)
+  map.getContainer().addEventListener('contextmenu', e=>e.preventDefault());
 }
 
 function setMapType(type,btn){
@@ -1696,6 +1744,10 @@ window.addEventListener('DOMContentLoaded',()=>{
   updateShareLink(CENTER[0],CENTER[1]);
   // Visibility default state
   document.querySelectorAll('.vis-opt.sel-pub').forEach(el=>{});
+  // Stop close button + backdrop
+  document.getElementById('closeAddStopBtn').addEventListener('touchend', e=>{e.preventDefault();closeSheet('addStopOv','addStopBg','addStopSheet');});
+  // Render tag iniziali (vuoto ma pronto)
+  renderStopTags();
   // SOS close button
   document.getElementById('closeSosBtn').addEventListener('click', ()=>closeSheet('sosOv','sosBg','sosSheet'));
   document.getElementById('closeSosBtn').addEventListener('touchend', e=>{e.preventDefault();closeSheet('sosOv','sosBg','sosSheet');});
@@ -1864,6 +1916,124 @@ function showSocialTab(tab,btn){
   btn.classList.add('active');
   const panel=document.getElementById('panel-'+tab);
   if(panel)panel.classList.add('active');
+}
+
+/* ══════════════════════════════════════════
+   AUTOCOMPLETE TAPPA ITINERARIO (Nominatim)
+══════════════════════════════════════════ */
+let stopAcTimer;
+function onStopNameFocus(){
+  const val=document.getElementById('stopNameIn').value;
+  if(!val&&gpsPos){
+    fetch(`https://nominatim.openstreetmap.org/reverse?lat=${gpsPos.lat}&lon=${gpsPos.lng}&format=json`,{headers:{'Accept-Language':lang}})
+      .then(r=>r.json()).then(d=>{
+        if(!d||!d.display_name)return;
+        const parts=d.display_name.split(',');
+        showStopAcSuggestion([{name:parts[0].trim(),addr:parts.slice(1,3).join(',').trim(),lat:gpsPos.lat,lng:gpsPos.lng}]);
+      }).catch(()=>{});
+  }
+}
+function onStopNameInput(val){
+  clearTimeout(stopAcTimer);
+  if(val.length<2){document.getElementById('stopAcDrop').classList.remove('open');return;}
+  const lat=gpsPos?gpsPos.lat:CENTER[0],lng=gpsPos?gpsPos.lng:CENTER[1];
+  stopAcTimer=setTimeout(()=>{
+    fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(val)}&format=json&limit=6&lat=${lat}&lon=${lng}&addressdetails=1`,{headers:{'Accept-Language':lang}})
+      .then(r=>r.json()).then(results=>{
+        showStopAcSuggestion(results.slice(0,6).map(r=>({
+          name: r.display_name.split(',')[0],
+          addr: r.display_name.split(',').slice(1,3).join(',').trim(),
+          lat:  parseFloat(r.lat),
+          lng:  parseFloat(r.lon),
+          type: r.type||''
+        })));
+      }).catch(()=>{});
+  },400);
+}
+function showStopAcSuggestion(items){
+  const drop=document.getElementById('stopAcDrop');
+  if(!items.length){drop.classList.remove('open');return;}
+  drop.innerHTML=items.map(item=>`
+    <div class="ac-item" onclick="selectStopAcItem('${item.name.replace(/'/g,"\\'")}',${item.lat},${item.lng})">
+      <i class="ph ph-map-pin"></i>
+      <div>
+        <div class="ac-item-name">${item.name}</div>
+        <div class="ac-item-addr">${item.addr}</div>
+      </div>
+    </div>`).join('');
+  drop.classList.add('open');
+}
+function selectStopAcItem(name,lat,lng){
+  document.getElementById('stopNameIn').value=name;
+  document.getElementById('stopAcDrop').classList.remove('open');
+  if(map)map.setView([lat,lng],15);
+  showToast(`📍 ${name}`);
+}
+document.addEventListener('click',e=>{
+  if(!e.target.closest('#stopAcDrop')&&!e.target.closest('#stopNameIn'))
+    document.getElementById('stopAcDrop')?.classList.remove('open');
+});
+
+/* ══════════════════════════════════════════
+   TAG PERSISTENTI (in-memory, condivisi tra POI e Tappa)
+══════════════════════════════════════════ */
+// Array globale — persiste per tutta la sessione
+let persistentTags=[];
+
+function renderStopTags(){
+  const container=document.getElementById('stopTagsContainer');
+  if(!container)return;
+  container.innerHTML='';
+  persistentTags.forEach((t,i)=>{
+    const chip=document.createElement('span');
+    chip.className='tag-chip-inline';
+    chip.innerHTML=`${t}<button class="tag-chip-rm" onclick="removeStopTag(${i})"><i class="ph ph-x"></i></button>`;
+    container.appendChild(chip);
+  });
+  // Spazio per nuovi tag
+}
+function showStopTagInput(){
+  const container=document.getElementById('stopTagsContainer');
+  const ex=container.querySelector('.tag-in-field');
+  if(ex){ex.focus();return;}
+  const inp=document.createElement('input');
+  inp.className='tag-in-field';
+  inp.placeholder='Tag…';inp.maxLength=30;
+  inp.onkeydown=e=>{
+    if(e.key==='Enter'&&inp.value.trim()){addStopTag(inp.value.trim());inp.value='';}
+    if(e.key==='Escape')inp.remove();
+  };
+  inp.onblur=()=>{if(!inp.value.trim())inp.remove();};
+  container.appendChild(inp);
+  setTimeout(()=>inp.focus(),50);
+}
+function addStopTag(text){
+  const t=text.trim();
+  if(!t||persistentTags.includes(t))return;
+  persistentTags.push(t);
+  renderStopTags();
+  showToast(`+ Tag "${t}" memorizzato`);
+}
+function removeStopTag(idx){
+  persistentTags.splice(idx,1);
+  renderStopTags();
+}
+
+/* ══════════════════════════════════════════
+   SALVA TAPPA
+══════════════════════════════════════════ */
+function saveStop(){
+  const name=(document.getElementById('stopNameIn')||{}).value?.trim()||'';
+  if(!name){
+    showToast(lang==='it'?'Inserisci il nome della tappa':lang==='sq'?'Fut emrin e stacionit':'Enter the stop name');
+    return;
+  }
+  // Reset form
+  document.getElementById('stopNameIn').value='';
+  document.getElementById('stopAcDrop').classList.remove('open');
+  document.querySelectorAll('#stopCatChips .chip.sel').forEach(c=>c.classList.remove('sel'));
+  closeSheet('addStopOv','addStopBg','addStopSheet');
+  showToast(`✓ ${lang==='it'?'Tappa aggiunta':lang==='sq'?'Stacioni shtuar':'Stop added'}: ${name}`);
 }
 </script>
 </body>
