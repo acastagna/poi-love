@@ -1630,6 +1630,8 @@ function openDBDetail(p) {
   // Coordinate nel detail
   const coordEl = document.getElementById('detailCoordsText');
   if (coordEl && p.lat && p.lng) coordEl.textContent = `${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}`;
+  // Aggiorna link condivisione — con ID se disponibile (link stabile)
+  updateShareLink(p.lat || 0, p.lng || 0, p.id || null);
   // Mostra "Modifica" solo se il POI appartiene all'utente corrente
   const editBtn = document.getElementById('editPoiBtn');
   if (editBtn) editBtn.style.display = (currentUser && currentUser.id === p.author_id) ? 'flex' : 'none';
@@ -2109,20 +2111,85 @@ document.addEventListener('click',e=>{
 });
 
 /* ══════════════════════════════════════════
-   SHARE LINK
+   SHARE LINK — formato: /demo?poi=ID o /demo?at=lat,lng
+   (evita /p/ che dà 404 perché non è una rotta reale)
 ══════════════════════════════════════════ */
-function updateShareLink(lat,lng){
-  const link=`https://poilove.com/p/${lat.toFixed(4)},${lng.toFixed(4)}`;
-  document.getElementById('shareLinkTxt').textContent=link;
-  document.getElementById('detailShareLinkTxt').textContent=link;
+function updateShareLink(lat, lng, poiId=null){
+  // Se abbiamo l'ID DB usiamo ?poi=id (link stabile, usa il record)
+  // Altrimenti ?at=lat,lng (coordine, per POI non ancora salvati)
+  const link = poiId
+    ? `https://poilove.com/demo?poi=${poiId}`
+    : `https://poilove.com/demo?at=${lat.toFixed(5)},${lng.toFixed(5)}`;
+  const txtA = document.getElementById('shareLinkTxt');
+  const txtB = document.getElementById('detailShareLinkTxt');
+  if(txtA) txtA.textContent = link;
+  if(txtB) txtB.textContent = link;
 }
 function copyShareLink(){
   const txt=document.getElementById('shareLinkTxt').textContent;
-  navigator.clipboard?navigator.clipboard.writeText(txt).then(()=>showToast('Link copiato!')):showToast(txt);
+  navigator.clipboard?navigator.clipboard.writeText(txt).then(()=>showToast('🔗 Link copiato!')):showToast(txt);
 }
 function copyDetailLink(){
   const txt=document.getElementById('detailShareLinkTxt').textContent;
-  navigator.clipboard?navigator.clipboard.writeText(txt).then(()=>showToast('Link copiato!')):showToast(txt);
+  navigator.clipboard?navigator.clipboard.writeText(txt).then(()=>showToast('🔗 Link copiato!')):showToast(txt);
+}
+
+/* ══════════════════════════════════════════
+   DEEP-LINK HANDLER — legge URL params all'avvio
+   ?poi=<uuid>   → apre direttamente il POI dal DB
+   ?at=lat,lng   → centra la mappa e mostra il pin
+   (compatibilità vecchi link /p/lat,lng gestita via .htaccess)
+══════════════════════════════════════════ */
+function handleDeepLink(){
+  const params = new URLSearchParams(window.location.search);
+  const poiId = params.get('poi');
+  const at    = params.get('at');
+
+  if(poiId && sb){
+    // Carica il POI specifico dal DB e apri il detail
+    sb.from('pois')
+      .select('id,name,description,lat,lng,category,love_count,photos,author_id,address,profiles(username,avatar_url)')
+      .eq('id', poiId)
+      .single()
+      .then(({data, error})=>{
+        if(error || !data){ showToast('❌ POI non trovato'); return; }
+        if(map) map.setView([data.lat, data.lng], 16);
+        openDBDetail(data);
+      });
+    return;
+  }
+
+  if(at){
+    // Centra mappa e mostra un marker temporaneo
+    const parts = at.split(',');
+    const lat = parseFloat(parts[0]);
+    const lng = parseFloat(parts[1]);
+    if(isNaN(lat)||isNaN(lng)){ return; }
+    if(map){ map.setView([lat, lng], 17); }
+    // Cerca il POI più vicino a quelle coordinate nel DB
+    if(sb){
+      sb.from('pois')
+        .select('id,name,description,lat,lng,category,love_count,photos,author_id,address,profiles(username,avatar_url)')
+        .eq('visibility','community')
+        .then(({data})=>{
+          if(!data||!data.length) return;
+          // Trova il POI più vicino alle coordinate (distanza euclidea)
+          let closest=null, minD=Infinity;
+          data.forEach(p=>{
+            const d=Math.abs(p.lat-lat)+Math.abs(p.lng-lng);
+            if(d<minD){minD=d;closest=p;}
+          });
+          // Se sotto 0.001° (~100m) apri il detail
+          if(closest&&minD<0.001){
+            if(map) map.setView([closest.lat, closest.lng], 17);
+            setTimeout(()=>openDBDetail(closest), 600);
+          } else {
+            // Mostra pin puntato
+            showToast(`📍 ${lat.toFixed(4)}, ${lng.toFixed(4)}`);
+          }
+        });
+    }
+  }
 }
 
 /* ══════════════════════════════════════════
@@ -2760,6 +2827,9 @@ window.addEventListener('DOMContentLoaded',()=>{
   initSwipe('sosHandle','sosSheet','sosBg');
   // Vanity URL on load (es. poilove.com/demo?@nomeutente)
   checkVanityUrlOnLoad();
+  // Deep-link: ?poi=id oppure ?at=lat,lng
+  // (attende che la mappa sia pronta — piccolo delay)
+  setTimeout(handleDeepLink, 800);
   // Dev mode (token 321PaLa)
   initDevMode();
 });
