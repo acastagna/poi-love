@@ -391,7 +391,8 @@ button{touch-action:manipulation}
 .trip-detail-section{padding:12px 16px 0}
 .trip-detail-header{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
 /* Mappa itinerario */
-.itin-map{height:180px;border-radius:12px;overflow:hidden;margin-bottom:14px;border:1px solid var(--border)}
+.itin-map{height:200px;border-radius:12px;overflow:hidden;margin-bottom:14px;border:1px solid var(--border)}
+@media(min-width:600px){.itin-map{height:300px}}
 /* Timeline tappe */
 .stops-list{padding-bottom:8px}
 .stop-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:10px;position:relative;transition:opacity .2s}
@@ -403,19 +404,21 @@ button{touch-action:manipulation}
 .stop-drag-handle{color:#C8BFB0;font-size:16px;cursor:grab;padding:6px 2px;flex-shrink:0;touch-action:none;z-index:1}
 .stop-drag-handle:active{cursor:grabbing}
 .stop-dot{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;z-index:1;flex-shrink:0}
-.stop-info{flex:1;background:#f5f0e8;border-radius:10px;padding:9px 11px;min-width:0}
+.stop-content{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}
+.stop-info{background:#f5f0e8;border-radius:10px;padding:9px 11px;min-width:0;cursor:pointer;transition:background .15s}
+.stop-info:active{background:#ede7dc}
 .stop-name{font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .stop-date{font-size:10px;color:var(--muted);margin-top:2px}
 .stop-status{font-size:9px;font-weight:700;padding:2px 6px;border-radius:5px;margin-top:4px;display:inline-block}
 .stop-status.planned{background:#EBF2FC;color:var(--blue)}
 .stop-status.done{background:#DCFCE7;color:#16A34A}
 .stop-status.suspended{background:#f5f0e8;color:var(--muted)}
-.stop-actions{display:flex;flex-direction:column;gap:4px;flex-shrink:0}
-.stop-act-btn{width:24px;height:24px;border-radius:6px;border:none;background:#f5f0e8;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted);transition:all .15s}
+.stop-actions{display:flex;flex-direction:row;gap:5px;padding:0 2px}
+.stop-act-btn{flex:1;height:34px;border-radius:9px;border:none;background:#f5f0e8;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--muted);transition:all .15s;gap:4px;font-size:12px;font-weight:700;font-family:inherit}
 .stop-act-btn:hover,.stop-act-btn:active{background:#ede7dc}
 .stop-act-btn.act-pause.paused{background:#FFF7F0;color:var(--orange)}
 .stop-act-btn.act-del{color:#DC2626}
-.stop-act-btn.act-del:hover{background:#FEE2E2}
+.stop-act-btn.act-del:hover,.stop-act-btn.act-del:active{background:#FEE2E2}
 /* Mini calendario modificabile */
 .mini-cal{background:var(--card);border-radius:12px;padding:12px 14px;margin-bottom:14px;border:1px solid var(--border)}
 .mini-cal-header{display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:800;color:var(--text);margin-bottom:8px}
@@ -457,6 +460,64 @@ button{touch-action:manipulation}
 /* TOAST */
 .toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%) translateY(20px);background:#1C1C1C;color:#fff;border-radius:20px;padding:10px 20px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* HERO BG BUTTON */
+.hero-bg-btn{position:absolute;top:14px;right:14px;background:rgba(0,0,0,.28);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:5px 10px;font-size:10px;font-weight:700;color:#fff;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px;transition:background .15s;z-index:2}
+.hero-bg-btn:active{background:rgba(0,0,0,.5)}
+/* HERO BG PICKER */
+.hero-bg-picker{position:absolute;top:44px;right:14px;background:var(--card);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.2);z-index:10;display:none;flex-direction:column;gap:4px;padding:8px;width:170px}
+.hero-bg-picker.open{display:flex}
+.hero-bg-opt{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;border:none;background:none;cursor:pointer;font-size:12px;font-weight:600;font-family:inherit;color:var(--text);text-align:left;transition:background .12s}
+.hero-bg-opt:hover,.hero-bg-opt:active{background:#f5f0e8}
+.hero-bg-swatch{width:20px;height:20px;border-radius:5px;flex-shrink:0;border:1px solid rgba(0,0,0,.1)}
+
+/* AVATAR POPUP */
+.av-popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:600;display:none;align-items:flex-end}
+.av-popup-overlay.open{display:flex}
+.av-popup{background:var(--card);border-radius:24px 24px 0 0;padding:0 0 52px;width:100%;max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.av-popup-handle{width:44px;height:5px;background:#C8BFB0;border-radius:3px;margin:14px auto 4px}
+.av-popup-head{padding:14px 20px 0;display:flex;align-items:flex-start;justify-content:space-between}
+.av-popup-title{font-size:18px;font-weight:800;color:var(--text)}
+.av-popup-sub{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.5}
+.av-popup-close{width:32px;height:32px;border-radius:16px;background:#ede7dc;border:none;cursor:pointer;font-size:17px;color:var(--muted);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.av-level-badge{margin:12px 20px;display:inline-flex;align-items:center;gap:8px;background:#FFF7F0;border:1.5px solid #FED7AA;border-radius:10px;padding:8px 12px;font-size:12px;font-weight:700;color:#92400E}
+.av-section-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;padding:4px 20px 10px;display:flex;align-items:center;justify-content:space-between}
+.av-env-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 20px 16px}
+.av-env-card{border-radius:14px;overflow:hidden;cursor:pointer;border:2.5px solid transparent;transition:all .2s;position:relative;aspect-ratio:1}
+.av-env-card.sel{border-color:var(--red);transform:scale(1.04)}
+.av-env-card-img{width:100%;height:100%;object-fit:cover;display:block}
+.av-env-label{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.72));color:#fff;font-size:10px;font-weight:700;padding:18px 6px 6px;text-align:center}
+.av-env-card.sel::after{content:'✓';position:absolute;top:6px;right:7px;background:var(--red);color:#fff;border-radius:50%;width:18px;height:18px;font-size:10px;font-weight:900;display:flex;align-items:center;justify-content:center}
+.av-gen-btn{margin:4px 20px 0;width:calc(100% - 40px);padding:12px;background:linear-gradient(135deg,var(--red),#E05858);border:none;border-radius:12px;font-size:13px;font-weight:800;color:#fff;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 14px rgba(212,43,43,.35);transition:transform .15s}
+.av-gen-btn:active{transform:scale(.97)}
+.av-gen-warning{margin:10px 20px 0;font-size:10px;color:var(--muted);line-height:1.5;display:flex;align-items:flex-start;gap:6px}
+
+/* STOP DETAIL MODAL */
+.stop-detail-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:600;display:none;align-items:flex-end}
+.stop-detail-overlay.open{display:flex}
+.stop-detail-sheet{background:var(--card);border-radius:24px 24px 0 0;padding:0 0 52px;width:100%;max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.stop-detail-handle{width:44px;height:5px;background:#C8BFB0;border-radius:3px;margin:14px auto 4px}
+.stop-detail-head{padding:14px 20px 0;display:flex;align-items:flex-start;justify-content:space-between}
+.stop-detail-title{font-size:18px;font-weight:800;color:var(--text);flex:1;padding-right:8px}
+.stop-detail-close{width:32px;height:32px;border-radius:16px;background:#ede7dc;border:none;cursor:pointer;font-size:17px;color:var(--muted);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.stop-detail-body{padding:14px 20px}
+.stop-detail-status{display:inline-flex;align-items:center;gap:6px;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;margin-bottom:12px}
+.stop-detail-note{width:100%;background:#f5f0e8;border:1.5px solid #E0D8CC;border-radius:11px;padding:10px 12px;font-size:13px;font-family:inherit;color:var(--text);outline:none;resize:none;height:80px;transition:border-color .2s;margin-bottom:12px}
+.stop-detail-note:focus{border-color:var(--red)}
+.stop-invite-section{background:#EBF2FC;border-radius:12px;padding:12px;margin-bottom:12px}
+.stop-invite-title{font-size:11px;font-weight:700;color:var(--blue);margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.stop-invite-row{display:flex;gap:6px}
+.stop-invite-btn{flex:1;height:34px;border-radius:9px;border:1.5px solid var(--border);background:var(--card);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--text);display:flex;align-items:center;justify-content:center;gap:5px;transition:all .15s}
+.stop-invite-btn:active{background:#f5f0e8}
+.stop-follower-warning{background:#FFF7F0;border:1.5px solid #FED7AA;border-radius:10px;padding:10px 12px;font-size:10px;color:#92400E;line-height:1.6;margin-top:8px;display:none;gap:7px;align-items:flex-start}
+.stop-follower-warning.show{display:flex}
+
+/* PROFILE ROUTES */
+.route-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.route-item:last-child{border-bottom:none}
+.route-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px}
+.route-name{font-size:13px;font-weight:700;color:var(--text)}
+.route-meta{font-size:10px;color:var(--muted);margin-top:1px}
 </style>
 </head>
 <body>
@@ -484,8 +545,8 @@ button{touch-action:manipulation}
 </div>
 
 <!-- SOS -->
-<button class="sos-btn" id="sosBtn" onclick="openSOS()" title="Segnala comportamento inappropriato">
-  <i class="ph-duotone ph-warning-circle"></i>
+<button class="sos-btn" id="sosBtn" onclick="openSOS()" title="Sicurezza e segnalazioni">
+  <i class="ph-fill ph-shield-warning"></i>
 </button>
 
 <!-- FAB -->
@@ -507,7 +568,7 @@ button{touch-action:manipulation}
     <i class="ph-fill ph-map-trifold"></i><span class="nav-lbl" data-t="nav_map">Mappa</span>
   </button>
   <button class="nav-item" id="nav-itin" onclick="showTab('itin')">
-    <i class="ph-fill ph-navigation"></i><span class="nav-lbl" data-t="nav_itin">Itinerari</span>
+    <i class="ph-fill ph-path"></i><span class="nav-lbl" data-t="nav_itin">Itinerari</span>
   </button>
   <button class="nav-item" id="nav-profile" onclick="showTab('profile')">
     <i class="ph ph-user-circle"></i><span class="nav-lbl" data-t="nav_profile">Profilo</span>
@@ -517,31 +578,30 @@ button{touch-action:manipulation}
 <!-- ═══ PROFILE VIEW ═══ -->
 <div class="profile-view" id="profileView">
   <div id="privateProfile">
-    <div class="profile-hero">
+    <div class="profile-hero" id="profileHero">
+      <!-- Cambio sfondo hero -->
+      <button class="hero-bg-btn" onclick="toggleHeroBgPicker(event)" id="heroBgBtn">
+        <i class="ph ph-image" style="font-size:12px"></i> Sfondo
+      </button>
+      <div class="hero-bg-picker" id="heroBgPicker">
+        <button class="hero-bg-opt" onclick="setHeroBg('linear-gradient(160deg,#D42B2B 0%,#7B1111 100%)')"><div class="hero-bg-swatch" style="background:linear-gradient(135deg,#D42B2B,#7B1111)"></div> Rosso classico</button>
+        <button class="hero-bg-opt" onclick="setHeroBg('linear-gradient(160deg,#285EA7 0%,#0F3060 100%)')"><div class="hero-bg-swatch" style="background:linear-gradient(135deg,#285EA7,#0F3060)"></div> Ocean Blue</button>
+        <button class="hero-bg-opt" onclick="setHeroBg('linear-gradient(160deg,#0F172A 0%,#1e3a5f 50%,#285EA7 100%)')"><div class="hero-bg-swatch" style="background:linear-gradient(135deg,#0F172A,#285EA7)"></div> Notte adriatica</button>
+        <button class="hero-bg-opt" onclick="setHeroBg('linear-gradient(160deg,#14532d 0%,#16A34A 100%)')"><div class="hero-bg-swatch" style="background:linear-gradient(135deg,#14532d,#16A34A)"></div> Foresta</button>
+        <button class="hero-bg-opt" onclick="setHeroBg('linear-gradient(160deg,#7C3AED 0%,#4C1D95 100%)')"><div class="hero-bg-swatch" style="background:linear-gradient(135deg,#7C3AED,#4C1D95)"></div> Viola cosmo</button>
+        <button class="hero-bg-opt" onclick="setHeroBgImg()"><div class="hero-bg-swatch" style="background:var(--bg);border:1px dashed #999"></div> Da Unsplash…</button>
+      </div>
+      <!-- Avatar -->
       <div class="profile-avatar-wrap" onclick="changeAvatar()">
-        <div class="profile-avatar">
+        <div class="profile-avatar" id="profileAvatarImg">
           <img src="https://ui-avatars.com/api/?name=Alessandro+C&background=D42B2B&color=fff&size=200" alt="avatar"/>
         </div>
-        <div class="avatar-edit"><i class="ph ph-camera"></i></div>
+        <div class="avatar-edit"><i class="ph ph-sparkle"></i></div>
       </div>
       <div class="profile-name">Alessandro C.</div>
       <div class="profile-email">it@altrostile.app</div>
-      <div class="prof-badge" id="profBadge" onclick="generateAvatar()"></div>
+      <div class="prof-badge" id="profBadge" onclick="changeAvatar()"></div>
       <div class="badge-label" id="badgeLabel"></div>
-    </div>
-    <!-- AVATAR TRANSFORMATION — ambienti per livello -->
-    <div class="avatar-level-section">
-      <div class="level-section-lbl">
-        <span><i class="ph ph-sparkle" style="color:var(--red);margin-right:3px"></i> Scegli il tuo ambiente — <span id="levelNameLbl">Amatore</span></span>
-        <span style="color:var(--muted);font-weight:400;font-size:9px">AI genererà il tuo avatar</span>
-      </div>
-      <div class="level-env-row" id="levelEnvRow">
-        <!-- Popolato dinamicamente da JS in base al livello -->
-      </div>
-      <button class="level-ai-btn" onclick="requestAvatarGen()">
-        <i class="ph-duotone ph-magic-wand" style="font-size:15px"></i>
-        Genera 3 avatar AI con questo ambiente
-      </button>
     </div>
     <div class="profile-stats">
       <div class="stat-item">
@@ -595,6 +655,21 @@ button{touch-action:manipulation}
           </div>
         </div>
       </div>
+      <!-- LE MIE ROTTE STORICHE -->
+      <div class="profile-sec">
+        <div class="prof-sec-lbl"><span>Le mie rotte storiche</span><span style="font-size:10px;font-weight:400;color:var(--muted)">selezionate sulla mappa</span></div>
+        <div id="myRoutesContainer">
+          <div class="route-item">
+            <div class="route-dot" style="background:#EBF2FC"><i class="ph ph-person-simple-walk" style="color:var(--blue)"></i></div>
+            <div><div class="route-name">Via Egnatia</div><div class="route-meta">Albania · Macedonia · Grecia</div></div>
+          </div>
+          <div class="route-item">
+            <div class="route-dot" style="background:#FFF5F5"><i class="ph ph-person-simple-run" style="color:var(--red)"></i></div>
+            <div><div class="route-name">Terre Illiriche</div><div class="route-meta">Popoli antichi dei Balcani</div></div>
+          </div>
+        </div>
+      </div>
+
       <!-- SEGUITI / BLOCCATI -->
       <div class="profile-sec">
         <div class="prof-sec-lbl"><span>Connessioni</span></div>
@@ -728,6 +803,15 @@ button{touch-action:manipulation}
       <div class="stat-item"><i class="ph ph-route"></i><div class="stat-v">2</div><div class="stat-l">Itinerari</div></div>
     </div>
     <div class="profile-body">
+      <!-- Stesso verde toggle — torna al tuo profilo -->
+      <button class="pub-toggle-card" onclick="togglePublicProfile(false)">
+        <div class="pub-toggle-icon"><i class="ph-fill ph-arrow-left"></i></div>
+        <div class="pub-toggle-text">
+          <div class="pub-toggle-title">Torna al tuo profilo</div>
+          <div class="pub-toggle-sub">Esci dall'anteprima pubblica e torna alla tua area privata</div>
+        </div>
+        <i class="ph ph-caret-right pub-toggle-arrow"></i>
+      </button>
       <div class="profile-sec">
         <div class="prof-sec-lbl">POI pubblici</div>
         <div class="poi-board">
@@ -1303,7 +1387,7 @@ function initMap(){
     lpPos=latlng; lpStarted=true;
     lpTimer=setTimeout(()=>{
       if(lpPos&&lpStarted){ openAddPOIAtCoords(lpPos.lat,lpPos.lng); }
-    },3000);
+    },1500);
   }
   function cancelLP(){ clearTimeout(lpTimer); lpTimer=null; lpPos=null; lpStarted=false; }
   map.on('mousedown', e=>startLP(e.latlng));
@@ -1597,10 +1681,13 @@ function showTab(tab){
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   const nm=document.getElementById('nav-'+tab);if(nm)nm.classList.add('active');
   const onMap=tab==='map';
-  document.getElementById('fab').style.display=onMap?'flex':'none';
-  document.getElementById('fabMenu').style.opacity='0';
-  document.getElementById('fabMenu').classList.remove('open');
-  document.getElementById('fab').classList.remove('open');
+  const fab=document.getElementById('fab');
+  const fabMenu=document.getElementById('fabMenu');
+  fab.style.display=onMap?'flex':'none';
+  // Reset FAB senza impostare style.opacity inline (bug: overriderebbe la classe .open)
+  fabMenu.classList.remove('open');
+  fab.classList.remove('open');
+  fabMenu.style.opacity=''; // pulisce qualsiasi inline style residuo
   document.querySelectorAll('.map-types')[0].style.display=onMap?'flex':'none';
   if(tab==='map'&&map)setTimeout(()=>map.invalidateSize(),50);
   if(tab==='profile')togglePublicProfile(false);
@@ -1838,9 +1925,85 @@ function removeSheetTag(btn){btn.closest('.tag-chip-inline').remove()}
 /* ══════════════════════════════════════════
    PROFILE HELPERS
 ══════════════════════════════════════════ */
+/* ── AVATAR POPUP ── */
+const AV_ENVS={
+  Comics:[
+    {img:'https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?w=200&h=200&fit=crop',lbl:'Comics urbano'},
+    {img:'https://images.unsplash.com/photo-1635805737707-575885ab0820?w=200&h=200&fit=crop',lbl:'Supereroe'},
+    {img:'https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=200&h=200&fit=crop',lbl:'Manga'},
+  ],
+  Luxury:[
+    {img:'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=200&h=200&fit=crop',lbl:'Hotel 5 stelle'},
+    {img:'https://images.unsplash.com/photo-1613977257363-707ba9348227?w=200&h=200&fit=crop',lbl:'Yacht'},
+    {img:'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=200&h=200&fit=crop',lbl:'Atelier moda'},
+  ],
+  Natura:[
+    {img:'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=200&h=200&fit=crop',lbl:'Foresta'},
+    {img:'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=200&h=200&fit=crop',lbl:'Montagna'},
+    {img:'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=200&h=200&fit=crop',lbl:'Mare'},
+  ],
+};
+let avSelEnv='Comics';
 function changeAvatar(){
-  showToast(lang==='it'?'Funzione attiva nell\'app':lang==='sq'?'Funksion aktiv në aplikacion':'Feature active in app');
+  const badge=getBadge(currentLoves);
+  const el=document.getElementById('avLevelText');
+  if(el)el.textContent=`${badge.label} · ${currentLoves} love`;
+  renderAvEnvGrid();
+  document.getElementById('avPopupOv').classList.add('open');
 }
+function closeAvPopup(){
+  document.getElementById('avPopupOv').classList.remove('open');
+}
+function renderAvEnvGrid(){
+  const grid=document.getElementById('avEnvGrid');
+  if(!grid)return;
+  const envNames=Object.keys(AV_ENVS);
+  // Sezione scelta stile
+  grid.innerHTML=`
+    <div style="grid-column:1/-1;display:flex;gap:8px;margin-bottom:12px">
+      ${envNames.map(name=>`<button style="flex:1;height:34px;border-radius:9px;border:2px solid ${avSelEnv===name?'var(--red)':'var(--border)'};background:${avSelEnv===name?'#FFF5F5':'none'};color:${avSelEnv===name?'var(--red)':'var(--muted)'};font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s" onclick="selectAvStyle('${name}')">${name}</button>`).join('')}
+    </div>
+    ${AV_ENVS[avSelEnv].map((e,i)=>`
+      <div class="av-env-card" onclick="showToast('Ambiente: ${e.lbl}')">
+        <img class="av-env-card-img" src="${e.img}" alt="${e.lbl}" loading="lazy"/>
+        <div class="av-env-label">${e.lbl}</div>
+      </div>`).join('')}`;
+}
+function selectAvStyle(name){
+  avSelEnv=name;
+  renderAvEnvGrid();
+}
+function requestAvatarGen(){
+  showToast(`🎨 POI•AI genererà il tuo avatar ${avSelEnv} — post-lancio`);
+  closeAvPopup();
+}
+
+/* ── HERO BACKGROUND ── */
+function toggleHeroBgPicker(e){
+  e.stopPropagation();
+  document.getElementById('heroBgPicker').classList.toggle('open');
+}
+function setHeroBg(gradient){
+  document.getElementById('profileHero').style.background=gradient;
+  document.getElementById('heroBgPicker').classList.remove('open');
+  showToast('🎨 Sfondo aggiornato');
+}
+function setHeroBgImg(){
+  document.getElementById('heroBgPicker').classList.remove('open');
+  // Pool di sfondi paesaggistici Wikimedia (affidabili)
+  const imgs=[
+    'https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Pyramid_of_Tirana_2022.jpg/800px-Pyramid_of_Tirana_2022.jpg',
+    'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Mostar_stari_most.jpg/800px-Mostar_stari_most.jpg',
+    'https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/Kotor_Montenegro_%281%29.jpg/800px-Kotor_Montenegro_%281%29.jpg',
+  ];
+  const url=imgs[Math.floor(Math.random()*imgs.length)];
+  document.getElementById('profileHero').style.background=`linear-gradient(rgba(0,0,0,.45),rgba(0,0,0,.65)),url('${url}') center/cover`;
+  showToast('🖼 Sfondo paesaggio aggiornato');
+}
+document.addEventListener('click',e=>{
+  if(!e.target.closest('#heroBgBtn')&&!e.target.closest('#heroBgPicker'))
+    document.getElementById('heroBgPicker')?.classList.remove('open');
+});
 function togglePublicProfile(show){
   document.getElementById('privateProfile').style.display=show?'none':'block';
   document.getElementById('publicProfile').style.display=show?'block':'none';
@@ -2318,15 +2481,17 @@ function renderTripStopsHTML(t){
       ondragend="dragEnd(event)">
       <span class="stop-drag-handle"><i class="ph ph-dots-six-vertical"></i></span>
       <div class="stop-dot" style="background:${s.iconBg}"><i class="${s.icon}" style="color:${s.iconColor};font-size:12px"></i></div>
-      <div class="stop-info">
-        <div class="stop-name">${s.name}</div>
-        <div class="stop-date">${s.date}</div>
-        <span class="stop-status ${susp?'suspended':s.status}">${susp?'⏸ Sospesa':s.status==='done'?'✓ Completata':'→ Pianificata'}</span>
-      </div>
-      <div class="stop-actions">
-        <button class="stop-act-btn act-pause${susp?' paused':''}" title="${susp?'Riprendi':'Sospendi'}" onclick="suspendStop('${t.id}','${s.id}')"><i class="ph ${susp?'ph-play':'ph-pause'}"></i></button>
-        <button class="stop-act-btn act-edit" title="Modifica" onclick="editStop('${t.id}','${s.id}')"><i class="ph ph-pencil-simple"></i></button>
-        <button class="stop-act-btn act-del" title="Elimina" onclick="deleteStop('${t.id}','${s.id}')"><i class="ph ph-trash"></i></button>
+      <div class="stop-content">
+        <div class="stop-info" onclick="openStopDetail('${t.id}','${s.id}')">
+          <div class="stop-name">${s.name}</div>
+          <div class="stop-date">${s.date}</div>
+          <span class="stop-status ${susp?'suspended':s.status}">${susp?'⏸ Sospesa':s.status==='done'?'✓ Completata':'→ Pianificata'}</span>
+        </div>
+        <div class="stop-actions">
+          <button class="stop-act-btn act-pause${susp?' paused':''}" onclick="suspendStop('${t.id}','${s.id}')"><i class="ph ${susp?'ph-play':'ph-pause'}" style="font-size:13px"></i> ${susp?'Riprendi':'Sospendi'}</button>
+          <button class="stop-act-btn act-edit" onclick="openStopDetail('${t.id}','${s.id}')"><i class="ph ph-pencil-simple" style="font-size:13px"></i> Modifica</button>
+          <button class="stop-act-btn act-del" onclick="deleteStop('${t.id}','${s.id}')"><i class="ph ph-trash" style="font-size:13px"></i> Elimina</button>
+        </div>
       </div>
     </div>`;
   }).join('');
@@ -2412,10 +2577,11 @@ function initItinMap(tripId){
   const t=TRIPS[tripId];
   t.stops.forEach((s,i)=>{
     if(!sc[i])return;
-    const bg=s.status==='done'?'#16A34A':'#D42B2B';
-    L.marker(sc[i],{
-      icon:L.divIcon({className:'',html:`<div style="width:22px;height:22px;border-radius:50%;background:${bg};border:2.5px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff;font-weight:900">${i+1}</div>`,iconSize:[22,22],iconAnchor:[11,11]})
-    }).addTo(m).bindPopup(`<b>${s.name}</b>`);
+    const bg=s.status==='done'?'#16A34A':s.suspended?'#F97316':'#D42B2B';
+    const mk=L.marker(sc[i],{
+      icon:L.divIcon({className:'',html:`<div style="width:26px;height:26px;border-radius:50%;background:${bg};border:3px solid #fff;box-shadow:0 3px 10px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:900;cursor:pointer">${i+1}</div>`,iconSize:[26,26],iconAnchor:[13,13]})
+    }).addTo(m);
+    mk.on('click',()=>openStopDetail(tripId,s.id));
   });
   if(sc.length>1){try{m.fitBounds(sc,{padding:[24,24],maxZoom:14});}catch(e){}}
   itinMaps[tripId]=m;
@@ -2439,10 +2605,48 @@ function suspendStop(tripId,stopId){
   refreshStops(tripId);
   showToast(s.suspended?'⏸ Tappa sospesa':'▶ Tappa ripristinata');
 }
-function editStop(tripId,stopId){
+function editStop(tripId,stopId){openStopDetail(tripId,stopId);}
+
+/* ── STOP DETAIL MODAL ── */
+let _curStopTrip=null, _curStopId=null;
+function openStopDetail(tripId,stopId){
   const t=TRIPS[tripId]; if(!t)return;
   const s=t.stops.find(x=>x.id===stopId); if(!s)return;
-  showToast(`✏️ Modifica "${s.name}" — disponibile nell'app`);
+  _curStopTrip=tripId; _curStopId=stopId;
+  document.getElementById('stopDetailTitle').textContent=s.name;
+  document.getElementById('stopDetailDate').textContent=s.date;
+  const susp=s.suspended||s.status==='suspended';
+  const statusEl=document.getElementById('stopDetailStatus');
+  statusEl.textContent=susp?'⏸ Sospesa':s.status==='done'?'✓ Completata':'→ Pianificata';
+  statusEl.style.background=susp?'#f5f0e8':s.status==='done'?'#DCFCE7':'#EBF2FC';
+  statusEl.style.color=susp?'var(--muted)':s.status==='done'?'#16A34A':'var(--blue)';
+  document.getElementById('stopDetailNote').value=s.note||'';
+  document.getElementById('followerWarning').classList.remove('show');
+  document.getElementById('stopDetailOv').classList.add('open');
+}
+function closeStopDetail(){
+  document.getElementById('stopDetailOv').classList.remove('open');
+  _curStopTrip=null; _curStopId=null;
+}
+function saveStopDetail(){
+  if(!_curStopTrip||!_curStopId)return;
+  const t=TRIPS[_curStopTrip];
+  const s=t?.stops.find(x=>x.id===_curStopId);
+  if(s){
+    s.note=document.getElementById('stopDetailNote').value.trim();
+    showToast(`✓ Modifiche salvate per "${s.name}"`);
+  }
+  closeStopDetail();
+}
+function inviteToStop(type){
+  const warn=document.getElementById('followerWarning');
+  if(type==='follower'){
+    warn.classList.add('show');
+    showToast('⚠️ Leggi il messaggio di sicurezza prima di procedere');
+  } else {
+    warn.classList.remove('show');
+    showToast('📩 Invito amico inviato — disponibile nell\'app');
+  }
 }
 function refreshStops(tripId){
   const el=document.getElementById('stops-'+tripId);
@@ -2505,15 +2709,30 @@ function shareTripLink(tripId){
   const link=`https://poilove.com/trip/${t.shareId}`;
   navigator.clipboard?navigator.clipboard.writeText(link).then(()=>showToast(`🔗 Link copiato!`)):showToast(`🔗 ${link}`);
 }
+// Pool di cover per rotazione locale (source.unsplash.com è deprecato)
+const TRIP_COVERS={
+  trip1:[
+    'https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Pyramid_of_Tirana_2022.jpg/800px-Pyramid_of_Tirana_2022.jpg',
+    'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/New_Bazaar_Tirana.jpg/800px-New_Bazaar_Tirana.jpg',
+    'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Blloku_Tirana.jpg/800px-Blloku_Tirana.jpg',
+    'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Skanderbeg_Square_Tirana.jpg/800px-Skanderbeg_Square_Tirana.jpg',
+  ],
+  trip2:[
+    'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Mostar_stari_most.jpg/800px-Mostar_stari_most.jpg',
+    'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Sarajevo_stari_grad.jpg/800px-Sarajevo_stari_grad.jpg',
+    'https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/Kotor_Montenegro_%281%29.jpg/800px-Kotor_Montenegro_%281%29.jpg',
+  ]
+};
+const _coverIdx={trip1:0,trip2:0};
 function changeTripCover(tripId){
   const t=TRIPS[tripId]; if(!t)return;
-  const q=encodeURIComponent(t.dest+' travel landscape');
-  const n=Date.now()%1000;
-  const newUrl=`https://source.unsplash.com/800x400/?${q}&sig=${n}`;
+  const pool=TRIP_COVERS[tripId]||TRIP_COVERS.trip1;
+  _coverIdx[tripId]=(_coverIdx[tripId]+1)%pool.length;
+  const newUrl=pool[_coverIdx[tripId]];
   t.cover=newUrl;
   const coverEl=document.querySelector(`#tc-${tripId} .trip-cover`);
   if(coverEl)coverEl.style.backgroundImage=`url('${newUrl}')`;
-  showToast('🖼 Cover aggiornata da Unsplash');
+  showToast('🖼 Cover aggiornata ('+(_coverIdx[tripId]+1)+'/'+pool.length+')');
 }
 function openNewTrip(){
   showToast(lang==='it'?'Crea nuovo viaggio — disponibile nell\'app':lang==='sq'?'Udhëtim i ri — aktiv në aplikacion':'New trip — available in app');
@@ -2722,5 +2941,70 @@ function saveStop(){
   showToast(`✓ ${lang==='it'?'Tappa aggiunta':lang==='sq'?'Stacioni shtuar':'Stop added'}: ${name}`);
 }
 </script>
+
+<!-- ═══ AVATAR POPUP ═══ -->
+<div class="av-popup-overlay" id="avPopupOv" onclick="if(event.target===this)closeAvPopup()">
+  <div class="av-popup">
+    <div class="av-popup-handle"></div>
+    <div class="av-popup-head">
+      <div>
+        <div class="av-popup-title">Trasforma il tuo avatar</div>
+        <div class="av-popup-sub">Scegli un ambiente. POI•AI genererà 3 varianti del tuo avatar in stile scelto, basate sul tuo livello.</div>
+      </div>
+      <button class="av-popup-close" onclick="closeAvPopup()"><i class="ph ph-x"></i></button>
+    </div>
+    <div class="av-level-badge" id="avLevelBadge">
+      <i class="ph-fill ph-star" style="color:#F97316"></i>
+      <span id="avLevelText">Amatore · 87 love</span>
+    </div>
+    <div class="av-section-lbl">
+      <span>Scegli l'ambiente</span>
+      <span style="font-weight:400;font-size:9px">poi AI genererà varianti</span>
+    </div>
+    <div class="av-env-grid" id="avEnvGrid">
+      <!-- popolato da JS -->
+    </div>
+    <button class="av-gen-btn" onclick="requestAvatarGen()">
+      <i class="ph-fill ph-magic-wand"></i>
+      Genera il mio avatar AI
+    </button>
+    <div class="av-gen-warning">
+      <i class="ph ph-info" style="font-size:14px;flex-shrink:0;margin-top:1px"></i>
+      La generazione sarà disponibile dopo il lancio ufficiale dell'app. Le scelte di ambiente vengono salvate ora.
+    </div>
+  </div>
+</div>
+
+<!-- ═══ STOP DETAIL MODAL ═══ -->
+<div class="stop-detail-overlay" id="stopDetailOv" onclick="if(event.target===this)closeStopDetail()">
+  <div class="stop-detail-sheet">
+    <div class="stop-detail-handle"></div>
+    <div class="stop-detail-head">
+      <div class="stop-detail-title" id="stopDetailTitle">Tappa</div>
+      <button class="stop-detail-close" onclick="closeStopDetail()"><i class="ph ph-x"></i></button>
+    </div>
+    <div class="stop-detail-body">
+      <div class="stop-detail-status" id="stopDetailStatus"></div>
+      <div class="sec-lbl" style="margin-bottom:6px">Data prevista</div>
+      <div id="stopDetailDate" style="font-size:13px;color:var(--muted);margin-bottom:14px;font-weight:600"></div>
+      <div class="sec-lbl" style="margin-bottom:6px">Note personali</div>
+      <textarea class="stop-detail-note" id="stopDetailNote" placeholder="Aggiungi note, promemoria, info pratiche…"></textarea>
+      <div class="stop-invite-section">
+        <div class="stop-invite-title"><i class="ph ph-users-three" style="font-size:14px"></i> Invita qualcuno a questa tappa</div>
+        <div class="stop-invite-row">
+          <button class="stop-invite-btn" onclick="inviteToStop('amico')"><i class="ph ph-handshake"></i> Amico</button>
+          <button class="stop-invite-btn" onclick="inviteToStop('follower')"><i class="ph ph-user-circle-plus"></i> Follower</button>
+        </div>
+        <div class="stop-follower-warning" id="followerWarning">
+          <i class="ph ph-shield-warning" style="font-size:18px;flex-shrink:0;color:#D97706"></i>
+          <div><b>Attenzione:</b> se non conosci personalmente questa persona, ti consigliamo di <b>attivare la condivisione della posizione</b> con qualcuno di fiducia prima di incontrarla in un luogo fisico.</div>
+        </div>
+      </div>
+      <button class="level-ai-btn" style="background:var(--card);border-color:var(--red);color:var(--red)" onclick="saveStopDetail()">
+        <i class="ph ph-floppy-disk"></i> Salva modifiche
+      </button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
