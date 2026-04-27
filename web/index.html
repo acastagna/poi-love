@@ -92,6 +92,17 @@ button{touch-action:manipulation}
 .nav-item.nav-sos{animation:sosPulse 2.2s ease-in-out infinite}
 @keyframes sosPulse{0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,0)}50%{box-shadow:0 0 0 6px rgba(220,38,38,.18)}}
 
+/* ── COMPAGNIA ── */
+.compagnia-badge{position:absolute;top:-4px;right:-4px;background:var(--blue);color:#fff;font-size:9px;font-weight:900;border-radius:8px;padding:1px 5px;min-width:16px;text-align:center;display:none}
+.compagnia-badge.vis{display:block}
+.compagnia-code-row{display:flex;gap:8px;margin-top:8px}
+.compagnia-code-in{flex:1;height:48px;border-radius:14px;border:2px solid var(--blue);background:#EBF2FC;padding:0 16px;font-size:20px;font-weight:900;letter-spacing:5px;text-transform:uppercase;color:var(--blue);font-family:monospace;outline:none;text-align:center}
+.compagnia-join-btn{height:48px;border-radius:14px;background:var(--blue);color:#fff;border:none;font-size:14px;font-weight:700;padding:0 20px;cursor:pointer;font-family:inherit;flex-shrink:0;transition:opacity .15s}
+.compagnia-join-btn:active{opacity:.8}
+.compagnia-hint{font-size:11px;color:var(--muted);margin-top:8px;line-height:1.6}
+.compagnia-stop{width:100%;height:44px;border-radius:14px;background:#FEE2E2;color:#DC2626;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;display:none}
+.compagnia-stop.vis{display:block}
+
 /* ── CREDIT STRIP (buffer anti-Siri + credits) ── */
 #lang-strip{position:fixed;bottom:0;left:0;right:0;z-index:500;height:50px;background:linear-gradient(160deg,#D42B2B 0%,#7B1111 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;user-select:none;pointer-events:none;padding:0 16px}
 #lang-strip .cr-top{font-size:9px;font-weight:800;color:rgba(255,255,255,.95);letter-spacing:.4px;white-space:nowrap}
@@ -596,6 +607,43 @@ button{touch-action:manipulation}
     <div class="fab-opt-icon" style="background:#EBF2FC;color:var(--blue)"><i class="ph ph-path"></i></div>
     <span data-t="fab_itin">Tappa Itinerario</span>
   </button>
+  <button class="fab-opt" id="compagniaFabBtn" onclick="closeFab();openCompagniaSheet()" style="position:relative">
+    <div class="fab-opt-icon" style="background:#F0FDF4;color:#16A34A;position:relative">
+      <i class="ph-fill ph-users-three"></i>
+      <span class="compagnia-badge" id="compagniaBadge">0</span>
+    </div>
+    <span>Compagnia</span>
+  </button>
+</div>
+
+<!-- COMPAGNIA SHEET -->
+<div class="sheet-overlay" id="compagniaOv">
+  <div class="sheet-backdrop" id="compagniaBg" onclick="closeSheet('compagniaOv','compagniaBg','compagniaSheet')"></div>
+  <div class="sheet" id="compagniaSheet">
+    <div class="sh-handle"></div>
+    <div class="sh-head">
+      <div>
+        <div class="sh-title">🧭 Compagnia</div>
+        <div class="sh-sub">Condividi la tua posizione GPS in tempo reale con gli amici</div>
+      </div>
+      <button class="sh-close" onclick="closeSheet('compagniaOv','compagniaBg','compagniaSheet')"><i class="ph ph-x"></i></button>
+    </div>
+    <div class="sh-body" style="padding-bottom:24px">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:4px;margin-top:8px">Crea una nuova compagnia o inserisci il codice ricevuto da un amico:</p>
+      <div class="compagnia-code-row">
+        <input class="compagnia-code-in" id="compagniaCode" type="text" maxlength="6" placeholder="ABC123"
+          onkeydown="if(event.key==='Enter')joinOrCreateCompagnia()"/>
+        <button class="compagnia-join-btn" onclick="joinOrCreateCompagnia()">Unisciti</button>
+      </div>
+      <p class="compagnia-hint">
+        Lascia il campo vuoto per <strong>creare</strong> una nuova compagnia e ottenere il codice da condividere.<br>
+        In albanese: <em>shoqëri</em> · In inglese: <em>travel party</em>
+      </p>
+      <button class="compagnia-stop vis" id="compagniaStopBtn" onclick="stopCompagnia();closeSheet('compagniaOv','compagniaBg','compagniaSheet')" style="display:none">
+        <i class="ph ph-stop-circle"></i> Lascia la compagnia
+      </button>
+    </div>
+  </div>
 </div>
 
 <!-- AUTH OVERLAY -->
@@ -1489,6 +1537,161 @@ async function savePOIToDB(data) {
   return poi;
 }
 
+/* ══════════════════════════════════════════
+   COMPAGNIA — GPS real-time (Supabase Realtime)
+   IT: Compagnia · SQ: Shoqëri · EN: Travel Party
+══════════════════════════════════════════ */
+let compagniaChannel = null;
+let compagniaCode = null;
+let compagniaActive = false;
+let gpsWatchId = null;
+const friendMarkers = {}; // userId → L.marker
+
+function generateCompagniaCode(){
+  const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code='';
+  for(let i=0;i<6;i++) code+=chars[Math.floor(Math.random()*chars.length)];
+  return code;
+}
+
+function startCompagnia(code){
+  if(!currentUser){ showToast('Accedi prima'); return; }
+  if(compagniaActive) stopCompagnia();
+  compagniaCode = code.toUpperCase();
+  compagniaActive = true;
+
+  compagniaChannel = sb.channel(`compagnia:${compagniaCode}`, {
+    config:{ presence:{ key: currentUser.id } }
+  });
+
+  // Presenza online (status amici)
+  compagniaChannel
+    .on('presence',{ event:'sync' }, ()=>{
+      const state = compagniaChannel.presenceState();
+      updateCompagniaPresenceUI(state);
+    })
+    .on('presence',{ event:'join' }, ({ key, newPresences })=>{
+      const name = newPresences[0]?.name || 'Qualcuno';
+      if(key !== currentUser.id) showToast(`👋 ${name} è entrato nella compagnia`);
+    })
+    .on('presence',{ event:'leave' }, ({ key, leftPresences })=>{
+      const name = leftPresences[0]?.name || 'Qualcuno';
+      if(key !== currentUser.id){
+        showToast(`${name} ha lasciato la compagnia`);
+        if(friendMarkers[key]){ friendMarkers[key].remove(); delete friendMarkers[key]; }
+      }
+    })
+    // GPS broadcast degli amici
+    .on('broadcast',{ event:'gps' }, ({ payload })=>{
+      if(payload.user_id === currentUser.id) return;
+      updateFriendMarker(payload);
+    })
+    .subscribe(async (status)=>{
+      if(status==='SUBSCRIBED'){
+        const meta = currentUser.user_metadata || {};
+        await compagniaChannel.track({
+          user_id: currentUser.id,
+          name: meta.full_name || meta.name || currentUser.email?.split('@')[0] || 'Tu',
+          online_at: new Date().toISOString()
+        });
+        startGPSBroadcast();
+        showToast(`✅ Compagnia "${compagniaCode}" attiva`);
+        updateCompagniaBtn(true);
+      }
+    });
+}
+
+function stopCompagnia(){
+  if(gpsWatchId){ navigator.geolocation.clearWatch(gpsWatchId); gpsWatchId=null; }
+  if(compagniaChannel){ sb.removeChannel(compagniaChannel); compagniaChannel=null; }
+  Object.values(friendMarkers).forEach(m=>m.remove());
+  Object.keys(friendMarkers).forEach(k=>delete friendMarkers[k]);
+  compagniaActive=false;
+  compagniaCode=null;
+  updateCompagniaBtn(false);
+  showToast('Compagnia chiusa');
+}
+
+function startGPSBroadcast(){
+  // Broadcast immediato se abbiamo già posizione
+  if(gpsPos) broadcastMyLocation(gpsPos.lat, gpsPos.lng);
+  // Watch continuo
+  if(navigator.geolocation){
+    gpsWatchId = navigator.geolocation.watchPosition(pos=>{
+      const {latitude:lat, longitude:lng} = pos.coords;
+      gpsPos={lat,lng};
+      broadcastMyLocation(lat,lng);
+    },()=>{},{ enableHighAccuracy:true, maximumAge:4000 });
+  }
+}
+
+function broadcastMyLocation(lat,lng){
+  if(!compagniaChannel||!compagniaActive) return;
+  const meta = currentUser?.user_metadata || {};
+  compagniaChannel.send({
+    type:'broadcast', event:'gps',
+    payload:{
+      user_id: currentUser.id,
+      name: meta.full_name || meta.name || 'Tu',
+      avatar: meta.avatar_url || meta.picture || '',
+      lat, lng, ts: Date.now()
+    }
+  });
+}
+
+function updateFriendMarker(p){
+  if(!map) return;
+  const initials = (p.name||'?').substring(0,2).toUpperCase();
+  const html=`<div style="width:38px;height:38px;border-radius:50%;background:var(--blue);border:3px solid #fff;box-shadow:0 3px 14px rgba(40,94,167,.45);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-direction:column">
+    ${p.avatar?`<img src="${p.avatar}" style="width:32px;height:32px;border-radius:50%;object-fit:cover">`:`<span style="font-size:11px;font-weight:900;color:#fff">${initials}</span>`}
+  </div><div style="margin-top:2px;background:rgba(40,94,167,.85);color:#fff;font-size:9px;font-weight:700;border-radius:5px;padding:1px 5px;max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center">${p.name}</div>`;
+  if(friendMarkers[p.user_id]){
+    friendMarkers[p.user_id].setLatLng([p.lat,p.lng]);
+  } else {
+    const icon=L.divIcon({className:'',html,iconSize:[38,56],iconAnchor:[19,56]});
+    friendMarkers[p.user_id]=L.marker([p.lat,p.lng],{icon}).addTo(map);
+    friendMarkers[p.user_id].bindTooltip(p.name,{permanent:false,direction:'top'});
+  }
+}
+
+function updateCompagniaPresenceUI(state){
+  const count = Object.keys(state).length;
+  const badge = document.getElementById('compagniaBadge');
+  if(badge) badge.textContent = count;
+}
+
+function updateCompagniaBtn(active){
+  const btn=document.getElementById('compagniaFabBtn');
+  if(!btn) return;
+  btn.style.background = active ? 'var(--blue)' : '';
+  btn.querySelector('span').textContent = active
+    ? (lang==='sq'?'Shoqëri':lang==='en'?'Party':'Compagnia') + ' ✓'
+    : (lang==='sq'?'Shoqëri':lang==='en'?'Party':'Compagnia');
+}
+
+function openCompagniaSheet(){
+  if(!currentUser){ document.getElementById('authOverlay').style.display='flex'; return; }
+  document.getElementById('compagniaCode').value = compagniaActive ? compagniaCode : '';
+  const stopBtn = document.getElementById('compagniaStopBtn');
+  if(stopBtn) stopBtn.style.display = compagniaActive ? 'block' : 'none';
+  const badge = document.getElementById('compagniaBadge');
+  if(badge) badge.classList.toggle('vis', compagniaActive);
+  openSheet('compagniaOv','compagniaBg','compagniaSheet');
+}
+
+function joinOrCreateCompagnia(){
+  const input = document.getElementById('compagniaCode').value.trim();
+  if(!input){
+    // Crea nuova compagnia
+    const code = generateCompagniaCode();
+    document.getElementById('compagniaCode').value = code;
+    startCompagnia(code);
+  } else {
+    startCompagnia(input);
+  }
+  closeSheet('compagniaOv','compagniaBg','compagniaSheet');
+}
+
 // ── LOVE toggle ──
 async function toggleLoveDB(poiId, badgeEl) {
   if (!currentUser) { showToast('Accedi per dare LOVE'); document.getElementById('authOverlay').style.display = 'flex'; return; }
@@ -1533,7 +1736,7 @@ let currentLoves=87;
 
 function generateAvatar(){
   const b=getBadge(currentLoves);
-  showToast(`${b.hat} Avatar "${b.label}" — disponibile post-lancio`);
+  openAvPopup();
 }
 
 /* ══════════════════════════════════════════
@@ -1773,6 +1976,7 @@ function copyDetailLink(){
    PHOTOS + EXIF GPS
 ══════════════════════════════════════════ */
 const photoData=[null,null,null];
+const photoFiles=[null,null,null]; // File object reali per upload Supabase
 let exifSuggestedName='';
 function triggerPhoto(idx){
   document.getElementById('photoInput'+idx).click();
@@ -1780,6 +1984,7 @@ function triggerPhoto(idx){
 function handlePhoto(input,idx){
   const file=input.files[0];
   if(!file)return;
+  photoFiles[idx]=file; // salva File reale
   const reader=new FileReader();
   reader.onload=e=>{
     photoData[idx]=e.target.result;
@@ -1839,6 +2044,7 @@ function acceptExifName(){
 function removePhoto(e,idx){
   e.stopPropagation();
   photoData[idx]=null;
+  photoFiles[idx]=null;
   const slot=document.getElementById('pslot-'+idx);
   slot.classList.remove('has-photo');
   slot.innerHTML=idx===0
@@ -1861,6 +2067,7 @@ function copyCoords(el){
 function removePhoto(e,idx){
   e.stopPropagation();
   photoData[idx]=null;
+  photoFiles[idx]=null;
   const slot=document.getElementById('pslot-'+idx);
   slot.classList.remove('has-photo');
   slot.innerHTML=idx===0
@@ -2220,7 +2427,7 @@ function selectAvStyle(name){
   renderAvEnvGrid();
 }
 function requestAvatarGen(){
-  showToast(`🎨 POI•AI genererà il tuo avatar ${avSelEnv} — post-lancio`);
+  showToast(`🎨 Ambiente scelto: ${avSelEnv} — il tuo avatar sarà generato da POI•AI`);
   closeAvPopup();
 }
 
@@ -2394,7 +2601,7 @@ function openAddPOIAtCoords(lat,lng){
 /* ══════════════════════════════════════════
    SALVA POI + MODAL POST-SAVE
 ══════════════════════════════════════════ */
-function savePOI(){
+async function savePOI(){
   const nameIn=document.getElementById('poiNameIn');
   const name=nameIn?nameIn.value.trim():'';
   if(!name){
@@ -2411,23 +2618,32 @@ function savePOI(){
   const lat2=parseFloat(parts[0])||CENTER[0];
   const lng2=parseFloat(parts[1])||CENTER[1];
   const photos=photoData.filter(Boolean);
+  const filesSnapshot=photoFiles.filter(Boolean); // cattura prima del reset
   const addr=document.getElementById('locStreet')?.textContent||'';
-  // Crea oggetto POI e aggiunge all'array
-  const newPOI={lat:lat2,lng:lng2,cat:cats,name,desc,address:addr,love:0,photos,author:'Tu'};
-  POIS.push(newPOI);
-  const idx=POIS.length-1;
-  // Aggiunge marker sulla mappa (blu = mio POI)
+  // Marker immediato (UX ottimistica — blu = mio POI non ancora in DB)
+  let tempMarker=null;
   if(map){
     const icon=L.divIcon({
       className:'',
-      html:`<div class="poi-marker"><div class="poi-bubble" style="background:var(--blue)"><i class="ph-fill ph-map-pin" style="font-size:15px;color:#fff;pointer-events:none"></i><div class="poi-badge">0</div></div><div class="poi-tail" style="border-top-color:var(--blue)"></div><div class="poi-label" style="background:rgba(40,94,167,.85)">${newPOI.name.length>11?newPOI.name.substring(0,11)+'…':newPOI.name}</div></div>`,
+      html:`<div class="poi-marker"><div class="poi-bubble" style="background:var(--blue)"><i class="ph-fill ph-map-pin" style="font-size:15px;color:#fff;pointer-events:none"></i><div class="poi-badge">0</div></div><div class="poi-tail" style="border-top-color:var(--blue)"></div><div class="poi-label" style="background:rgba(40,94,167,.85)">${name.length>11?name.substring(0,11)+'…':name}</div></div>`,
       iconSize:[36,58],iconAnchor:[18,58]
     });
-    L.marker([lat2,lng2],{icon}).addTo(map).on('click',()=>openDetail(idx));
+    tempMarker=L.marker([lat2,lng2],{icon}).addTo(map);
   }
-  // Aggiorna counter profilo
+  // Aggiorna counter profilo locale
   const statEl=document.getElementById('statPoi');
   if(statEl)statEl.textContent=parseInt(statEl.textContent||0)+1;
+  // Salva in DB in background (non blocca UI)
+  if(currentUser){
+    savePOIToDB({name,desc,cat:cats,lat:lat2,lng:lng2,address:addr,files:filesSnapshot})
+      .then(savedPOI=>{
+        if(savedPOI&&tempMarker){
+          // Rimuovi marker temporaneo, aggiungi quello reale con ID
+          tempMarker.remove();
+          addDBMarker(savedPOI);
+        }
+      });
+  }
   // Salva secondi prima di chiudere
   const sec=timerSec;
   clearInterval(timerInterval);
@@ -2571,7 +2787,7 @@ function selectEnv(idx){
   showToast('Ambiente selezionato!');
 }
 function requestAvatarGen(){
-  showToast('🎨 Generazione avatar AI — disponibile post-lancio');
+  showToast('🎨 Ambiente selezionato — avatar generato da POI•AI');
 }
 
 /* ══════════════════════════════════════════
