@@ -260,11 +260,67 @@ button{touch-action:manipulation}
 .poi-card-btn{width:22px;height:22px;border-radius:6px;border:none;background:#f5f0e8;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted);transition:all .15s}
 .pcb-del:active{background:#FEE2E2;color:var(--red)}
 
+/* PUBLIC TOGGLE BUTTON — grande e chiaro */
+.pub-toggle-card{background:linear-gradient(135deg,var(--blue) 0%,#1a3d6e 100%);border-radius:14px;padding:16px 18px;cursor:pointer;display:flex;align-items:center;gap:14px;border:none;width:100%;text-align:left;margin-bottom:24px;box-shadow:0 4px 16px rgba(40,94,167,.35);transition:transform .15s}
+.pub-toggle-card:active{transform:scale(.98)}
+.pub-toggle-icon{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;flex-shrink:0}
+.pub-toggle-text{flex:1}
+.pub-toggle-title{font-size:15px;font-weight:800;color:#fff;margin-bottom:3px}
+.pub-toggle-sub{font-size:11px;color:rgba(255,255,255,.7);line-height:1.4}
+.pub-toggle-arrow{color:rgba(255,255,255,.6);font-size:18px;flex-shrink:0}
+
 /* PUBLIC PROFILE */
 .public-profile-view{display:none}
-.pub-header{background:linear-gradient(160deg,#285EA7 0%,#1a3d6e 100%);padding:52px 20px 30px;text-align:center}
+.pub-header{background:linear-gradient(160deg,#285EA7 0%,#1a3d6e 100%);padding:52px 20px 30px;text-align:center;position:relative}
 .back-btn{position:absolute;top:14px;left:14px;border:none;background:rgba(255,255,255,.2);border-radius:20px;padding:6px 12px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px}
+.back-profile-btn{position:absolute;top:14px;right:14px;border:none;background:rgba(255,255,255,.2);border-radius:20px;padding:6px 12px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px}
 .pub-follow-btn{background:#fff;color:var(--blue);border:none;border-radius:20px;padding:8px 20px;font-size:13px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+
+/* FOLLOWERS / BLOCCATI */
+.social-tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:14px}
+.social-tab{flex:1;padding:10px 0;text-align:center;font-size:12px;font-weight:700;color:var(--muted);border:none;background:none;cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-2px;transition:all .2s}
+.social-tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+.social-panel{display:none}
+.social-panel.active{display:block}
+.user-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.user-row:last-child{border-bottom:none}
+.u-avatar{width:38px;height:38px;border-radius:50%;overflow:hidden;flex-shrink:0}
+.u-avatar img{width:100%;height:100%;object-fit:cover}
+.u-info{flex:1}
+.u-name{font-size:13px;font-weight:700;color:var(--text)}
+.u-meta{font-size:10px;color:var(--muted);margin-top:1px}
+.u-action{height:28px;padding:0 12px;border-radius:14px;border:1.5px solid var(--border);background:none;font-size:11px;font-weight:700;color:var(--muted);cursor:pointer;font-family:inherit;transition:all .15s}
+.u-action.danger{border-color:#FCA5A5;color:#DC2626}
+.u-action.danger:active{background:#FEE2E2}
+
+/* SOS BUTTON */
+.sos-btn{position:fixed;bottom:70px;right:14px;z-index:251;width:44px;height:44px;border-radius:22px;background:#fff;border:2px solid #DC2626;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 14px rgba(220,38,38,.35);transition:transform .15s}
+.sos-btn:active{transform:scale(.92)}
+.sos-btn i{font-size:20px;color:#DC2626}
+
+/* POST-SAVE MODAL */
+.save-modal-overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.6);display:none;align-items:flex-end;justify-content:center}
+.save-modal-overlay.show{display:flex}
+.save-modal{background:var(--card);border-radius:24px 24px 0 0;padding:0 24px 52px;width:100%;text-align:center;transform:translateY(100%);transition:transform .4s cubic-bezier(.32,.72,0,1)}
+.save-modal-overlay.show .save-modal{transform:translateY(0)}
+.save-modal-icon{font-size:64px;margin:24px 0 8px;line-height:1}
+.save-modal-title{font-size:22px;font-weight:900;color:var(--text);margin-bottom:8px;line-height:1.2}
+.save-modal-sub{font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:24px}
+.save-modal-poi{background:var(--bg);border-radius:12px;padding:12px 16px;text-align:left;margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.save-modal-poi-name{font-size:15px;font-weight:800;color:var(--text)}
+.save-modal-poi-coords{font-size:10px;color:var(--muted);font-family:monospace;margin-top:2px}
+.save-modal-close{width:100%;padding:14px;background:var(--red);color:#fff;border:none;border-radius:13px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit}
+
+/* SOS SHEET */
+.sos-sheet-content{padding:16px 20px 0}
+.sos-alert-box{background:#FEF2F2;border:1.5px solid #FECACA;border-radius:12px;padding:14px 16px;margin-bottom:16px;text-align:center}
+.sos-alert-title{font-size:16px;font-weight:900;color:#DC2626;margin-bottom:6px}
+.sos-alert-sub{font-size:12px;color:#7F1D1D;line-height:1.5}
+.sos-option{width:100%;padding:13px 16px;border-radius:12px;border:1.5px solid var(--border);background:var(--bg);font-size:13px;font-weight:700;color:var(--text);cursor:pointer;font-family:inherit;text-align:left;display:flex;align-items:center;gap:12px;margin-bottom:10px;transition:all .15s}
+.sos-option:active{transform:scale(.98)}
+.sos-option.danger{border-color:#FECACA;color:#DC2626;background:#FEF2F2}
+.sos-option i{font-size:20px;flex-shrink:0}
+.sos-moderation-note{background:#EBF2FC;border-radius:10px;padding:12px;font-size:11px;color:var(--blue);line-height:1.6;margin-top:8px}
 
 /* ITIN VIEW */
 .itin-view{background:var(--bg)}
@@ -298,6 +354,11 @@ button{touch-action:manipulation}
   <button class="mt-btn" onclick="setMapType('routes',this)" data-t="mt_routes">Rotte Storiche</button>
 </div>
 
+<!-- SOS -->
+<button class="sos-btn" id="sosBtn" onclick="openSOS()" title="Segnala comportamento inappropriato">
+  <i class="ph-duotone ph-warning-circle"></i>
+</button>
+
 <!-- FAB -->
 <button class="fab" id="fab" onclick="toggleFab()"><i class="ph ph-plus"></i></button>
 <div class="fab-menu" id="fabMenu">
@@ -317,7 +378,7 @@ button{touch-action:manipulation}
     <i class="ph-fill ph-map-trifold"></i><span class="nav-lbl" data-t="nav_map">Mappa</span>
   </button>
   <button class="nav-item" id="nav-itin" onclick="showTab('itin')">
-    <i class="ph ph-route"></i><span class="nav-lbl" data-t="nav_itin">Itinerari</span>
+    <i class="ph-duotone ph-navigation" id="iconItin"></i><span class="nav-lbl" data-t="nav_itin">Itinerari</span>
   </button>
   <button class="nav-item" id="nav-profile" onclick="showTab('profile')">
     <i class="ph ph-user-circle"></i><span class="nav-lbl" data-t="nav_profile">Profilo</span>
@@ -357,14 +418,15 @@ button{touch-action:manipulation}
       </div>
     </div>
     <div class="profile-body">
-      <div class="profile-sec">
-        <div class="prof-sec-lbl">
-          <span data-t="prof_pub_toggle">Come mi vedono gli altri</span>
-          <button class="prof-sec-add" onclick="togglePublicProfile(true)">
-            <i class="ph ph-eye"></i> <span>Anteprima</span>
-          </button>
+      <!-- CARD: come ti vedono gli altri -->
+      <button class="pub-toggle-card" onclick="togglePublicProfile(true)">
+        <div class="pub-toggle-icon"><i class="ph-duotone ph-eye"></i></div>
+        <div class="pub-toggle-text">
+          <div class="pub-toggle-title" data-t="prof_pub_toggle">Come ti vedono gli altri</div>
+          <div class="pub-toggle-sub">Anteprima del tuo profilo pubblico: POI, itinerari, follower</div>
         </div>
-      </div>
+        <i class="ph ph-caret-right pub-toggle-arrow"></i>
+      </button>
       <div class="profile-sec">
         <div class="prof-sec-lbl">
           <span data-t="prof_lists">Le mie liste</span>
@@ -390,9 +452,48 @@ button{touch-action:manipulation}
           </div>
         </div>
       </div>
+      <!-- SEGUITI / BLOCCATI -->
       <div class="profile-sec">
-        <div class="prof-sec-lbl">
-          <span data-t="prof_tags">I miei tag</span>
+        <div class="prof-sec-lbl"><span>Connessioni</span></div>
+        <div class="social-tabs">
+          <button class="social-tab active" onclick="showSocialTab('seguiti',this)">Seguiti <span style="background:#EBF2FC;color:var(--blue);border-radius:8px;padding:1px 6px;font-size:10px">3</span></button>
+          <button class="social-tab" onclick="showSocialTab('follower',this)">Follower <span style="background:#f5f0e8;color:var(--muted);border-radius:8px;padding:1px 6px;font-size:10px">12</span></button>
+          <button class="social-tab" onclick="showSocialTab('bloccati',this)">Bloccati <span style="background:#FEE2E2;color:#DC2626;border-radius:8px;padding:1px 6px;font-size:10px">1</span></button>
+        </div>
+        <div class="social-panel active" id="panel-seguiti">
+          <div class="user-row">
+            <div class="u-avatar"><img src="https://ui-avatars.com/api/?name=Mirela+K&background=285EA7&color=fff&size=80" alt=""></div>
+            <div class="u-info"><div class="u-name">Mirela K.</div><div class="u-meta">18 POI · Tirana</div></div>
+            <button class="u-action" onclick="showToast('Smetti di seguire Mirela K.')">Segui già</button>
+          </div>
+          <div class="user-row">
+            <div class="u-avatar"><img src="https://ui-avatars.com/api/?name=Arben+S&background=22C55E&color=fff&size=80" alt=""></div>
+            <div class="u-info"><div class="u-name">Arben S.</div><div class="u-meta">7 POI · Shkodër</div></div>
+            <button class="u-action" onclick="showToast('Smetti di seguire Arben S.')">Segui già</button>
+          </div>
+          <div class="user-row">
+            <div class="u-avatar"><img src="https://ui-avatars.com/api/?name=Liri+V&background=D42B2B&color=fff&size=80" alt=""></div>
+            <div class="u-info"><div class="u-name">Liri V.</div><div class="u-meta">31 POI · Tirana</div></div>
+            <button class="u-action" onclick="showToast('Smetti di seguire Liri V.')">Segui già</button>
+          </div>
+        </div>
+        <div class="social-panel" id="panel-follower">
+          <div style="text-align:center;padding:20px 0;color:var(--muted);font-size:12px">
+            <i class="ph-duotone ph-users" style="font-size:32px;display:block;margin-bottom:8px"></i>
+            12 persone ti seguono.<br>Solo i tuoi seguiti vedono i tuoi POI privati.
+          </div>
+        </div>
+        <div class="social-panel" id="panel-bloccati">
+          <div class="user-row">
+            <div class="u-avatar"><img src="https://ui-avatars.com/api/?name=U+B&background=6B6B6B&color=fff&size=80" alt=""></div>
+            <div class="u-info"><div class="u-name">Utente bloccato</div><div class="u-meta">Non vede i tuoi contenuti</div></div>
+            <button class="u-action danger" onclick="showToast('Utente sbloccato')"><i class="ph ph-lock-open" style="font-size:12px"></i> Sblocca</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-sec">
+        <div class="prof-sec-lbl"><span data-t="prof_tags">I miei tag</span>
           <button class="add-tag-btn" onclick="showTagInput()"><i class="ph ph-plus"></i> <span data-t="prof_new_tag">Aggiungi</span></button>
         </div>
         <div class="tags-cloud" id="tagsContainer">
@@ -448,9 +549,12 @@ button{touch-action:manipulation}
 
   <!-- PUBLIC PROFILE -->
   <div id="publicProfile" class="public-profile-view">
-    <div class="pub-header" style="position:relative">
+    <div class="pub-header">
       <button class="back-btn" onclick="togglePublicProfile(false)">
         <i class="ph ph-arrow-left"></i> <span data-t="back">Indietro</span>
+      </button>
+      <button class="back-profile-btn" onclick="togglePublicProfile(false)">
+        <i class="ph ph-user-circle"></i> <span>Ritorna al tuo profilo</span>
       </button>
       <div class="profile-avatar-wrap" style="cursor:default">
         <div class="profile-avatar">
@@ -685,7 +789,7 @@ button{touch-action:manipulation}
         <div class="gps-info" id="gpsRegisterInfo">Registra la tua posizione per attivare "Consiglia a Google Maps"</div>
         <button onclick="registerGPS()">Registra</button>
       </div>
-      <button class="save-btn" id="saveBtn" data-t="save_disabled">Inserisci il nome per continuare</button>
+      <button class="save-btn" id="saveBtn" data-t="save_disabled" onclick="savePOI()">Inserisci il nome per continuare</button>
       <button class="google-btn" id="googleSuggestBtn" onclick="openGoogleMapsContrib()">
         <svg width="16" height="16" viewBox="0 0 48 48"><path fill="#4285F4" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#34A853" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#EA4335" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
         <span data-t="google_suggest">Consiglia a Google Maps</span>
@@ -788,6 +892,63 @@ button{touch-action:manipulation}
   </div>
 </div>
 
+<!-- POST-SAVE MODAL -->
+<div class="save-modal-overlay" id="saveModalOv" onclick="closeSaveModal()">
+  <div class="save-modal" onclick="event.stopPropagation()">
+    <div class="save-modal-icon" id="saveModalIcon"></div>
+    <div class="save-modal-title" id="saveModalTitle"></div>
+    <div class="save-modal-sub" id="saveModalSub"></div>
+    <div class="save-modal-poi">
+      <i class="ph-fill ph-map-pin" style="font-size:20px;color:var(--red);flex-shrink:0"></i>
+      <div>
+        <div class="save-modal-poi-name" id="saveModalPoiName"></div>
+        <div class="save-modal-poi-coords" id="saveModalPoiCoords"></div>
+      </div>
+    </div>
+    <button class="save-modal-close" onclick="closeSaveModal()">
+      <i class="ph ph-check-circle"></i> Vai alla mappa
+    </button>
+  </div>
+</div>
+
+<!-- SOS SHEET -->
+<div class="sheet-overlay" id="sosOv">
+  <div class="sheet-backdrop" id="sosBg"></div>
+  <div class="sheet" id="sosSheet">
+    <div class="sh-handle" id="sosHandle"></div>
+    <div class="sh-head">
+      <div><div class="sh-title" style="color:#DC2626"><i class="ph-duotone ph-warning-circle"></i> Segnalazione</div><div class="sh-sub">POI•LOVE è una community sicura</div></div>
+      <button class="sh-close" id="closeSosBtn"><i class="ph ph-x"></i></button>
+    </div>
+    <div class="sos-sheet-content">
+      <div class="sos-alert-box">
+        <div class="sos-alert-title">Ti senti in pericolo?</div>
+        <div class="sos-alert-sub">Se sei in pericolo immediato chiama il <strong>112</strong>.<br>Puoi segnalare anche qui — ogni segnalazione viene gestita dal team entro 24h.</div>
+      </div>
+      <button class="sos-option danger" onclick="sendSOS('pericolo')">
+        <i class="ph-duotone ph-siren"></i>
+        <div><div style="font-weight:800">Mi sento in pericolo</div><div style="font-size:11px;font-weight:400;margin-top:2px;opacity:.8">Notifica urgente al team di moderazione</div></div>
+      </button>
+      <button class="sos-option" onclick="sendSOS('comportamento')">
+        <i class="ph-duotone ph-hand-palm" style="color:#D97706"></i>
+        <div><div style="font-weight:800">Comportamento inappropriato</div><div style="font-size:11px;font-weight:400;margin-top:2px;opacity:.7">Messaggi, commenti o azioni offensive</div></div>
+      </button>
+      <button class="sos-option" onclick="sendSOS('contenuto')">
+        <i class="ph-duotone ph-flag" style="color:var(--blue)"></i>
+        <div><div style="font-weight:800">Contenuto inappropriato</div><div style="font-size:11px;font-weight:400;margin-top:2px;opacity:.7">POI, immagini o descrizioni offensive</div></div>
+      </button>
+      <button class="sos-option" onclick="sendSOS('spam')">
+        <i class="ph-duotone ph-prohibit" style="color:var(--muted)"></i>
+        <div><div style="font-weight:800">Spam o account falso</div><div style="font-size:11px;font-weight:400;margin-top:2px;opacity:.7">Profilo non autentico o comportamento automatizzato</div></div>
+      </button>
+      <div class="sos-moderation-note">
+        <i class="ph ph-shield-check" style="font-size:14px;margin-right:4px"></i>
+        <strong>Come gestiamo le segnalazioni:</strong> ogni report viene analizzato entro 24h. L'utente segnalato non riceve notifica di chi ha segnalato. In caso di pericolo imminente il team può bloccare l'account in 15 minuti e coopera con le autorità competenti.
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toastMsg"></div>
 
 <script>
@@ -856,13 +1017,15 @@ const POIS=[
   {lat:41.3320,lng:19.8242,cat:'Natura',name:'Liqeni Artificial',desc:'Il lago artificiale è il polmone verde di Tirana. Al tramonto è pura magia.',address:'Parku Kombëtar, Tiranë',love:33,photos:[],author:'Arben S.'},
 ];
 
-let map,tileStreet,tileSat,routeLayer,currentPOI;
+let map,tileStreet,tileSat,tileLabels,routeLayer,currentPOI;
 let gpsPos=null,gpsRegistered=false;
 
 function initMap(){
   map=L.map('map',{zoomControl:false,attributionControl:true}).setView(CENTER,15);
   tileStreet=L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
   tileSat=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19});
+  // Etichette trasparenti da sovrapporre al satellite
+  tileLabels=L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png',{maxZoom:19,attribution:'',opacity:1,pane:'overlayPane'});
   routeLayer=L.polyline([[41.35,19.60],[41.34,19.70],[41.33,19.78],[41.3275,19.8189],[41.32,19.86],[41.30,19.95]],{color:'#7C3AED',weight:4,opacity:.75,dashArray:'10,7'});
 
   POIS.forEach((p,i)=>{
@@ -898,13 +1061,39 @@ function initMap(){
   }
 
   setTimeout(()=>map.invalidateSize(),200);
+
+  // ── LONG PRESS sulla mappa (3 secondi) → apri Aggiungi POI con coordinate ──
+  let lpTimer=null,lpPos=null,lpStarted=false;
+  function startLP(latlng){
+    if(!latlng)return;
+    lpPos=latlng; lpStarted=true;
+    lpTimer=setTimeout(()=>{
+      if(lpPos&&lpStarted){ openAddPOIAtCoords(lpPos.lat,lpPos.lng); }
+    },3000);
+  }
+  function cancelLP(){ clearTimeout(lpTimer); lpTimer=null; lpPos=null; lpStarted=false; }
+  map.on('mousedown', e=>startLP(e.latlng));
+  map.on('touchstart', e=>{ if(e.originalEvent.touches.length===1) startLP(e.latlng); },{passive:true});
+  map.on('mouseup mousemove contextmenu', cancelLP);
+  map.on('touchend touchmove', cancelLP);
 }
 
 function setMapType(type,btn){
   document.querySelectorAll('.mt-btn').forEach(b=>b.classList.remove('active','route-active'));
-  if(type==='street'){tileStreet.addTo(map);tileSat.remove();routeLayer.remove();btn.classList.add('active')}
-  if(type==='satellite'){tileSat.addTo(map);tileStreet.remove();routeLayer.remove();btn.classList.add('active')}
-  if(type==='routes'){tileStreet.addTo(map);tileSat.remove();routeLayer.addTo(map);btn.classList.add('route-active')}
+  if(type==='street'){
+    tileStreet.addTo(map);tileSat.remove();tileLabels.remove();routeLayer.remove();
+    btn.classList.add('active');
+  }
+  if(type==='satellite'){
+    tileSat.addTo(map);tileStreet.remove();routeLayer.remove();
+    // Labels trasparenti sopra il satellite
+    tileLabels.addTo(map);
+    btn.classList.add('active');
+  }
+  if(type==='routes'){
+    tileStreet.addTo(map);tileSat.remove();tileLabels.remove();routeLayer.addTo(map);
+    btn.classList.add('route-active');
+  }
 }
 function centerMap(){if(map)map.setView(CENTER,15)}
 
@@ -1507,7 +1696,175 @@ window.addEventListener('DOMContentLoaded',()=>{
   updateShareLink(CENTER[0],CENTER[1]);
   // Visibility default state
   document.querySelectorAll('.vis-opt.sel-pub').forEach(el=>{});
+  // SOS close button
+  document.getElementById('closeSosBtn').addEventListener('click', ()=>closeSheet('sosOv','sosBg','sosSheet'));
+  document.getElementById('closeSosBtn').addEventListener('touchend', e=>{e.preventDefault();closeSheet('sosOv','sosBg','sosSheet');});
+  document.getElementById('sosBg').addEventListener('click', ()=>closeSheet('sosOv','sosBg','sosSheet'));
+  initSwipe('sosHandle','sosSheet','sosBg');
 });
+
+/* ══════════════════════════════════════════
+   LONG PRESS COORDS → AGGIUNGI POI
+══════════════════════════════════════════ */
+function openAddPOIAtCoords(lat,lng){
+  openAddPOI();
+  // Pre-compila coordinate
+  document.getElementById('locCoords').textContent=`${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+  updateShareLink(lat,lng);
+  if(map)map.setView([lat,lng],17);
+  // Reverse geocode → pre-compila nome e indirizzo
+  fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`,{headers:{'Accept-Language':lang}})
+    .then(r=>r.json()).then(d=>{
+      if(!d||!d.display_name)return;
+      const parts=d.display_name.split(',');
+      const name=parts[0].trim();
+      const street=(d.address?.road||d.address?.pedestrian||'').trim();
+      const city=(d.address?.city||d.address?.town||d.address?.village||'').trim();
+      const country=(d.address?.country||'').trim();
+      const locName=document.getElementById('locName');
+      if(locName){locName.textContent=name;locName.style.display='block';}
+      const locStreet=document.getElementById('locStreet');
+      if(locStreet)locStreet.textContent=[street,city,country].filter(Boolean).join(', ');
+      const nameIn=document.getElementById('poiNameIn');
+      if(nameIn&&!nameIn.value.trim()){nameIn.value=name;checkSave();}
+    }).catch(()=>{});
+  showToast(lang==='it'?'📍 Coordinate dalla mappa':lang==='sq'?'📍 Koordinatat nga harta':'📍 Coordinates from map');
+}
+
+/* ══════════════════════════════════════════
+   SALVA POI + MODAL POST-SAVE
+══════════════════════════════════════════ */
+function savePOI(){
+  const nameIn=document.getElementById('poiNameIn');
+  const name=nameIn?nameIn.value.trim():'';
+  if(!name){
+    showToast(lang==='it'?'Inserisci il nome del posto':lang==='sq'?'Fut emrin e vendit':'Enter the place name');
+    return;
+  }
+  // Raccogli categorie selezionate
+  const cats=Array.from(document.querySelectorAll('#addPoiSheet .chip.sel'))
+    .map(c=>c.textContent.trim()).join(', ')||'Generale';
+  const desc=(document.getElementById('storyIn')||{}).value||'';
+  // Coordinate
+  const coordsTxt=document.getElementById('locCoords').textContent||'';
+  const parts=coordsTxt.split(',');
+  const lat2=parseFloat(parts[0])||CENTER[0];
+  const lng2=parseFloat(parts[1])||CENTER[1];
+  const photos=photoData.filter(Boolean);
+  const addr=document.getElementById('locStreet')?.textContent||'';
+  // Crea oggetto POI e aggiunge all'array
+  const newPOI={lat:lat2,lng:lng2,cat:cats,name,desc,address:addr,love:0,photos,author:'Tu'};
+  POIS.push(newPOI);
+  const idx=POIS.length-1;
+  // Aggiunge marker sulla mappa (blu = mio POI)
+  if(map){
+    const icon=L.divIcon({
+      className:'',
+      html:`<div class="poi-marker"><div class="poi-bubble" style="background:var(--blue)"><i class="ph-fill ph-map-pin" style="font-size:15px;color:#fff;pointer-events:none"></i><div class="poi-badge">0</div></div><div class="poi-tail" style="border-top-color:var(--blue)"></div></div>`,
+      iconSize:[36,46],iconAnchor:[18,46]
+    });
+    L.marker([lat2,lng2],{icon}).addTo(map).on('click',()=>openDetail(idx));
+  }
+  // Aggiorna counter profilo
+  const statEl=document.getElementById('statPoi');
+  if(statEl)statEl.textContent=parseInt(statEl.textContent||0)+1;
+  // Salva secondi prima di chiudere
+  const sec=timerSec;
+  clearInterval(timerInterval);
+  // Chiudi sheet
+  closeAddPOI();
+  // Reset form
+  if(nameIn)nameIn.value='';
+  const storyEl=document.getElementById('storyIn');
+  if(storyEl)storyEl.value='';
+  photoData[0]=photoData[1]=photoData[2]=null;
+  [0,1,2].forEach(i=>{
+    const slot=document.getElementById('pslot-'+i);
+    if(slot){
+      slot.classList.remove('has-photo');
+      slot.innerHTML=i===0
+        ?`<i class="ph ph-camera"></i><span class="slot-lbl">Principale</span>`
+        :`<i class="ph ph-plus"></i><span class="slot-lbl">Foto ${i+1}</span>`;
+    }
+    const inp=document.getElementById('photoInput'+i);
+    if(inp)inp.value='';
+  });
+  document.getElementById('locHint')?.classList.remove('show');
+  const locNameEl=document.getElementById('locName');
+  if(locNameEl)locNameEl.style.display='none';
+  exifSuggestedName='';
+  // Apri modal congratulazioni dopo breve ritardo (attendi chiusura sheet)
+  setTimeout(()=>openSaveModal(name,lat2,lng2,sec),320);
+}
+
+function openSaveModal(name,lat,lng,sec){
+  const fast=sec<=60;
+  document.getElementById('saveModalIcon').innerHTML=fast
+    ?'<i class="ph-duotone ph-trophy" style="font-size:52px;color:#D97706"></i>'
+    :'<i class="ph-duotone ph-chalkboard-teacher" style="font-size:52px;color:#92400E"></i>';
+  document.getElementById('saveModalTitle').textContent=fast
+    ?(lang==='it'?`Bravo, sei un razzo! ⚡ ${sec}s`
+      :lang==='sq'?`Bravo, je një raketë! ⚡ ${sec}s`
+      :`You're a rocket! ⚡ ${sec}s`)
+    :(lang==='it'?`Grazie dell'impegno! 💛 ${sec}s`
+      :lang==='sq'?`Faleminderit për angazhimin! 💛 ${sec}s`
+      :`Thank you for the care! 💛 ${sec}s`);
+  document.getElementById('saveModalSub').textContent=fast
+    ?(lang==='it'?'Hai mappato questo luogo con amore e velocità!'
+      :lang==='sq'?'E ke hartografuar me dashuri dhe shpejtësi!'
+      :'You mapped this place with love and speed!')
+    :(lang==='it'?'Ti sei preso del tempo per mappare con cura. Ogni secondo vale.'
+      :lang==='sq'?'Keni marrë kohën e duhur për të hartografuar me kujdes.'
+      :'You took extra care mapping this place. That dedication matters.');
+  document.getElementById('saveModalPoiName').textContent=name;
+  document.getElementById('saveModalPoiCoords').textContent=`${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+  document.getElementById('saveModalOv').classList.add('show');
+}
+
+function closeSaveModal(){
+  document.getElementById('saveModalOv').classList.remove('show');
+  showTab('map');
+}
+
+/* ══════════════════════════════════════════
+   SOS / SEGNALAZIONE
+══════════════════════════════════════════ */
+function openSOS(){
+  openSheet('sosOv','sosBg','sosSheet');
+}
+function sendSOS(type){
+  const msgs={
+    pericolo: lang==='it'
+      ?'⚠️ Segnalazione urgente inviata. Il team è stato notificato.'
+      :lang==='sq'?'⚠️ Sinjal urgjent dërguar. Ekipi është njoftuar.'
+      :'⚠️ Urgent report sent. The team has been notified.',
+    comportamento: lang==='it'
+      ?'Segnalazione inviata. Risposta entro 24h.'
+      :lang==='sq'?'Raportimi dërguar. Përgjigje brenda 24h.'
+      :'Report sent. Response within 24h.',
+    contenuto: lang==='it'
+      ?'Contenuto segnalato. Grazie per la segnalazione.'
+      :lang==='sq'?'Përmbajtja e raportuar. Faleminderit.'
+      :'Content reported. Thank you.',
+    spam: lang==='it'
+      ?'Spam segnalato. Il team verificherà l\'account.'
+      :lang==='sq'?'Spam i raportuar. Ekipi do të verifikojë llogarinë.'
+      :'Spam reported. Team will review the account.',
+  };
+  closeSheet('sosOv','sosBg','sosSheet');
+  showToast(msgs[type]||'Segnalazione inviata');
+}
+
+/* ══════════════════════════════════════════
+   SOCIAL TABS (Seguiti / Follower / Bloccati)
+══════════════════════════════════════════ */
+function showSocialTab(tab,btn){
+  document.querySelectorAll('.social-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.social-panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  const panel=document.getElementById('panel-'+tab);
+  if(panel)panel.classList.add('active');
+}
 </script>
 </body>
 </html>
