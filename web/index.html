@@ -3,11 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>POI•LOVE — Demo</title>
+<title>POI•LOVE</title>
+<!-- PWA -->
+<meta name="theme-color" content="#D42B2B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="POI•LOVE">
+<link rel="apple-touch-icon" href="https://poilove.com/img/logo-symbol.svg">
+<link rel="manifest" href="manifest.json">
+<!-- Libs -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/@phosphor-icons/web@2.1.1/src/index.js"></script>
 <script src="https://unpkg.com/exifr@7.1.3/dist/lite.umd.js"></script>
+<!-- Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 :root{
@@ -34,6 +44,26 @@ button{touch-action:manipulation}
 .tb-btn{height:38px;border-radius:19px;background:var(--card);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,.13);padding:0 12px;font-size:18px;font-weight:700;color:var(--blue);gap:5px;transition:transform .15s}
 .tb-btn:active{transform:scale(.93)}
 .tb-btn.icon-only{width:44px;height:44px;border-radius:22px;padding:0;color:var(--muted);font-size:22px}
+
+/* ── AUTH OVERLAY ── */
+#authOverlay{position:fixed;inset:0;z-index:9000;background:linear-gradient(160deg,#1a0a0a 0%,#2d1515 40%,#0f1e35 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;gap:0}
+.auth-logo{height:48px;margin-bottom:24px}
+.auth-title{font-size:28px;font-weight:900;color:#fff;letter-spacing:-.5px;margin-bottom:6px}
+.auth-title span{color:var(--red)}
+.auth-sub{font-size:14px;color:rgba(255,255,255,.55);margin-bottom:36px;text-align:center;line-height:1.5;max-width:280px}
+.auth-btn{width:100%;max-width:320px;height:52px;border-radius:26px;border:none;cursor:pointer;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px;transition:transform .15s,opacity .15s;font-family:inherit}
+.auth-btn:active{transform:scale(.97)}
+.auth-btn-google{background:#fff;color:#1C1C1C;box-shadow:0 4px 20px rgba(0,0,0,.35);margin-bottom:12px}
+.auth-btn-google img{width:22px;height:22px}
+.auth-magic{width:100%;max-width:320px;margin-top:8px}
+.auth-divider{font-size:11px;color:rgba(255,255,255,.3);text-align:center;margin:4px 0 12px;letter-spacing:.5px}
+.auth-email-row{display:flex;gap:8px;width:100%;max-width:320px}
+.auth-email-in{flex:1;height:48px;border-radius:24px;border:1.5px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);padding:0 16px;font-size:14px;color:#fff;font-family:inherit;outline:none}
+.auth-email-in::placeholder{color:rgba(255,255,255,.3)}
+.auth-email-in:focus{border-color:rgba(212,43,43,.7)}
+.auth-email-send{height:48px;border-radius:24px;border:none;background:var(--red);color:#fff;font-size:13px;font-weight:700;padding:0 18px;cursor:pointer;font-family:inherit;flex-shrink:0;transition:opacity .15s}
+.auth-email-send:active{opacity:.8}
+.auth-footer{margin-top:32px;font-size:10px;color:rgba(255,255,255,.2);text-align:center;line-height:1.6}
 
 /* ── MAP TYPES ── */
 .map-types{position:fixed;top:56px;left:14px;z-index:200;display:flex;gap:5px}
@@ -566,6 +596,29 @@ button{touch-action:manipulation}
     <div class="fab-opt-icon" style="background:#EBF2FC;color:var(--blue)"><i class="ph ph-path"></i></div>
     <span data-t="fab_itin">Tappa Itinerario</span>
   </button>
+</div>
+
+<!-- AUTH OVERLAY -->
+<div id="authOverlay" style="display:none">
+  <img class="auth-logo" src="https://poilove.com/img/logo-completo.svg" onerror="this.style.display='none'" alt="POI•LOVE">
+  <div class="auth-title">POI<span>•</span>LOVE</div>
+  <div class="auth-sub">La mappa dei luoghi che ami davvero.<br>Accedi per salvare i tuoi posti e dare LOVE.</div>
+  <button class="auth-btn auth-btn-google" onclick="signInWithGoogle()">
+    <svg width="22" height="22" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+    Continua con Google
+  </button>
+  <div class="auth-divider">OPPURE</div>
+  <div class="auth-magic">
+    <div class="auth-email-row">
+      <input class="auth-email-in" id="authEmailIn" type="email" placeholder="la-tua@email.com"
+        onkeydown="if(event.key==='Enter')sendMagicLink()"/>
+      <button class="auth-email-send" onclick="sendMagicLink()">Invia link</button>
+    </div>
+  </div>
+  <div class="auth-footer">
+    Accedendo accetti i Termini di servizio di POI•LOVE<br>
+    Progetto Open Source · MIT License · © 2026 321.AL
+  </div>
 </div>
 
 <!-- BOTTOM NAV -->
@@ -1284,6 +1337,176 @@ button{touch-action:manipulation}
 <div class="toast" id="toastMsg"></div>
 
 <script>
+/* ══════════════════════════════════════════
+   SUPABASE — connessione reale
+══════════════════════════════════════════ */
+const SUPABASE_URL = 'https://ptppxwlafswfhbueakjt.supabase.co';
+const SUPABASE_ANON = 'INSERISCI_ANON_KEY_QUI'; // ← Project Settings → API → anon public
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+let currentUser = null;
+
+// Ascolta cambi sessione (login / logout / token refresh)
+sb.auth.onAuthStateChange((event, session) => {
+  currentUser = session?.user ?? null;
+  onAuthStateUpdate(event);
+});
+
+// Legge sessione esistente all'avvio
+sb.auth.getSession().then(({ data: { session } }) => {
+  currentUser = session?.user ?? null;
+  const overlay = document.getElementById('authOverlay');
+  if (overlay) overlay.style.display = currentUser ? 'none' : 'flex';
+  if (currentUser) syncProfileFromAuth();
+});
+
+function onAuthStateUpdate(event) {
+  const overlay = document.getElementById('authOverlay');
+  if (!overlay) return;
+  if (currentUser) {
+    overlay.style.display = 'none';
+    syncProfileFromAuth();
+    loadPOIsFromDB();
+    showToast('👋 Bentornato!');
+  } else {
+    overlay.style.display = 'flex';
+  }
+}
+
+function syncProfileFromAuth() {
+  const meta = currentUser?.user_metadata || {};
+  const name = meta.full_name || meta.name || currentUser?.email?.split('@')[0] || 'Utente';
+  const avatar = meta.avatar_url || meta.picture || '';
+  // Aggiorna UI profilo
+  const pname = document.getElementById('profileName');
+  if (pname) pname.textContent = name;
+  const pav = document.querySelector('.profile-avatar img');
+  if (pav && avatar) pav.src = avatar;
+  // Aggiorna o crea profilo in DB (upsert silenzioso)
+  sb.from('profiles').upsert({
+    id: currentUser.id,
+    username: name,
+    avatar_url: avatar,
+    updated_at: new Date().toISOString()
+  }, { onConflict: 'id' }).then(() => {});
+}
+
+// ── LOGIN ──
+async function signInWithGoogle() {
+  const { error } = await sb.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.href }
+  });
+  if (error) showToast('Errore: ' + error.message);
+}
+
+async function sendMagicLink() {
+  const email = document.getElementById('authEmailIn')?.value?.trim();
+  if (!email || !email.includes('@')) { showToast('Inserisci una email valida'); return; }
+  const { error } = await sb.auth.signInWithOtp({
+    email,
+    options: { emailRedirectTo: window.location.href }
+  });
+  if (error) showToast('Errore: ' + error.message);
+  else {
+    showToast('📧 Link inviato! Controlla la mail.');
+    document.getElementById('authEmailIn').value = '';
+  }
+}
+
+async function signOut() {
+  await sb.auth.signOut();
+  showToast('👋 Disconnesso');
+}
+
+// ── LOAD POIs da Supabase ──
+async function loadPOIsFromDB() {
+  const { data, error } = await sb
+    .from('pois')
+    .select('id,name,description,lat,lng,category,love_count,photos,author_id,profiles(username,avatar_url)')
+    .eq('visibility', 'community')
+    .order('love_count', { ascending: false })
+    .limit(200);
+  if (error) { console.warn('loadPOIs:', error.message); return; }
+  // Svuota marker esistenti (tranne quelli demo statici)
+  data.forEach(p => addDBMarker(p));
+}
+
+function addDBMarker(p) {
+  if (!map || !p.lat || !p.lng) return;
+  const label = p.name.length > 11 ? p.name.substring(0, 11) + '…' : p.name;
+  const icon = L.divIcon({
+    className: '',
+    html: `<div class="poi-marker"><div class="poi-bubble"><i class="ph-fill ph-map-pin" style="font-size:15px;color:#fff;pointer-events:none"></i><div class="poi-badge">${p.love_count || 0}</div></div><div class="poi-tail"></div><div class="poi-label">${label}</div></div>`,
+    iconSize: [36, 58], iconAnchor: [18, 58]
+  });
+  L.marker([p.lat, p.lng], { icon }).addTo(map).on('click', () => openDBDetail(p));
+}
+
+function openDBDetail(p) {
+  // Popola il detail sheet con dati reali
+  const photos = Array.isArray(p.photos) ? p.photos : (p.photos ? [p.photos] : []);
+  const photoUrl = photos[0] || 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Pyramid_of_Tirana_2022.jpg/400px-Pyramid_of_Tirana_2022.jpg';
+  currentPOI = { ...p, idx: -1 };
+  // Usa il detail sheet esistente
+  document.getElementById('detailPhoto').src = photoUrl;
+  document.getElementById('detailName').textContent = p.name;
+  document.getElementById('detailCat').textContent = p.category || '';
+  document.getElementById('detailAddr').textContent = p.address || '';
+  document.getElementById('detailDesc').textContent = p.description || '';
+  document.getElementById('detailAuthor').textContent = p.profiles?.username || 'Anonimo';
+  document.getElementById('detailLoveCount').textContent = p.love_count || 0;
+  openSheet('detailOv', 'detailBg', 'detailSheet');
+}
+
+// ── SAVE POI reale ──
+async function savePOIToDB(data) {
+  if (!currentUser) { showToast('Accedi per salvare'); document.getElementById('authOverlay').style.display = 'flex'; return null; }
+  // Upload foto su Storage
+  const photoUrls = [];
+  for (const file of data.files || []) {
+    if (!file) continue;
+    const ext = file.name.split('.').pop();
+    const path = `${currentUser.id}/${Date.now()}_${Math.random().toString(36).substr(2,6)}.${ext}`;
+    const { error: upErr } = await sb.storage.from('poi_photos').upload(path, file, { cacheControl: '3600', upsert: false });
+    if (!upErr) {
+      const { data: urlData } = sb.storage.from('poi_photos').getPublicUrl(path);
+      photoUrls.push(urlData.publicUrl);
+    }
+  }
+  const { data: poi, error } = await sb.from('pois').insert({
+    author_id: currentUser.id,
+    name: data.name,
+    description: data.desc,
+    category: data.cat,
+    lat: data.lat,
+    lng: data.lng,
+    address: data.address,
+    photos: photoUrls,
+    visibility: 'community',
+    love_count: 0
+  }).select().single();
+  if (error) { console.error('savePOI:', error); showToast('Errore salvataggio'); return null; }
+  return poi;
+}
+
+// ── LOVE toggle ──
+async function toggleLoveDB(poiId, badgeEl) {
+  if (!currentUser) { showToast('Accedi per dare LOVE'); document.getElementById('authOverlay').style.display = 'flex'; return; }
+  const { data: existing } = await sb.from('loves')
+    .select('id').eq('poi_id', poiId).eq('user_id', currentUser.id).maybeSingle();
+  if (existing) {
+    await sb.from('loves').delete().eq('id', existing.id);
+    await sb.from('pois').update({ love_count: sb.rpc('decrement', { x: 1 }) }).eq('id', poiId);
+    if (badgeEl) badgeEl.textContent = Math.max(0, parseInt(badgeEl.textContent) - 1);
+    showToast('💔 LOVE rimosso');
+  } else {
+    await sb.from('loves').insert({ poi_id: poiId, user_id: currentUser.id });
+    await sb.from('pois').rpc('increment_love', { poi_id: poiId });
+    if (badgeEl) badgeEl.textContent = parseInt(badgeEl.textContent) + 1;
+    showToast('❤️ LOVE!');
+  }
+}
+
 /* ══════════════════════════════════════════
    BADGE SYSTEM
 ══════════════════════════════════════════ */
@@ -2094,6 +2317,10 @@ function showToast(msg){
    INIT
 ══════════════════════════════════════════ */
 window.addEventListener('DOMContentLoaded',()=>{
+  // Auth overlay — visibile di default fino a verifica sessione
+  // (getSession() lo nasconde se utente già loggato — vedi sopra)
+  // Per demo in locale senza backend attivo, commenta la riga seguente:
+  // document.getElementById('authOverlay').style.display='flex';
   // Map
   initMap();
   // Lang
