@@ -1978,6 +1978,7 @@ function copyDetailLink(){
 const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 let exifSuggestedName='';
+let exifCache=null; // { lat, lng, name, street } — ultimo risultato EXIF disponibile
 function triggerPhoto(idx){
   document.getElementById('photoInput'+idx).click();
 }
@@ -1994,13 +1995,11 @@ function handlePhoto(input,idx){
     showToast(lang==='sq'?'Foto shtuar!':lang==='en'?'Photo added!':'Foto aggiunta!');
   };
   reader.readAsDataURL(file);
-  // EXIF GPS extraction (solo per la foto principale)
-  if(idx===0&&typeof exifr!=='undefined'){
+  // EXIF GPS extraction — su qualsiasi foto caricata
+  if(typeof exifr!=='undefined'){
     exifr.gps(file).then(gps=>{
       if(!gps||!gps.latitude)return;
       const lat=gps.latitude,lng=gps.longitude;
-      // Aggiorna coordinate
-      document.getElementById('locCoords').textContent=`${lat.toFixed(4)}, ${lng.toFixed(4)}`;
       updateShareLink(lat,lng);
       if(map)map.setView([lat,lng],17);
       // Reverse geocode → nome luogo
@@ -2017,22 +2016,63 @@ function handlePhoto(input,idx){
           if(locName){locName.textContent=name;locName.style.display='block';}
           const locStreet=document.getElementById('locStreet');
           if(locStreet)locStreet.textContent=[street,city,country].filter(Boolean).join(', ');
-          // Hint autocomplete nome
+          // Salva in cache — usato dal tab EXIF
           exifSuggestedName=name;
+          exifCache={lat,lng,name,street:[street,city,country].filter(Boolean).join(', ')};
+          // Aggiorna i campi anche subito se il tab EXIF è attivo
+          const activeTab=document.querySelector('.loc-tab.active span[data-t="loc_exif"]');
+          if(activeTab) applyExifToForm();
+          // Hint suggerimento nome
           const hint=document.getElementById('locHint');
           const hintName=document.getElementById('locHintName');
           if(hint&&hintName){
             hintName.textContent=`📍 ${name}`;
             hint.classList.add('show');
-            // Se il campo nome è vuoto, pre-compila automaticamente
             const nameIn=document.getElementById('poiNameIn');
-            if(nameIn&&!nameIn.value.trim()){
-              nameIn.value=name;checkSave();
-            }
+            if(nameIn&&!nameIn.value.trim()){nameIn.value=name;checkSave();}
           }
         }).catch(()=>{});
     }).catch(()=>{});
   }
+}
+
+// Compila tutti i campi posizione dai dati EXIF cachati
+function applyExifToForm(){
+  if(!exifCache){
+    // Nessun EXIF trovato finora — prova a estrarlo dalla prima foto disponibile
+    const file=photoFiles.find(Boolean);
+    if(!file){ showToast('📷 Carica prima una foto con GPS'); return; }
+    if(typeof exifr==='undefined'){ showToast('Libreria EXIF non disponibile'); return; }
+    showToast('🔍 Leggo i dati EXIF…');
+    exifr.gps(file).then(gps=>{
+      if(!gps||!gps.latitude){ showToast('Nessun GPS trovato in questa foto'); return; }
+      const lat=gps.latitude, lng=gps.longitude;
+      fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`,{headers:{'Accept-Language':lang}})
+        .then(r=>r.json()).then(d=>{
+          const parts=(d?.display_name||'').split(',');
+          const name=parts[0]?.trim()||'';
+          const street=(d?.address?.road||d?.address?.pedestrian||'').trim();
+          const city=(d?.address?.city||d?.address?.town||d?.address?.village||'').trim();
+          const country=(d?.address?.country||'').trim();
+          exifCache={lat,lng,name,street:[street,city,country].filter(Boolean).join(', ')};
+          exifSuggestedName=name;
+          applyExifToForm(); // ora exifCache è pieno, richiama
+        }).catch(()=>{ exifCache={lat,lng,name:'',street:''}; applyExifToForm(); });
+    }).catch(()=>showToast('Errore lettura EXIF'));
+    return;
+  }
+  // Applica tutto
+  document.getElementById('locCoords').textContent=`${exifCache.lat.toFixed(6)}, ${exifCache.lng.toFixed(6)}`;
+  const locName=document.getElementById('locName');
+  if(locName&&exifCache.name){locName.textContent=exifCache.name;locName.style.display='block';}
+  const locStreet=document.getElementById('locStreet');
+  if(locStreet&&exifCache.street) locStreet.textContent=exifCache.street;
+  updateShareLink(exifCache.lat,exifCache.lng);
+  if(map) map.setView([exifCache.lat,exifCache.lng],17);
+  // Pre-compila nome se vuoto
+  const nameIn=document.getElementById('poiNameIn');
+  if(nameIn&&!nameIn.value.trim()&&exifCache.name){nameIn.value=exifCache.name;checkSave();}
+  showToast('📍 Posizione dalla foto applicata');
 }
 function acceptExifName(){
   if(!exifSuggestedName)return;
@@ -2054,7 +2094,7 @@ function removePhoto(e,idx){
   if(idx===0){
     document.getElementById('locHint').classList.remove('show');
     document.getElementById('locName').style.display='none';
-    exifSuggestedName='';
+    exifSuggestedName=''; exifCache=null;
   }
 }
 
@@ -2308,6 +2348,7 @@ function updateChar(){
 function setLocTab(btn,type){
   document.querySelectorAll('.loc-tab').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
+  if(type==='exif') applyExifToForm();
 }
 function toggleCat(btn){
   const chips=btn.closest('.chips');
@@ -2668,7 +2709,7 @@ async function savePOI(){
   document.getElementById('locHint')?.classList.remove('show');
   const locNameEl=document.getElementById('locName');
   if(locNameEl)locNameEl.style.display='none';
-  exifSuggestedName='';
+  exifSuggestedName=''; exifCache=null;
   // Apri modal congratulazioni dopo breve ritardo (attendi chiusura sheet)
   setTimeout(()=>openSaveModal(name,lat2,lng2,sec),320);
 }
