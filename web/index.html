@@ -1566,9 +1566,9 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
       </div>
       <div class="story-actions">
         <button class="voice-btn" id="voiceBtn" onclick="toggleVoice()"><i class="ph ph-microphone"></i> <span id="voiceBtnLbl">Dett.</span></button>
-        <button class="ai-btn" onclick="aiSummarize()"><i class="ph ph-sparkle"></i> <span>Riassumi</span></button>
+        <button class="ai-btn" id="aiSumBtn" onclick="aiSummarize()"><i class="ph ph-sparkle"></i> <span id="aiSumLbl">AI</span></button>
       </div>
-      <textarea class="field-in field-ta" id="storyIn" placeholder="L'anima di questo posto… (fino a 1000 caratteri)" maxlength="1000" oninput="updateChar()"></textarea>
+      <textarea class="field-in field-ta" id="storyIn" placeholder="L'anima di questo posto… (fino a 1000 caratteri)" maxlength="1000" oninput="updateChar();const lbl=document.getElementById('aiSumLbl');if(lbl)lbl.textContent=this.value.trim().length<20?'Genera':'Riassumi'"></textarea>
 
       <!-- CATEGORIE -->
       <div class="sec-lbl">
@@ -2835,18 +2835,51 @@ function toggleVoice(){
 /* ══════════════════════════════════════════
    AI SUMMARIZE (smart truncation, free)
 ══════════════════════════════════════════ */
-function aiSummarize(){
+async function aiSummarize(){
   const ta=document.getElementById('storyIn');
-  const text=ta.value.trim();
-  if(!text){showToast(lang==='it'?'Scrivi prima qualcosa':lang==='sq'?'Shkruaj diçka':'Write something first');return;}
-  if(text.length<=200){showToast('Già sotto i 200 caratteri!');return;}
-  // Cut at last sentence boundary before 200
-  const cut=text.substring(0,200);
-  const lastDot=Math.max(cut.lastIndexOf('.'),cut.lastIndexOf('!'),cut.lastIndexOf('?'));
-  const result=lastDot>80?cut.substring(0,lastDot+1):cut.substring(0,cut.lastIndexOf(' '))||cut;
-  ta.value=result.trim();
-  updateChar();
-  showToast(lang==='it'?'Testo sintetizzato a 200 caratteri':lang==='sq'?'Tekst i shkurtuar':' Summarized to 200 chars');
+  const nameIn=document.getElementById('poiNameIn');
+  const existingText=ta.value.trim();
+  const placeName=nameIn?.value.trim()||'questo posto';
+  const address=document.getElementById('locStreet')?.textContent||'';
+  const coords=document.getElementById('locCoords')?.textContent||'';
+
+  // Se c'è già testo lungo, lo sintetizza; altrimenti genera da zero
+  const isGenerate=existingText.length<20;
+  const btnEl=document.querySelector('.ai-btn');
+  if(btnEl){btnEl.disabled=true;btnEl.innerHTML='<i class="ph ph-circle-notch" style="animation:spin 1s linear infinite"></i>';}
+
+  const langLabel=lang==='it'?'italiano':lang==='sq'?'albanese':'English';
+  let prompt;
+  if(isGenerate){
+    prompt=`Scrivi una breve descrizione originale (massimo 180 caratteri, stile POI•LOVE — caldo, vivo, senza cliché) per questo luogo:
+Nome: "${placeName}"
+${address?`Indirizzo: ${address}`:''}
+${coords?`Coordinate: ${coords}`:''}
+Rispondi solo con il testo della descrizione, senza virgolette, in ${langLabel}.`;
+  } else {
+    prompt=`Sintetizza questo testo a massimo 180 caratteri mantenendo lo spirito e il tono del luogo. Rispondi solo con il testo sintetizzato, senza virgolette, in ${langLabel}:
+"${existingText}"`;
+  }
+
+  try {
+    const res=await fetch(GEMINI_URL,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({contents:[{role:'user',parts:[{text:prompt}]}],
+        generationConfig:{temperature:0.9,maxOutputTokens:120}})});
+    const json=await res.json();
+    const generated=(json?.candidates?.[0]?.content?.parts?.[0]?.text||'').trim()
+      .replace(/^["']|["']$/g,'').substring(0,200);
+    if(generated){
+      ta.value=generated;
+      updateChar();
+      showToast(isGenerate?'✨ Descrizione generata da POI•AI!':'✨ Testo sintetizzato da POI•AI!');
+    } else {
+      showToast('POI•AI non ha risposto.');
+    }
+  } catch(err){
+    showToast('Errore AI: '+err.message);
+  } finally {
+    if(btnEl){btnEl.disabled=false;btnEl.innerHTML='<i class="ph ph-sparkle"></i> <span>'+(isGenerate?'Genera':'Riassumi')+'</span>';}
+  }
 }
 
 /* ══════════════════════════════════════════
@@ -4588,43 +4621,106 @@ document.addEventListener('click',e=>{
 /* ══════════════════════════════════════════
    POI•AI TRAVEL ADVISOR
 ══════════════════════════════════════════ */
-const POIAI_RESPONSES=[
-  {text:'Ottima domanda! A Tirana ci sono posti incredibili con vista panoramica. Eccone tre:',places:['Ballkoni i Qytetit','Mullixhiu Restaurant','Uka Farm & Winery']},
-  {text:'Per Sarajevo in 2 giorni, le tappe imperdibili sono:',places:['Baščaršija','Ponte Latino','Tunnel della Speranza']},
-  {text:'Il Blloku a Tirana è perfetto per la sera. Ti suggerisco:',places:['Komiteti – Kafe Muzeum','Radio Bar Tirana','Sky Club Roof Bar']},
-  {text:'In Montenegro non perdere queste gemme:',places:['Città Vecchia di Kotor','Perast sul Lago','Parco Naz. del Durmitor']},
-  {text:'Cultura albanese autentica? Ecco le mie scelte:',places:['Berat Città UNESCO','Gjirokastër Fortezza','Bunker Art 2']},
-];
-let poiaiRespIdx=0;
+/* ═══════════════════════════════════════════════════════
+   POI•AI — Gemini 2.0 Flash (Google AI Studio)
+   API key: front-end, MVP. Migrare a proxy per produzione.
+═══════════════════════════════════════════════════════ */
+const GEMINI_KEY='AIzaSyDtMBZv1eukoXpClDkvNoOWvMRfBo9Z8yw';
+const GEMINI_URL=`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`;
 
-function sendPoiAIMsg(){
+// Conversazione in memoria per contesto multi-turno
+let poiaiHistory=[];
+
+function _buildPoiAISystemPrompt(){
+  // Contestualizza l'AI con: luogo attivo, itinerario corrente, lingua UI
+  const tripNames=Object.values(TRIPS).map(t=>t.name).join(', ')||'nessun itinerario';
+  const activePoiName=currentPOI?.name||null;
+  const langLabel=lang==='it'?'italiano':lang==='sq'?'albanese':'English';
+  const locationCtx=gpsPos?`L'utente è circa a ${gpsPos.lat.toFixed(3)},${gpsPos.lng.toFixed(3)}.`:'';
+
+  return `Sei POI•AI, il Travel Advisor integrato nell'app POI•LOVE — una mappa comunitaria di luoghi autentici nei Balcani e nel mondo.
+Il tuo compito: suggerire luoghi di interesse (POI), ristoranti, esperienze culturali, tappe per itinerari. Rispondi sempre in ${langLabel}.
+${locationCtx}
+Itinerari attivi dell'utente: ${tripNames}.
+${activePoiName?`POI attualmente visualizzato: "${activePoiName}".`:''}
+
+REGOLA FONDAMENTALE: Quando suggerisci luoghi concreti, restituisci SEMPRE una sezione JSON strutturata alla fine del messaggio con questo formato esatto (non deviare):
+===PLACES===
+["Nome Luogo 1","Nome Luogo 2","Nome Luogo 3"]
+===END===
+
+Risposte: brevi (max 4 frasi), concrete, con personalità. Niente liste puntate eccessive. Se non hai luoghi da suggerire, ometti la sezione PLACES.`.trim();
+}
+
+async function sendPoiAIMsg(){
   const input=document.getElementById('poiaiInput');
   const msgs=document.getElementById('poiaiMsgs');
   const text=input.value.trim();
   if(!text)return;
-  msgs.innerHTML+=`<div class="poiai-msg user">${text}</div>`;
+
+  // Mostra messaggio utente
+  msgs.innerHTML+=`<div class="poiai-msg user">${text.replace(/</g,'&lt;')}</div>`;
   input.value='';
   msgs.scrollTop=msgs.scrollHeight;
-  setTimeout(()=>{
-    const resp=POIAI_RESPONSES[poiaiRespIdx%POIAI_RESPONSES.length];
-    poiaiRespIdx++;
-    const tripSel=Object.values(TRIPS).map((t,i)=>`<button class="poiai-trip-chip${i===0?' sel':''}" onclick="document.querySelectorAll('.poiai-trip-chip').forEach(b=>b.classList.remove('sel'));this.classList.add('sel');window._paiTrip='${t.id}'">${t.name.split(' ').slice(0,3).join(' ')}</button>`).join('');
-    const chips=resp.places.map(p=>`<button class="poiai-place-chip" onclick="addAISuggestionAsStop(window._paiTrip||'trip1','${p.replace(/'/g,"\\'")}')"><i class="ph ph-plus-circle"></i> ${p}</button>`).join('');
-    msgs.innerHTML+=`
-      <div class="poiai-msg ai">
-        ${resp.text}
-        <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px">${chips}</div>
-        <div style="margin-top:8px;font-size:10px;color:var(--muted)"><i class="ph ph-arrow-down"></i> Seleziona il viaggio:</div>
-        <div class="poiai-trip-selector">${tripSel}</div>
-      </div>`;
-    window._paiTrip='trip1';
-    msgs.scrollTop=msgs.scrollHeight;
-    // Voice TTS — solo testo plain, no HTML
-    if(voiceOn){
-      const plain=resp.text.replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim();
-      speakText(plain);
+
+  // Spinner attesa
+  const loadId='pai-load-'+Date.now();
+  msgs.innerHTML+=`<div class="poiai-msg ai" id="${loadId}" style="opacity:.6">
+    <i class="ph ph-circle-notch" style="animation:spin 1s linear infinite;font-size:14px"></i> Sto pensando…
+  </div>`;
+  msgs.scrollTop=msgs.scrollHeight;
+
+  // Aggiorna storia conversazione
+  poiaiHistory.push({role:'user',parts:[{text}]});
+
+  try {
+    const body={
+      system_instruction:{parts:[{text:_buildPoiAISystemPrompt()}]},
+      contents:poiaiHistory.slice(-10), // max 10 turni in memoria
+      generationConfig:{temperature:0.85,maxOutputTokens:512,topP:0.9}
+    };
+    const res=await fetch(GEMINI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const json=await res.json();
+
+    if(!res.ok){
+      throw new Error(json?.error?.message||`HTTP ${res.status}`);
     }
-  },800);
+
+    const rawText=json?.candidates?.[0]?.content?.parts?.[0]?.text||'Non ho ricevuto risposta.';
+
+    // Estrai sezione PLACES
+    let places=[];
+    const placesMatch=rawText.match(/===PLACES===\s*([\s\S]*?)\s*===END===/);
+    if(placesMatch){
+      try{ places=JSON.parse(placesMatch[1]); }catch(e){}
+    }
+    // Testo pulito senza la sezione JSON
+    const cleanText=rawText.replace(/===PLACES===[\s\S]*?===END===/,'').trim()
+      .replace(/</g,'&lt;').replace(/\n/g,'<br>');
+
+    // Aggiorna storia con risposta AI
+    poiaiHistory.push({role:'model',parts:[{text:rawText}]});
+
+    // Chip luoghi + selezione viaggio
+    const tripSel=Object.values(TRIPS).map((t,i)=>`<button class="poiai-trip-chip${i===0?' sel':''}" onclick="document.querySelectorAll('.poiai-trip-chip').forEach(b=>b.classList.remove('sel'));this.classList.add('sel');window._paiTrip='${t.id}'">${t.name.split(' ').slice(0,3).join(' ')}</button>`).join('');
+    const chips=places.map(p=>`<button class="poiai-place-chip" onclick="addAISuggestionAsStop(window._paiTrip||'trip1','${p.replace(/'/g,"\\'").replace(/"/g,'&quot;')}')"><i class="ph ph-plus-circle"></i> ${p}</button>`).join('');
+
+    const loadEl=document.getElementById(loadId);
+    if(loadEl) loadEl.outerHTML=`
+      <div class="poiai-msg ai">
+        ${cleanText}
+        ${chips?`<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px">${chips}</div>`:''}
+        ${chips&&Object.keys(TRIPS).length?`<div style="margin-top:8px;font-size:10px;color:var(--muted)"><i class="ph ph-arrow-down"></i> Aggiungi a:</div><div class="poiai-trip-selector">${tripSel}</div>`:''}
+      </div>`;
+    window._paiTrip=Object.keys(TRIPS)[0]||'trip1';
+    msgs.scrollTop=msgs.scrollHeight;
+    if(voiceOn){ speakText(cleanText.replace(/<[^>]+>/g,' ')); }
+
+  } catch(err){
+    const loadEl=document.getElementById(loadId);
+    if(loadEl) loadEl.outerHTML=`<div class="poiai-msg ai" style="color:var(--red)"><i class="ph ph-warning"></i> Errore: ${err.message}</div>`;
+    console.error('POI•AI error:',err);
+  }
 }
 
 /* ══════════════════════════════════════════
