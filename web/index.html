@@ -782,7 +782,7 @@ button{touch-action:manipulation}
       <div class="profile-email" id="myProfileEmail">it@altrostile.app</div>
       <div class="profile-vanity" id="myVanityUrl" onclick="copyMyVanityUrl()" style="margin:6px auto 0">
         <i class="ph ph-link"></i>
-        <span id="myVanityTxt">poilove.com/demo?@tu</span>
+        <span id="myVanityTxt">poilove.com?@tu</span>
       </div>
       <div class="prof-badge" id="profBadge" onclick="changeAvatar()"></div>
       <div class="badge-label" id="badgeLabel"></div>
@@ -990,7 +990,7 @@ button{touch-action:manipulation}
       <!-- Vanity URL — cliccabile per copiare -->
       <div class="profile-vanity" id="pubVanityUrl" onclick="copyVanityUrl()">
         <i class="ph ph-link"></i>
-        <span id="pubVanityTxt">poilove.com/demo?@alessandrocastagna</span>
+        <span id="pubVanityTxt">poilove.com?@alessandrocastagna</span>
       </div>
       <div class="prof-badge" id="pubProfileBadge" style="background:rgba(245,158,11,.2);color:#FDE68A;border-color:rgba(245,158,11,.3)">
         <i class="ph-fill ph-star" style="color:#FDE68A"></i>
@@ -1553,7 +1553,7 @@ function syncProfileFromAuth() {
 async function signInWithGoogle() {
   const { error } = await sb.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo: 'https://poilove.com/demo' }
+    options: { redirectTo: 'https://poilove.com' }
   });
   if (error) showToast('Errore: ' + error.message);
 }
@@ -1563,7 +1563,7 @@ async function sendMagicLink() {
   if (!email || !email.includes('@')) { showToast('Inserisci una email valida'); return; }
   const { error } = await sb.auth.signInWithOtp({
     email,
-    options: { emailRedirectTo: 'https://poilove.com/demo' }
+    options: { emailRedirectTo: 'https://poilove.com' }
   });
   if (error) showToast('Errore: ' + error.message);
   else {
@@ -2118,8 +2118,8 @@ function updateShareLink(lat, lng, poiId=null){
   // Se abbiamo l'ID DB usiamo ?poi=id (link stabile, usa il record)
   // Altrimenti ?at=lat,lng (coordine, per POI non ancora salvati)
   const link = poiId
-    ? `https://poilove.com/demo?poi=${poiId}`
-    : `https://poilove.com/demo?at=${lat.toFixed(5)},${lng.toFixed(5)}`;
+    ? `https://poilove.com?poi=${poiId}`
+    : `https://poilove.com?at=${lat.toFixed(5)},${lng.toFixed(5)}`;
   const txtA = document.getElementById('shareLinkTxt');
   const txtB = document.getElementById('detailShareLinkTxt');
   if(txtA) txtA.textContent = link;
@@ -2825,7 +2825,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('closeSosBtn').addEventListener('touchend', e=>{e.preventDefault();closeSheet('sosOv','sosBg','sosSheet');});
   document.getElementById('sosBg').addEventListener('click', ()=>closeSheet('sosOv','sosBg','sosSheet'));
   initSwipe('sosHandle','sosSheet','sosBg');
-  // Vanity URL on load (es. poilove.com/demo?@nomeutente)
+  // Vanity URL on load (es. poilove.com?@nomeutente)
   checkVanityUrlOnLoad();
   // Deep-link: ?poi=id oppure ?at=lat,lng
   // (attende che la mappa sia pronta — piccolo delay)
@@ -3089,7 +3089,7 @@ function getVanityHandle(user){
   return name;
 }
 function buildVanityUrl(handle){
-  return `poilove.com/demo?@${handle}`;
+  return `poilove.com?@${handle}`;
 }
 function updateMyVanityUrl(){
   const handle=getVanityHandle(currentUser);
