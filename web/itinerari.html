@@ -6,34 +6,34 @@
 <title>POI•LOVE — Itinerari</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/@phosphor-icons/web@2.1.1/src/index.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 :root{
   --red:#D42B2B; --blue:#285EA7; --bg:#EAE4D8;
   --card:#FDFAF5; --text:#1C1C1C; --muted:#6B6B6B;
   --border:rgba(0,0,0,.09); --green:#22C55E;
-  --dark:#0F172A;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;font-family:'Inter',sans-serif}
 html,body{height:100%;overflow:hidden;background:#000}
+i.ph,i.ph-fill{line-height:1}
 
-/* ── MAP (full screen) ── */
+/* ── MAP ── */
 #map{position:fixed;inset:0;z-index:1}
 .leaflet-control-zoom{display:none}
-.leaflet-control-attribution{font-size:9px;opacity:.35;bottom:240px!important}
+.leaflet-control-attribution{font-size:9px;opacity:.3}
 
 /* ── TOP BAR ── */
 .topbar{
   position:fixed;top:0;left:0;right:0;z-index:200;
-  display:flex;align-items:center;gap:10px;padding:12px 14px;
-  pointer-events:none;
+  display:flex;align-items:center;gap:10px;padding:12px 14px;pointer-events:none;
 }
 .tb-back{
   pointer-events:all;
   width:40px;height:40px;border-radius:20px;
   background:var(--card);border:none;cursor:pointer;
   display:flex;align-items:center;justify-content:center;
-  box-shadow:0 2px 12px rgba(0,0,0,.15);font-size:18px;color:var(--text)
+  box-shadow:0 2px 12px rgba(0,0,0,.2);font-size:18px;color:var(--text)
 }
 .tb-title{
   pointer-events:all;
@@ -46,13 +46,11 @@ html,body{height:100%;overflow:hidden;background:#000}
 .tb-lang{
   pointer-events:all;
   background:var(--card);border-radius:20px;
-  padding:10px 12px;box-shadow:0 2px 12px rgba(0,0,0,.15);
-  display:flex;gap:4px
+  padding:8px 10px;box-shadow:0 2px 12px rgba(0,0,0,.15);display:flex;gap:3px
 }
 .lang-btn{
   width:28px;height:24px;border-radius:6px;border:none;
-  font-size:10px;font-weight:700;cursor:pointer;
-  background:transparent;color:var(--muted);transition:all .15s
+  font-size:10px;font-weight:700;cursor:pointer;background:transparent;color:var(--muted);transition:all .15s
 }
 .lang-btn.active{background:var(--red);color:#fff}
 
@@ -63,78 +61,67 @@ html,body{height:100%;overflow:hidden;background:#000}
   padding:12px 14px;box-shadow:0 8px 28px rgba(0,0,0,.18);
   display:flex;align-items:center;gap:10px;
   border-left:4px solid var(--green);
-  transform:translateY(-140px) scale(.95);
+  transform:translateY(-140px);opacity:0;
   transition:transform .4s cubic-bezier(.32,.72,0,1),opacity .4s;
-  opacity:0;
 }
-.gps-banner.show{transform:translateY(0) scale(1);opacity:1}
-.gps-pulse{width:10px;height:10px;border-radius:50%;background:var(--green);flex-shrink:0;animation:gpsp 1.2s infinite}
-@keyframes gpsp{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.4);opacity:.5}}
+.gps-banner.show{transform:translateY(0);opacity:1}
+.gps-pulse{
+  width:12px;height:12px;border-radius:50%;background:var(--green);flex-shrink:0;
+  animation:gpsp 1.2s infinite
+}
+@keyframes gpsp{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.5);opacity:.5}}
 .gps-text{flex:1}
 .gps-t{font-size:13px;font-weight:700;color:var(--text)}
-.gps-s{font-size:11px;color:var(--muted);margin-top:1px}
+.gps-s{font-size:11px;color:var(--muted);margin-top:2px}
 .gps-btn{
   background:var(--red);color:#fff;border:none;border-radius:10px;
-  padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0
+  padding:8px 13px;font-size:12px;font-weight:700;cursor:pointer;
+  display:flex;align-items:center;gap:5px;flex-shrink:0
 }
+.gps-btn i{font-size:13px}
 
 /* ── BOTTOM DRAWER ── */
 .drawer{
   position:fixed;bottom:0;left:0;right:0;z-index:200;
   background:var(--card);border-radius:24px 24px 0 0;
-  box-shadow:0 -8px 40px rgba(0,0,0,.15);
+  box-shadow:0 -8px 40px rgba(0,0,0,.18);
   transition:transform .35s cubic-bezier(.32,.72,0,1);
 }
-.drawer.peek{transform:translateY(0)} /* collapsed: shows handle + summary */
-.drawer.open{transform:translateY(0)}
-.handle-area{
-  padding:10px 20px 0;cursor:grab;
-  display:flex;flex-direction:column;align-items:center;gap:8px
-}
+.handle-area{padding:10px 20px 0;cursor:grab;display:flex;flex-direction:column;align-items:center}
 .handle-bar{width:40px;height:4px;background:#C8BFB0;border-radius:2px}
-
-/* DRAWER SUMMARY (always visible) */
 .drawer-summary{
-  display:flex;align-items:center;gap:12px;
-  padding:10px 20px 12px;cursor:pointer
+  display:flex;align-items:center;gap:10px;padding:10px 20px 12px;cursor:pointer
 }
 .itin-pill{
-  background:var(--red);color:#fff;border-radius:12px;
-  padding:8px 14px;font-size:13px;font-weight:800;flex:1
+  background:var(--red);color:#fff;border-radius:12px;padding:9px 14px;flex:1
 }
-.itin-pill small{display:block;font-size:10px;font-weight:500;opacity:.75;margin-top:1px}
-.visibility-btn{
+.itin-pill-title{font-size:13px;font-weight:800;display:block}
+.itin-pill-sub{font-size:10px;font-weight:500;opacity:.75;display:block;margin-top:2px}
+.vis-btn{
   background:var(--bg);border:none;border-radius:12px;
-  padding:8px 12px;font-size:11px;font-weight:700;color:var(--muted);
-  cursor:pointer;white-space:nowrap
+  padding:7px 11px;font-size:11px;font-weight:700;color:var(--muted);
+  cursor:pointer;display:flex;align-items:center;gap:5px
 }
-.visibility-btn.pub{background:#EBF2FC;color:var(--blue)}
+.vis-btn i{font-size:14px}
+.vis-btn.pub{background:#EBF2FC;color:var(--blue)}
 .expand-btn{
   width:36px;height:36px;border-radius:18px;background:var(--bg);
-  border:none;cursor:pointer;font-size:16px;color:var(--muted);
+  border:none;cursor:pointer;font-size:18px;color:var(--muted);
   display:flex;align-items:center;justify-content:center;
   transition:transform .25s;flex-shrink:0
 }
 .expand-btn.open{transform:rotate(180deg)}
-
-/* DRAWER BODY (scrollable, hidden when collapsed) */
-.drawer-body{
-  max-height:0;overflow:hidden;
-  transition:max-height .4s cubic-bezier(.32,.72,0,1)
-}
+.drawer-body{max-height:0;overflow:hidden;transition:max-height .4s cubic-bezier(.32,.72,0,1)}
 .drawer-body.open{max-height:65vh}
 .drawer-scroll{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 20px 40px}
 
 /* ── MICRO CALENDAR ── */
-.micro-cal{
-  background:var(--bg);border-radius:14px;padding:12px;
-  margin-bottom:16px;
-}
+.micro-cal{background:var(--bg);border-radius:14px;padding:12px;margin-bottom:16px}
 .mc-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .mc-month{font-size:12px;font-weight:700;color:var(--text)}
 .mc-arrow{
   width:26px;height:26px;border-radius:13px;background:#fff;
-  border:none;cursor:pointer;font-size:12px;color:var(--muted);
+  border:none;cursor:pointer;font-size:14px;color:var(--muted);
   display:flex;align-items:center;justify-content:center
 }
 .mc-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
@@ -152,63 +139,125 @@ html,body{height:100%;overflow:hidden;background:#000}
 .mc-day.sel-e{border-radius:0 50% 50% 0}
 .mc-day.sel-s.sel-e{border-radius:50%}
 
-/* ── COMPANIONS PILL ── */
+/* ── COMPANIONS ── */
 .comp-row{
   display:flex;align-items:center;gap:10px;
   background:#EBF2FC;border-radius:12px;padding:10px 14px;
-  margin-bottom:14px;cursor:pointer
+  margin-bottom:16px;cursor:pointer
 }
 .comp-avatars{display:flex}
 .comp-av{
-  width:26px;height:26px;border-radius:50%;
-  border:2px solid #fff;background:var(--bg);
-  display:flex;align-items:center;justify-content:center;
-  font-size:12px;margin-left:-4px;
+  width:28px;height:28px;border-radius:50%;border:2px solid #fff;
+  background:var(--bg);display:flex;align-items:center;justify-content:center;
+  font-size:13px;margin-left:-6px;overflow:hidden;
 }
 .comp-av:first-child{margin-left:0}
+.comp-av img{width:100%;height:100%;object-fit:cover}
 .comp-text{flex:1}
 .comp-t{font-size:12px;font-weight:700;color:var(--blue)}
-.comp-s{font-size:10px;color:#5A6E8A;margin-top:1px}
-.comp-chevron{font-size:14px;color:var(--blue)}
+.comp-s{font-size:10px;color:#5A6E8A;margin-top:2px}
+.comp-chevron{font-size:18px;color:var(--blue)}
 
 /* ── STOPS ── */
 .stops-lbl{
-  font-size:10px;font-weight:700;color:var(--muted);
-  text-transform:uppercase;letter-spacing:.7px;
-  display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:10px
+  font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;
+  display:flex;align-items:center;justify-content:space-between;margin-bottom:12px
 }
 .add-stop-btn{
-  font-size:11px;font-weight:700;color:var(--red);
-  background:none;border:none;cursor:pointer;padding:0
+  font-size:11px;font-weight:700;color:var(--red);background:none;border:none;
+  cursor:pointer;display:flex;align-items:center;gap:4px
 }
+.add-stop-btn i{font-size:13px}
+
+/* Stop row */
 .stop-row{
-  display:flex;align-items:flex-start;gap:10px;
-  padding:10px 0;border-bottom:1px solid var(--border)
+  display:flex;align-items:flex-start;gap:12px;
+  padding:12px 0;border-bottom:1px solid var(--border)
 }
 .stop-row:last-child{border-bottom:none}
 .stop-num{
-  width:26px;height:26px;border-radius:50%;
+  width:28px;height:28px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
-  font-size:10px;font-weight:800;color:#fff;flex-shrink:0;margin-top:2px
+  font-size:11px;font-weight:800;color:#fff;flex-shrink:0;margin-top:2px
 }
-.stop-body{flex:1}
-.stop-name{font-size:13px;font-weight:700;color:var(--text);line-height:1.3}
-.stop-meta{display:flex;align-items:center;gap:6px;margin-top:3px;flex-wrap:wrap}
-.stop-date{font-size:10px;color:var(--muted)}
-.badge{padding:2px 7px;border-radius:6px;font-size:9px;font-weight:700;white-space:nowrap}
-.b-done{background:#ECFDF5;color:#15803D}
-.b-near{background:#FFF5F5;color:var(--red);animation:pulse 1.5s infinite}
-.b-plan{background:var(--bg);color:var(--muted)}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
-.stop-note{font-size:10px;color:var(--muted);font-style:italic;margin-top:3px;line-height:1.4}
-.stop-btns{display:flex;gap:5px;margin-top:6px}
+.stop-body{flex:1;min-width:0}
+.stop-name{font-size:14px;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:4px}
+.stop-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:5px}
+.stop-date{font-size:10px;color:var(--muted);display:flex;align-items:center;gap:3px}
+.stop-date i{font-size:11px}
+.stop-badge{
+  padding:2px 8px;border-radius:6px;font-size:9px;font-weight:700;
+  display:flex;align-items:center;gap:3px
+}
+.stop-badge i{font-size:10px}
+.sb-done{background:#ECFDF5;color:#15803D}
+.sb-near{background:#FFF5F5;color:var(--red);animation:pulse 1.5s infinite}
+.sb-plan{background:var(--bg);color:var(--muted)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
+.stop-note{font-size:11px;color:var(--muted);font-style:italic;line-height:1.5;margin-bottom:8px}
+.stop-btns{display:flex;gap:6px}
 .stop-action{
-  padding:4px 9px;border-radius:7px;border:none;
-  font-size:10px;font-weight:600;cursor:pointer;font-family:inherit
+  padding:5px 10px;border-radius:8px;border:none;
+  font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;
+  display:flex;align-items:center;gap:4px;transition:opacity .15s
 }
+.stop-action i{font-size:12px}
 .sa-poi{background:#FFF0F0;color:var(--red)}
 .sa-nav{background:#EBF2FC;color:var(--blue)}
+
+/* ── POI CARDS (altri utenti) ── */
+.section-lbl{
+  font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.7px;margin:16px 0 10px
+}
+.poi-cards-row{
+  display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;
+  margin:0 -20px;padding:0 20px 4px;
+}
+.poi-other-card{
+  flex-shrink:0;width:220px;background:var(--bg);
+  border-radius:14px;overflow:hidden;border:1px solid var(--border);
+}
+.poc-img{
+  width:100%;height:120px;background-size:cover;background-position:center;
+  background-color:#D0C8BC;position:relative
+}
+.poc-img-placeholder{
+  width:100%;height:120px;background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  font-size:36px;color:var(--muted)
+}
+.poc-cat{
+  position:absolute;top:8px;left:8px;
+  background:rgba(253,250,245,.92);backdrop-filter:blur(4px);
+  border-radius:8px;padding:3px 8px;font-size:9px;font-weight:700;
+  color:var(--muted);display:flex;align-items:center;gap:4px
+}
+.poc-cat i{font-size:10px}
+.poc-body{padding:10px 12px}
+.poc-name{font-size:13px;font-weight:800;color:var(--text);margin-bottom:3px;line-height:1.2}
+.poc-desc{font-size:10px;color:var(--muted);line-height:1.5;margin-bottom:7px}
+.poc-loc{display:flex;align-items:center;gap:4px;margin-bottom:7px}
+.poc-loc i{font-size:11px;color:var(--muted);flex-shrink:0}
+.poc-loc span{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.poc-coords{font-size:9px;color:#B0A090;font-family:'Courier New',monospace;margin-bottom:8px}
+.poc-footer{display:flex;align-items:center;justify-content:space-between}
+.poc-author{display:flex;align-items:center;gap:5px}
+.poc-avatar{
+  width:20px;height:20px;border-radius:50%;overflow:hidden;
+  background:var(--red);display:flex;align-items:center;justify-content:center;
+  font-size:9px;color:#fff;font-weight:700;flex-shrink:0
+}
+.poc-avatar img{width:100%;height:100%;object-fit:cover}
+.poc-author-name{font-size:10px;color:var(--muted)}
+.poc-love{
+  display:flex;align-items:center;gap:4px;font-size:11px;font-weight:700;
+  color:#B0A090;cursor:pointer;border:none;background:none;font-family:inherit;
+  padding:5px 10px;border-radius:10px;transition:all .2s
+}
+.poc-love i{font-size:13px;transition:all .2s}
+.poc-love.loved{color:var(--red)}
+.poc-love.loved i{color:var(--red)}
 
 /* ── SHEETS ── */
 .overlay{position:fixed;inset:0;z-index:500;pointer-events:none}
@@ -225,30 +274,69 @@ html,body{height:100%;overflow:hidden;background:#000}
 .sh-body{padding:16px 20px 0}
 .sh-title{font-size:18px;font-weight:800;color:var(--text);margin-bottom:4px}
 .sh-sub{font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.5}
+.sh-close{
+  float:right;margin-top:-2px;
+  width:28px;height:28px;border-radius:14px;background:#f0ece4;
+  border:none;cursor:pointer;font-size:16px;color:var(--muted);
+  display:flex;align-items:center;justify-content:center
+}
 .field-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}
 .field-in{
   width:100%;background:#f5f0e8;border:1.5px solid #E0D8CC;
   border-radius:10px;padding:11px 14px;font-size:14px;
-  font-family:inherit;color:var(--text);outline:none;margin-bottom:12px;
-  transition:border-color .2s
+  font-family:inherit;color:var(--text);outline:none;margin-bottom:12px;transition:border-color .2s
 }
 .field-in:focus{border-color:var(--red)}
 .field-in::placeholder{color:#B0A090}
-.field-ta{resize:none;height:64px}
+.field-ta{resize:none;height:64px;font-size:13px}
 .sh-save{
   width:100%;padding:14px;background:var(--red);color:#fff;
   border:none;border-radius:13px;font-size:15px;font-weight:700;
   cursor:pointer;font-family:inherit;margin-top:4px;
-  transition:opacity .15s
+  display:flex;align-items:center;justify-content:center;gap:8px
 }
-.sh-save:hover{opacity:.88}
+.sh-save i{font-size:17px}
 .info-pill{
   background:#EBF2FC;border-radius:10px;padding:10px 12px;
-  font-size:11px;color:var(--blue);line-height:1.5;margin-bottom:12px
+  font-size:11px;color:var(--blue);line-height:1.5;margin-bottom:12px;
+  display:flex;align-items:flex-start;gap:7px
 }
+.info-pill i{font-size:15px;flex-shrink:0;margin-top:1px}
 
-/* drawer height management */
-.drawer-collapsed .drawer-body{max-height:0}
+/* ── COMP SHEET ── */
+.comp-user{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 0;border-bottom:1px solid var(--border)
+}
+.comp-user:last-child{border-bottom:none}
+.cu-avatar{
+  width:44px;height:44px;border-radius:50%;background:var(--bg);
+  overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  font-size:20px
+}
+.cu-avatar img{width:100%;height:100%;object-fit:cover}
+.cu-info{flex:1}
+.cu-name{font-size:14px;font-weight:700;color:var(--text)}
+.cu-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.cu-badge{padding:3px 8px;border-radius:8px;font-size:9px;font-weight:700;background:#EBF2FC;color:var(--blue)}
+.cu-actions{display:flex;gap:6px}
+.cu-btn{
+  padding:7px 10px;border-radius:9px;border:none;cursor:pointer;
+  font-size:11px;font-weight:700;font-family:inherit;
+  display:flex;align-items:center;gap:4px
+}
+.cu-btn i{font-size:13px}
+.cu-msg{background:#EBF2FC;color:var(--blue)}
+.cu-block{background:#FFF0F0;color:var(--red)}
+
+/* Toast */
+.toast{
+  position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);
+  z-index:700;background:var(--text);color:#fff;border-radius:12px;
+  padding:10px 18px;font-size:13px;font-weight:600;
+  opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
 </head>
 <body>
@@ -263,15 +351,21 @@ html,body{height:100%;overflow:hidden;background:#000}
     <div class="gps-t" id="gpsTitle">Sei vicino a Xhamia e Et'hem Beut</div>
     <div class="gps-s" id="gpsSub">Vuoi registrarlo come POI?</div>
   </div>
-  <button class="gps-btn" onclick="openPoiSheet()" id="gpsBtn">Registra</button>
+  <button class="gps-btn" onclick="openPoiSheet()">
+    <i class="ph ph-map-pin"></i>
+    <span id="gpsBtn">Registra</span>
+  </button>
 </div>
 
 <!-- TOP BAR -->
 <div class="topbar">
-  <button class="tb-back" onclick="window.location.href='index.html'">←</button>
+  <button class="tb-back" onclick="window.location.href='index.html'">
+    <i class="ph ph-arrow-left"></i>
+  </button>
   <div class="tb-title">
+    <i class="ph ph-route" style="font-size:16px;color:var(--red);flex-shrink:0"></i>
     <div class="tb-label" id="itinTitleLabel">Alla scoperta di Tirana</div>
-    <div class="tb-dates">14–18 Giu</div>
+    <div class="tb-dates" id="itinDates">14–18 Giu</div>
   </div>
   <div class="tb-lang">
     <button class="lang-btn active" onclick="setLang('it')">IT</button>
@@ -287,23 +381,26 @@ html,body{height:100%;overflow:hidden;background:#000}
   </div>
   <div class="drawer-summary" onclick="toggleDrawer()">
     <div class="itin-pill">
-      <span id="itinPillTitle">Alla scoperta di Tirana</span>
-      <small id="itinPillSub">5 tappe · 14–18 Giugno 2026</small>
+      <span class="itin-pill-title" id="itinPillTitle">Alla scoperta di Tirana</span>
+      <span class="itin-pill-sub" id="itinPillSub">5 tappe · 14–18 Giugno 2026</span>
     </div>
-    <button class="visibility-btn pub" onclick="event.stopPropagation();toggleVis(this)" id="visBtn">🌍 Pubblico</button>
-    <div class="expand-btn" id="expandBtn">↓</div>
+    <button class="vis-btn pub" onclick="event.stopPropagation();toggleVis(this)" id="visBtn">
+      <i class="ph ph-globe"></i>
+      <span id="visTxt">Pubblico</span>
+    </button>
+    <div class="expand-btn" id="expandBtn"><i class="ph ph-caret-down"></i></div>
   </div>
 
-  <!-- BODY -->
+  <!-- DRAWER BODY -->
   <div class="drawer-body" id="drawerBody">
     <div class="drawer-scroll">
 
       <!-- MICRO CALENDAR -->
       <div class="micro-cal">
         <div class="mc-nav">
-          <button class="mc-arrow" onclick="prevMonth()">‹</button>
+          <button class="mc-arrow" onclick="prevMonth()"><i class="ph ph-caret-left"></i></button>
           <div class="mc-month" id="mcLabel"></div>
-          <button class="mc-arrow" onclick="nextMonth()">›</button>
+          <button class="mc-arrow" onclick="nextMonth()"><i class="ph ph-caret-right"></i></button>
         </div>
         <div class="mc-grid" id="mcGrid"></div>
       </div>
@@ -311,66 +408,81 @@ html,body{height:100%;overflow:hidden;background:#000}
       <!-- COMPANIONS -->
       <div class="comp-row" onclick="openCompSheet()">
         <div class="comp-avatars">
-          <div class="comp-av">🇮🇹</div>
-          <div class="comp-av">🇦🇱</div>
-          <div class="comp-av">🇬🇧</div>
+          <div class="comp-av">
+            <img src="https://ui-avatars.com/api/?name=Marco+B&background=D42B2B&color=fff&size=60" alt="">
+          </div>
+          <div class="comp-av">
+            <img src="https://ui-avatars.com/api/?name=Arta+K&background=285EA7&color=fff&size=60" alt="">
+          </div>
+          <div class="comp-av">
+            <img src="https://ui-avatars.com/api/?name=James+W&background=22C55E&color=fff&size=60" alt="">
+          </div>
         </div>
         <div class="comp-text">
           <div class="comp-t" id="compTitle">Compagni di Viaggio</div>
           <div class="comp-s" id="compSub">3 persone pianificano lo stesso percorso</div>
         </div>
-        <div class="comp-chevron">›</div>
+        <i class="ph ph-caret-right comp-chevron"></i>
       </div>
 
       <!-- STOPS -->
       <div class="stops-lbl">
         <span id="stopsLbl">Tappe · 5</span>
-        <button class="add-stop-btn" onclick="openAddStop()" id="addStopBtn">+ Aggiungi</button>
+        <button class="add-stop-btn" onclick="openAddStop()">
+          <i class="ph ph-plus-circle"></i>
+          <span id="addStopLbl">Aggiungi</span>
+        </button>
       </div>
 
-      <!-- S1 -->
+      <!-- S1 — Visitato -->
       <div class="stop-row">
-        <div class="stop-num" style="background:#D42B2B">1</div>
+        <div class="stop-num" style="background:var(--red)">1</div>
         <div class="stop-body">
-          <div class="stop-name" id="s1n">Blloku — Il cuore pulsante</div>
+          <div class="stop-name">Blloku — Il cuore pulsante</div>
           <div class="stop-meta">
-            <div class="stop-date">📅 14 Giu</div>
-            <div class="badge b-done" id="s1b">✓ Visitato</div>
+            <div class="stop-date"><i class="ph ph-calendar"></i> 14 Giu</div>
+            <div class="stop-badge sb-done"><i class="ph-fill ph-check-circle"></i> Visitato</div>
           </div>
-          <div class="stop-note" id="s1nt">Quartiere liberato nel '91. Caffè, storia, energia.</div>
+          <div class="stop-note">Quartiere liberato nel '91. Caffè, storia, energia vibrante.</div>
           <div class="stop-btns">
-            <button class="stop-action sa-poi" id="s1a">Ver POI ↗</button>
+            <button class="stop-action sa-poi">
+              <i class="ph ph-arrow-square-out"></i> Ver POI
+            </button>
           </div>
         </div>
       </div>
 
-      <!-- S2 -->
+      <!-- S2 — GPS near -->
       <div class="stop-row">
-        <div class="stop-num" style="background:#285EA7">2</div>
+        <div class="stop-num" style="background:var(--blue)">2</div>
         <div class="stop-body">
-          <div class="stop-name" id="s2n">Xhamia e Et'hem Beut</div>
+          <div class="stop-name">Xhamia e Et'hem Beut</div>
           <div class="stop-meta">
-            <div class="stop-date">📅 15 Giu</div>
-            <div class="badge b-near" id="s2b">📡 Sei qui!</div>
+            <div class="stop-date"><i class="ph ph-calendar"></i> 15 Giu</div>
+            <div class="stop-badge sb-near"><i class="ph ph-broadcast"></i> Sei qui!</div>
           </div>
-          <div class="stop-note" id="s2nt">Moschea ottomana sopravvissuta al comunismo.</div>
+          <div class="stop-note">Moschea ottomana 1823, sopravvissuta al comunismo. Capolavoro di tilework.</div>
           <div class="stop-btns">
-            <button class="stop-action sa-poi" onclick="openPoiSheet()" id="s2a">Registra POI</button>
-            <button class="stop-action sa-nav" id="s2c">Naviga</button>
+            <button class="stop-action sa-poi" onclick="openPoiSheet()">
+              <i class="ph-fill ph-map-pin"></i> Registra POI
+            </button>
+            <button class="stop-action sa-nav" onclick="openNavigation(41.3275,19.8212)">
+              <i class="ph ph-navigation-arrow"></i> Naviga
+            </button>
           </div>
         </div>
       </div>
 
-      <!-- S3 -->
+      <!-- S3 — Pianificato -->
       <div class="stop-row">
         <div class="stop-num" style="background:#22A35A">3</div>
         <div class="stop-body">
-          <div class="stop-name" id="s3n">Piramida di Tirana</div>
+          <div class="stop-name">Piramida di Tirana</div>
           <div class="stop-meta">
-            <div class="stop-date">📅 16 Giu</div>
-            <div class="badge b-plan" id="s3b">Pianificato</div>
+            <div class="stop-date"><i class="ph ph-calendar"></i> 16 Giu</div>
+            <div class="stop-badge sb-plan"><i class="ph ph-clock"></i> Pianificato</div>
           </div>
-          <div class="stop-note" id="s3nt">Monumento al passato, cantiere del futuro.</div>
+          <div class="stop-note">Costruita nel 1988. Oggi spazio culturale in trasformazione.</div>
         </div>
       </div>
 
@@ -378,337 +490,553 @@ html,body{height:100%;overflow:hidden;background:#000}
       <div class="stop-row">
         <div class="stop-num" style="background:#D48B2B">4</div>
         <div class="stop-body">
-          <div class="stop-name" id="s4n">Mercato Pazari i Ri</div>
+          <div class="stop-name">Pazari i Ri</div>
           <div class="stop-meta">
-            <div class="stop-date">📅 17 Giu</div>
-            <div class="badge b-plan" id="s4b">Pianificato</div>
+            <div class="stop-date"><i class="ph ph-calendar"></i> 17 Giu</div>
+            <div class="stop-badge sb-plan"><i class="ph ph-clock"></i> Pianificato</div>
           </div>
-          <div class="stop-note" id="s4nt">Il mercato più bello dei Balcani.</div>
+          <div class="stop-note">Il mercato più autentico dei Balcani. Spezie, colori, vita.</div>
         </div>
       </div>
 
       <!-- S5 -->
       <div class="stop-row">
-        <div class="stop-num" style="background:#8B2BD4">5</div>
+        <div class="stop-num" style="background:#7C3AED">5</div>
         <div class="stop-body">
-          <div class="stop-name" id="s5n">Lago Artificiale — Tramonto</div>
+          <div class="stop-name">Liqeni Artificial — Tramonto</div>
           <div class="stop-meta">
-            <div class="stop-date">📅 18 Giu</div>
-            <div class="badge b-plan" id="s5b">Pianificato</div>
+            <div class="stop-date"><i class="ph ph-calendar"></i> 18 Giu</div>
+            <div class="stop-badge sb-plan"><i class="ph ph-clock"></i> Pianificato</div>
           </div>
-          <div class="stop-note" id="s5nt">Il posto più bello per concludere il viaggio.</div>
+          <div class="stop-note">Il lago artificiale al tramonto — il finale perfetto per un itinerario su Tirana.</div>
         </div>
       </div>
 
+      <!-- POI DEGLI ALTRI nelle vicinanze -->
+      <div class="section-lbl" id="nearbyLbl">POI nelle vicinanze · creati da altri utenti</div>
+      <div class="poi-cards-row" id="nearbyPOIs">
+
+        <div class="poi-other-card">
+          <div class="poc-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Blloku_Tirana.jpg/400px-Blloku_Tirana.jpg')">
+            <div class="poc-cat"><i class="ph ph-buildings"></i> Cultura</div>
+          </div>
+          <div class="poc-body">
+            <div class="poc-name">Blloku · Caffè Komiteti</div>
+            <div class="poc-desc">Il bar museo dell'era comunista. Bottiglie di alcolici vintage come arredamento.</div>
+            <div class="poc-loc">
+              <i class="ph ph-map-pin"></i>
+              <span>Rruga Pjetër Bogdani, Tiranë</span>
+            </div>
+            <div class="poc-coords">41.3264, 19.8193</div>
+            <div class="poc-footer">
+              <div class="poc-author">
+                <div class="poc-avatar">
+                  <img src="https://ui-avatars.com/api/?name=Mirela+K&background=285EA7&color=fff&size=40" alt="">
+                </div>
+                <span class="poc-author-name">Mirela K.</span>
+              </div>
+              <button class="poc-love" onclick="togglePocLove(this)">
+                <i class="ph ph-heart"></i>
+                <span>23</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="poi-other-card">
+          <div class="poc-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Mosque_of_Ethem_Bey.jpg/400px-Mosque_of_Ethem_Bey.jpg')">
+            <div class="poc-cat"><i class="ph ph-mosque"></i> Cultura</div>
+          </div>
+          <div class="poc-body">
+            <div class="poc-name">Xhamia Et'hem Beut · luce dorata</div>
+            <div class="poc-desc">Fotografata all'alba, la luce filtra tra le piastrelle dipinte. Silenzio assoluto.</div>
+            <div class="poc-loc">
+              <i class="ph ph-map-pin"></i>
+              <span>Sheshi Skënderbej, Tiranë</span>
+            </div>
+            <div class="poc-coords">41.3275, 19.8212</div>
+            <div class="poc-footer">
+              <div class="poc-author">
+                <div class="poc-avatar">
+                  <img src="https://ui-avatars.com/api/?name=Arben+S&background=D42B2B&color=fff&size=40" alt="">
+                </div>
+                <span class="poc-author-name">Arben S.</span>
+              </div>
+              <button class="poc-love" onclick="togglePocLove(this)">
+                <i class="ph ph-heart"></i>
+                <span>41</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="poi-other-card">
+          <div class="poc-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Pyramid_of_Tirana_2022.jpg/400px-Pyramid_of_Tirana_2022.jpg')">
+            <div class="poc-cat"><i class="ph ph-buildings"></i> Cultura</div>
+          </div>
+          <div class="poc-body">
+            <div class="poc-name">Piramida · graffiti underground</div>
+            <div class="poc-desc">Il retro della piramide è una galleria a cielo aperto. Street art di livello mondiale.</div>
+            <div class="poc-loc">
+              <i class="ph ph-map-pin"></i>
+              <span>Bulevardi Dëshmorët e Kombit</span>
+            </div>
+            <div class="poc-coords">41.3293, 19.8180</div>
+            <div class="poc-footer">
+              <div class="poc-author">
+                <div class="poc-avatar">
+                  <img src="https://ui-avatars.com/api/?name=Liri+V&background=7C3AED&color=fff&size=40" alt="">
+                </div>
+                <span class="poc-author-name">Liri V.</span>
+              </div>
+              <button class="poc-love" onclick="togglePocLove(this)">
+                <i class="ph ph-heart"></i>
+                <span>17</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="poi-other-card">
+          <div class="poc-img-placeholder">
+            <i class="ph ph-fork-knife" style="font-size:40px;color:#B0A090"></i>
+          </div>
+          <div class="poc-body">
+            <div class="poc-name">Pazari i Ri · spezie albanesi</div>
+            <div class="poc-desc">Il banco delle spezie nell'angolo est. Misto di erbe medicali e condimenti unici.</div>
+            <div class="poc-loc">
+              <i class="ph ph-map-pin"></i>
+              <span>Rruga Luigj Gurakuqi, Tiranë</span>
+            </div>
+            <div class="poc-coords">41.3236, 19.8162</div>
+            <div class="poc-footer">
+              <div class="poc-author">
+                <div class="poc-avatar">
+                  <img src="https://ui-avatars.com/api/?name=Marco+B&background=22C55E&color=fff&size=40" alt="">
+                </div>
+                <span class="poc-author-name">Marco B.</span>
+              </div>
+              <button class="poc-love" onclick="togglePocLove(this)">
+                <i class="ph ph-heart"></i>
+                <span>9</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /poi-cards-row -->
+
+    </div><!-- /drawer-scroll -->
+  </div><!-- /drawer-body -->
+</div><!-- /drawer -->
+
+<!-- ═══════════════════════════════════════
+     SHEET: ADD STOP
+════════════════════════════════════════ -->
+<div class="overlay" id="addStopOv">
+  <div class="backdrop" id="addStopBg" onclick="closeAddStop()"></div>
+  <div class="sheet" id="addStopSheet">
+    <div class="sh-handle"></div>
+    <div class="sh-body">
+      <button class="sh-close" onclick="closeAddStop()"><i class="ph ph-x"></i></button>
+      <div class="sh-title" id="stopShTitle">Nuova Tappa</div>
+      <div class="sh-sub" id="stopShSub">Senza foto. Pianifica ora, racconta quando ci sei.</div>
+      <div class="field-lbl" id="stopLblName">Nome della tappa</div>
+      <input class="field-in" type="text" id="newStopName" placeholder="es. Castello di Shkodër"/>
+      <div class="field-lbl" id="stopLblNote">Nota (opzionale)</div>
+      <textarea class="field-in field-ta" placeholder="Perché vuoi visitare questo posto…"></textarea>
+      <div class="field-lbl" id="stopLblDate">Data prevista</div>
+      <input class="field-in" type="date"/>
+      <div class="info-pill">
+        <i class="ph ph-info"></i>
+        <span id="stopInfoTxt">Potrai aggiungere foto e racconto quando sarai sul posto e registrerai il POI.</span>
+      </div>
+      <button class="sh-save" onclick="saveNewStop()">
+        <i class="ph ph-plus-circle"></i>
+        <span id="stopSaveLbl">Aggiungi tappa</span>
+      </button>
     </div>
   </div>
 </div>
 
-<!-- SHEET: REGISTER POI -->
-<div class="overlay" id="poiOverlay">
-  <div class="backdrop" id="poiBg" onclick="closePoiSheet()"></div>
+<!-- ═══════════════════════════════════════
+     SHEET: REGISTER AS POI
+════════════════════════════════════════ -->
+<div class="overlay" id="poiShOv">
+  <div class="backdrop" id="poiShBg" onclick="closePoiSheet()"></div>
   <div class="sheet" id="poiSheet">
     <div class="sh-handle"></div>
     <div class="sh-body">
-      <div class="sh-title" id="psh_t">Registra come POI</div>
-      <div class="sh-sub" id="psh_s">Sei a Xhamia e Et'hem Beut. Aggiungi foto, racconto e un LOVE ❤️</div>
-      <div class="field-lbl" id="psh_l1">Nome del POI</div>
-      <input class="field-in" type="text" value="Xhamia e Et'hem Beut" style="font-weight:600"/>
-      <div class="field-lbl" id="psh_l2">Racconta questo posto</div>
-      <textarea class="field-in field-ta" id="psh_ph"></textarea>
-      <div class="info-pill" id="psh_info">📍 Coordinate GPS acquisite automaticamente dalla posizione attuale.</div>
-      <button class="sh-save" onclick="closePoiSheet()" id="psh_btn">Segna sulla mappa</button>
+      <button class="sh-close" onclick="closePoiSheet()"><i class="ph ph-x"></i></button>
+      <div class="sh-title" id="poiShTitle">Registra come POI</div>
+      <div class="sh-sub" id="poiShSub">Le coordinate sono già impostate · aggiungi foto e racconto</div>
+      <div style="background:#EAF3DE;border:1px solid #C0DD97;border-radius:10px;padding:10px 12px;margin-bottom:14px;font-size:12px;color:#3B6D11">
+        <strong>Xhamia e Et'hem Beut</strong> — Tappa 2<br>
+        <span style="font-size:10px;opacity:.8">41.3275, 19.8212 · rilevato via GPS</span>
+      </div>
+      <div class="field-lbl" id="poiLblDesc">Racconta (max 200 caratteri)</div>
+      <textarea class="field-in field-ta" placeholder="L'anima di questo posto…" maxlength="200"></textarea>
+      <div class="field-lbl" id="poiLblPhotos">Foto</div>
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <div onclick="this.innerHTML='<i class=\'ph-fill ph-check-circle\' style=\'font-size:22px;color:var(--green)\'></i>'"
+             style="flex:1;aspect-ratio:1;border-radius:10px;background:#f5f0e8;border:1.5px dashed #C8BFB0;display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;color:var(--muted)">
+          <i class="ph ph-camera"></i>
+        </div>
+        <div onclick="this.innerHTML='<i class=\'ph-fill ph-check-circle\' style=\'font-size:22px;color:var(--green)\'></i>'"
+             style="flex:1;aspect-ratio:1;border-radius:10px;background:#f5f0e8;border:1.5px dashed #C8BFB0;display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;color:var(--muted)">
+          <i class="ph ph-plus"></i>
+        </div>
+        <div onclick="this.innerHTML='<i class=\'ph-fill ph-check-circle\' style=\'font-size:22px;color:var(--green)\'></i>'"
+             style="flex:1;aspect-ratio:1;border-radius:10px;background:#f5f0e8;border:1.5px dashed #C8BFB0;display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;color:var(--muted)">
+          <i class="ph ph-plus"></i>
+        </div>
+      </div>
+      <button class="sh-save" onclick="closePoiSheet();showToast('✓ POI registrato!')">
+        <i class="ph-fill ph-map-pin"></i>
+        <span id="poiSaveLbl">Salva POI</span>
+      </button>
     </div>
   </div>
 </div>
 
-<!-- SHEET: ADD STOP -->
-<div class="overlay" id="stopOverlay">
-  <div class="backdrop" id="stopBg" onclick="closeAddStop()"></div>
-  <div class="sheet" id="stopSheet">
-    <div class="sh-handle"></div>
-    <div class="sh-body">
-      <div class="sh-title" id="ash_t">Nuova Tappa</div>
-      <div class="sh-sub" id="ash_s">Le foto arrivano quando ci sei davvero.</div>
-      <div class="field-lbl" id="ash_l1">Nome del luogo</div>
-      <input class="field-in" type="text" id="ash_ph1" placeholder="es. Castello di Shkodër"/>
-      <div class="field-lbl" id="ash_l2">Nota breve</div>
-      <textarea class="field-in field-ta" id="ash_ph2" placeholder="Perché vuoi andarci?"></textarea>
-      <div class="field-lbl" id="ash_l3">Data prevista</div>
-      <input class="field-in" type="date"/>
-      <button class="sh-save" onclick="closeAddStop()" id="ash_btn">Aggiungi alla lista</button>
-    </div>
-  </div>
-</div>
-
-<!-- SHEET: COMPANIONS -->
-<div class="overlay" id="compOverlay">
+<!-- ═══════════════════════════════════════
+     SHEET: COMPANIONS
+════════════════════════════════════════ -->
+<div class="overlay" id="compOv">
   <div class="backdrop" id="compBg" onclick="closeCompSheet()"></div>
   <div class="sheet" id="compSheet">
     <div class="sh-handle"></div>
     <div class="sh-body">
-      <div class="sh-title" id="csh_t">Compagni di Viaggio</div>
-      <div class="sh-sub" id="csh_s">Il tuo itinerario è pubblico. Queste persone pianificano lo stesso percorso a giugno.</div>
-      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
-        <div style="display:flex;align-items:center;gap:10px;background:var(--bg);border-radius:12px;padding:12px">
-          <div style="font-size:26px">🇮🇹</div>
-          <div>
-            <div style="font-size:13px;font-weight:700" id="csh_u1">Marco, Milano</div>
-            <div style="font-size:11px;color:var(--muted)" id="csh_u1d">14–16 Giu · Blloku, Piramida</div>
-          </div>
+      <button class="sh-close" onclick="closeCompSheet()"><i class="ph ph-x"></i></button>
+      <div class="sh-title" id="compShTitle">Compagni di Viaggio</div>
+      <div class="sh-sub" id="compShSub">Pianificano lo stesso itinerario in date sovrapposte</div>
+      <div class="comp-user">
+        <div class="cu-avatar">
+          <img src="https://ui-avatars.com/api/?name=Marco+B&background=D42B2B&color=fff&size=80" alt="">
         </div>
-        <div style="display:flex;align-items:center;gap:10px;background:var(--bg);border-radius:12px;padding:12px">
-          <div style="font-size:26px">🇦🇱</div>
-          <div>
-            <div style="font-size:13px;font-weight:700" id="csh_u2">Arta, Tiranë</div>
-            <div style="font-size:11px;color:var(--muted)" id="csh_u2d">15–18 Giu · Et'hem Beut, Pazari</div>
-          </div>
+        <div class="cu-info">
+          <div class="cu-name">Marco B.</div>
+          <div class="cu-meta">Milano · 14–19 Giu 2026</div>
+          <span class="cu-badge" style="margin-top:4px;display:inline-block">Viaggiatore</span>
         </div>
-        <div style="display:flex;align-items:center;gap:10px;background:var(--bg);border-radius:12px;padding:12px">
-          <div style="font-size:26px">🇬🇧</div>
-          <div>
-            <div style="font-size:13px;font-weight:700" id="csh_u3">James, London</div>
-            <div style="font-size:11px;color:var(--muted)" id="csh_u3d">14–18 Giu · Full route</div>
-          </div>
+        <div class="cu-actions">
+          <button class="cu-btn cu-msg"><i class="ph ph-chat-circle"></i></button>
+          <button class="cu-btn cu-block"><i class="ph ph-prohibit"></i></button>
         </div>
       </div>
-      <div class="info-pill" id="csh_info">Rendi il tuo itinerario privato per non apparire in questa lista.</div>
-      <button class="sh-save" onclick="closeCompSheet()" id="csh_btn">Chiudi</button>
+      <div class="comp-user">
+        <div class="cu-avatar">
+          <img src="https://ui-avatars.com/api/?name=Arta+K&background=285EA7&color=fff&size=80" alt="">
+        </div>
+        <div class="cu-info">
+          <div class="cu-name">Arta K.</div>
+          <div class="cu-meta">Tiranë · 12–18 Giu 2026</div>
+          <span class="cu-badge" style="margin-top:4px;display:inline-block">Amatore</span>
+        </div>
+        <div class="cu-actions">
+          <button class="cu-btn cu-msg"><i class="ph ph-chat-circle"></i></button>
+          <button class="cu-btn cu-block"><i class="ph ph-prohibit"></i></button>
+        </div>
+      </div>
+      <div class="comp-user">
+        <div class="cu-avatar">
+          <img src="https://ui-avatars.com/api/?name=James+W&background=22C55E&color=fff&size=80" alt="">
+        </div>
+        <div class="cu-info">
+          <div class="cu-name">James W.</div>
+          <div class="cu-meta">London · 16–20 Giu 2026</div>
+          <span class="cu-badge" style="margin-top:4px;display:inline-block">Amatore</span>
+        </div>
+        <div class="cu-actions">
+          <button class="cu-btn cu-msg"><i class="ph ph-chat-circle"></i></button>
+          <button class="cu-btn cu-block"><i class="ph ph-prohibit"></i></button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
+<!-- TOAST -->
+<div class="toast" id="toastMsg"></div>
+
 <script>
-// ── TRANSLATIONS ──
-const T = {
+/* ══════════════════════════════════
+   TRANSLATIONS
+══════════════════════════════════ */
+const T={
   it:{
-    itin_title:'Alla scoperta di Tirana',
-    pill_sub:'5 tappe · 14–18 Giugno 2026',
-    vis_pub:'🌍 Pubblico', vis_prv:'🔒 Privato',
     gps_title:'Sei vicino a Xhamia e Et\'hem Beut',
-    gps_sub:'Vuoi registrarlo come POI?', gps_btn:'Registra',
+    gps_sub:'Vuoi registrarlo come POI?',
+    gps_btn:'Registra',
+    itin_dates:'14–18 Giu',
+    pill_sub:'5 tappe · 14–18 Giugno 2026',
+    vis_pub:'Pubblico',vis_prv:'Privato',
     comp_title:'Compagni di Viaggio',
     comp_sub:'3 persone pianificano lo stesso percorso',
-    stops_lbl:'Tappe · 5', add_stop:'+ Aggiungi',
-    s1n:'Blloku — Il cuore pulsante', s1b:'✓ Visitato', s1nt:'Quartiere liberato nel \'91. Caffè, storia, energia.', s1a:'Ver POI ↗',
-    s2n:'Xhamia e Et\'hem Beut', s2b:'📡 Sei qui!', s2nt:'Moschea ottomana sopravvissuta al comunismo.', s2a:'Registra POI', s2c:'Naviga',
-    s3n:'Piramida di Tirana', s3b:'Pianificato', s3nt:'Monumento al passato, cantiere del futuro.',
-    s4n:'Mercato Pazari i Ri', s4b:'Pianificato', s4nt:'Il mercato più bello dei Balcani.',
-    s5n:'Lago Artificiale — Tramonto', s5b:'Pianificato', s5nt:'Il posto più bello per concludere il viaggio.',
-    psh_t:'Registra come POI', psh_s:'Sei a Xhamia e Et\'hem Beut. Aggiungi foto, racconto e un LOVE ❤️',
-    psh_l1:'Nome del POI', psh_l2:'Racconta questo posto',
-    psh_ph:'L\'anima di questo posto… perché merita di essere ricordato?',
-    psh_info:'📍 Coordinate GPS acquisite automaticamente dalla posizione attuale.',
-    psh_btn:'Segna sulla mappa',
-    ash_t:'Nuova Tappa', ash_s:'Le foto arrivano quando ci sei davvero.',
-    ash_l1:'Nome del luogo', ash_ph1:'es. Castello di Shkodër',
-    ash_l2:'Nota breve', ash_ph2:'Perché vuoi andarci?',
-    ash_l3:'Data prevista', ash_btn:'Aggiungi alla lista',
-    csh_t:'Compagni di Viaggio',
-    csh_s:'Il tuo itinerario è pubblico. Queste persone pianificano lo stesso percorso a giugno.',
-    csh_u1:'Marco, Milano', csh_u1d:'14–16 Giu · Blloku, Piramida',
-    csh_u2:'Arta, Tiranë', csh_u2d:'15–18 Giu · Et\'hem Beut, Pazari',
-    csh_u3:'James, London', csh_u3d:'14–18 Giu · Full route',
-    csh_info:'Rendi il tuo itinerario privato per non apparire in questa lista.',
-    csh_btn:'Chiudi',
+    stops_lbl:'Tappe · 5',add_stop:'Aggiungi',
+    nearby_lbl:'POI nelle vicinanze · creati da altri utenti',
+    sh_stop_title:'Nuova Tappa',sh_stop_sub:'Senza foto. Pianifica ora, racconta quando ci sei.',
+    stop_lbl_name:'Nome della tappa',stop_lbl_note:'Nota (opzionale)',stop_lbl_date:'Data prevista',
+    stop_info:'Potrai aggiungere foto e racconto quando sarai sul posto e registrerai il POI.',
+    stop_save:'Aggiungi tappa',
+    poi_sh_title:'Registra come POI',poi_sh_sub:'Le coordinate sono già impostate · aggiungi foto e racconto',
+    poi_lbl_desc:'Racconta (max 200 caratteri)',poi_lbl_photos:'Foto',poi_save:'Salva POI',
+    comp_sh_title:'Compagni di Viaggio',comp_sh_sub:'Pianificano lo stesso itinerario in date sovrapposte',
   },
   sq:{
-    itin_title:'Zbulimi i Tiranës',
+    gps_title:'Jeni afër Xhamisë Et\'hem Beut',
+    gps_sub:'Doni ta regjistroni si POI?',
+    gps_btn:'Regjistro',
+    itin_dates:'14–18 Qer',
     pill_sub:'5 stacione · 14–18 Qershor 2026',
-    vis_pub:'🌍 Publik', vis_prv:'🔒 Privat',
-    gps_title:'Jeni pranë Xhamisë Et\'hem Bej',
-    gps_sub:'Doni ta regjistroni si POI?', gps_btn:'Regjistro',
+    vis_pub:'Publik',vis_prv:'Privat',
     comp_title:'Shokë Udhëtimi',
-    comp_sub:'3 persona planifikojnë të njëjtin rrugëtim',
-    stops_lbl:'Stacione · 5', add_stop:'+ Shto',
-    s1n:'Blloku — Zemra Pulsuese', s1b:'✓ Vizituar', s1nt:'Lagjja e çliruar në \'91. Kafeneja, historia, energjia.', s1a:'Shih POI ↗',
-    s2n:'Xhamia e Et\'hem Beut', s2b:'📡 Jeni këtu!', s2nt:'Xhami otomane e mbijetuar nga komunizmi.', s2a:'Regjistro POI', s2c:'Navigo',
-    s3n:'Piramida e Tiranës', s3b:'Planifikuar', s3nt:'Monument i së shkuarës, shantier i së ardhmes.',
-    s4n:'Tregu Pazari i Ri', s4b:'Planifikuar', s4nt:'Tregu më i bukur në Ballkan.',
-    s5n:'Liqeni Artificial — Perëndimi', s5b:'Planifikuar', s5nt:'Vendi më i bukur për të mbyllur udhëtimin.',
-    psh_t:'Regjistro si POI', psh_s:'Jeni te Xhamia. Shtoni foto, tregim dhe një LOVE ❤️',
-    psh_l1:'Emri i POI', psh_l2:'Trego këtë vend',
-    psh_ph:'Shpirti i këtij vendi… pse meriton të kujtohet?',
-    psh_info:'📍 Koordinatat GPS merren automatikisht nga pozicioni juaj.',
-    psh_btn:'Shëno në hartë',
-    ash_t:'Stacion i Ri', ash_s:'Fotot vijnë kur jeni atje.',
-    ash_l1:'Emri i vendit', ash_ph1:'p.sh. Kalaja e Shkodrës',
-    ash_l2:'Shënim', ash_ph2:'Pse doni të shkoni atje?',
-    ash_l3:'Data e planifikuar', ash_btn:'Shto në listë',
-    csh_t:'Shokë Udhëtimi',
-    csh_s:'Itinerari juaj është publik. Këta persona planifikojnë të njëjtin rrugëtim.',
-    csh_u1:'Marco, Milano', csh_u1d:'14–16 Qer · Blloku, Piramida',
-    csh_u2:'Arta, Tiranë', csh_u2d:'15–18 Qer · Et\'hem Beut, Pazari',
-    csh_u3:'James, Londër', csh_u3d:'14–18 Qer · Rrugë e plotë',
-    csh_info:'Bëni itinerarin privat për të mos u shfaqur në këtë listë.',
-    csh_btn:'Mbyll',
+    comp_sub:'3 persona planifikojnë të njëjtin itinerar',
+    stops_lbl:'Stacione · 5',add_stop:'Shto',
+    nearby_lbl:'POI afërsisht · krijuar nga përdoruesit e tjerë',
+    sh_stop_title:'Stacion i Ri',sh_stop_sub:'Pa foto. Planifiko tani, trego kur je aty.',
+    stop_lbl_name:'Emri i stacionit',stop_lbl_note:'Shënim (fakultativ)',stop_lbl_date:'Data e planifikuar',
+    stop_info:'Mund të shtoni foto kur të jeni aty dhe të regjistroni POI-n.',
+    stop_save:'Shto stacionin',
+    poi_sh_title:'Regjistro si POI',poi_sh_sub:'Koordinatat janë vendosur · shto foto dhe tregim',
+    poi_lbl_desc:'Trego (maks 200 karaktere)',poi_lbl_photos:'Foto',poi_save:'Ruaj POI',
+    comp_sh_title:'Shokë Udhëtimi',comp_sh_sub:'Planifikojnë të njëjtin itinerar me data të mbivendosura',
   },
   en:{
-    itin_title:'Discovering Tirana',
+    gps_title:'You are near Et\'hem Bey Mosque',
+    gps_sub:'Would you like to register it as a POI?',
+    gps_btn:'Register',
+    itin_dates:'Jun 14–18',
     pill_sub:'5 stops · June 14–18, 2026',
-    vis_pub:'🌍 Public', vis_prv:'🔒 Private',
-    gps_title:'You\'re near Et\'hem Bey Mosque',
-    gps_sub:'Want to register it as a POI?', gps_btn:'Register',
+    vis_pub:'Public',vis_prv:'Private',
     comp_title:'Travel Companions',
-    comp_sub:'3 people are planning the same route',
-    stops_lbl:'Stops · 5', add_stop:'+ Add',
-    s1n:'Blloku — The Beating Heart', s1b:'✓ Visited', s1nt:'Neighborhood liberated in \'91. Coffee, history, energy.', s1a:'View POI ↗',
-    s2n:'Et\'hem Bey Mosque', s2b:'📡 You\'re here!', s2nt:'Ottoman mosque that survived communism.', s2a:'Register POI', s2c:'Navigate',
-    s3n:'Tirana Pyramid', s3b:'Planned', s3nt:'Monument to the past, construction site for the future.',
-    s4n:'Pazari i Ri Market', s4b:'Planned', s4nt:'The most beautiful market in the Balkans.',
-    s5n:'Artificial Lake — Sunset', s5b:'Planned', s5nt:'The most beautiful place to end the journey.',
-    psh_t:'Register as POI', psh_s:'You\'re at Et\'hem Bey Mosque. Add photos, your story and a LOVE ❤️',
-    psh_l1:'POI name', psh_l2:'Tell us about this place',
-    psh_ph:'The soul of this place… why does it deserve to be remembered?',
-    psh_info:'📍 GPS coordinates automatically captured from your current position.',
-    psh_btn:'Mark on map',
-    ash_t:'New Stop', ash_s:'Photos come when you\'re actually there.',
-    ash_l1:'Place name', ash_ph1:'e.g. Shkodër Castle',
-    ash_l2:'Short note', ash_ph2:'Why do you want to go?',
-    ash_l3:'Planned date', ash_btn:'Add to list',
-    csh_t:'Travel Companions',
-    csh_s:'Your itinerary is public. These people are planning the same route in June.',
-    csh_u1:'Marco, Milan', csh_u1d:'Jun 14–16 · Blloku, Pyramid',
-    csh_u2:'Arta, Tirana', csh_u2d:'Jun 15–18 · Et\'hem Bey, Market',
-    csh_u3:'James, London', csh_u3d:'Jun 14–18 · Full route',
-    csh_info:'Make your itinerary private to not appear in this list.',
-    csh_btn:'Close',
+    comp_sub:'3 people planning the same itinerary',
+    stops_lbl:'Stops · 5',add_stop:'Add',
+    nearby_lbl:'Nearby POIs · created by other users',
+    sh_stop_title:'New Stop',sh_stop_sub:'No photos. Plan now, tell the story when you\'re there.',
+    stop_lbl_name:'Stop name',stop_lbl_note:'Note (optional)',stop_lbl_date:'Planned date',
+    stop_info:'You can add photos and story when you\'re there and register the POI.',
+    stop_save:'Add stop',
+    poi_sh_title:'Register as POI',poi_sh_sub:'Coordinates already set · add photos and story',
+    poi_lbl_desc:'Tell your story (max 200 chars)',poi_lbl_photos:'Photos',poi_save:'Save POI',
+    comp_sh_title:'Travel Companions',comp_sh_sub:'Planning the same itinerary on overlapping dates',
   }
 };
 
-const MONTHS_IT=['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
-const MONTHS_SQ=['Janar','Shkurt','Mars','Prill','Maj','Qershor','Korrik','Gusht','Shtator','Tetor','Nëntor','Dhjetor'];
-const MONTHS_EN=['January','February','March','April','May','June','July','August','September','October','November','December'];
-const DAYS_IT=['Lu','Ma','Me','Gi','Ve','Sa','Do'];
-const DAYS_SQ=['Hë','Ma','Më','En','Pr','Sh','Di'];
-const DAYS_EN=['Mo','Tu','We','Th','Fr','Sa','Su'];
-
-const defLang = navigator.language?(navigator.language.startsWith('sq')?'sq':navigator.language.startsWith('it')?'it':'en'):'it';
-let curLang = defLang;
-let calY=2026, calM=5; // June
-const selS=new Date(2026,5,14), selE=new Date(2026,5,18);
-let drawerOpen=false;
-
+let lang='it';
 function setLang(l){
-  curLang=l;
+  lang=l;
   document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.textContent===l.toUpperCase()));
   const t=T[l];
-  Object.keys(t).forEach(k=>{
-    const el=document.getElementById(k);
-    if(!el)return;
-    if(el.tagName==='INPUT'&&el.type!=='date')el.placeholder=t[k];
-    else if(el.tagName==='TEXTAREA')el.placeholder=t[k];
-    else el.textContent=t[k];
-  });
-  document.getElementById('itinTitleLabel').textContent=t.itin_title;
-  renderCal();
+  document.getElementById('gpsTitle').textContent=t.gps_title;
+  document.getElementById('gpsSub').textContent=t.gps_sub;
+  document.getElementById('gpsBtn').textContent=t.gps_btn;
+  document.getElementById('itinDates').textContent=t.itin_dates;
+  document.getElementById('itinPillSub').textContent=t.pill_sub;
+  document.getElementById('visTxt').textContent=t.vis_pub;
+  document.getElementById('compTitle').textContent=t.comp_title;
+  document.getElementById('compSub').textContent=t.comp_sub;
+  document.getElementById('stopsLbl').textContent=t.stops_lbl;
+  document.getElementById('addStopLbl').textContent=t.add_stop;
+  document.getElementById('nearbyLbl').textContent=t.nearby_lbl;
+  // Sheets
+  document.getElementById('stopShTitle').textContent=t.sh_stop_title;
+  document.getElementById('stopShSub').textContent=t.sh_stop_sub;
+  document.getElementById('stopLblName').textContent=t.stop_lbl_name;
+  document.getElementById('stopLblNote').textContent=t.stop_lbl_note;
+  document.getElementById('stopLblDate').textContent=t.stop_lbl_date;
+  document.getElementById('stopInfoTxt').textContent=t.stop_info;
+  document.getElementById('stopSaveLbl').textContent=t.stop_save;
+  document.getElementById('poiShTitle').textContent=t.poi_sh_title;
+  document.getElementById('poiShSub').textContent=t.poi_sh_sub;
+  document.getElementById('poiLblDesc').textContent=t.poi_lbl_desc;
+  document.getElementById('poiLblPhotos').textContent=t.poi_lbl_photos;
+  document.getElementById('poiSaveLbl').textContent=t.poi_save;
+  document.getElementById('compShTitle').textContent=t.comp_sh_title;
+  document.getElementById('compShSub').textContent=t.comp_sh_sub;
 }
+// Detect lang
+const nl=(navigator.language||'').substring(0,2);
+if(nl==='sq')setLang('sq'); else if(nl!=='it')setLang('en');
 
-// ── MICRO CALENDAR ──
-function getMs(){return curLang==='sq'?MONTHS_SQ:curLang==='en'?MONTHS_EN:MONTHS_IT}
-function getDs(){return curLang==='sq'?DAYS_SQ:curLang==='en'?DAYS_EN:DAYS_IT}
-
-function renderCal(){
-  const grid=document.getElementById('mcGrid');
-  document.getElementById('mcLabel').textContent=getMs()[calM]+' '+calY;
-  grid.innerHTML='';
-  getDs().forEach(d=>{const c=document.createElement('div');c.className='mc-dow';c.textContent=d;grid.appendChild(c)});
-  const first=new Date(calY,calM,1);
-  let sd=(first.getDay()+6)%7;
-  const dim=new Date(calY,calM+1,0).getDate();
-  const dipm=new Date(calY,calM,0).getDate();
-  for(let i=sd-1;i>=0;i--){const c=document.createElement('button');c.className='mc-day other';c.textContent=dipm-i;grid.appendChild(c)}
-  const today=new Date();
-  for(let d=1;d<=dim;d++){
-    const c=document.createElement('button');c.textContent=d;
-    const td=new Date(calY,calM,d);
-    let cls='mc-day';
-    if(td.toDateString()===today.toDateString())cls+=' today';
-    const isS=td.toDateString()===selS.toDateString();
-    const isE=td.toDateString()===selE.toDateString();
-    const inR=td>selS&&td<selE;
-    if(isS)cls+=' sel-s'; if(isE)cls+=' sel-e'; if(inR)cls+=' range';
-    c.className=cls; grid.appendChild(c);
-  }
-  const total=sd+dim; const rem=total%7===0?0:7-(total%7);
-  for(let d=1;d<=rem;d++){const c=document.createElement('button');c.className='mc-day other';c.textContent=d;grid.appendChild(c)}
-}
-function prevMonth(){calM--;if(calM<0){calM=11;calY--}renderCal()}
-function nextMonth(){calM++;if(calM>11){calM=0;calY++}renderCal()}
-
-// ── DRAWER ──
-function toggleDrawer(){
-  drawerOpen=!drawerOpen;
-  const body=document.getElementById('drawerBody');
-  const btn=document.getElementById('expandBtn');
-  body.classList.toggle('open',drawerOpen);
-  btn.classList.toggle('open',drawerOpen);
-  btn.textContent=drawerOpen?'↓':'↑';
-}
-
-// ── VISIBILITY ──
-function toggleVis(el){
-  const l=curLang, t=T[l];
-  const isPub=el.classList.contains('pub');
-  el.classList.toggle('pub',!isPub);
-  el.textContent=isPub?t.vis_prv:t.vis_pub;
-}
-
-// ── SHEETS ──
-function openSheet(ov,bg,sh){
-  document.getElementById(ov).style.pointerEvents='all';
-  document.getElementById(bg).classList.add('vis');
-  setTimeout(()=>document.getElementById(sh).classList.add('open'),10);
-}
-function closeSheet(ov,bg,sh){
-  document.getElementById(sh).classList.remove('open');
-  document.getElementById(bg).classList.remove('vis');
-  setTimeout(()=>document.getElementById(ov).style.pointerEvents='none',380);
-}
-function openPoiSheet(){closeGPS();openSheet('poiOverlay','poiBg','poiSheet')}
-function closePoiSheet(){closeSheet('poiOverlay','poiBg','poiSheet')}
-function openAddStop(){openSheet('stopOverlay','stopBg','stopSheet')}
-function closeAddStop(){closeSheet('stopOverlay','stopBg','stopSheet')}
-function openCompSheet(){openSheet('compOverlay','compBg','compSheet')}
-function closeCompSheet(){closeSheet('compOverlay','compBg','compSheet')}
-
-// ── GPS ──
-function closeGPS(){document.getElementById('gpsBanner').classList.remove('show')}
-
-// ── MAP ──
-const stops=[
-  {lat:41.3264,lng:19.8193,num:1,color:'#D42B2B',name:'Blloku'},
-  {lat:41.3275,lng:19.8212,num:2,color:'#285EA7',name:"Xhamia Et'hem Beut"},
-  {lat:41.3293,lng:19.8180,num:3,color:'#22A35A',name:'Piramida'},
-  {lat:41.3236,lng:19.8162,num:4,color:'#D48B2B',name:'Pazari i Ri'},
-  {lat:41.3319,lng:19.8137,num:5,color:'#8B2BD4',name:'Lago Artificiale'}
+/* ══════════════════════════════════
+   MAP
+══════════════════════════════════ */
+const CENTER=[41.3275,19.8189];
+const STOPS=[
+  {lat:41.3264,lng:19.8193,num:1,color:'#D42B2B'},
+  {lat:41.3275,lng:19.8212,num:2,color:'#285EA7'},
+  {lat:41.3293,lng:19.8180,num:3,color:'#22A35A'},
+  {lat:41.3236,lng:19.8162,num:4,color:'#D48B2B'},
+  {lat:41.3320,lng:19.8242,num:5,color:'#7C3AED'},
 ];
 
-let map;
 function initMap(){
-  map=L.map('map',{zoomControl:false})
-    .setView([41.3275,19.8185],14);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-    {attribution:'© OpenStreetMap © CARTO',maxZoom:19}).addTo(map);
-  L.polyline(stops.map(s=>[s.lat,s.lng]),
-    {color:'#D42B2B',weight:2.5,opacity:.55,dashArray:'7 9'}).addTo(map);
-  stops.forEach(s=>{
+  const map=L.map('map',{zoomControl:false}).setView(CENTER,14.5);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(map);
+
+  // Polyline itinerario
+  const pts=STOPS.map(s=>[s.lat,s.lng]);
+  L.polyline(pts,{color:'#D42B2B',weight:2.5,opacity:.6,dashArray:'6,5'}).addTo(map);
+
+  // Markers numerati
+  STOPS.forEach(s=>{
     const icon=L.divIcon({
       className:'',
-      html:`<div style="width:30px;height:30px;border-radius:50%;background:${s.color};border:2.5px solid #fff;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:800;box-shadow:0 2px 10px rgba(0,0,0,.22)">${s.num}</div>`,
-      iconSize:[30,30],iconAnchor:[15,15]
+      html:`<div style="display:flex;flex-direction:column;align-items:center">
+        <div style="width:30px;height:30px;border-radius:50%;background:${s.color};border:2.5px solid #fff;
+          display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;
+          color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.35)">${s.num}</div>
+        <div style="width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:7px solid ${s.color};margin-top:-2px"></div>
+      </div>`,
+      iconSize:[30,40],iconAnchor:[15,40]
     });
-    L.marker([s.lat,s.lng],{icon}).addTo(map)
-      .bindTooltip(s.name,{permanent:false,direction:'top',offset:[0,-18]});
+    L.marker([s.lat,s.lng],{icon}).addTo(map);
   });
 }
 
-// ── INIT ──
+/* ══════════════════════════════════
+   DRAWER
+══════════════════════════════════ */
+let drawerOpen=false;
+function toggleDrawer(){
+  drawerOpen=!drawerOpen;
+  document.getElementById('drawerBody').classList.toggle('open',drawerOpen);
+  document.getElementById('expandBtn').classList.toggle('open',drawerOpen);
+}
+
+/* ══════════════════════════════════
+   VISIBILITY TOGGLE
+══════════════════════════════════ */
+let isPublic=true;
+function toggleVis(btn){
+  isPublic=!isPublic;
+  const icon=btn.querySelector('i');
+  const txt=document.getElementById('visTxt');
+  if(isPublic){
+    icon.className='ph ph-globe';
+    txt.textContent=T[lang].vis_pub;
+    btn.classList.add('pub');
+  } else {
+    icon.className='ph ph-lock-simple';
+    txt.textContent=T[lang].vis_prv;
+    btn.classList.remove('pub');
+  }
+  showToast(isPublic?'Itinerario reso pubblico':'Itinerario reso privato');
+}
+
+/* ══════════════════════════════════
+   SHEETS
+══════════════════════════════════ */
+function openAddStop(){
+  document.getElementById('addStopBg').classList.add('vis');
+  document.getElementById('addStopSheet').classList.add('open');
+  setTimeout(()=>document.getElementById('newStopName').focus(),300);
+}
+function closeAddStop(){
+  document.getElementById('addStopBg').classList.remove('vis');
+  document.getElementById('addStopSheet').classList.remove('open');
+}
+function saveNewStop(){
+  const name=document.getElementById('newStopName').value.trim();
+  if(!name){showToast('Inserisci il nome della tappa');return;}
+  closeAddStop();
+  showToast(`+ Tappa "${name}" aggiunta!`);
+  document.getElementById('newStopName').value='';
+}
+function openPoiSheet(){
+  document.getElementById('gpsBanner').classList.remove('show');
+  document.getElementById('poiShBg').classList.add('vis');
+  document.getElementById('poiSheet').classList.add('open');
+}
+function closePoiSheet(){
+  document.getElementById('poiShBg').classList.remove('vis');
+  document.getElementById('poiSheet').classList.remove('open');
+}
+function openCompSheet(){
+  document.getElementById('compBg').classList.add('vis');
+  document.getElementById('compSheet').classList.add('open');
+}
+function closeCompSheet(){
+  document.getElementById('compBg').classList.remove('vis');
+  document.getElementById('compSheet').classList.remove('open');
+}
+
+/* ══════════════════════════════════
+   POI LOVE (altri utenti)
+══════════════════════════════════ */
+function togglePocLove(btn){
+  const loved=btn.classList.toggle('loved');
+  const icon=btn.querySelector('i');
+  const cnt=btn.querySelector('span');
+  icon.className=loved?'ph-fill ph-heart':'ph ph-heart';
+  cnt.textContent=parseInt(cnt.textContent)+(loved?1:-1);
+}
+
+/* ══════════════════════════════════
+   NAVIGATION
+══════════════════════════════════ */
+function openNavigation(lat,lng){
+  window.open(`https://maps.google.com/maps?daddr=${lat},${lng}&directionsmode=walking`,'_blank');
+}
+
+/* ══════════════════════════════════
+   MICRO CALENDAR
+══════════════════════════════════ */
+const MONTHS_IT=['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+const MONTHS_EN=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DOW=['L','M','M','G','V','S','D'];
+let calMonth=5,calYear=2026,selStart=14,selEnd=18; // Giugno 2026
+
+function buildCal(){
+  const lbl=document.getElementById('mcLabel');
+  const months=lang==='en'?MONTHS_EN:MONTHS_IT;
+  lbl.textContent=`${months[calMonth]} ${calYear}`;
+  const grid=document.getElementById('mcGrid');
+  grid.innerHTML='';
+  DOW.forEach(d=>{const el=document.createElement('div');el.className='mc-dow';el.textContent=d;grid.appendChild(el);});
+  const firstDay=(new Date(calYear,calMonth,1).getDay()+6)%7;
+  const daysInMonth=new Date(calYear,calMonth+1,0).getDate();
+  const today=new Date(),todayY=today.getFullYear(),todayM=today.getMonth(),todayD=today.getDate();
+  for(let i=0;i<firstDay;i++){const el=document.createElement('button');el.className='mc-day other';el.textContent='';grid.appendChild(el);}
+  for(let d=1;d<=daysInMonth;d++){
+    const el=document.createElement('button');el.className='mc-day';el.textContent=d;
+    if(calYear===todayY&&calMonth===todayM&&d===todayD)el.classList.add('today');
+    if(calMonth===5&&calYear===2026){
+      if(d===selStart)el.classList.add('sel-s');
+      else if(d===selEnd)el.classList.add('sel-e');
+      else if(d>selStart&&d<selEnd)el.classList.add('range');
+    }
+    el.onclick=()=>selectDay(d);
+    grid.appendChild(el);
+  }
+}
+function selectDay(d){
+  if(!selStart||selEnd){selStart=d;selEnd=null;}
+  else if(d<selStart){selEnd=selStart;selStart=d;}
+  else{selEnd=d;}
+  buildCal();
+}
+function prevMonth(){calMonth--;if(calMonth<0){calMonth=11;calYear--;}buildCal();}
+function nextMonth(){calMonth++;if(calMonth>11){calMonth=0;calYear++;}buildCal();}
+
+/* ══════════════════════════════════
+   TOAST
+══════════════════════════════════ */
+let toastTimer;
+function showToast(msg){
+  const el=document.getElementById('toastMsg');
+  el.textContent=msg;el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.classList.remove('show'),2200);
+}
+
+/* ══════════════════════════════════
+   INIT
+══════════════════════════════════ */
 window.addEventListener('DOMContentLoaded',()=>{
-  initMap();
-  renderCal();
-  setLang(curLang);
-  // GPS banner dopo 2s
+  initMap();buildCal();
+  // GPS banner after 2s
   setTimeout(()=>document.getElementById('gpsBanner').classList.add('show'),2000);
 });
 </script>
