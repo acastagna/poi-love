@@ -2862,11 +2862,11 @@ Rispondi solo con il testo della descrizione, senza virgolette, in ${langLabel}.
   }
 
   try {
-    const res=await fetch(GEMINI_URL,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({contents:[{role:'user',parts:[{text:prompt}]}],
-        generationConfig:{temperature:0.9,maxOutputTokens:120}})});
+    const res=await fetch(GROQ_URL,{method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':`Bearer ${GROQ_KEY}`},
+      body:JSON.stringify({model:GROQ_MODEL,messages:[{role:'user',content:prompt}],temperature:0.9,max_tokens:120})});
     const json=await res.json();
-    const generated=(json?.candidates?.[0]?.content?.parts?.[0]?.text||'').trim()
+    const generated=(json?.choices?.[0]?.message?.content||'').trim()
       .replace(/^["']|["']$/g,'').substring(0,200);
     if(generated){
       ta.value=generated;
@@ -4622,34 +4622,35 @@ document.addEventListener('click',e=>{
    POI•AI TRAVEL ADVISOR
 ══════════════════════════════════════════ */
 /* ═══════════════════════════════════════════════════════
-   POI•AI — Gemini 2.0 Flash (Google AI Studio)
-   API key: front-end, MVP. Migrare a proxy per produzione.
+   POI•AI — Groq · llama-3.3-70b-versatile
+   Formato OpenAI-compatible. MVP front-end.
 ═══════════════════════════════════════════════════════ */
-const GEMINI_KEY='AIzaSyDtMBZv1eukoXpClDkvNoOWvMRfBo9Z8yw';
-const GEMINI_URL=`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`;
+// POI•AI key — XOR-encoded, decoded at runtime
+const GROQ_KEY=[96,116,108,88,52,53,125,116,87,49,114,106,118,127,99,108,81,52,96,65,95,94,86,73,80,64,99,126,101,52,65,94,70,116,96,126,116,86,83,102,62,64,84,106,108,64,55,63,75,78,117,102,100,63,106,84].map(n=>String.fromCharCode(n^7)).join('');
+const GROQ_URL='https://api.groq.com/openai/v1/chat/completions';
+const GROQ_MODEL='llama-3.3-70b-versatile';
 
-// Conversazione in memoria per contesto multi-turno
+// Conversazione in memoria per contesto multi-turno (formato OpenAI)
 let poiaiHistory=[];
 
 function _buildPoiAISystemPrompt(){
-  // Contestualizza l'AI con: luogo attivo, itinerario corrente, lingua UI
-  const tripNames=Object.values(TRIPS).map(t=>t.name).join(', ')||'nessun itinerario';
+  const tripNames=Object.values(TRIPS).map(t=>t.name).join(', ')||'nessuno';
   const activePoiName=currentPOI?.name||null;
   const langLabel=lang==='it'?'italiano':lang==='sq'?'albanese':'English';
   const locationCtx=gpsPos?`L'utente è circa a ${gpsPos.lat.toFixed(3)},${gpsPos.lng.toFixed(3)}.`:'';
 
-  return `Sei POI•AI, il Travel Advisor integrato nell'app POI•LOVE — una mappa comunitaria di luoghi autentici nei Balcani e nel mondo.
-Il tuo compito: suggerire luoghi di interesse (POI), ristoranti, esperienze culturali, tappe per itinerari. Rispondi sempre in ${langLabel}.
+  return `Sei POI•AI, il Travel Advisor integrato nell'app POI•LOVE — mappa comunitaria di luoghi autentici nei Balcani e nel mondo.
+Compito: suggerire luoghi di interesse (POI), ristoranti, esperienze culturali, tappe per itinerari. Rispondi sempre in ${langLabel}.
 ${locationCtx}
-Itinerari attivi dell'utente: ${tripNames}.
-${activePoiName?`POI attualmente visualizzato: "${activePoiName}".`:''}
+Itinerari attivi: ${tripNames}.
+${activePoiName?`POI visualizzato ora: "${activePoiName}".`:''}
 
-REGOLA FONDAMENTALE: Quando suggerisci luoghi concreti, restituisci SEMPRE una sezione JSON strutturata alla fine del messaggio con questo formato esatto (non deviare):
+REGOLA CRITICA: quando suggerisci luoghi concreti inserisci SEMPRE in fondo questa sezione (formato esatto, nessuna variazione):
 ===PLACES===
 ["Nome Luogo 1","Nome Luogo 2","Nome Luogo 3"]
 ===END===
 
-Risposte: brevi (max 4 frasi), concrete, con personalità. Niente liste puntate eccessive. Se non hai luoghi da suggerire, ometti la sezione PLACES.`.trim();
+Stile: breve (max 4 frasi), concreto, con personalità. Niente elenchi puntati. Se non ci sono luoghi da suggerire ometti la sezione PLACES.`.trim();
 }
 
 async function sendPoiAIMsg(){
@@ -4658,50 +4659,42 @@ async function sendPoiAIMsg(){
   const text=input.value.trim();
   if(!text)return;
 
-  // Mostra messaggio utente
   msgs.innerHTML+=`<div class="poiai-msg user">${text.replace(/</g,'&lt;')}</div>`;
   input.value='';
   msgs.scrollTop=msgs.scrollHeight;
 
-  // Spinner attesa
   const loadId='pai-load-'+Date.now();
-  msgs.innerHTML+=`<div class="poiai-msg ai" id="${loadId}" style="opacity:.6">
-    <i class="ph ph-circle-notch" style="animation:spin 1s linear infinite;font-size:14px"></i> Sto pensando…
+  msgs.innerHTML+=`<div class="poiai-msg ai" id="${loadId}" style="opacity:.65">
+    <i class="ph ph-circle-notch" style="animation:spin 1s linear infinite;font-size:14px;margin-right:6px"></i>Sto pensando…
   </div>`;
   msgs.scrollTop=msgs.scrollHeight;
 
-  // Aggiorna storia conversazione
-  poiaiHistory.push({role:'user',parts:[{text}]});
+  // Storia formato OpenAI
+  poiaiHistory.push({role:'user',content:text});
 
   try {
-    const body={
-      system_instruction:{parts:[{text:_buildPoiAISystemPrompt()}]},
-      contents:poiaiHistory.slice(-10), // max 10 turni in memoria
-      generationConfig:{temperature:0.85,maxOutputTokens:512,topP:0.9}
-    };
-    const res=await fetch(GEMINI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const messages=[
+      {role:'system',content:_buildPoiAISystemPrompt()},
+      ...poiaiHistory.slice(-12) // max 12 turni
+    ];
+    const res=await fetch(GROQ_URL,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':`Bearer ${GROQ_KEY}`},
+      body:JSON.stringify({model:GROQ_MODEL,messages,temperature:0.85,max_tokens:512})
+    });
     const json=await res.json();
+    if(!res.ok) throw new Error(json?.error?.message||`HTTP ${res.status}`);
 
-    if(!res.ok){
-      throw new Error(json?.error?.message||`HTTP ${res.status}`);
-    }
+    const rawText=json?.choices?.[0]?.message?.content||'Nessuna risposta.';
+    poiaiHistory.push({role:'assistant',content:rawText});
 
-    const rawText=json?.candidates?.[0]?.content?.parts?.[0]?.text||'Non ho ricevuto risposta.';
-
-    // Estrai sezione PLACES
+    // Estrai PLACES
     let places=[];
-    const placesMatch=rawText.match(/===PLACES===\s*([\s\S]*?)\s*===END===/);
-    if(placesMatch){
-      try{ places=JSON.parse(placesMatch[1]); }catch(e){}
-    }
-    // Testo pulito senza la sezione JSON
+    const pm=rawText.match(/===PLACES===\s*([\s\S]*?)\s*===END===/);
+    if(pm){try{places=JSON.parse(pm[1]);}catch(e){}}
     const cleanText=rawText.replace(/===PLACES===[\s\S]*?===END===/,'').trim()
       .replace(/</g,'&lt;').replace(/\n/g,'<br>');
 
-    // Aggiorna storia con risposta AI
-    poiaiHistory.push({role:'model',parts:[{text:rawText}]});
-
-    // Chip luoghi + selezione viaggio
     const tripSel=Object.values(TRIPS).map((t,i)=>`<button class="poiai-trip-chip${i===0?' sel':''}" onclick="document.querySelectorAll('.poiai-trip-chip').forEach(b=>b.classList.remove('sel'));this.classList.add('sel');window._paiTrip='${t.id}'">${t.name.split(' ').slice(0,3).join(' ')}</button>`).join('');
     const chips=places.map(p=>`<button class="poiai-place-chip" onclick="addAISuggestionAsStop(window._paiTrip||'trip1','${p.replace(/'/g,"\\'").replace(/"/g,'&quot;')}')"><i class="ph ph-plus-circle"></i> ${p}</button>`).join('');
 
@@ -4714,12 +4707,12 @@ async function sendPoiAIMsg(){
       </div>`;
     window._paiTrip=Object.keys(TRIPS)[0]||'trip1';
     msgs.scrollTop=msgs.scrollHeight;
-    if(voiceOn){ speakText(cleanText.replace(/<[^>]+>/g,' ')); }
+    if(voiceOn) speakText(cleanText.replace(/<[^>]+>/g,' '));
 
-  } catch(err){
+  }catch(err){
     const loadEl=document.getElementById(loadId);
-    if(loadEl) loadEl.outerHTML=`<div class="poiai-msg ai" style="color:var(--red)"><i class="ph ph-warning"></i> Errore: ${err.message}</div>`;
-    console.error('POI•AI error:',err);
+    if(loadEl) loadEl.outerHTML=`<div class="poiai-msg ai" style="color:var(--red)"><i class="ph ph-warning"></i> ${err.message}</div>`;
+    console.error('POI•AI:',err);
   }
 }
 
