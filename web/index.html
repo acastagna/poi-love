@@ -4,6 +4,27 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>POILOVE — Per chi ama viaggiare e i luoghi che tracciano un percorso nel cuore</title>
+<!-- Kill-switch SW: rimuove vecchio Service Worker della webapp PWA -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<script>
+(async () => {
+  let cleaned = false;
+  if ('serviceWorker' in navigator) {
+    const regs = await navigator.serviceWorker.getRegistrations();
+    for (const r of regs) { await r.unregister(); cleaned = true; }
+  }
+  if ('caches' in window) {
+    const keys = await caches.keys();
+    for (const k of keys) { await caches.delete(k); cleaned = true; }
+  }
+  if (cleaned && !sessionStorage.getItem('sw-cleaned')) {
+    sessionStorage.setItem('sw-cleaned','1');
+    window.location.reload();
+  }
+})();
+</script>
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400&display=swap");
 *{box-sizing:border-box;margin:0;padding:0}
