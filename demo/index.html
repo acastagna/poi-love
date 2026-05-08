@@ -1951,6 +1951,8 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
   <div class="sheet-backdrop" id="detailBg"></div>
   <div class="sheet" id="detailSheet">
     <div class="sh-handle" id="detailHandle"></div>
+    <!-- Bottone X di chiusura (fix desktop: il sheet copre tutto il backdrop) -->
+    <button class="sh-close" onclick="closeDetail()" title="Chiudi" style="position:absolute;top:12px;right:14px;z-index:5"><i class="ph ph-x"></i></button>
     <div style="padding:4px 20px 0">
       <div class="detail-photos" id="detailPhotos"></div>
       <div class="detail-tag" id="detailTag"><i class="ph ph-tag" style="font-size:11px"></i> Cultura</div>
@@ -3495,6 +3497,10 @@ function openDetail(idx){
   openSheet('detailOv','detailBg','detailSheet');
 }
 function closeDetail(){closeSheet('detailOv','detailBg','detailSheet')}
+// Tasto Escape chiude il POI detail (fix desktop)
+document.addEventListener('keydown', e => {
+  if(e.key==='Escape' && document.getElementById('detailBg')?.classList.contains('vis')) closeDetail();
+});
 function toggleLove(){
   const btn=document.getElementById('loveBtn'),heart=document.getElementById('loveHeart'),cnt=document.getElementById('loveCnt');
   const loved=btn.classList.toggle('loved');
