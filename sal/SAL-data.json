@@ -1,0 +1,92 @@
+{
+  "_meta": {
+    "last_updated": "2026-05-08",
+    "version": "2.4",
+    "next_deadline": "2026-05-13",
+    "next_deadline_label": "🎤 Finestra presentazioni 13-17 Maggio — demo live + roadmap Tirana",
+    "presentation_window_start": "2026-05-13",
+    "presentation_window_end": "2026-05-17",
+    "launch_date": "Giugno 2026 (Tirana — lancio pubblico fisico)",
+    "launch_city": "Tirana"
+  },
+  "overview": {
+    "overall_pct": 75,
+    "weeks_to_launch": 5,
+    "db_tables": 12,
+    "license": "MIT"
+  },
+  "areas": [
+    { "id": "infra",   "pct": 100, "status": "done"    },
+    { "id": "app",     "pct": 75,  "status": "active"  },
+    { "id": "ux",      "pct": 65,  "status": "active"  },
+    { "id": "launch",  "pct": 40,  "status": "active"  }
+  ],
+  "pie": [
+    { "id": "done",   "value": 60 },
+    { "id": "active", "value": 25 },
+    { "id": "todo",   "value": 15 }
+  ],
+  "tasks": [
+    { "id": "t1",  "group": "done",   "pct": 100, "time_est": 8,  "status": "done"   },
+    { "id": "t2",  "group": "done",   "pct": 100, "time_est": 6,  "status": "done"   },
+    { "id": "t3",  "group": "done",   "pct": 100, "time_est": 2,  "status": "done"   },
+    { "id": "t4",  "group": "done",   "pct": 100, "time_est": 2,  "status": "done"   },
+    { "id": "t5",  "group": "done",   "pct": 100, "time_est": 12, "status": "done"   },
+    { "id": "t6",  "group": "done",   "pct": 100, "time_est": 4,  "status": "done"   },
+    { "id": "t7",  "group": "sprint", "pct": 70,  "time_est": 3,  "status": "sprint" },
+    { "id": "t8",  "group": "sprint", "pct": 50,  "time_est": 6,  "status": "sprint" },
+    { "id": "t9",  "group": "next",   "pct": 0,   "time_est": 10, "status": "next"   },
+    { "id": "t10", "group": "next",   "pct": 0,   "time_est": 6,  "status": "next"   },
+    { "id": "t11", "group": "next",   "pct": 0,   "time_est": 6,  "status": "next"   },
+    { "id": "t12", "group": "future", "pct": 0,   "time_est": 3,  "status": "future" },
+    { "id": "t13", "group": "future", "pct": 0,   "time_est": 5,  "status": "future" },
+    { "id": "t14", "group": "future", "pct": 0,   "time_est": 4,  "status": "future" },
+    { "id": "t15", "group": "future", "pct": 0,   "time_est": 18, "status": "future", "label": "Itinerari di Viaggio — Migration 002 + UI + Geofencing + Compagni" }
+  ],
+  "changelog": [
+    {
+      "date": "2026-05-08",
+      "note": "SESSIONE v2.4: Spostata presentazione da singolo giorno (10 Mag) a FINESTRA 13-17 Maggio (5 giorni, Mer-Dom) — meeting hand-picked distribuiti nei 5 giorni anziché concentrati. Sprint pre-finestra: 7 giorni (Ven 8 oggi → Gio 14). Deadline marker su Mer 13 (inizio finestra)."
+    },
+    {
+      "date": "2026-05-08",
+      "note": "SESSIONE v2.3: Riformulazione SAL — rimosso lancio digitale 1 Maggio, focus su Presentazione + Lancio Tirana Giugno. T7 Plesk Upload riconosciuto a 70% (server live, manca wire AddPOI demo). T8 Expo a 50% (scaffold 17 file pronto). Aree macro aggiornate: ux 25→65%, launch 35→40%, app 75%."
+    },
+    {
+      "date": "2026-05-07",
+      "note": "SESSIONE v2.2: Webapp HTML demo consolidata — index.html SPA 303KB con bottom nav, FAB AddPOI/AddStop/Compagnia, mappa Leaflet trilingue IT/SQ/EN, sheet system, demo mode, login Google + magic link. itinerari.html dettagliata con polyline numerata, mini calendario interattivo, GPS banner. POI-LOVE-SAL.html aggiornato a 90KB."
+    },
+    {
+      "date": "2026-04-26",
+      "note": "SESSIONE v2.1: Feature spec Itinerari di Viaggio — pianificazione pre-viaggio + mini calendario + piantina numerata + geofencing invito POI + compagni di viaggio pubblici. Migration 002 SQL scritta (itineraries, itinerary_stops, itinerary_interests + RLS). DB tabelle 9→12. Milestone: Atto I.5 post-presentazione."
+    },
+    {
+      "date": "2026-04-26",
+      "note": "SESSIONE v1.9: Expo app MVP scaffold completo — 17 file TypeScript. Root layout con AuthContext Supabase. Google OAuth login screen. react-native-maps PROVIDER_GOOGLE con stile warm-beige. AddPOISheet flusso < 90 sec. POIDetailCard con foto scroll horizontal. LoveButton animazione optimistic. POIMarker con badge love_count. MediaUpload JWT Bearer → media.poilove.com. Push GitHub: app/poi-love-app/ (17 file)."
+    },
+    {
+      "date": "2026-04-26",
+      "note": "SESSIONE v1.8: Media server PHP live su media.poilove.com — PHP 8.3.30, GD WebP, cURL 7.88, EXIF, storage poi/ scrivibile, Supabase connesso. GitHub Actions deploy SSH automatico (chiave ED25519, 5 secrets). .user.ini PHP-FPM upload 10M. Branded 403 page."
+    },
+    {
+      "date": "2026-04-26",
+      "note": "SESSIONE v1.7: GitHub push via API (token PAT) — migration 001, card-system.md, architecture.md, schema.sql v1.1. Migration applicata su Supabase (poi_visibility ENUM, card_generations, RLS). Fix funzioni DB senza search_path. Security Advisor: 0 errori. Infrastruttura 100%."
+    },
+    {
+      "date": "2026-04-25",
+      "note": "SESSIONE v1.6: Migration 001: poi_visibility ENUM + card_generations table + RLS. card-system.md spec completa (feed 4:5, stories 9:16, qr_strip, SHA-256, consent NFT/book). architecture.md aggiornato (9 tabelle)."
+    },
+    {
+      "date": "2026-04-24",
+      "note": "SESSIONE v1.4-1.5: Google OAuth attivo. Google Maps Platform configurata. SAL trilingue IT/SQ/EN. SAL-data.json creato come fonte di verità. Repository GitHub live con CI/CD. Schema Supabase 9 tabelle + RLS."
+    }
+  ],
+  "next_session_priorities": [
+    "FINESTRA PRESENTAZIONI 13-17 MAGGIO: meeting hand-picked distribuiti nei 5 giorni — partner, investitori, alleati locali",
+    "Sprint pre-finestra (Ven 8 → Mar 12): wire AddPOI Plesk + slide demo + dry-run + dress rehearsal",
+    "T7 Plesk: wire AddPOI della demo HTML al endpoint upload.php (file picker → multipart POST con JWT Supabase) + scrittura riga in tabella media post-upload",
+    "T8 Expo: testare l'app scaffold su Expo Go device fisico — login Google + mappa base + AddPOI < 90s",
+    "Commit + push dei file untracked su GitHub acastagna/poi-love (index.html, itinerari.html, prototype, SAL, SAL-data.json)",
+    "Post-finestra (18 Mag → Giugno): iterazione su feedback partner, accordi locali Tirana, evento di lancio fisico Giugno"
+  ]
+}

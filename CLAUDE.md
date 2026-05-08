@@ -3,6 +3,26 @@
 
 ---
 
+## ⚡ Aggiornamento 2026-05-08 — Architettura a 4 sotto-domini
+
+**IMPORTANTE:** L'architettura è stata divisa in 4 ambiti separati. NON è più "tutto in `web/`".
+
+| URL | Cartella repo | Cosa contiene |
+|---|---|---|
+| **poilove.com** | `web/` | 📄 Presentazione del progetto (v9 17:09 · PDF v5 + notarizzazione SHA-256) |
+| **poilove.com/dev/**, `/v2/`, `/preview/` … | `web/dev/`, `web/v2/`, `web/preview/` … | versioni in sviluppo (sotto-livelli del dominio principale) |
+| **demo.poilove.com** | `demo/` | ⭐ versione **ufficiale blessed** della webapp |
+| **sal.poilove.com** | `sal/` | SAL — Stato Avanzamento Lavori (per investitori/partner) |
+| **media.poilove.com** | `plesk-media-server/` | Media server PHP (foto upload) |
+
+**Workflow di promozione**: una versione WIP gira in `web/<nome>/` → quando approvata, la copiamo in `demo/` (il `cp -r web/wip/* demo/` poi `git push` poi su Plesk → `Pull updates`).
+
+**Deploy**: passato da GitHub Actions auto-deploy → **Plesk Git pull manuale**. I workflow `deploy-web.yml` e `pages.yml` sono in `workflow_dispatch only` (non scattano da soli al push). Setup Plesk dettagliato in `PLESK-GITHUB-DEPLOY.md`.
+
+Vedi la sezione **Struttura del repository** sotto per la mappa file aggiornata.
+
+---
+
 ## Identità progetto
 
 **POI•LOVE** è una mappa comunitaria dei luoghi amati — un'alternativa umana e culturale a Google Maps. Primo lancio: **Tirana, Albania — giugno 2026**. Framework open source: **Cultural Bridge OS** (MIT).

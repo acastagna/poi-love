@@ -1,11 +1,12 @@
 name: Deploy GitHub Pages
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'web/**'
-      - '.github/workflows/pages.yml'
+  # Auto-deploy GitHub Pages DISATTIVATO 2026-05-08. Si lancia solo su richiesta.
+  # push:
+  #   branches: [main]
+  #   paths:
+  #     - 'web/**'
+  #     - '.github/workflows/pages.yml'
   workflow_dispatch:
 
 permissions:

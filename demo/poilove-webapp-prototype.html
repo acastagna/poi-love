@@ -1,0 +1,2172 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>POI•LOVE — Webapp Prototype</title>
+
+<!-- Phosphor Icons v2.1.1 -->
+<script src="https://unpkg.com/@phosphor-icons/web@2.1.1/src/index.js"></script>
+
+<!-- React 18 from CDN -->
+<script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<style>
+  /* ============================================================
+     DESIGN TOKENS — POI•LOVE Brand
+  ============================================================ */
+  :root {
+    --red:       #D42B2B;
+    --red-dark:  #A82020;
+    --red-light: #F5DADA;
+    --blue:      #285EA7;
+    --blue-dark: #1C4378;
+    --blue-light:#DCE9F8;
+    --bg:        #EAE4D8;
+    --bg-card:   #F5F1E8;
+    --bg-dark:   #D8D0C0;
+    --text:      #1A1A1A;
+    --text-sub:  #6B6560;
+    --text-inv:  #FFFFFF;
+    --border:    #C8C0B0;
+    --shadow:    0 2px 12px rgba(0,0,0,0.10);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.15);
+    --radius:    14px;
+    --radius-sm: 8px;
+    --nav-h:     72px;
+    --header-h:  56px;
+    --font:      'Georgia', serif;
+    --font-ui:   -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  html, body, #root {
+    width: 100%; height: 100%;
+    background: var(--bg);
+    font-family: var(--font-ui);
+    color: var(--text);
+    overflow: hidden;
+  }
+
+  /* ============================================================
+     LAYOUT SHELL
+  ============================================================ */
+  .app-shell {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    max-width: 430px;
+    margin: 0 auto;
+    background: var(--bg);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 40px rgba(0,0,0,0.12);
+  }
+
+  /* Screen container */
+  .screen {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    position: relative;
+  }
+
+  .screen.no-scroll { overflow: hidden; }
+
+  /* ============================================================
+     HEADER
+  ============================================================ */
+  .header {
+    height: var(--header-h);
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 12px;
+    position: relative;
+    z-index: 10;
+    flex-shrink: 0;
+  }
+
+  .header-title {
+    font-family: var(--font);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    flex: 1;
+  }
+
+  .header-logo {
+    height: 32px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .logo-dot {
+    width: 28px; height: 28px;
+    background: var(--red);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .logo-text {
+    font-family: var(--font);
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+
+  .logo-text span { color: var(--red); }
+
+  .btn-icon {
+    width: 40px; height: 40px;
+    border: none; background: transparent;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; cursor: pointer;
+    color: var(--text);
+    transition: background 0.15s;
+  }
+  .btn-icon:active { background: var(--bg-dark); }
+
+  /* ============================================================
+     BOTTOM NAV
+  ============================================================ */
+  .bottom-nav {
+    height: var(--nav-h);
+    background: var(--bg-card);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0 8px;
+    padding-bottom: env(safe-area-inset-bottom);
+    flex-shrink: 0;
+    position: relative;
+    z-index: 10;
+  }
+
+  .nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 8px 4px;
+    border: none; background: transparent;
+    cursor: pointer;
+    color: var(--text-sub);
+    font-size: 10px;
+    font-family: var(--font-ui);
+    transition: color 0.15s;
+    border-radius: var(--radius-sm);
+  }
+
+  .nav-item.active { color: var(--red); }
+  .nav-item:active { background: var(--bg-dark); }
+
+  /* FAB center button */
+  .nav-fab {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: var(--red);
+    border: 3px solid var(--bg-card);
+    color: white;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    box-shadow: var(--shadow-lg);
+    transition: transform 0.15s, background 0.15s;
+    flex-shrink: 0;
+    margin-top: -16px;
+  }
+  .nav-fab:active { transform: scale(0.92); background: var(--red-dark); }
+
+  /* ============================================================
+     BUTTONS
+  ============================================================ */
+  .btn {
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px;
+    padding: 14px 24px;
+    border-radius: var(--radius);
+    border: none; cursor: pointer;
+    font-size: 15px; font-weight: 600;
+    font-family: var(--font-ui);
+    transition: all 0.15s;
+    width: 100%;
+  }
+
+  .btn-primary {
+    background: var(--red);
+    color: white;
+  }
+  .btn-primary:active { background: var(--red-dark); transform: scale(0.98); }
+
+  .btn-secondary {
+    background: var(--bg-card);
+    color: var(--text);
+    border: 1.5px solid var(--border);
+  }
+  .btn-secondary:active { background: var(--bg-dark); }
+
+  .btn-blue {
+    background: var(--blue);
+    color: white;
+  }
+  .btn-blue:active { background: var(--blue-dark); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-sub);
+    padding: 10px 16px;
+    width: auto;
+  }
+
+  /* ============================================================
+     CARDS
+  ============================================================ */
+  .card {
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .poi-card {
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .poi-card:active { transform: scale(0.98); box-shadow: none; }
+
+  .poi-card-img {
+    width: 100%; height: 160px;
+    object-fit: cover;
+    background: var(--bg-dark);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-sub);
+    font-size: 40px;
+  }
+
+  .poi-card-body { padding: 12px; }
+  .poi-card-name { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .poi-card-desc { font-size: 12px; color: var(--text-sub); line-height: 1.4; margin-bottom: 8px; }
+
+  .poi-card-meta {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .tag-pill {
+    font-size: 11px; font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 20px;
+    background: var(--red-light);
+    color: var(--red-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .love-count {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 13px; font-weight: 600;
+    color: var(--red);
+  }
+
+  /* ============================================================
+     SPLASH SCREEN
+  ============================================================ */
+  .splash {
+    height: 100%;
+    background: linear-gradient(160deg, #1A1A1A 0%, #2C1010 60%, #D42B2B 100%);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 40px 32px;
+    gap: 0;
+  }
+
+  .splash-logo {
+    margin-bottom: 24px;
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+  }
+
+  .splash-icon {
+    width: 80px; height: 80px;
+    background: var(--red);
+    border-radius: 24px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 8px 32px rgba(212,43,43,0.5);
+  }
+
+  .splash-brand {
+    font-family: var(--font);
+    font-size: 36px;
+    font-weight: 700;
+    color: white;
+    letter-spacing: 1px;
+  }
+
+  .splash-brand span { color: var(--red); }
+
+  .splash-tagline {
+    font-size: 16px;
+    color: rgba(255,255,255,0.75);
+    text-align: center;
+    line-height: 1.5;
+    margin-bottom: 48px;
+    font-style: italic;
+  }
+
+  .splash-cta { width: 100%; display: flex; flex-direction: column; gap: 12px; }
+
+  .splash-btn-google {
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+    background: white;
+    color: #1A1A1A;
+    font-weight: 700; font-size: 15px;
+    padding: 15px 24px;
+    border-radius: var(--radius);
+    border: none; cursor: pointer;
+    width: 100%;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    transition: transform 0.15s;
+  }
+  .splash-btn-google:active { transform: scale(0.97); }
+
+  .google-g {
+    width: 22px; height: 22px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z' fill='%234285F4'/%3E%3Cpath d='M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z' fill='%2334A853'/%3E%3Cpath d='M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z' fill='%23FBBC05'/%3E%3Cpath d='M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z' fill='%23EA4335'/%3E%3C/svg%3E") center/contain no-repeat;
+  }
+
+  .splash-skip {
+    color: rgba(255,255,255,0.5);
+    font-size: 13px;
+    text-align: center;
+    cursor: pointer;
+    padding: 8px;
+  }
+  .splash-skip:active { color: white; }
+
+  /* ============================================================
+     MAP SCREEN
+  ============================================================ */
+  .map-container {
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .map-bg {
+    position: absolute; inset: 0;
+    background:
+      linear-gradient(rgba(200,210,180,0.3) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(200,210,180,0.3) 1px, transparent 1px),
+      linear-gradient(135deg, #C8D4A8 0%, #B8CCA0 25%, #D4C4A0 50%, #C0B890 75%, #BCC8A4 100%);
+    background-size: 40px 40px, 40px 40px, 100% 100%;
+  }
+
+  /* Simulated roads */
+  .map-road {
+    position: absolute;
+    background: rgba(255,255,255,0.7);
+    border-radius: 2px;
+  }
+
+  .map-search-bar {
+    position: absolute;
+    top: 12px; left: 12px; right: 12px;
+    z-index: 5;
+  }
+
+  .search-input-wrap {
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    display: flex; align-items: center;
+    padding: 0 16px;
+    gap: 10px;
+    height: 48px;
+  }
+
+  .search-input {
+    flex: 1; border: none; outline: none;
+    font-size: 15px; font-family: var(--font-ui);
+    color: var(--text);
+    background: transparent;
+  }
+
+  .search-input::placeholder { color: var(--text-sub); }
+
+  .map-poi-marker {
+    position: absolute;
+    display: flex; flex-direction: column; align-items: center;
+    cursor: pointer;
+    transform: translate(-50%, -100%);
+    transition: transform 0.15s;
+  }
+  .map-poi-marker:active { transform: translate(-50%, -100%) scale(1.15); }
+
+  .marker-bubble {
+    background: var(--red);
+    color: white;
+    border-radius: 20px;
+    padding: 5px 10px;
+    font-size: 11px; font-weight: 700;
+    white-space: nowrap;
+    box-shadow: var(--shadow);
+    display: flex; align-items: center; gap: 4px;
+  }
+  .marker-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -7px; left: 50%;
+    transform: translateX(-50%);
+    border: 4px solid transparent;
+    border-top-color: var(--red);
+    border-bottom: none;
+  }
+
+  .marker-heart {
+    width: 32px; height: 32px;
+    background: var(--red);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: var(--shadow);
+    color: white;
+    font-size: 16px;
+  }
+
+  .map-filters {
+    position: absolute;
+    top: 72px; left: 12px; right: 12px;
+    z-index: 5;
+    display: flex; gap: 8px; overflow-x: auto;
+    scrollbar-width: none; padding-bottom: 4px;
+  }
+  .map-filters::-webkit-scrollbar { display: none; }
+
+  .filter-chip {
+    white-space: nowrap;
+    padding: 6px 14px;
+    border-radius: 20px;
+    background: white;
+    border: 1.5px solid var(--border);
+    font-size: 12px; font-weight: 600;
+    cursor: pointer;
+    color: var(--text);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    display: flex; align-items: center; gap: 5px;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+  .filter-chip.active { background: var(--red); color: white; border-color: var(--red); }
+
+  .map-controls {
+    position: absolute;
+    right: 12px; bottom: 24px;
+    display: flex; flex-direction: column; gap: 8px;
+    z-index: 5;
+  }
+
+  .map-ctrl-btn {
+    width: 44px; height: 44px;
+    background: white;
+    border-radius: 50%;
+    border: none;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    color: var(--text);
+  }
+  .map-ctrl-btn:active { background: var(--bg-dark); }
+
+  /* POI preview card on map */
+  .map-poi-preview {
+    position: absolute;
+    bottom: 16px; left: 12px; right: 12px;
+    z-index: 8;
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    overflow: hidden;
+    cursor: pointer;
+  }
+
+  .map-poi-preview-img {
+    width: 80px; height: 80px;
+    background: var(--bg-dark);
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+  }
+
+  .map-poi-preview-info {
+    flex: 1; padding: 10px 12px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+
+  /* ============================================================
+     ADD POI WIZARD
+  ============================================================ */
+  .wizard-header {
+    background: var(--bg-card);
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .wizard-steps {
+    display: flex; gap: 6px; margin-bottom: 12px;
+  }
+
+  .wizard-step {
+    flex: 1; height: 4px;
+    background: var(--bg-dark);
+    border-radius: 2px;
+    transition: background 0.3s;
+  }
+  .wizard-step.done { background: var(--red); }
+  .wizard-step.active { background: var(--red); opacity: 0.5; }
+
+  .wizard-label {
+    font-size: 12px; font-weight: 700;
+    color: var(--red);
+    text-transform: uppercase; letter-spacing: 0.8px;
+  }
+
+  .wizard-title {
+    font-size: 20px; font-weight: 700;
+    font-family: var(--font);
+    margin-top: 4px;
+  }
+
+  .wizard-body { padding: 20px 16px; }
+
+  /* Location step */
+  .location-map-preview {
+    width: 100%; height: 180px;
+    border-radius: var(--radius);
+    background:
+      linear-gradient(rgba(200,210,180,0.3) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(200,210,180,0.3) 1px, transparent 1px),
+      linear-gradient(135deg, #C8D4A8 0%, #B8CCA0 50%, #D4C4A0 100%);
+    background-size: 30px 30px, 30px 30px, 100% 100%;
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+
+  .location-pin {
+    display: flex; flex-direction: column; align-items: center;
+  }
+
+  .location-pin-head {
+    width: 32px; height: 32px;
+    background: var(--red);
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    box-shadow: 0 2px 8px rgba(212,43,43,0.5);
+  }
+
+  .location-address {
+    background: white;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    display: flex; align-items: center; gap: 10px;
+    color: var(--text);
+    font-size: 14px;
+    margin-bottom: 12px;
+    cursor: pointer;
+  }
+
+  /* Photo step */
+  .photo-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .photo-slot {
+    aspect-ratio: 1;
+    border-radius: var(--radius-sm);
+    border: 2px dashed var(--border);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    color: var(--text-sub);
+    font-size: 11px;
+    font-weight: 600;
+    background: var(--bg);
+    transition: border-color 0.15s, background 0.15s;
+    overflow: hidden;
+    position: relative;
+  }
+  .photo-slot.filled { border-style: solid; border-color: var(--border); }
+  .photo-slot:active { background: var(--bg-dark); border-color: var(--red); }
+
+  .photo-filled-overlay {
+    position: absolute; inset: 0;
+    display: flex; align-items: flex-end; justify-content: flex-end;
+    padding: 4px;
+  }
+
+  /* Details step */
+  .textarea-field {
+    width: 100%;
+    background: white;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    font-size: 14px; font-family: var(--font-ui);
+    color: var(--text);
+    resize: none;
+    outline: none;
+    transition: border-color 0.15s;
+    line-height: 1.5;
+  }
+  .textarea-field:focus { border-color: var(--red); }
+
+  .char-counter {
+    text-align: right;
+    font-size: 11px;
+    color: var(--text-sub);
+    margin-top: 4px;
+    margin-bottom: 16px;
+  }
+
+  .tags-wrap {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .tag-btn {
+    padding: 7px 14px;
+    border-radius: 20px;
+    border: 1.5px solid var(--border);
+    background: var(--bg);
+    font-size: 12px; font-weight: 600;
+    cursor: pointer;
+    color: var(--text-sub);
+    transition: all 0.15s;
+  }
+  .tag-btn.selected { background: var(--red); color: white; border-color: var(--red); }
+
+  .visibility-options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
+
+  .vis-option {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--border);
+    background: var(--bg);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .vis-option.selected { border-color: var(--red); background: var(--red-light); }
+  .vis-option-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .vis-option-text { flex: 1; }
+  .vis-option-title { font-size: 14px; font-weight: 700; }
+  .vis-option-desc { font-size: 12px; color: var(--text-sub); margin-top: 2px; }
+
+  /* ============================================================
+     POI DETAIL SCREEN
+  ============================================================ */
+  .detail-photos {
+    display: flex; overflow-x: auto; scroll-snap-type: x mandatory;
+    scrollbar-width: none; height: 260px;
+  }
+  .detail-photos::-webkit-scrollbar { display: none; }
+
+  .detail-photo {
+    width: 100%; height: 260px;
+    flex-shrink: 0;
+    scroll-snap-align: start;
+    background: var(--bg-dark);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 60px;
+  }
+
+  .photo-dots {
+    display: flex; justify-content: center; gap: 6px;
+    padding: 10px 0 4px;
+  }
+  .photo-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--bg-dark); }
+  .photo-dot.active { background: var(--red); }
+
+  .detail-body { padding: 16px; }
+
+  .detail-header {
+    display: flex; align-items: flex-start; gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .detail-title {
+    flex: 1;
+    font-family: var(--font);
+    font-size: 22px; font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .love-btn {
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    border: none; background: transparent; cursor: pointer;
+    padding: 8px;
+    transition: transform 0.15s;
+  }
+  .love-btn:active { transform: scale(1.2); }
+  .love-btn-count { font-size: 12px; font-weight: 700; color: var(--red); }
+
+  .detail-meta {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .detail-desc {
+    font-size: 14px; color: var(--text);
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+
+  .detail-author {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px;
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+    margin-bottom: 16px;
+  }
+
+  .avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--blue);
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: 700; font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .detail-actions {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 10px; margin-bottom: 16px;
+  }
+
+  .detail-action-btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 12px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--border);
+    background: var(--bg);
+    font-size: 13px; font-weight: 600;
+    cursor: pointer; color: var(--text);
+    transition: background 0.15s;
+  }
+  .detail-action-btn:active { background: var(--bg-dark); }
+
+  /* ============================================================
+     EXPLORE SCREEN
+  ============================================================ */
+  .section-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 16px 8px;
+  }
+
+  .section-title {
+    font-family: var(--font);
+    font-size: 18px; font-weight: 700;
+  }
+
+  .section-more {
+    font-size: 13px; color: var(--red); font-weight: 600;
+    cursor: pointer;
+  }
+
+  .featured-scroll {
+    display: flex; gap: 12px;
+    padding: 0 16px 16px;
+    overflow-x: auto; scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+  .featured-scroll::-webkit-scrollbar { display: none; }
+
+  .featured-card {
+    width: 200px; flex-shrink: 0;
+    scroll-snap-align: start;
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    background: var(--bg-card);
+    transition: transform 0.15s;
+  }
+  .featured-card:active { transform: scale(0.97); }
+
+  .featured-img {
+    height: 120px; background: var(--bg-dark);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 36px;
+  }
+
+  .featured-info { padding: 10px; }
+  .featured-name { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .featured-sub { font-size: 11px; color: var(--text-sub); }
+
+  .poi-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding: 0 16px 16px;
+  }
+
+  /* ============================================================
+     LISTS SCREEN
+  ============================================================ */
+  .list-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    background: var(--bg-card);
+    transition: background 0.15s;
+  }
+  .list-item:first-child { border-radius: var(--radius) var(--radius) 0 0; }
+  .list-item:last-child { border-bottom: none; border-radius: 0 0 var(--radius) var(--radius); }
+  .list-item:active { background: var(--bg-dark); }
+
+  .list-icon {
+    width: 44px; height: 44px;
+    border-radius: var(--radius-sm);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    font-size: 20px;
+  }
+
+  .list-info { flex: 1; }
+  .list-name { font-size: 15px; font-weight: 700; margin-bottom: 3px; }
+  .list-sub { font-size: 12px; color: var(--text-sub); }
+
+  .vis-badge {
+    font-size: 10px; font-weight: 700;
+    padding: 3px 8px; border-radius: 10px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .vis-badge.private { background: var(--bg-dark); color: var(--text-sub); }
+  .vis-badge.public { background: var(--blue-light); color: var(--blue); }
+  .vis-badge.community { background: var(--red-light); color: var(--red-dark); }
+
+  /* ============================================================
+     PROFILE SCREEN
+  ============================================================ */
+  .profile-hero {
+    background: linear-gradient(160deg, var(--red) 0%, var(--red-dark) 100%);
+    padding: 32px 20px 24px;
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    color: white;
+  }
+
+  .profile-avatar {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    border: 3px solid white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; font-weight: 700; color: white;
+  }
+
+  .profile-name { font-size: 20px; font-weight: 700; font-family: var(--font); }
+  .profile-email { font-size: 13px; opacity: 0.8; }
+
+  .profile-stats {
+    display: flex; justify-content: space-around;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 0;
+  }
+
+  .stat-item { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  .stat-num { font-size: 22px; font-weight: 700; color: var(--red); font-family: var(--font); }
+  .stat-label { font-size: 11px; color: var(--text-sub); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* ============================================================
+     SETTINGS SCREEN
+  ============================================================ */
+  .settings-section { margin: 16px 16px 0; }
+  .settings-section-title {
+    font-size: 11px; font-weight: 700;
+    color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.8px;
+    margin-bottom: 8px; padding-left: 4px;
+  }
+
+  .settings-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 14px;
+    background: var(--bg-card);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .settings-item:not(:last-child) { border-bottom: 1px solid var(--border); }
+  .settings-item:first-child { border-radius: var(--radius) var(--radius) 0 0; }
+  .settings-item:last-child { border-radius: 0 0 var(--radius) var(--radius); }
+  .settings-item:only-child { border-radius: var(--radius); }
+  .settings-item:active { background: var(--bg-dark); }
+  .settings-item-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .settings-item-text { flex: 1; }
+  .settings-item-title { font-size: 15px; font-weight: 600; }
+  .settings-item-sub { font-size: 12px; color: var(--text-sub); margin-top: 1px; }
+
+  .lang-selector {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    padding: 12px 14px;
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    margin: 16px 16px 0;
+  }
+
+  .lang-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 14px;
+    border-radius: 20px;
+    border: 1.5px solid var(--border);
+    background: var(--bg);
+    font-size: 13px; font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .lang-btn.active { background: var(--blue); color: white; border-color: var(--blue); }
+
+  /* ============================================================
+     SHEET OVERLAY
+  ============================================================ */
+  .overlay {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 20;
+    display: flex; align-items: flex-end;
+  }
+
+  .sheet {
+    width: 100%;
+    background: var(--bg-card);
+    border-radius: var(--radius) var(--radius) 0 0;
+    max-height: 90%;
+    overflow-y: auto;
+  }
+
+  .sheet-handle {
+    width: 36px; height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin: 12px auto 0;
+  }
+
+  /* ============================================================
+     MISC UTILITIES
+  ============================================================ */
+  .divider { height: 1px; background: var(--border); margin: 8px 0; }
+  .spacer { flex: 1; }
+
+  .section-label {
+    font-size: 11px; font-weight: 700;
+    color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.8px;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .input-field {
+    width: 100%;
+    background: white;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    font-size: 14px; font-family: var(--font-ui);
+    color: var(--text);
+    outline: none;
+    margin-bottom: 16px;
+    transition: border-color 0.15s;
+  }
+  .input-field:focus { border-color: var(--red); }
+
+  /* Notification dot */
+  .notif-dot {
+    width: 8px; height: 8px;
+    background: var(--red);
+    border-radius: 50%;
+    position: absolute; top: 8px; right: 8px;
+  }
+
+  /* Success screen */
+  .success-screen {
+    height: 100%;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 40px 32px;
+    gap: 16px; text-align: center;
+  }
+
+  .success-icon {
+    width: 80px; height: 80px;
+    background: var(--red-light);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 36px;
+  }
+
+  .success-title {
+    font-family: var(--font);
+    font-size: 24px; font-weight: 700;
+  }
+
+  .success-sub {
+    font-size: 15px; color: var(--text-sub);
+    line-height: 1.5;
+  }
+
+  /* Transition animation */
+  @keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+  @keyframes slideUp {
+    from { transform: translateY(30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .slide-in { animation: slideIn 0.25s ease-out; }
+  .slide-up { animation: slideUp 0.25s ease-out; }
+
+  /* Scrollable page padding bottom */
+  .page-content { padding-bottom: 16px; }
+
+  /* Empty state */
+  .empty-state {
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    padding: 48px 32px; text-align: center;
+  }
+  .empty-icon { font-size: 48px; opacity: 0.3; }
+  .empty-title { font-size: 17px; font-weight: 700; }
+  .empty-sub { font-size: 14px; color: var(--text-sub); line-height: 1.5; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useCallback, useRef, useEffect } = React;
+
+/* ============================================================
+   TRANSLATIONS — IT / SQ / EN
+============================================================ */
+const detectLang = () => {
+  const l = navigator.language || 'en';
+  if (l.startsWith('it')) return 'it';
+  if (l.startsWith('sq') || l.startsWith('al')) return 'sq';
+  return 'en';
+};
+
+const T = {
+  it: {
+    tagline: 'Scopri i luoghi amati dalla comunità',
+    loginGoogle: 'Continua con Google',
+    skipDemo: 'Esplora come ospite',
+    map: 'Mappa', explore: 'Esplora', add: 'Aggiungi', lists: 'Liste', profile: 'Profilo',
+    searchPlaceholder: 'Cerca un luogo...',
+    allFilter: 'Tutti', restaurantFilter: 'Ristoranti', cultureFilter: 'Cultura', natureFilter: 'Natura', hiddenFilter: 'Nascosti',
+    addPOI: 'Aggiungi un POI',
+    step1Title: 'Dove si trova?', step1Label: 'PASSO 1 DI 3 — POSIZIONE',
+    step2Title: 'Foto del luogo', step2Label: 'PASSO 2 DI 3 — FOTO',
+    step3Title: 'Raccontalo', step3Label: 'PASSO 3 DI 3 — DETTAGLI',
+    descPlaceholder: 'Cosa rende speciale questo luogo? (max 200 caratteri)',
+    locationLabel: 'Via Ismail Qemali 42, Tirana',
+    useLocation: 'Usa la mia posizione',
+    changeLocation: 'Cambia posizione',
+    addPhotos: 'Aggiungi foto',
+    selectTag: 'Seleziona un tag',
+    visibility: 'Visibilità',
+    visPrivate: 'Privato', visPrivateDesc: 'Solo tu puoi vederlo',
+    visCommunity: 'Community', visCommunityDesc: 'Visibile a tutti su POI•LOVE',
+    visGoogle: 'Suggerisci a Google', visGoogleDesc: 'Proposto come luogo su Google Maps',
+    publish: 'Pubblica POI',
+    successTitle: 'POI pubblicato!',
+    successSub: 'Il tuo luogo è ora visibile sulla mappa della community.',
+    backToMap: 'Torna alla mappa',
+    trending: 'In tendenza', featured: 'Liste in evidenza',
+    myLists: 'Le mie liste', newList: 'Nuova lista',
+    myPOIs: 'I miei POI', loved: 'Amati', contributions: 'Contributi',
+    settings: 'Impostazioni',
+    language: 'Lingua', account: 'Account', notifications: 'Notifiche',
+    privacy: 'Privacy', about: 'Chi siamo', logout: 'Esci',
+    addToList: 'Aggiungi a lista',
+    shareBtn: 'Condividi',
+    directionsBtn: 'Indicazioni',
+    love: 'Ama',
+    postedBy: 'Aggiunto da',
+    poi_count: 'POI',
+    loves_count: 'Amori',
+    lists_count: 'Liste',
+    langName: 'Italiano',
+    noLists: 'Nessuna lista ancora',
+    noListsSub: 'Crea la tua prima lista di luoghi amati',
+    createList: 'Crea lista',
+    back: 'Indietro',
+    next: 'Avanti',
+    save: 'Salva',
+    photoRequired: 'Aggiungi almeno una foto',
+  },
+  sq: {
+    tagline: 'Zbulo vendet e dashura nga komuniteti',
+    loginGoogle: 'Vazhdo me Google',
+    skipDemo: 'Eksploro si mysafir',
+    map: 'Harta', explore: 'Eksploro', add: 'Shto', lists: 'Lista', profile: 'Profili',
+    searchPlaceholder: 'Kërko një vend...',
+    allFilter: 'Të gjitha', restaurantFilter: 'Restorante', cultureFilter: 'Kulturë', natureFilter: 'Natyrë', hiddenFilter: 'Të fshehura',
+    addPOI: 'Shto një POI',
+    step1Title: 'Ku ndodhet?', step1Label: 'HAPI 1 NGA 3 — VENDNDODHJA',
+    step2Title: 'Foto të vendit', step2Label: 'HAPI 2 NGA 3 — FOTO',
+    step3Title: 'Trego historinë', step3Label: 'HAPI 3 NGA 3 — DETAJET',
+    descPlaceholder: 'Çfarë e bën të veçantë këtë vend? (maks 200 karaktere)',
+    locationLabel: 'Rruga Ismail Qemali 42, Tiranë',
+    useLocation: 'Përdor vendndodhjen time',
+    changeLocation: 'Ndrysho vendndodhjen',
+    addPhotos: 'Shto foto',
+    selectTag: 'Zgjidh një etiketë',
+    visibility: 'Dukshmëria',
+    visPrivate: 'Privat', visPrivateDesc: 'Vetëm ti mund ta shohësh',
+    visCommunity: 'Komunitet', visCommunityDesc: 'E dukshme për të gjithë në POI•LOVE',
+    visGoogle: 'Sugjero në Google', visGoogleDesc: 'Propozuar si vend në Google Maps',
+    publish: 'Publiko POI',
+    successTitle: 'POI u publikua!',
+    successSub: 'Vendi yt tani është i dukshëm në hartën e komunitetit.',
+    backToMap: 'Kthehu te harta',
+    trending: 'Në trend', featured: 'Lista të veçanta',
+    myLists: 'Listat e mia', newList: 'Listë e re',
+    myPOIs: 'POI-të e mia', loved: 'Të dashura', contributions: 'Kontribute',
+    settings: 'Cilësimet',
+    language: 'Gjuha', account: 'Llogaria', notifications: 'Njoftimet',
+    privacy: 'Privatësia', about: 'Rreth nesh', logout: 'Dil',
+    addToList: 'Shto në listë',
+    shareBtn: 'Ndaj',
+    directionsBtn: 'Udhëzime',
+    love: 'Dua',
+    postedBy: 'Shtuar nga',
+    poi_count: 'POI',
+    loves_count: 'Dashuri',
+    lists_count: 'Lista',
+    langName: 'Shqip',
+    noLists: 'Asnjë listë akoma',
+    noListsSub: 'Krijo listën tënde të parë të vendeve të dashura',
+    createList: 'Krijo listë',
+    back: 'Kthehu',
+    next: 'Tjetër',
+    save: 'Ruaj',
+    photoRequired: 'Shto të paktën një foto',
+  },
+  en: {
+    tagline: 'Discover places loved by your community',
+    loginGoogle: 'Continue with Google',
+    skipDemo: 'Explore as guest',
+    map: 'Map', explore: 'Explore', add: 'Add', lists: 'Lists', profile: 'Profile',
+    searchPlaceholder: 'Search a place...',
+    allFilter: 'All', restaurantFilter: 'Restaurants', cultureFilter: 'Culture', natureFilter: 'Nature', hiddenFilter: 'Hidden',
+    addPOI: 'Add a POI',
+    step1Title: 'Where is it?', step1Label: 'STEP 1 OF 3 — LOCATION',
+    step2Title: 'Place photos', step2Label: 'STEP 2 OF 3 — PHOTOS',
+    step3Title: 'Tell the story', step3Label: 'STEP 3 OF 3 — DETAILS',
+    descPlaceholder: 'What makes this place special? (max 200 characters)',
+    locationLabel: 'Ismail Qemali St 42, Tirana',
+    useLocation: 'Use my location',
+    changeLocation: 'Change location',
+    addPhotos: 'Add photos',
+    selectTag: 'Select a tag',
+    visibility: 'Visibility',
+    visPrivate: 'Private', visPrivateDesc: 'Only you can see it',
+    visCommunity: 'Community', visCommunityDesc: 'Visible to everyone on POI•LOVE',
+    visGoogle: 'Suggest to Google', visGoogleDesc: 'Proposed as a place on Google Maps',
+    publish: 'Publish POI',
+    successTitle: 'POI published!',
+    successSub: 'Your place is now visible on the community map.',
+    backToMap: 'Back to map',
+    trending: 'Trending', featured: 'Featured lists',
+    myLists: 'My lists', newList: 'New list',
+    myPOIs: 'My POIs', loved: 'Loved', contributions: 'Contributions',
+    settings: 'Settings',
+    language: 'Language', account: 'Account', notifications: 'Notifications',
+    privacy: 'Privacy', about: 'About us', logout: 'Sign out',
+    addToList: 'Add to list',
+    shareBtn: 'Share',
+    directionsBtn: 'Directions',
+    love: 'Love',
+    postedBy: 'Added by',
+    poi_count: 'POIs',
+    loves_count: 'Loves',
+    lists_count: 'Lists',
+    langName: 'English',
+    noLists: 'No lists yet',
+    noListsSub: 'Create your first list of loved places',
+    createList: 'Create list',
+    back: 'Back',
+    next: 'Next',
+    save: 'Save',
+    photoRequired: 'Add at least one photo',
+  }
+};
+
+/* ============================================================
+   MOCK DATA
+============================================================ */
+const MOCK_POIS = [
+  { id:1, name:'Oda Restaurant', emoji:'🍽️', tag:'restaurant', desc:'Il ristorante più autentico di Tirana. Cucina albanese tradizionale in un cortile nascosto del centro.', loves:247, author:'Erion K.', authorInitial:'E', lat:41.33, lng:19.82, visibility:'community', photos:['🍽️','🏛️','🌿'] },
+  { id:2, name:'Liqeni i Tiranës', emoji:'🌊', tag:'nature', desc:'Il lago artificiale nel cuore del parco. Al tramonto diventa rosa e oro. Il posto migliore per correre.', loves:389, author:'Alessandro C.', authorInitial:'A', lat:41.32, lng:19.81, visibility:'community', photos:['🌊','🌅','🦆'] },
+  { id:3, name:'Bunk\'Art 2', emoji:'🏛️', tag:'culture', desc:'Il bunker di Enver Hoxha trasformato in museo. Un pezzo di storia che ti lascia senza parole.', loves:512, author:'Mirela D.', authorInitial:'M', lat:41.33, lng:19.83, visibility:'suggested_google', photos:['🏛️','🎨','💡'] },
+  { id:4, name:'Pazari i Ri', emoji:'☕', tag:'food', desc:'Il mercato nuovo. Caffè, frutta fresca, feta albanese. Vai di mattina presto per sentire i sapori veri.', loves:198, author:'Gent A.', authorInitial:'G', lat:41.34, lng:19.82, visibility:'community', photos:['☕','🥛','🫙'] },
+  { id:5, name:'Sky Tower Vista', emoji:'🌆', tag:'hidden', desc:'L\'ultimo piano dello Sky Tower è aperto al pubblico. Vista 360° su Tirana che pochissimi conoscono.', loves:156, author:'Alessandro C.', authorInitial:'A', lat:41.33, lng:19.82, visibility:'private', photos:['🌆','🌇','🏙️'] },
+  { id:6, name:'Mulliri i Vjetër', emoji:'🌿', tag:'nature', desc:'Il vecchio mulino fuori città. Un\'oasi verde raggiungibile in 20 minuti. Perfetto per il picnic.', loves:88, author:'Klaudia B.', authorInitial:'K', lat:41.31, lng:19.80, visibility:'community', photos:['🌿','💧','🦋'] },
+];
+
+const MOCK_LISTS = [
+  { id:1, name:'Tirana Nascosta', emoji:'🗝️', count:8, visibility:'public', desc:'I luoghi che i turisti non trovano mai' },
+  { id:2, name:'Caffè Perfetti', emoji:'☕', count:12, visibility:'public', desc:'I migliori caffè per lavorare o stare' },
+  { id:3, name:'Preferiti di Alessandro', emoji:'❤️', count:5, visibility:'private', desc:'La mia lista personale' },
+  { id:4, name:'Cibo Autentico', emoji:'🍽️', count:9, visibility:'community', desc:'Dove mangiare come un locale' },
+];
+
+const TAGS = ['restaurant','food','culture','nature','hidden','art','history','coffee','market','panorama'];
+const TAG_EMOJI = { restaurant:'🍽️', food:'🥘', culture:'🏛️', nature:'🌿', hidden:'🗝️', art:'🎨', history:'📜', coffee:'☕', market:'🛒', panorama:'🌄' };
+
+/* ============================================================
+   COMPONENTS
+============================================================ */
+
+/* Logo */
+const Logo = ({ small }) => (
+  <div className="header-logo">
+    <div className="logo-dot">
+      <i className="ph-fill ph-heart" style={{color:'white', fontSize: small ? 12 : 14}}></i>
+    </div>
+    <span className="logo-text">POI<span>•</span>LOVE</span>
+  </div>
+);
+
+/* Bottom Nav */
+const BottomNav = ({ active, onNav, onAdd }) => {
+  const t = React.useContext(LangContext);
+  return (
+    <nav className="bottom-nav">
+      <button className={`nav-item ${active==='map'?'active':''}`} onClick={()=>onNav('map')}>
+        <i className={`ph${active==='map'?'-fill':''} ph-map-trifold`} style={{fontSize:22}}></i>
+        <span>{t.map}</span>
+      </button>
+      <button className={`nav-item ${active==='explore'?'active':''}`} onClick={()=>onNav('explore')}>
+        <i className={`ph${active==='explore'?'-fill':''} ph-compass`} style={{fontSize:22}}></i>
+        <span>{t.explore}</span>
+      </button>
+      <button className="nav-fab" onClick={onAdd}>
+        <i className="ph ph-plus" style={{fontSize:26, color:'white'}}></i>
+      </button>
+      <button className={`nav-item ${active==='lists'?'active':''}`} onClick={()=>onNav('lists')}>
+        <i className={`ph${active==='lists'?'-fill':''} ph-list-heart`} style={{fontSize:22}}></i>
+        <span>{t.lists}</span>
+      </button>
+      <button className={`nav-item ${active==='profile'?'active':''}`} onClick={()=>onNav('profile')}>
+        <i className={`ph${active==='profile'?'-fill':''} ph-user-circle`} style={{fontSize:22}}></i>
+        <span>{t.profile}</span>
+      </button>
+    </nav>
+  );
+};
+
+/* POI Card */
+const POICard = ({ poi, onClick }) => {
+  const [loved, setLoved] = useState(false);
+  return (
+    <div className="poi-card" onClick={onClick}>
+      <div className="poi-card-img">{poi.emoji}</div>
+      <div className="poi-card-body">
+        <div className="poi-card-name">{poi.name}</div>
+        <div className="poi-card-desc">{poi.desc.substring(0,80)}...</div>
+        <div className="poi-card-meta">
+          <span className="tag-pill">{poi.tag}</span>
+          <span className="love-count">
+            <i className="ph-fill ph-heart" style={{fontSize:14}}></i>
+            {poi.loves + (loved?1:0)}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ============================================================
+   SCREENS
+============================================================ */
+
+/* 1. SPLASH */
+const SplashScreen = ({ onLogin }) => {
+  const t = React.useContext(LangContext);
+  return (
+    <div className="splash">
+      <div className="splash-logo">
+        <div className="splash-icon">
+          <i className="ph-fill ph-heart" style={{fontSize:40, color:'white'}}></i>
+        </div>
+        <div className="splash-brand">POI<span>•</span>LOVE</div>
+      </div>
+      <div className="splash-tagline">{t.tagline}</div>
+      <div className="splash-cta">
+        <button className="splash-btn-google" onClick={()=>onLogin('google')}>
+          <div className="google-g"></div>
+          {t.loginGoogle}
+        </button>
+        <div className="splash-skip" onClick={()=>onLogin('guest')}>{t.skipDemo} →</div>
+      </div>
+    </div>
+  );
+};
+
+/* 2. MAP */
+const MapScreen = ({ onPOIClick, selectedPOI, setSelectedPOI }) => {
+  const t = React.useContext(LangContext);
+  const [filter, setFilter] = useState('all');
+
+  const filters = [
+    { key:'all', label: t.allFilter },
+    { key:'restaurant', label: t.restaurantFilter },
+    { key:'culture', label: t.cultureFilter },
+    { key:'nature', label: t.natureFilter },
+    { key:'hidden', label: t.hiddenFilter },
+  ];
+
+  const visiblePOIs = filter === 'all' ? MOCK_POIS : MOCK_POIS.filter(p => p.tag === filter || (filter==='restaurant' && p.tag==='food'));
+
+  // Marker positions (fake, visually spread on the bg)
+  const markerPositions = [
+    { top:'35%', left:'52%' },
+    { top:'55%', left:'38%' },
+    { top:'28%', left:'65%' },
+    { top:'62%', left:'60%' },
+    { top:'42%', left:'30%' },
+    { top:'70%', left:'45%' },
+  ];
+
+  return (
+    <div className="map-container">
+      <div className="map-bg">
+        {/* Simulated roads */}
+        <div className="map-road" style={{width:'100%', height:8, top:'50%', transform:'translateY(-50%)', opacity:0.7}}></div>
+        <div className="map-road" style={{width:6, height:'100%', left:'45%', opacity:0.7}}></div>
+        <div className="map-road" style={{width:'60%', height:6, top:'30%', left:'20%', transform:'rotate(-5deg)', opacity:0.5}}></div>
+        <div className="map-road" style={{width:'40%', height:5, top:'65%', left:'30%', transform:'rotate(3deg)', opacity:0.5}}></div>
+        <div className="map-road" style={{width:4, height:'40%', left:'70%', top:'40%', opacity:0.5}}></div>
+      </div>
+
+      {/* Search */}
+      <div className="map-search-bar">
+        <div className="search-input-wrap">
+          <i className="ph ph-magnifying-glass" style={{fontSize:20, color:'var(--text-sub)'}}></i>
+          <input className="search-input" placeholder={t.searchPlaceholder} readOnly />
+          <i className="ph ph-sliders-horizontal" style={{fontSize:20, color:'var(--text-sub)', cursor:'pointer'}}></i>
+        </div>
+      </div>
+
+      {/* Filter chips */}
+      <div className="map-filters">
+        {filters.map(f => (
+          <div key={f.key} className={`filter-chip ${filter===f.key?'active':''}`} onClick={()=>setFilter(f.key)}>
+            {f.key !== 'all' && <i className={`ph ph-${f.key==='restaurant'?'fork-knife':f.key==='culture'?'buildings':f.key==='nature'?'tree':f.key==='hidden'?'key':'star'}`} style={{fontSize:12}}></i>}
+            {f.label}
+          </div>
+        ))}
+      </div>
+
+      {/* POI Markers */}
+      {visiblePOIs.map((poi, i) => (
+        <div
+          key={poi.id}
+          className="map-poi-marker"
+          style={{ top: markerPositions[i]?.top, left: markerPositions[i]?.left }}
+          onClick={()=>setSelectedPOI(selectedPOI?.id===poi.id ? null : poi)}
+        >
+          <div className="marker-bubble">
+            {poi.emoji} {poi.loves}
+          </div>
+        </div>
+      ))}
+
+      {/* Map controls */}
+      <div className="map-controls">
+        <button className="map-ctrl-btn">
+          <i className="ph ph-navigation-arrow" style={{fontSize:20, color:'var(--blue)'}}></i>
+        </button>
+        <button className="map-ctrl-btn">
+          <i className="ph ph-plus" style={{fontSize:20}}></i>
+        </button>
+        <button className="map-ctrl-btn">
+          <i className="ph ph-minus" style={{fontSize:20}}></i>
+        </button>
+      </div>
+
+      {/* Selected POI preview */}
+      {selectedPOI && (
+        <div className="map-poi-preview" onClick={()=>onPOIClick(selectedPOI)}>
+          <div className="map-poi-preview-img">{selectedPOI.emoji}</div>
+          <div className="map-poi-preview-info">
+            <div style={{fontWeight:700, fontSize:15}}>{selectedPOI.name}</div>
+            <div style={{display:'flex', alignItems:'center', gap:6, marginTop:3}}>
+              <span className="tag-pill">{selectedPOI.tag}</span>
+              <span className="love-count"><i className="ph-fill ph-heart" style={{fontSize:12}}></i>{selectedPOI.loves}</span>
+            </div>
+            <div style={{fontSize:12, color:'var(--text-sub)', marginTop:4}}>
+              {selectedPOI.desc.substring(0,60)}...
+            </div>
+          </div>
+          <div style={{padding:'10px 12px', display:'flex', alignItems:'center'}}>
+            <i className="ph ph-caret-right" style={{fontSize:18, color:'var(--text-sub)'}}></i>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* 3. ADD POI WIZARD */
+const AddPOIScreen = ({ onClose, onSuccess }) => {
+  const t = React.useContext(LangContext);
+  const [step, setStep] = useState(1);
+  const [photos, setPhotos] = useState([null,null,null]);
+  const [desc, setDesc] = useState('');
+  const [selectedTag, setSelectedTag] = useState(null);
+  const [visibility, setVisibility] = useState('community');
+
+  const photoEmojis = ['📸','🌅','🏙️','🌿','🍽️','🎨','☕','🏛️','🌊','🌸'];
+
+  const addPhoto = (slot) => {
+    const newPhotos = [...photos];
+    newPhotos[slot] = photoEmojis[Math.floor(Math.random()*photoEmojis.length)];
+    setPhotos(newPhotos);
+  };
+
+  const stepProgress = (s) => {
+    if (s < step) return 'done';
+    if (s === step) return 'active';
+    return '';
+  };
+
+  if (step === 4) {
+    return (
+      <div className="success-screen slide-up">
+        <div className="success-icon">❤️</div>
+        <div className="success-title">{t.successTitle}</div>
+        <div className="success-sub">{t.successSub}</div>
+        <div style={{marginTop:8, width:'100%'}}>
+          <button className="btn btn-primary" onClick={onSuccess}>{t.backToMap}</button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{display:'flex', flexDirection:'column', height:'100%'}}>
+      <div className="wizard-header">
+        <div style={{display:'flex', alignItems:'center', gap:8, marginBottom:12}}>
+          <button className="btn-icon" onClick={step===1?onClose:()=>setStep(s=>s-1)}>
+            <i className="ph ph-x" style={{fontSize:20}}></i>
+          </button>
+          <div className="wizard-steps">
+            {[1,2,3].map(s=>(
+              <div key={s} className={`wizard-step ${stepProgress(s)}`}></div>
+            ))}
+          </div>
+        </div>
+        <div className="wizard-label">{step===1?t.step1Label:step===2?t.step2Label:t.step3Label}</div>
+        <div className="wizard-title">{step===1?t.step1Title:step===2?t.step2Title:t.step3Title}</div>
+      </div>
+
+      <div className="wizard-body" style={{flex:1, overflowY:'auto'}}>
+        {/* STEP 1 — LOCATION */}
+        {step===1 && (
+          <div>
+            <div className="location-map-preview">
+              <div className="location-pin">
+                <div className="location-pin-head"></div>
+              </div>
+            </div>
+            <div className="location-address">
+              <i className="ph-fill ph-map-pin" style={{fontSize:20, color:'var(--red)'}}></i>
+              <div style={{flex:1}}>
+                <div style={{fontSize:14, fontWeight:600}}>{t.locationLabel}</div>
+                <div style={{fontSize:12, color:'var(--text-sub)', marginTop:2}}>Tirana, Albania</div>
+              </div>
+              <i className="ph ph-pencil" style={{fontSize:16, color:'var(--text-sub)'}}></i>
+            </div>
+            <button className="btn btn-secondary" style={{gap:8}}>
+              <i className="ph ph-navigation-arrow" style={{fontSize:18, color:'var(--blue)'}}></i>
+              {t.useLocation}
+            </button>
+          </div>
+        )}
+
+        {/* STEP 2 — PHOTOS */}
+        {step===2 && (
+          <div>
+            <span className="section-label">{t.addPhotos} (min. 1, max. 3)</span>
+            <div className="photo-grid">
+              {photos.map((p, i) => (
+                <div key={i} className={`photo-slot ${p?'filled':''}`} onClick={()=>addPhoto(i)}
+                  style={p ? {background:'var(--bg-dark)', fontSize:40, display:'flex', alignItems:'center', justifyContent:'center'} : {}}>
+                  {p ? (
+                    <>
+                      <span style={{fontSize:40}}>{p}</span>
+                      <div className="photo-filled-overlay">
+                        <div style={{background:'rgba(0,0,0,0.5)', borderRadius:6, padding:'2px 5px'}}>
+                          <i className="ph ph-check" style={{fontSize:12, color:'white'}}></i>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <i className="ph ph-camera" style={{fontSize:24}}></i>
+                      <span>Foto {i+1}</span>
+                    </>
+                  )}
+                </div>
+              ))}
+            </div>
+            <div style={{background:'var(--bg)', borderRadius:'var(--radius-sm)', padding:'12px', fontSize:13, color:'var(--text-sub)', display:'flex', gap:8, alignItems:'flex-start'}}>
+              <i className="ph ph-info" style={{fontSize:16, flexShrink:0, marginTop:1}}></i>
+              <span>Le foto aiutano la community a trovare e riconoscere il luogo. Scegli immagini luminose e rappresentative.</span>
+            </div>
+          </div>
+        )}
+
+        {/* STEP 3 — DETAILS */}
+        {step===3 && (
+          <div>
+            <span className="section-label">{t.descPlaceholder.split('(')[0]}</span>
+            <textarea
+              className="textarea-field"
+              rows={4}
+              placeholder={t.descPlaceholder}
+              maxLength={200}
+              value={desc}
+              onChange={e=>setDesc(e.target.value)}
+            />
+            <div className="char-counter">{desc.length}/200</div>
+
+            <span className="section-label">{t.selectTag}</span>
+            <div className="tags-wrap">
+              {TAGS.map(tag => (
+                <button key={tag} className={`tag-btn ${selectedTag===tag?'selected':''}`}
+                  onClick={()=>setSelectedTag(tag)}>
+                  {TAG_EMOJI[tag]} {tag}
+                </button>
+              ))}
+            </div>
+
+            <span className="section-label">{t.visibility}</span>
+            <div className="visibility-options">
+              {[
+                { key:'private', icon:'ph-lock', color:'var(--bg-dark)', title:t.visPrivate, desc:t.visPrivateDesc },
+                { key:'community', icon:'ph-users-three', color:'var(--red-light)', title:t.visCommunity, desc:t.visCommunityDesc },
+                { key:'suggested_google', icon:'ph-google-logo', color:'var(--blue-light)', title:t.visGoogle, desc:t.visGoogleDesc },
+              ].map(v => (
+                <div key={v.key} className={`vis-option ${visibility===v.key?'selected':''}`}
+                  onClick={()=>setVisibility(v.key)}>
+                  <div className="vis-option-icon" style={{background:v.color}}>
+                    <i className={`ph ${v.icon}`} style={{fontSize:18, color: v.key==='community'?'var(--red)':v.key==='suggested_google'?'var(--blue)':'var(--text-sub)'}}></i>
+                  </div>
+                  <div className="vis-option-text">
+                    <div className="vis-option-title">{v.title}</div>
+                    <div className="vis-option-desc">{v.desc}</div>
+                  </div>
+                  {visibility===v.key && <i className="ph-fill ph-check-circle" style={{color:'var(--red)', fontSize:20}}></i>}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div style={{padding:'12px 16px', borderTop:'1px solid var(--border)', background:'var(--bg-card)'}}>
+        <button className="btn btn-primary" onClick={()=>{
+          if(step===3) setStep(4);
+          else setStep(s=>s+1);
+        }}>
+          {step===3 ? t.publish : t.next}
+          {step<3 && <i className="ph ph-arrow-right" style={{fontSize:18}}></i>}
+        </button>
+      </div>
+    </div>
+  );
+};
+
+/* 4. POI DETAIL */
+const POIDetailScreen = ({ poi, onBack, onListsOpen }) => {
+  const t = React.useContext(LangContext);
+  const [loved, setLoved] = useState(false);
+  const [photoIdx, setPhotoIdx] = useState(0);
+
+  return (
+    <div style={{display:'flex', flexDirection:'column', height:'100%'}}>
+      {/* Back button over photos */}
+      <div style={{position:'relative'}}>
+        <div className="detail-photos">
+          {poi.photos.map((ph, i) => (
+            <div key={i} className="detail-photo" onClick={()=>setPhotoIdx(i)}>{ph}</div>
+          ))}
+        </div>
+        <button className="btn-icon" onClick={onBack}
+          style={{position:'absolute', top:12, left:12, background:'rgba(255,255,255,0.9)', boxShadow:'var(--shadow)'}}>
+          <i className="ph ph-arrow-left" style={{fontSize:20}}></i>
+        </button>
+        <div style={{
+          position:'absolute', top:12, right:12,
+          background: poi.visibility==='private'?'rgba(0,0,0,0.5)':poi.visibility==='community'?'rgba(212,43,43,0.85)':'rgba(40,94,167,0.85)',
+          color:'white', borderRadius:20, padding:'4px 12px', fontSize:11, fontWeight:700
+        }}>
+          {poi.visibility==='private'?'🔒 '+t.visPrivate:poi.visibility==='community'?'👥 Community':'🔍 Google'}
+        </div>
+        <div className="photo-dots">
+          {poi.photos.map((_,i)=>(
+            <div key={i} className={`photo-dot ${i===photoIdx?'active':''}`}></div>
+          ))}
+        </div>
+      </div>
+
+      <div className="screen" style={{flex:1}}>
+        <div className="detail-body">
+          <div className="detail-header">
+            <div className="detail-title">{poi.name}</div>
+            <button className="love-btn" onClick={()=>setLoved(!loved)}>
+              <i className={`${loved?'ph-fill':'ph'} ph-heart`}
+                style={{fontSize:28, color: loved?'var(--red)':'var(--text-sub)'}}></i>
+              <span className="love-btn-count">{poi.loves + (loved?1:0)}</span>
+            </button>
+          </div>
+
+          <div className="detail-meta">
+            <span className="tag-pill">{TAG_EMOJI[poi.tag]} {poi.tag}</span>
+            <i className="ph ph-map-pin" style={{fontSize:14, color:'var(--text-sub)'}}></i>
+            <span style={{fontSize:13, color:'var(--text-sub)'}}>Tirana, Albania</span>
+          </div>
+
+          <p className="detail-desc">{poi.desc}</p>
+
+          <div className="detail-author">
+            <div className="avatar">{poi.authorInitial}</div>
+            <div>
+              <div style={{fontSize:12, color:'var(--text-sub)'}}>{t.postedBy}</div>
+              <div style={{fontSize:14, fontWeight:700}}>{poi.author}</div>
+            </div>
+          </div>
+
+          <div className="detail-actions">
+            <button className="detail-action-btn" onClick={onListsOpen}>
+              <i className="ph ph-list-plus" style={{fontSize:18, color:'var(--blue)'}}></i>
+              {t.addToList}
+            </button>
+            <button className="detail-action-btn">
+              <i className="ph ph-share-network" style={{fontSize:18, color:'var(--text-sub)'}}></i>
+              {t.shareBtn}
+            </button>
+            <button className="detail-action-btn">
+              <i className="ph ph-navigation-arrow" style={{fontSize:18, color:'var(--red)'}}></i>
+              {t.directionsBtn}
+            </button>
+            <button className="detail-action-btn">
+              <i className="ph ph-bookmark" style={{fontSize:18, color:'var(--text-sub)'}}></i>
+              Salva
+            </button>
+          </div>
+
+          {/* Nearby */}
+          <div style={{marginTop:8}}>
+            <div className="section-title" style={{marginBottom:12}}>Nelle vicinanze</div>
+            {MOCK_POIS.filter(p=>p.id!==poi.id).slice(0,2).map(p=>(
+              <div key={p.id} className="list-item" style={{marginBottom:8, borderRadius:'var(--radius)', border:'1px solid var(--border)'}}>
+                <div style={{fontSize:28}}>{p.emoji}</div>
+                <div className="list-info">
+                  <div className="list-name">{p.name}</div>
+                  <div className="list-sub">{p.tag} • {p.loves} ❤️</div>
+                </div>
+                <i className="ph ph-caret-right" style={{color:'var(--text-sub)', fontSize:16}}></i>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* 5. EXPLORE */
+const ExploreScreen = ({ onPOIClick }) => {
+  const t = React.useContext(LangContext);
+  return (
+    <div className="page-content">
+      <div className="section-header">
+        <div className="section-title">{t.trending} 🔥</div>
+        <span className="section-more">Vedi tutti</span>
+      </div>
+      <div className="featured-scroll">
+        {MOCK_POIS.slice(0,4).map(poi => (
+          <div key={poi.id} className="featured-card" onClick={()=>onPOIClick(poi)}>
+            <div className="featured-img">{poi.emoji}</div>
+            <div className="featured-info">
+              <div className="featured-name">{poi.name}</div>
+              <div className="featured-sub">{poi.loves} ❤️ • {poi.tag}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="section-header">
+        <div className="section-title">{t.featured} 📋</div>
+      </div>
+      <div style={{padding:'0 16px 16px'}}>
+        {MOCK_LISTS.slice(0,2).map(list => (
+          <div key={list.id} className="list-item" style={{marginBottom:8, borderRadius:'var(--radius)', border:'1px solid var(--border)'}}>
+            <div className="list-icon" style={{background:'var(--bg)', fontSize:24}}>{list.emoji}</div>
+            <div className="list-info">
+              <div className="list-name">{list.name}</div>
+              <div className="list-sub">{list.count} POI · {list.desc}</div>
+            </div>
+            <i className="ph ph-caret-right" style={{color:'var(--text-sub)', fontSize:16}}></i>
+          </div>
+        ))}
+      </div>
+
+      <div className="section-header">
+        <div className="section-title">Scopri Tirana 🇦🇱</div>
+        <span className="section-more">Mappa</span>
+      </div>
+      <div className="poi-grid">
+        {MOCK_POIS.map(poi => (
+          <POICard key={poi.id} poi={poi} onClick={()=>onPOIClick(poi)} />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+/* 6. MY LISTS */
+const ListsScreen = ({ onListClick }) => {
+  const t = React.useContext(LangContext);
+  return (
+    <div className="page-content">
+      <div style={{padding:'16px 16px 0'}}>
+        <button className="btn btn-primary" style={{marginBottom:16}}>
+          <i className="ph ph-plus" style={{fontSize:18}}></i>
+          {t.newList}
+        </button>
+      </div>
+      <div style={{padding:'0 16px'}}>
+        <div className="card">
+          {MOCK_LISTS.map((list,i) => (
+            <div key={list.id} className="list-item" onClick={()=>onListClick(list)}
+              style={i===0?{borderRadius:'var(--radius) var(--radius) 0 0'}:i===MOCK_LISTS.length-1?{borderRadius:'0 0 var(--radius) var(--radius)'}:{}}>
+              <div className="list-icon" style={{background:'var(--bg)', fontSize:22, borderRadius:'var(--radius-sm)'}}>{list.emoji}</div>
+              <div className="list-info">
+                <div className="list-name">{list.name}</div>
+                <div className="list-sub">{list.count} POI · {list.desc.substring(0,35)}</div>
+              </div>
+              <div style={{display:'flex', flexDirection:'column', alignItems:'flex-end', gap:6}}>
+                <span className={`vis-badge ${list.visibility}`}>{list.visibility}</span>
+                <i className="ph ph-caret-right" style={{color:'var(--text-sub)', fontSize:14}}></i>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div style={{padding:'24px 16px 0'}}>
+        <div style={{background:'var(--blue-light)', borderRadius:'var(--radius)', padding:'16px', display:'flex', gap:12, alignItems:'flex-start'}}>
+          <i className="ph-fill ph-info" style={{fontSize:20, color:'var(--blue)', flexShrink:0, marginTop:2}}></i>
+          <div>
+            <div style={{fontWeight:700, fontSize:14, color:'var(--blue)', marginBottom:4}}>Liste pubbliche</div>
+            <div style={{fontSize:13, color:'var(--blue-dark)', lineHeight:1.5}}>
+              Rendi pubblica una lista per condividerla con tutta la community POI•LOVE.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* 7. LIST DETAIL */
+const ListDetailScreen = ({ list, onBack, onPOIClick }) => {
+  const t = React.useContext(LangContext);
+  const listPOIs = MOCK_POIS.slice(0, list.count > MOCK_POIS.length ? MOCK_POIS.length : Math.min(list.count, MOCK_POIS.length));
+  return (
+    <div style={{display:'flex', flexDirection:'column', height:'100%'}}>
+      <div className="header">
+        <button className="btn-icon" onClick={onBack}>
+          <i className="ph ph-arrow-left" style={{fontSize:20}}></i>
+        </button>
+        <div style={{flex:1}}>
+          <div className="header-title">{list.emoji} {list.name}</div>
+        </div>
+        <button className="btn-icon">
+          <i className="ph ph-dots-three" style={{fontSize:20}}></i>
+        </button>
+      </div>
+      <div className="screen">
+        <div style={{padding:'12px 16px', background:'var(--bg-card)', borderBottom:'1px solid var(--border)', display:'flex', gap:8, alignItems:'center'}}>
+          <span className={`vis-badge ${list.visibility}`}>{list.visibility}</span>
+          <span style={{fontSize:13, color:'var(--text-sub)'}}>{list.count} POI · {list.desc}</span>
+        </div>
+        <div className="page-content" style={{padding:'12px 16px'}}>
+          <div className="poi-grid">
+            {listPOIs.map(poi => (
+              <POICard key={poi.id} poi={poi} onClick={()=>onPOIClick(poi)} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* 8. PROFILE */
+const ProfileScreen = ({ onSettings }) => {
+  const t = React.useContext(LangContext);
+  const [activeTab, setActiveTab] = useState('pois');
+  return (
+    <div style={{display:'flex', flexDirection:'column', height:'100%'}}>
+      <div className="profile-hero">
+        <div className="profile-avatar">A</div>
+        <div className="profile-name">Alessandro Castagna</div>
+        <div className="profile-email">it@altrostile.app</div>
+      </div>
+
+      <div className="profile-stats">
+        <div className="stat-item">
+          <div className="stat-num">12</div>
+          <div className="stat-label">{t.poi_count}</div>
+        </div>
+        <div className="stat-item">
+          <div className="stat-num">384</div>
+          <div className="stat-label">{t.loves_count}</div>
+        </div>
+        <div className="stat-item">
+          <div className="stat-num">4</div>
+          <div className="stat-label">{t.lists_count}</div>
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <div style={{display:'flex', borderBottom:'1px solid var(--border)', background:'var(--bg-card)'}}>
+        {[{k:'pois',l:t.myPOIs},{k:'loved',l:t.loved},{k:'contributions',l:t.contributions}].map(tab=>(
+          <button key={tab.k} onClick={()=>setActiveTab(tab.k)}
+            style={{flex:1, padding:'12px 8px', border:'none', background:'transparent', cursor:'pointer',
+              fontWeight:700, fontSize:13, fontFamily:'var(--font-ui)',
+              color: activeTab===tab.k?'var(--red)':'var(--text-sub)',
+              borderBottom: activeTab===tab.k?'2px solid var(--red)':'2px solid transparent',
+              transition:'all 0.15s'
+            }}>
+            {tab.l}
+          </button>
+        ))}
+      </div>
+
+      <div className="screen">
+        <div className="poi-grid" style={{padding:'12px 16px', paddingBottom:16}}>
+          {(activeTab==='loved' ? MOCK_POIS.slice(2,5) : activeTab==='contributions' ? MOCK_POIS.slice(0,3) : MOCK_POIS.filter(p=>p.authorInitial==='A')).map(poi => (
+            <POICard key={poi.id} poi={poi} onClick={()=>{}} />
+          ))}
+        </div>
+      </div>
+
+      <div style={{padding:'12px 16px 16px', background:'var(--bg-card)', borderTop:'1px solid var(--border)'}}>
+        <button className="btn btn-secondary" onClick={onSettings} style={{gap:8}}>
+          <i className="ph ph-gear" style={{fontSize:18}}></i>
+          {t.settings}
+        </button>
+      </div>
+    </div>
+  );
+};
+
+/* 9. SETTINGS */
+const SettingsScreen = ({ onBack, lang, setLang }) => {
+  const t = React.useContext(LangContext);
+  return (
+    <div style={{display:'flex', flexDirection:'column', height:'100%'}}>
+      <div className="header">
+        <button className="btn-icon" onClick={onBack}>
+          <i className="ph ph-arrow-left" style={{fontSize:20}}></i>
+        </button>
+        <div className="header-title">{t.settings}</div>
+      </div>
+      <div className="screen">
+        <div style={{marginTop:16, padding:'0 16px'}}>
+          <div style={{fontSize:11, fontWeight:700, color:'var(--text-sub)', textTransform:'uppercase', letterSpacing:'0.8px', marginBottom:8, paddingLeft:4}}>
+            {t.language}
+          </div>
+          <div className="lang-selector" style={{flexDirection:'row', gap:8}}>
+            {[{k:'it',flag:'🇮🇹',name:'Italiano'},{k:'sq',flag:'🇦🇱',name:'Shqip'},{k:'en',flag:'🇬🇧',name:'English'}].map(l=>(
+              <button key={l.k} className={`lang-btn ${lang===l.k?'active':''}`} onClick={()=>setLang(l.k)}>
+                {l.flag} {l.name}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="settings-section" style={{marginTop:24}}>
+          <div className="settings-section-title">{t.account}</div>
+          <div className="card">
+            {[
+              {icon:'ph-user', color:'var(--blue-light)', title:'Profilo pubblico', sub:'Alessandro Castagna'},
+              {icon:'ph-bell', color:'var(--red-light)', title:t.notifications, sub:'Attive'},
+              {icon:'ph-shield-check', color:'var(--bg-dark)', title:t.privacy, sub:'Gestisci i tuoi dati'},
+            ].map((item,i)=>(
+              <div key={i} className="settings-item">
+                <div className="settings-item-icon" style={{background:item.color}}>
+                  <i className={`ph ${item.icon}`} style={{fontSize:18, color:'var(--text)'}}></i>
+                </div>
+                <div className="settings-item-text">
+                  <div className="settings-item-title">{item.title}</div>
+                  <div className="settings-item-sub">{item.sub}</div>
+                </div>
+                <i className="ph ph-caret-right" style={{color:'var(--text-sub)', fontSize:16}}></i>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="settings-section" style={{marginTop:16}}>
+          <div className="settings-section-title">{t.about}</div>
+          <div className="card">
+            {[
+              {icon:'ph-info', color:'var(--blue-light)', title:'POI•LOVE', sub:'v1.0.0 — MIT Open Source'},
+              {icon:'ph-github-logo', color:'var(--bg-dark)', title:'GitHub', sub:'acastagna/poi-love'},
+              {icon:'ph-globe', color:'var(--red-light)', title:'poilove.com', sub:'Sito ufficiale'},
+            ].map((item,i)=>(
+              <div key={i} className="settings-item">
+                <div className="settings-item-icon" style={{background:item.color}}>
+                  <i className={`ph ${item.icon}`} style={{fontSize:18, color:'var(--text)'}}></i>
+                </div>
+                <div className="settings-item-text">
+                  <div className="settings-item-title">{item.title}</div>
+                  <div className="settings-item-sub">{item.sub}</div>
+                </div>
+                <i className="ph ph-caret-right" style={{color:'var(--text-sub)', fontSize:16}}></i>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div style={{padding:'24px 16px'}}>
+          <button className="btn btn-secondary" style={{color:'var(--red)', borderColor:'var(--red-light)'}}>
+            <i className="ph ph-sign-out" style={{fontSize:18, color:'var(--red)'}}></i>
+            {t.logout}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ============================================================
+   ADD TO LIST SHEET
+============================================================ */
+const AddToListSheet = ({ onClose }) => {
+  const t = React.useContext(LangContext);
+  return (
+    <div className="overlay" onClick={onClose}>
+      <div className="sheet slide-up" onClick={e=>e.stopPropagation()}>
+        <div className="sheet-handle"></div>
+        <div style={{padding:'16px 20px'}}>
+          <div style={{fontFamily:'var(--font)', fontSize:18, fontWeight:700, marginBottom:16}}>
+            {t.addToList}
+          </div>
+          {MOCK_LISTS.map((list,i)=>(
+            <div key={list.id} className="list-item"
+              style={i===0?{borderRadius:'var(--radius) var(--radius) 0 0', border:'1px solid var(--border)', borderBottom:'none'}
+                :i===MOCK_LISTS.length-1?{borderRadius:'0 0 var(--radius) var(--radius)', border:'1px solid var(--border)'}
+                :{border:'1px solid var(--border)', borderBottom:'none'}}
+              onClick={onClose}>
+              <div className="list-icon" style={{background:'var(--bg)', fontSize:20}}>{list.emoji}</div>
+              <div className="list-info">
+                <div className="list-name">{list.name}</div>
+                <div className="list-sub">{list.count} POI</div>
+              </div>
+              <i className="ph ph-plus-circle" style={{color:'var(--red)', fontSize:22}}></i>
+            </div>
+          ))}
+          <div style={{marginTop:12}}>
+            <button className="btn btn-secondary">
+              <i className="ph ph-plus" style={{fontSize:18}}></i>
+              {t.newList}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ============================================================
+   LANG CONTEXT
+============================================================ */
+const LangContext = React.createContext(T['it']);
+
+/* ============================================================
+   APP ROOT
+============================================================ */
+const App = () => {
+  const [lang, setLang] = useState(detectLang());
+  const t = T[lang] || T['en'];
+
+  const [screen, setScreen] = useState('splash');
+  const [activeTab, setActiveTab] = useState('map');
+  const [selectedPOI, setSelectedPOI] = useState(null);
+  const [showAddPOI, setShowAddPOI] = useState(false);
+  const [showDetail, setShowDetail] = useState(false);
+  const [showListSheet, setShowListSheet] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [selectedList, setSelectedList] = useState(null);
+  const [showListDetail, setShowListDetail] = useState(false);
+
+  const handleLogin = (type) => { setScreen('main'); };
+
+  const handleNav = (tab) => {
+    setActiveTab(tab);
+    setShowDetail(false);
+    setShowSettings(false);
+    setShowListDetail(false);
+  };
+
+  const handlePOIClick = (poi) => {
+    setSelectedPOI(poi);
+    setShowDetail(true);
+    setShowAddPOI(false);
+  };
+
+  const handleListClick = (list) => {
+    setSelectedList(list);
+    setShowListDetail(true);
+  };
+
+  const noNav = showAddPOI || showDetail || showSettings || showListDetail;
+
+  const renderMainContent = () => {
+    if (showSettings) return (
+      <SettingsScreen onBack={()=>setShowSettings(false)} lang={lang} setLang={(l)=>setLang(l)} />
+    );
+
+    if (showDetail && selectedPOI) return (
+      <POIDetailScreen
+        poi={selectedPOI}
+        onBack={()=>setShowDetail(false)}
+        onListsOpen={()=>setShowListSheet(true)}
+      />
+    );
+
+    if (showListDetail && selectedList) return (
+      <ListDetailScreen
+        list={selectedList}
+        onBack={()=>setShowListDetail(false)}
+        onPOIClick={handlePOIClick}
+      />
+    );
+
+    if (showAddPOI) return (
+      <AddPOIScreen
+        onClose={()=>setShowAddPOI(false)}
+        onSuccess={()=>{ setShowAddPOI(false); setActiveTab('map'); }}
+      />
+    );
+
+    switch(activeTab) {
+      case 'map':
+        return (
+          <MapScreen
+            onPOIClick={handlePOIClick}
+            selectedPOI={selectedPOI}
+            setSelectedPOI={setSelectedPOI}
+          />
+        );
+      case 'explore':
+        return <ExploreScreen onPOIClick={handlePOIClick} />;
+      case 'lists':
+        return <ListsScreen onListClick={handleListClick} />;
+      case 'profile':
+        return <ProfileScreen onSettings={()=>setShowSettings(true)} />;
+      default:
+        return null;
+    }
+  };
+
+  if (screen === 'splash') {
+    return (
+      <LangContext.Provider value={t}>
+        <div className="app-shell">
+          <div className="screen no-scroll">
+            <SplashScreen onLogin={handleLogin} />
+          </div>
+        </div>
+      </LangContext.Provider>
+    );
+  }
+
+  return (
+    <LangContext.Provider value={t}>
+      <div className="app-shell">
+        {/* Header — solo quando non siamo in schermate full-screen */}
+        {!noNav && (
+          <div className="header">
+            <Logo />
+            <div style={{flex:1}}></div>
+            {activeTab==='map' && (
+              <button className="btn-icon">
+                <i className="ph ph-bell" style={{fontSize:22}}></i>
+              </button>
+            )}
+            {activeTab==='explore' && (
+              <button className="btn-icon">
+                <i className="ph ph-magnifying-glass" style={{fontSize:22}}></i>
+              </button>
+            )}
+            {activeTab==='lists' && (
+              <button className="btn-icon">
+                <i className="ph ph-share-network" style={{fontSize:22}}></i>
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Screen content */}
+        <div className={`screen ${activeTab==='map'&&!noNav?'no-scroll':''}`}>
+          {renderMainContent()}
+        </div>
+
+        {/* Bottom nav */}
+        {!noNav && (
+          <BottomNav
+            active={activeTab}
+            onNav={handleNav}
+            onAdd={()=>{ setShowAddPOI(true); setShowDetail(false); }}
+          />
+        )}
+
+        {/* Sheet overlay — Aggiungi a lista */}
+        {showListSheet && <AddToListSheet onClose={()=>setShowListSheet(false)} />}
+      </div>
+    </LangContext.Provider>
+  );
+};
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

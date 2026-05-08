@@ -233,14 +233,22 @@ body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); 
 .sp-dl-critical .sp-dl-date { color:var(--red); }
 .sp-dl-launch   .sp-dl-date { color:#60A5FA; }
 /* grid scrollabile su mobile */
-.sp-grid-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; margin:0 -4px; padding:0 4px 4px; }
-.sp-grid { display:grid; grid-template-columns:repeat(7,minmax(84px,1fr)); gap:8px; }
-.sp-day { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:11px; padding:12px 8px; text-align:center; }
-.sp-day.today { background:rgba(212,43,43,0.2); border-color:var(--red); }
-.sp-day.dl    { background:rgba(212,43,43,0.1); border-color:rgba(212,43,43,0.4); }
-.sp-num  { font-size:20px; font-weight:900; color:var(--white); }
-.sp-lbl  { font-size:8px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:rgba(255,255,255,0.3); margin-bottom:6px; }
-.sp-task { font-size:9px; color:rgba(255,255,255,0.62); font-weight:500; line-height:1.5; margin-top:7px; }
+.sp-grid-wrap { overflow:hidden; margin:0 -4px; padding:0 4px 4px; -webkit-mask-image:linear-gradient(to right, transparent, #000 40px, #000 calc(100% - 40px), transparent); mask-image:linear-gradient(to right, transparent, #000 40px, #000 calc(100% - 40px), transparent); cursor:grab; user-select:none; -webkit-user-select:none; touch-action:pan-y; }
+.sp-grid-wrap.is-dragging { cursor:grabbing; }
+.sp-grid { display:flex; gap:8px; width:max-content; animation:sp-scroll 90s linear infinite; will-change:transform; }
+.sp-grid-wrap:hover .sp-grid { animation-play-state:paused; }
+.sp-grid-wrap.is-dragging .sp-grid { animation:none !important; }
+.sp-day { flex:0 0 100px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:11px; padding:11px 8px 10px; text-align:center; transition:transform .2s, border-color .2s; pointer-events:none; }
+.sp-day.done   { background:rgba(34,197,94,0.12);  border-color:rgba(34,197,94,0.35); }
+.sp-day.today  { background:rgba(245,158,11,0.20); border-color:rgba(245,158,11,0.6); }
+.sp-day.next   { background:rgba(255,255,255,0.04); border-color:rgba(255,255,255,0.12); }
+.sp-day.dl     { background:rgba(212,43,43,0.25); border-color:var(--red); }
+.sp-day.window { background:rgba(212,43,43,0.12); border-color:rgba(212,43,43,0.45); }
+.sp-num  { font-size:20px; font-weight:900; color:var(--white); line-height:1; }
+.sp-lbl  { font-size:8px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:rgba(255,255,255,0.35); margin-bottom:5px; }
+.sp-month{ font-size:8px; font-weight:700; text-transform:uppercase; letter-spacing:0.7px; color:rgba(255,255,255,0.5); margin-top:2px; }
+.sp-task { font-size:8.5px; color:rgba(255,255,255,0.62); font-weight:500; line-height:1.35; margin-top:6px; min-height:24px; }
+@keyframes sp-scroll { 0% { transform:translateX(0); } 100% { transform:translateX(-50%); } }
 
 /* ── MILESTONES ── */
 .ms-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
@@ -372,7 +380,7 @@ body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); 
       <button class="lang-btn" data-lang="sq" title="Shqip" onclick="switchLang('sq')">🇦🇱</button>
       <button class="lang-btn" data-lang="en" title="English" onclick="switchLang('en')">🇬🇧</button>
     </div>
-    <span class="hdr-date" data-t="updated_date">Aggiornato: 24 Aprile 2026</span>
+    <span class="hdr-date" data-t="updated_date">Aggiornato: 8 Maggio 2026</span>
     <div class="status-pill"><div class="sdot"></div><span data-t="status_pill">MVP in sviluppo</span></div>
   </div>
 </header>
@@ -384,7 +392,7 @@ body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); 
     <p data-t="hero_desc">Mappa comunitaria dei luoghi amati. Prima istanza: Albania · Tirana. Lancio previsto giugno 2026. Framework open source Cultural Bridge OS — Licenza MIT.</p>
   </div>
   <div class="kpis">
-    <div class="kpi"><div class="kpi-v">65%</div><div class="kpi-l" data-t="kpi_done">Completamento</div></div>
+    <div class="kpi"><div class="kpi-v">75%</div><div class="kpi-l" data-t="kpi_done">Completamento</div></div>
     <div class="kpi"><div class="kpi-v">5</div><div class="kpi-l" data-t="kpi_weeks">Settimane al lancio</div></div>
     <div class="kpi"><div class="kpi-v">12</div><div class="kpi-l" data-t="kpi_tables">Tabelle database</div></div>
     <div class="kpi"><div class="kpi-v">MIT</div><div class="kpi-l" data-t="kpi_license">Licenza</div></div>
@@ -405,25 +413,25 @@ body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); 
       <div class="pg-lbl g" data-t="lbl_done">✓ Completata</div>
       <div class="pg-title" data-t="area1">Infrastruttura &amp; Backend</div>
       <div class="pg-pct g">100%</div>
-      <div class="bar-track"><div class="bar-fill bf-g" data-target="90" style="width:0%"></div></div>
+      <div class="bar-track"><div class="bar-fill bf-g" data-target="100" style="width:0%"></div></div>
     </div>
     <div class="pg-card c-y">
       <div class="pg-lbl y" data-t="lbl_active">↗ In corso</div>
       <div class="pg-title" data-t="area2">App Mobile iOS/Android</div>
-      <div class="pg-pct y">10%</div>
-      <div class="bar-track"><div class="bar-fill bf-y" data-target="5" style="width:0%"></div></div>
+      <div class="pg-pct y">75%</div>
+      <div class="bar-track"><div class="bar-fill bf-y" data-target="75" style="width:0%"></div></div>
     </div>
     <div class="pg-card c-m">
       <div class="pg-lbl m" data-t="lbl_todo">○ Da avviare</div>
       <div class="pg-title" data-t="area3">UX/UI &amp; Contenuti</div>
-      <div class="pg-pct m">20%</div>
-      <div class="bar-track"><div class="bar-fill bf-m" data-target="20" style="width:0%"></div></div>
+      <div class="pg-pct m">65%</div>
+      <div class="bar-track"><div class="bar-fill bf-m" data-target="65" style="width:0%"></div></div>
     </div>
     <div class="pg-card c-r">
       <div class="pg-lbl r" data-t="lbl_critical">⚡ Critico</div>
       <div class="pg-title" data-t="area4">Lancio &amp; Distribuzione</div>
-      <div class="pg-pct r">0%</div>
-      <div class="bar-track"><div class="bar-fill bf-r" data-target="0" style="width:0%"></div></div>
+      <div class="pg-pct r">40%</div>
+      <div class="bar-track"><div class="bar-fill bf-r" data-target="40" style="width:0%"></div></div>
     </div>
   </div>
 </div>
@@ -437,7 +445,7 @@ body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); 
       <svg id="pieSvg" viewBox="-12 -12 224 224" xmlns="http://www.w3.org/2000/svg">
         <g id="pieSlices"></g>
         <circle cx="100" cy="100" r="54" fill="white"/>
-        <text x="100" y="94" text-anchor="middle" font-family="Inter" font-weight="900" font-size="21" fill="#1C1C1C" id="cPct">65%</text>
+        <text x="100" y="94" text-anchor="middle" font-family="Inter" font-weight="900" font-size="21" fill="#1C1C1C" id="cPct">75%</text>
         <text x="100" y="112" text-anchor="middle" font-family="Inter" font-weight="500" font-size="9.5" fill="#6B6B6B" id="cLbl" data-t="completed_lbl">completato</text>
       </svg>
       <div class="pie-popup" id="piePopup">
@@ -570,7 +578,7 @@ body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); 
         </div>
       </div>
       <div class="ws-phase ws-col-phase" data-t="t7_phase">Infrastruttura</div>
-      <div class="ws-prog ws-col-prog"><div class="ws-track"><div class="ws-fill" style="width:0%;background:#F59E0B" data-target="0"></div></div><span class="ws-pct" style="color:#F59E0B">0%</span></div>
+      <div class="ws-prog ws-col-prog"><div class="ws-track"><div class="ws-fill" style="width:0%;background:#F59E0B" data-target="70"></div></div><span class="ws-pct" style="color:#F59E0B">70%</span></div>
       <div class="ws-time ws-col-time">~3h</div>
       <div class="ws-badge-time"><span class="badge bs"><i class="ph ph-lightning"></i> <span data-t="badge_sprint">Sprint</span></span></div>
     </div>
@@ -585,7 +593,7 @@ body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); 
         </div>
       </div>
       <div class="ws-phase ws-col-phase" data-t="t8_phase">App Mobile</div>
-      <div class="ws-prog ws-col-prog"><div class="ws-track"><div class="ws-fill" style="width:0%;background:var(--blue)" data-target="0"></div></div><span class="ws-pct" style="color:var(--blue)">0%</span></div>
+      <div class="ws-prog ws-col-prog"><div class="ws-track"><div class="ws-fill" style="width:0%;background:var(--blue)" data-target="50"></div></div><span class="ws-pct" style="color:var(--blue)">50%</span></div>
       <div class="ws-time ws-col-time">~6h</div>
       <div class="ws-badge-time"><span class="badge bs"><i class="ph ph-lightning"></i> <span data-t="badge_sprint">Sprint</span></span></div>
     </div>
@@ -692,59 +700,69 @@ body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); 
       <i class="ph ph-rocket-launch"></i>
     </div>
     <div>
-      <div class="sp-ttl" data-t="sprint_title">Sprint Critico — 7 Giorni</div>
-      <div class="sp-sub" data-t="sprint_sub">Piano d'azione per la candidatura Anthropic for Startups</div>
+      <div class="sp-ttl" data-t="sprint_title">Sprint Pre-Presentazione</div>
+      <div class="sp-sub" data-t="sprint_sub">Cosa serve entro Mercoledì 13 Maggio (apertura finestra)</div>
     </div>
   </div>
   <!-- due scadenze sempre visibili -->
   <div class="sp-deadlines">
     <div class="sp-dl-card sp-dl-critical">
-      <div class="sp-dl-lbl" data-t="deadline_anthropic_lbl">⚡ Scadenza Anthropic</div>
-      <div class="sp-dl-date" data-t="deadline_anthropic_date">1 Maggio 2026</div>
+      <div class="sp-dl-lbl" data-t="deadline_anthropic_lbl">🎤 Finestra Presentazioni</div>
+      <div class="sp-dl-date" data-t="deadline_anthropic_date">13-17 Maggio 2026</div>
     </div>
     <div class="sp-dl-card sp-dl-launch">
       <div class="sp-dl-lbl" data-t="deadline_tirana_lbl">🚀 Lancio Tirana</div>
       <div class="sp-dl-date" data-t="deadline_tirana_date">Giugno 2026</div>
     </div>
   </div>
-  <!-- griglia scrollabile su mobile -->
-  <div class="sp-grid-wrap">
-    <div class="sp-grid">
-      <div class="sp-day today">
-        <div class="sp-lbl" data-t="day_today">Oggi</div>
-        <div class="sp-num">24</div>
-        <div class="sp-task" data-t="day1_task">SAL Investitori + Form Anthropic</div>
-      </div>
-      <div class="sp-day">
-        <div class="sp-lbl" data-t="day_fri">Ven</div>
-        <div class="sp-num">25</div>
-        <div class="sp-task" data-t="day2_task">Hacker News Show HN post</div>
-      </div>
-      <div class="sp-day">
-        <div class="sp-lbl" data-t="day_sat">Sab</div>
-        <div class="sp-num">26</div>
-        <div class="sp-task" data-t="day3_task">Expo setup + Google Maps</div>
-      </div>
-      <div class="sp-day">
-        <div class="sp-lbl" data-t="day_sun">Dom</div>
-        <div class="sp-num">27</div>
-        <div class="sp-task" data-t="day4_task">Schermata Mappa + POI</div>
-      </div>
-      <div class="sp-day">
-        <div class="sp-lbl" data-t="day_mon">Lun</div>
-        <div class="sp-num">28</div>
-        <div class="sp-task" data-t="day5_task">Supabase Integration</div>
-      </div>
-      <div class="sp-day">
-        <div class="sp-lbl" data-t="day_tue">Mar</div>
-        <div class="sp-num">29</div>
-        <div class="sp-task" data-t="day6_task">Video demo + Plesk API</div>
-      </div>
-      <div class="sp-day dl">
-        <div class="sp-lbl" data-t="day_wed">Mer</div>
-        <div class="sp-num" style="color:var(--red)">30</div>
-        <div class="sp-task" style="color:rgba(255,110,110,0.9)" data-t="day7_task">Submit Anthropic 🚀</div>
-      </div>
+  <!-- griglia auto-scroll + drag manuale: 27 Apr → 17 Mag (21 giorni) — pausa al hover -->
+  <div class="sp-grid-wrap" id="spGridWrap">
+    <div class="sp-grid" id="spGrid">
+      <!-- 21 giorni: 27 Apr → 17 Mag -->
+      <div class="sp-day done"><div class="sp-lbl">Lun</div><div class="sp-num">27</div><div class="sp-month">Apr</div><div class="sp-task">Cultural Bridge OS</div></div>
+      <div class="sp-day done"><div class="sp-lbl">Mar</div><div class="sp-num">28</div><div class="sp-month">Apr</div><div class="sp-task">Bio trilingue</div></div>
+      <div class="sp-day done"><div class="sp-lbl">Mer</div><div class="sp-num">29</div><div class="sp-month">Apr</div><div class="sp-task">Demo HTML5</div></div>
+      <div class="sp-day done"><div class="sp-lbl">Gio</div><div class="sp-num">30</div><div class="sp-month">Apr</div><div class="sp-task">Avatar Liri</div></div>
+      <div class="sp-day done"><div class="sp-lbl">Ven</div><div class="sp-num">1</div><div class="sp-month">Mag</div><div class="sp-task">README upgrade</div></div>
+      <div class="sp-day done"><div class="sp-lbl">Sab</div><div class="sp-num">2</div><div class="sp-month">Mag</div><div class="sp-task">Migration Supabase</div></div>
+      <div class="sp-day done"><div class="sp-lbl">Dom</div><div class="sp-num">3</div><div class="sp-month">Mag</div><div class="sp-task">Card system</div></div>
+      <div class="sp-day done"><div class="sp-lbl">Lun</div><div class="sp-num">4</div><div class="sp-month">Mag</div><div class="sp-task">Webapp HTML demo</div></div>
+      <div class="sp-day done"><div class="sp-lbl">Mar</div><div class="sp-num">5</div><div class="sp-month">Mag</div><div class="sp-task">index.html SPA</div></div>
+      <div class="sp-day done"><div class="sp-lbl">Mer</div><div class="sp-num">6</div><div class="sp-month">Mag</div><div class="sp-task">SAL multilingue</div></div>
+      <div class="sp-day done"><div class="sp-lbl">Gio</div><div class="sp-num">7</div><div class="sp-month">Mag</div><div class="sp-task">Itinerari + polyline</div></div>
+      <div class="sp-day today"><div class="sp-lbl">Oggi · Ven</div><div class="sp-num">8</div><div class="sp-month">Mag</div><div class="sp-task">Wire Plesk + nav</div></div>
+      <div class="sp-day next"><div class="sp-lbl">Sab</div><div class="sp-num">9</div><div class="sp-month">Mag</div><div class="sp-task">Slide demo + storia</div></div>
+      <div class="sp-day next"><div class="sp-lbl">Dom</div><div class="sp-num">10</div><div class="sp-month">Mag</div><div class="sp-task">Dry-run completo</div></div>
+      <div class="sp-day next"><div class="sp-lbl">Lun</div><div class="sp-num">11</div><div class="sp-month">Mag</div><div class="sp-task">Refining + audience</div></div>
+      <div class="sp-day next"><div class="sp-lbl">Mar</div><div class="sp-num">12</div><div class="sp-month">Mag</div><div class="sp-task">Dress rehearsal</div></div>
+      <div class="sp-day dl"><div class="sp-lbl">Mer</div><div class="sp-num" style="color:var(--red)">13</div><div class="sp-month" style="color:rgba(255,110,110,0.9)">Mag</div><div class="sp-task" style="color:rgba(255,110,110,0.95)">🎤 Apertura finestra</div></div>
+      <div class="sp-day window"><div class="sp-lbl">Gio</div><div class="sp-num">14</div><div class="sp-month">Mag</div><div class="sp-task">🎤 Presentazioni</div></div>
+      <div class="sp-day window"><div class="sp-lbl">Ven</div><div class="sp-num">15</div><div class="sp-month">Mag</div><div class="sp-task">🎤 Presentazioni</div></div>
+      <div class="sp-day window"><div class="sp-lbl">Sab</div><div class="sp-num">16</div><div class="sp-month">Mag</div><div class="sp-task">🎤 Presentazioni</div></div>
+      <div class="sp-day window"><div class="sp-lbl">Dom</div><div class="sp-num">17</div><div class="sp-month">Mag</div><div class="sp-task">🎤 Chiusura finestra</div></div>
+
+      <!-- DUPLICATO per loop seamless (aria-hidden) -->
+      <div class="sp-day done" aria-hidden="true"><div class="sp-lbl">Lun</div><div class="sp-num">27</div><div class="sp-month">Apr</div><div class="sp-task">Cultural Bridge OS</div></div>
+      <div class="sp-day done" aria-hidden="true"><div class="sp-lbl">Mar</div><div class="sp-num">28</div><div class="sp-month">Apr</div><div class="sp-task">Bio trilingue</div></div>
+      <div class="sp-day done" aria-hidden="true"><div class="sp-lbl">Mer</div><div class="sp-num">29</div><div class="sp-month">Apr</div><div class="sp-task">Demo HTML5</div></div>
+      <div class="sp-day done" aria-hidden="true"><div class="sp-lbl">Gio</div><div class="sp-num">30</div><div class="sp-month">Apr</div><div class="sp-task">Avatar Liri</div></div>
+      <div class="sp-day done" aria-hidden="true"><div class="sp-lbl">Ven</div><div class="sp-num">1</div><div class="sp-month">Mag</div><div class="sp-task">README upgrade</div></div>
+      <div class="sp-day done" aria-hidden="true"><div class="sp-lbl">Sab</div><div class="sp-num">2</div><div class="sp-month">Mag</div><div class="sp-task">Migration Supabase</div></div>
+      <div class="sp-day done" aria-hidden="true"><div class="sp-lbl">Dom</div><div class="sp-num">3</div><div class="sp-month">Mag</div><div class="sp-task">Card system</div></div>
+      <div class="sp-day done" aria-hidden="true"><div class="sp-lbl">Lun</div><div class="sp-num">4</div><div class="sp-month">Mag</div><div class="sp-task">Webapp HTML demo</div></div>
+      <div class="sp-day done" aria-hidden="true"><div class="sp-lbl">Mar</div><div class="sp-num">5</div><div class="sp-month">Mag</div><div class="sp-task">index.html SPA</div></div>
+      <div class="sp-day done" aria-hidden="true"><div class="sp-lbl">Mer</div><div class="sp-num">6</div><div class="sp-month">Mag</div><div class="sp-task">SAL multilingue</div></div>
+      <div class="sp-day done" aria-hidden="true"><div class="sp-lbl">Gio</div><div class="sp-num">7</div><div class="sp-month">Mag</div><div class="sp-task">Itinerari + polyline</div></div>
+      <div class="sp-day today" aria-hidden="true"><div class="sp-lbl">Oggi · Ven</div><div class="sp-num">8</div><div class="sp-month">Mag</div><div class="sp-task">Wire Plesk + nav</div></div>
+      <div class="sp-day next" aria-hidden="true"><div class="sp-lbl">Sab</div><div class="sp-num">9</div><div class="sp-month">Mag</div><div class="sp-task">Slide demo + storia</div></div>
+      <div class="sp-day next" aria-hidden="true"><div class="sp-lbl">Dom</div><div class="sp-num">10</div><div class="sp-month">Mag</div><div class="sp-task">Dry-run completo</div></div>
+      <div class="sp-day next" aria-hidden="true"><div class="sp-lbl">Lun</div><div class="sp-num">11</div><div class="sp-month">Mag</div><div class="sp-task">Refining + audience</div></div>
+      <div class="sp-day next" aria-hidden="true"><div class="sp-lbl">Mar</div><div class="sp-num">12</div><div class="sp-month">Mag</div><div class="sp-task">Dress rehearsal</div></div>
+      <div class="sp-day dl" aria-hidden="true"><div class="sp-lbl">Mer</div><div class="sp-num" style="color:var(--red)">13</div><div class="sp-month" style="color:rgba(255,110,110,0.9)">Mag</div><div class="sp-task" style="color:rgba(255,110,110,0.95)">🎤 Apertura finestra</div></div>
+      <div class="sp-day window" aria-hidden="true"><div class="sp-lbl">Gio</div><div class="sp-num">14</div><div class="sp-month">Mag</div><div class="sp-task">🎤 Presentazioni</div></div>
+      <div class="sp-day window" aria-hidden="true"><div class="sp-lbl">Ven</div><div class="sp-num">15</div><div class="sp-month">Mag</div><div class="sp-task">🎤 Presentazioni</div></div>
+      <div class="sp-day window" aria-hidden="true"><div class="sp-lbl">Sab</div><div class="sp-num">16</div><div class="sp-month">Mag</div><div class="sp-task">🎤 Presentazioni</div></div>
+      <div class="sp-day window" aria-hidden="true"><div class="sp-lbl">Dom</div><div class="sp-num">17</div><div class="sp-month">Mag</div><div class="sp-task">🎤 Chiusura finestra</div></div>
     </div>
   </div>
 </div>
@@ -830,8 +848,8 @@ body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); 
   <div class="sec-hdr">
     <div class="sec-icon si-r"><i class="ph ph-rocket-launch"></i></div>
     <div>
-      <div class="sec-ttl" data-t="launch_title">Strategia di Lancio — 8 Giorni</div>
-      <div class="sec-sub" data-t="launch_sub">27 Apr → 8 Mag · 4 fasi · valutazione realistica</div>
+      <div class="sec-ttl" data-t="launch_title">Roadmap fino al Lancio Tirana</div>
+      <div class="sec-sub" data-t="launch_sub">27 Apr → Giugno · 4 fasi · finestra presentazioni 13-17 Maggio</div>
     </div>
   </div>
 
@@ -840,7 +858,7 @@ body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); 
     <div style="font-size:18px;flex-shrink:0;margin-top:1px">⚠️</div>
     <div>
       <div style="font-size:13px;font-weight:700;color:#92400E;margin-bottom:4px" data-t="warn_title">Cosa può andare storto — senza filtri</div>
-      <div style="font-size:12px;color:#78350F;line-height:1.65" data-t="warn_body">L'app non è ancora testata su un device fisico. I video HeyGen richiedono tempo di produzione reale. 0 stelle GitHub oggi significa che la candidatura Claude for OSS usa l'exception clause, non il percorso standard. Il lancio del 1 Maggio funziona solo se bios, demo e video arrivano insieme — non in sequenza. Se uno slitta, slitta tutto.</div>
+      <div style="font-size:12px;color:#78350F;line-height:1.65" data-t="warn_body">Finestra presentazioni: 13-17 Maggio (5 giorni dal Mer 13). La demo HTML è pronta (index.html navigabile, itinerari, media server PHP live su media.poilove.com), ma il wire AddPOI verso upload.php manca. App Expo non testata su device fisico. Il lancio Tirana di Giugno funziona solo se la finestra porta i partner giusti.</div>
     </div>
   </div>
 
@@ -849,9 +867,9 @@ body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); 
 
     <!-- FASE 1 -->
     <div style="background:#fff;border-radius:16px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,.07);border:1px solid var(--border);border-top:3px solid #285EA7">
-      <div style="font-size:10px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px" data-t="f1_phase">FASE 1 · 27–28 Apr</div>
-      <div style="font-size:15px;font-weight:800;margin-bottom:8px" data-t="f1_title">Identità</div>
-      <div style="font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:12px" data-t="f1_desc">Bio trilingue su LinkedIn, GitHub e X. Apertura Gmail, Instagram, TikTok. Avatar Liri per HeyGen. README upgrade GitHub.</div>
+      <div style="font-size:10px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px" data-t="f1_phase">FASE 1 · 27 Apr → 6 Mag</div>
+      <div style="font-size:15px;font-weight:800;margin-bottom:8px" data-t="f1_title">✅ Webapp & Infrastruttura</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:12px" data-t="f1_desc">Webapp HTML SPA navigabile, mappa Leaflet trilingue, sheet system, demo mode. Media server PHP live su media.poilove.com (upload + card + delete + JWT). Supabase 12 tabelle + RLS. Expo scaffold 17 file.</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
         <span style="background:#EBF2FC;color:var(--blue);font-size:9px;font-weight:700;padding:3px 7px;border-radius:6px" data-t="f1_who_c">Claude</span>
         <span style="background:#ECFDF5;color:#15803D;font-size:9px;font-weight:700;padding:3px 7px;border-radius:6px" data-t="f1_who_t">Tu</span>
@@ -860,31 +878,31 @@ body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); 
 
     <!-- FASE 2 -->
     <div style="background:#fff;border-radius:16px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,.07);border:1px solid var(--border);border-top:3px solid #D48B2B">
-      <div style="font-size:10px;font-weight:700;color:#D48B2B;text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px" data-t="f2_phase">FASE 2 · 28–29 Apr</div>
-      <div style="font-size:15px;font-weight:800;margin-bottom:8px" data-t="f2_title">Contenuti</div>
-      <div style="font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:12px" data-t="f2_desc">Demo HTML5 live su GitHub Pages. Video HeyGen con script IT/SQ/EN. Revisione sito poilove.com con sezione demo. GIF da Expo Go su device fisico.</div>
+      <div style="font-size:10px;font-weight:700;color:#D48B2B;text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px" data-t="f2_phase">FASE 2 · 7–9 Maggio</div>
+      <div style="font-size:15px;font-weight:800;margin-bottom:8px" data-t="f2_title">🔄 Rifinitura Demo + API Wire</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:12px" data-t="f2_desc">index.html consolidato (303KB). Wire AddPOI verso Plesk upload.php. Test end-to-end. Navigabilità chiusa. Slide presentazione + storia.</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <span style="background:#FFF8E7;color:#92400E;font-size:9px;font-weight:700;padding:3px 7px;border-radius:6px" data-t="f2_risk">⚠ rischio: video</span>
+        <span style="background:#FFF8E7;color:#92400E;font-size:9px;font-weight:700;padding:3px 7px;border-radius:6px" data-t="f2_risk">⚠ rischio: device test</span>
       </div>
     </div>
 
     <!-- FASE 3 -->
     <div style="background:#fff;border-radius:16px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,.07);border:1px solid var(--border);border-top:3px solid var(--red)">
-      <div style="font-size:10px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px" data-t="f3_phase">FASE 3 · 1 Maggio</div>
-      <div style="font-size:15px;font-weight:800;margin-bottom:8px" data-t="f3_title">🚀 Lancio Digitale</div>
-      <div style="font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:12px" data-t="f3_desc">Push alle 09:00 CET. README live con GIF + video. Post LinkedIn, thread X, TikTok/Instagram reel. Comunicato stampa a 5 testate tech IT + media albanesi.</div>
+      <div style="font-size:10px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px" data-t="f3_phase">FASE 3 · 13-17 Maggio</div>
+      <div style="font-size:15px;font-weight:800;margin-bottom:8px" data-t="f3_title">🎤 Finestra Presentazioni</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:12px" data-t="f3_desc">5 giorni di demo live distribuite. SAL aggiornato. Q&A tecniche. Roadmap Tirana mostrata. Audience: partner + investitori + alleati locali, hand-picked, ripartiti nei 5 giorni.</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <span style="background:#FFF0F0;color:var(--red);font-size:9px;font-weight:700;padding:3px 7px;border-radius:6px" data-t="f3_note">Tutto insieme — non in sequenza</span>
+        <span style="background:#FFF0F0;color:var(--red);font-size:9px;font-weight:700;padding:3px 7px;border-radius:6px" data-t="f3_note">Una sola — niente HN, niente lancio digitale</span>
       </div>
     </div>
 
     <!-- FASE 4 -->
     <div style="background:#fff;border-radius:16px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,.07);border:1px solid var(--border);border-top:3px solid var(--green)">
-      <div style="font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px" data-t="f4_phase">FASE 4 · 6 Maggio</div>
-      <div style="font-size:15px;font-weight:800;margin-bottom:8px" data-t="f4_title">Amplificazione</div>
-      <div style="font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:12px" data-t="f4_desc">Show HN mercoledì 09:00 CET — titolo senza Tirana. Reddit blast in 4 community. Articolo Dev.to/Medium. Email Anthropic Claude for OSS il 8 Maggio con i dati reali di trazione.</div>
+      <div style="font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px" data-t="f4_phase">FASE 4 · 11 Mag → Giugno</div>
+      <div style="font-size:15px;font-weight:800;margin-bottom:8px" data-t="f4_title">🚀 Pre-Lancio Tirana</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:12px" data-t="f4_desc">Iterazione su feedback. Test app Expo su device fisico. Accordi partner locali. Evento di lancio fisico Tirana. Lancio pubblico Giugno.</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <span style="background:#ECFDF5;color:#15803D;font-size:9px;font-weight:700;padding:3px 7px;border-radius:6px" data-t="f4_hn">HN = mercoledì, mai venerdì</span>
+        <span style="background:#ECFDF5;color:#15803D;font-size:9px;font-weight:700;padding:3px 7px;border-radius:6px" data-t="f4_hn">Lancio fisico, non digitale</span>
       </div>
     </div>
   </div>
@@ -893,11 +911,11 @@ body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); 
   <div style="background:var(--bg);border-radius:12px;padding:14px 18px;margin-top:14px;display:flex;flex-direction:column;gap:8px">
     <div style="display:flex;gap:10px;align-items:flex-start">
       <span style="font-size:14px;flex-shrink:0">⚡</span>
-      <div style="font-size:11px;color:var(--muted);line-height:1.6" data-t="why1">HN non il 1 Maggio. Il venerdì è il giorno peggiore — traffico basso, weekend. Il 1 Maggio serve per costruire la base (README, video, demo) così quando arriva HN il mercoledì c'è qualcosa da vedere.</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6" data-t="why1">Finestra di 5 giorni (13-17 Maggio) invece di un singolo giorno. Niente HN, niente lancio digitale anticipato. Si mostra a partner, investitori, alleati locali — hand-picked, distribuiti nei 5 giorni. Nessun rumore esterno fino al lancio Tirana di Giugno.</div>
     </div>
     <div style="display:flex;gap:10px;align-items:flex-start">
       <span style="font-size:14px;flex-shrink:0">📊</span>
-      <div style="font-size:11px;color:var(--muted);line-height:1.6" data-t="why2">Email Anthropic dopo la trazione. "Abbiamo appena lanciato e in 7 giorni abbiamo X stelle, Y visitatori alla demo, Z post su HN" è un'email completamente diversa da una scritta nel vuoto.</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6" data-t="why2">Tra il 17 Maggio e Giugno passano 2-3 settimane: tempo per iterare su feedback, testare app su device, chiudere accordi locali, organizzare evento di lancio fisico a Tirana.</div>
     </div>
   </div>
 </div>
@@ -1011,7 +1029,7 @@ function rebuildPieLegend() {
 
 const T = {
   it: {
-    sal_badge:'SAL — Stato Avanzamento Lavori', updated_date:'Aggiornato: 26 Aprile 2026',
+    sal_badge:'SAL — Stato Avanzamento Lavori', updated_date:'Aggiornato: 8 Maggio 2026',
     status_pill:'MVP in sviluppo', hero_sub:'Stato del Progetto',
     hero_desc:'Mappa comunitaria dei luoghi amati. Prima istanza: Albania · Tirana. Lancio previsto giugno 2026. Framework open source Cultural Bridge OS — Licenza MIT.',
     kpi_done:'Completamento', kpi_weeks:'Settimane al lancio', kpi_tables:'Tabelle database', kpi_license:'Licenza',
@@ -1039,13 +1057,13 @@ const T = {
     t13_name:'App Store + Google Play — Submission', t13_sub:'Screenshot, descrizioni, review Apple 1-3gg, Google 2-7gg', t13_phase:'Lancio', t13_time_m:'~5h — futuro',
     t14_name:'Campagna Lancio — Hacker News, Reddit, Twitter', t14_sub:'Show HN post, r/opensource, thread Twitter founder story', t14_phase:'Marketing', t14_time_m:'~4h — futuro',
     done_lbl:'completato', badge_done:'Fatto', badge_sprint:'Sprint', badge_next:'Prossimo', badge_future:'Futuro',
-    deadline_anthropic_lbl:'⚡ Scadenza Anthropic', deadline_anthropic_date:'1 Maggio 2026',
+    deadline_anthropic_lbl:'🎤 Finestra Presentazioni', deadline_anthropic_date:'13-17 Maggio 2026',
     deadline_tirana_lbl:'🚀 Lancio Tirana', deadline_tirana_date:'Giugno 2026',
     browser_banner:'📱 Per la migliore esperienza, apri in <strong>Safari</strong> o <strong>Chrome</strong>',
-    sprint_title:'Sprint Critico — 7 Giorni', sprint_sub:'Piano d\'azione per la candidatura Anthropic for Startups',
-    day_today:'Oggi', day_fri:'Ven', day_sat:'Sab', day_sun:'Dom', day_mon:'Lun', day_tue:'Mar', day_wed:'Mer',
-    day1_task:'SAL Investitori + Form Anthropic', day2_task:'Hacker News Show HN post', day3_task:'Expo setup + Google Maps',
-    day4_task:'Schermata Mappa + POI', day5_task:'Supabase Integration', day6_task:'Video demo + Plesk API', day7_task:'Submit Anthropic 🚀',
+    sprint_title:'Sprint Pre-Presentazione', sprint_sub:'Cosa serve entro Mercoledì 13 Maggio (apertura finestra)',
+    day_today:'Oggi', day_fri:'Sab', day_sat:'Dom', day_sun:'Lun', day_mon:'Mar', day_tue:'Mer', day_wed:'Gio',
+    day1_task:'Wire Plesk Upload + nav', day2_task:'Slide demo + storia', day3_task:'Dry-run completo',
+    day4_task:'Refining + audience', day5_task:'Dress rehearsal', day6_task:'🎤 Apertura finestra', day7_task:'🎤 Presentazione 2/5',
     ms_title:'Milestone di Progetto', ms_sub:'Roadmap dal lancio di Tirana alla scalabilità globale',
     ms1_date:'✓ Completata', ms1_title:'Prototipo Web + Infrastruttura', ms1_desc:'Demo live, database Supabase, autenticazione Google, API Maps configurate.', ms1_status:'Rilasciato',
     ms2_date:'🎯 Giugno 2026', ms2_title:'MVP App iOS + Android', ms2_desc:'Lancio pubblico a Tirana. Mappa, inserimento POI, liste, sistema LOVE.', ms2_status:'In sviluppo',
@@ -1056,31 +1074,31 @@ const T = {
     tech3_role:'Repo pubblico + CI/CD + Demo live', tech4_role:'iOS + Android da un unico codebase',
     tech5_role:'Storage foto proprietario — API PHP custom', tech6_role:'AI pipeline: enrichment, categorizzazione, audio guide future',
     tech_active:'Attivo', tech_start:'Da avviare', tech_config:'Da configurare', tech_phase2:'Fase 2',
-    launch_title:'Strategia di Lancio — 8 Giorni',
-    launch_sub:'27 Apr → 8 Mag · 4 fasi · valutazione realistica',
+    launch_title:'Roadmap fino al Lancio Tirana',
+    launch_sub:'27 Apr → Giugno · 4 fasi · finestra presentazioni 13-17 Maggio',
     warn_title:'Cosa può andare storto — senza filtri',
-    warn_body:'L\'app non è ancora testata su device fisico. I video HeyGen richiedono produzione reale. 0 stelle GitHub oggi = candidatura via exception clause, non percorso standard. Il lancio del 1 Maggio funziona solo se bios, demo e video arrivano insieme. Se uno slitta, slitta tutto.',
-    f1_phase:'FASE 1 · 27–28 Apr', f1_title:'Identità',
-    f1_desc:'Bio trilingue su LinkedIn, GitHub e X. Gmail, Instagram, TikTok. Avatar Liri per HeyGen. README upgrade.',
+    warn_body:'Finestra presentazioni: 13-17 Maggio (5 giorni dal Mer 13). La demo HTML è pronta (index.html navigabile, itinerari, media server PHP live su media.poilove.com), ma il wire AddPOI verso upload.php manca. App Expo non testata su device fisico. Il lancio Tirana di Giugno funziona solo se la finestra porta i partner giusti.',
+    f1_phase:'FASE 1 · 27 Apr → 6 Mag', f1_title:'✅ Webapp & Infrastruttura',
+    f1_desc:'Webapp HTML SPA navigabile, mappa Leaflet trilingue, sheet system, demo mode. Media server PHP live su media.poilove.com (upload + card + delete + JWT). Supabase 12 tabelle + RLS. Expo scaffold 17 file.',
     f1_who_c:'Claude', f1_who_t:'Tu',
-    f2_phase:'FASE 2 · 28–29 Apr', f2_title:'Contenuti',
-    f2_desc:'Demo HTML5 su GitHub Pages. Video HeyGen IT/SQ/EN. Revisione poilove.com. GIF da Expo Go su device.',
-    f2_risk:'⚠ rischio: video',
-    f3_phase:'FASE 3 · 1 Maggio', f3_title:'🚀 Lancio Digitale',
-    f3_desc:'Push alle 09:00 CET. README live con GIF + video. Post LinkedIn, thread X, TikTok/Instagram. Comunicato a 5 testate tech IT + media albanesi.',
-    f3_note:'Tutto insieme — non in sequenza',
-    f4_phase:'FASE 4 · 6 Maggio', f4_title:'Amplificazione',
-    f4_desc:'Show HN mercoledì 09:00 CET. Reddit blast 4 community. Articolo Dev.to. Email Anthropic 8 Maggio con dati reali.',
-    f4_hn:'HN = mercoledì, mai venerdì',
-    why1:'HN non il 1 Maggio. Il venerdì è il giorno peggiore — traffico basso, weekend. Il 1 Maggio serve per costruire la base così quando arriva HN il mercoledì c\'è qualcosa da vedere.',
-    why2:'"Abbiamo lanciato e in 7 giorni abbiamo X stelle, Y visitatori, Z commenti su HN" è un\'email completamente diversa da una scritta nel vuoto.',
+    f2_phase:'FASE 2 · 7–9 Maggio', f2_title:'🔄 Rifinitura Demo + API Wire',
+    f2_desc:'index.html consolidato (303KB). Wire AddPOI verso Plesk upload.php. Test end-to-end. Navigabilità chiusa. Slide presentazione + storia.',
+    f2_risk:'⚠ rischio: device test',
+    f3_phase:'FASE 3 · 13-17 Maggio', f3_title:'🎤 Finestra Presentazioni',
+    f3_desc:'5 giorni di demo live distribuite. SAL aggiornato. Q&A tecniche. Roadmap Tirana mostrata. Audience: partner + investitori + alleati locali, hand-picked, ripartiti nei 5 giorni.',
+    f3_note:'Una sola — niente HN, niente lancio digitale',
+    f4_phase:'FASE 4 · 11 Mag → Giugno', f4_title:'🚀 Pre-Lancio Tirana',
+    f4_desc:'Iterazione su feedback. Test app Expo su device fisico. Accordi partner locali. Evento di lancio fisico Tirana. Lancio pubblico Giugno.',
+    f4_hn:'Lancio fisico, non digitale',
+    why1:'Finestra di 5 giorni (13-17 Maggio) invece di un singolo giorno. Niente HN, niente lancio digitale anticipato. Si mostra a partner, investitori, alleati locali — hand-picked, distribuiti nei 5 giorni. Nessun rumore esterno fino al lancio Tirana di Giugno.',
+    why2:'Tra il 17 Maggio e Giugno passano 2-3 settimane: tempo per iterare su feedback, testare app su device, chiudere accordi locali, organizzare evento di lancio fisico a Tirana.',
     cta_title:'Claude for OSS — 6 mesi gratuiti',
     cta_desc:'Non è Anthropic for Startups. È il programma Claude for Open Source: 6 mesi di Claude Max gratuito. Requisito standard: 5.000 stelle GitHub. Percorso alternativo: exception clause per missione culturale, MIT license, sviluppo attivo. POI•LOVE si candida via exception clause — subito, senza aspettare le stelle. Scadenza: rolling, 10.000 posti totali.',
     cta_btn:'Candidati →', links_title:'Link Rapidi', link1_name:'Demo Live', link3_name:'Sito Ufficiale',
     open_link:'Apri →', link_demo:'Demo Live', footer_copy:'SAL — Documento per investitori e partner',
   },
   en: {
-    sal_badge:'Project Status Report', updated_date:'Updated: April 24, 2026',
+    sal_badge:'Project Status Report', updated_date:'Updated: May 8, 2026',
     status_pill:'MVP in development', hero_sub:'Project Status',
     hero_desc:'Community map of beloved places. First instance: Albania · Tirana. Launch planned June 2026. Open source framework Cultural Bridge OS — MIT License.',
     kpi_done:'Completion', kpi_weeks:'Weeks to launch', kpi_tables:'Database tables', kpi_license:'License',
@@ -1108,13 +1126,13 @@ const T = {
     t13_name:'App Store + Google Play — Submission', t13_sub:'Screenshots, descriptions, Apple review 1-3d, Google 2-7d', t13_phase:'Launch', t13_time_m:'~5h — future',
     t14_name:'Launch Campaign — Hacker News, Reddit, Twitter', t14_sub:'Show HN post, r/opensource, Twitter founder story thread', t14_phase:'Marketing', t14_time_m:'~4h — future',
     done_lbl:'done', badge_done:'Done', badge_sprint:'Sprint', badge_next:'Next', badge_future:'Future',
-    deadline_anthropic_lbl:'⚡ Anthropic Deadline', deadline_anthropic_date:'May 1, 2026',
+    deadline_anthropic_lbl:'🎤 Presentation Window', deadline_anthropic_date:'May 13-17, 2026',
     deadline_tirana_lbl:'🚀 Tirana Launch', deadline_tirana_date:'June 2026',
     browser_banner:'📱 For the best experience, open in <strong>Safari</strong> or <strong>Chrome</strong>',
-    sprint_title:'Critical Sprint — 7 Days', sprint_sub:'Action plan for the Anthropic for Startups application',
-    day_today:'Today', day_fri:'Fri', day_sat:'Sat', day_sun:'Sun', day_mon:'Mon', day_tue:'Tue', day_wed:'Wed',
-    day1_task:'Investor SAL + Anthropic Form', day2_task:'Hacker News Show HN post', day3_task:'Expo setup + Google Maps',
-    day4_task:'Map Screen + POI', day5_task:'Supabase Integration', day6_task:'Video demo + Plesk API', day7_task:'Submit Anthropic 🚀',
+    sprint_title:'Pre-Presentation Sprint', sprint_sub:'Goals for Wednesday May 13 (window opens)',
+    day_today:'Today', day_fri:'Sat', day_sat:'Sun', day_sun:'Mon', day_mon:'Tue', day_tue:'Wed', day_wed:'Thu',
+    day1_task:'Wire Plesk Upload + nav', day2_task:'Slides + story', day3_task:'Full dry-run',
+    day4_task:'Refining + audience', day5_task:'Dress rehearsal', day6_task:'🎤 Window opens', day7_task:'🎤 Presentation 2/5',
     ms_title:'Project Milestones', ms_sub:'Roadmap from Tirana launch to global scale',
     ms1_date:'✓ Completed', ms1_title:'Web Prototype + Infrastructure', ms1_desc:'Live demo, Supabase database, Google auth, Maps APIs configured.', ms1_status:'Released',
     ms2_date:'🎯 June 2026', ms2_title:'MVP App iOS + Android', ms2_desc:'Public launch in Tirana. Map, POI entry, lists, LOVE system.', ms2_status:'In development',
@@ -1125,31 +1143,31 @@ const T = {
     tech3_role:'Public repo + CI/CD + Live demo', tech4_role:'iOS + Android from a single codebase',
     tech5_role:'Proprietary photo storage — custom PHP API', tech6_role:'AI pipeline: enrichment, categorization, future audio guides',
     tech_active:'Active', tech_start:'To start', tech_config:'To configure', tech_phase2:'Phase 2',
-    launch_title:'Launch Strategy — 8 Days',
-    launch_sub:'Apr 27 → May 8 · 4 phases · realistic assessment',
+    launch_title:'Roadmap to Tirana Launch',
+    launch_sub:'Apr 27 → June · 4 phases · presentation window May 13-17',
     warn_title:'What can go wrong — no filters',
-    warn_body:'The app hasn\'t been tested on a physical device yet. HeyGen videos require real production time. 0 GitHub stars today means the Claude for OSS application uses the exception clause, not the standard path. The May 1st launch only works if bios, demo and videos all land together — not in sequence. If one slips, everything slips.',
-    f1_phase:'PHASE 1 · Apr 27–28', f1_title:'Identity',
-    f1_desc:'Trilingual bios on LinkedIn, GitHub and X. Gmail, Instagram, TikTok setup. Liri avatar brief for HeyGen. GitHub README upgrade.',
+    warn_body:'Presentation window: May 13-17 (5 days starting Wed 13). The HTML demo is ready (navigable index.html, itinerari, live PHP media server on media.poilove.com), but the AddPOI to upload.php wire is missing. Expo app not yet tested on physical device. The June Tirana launch only works if the window brings the right partners.',
+    f1_phase:'PHASE 1 · Apr 27 → May 6', f1_title:'✅ Webapp & Infrastructure',
+    f1_desc:'Navigable HTML SPA, trilingual Leaflet map, sheet system, demo mode. Live PHP media server on media.poilove.com (upload + card + delete + JWT). Supabase 12 tables + RLS. Expo scaffold 17 files.',
     f1_who_c:'Claude', f1_who_t:'You',
-    f2_phase:'PHASE 2 · Apr 28–29', f2_title:'Content',
-    f2_desc:'HTML5 demo live on GitHub Pages. HeyGen videos IT/SQ/EN. poilove.com revision with demo section. GIF from Expo Go on physical device.',
-    f2_risk:'⚠ risk: video production',
-    f3_phase:'PHASE 3 · May 1st', f3_title:'🚀 Digital Launch',
-    f3_desc:'Push at 09:00 CET. README live with GIF + video. LinkedIn post, X thread, TikTok/Instagram reel. Press release to 5 Italian tech outlets + Albanian media.',
-    f3_note:'All together — not in sequence',
-    f4_phase:'PHASE 4 · May 6th', f4_title:'Amplification',
-    f4_desc:'Show HN Wednesday 09:00 CET — global title, no Tirana. Reddit blast 4 communities. Dev.to article. Anthropic email May 8th with real traction data.',
-    f4_hn:'HN = Wednesday, never Friday',
-    why1:'HN not on May 1st. Friday is the worst day — low traffic, weekend. May 1st is to build the base (README, video, demo) so when HN Wednesday comes there\'s something to see.',
-    why2:'"We just launched and in 7 days we have X stars, Y demo visitors, Z HN comments" is a completely different email from one written in a vacuum.',
+    f2_phase:'PHASE 2 · May 7–9', f2_title:'🔄 Demo Polish + API Wire',
+    f2_desc:'index.html consolidated (303KB). Wire AddPOI to Plesk upload.php. End-to-end test. Navigation closed. Slides + story.',
+    f2_risk:'⚠ risk: device testing',
+    f3_phase:'PHASE 3 · May 13-17', f3_title:'🎤 Presentation Window',
+    f3_desc:'5 days of distributed live demos. Updated SAL. Technical Q&A. Tirana roadmap shown. Audience: partners + investors + local allies, hand-picked, spread across 5 days.',
+    f3_note:'One only — no HN, no digital launch',
+    f4_phase:'PHASE 4 · May 11 → June', f4_title:'🚀 Pre-Launch Tirana',
+    f4_desc:'Iteration on feedback. Expo app tested on physical device. Local partner agreements. Physical launch event Tirana. Public launch June.',
+    f4_hn:'Physical launch, not digital',
+    why1:'A 5-day window (May 13-17) instead of a single day. No HN, no early digital launch. Shown to partners, investors, local allies — hand-picked, spread across 5 days. No external noise until the June Tirana launch.',
+    why2:'Between May 17 and June, 2-3 weeks pass: time to iterate on feedback, test the app on devices, close local agreements, organize the physical launch event in Tirana.',
     cta_title:'Claude for OSS — 6 months free',
     cta_desc:'Not Anthropic for Startups. This is the Claude for Open Source program: 6 months of free Claude Max for OSS builders. Standard requirement: 5,000 GitHub stars. Alternative path: exception clause for cultural mission, MIT license, active development. POI•LOVE applies via exception clause — now, without waiting for stars. Deadline: rolling, 10,000 spots total.',
     cta_btn:'Apply →', links_title:'Quick Links', link1_name:'Live Demo', link3_name:'Official Website',
     open_link:'Open →', link_demo:'Live Demo', footer_copy:'Status Report — For investors and partners',
   },
   sq: {
-    sal_badge:'Raport i Progresit të Projektit', updated_date:'Përditësuar: 24 Prill 2026',
+    sal_badge:'Raport i Progresit të Projektit', updated_date:'Përditësuar: 8 Maj 2026',
     status_pill:'MVP në zhvillim', hero_sub:'Gjendja e Projektit',
     hero_desc:'Hartë komunitare e vendeve të dashura. Rasti i parë: Shqipëri · Tiranë. Lansim i planifikuar qershor 2026. Kornizë me burim të hapur Cultural Bridge OS — Licencë MIT.',
     kpi_done:'Përfundim', kpi_weeks:'Javë deri lansim', kpi_tables:'Tabela DB', kpi_license:'Licencë',
@@ -1177,13 +1195,13 @@ const T = {
     t13_name:'App Store + Google Play — Dorëzim', t13_sub:'Pamje ekrani, përshkrime, rishikim Apple 1-3d, Google 2-7d', t13_phase:'Lansim', t13_time_m:'~5h — e ardhshme',
     t14_name:'Fushatë Lansimi — Hacker News, Reddit, Twitter', t14_sub:'Show HN post, r/opensource, thread Twitter historia e themeluesit', t14_phase:'Marketing', t14_time_m:'~4h — e ardhshme',
     done_lbl:'kryer', badge_done:'Kryer', badge_sprint:'Sprint', badge_next:'Tjetri', badge_future:'I ardhshëm',
-    deadline_anthropic_lbl:'⚡ Afati Anthropic', deadline_anthropic_date:'1 Maj 2026',
+    deadline_anthropic_lbl:'🎤 Dritarja e Prezantimit', deadline_anthropic_date:'13-17 Maj 2026',
     deadline_tirana_lbl:'🚀 Lansimi Tiranë', deadline_tirana_date:'Qershor 2026',
     browser_banner:'📱 Për përvojën më të mirë, hapeni në <strong>Safari</strong> ose <strong>Chrome</strong>',
-    sprint_title:'Sprint Kritik — 7 Ditë', sprint_sub:'Plan veprimi për aplikimin Anthropic for Startups',
-    day_today:'Sot', day_fri:'Pre', day_sat:'Sht', day_sun:'Die', day_mon:'Hën', day_tue:'Mar', day_wed:'Mër',
-    day1_task:'SAL Investitorë + Formular Anthropic', day2_task:'Hacker News Show HN post', day3_task:'Expo setup + Google Maps',
-    day4_task:'Ekrani Hartës + POI', day5_task:'Integrim Supabase', day6_task:'Video demo + Plesk API', day7_task:'Dorëzo Anthropic 🚀',
+    sprint_title:'Sprint Para-Prezantim', sprint_sub:'Çfarë duhet deri të Mërkurën 13 Maj (hapja e dritares)',
+    day_today:'Sot', day_fri:'Sht', day_sat:'Die', day_sun:'Hën', day_mon:'Mar', day_tue:'Mër', day_wed:'Enj',
+    day1_task:'Wire Plesk Upload + nav', day2_task:'Slide + histori', day3_task:'Dry-run i plotë',
+    day4_task:'Rafinim + audienca', day5_task:'Provë kostumesh', day6_task:'🎤 Hapet dritarja', day7_task:'🎤 Prezantim 2/5',
     ms_title:'Piketat e Projektit', ms_sub:'Rrugëtimi nga lansimi i Tiranës deri te shkallëzimi global',
     ms1_date:'✓ Përfunduar', ms1_title:'Prototip Web + Infrastrukturë', ms1_desc:'Demo live, database Supabase, autentikim Google, API Maps të konfiguruara.', ms1_status:'Lëshuar',
     ms2_date:'🎯 Qershor 2026', ms2_title:'MVP App iOS + Android', ms2_desc:'Lansim publik në Tiranë. Hartë, futja e POI, lista, sistemi LOVE.', ms2_status:'Në zhvillim',
@@ -1194,24 +1212,24 @@ const T = {
     tech3_role:'Repo publik + CI/CD + Demo live', tech4_role:'iOS + Android nga një bazë kodi e vetme',
     tech5_role:'Ruajtje foto pronësor — API PHP me porosi', tech6_role:'Pipeline AI: pasurimi, kategorizimi, audio guida të ardhshme',
     tech_active:'Aktiv', tech_start:'Për t\'u nisur', tech_config:'Për t\'u konfiguruar', tech_phase2:'Faza 2',
-    launch_title:'Strategji Lansimi — 8 Ditë',
-    launch_sub:'27 Pri → 8 Maj · 4 faza · vlerësim realist',
+    launch_title:'Plani deri në Lansimin e Tiranës',
+    launch_sub:'27 Pri → Qershor · 4 faza · dritare prezantimesh 13-17 Maj',
     warn_title:'Çfarë mund të shkojë keq — pa filtër',
-    warn_body:'Aplikacioni nuk është testuar ende në pajisje fizike. Videot HeyGen kërkojnë kohë reale prodhimi. 0 yje GitHub sot = aplikimi Claude for OSS me klauzolë përjashtimi, jo rruga standarde. Lansimi i 1 Majit funksionon vetëm nëse bio, demo dhe videot vijnë së bashku — jo në sekuencë. Nëse njëra rrëshqet, rrëshqet gjithçka.',
-    f1_phase:'FAZA 1 · 27–28 Pri', f1_title:'Identiteti',
-    f1_desc:'Bio trefishe në LinkedIn, GitHub dhe X. Gmail, Instagram, TikTok. Avatari Liri për HeyGen. README upgrade.',
+    warn_body:'Dritarja e prezantimit: 13-17 Maj (5 ditë duke nisur të mërkurën 13). Demo HTML është gati (index.html i lundrueshëm, itinerari, media server PHP live në media.poilove.com), por wire AddPOI te upload.php mungon. App Expo ende e patestuar në pajisje fizike. Lansimi i Tiranës i Qershorit funksionon vetëm nëse dritarja sjell partnerët e duhur.',
+    f1_phase:'FAZA 1 · 27 Pri → 6 Maj', f1_title:'✅ Webapp & Infrastrukturë',
+    f1_desc:'Webapp HTML SPA e lundrueshme, hartë Leaflet trefishe, sheet system, demo mode. Media server PHP live në media.poilove.com (upload + card + delete + JWT). Supabase 12 tabela + RLS. Expo scaffold 17 file.',
     f1_who_c:'Claude', f1_who_t:'Ti',
-    f2_phase:'FAZA 2 · 28–29 Pri', f2_title:'Përmbajtja',
-    f2_desc:'Demo HTML5 në GitHub Pages. Videot HeyGen IT/SQ/EN. Rishikim poilove.com. GIF nga Expo Go në pajisje fizike.',
-    f2_risk:'⚠ rrezik: prodhimi video',
-    f3_phase:'FAZA 3 · 1 Maj', f3_title:'🚀 Lansimi Dixhital',
-    f3_desc:'Push në orën 09:00 CET. README live me GIF + video. Post LinkedIn, fije X, TikTok/Instagram reel. Komunikatë shtypi për 5 media tech IT + media shqiptare.',
-    f3_note:'Gjithçka së bashku — jo në sekuencë',
-    f4_phase:'FAZA 4 · 6 Maj', f4_title:'Amplifikimi',
-    f4_desc:'Show HN të mërkurën 09:00 CET — titull global, pa Tiranë. Reddit blast 4 komunitete. Artikull Dev.to. Email Anthropic 8 Maj me të dhëna reale.',
-    f4_hn:'HN = e mërkurë, kurrë e premte',
-    why1:'HN jo më 1 Maj. E premtja është dita më e keqe — trafik i ulët, fundjavë. 1 Maji shërben për të ndërtuar bazën kështu që kur vjen HN e mërkurën ka diçka për të parë.',
-    why2:'"Sapo u lansua dhe në 7 ditë kemi X yje, Y vizitorë demo, Z komente HN" është një email krejtësisht ndryshe nga njëra e shkruar në boshllëk.',
+    f2_phase:'FAZA 2 · 7–9 Maj', f2_title:'🔄 Lustrim Demo + Wire API',
+    f2_desc:'index.html i konsoliduar (303KB). Wire AddPOI te Plesk upload.php. Test end-to-end. Navigimi i mbyllur. Slide + histori.',
+    f2_risk:'⚠ rrezik: testim pajisjeje',
+    f3_phase:'FAZA 3 · 13-17 Maj', f3_title:'🎤 Dritarja e Prezantimit',
+    f3_desc:'5 ditë demo live të shpërndara. SAL i përditësuar. Q&A teknike. Roadmap Tirana e shfaqur. Audienca: partnerë + investitorë + aleatë lokalë, të zgjedhur me dorë, të shpërndarë në 5 ditë.',
+    f3_note:'Vetëm një — pa HN, pa lansim dixhital',
+    f4_phase:'FAZA 4 · 11 Maj → Qershor', f4_title:'🚀 Para-Lansim Tiranë',
+    f4_desc:'Iterim mbi feedback. App Expo i testuar në pajisje fizike. Marrëveshje me partnerë lokalë. Event lansimi fizik në Tiranë. Lansim publik Qershor.',
+    f4_hn:'Lansim fizik, jo dixhital',
+    why1:'Dritare 5-ditore (13-17 Maj) në vend të një dite të vetme. Pa HN, pa lansim dixhital të parakohshëm. I shfaqet partnerëve, investitorëve, aleatëve lokalë — të zgjedhur me dorë, të shpërndarë në 5 ditë. Pa zhurmë të jashtme deri në lansimin e Tiranës në Qershor.',
+    why2:'Mes 17 Majit dhe Qershorit kalojnë 2-3 javë: koha për të iteruar mbi feedback, testuar app-in në pajisje, mbyllur marrëveshje lokale, organizuar eventin fizik të lansimit në Tiranë.',
     cta_title:'Claude for OSS — 6 muaj falas',
     cta_desc:'Jo Anthropic for Startups. Ky është programi Claude for Open Source: 6 muaj Claude Max falas. Kërkesë standarde: 5.000 yje GitHub. Rruga alternative: klauzolë përjashtimi për mision kulturor, licencë MIT, zhvillim aktiv. POI•LOVE aplikon me klauzolë përjashtimi — tani, pa pritur yjet. Afati: rolling, 10.000 vende gjithsej.',
     cta_btn:'Apliko →', links_title:'Lidhje të Shpejta', link1_name:'Demo Live', link3_name:'Faqja Zyrtare',
@@ -1229,20 +1247,20 @@ let tr = T[LANG];
 ═══════════════════════════════════════════ */
 /* PIE usa chiavi di traduzione — si risolve dinamicamente al cambio lingua */
 const PIE = [
-  { id:'done',   color:'#22C55E', value:55, label_key:'pie_done',
+  { id:'done',   color:'#22C55E', value:60, label_key:'pie_done',
     items:[
       {key:'t1_name',done:true},{key:'t2_name',done:true},{key:'t3_name',done:true},
       {key:'t4_name',done:true},{key:'t5_name',done:true},{key:'t6_name',done:true}
     ]
   },
-  { id:'active', color:'#F59E0B', value:20, label_key:'pie_active',
+  { id:'active', color:'#F59E0B', value:25, label_key:'pie_active',
     items:[
       {key:'t7_name',done:false},{key:'t8_name',done:false},
       {key:'cta_title',done:false},
       {key:'_video',done:false}  /* chiave speciale */
     ]
   },
-  { id:'todo',   color:'#D42B2B', value:25, label_key:'pie_todo',
+  { id:'todo',   color:'#D42B2B', value:15, label_key:'pie_todo',
     items:[
       {key:'t9_name',done:false},{key:'t10_name',done:false},{key:'t11_name',done:false},
       {key:'t12_name',done:false},{key:'t13_name',done:false},{key:'t14_name',done:false}
@@ -1404,6 +1422,59 @@ window.addEventListener('load', ()=>{
     });
   }, 500);
 });
+
+/* ═══════════════
+   SPRINT GRID — DRAG MANUALE
+═══════════════ */
+(function(){
+  const wrap = document.getElementById('spGridWrap');
+  const grid = document.getElementById('spGrid');
+  if (!wrap || !grid) return;
+  const ANIM_DURATION = 90; // secondi (deve combaciare col CSS)
+  let isDown = false, startX = 0, startOffset = 0, halfWidth = 0;
+  function getCurrentTranslateX(){
+    const t = window.getComputedStyle(grid).transform;
+    if (!t || t === 'none') return 0;
+    const m = t.match(/matrix\([^)]+\)/);
+    if (!m) return 0;
+    const parts = m[0].slice(7,-1).split(',').map(s=>parseFloat(s.trim()));
+    return parts[4] || 0;
+  }
+  function setX(px){
+    grid.style.animation = 'none';
+    grid.style.transform = 'translateX(' + px + 'px)';
+  }
+  wrap.addEventListener('pointerdown', function(e){
+    isDown = true;
+    halfWidth = grid.scrollWidth / 2;
+    startX = e.clientX;
+    startOffset = getCurrentTranslateX();
+    wrap.classList.add('is-dragging');
+    setX(startOffset);
+    try { wrap.setPointerCapture(e.pointerId); } catch(_){}
+    e.preventDefault();
+  });
+  wrap.addEventListener('pointermove', function(e){
+    if (!isDown) return;
+    let newX = startOffset + (e.clientX - startX);
+    while (newX > 0) newX -= halfWidth;
+    while (newX < -halfWidth) newX += halfWidth;
+    setX(newX);
+  });
+  function release(){
+    if (!isDown) return;
+    isDown = false;
+    wrap.classList.remove('is-dragging');
+    const finalX = getCurrentTranslateX();
+    const progress = halfWidth > 0 ? Math.min(Math.max(Math.abs(finalX) / halfWidth, 0), 1) : 0;
+    grid.style.transform = '';
+    grid.style.animation = '';
+    grid.style.animationDelay = '-' + (progress * ANIM_DURATION) + 's';
+  }
+  wrap.addEventListener('pointerup', release);
+  wrap.addEventListener('pointercancel', release);
+  wrap.addEventListener('pointerleave', function(e){ if (isDown) release(); });
+})();
 </script>
 </body>
 </html>

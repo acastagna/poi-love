@@ -1,0 +1,8 @@
+POILOVE — CERTIFICATO DI NOTARIZZAZIONE
+DOCUMENTO: POILOVE — Progetto Digitale v5.0
+DATA: 01 April 2026, 14:23:34 UTC
+DIMENSIONE: 336,325 bytes
+SHA-256: 2e543e7a7822f9a1a402f36b90496e6907f694de6a9907ba3f14db1a9b7e14f1
+MD5: 9cb1bc99e9bab57f8d7a9ec756ab23bd
+VERIFICA: sha256sum poilove-progetto.pdf
+321.al · Alessandro Castagna · alessandrocastagna.it · Aprile 2026
