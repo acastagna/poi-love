@@ -169,8 +169,15 @@ button{touch-action:manipulation}
 #lang-strip .cr-bot{font-size:8px;font-weight:500;color:rgba(255,255,255,.65);letter-spacing:.2px;white-space:nowrap}
 
 /* ── VIEWS ── */
-.profile-view,.itin-view,.poi-view,.companions-view{position:fixed;inset:0 0 106px 0;z-index:100;background:var(--bg);overflow-y:auto;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.72,0,1);-webkit-overflow-scrolling:touch}
-.profile-view.active,.itin-view.active,.poi-view.active,.companions-view.active{transform:translateY(0)}
+.profile-view,.itin-view,.poi-view,.companions-view,.illi-view{position:fixed;inset:0 0 106px 0;z-index:100;background:var(--bg);overflow-y:auto;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.72,0,1);-webkit-overflow-scrolling:touch}
+.profile-view.active,.itin-view.active,.poi-view.active,.companions-view.active,.illi-view.active{transform:translateY(0)}
+/* ILLI•AI dedicated view: scuro, focalizzato sul chat */
+.illi-view{background:linear-gradient(180deg,#0F172A 0%,#1e3a5f 60%,#285EA7 100%);color:#fff}
+.illi-view .poiai-section{margin:14px;border-radius:18px}
+.illi-view-hdr{padding:18px 20px 6px;color:#fff}
+.illi-view-hdr h2{font-size:22px;font-weight:900;margin:0;display:flex;align-items:center;gap:10px}
+.illi-view-hdr p{font-size:13px;color:rgba(255,255,255,0.65);margin:6px 0 0;line-height:1.5}
+.illi-view-hdr img{width:42px;height:42px;border-radius:50%;background:#fff;padding:4px}
 /* Sub-tabs per Tab POI */
 .poi-subtabs{display:flex;gap:4px;padding:8px;background:var(--card);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:5}
 .poi-subtab{flex:1;height:36px;border:none;background:transparent;border-radius:9px;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;font-family:inherit}
@@ -457,7 +464,7 @@ button{touch-action:manipulation}
   body.tab-active #map{inset:0 50% 0 0}
 
   /* Pannelli contenuto: metà destra */
-  .profile-view,.itin-view,.poi-view,.companions-view{left:50%}
+  .profile-view,.itin-view,.poi-view,.companions-view,.illi-view{left:50%}
   .nav-bar{left:50%;right:0}
 
   /* Detail sheet overlay: ancorato alla metà destra */
@@ -828,6 +835,16 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 .av-popup-title{font-size:18px;font-weight:800;color:var(--text)}
 .av-popup-sub{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.5}
 .av-popup-close{width:32px;height:32px;border-radius:16px;background:#ede7dc;border:none;cursor:pointer;font-size:17px;color:var(--muted);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+/* Avatar tabs (Upload · Unsplash · AI) */
+.av-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin:14px 20px 12px;padding:4px;background:#f5f0e8;border-radius:12px}
+.av-tab-btn{height:38px;border:none;background:transparent;border-radius:9px;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:5px}
+.av-tab-btn.active{background:var(--card);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.av-pane{padding:0 20px}
+.av-upload-drop{border:2px dashed var(--border);border-radius:14px;padding:30px 20px;text-align:center;cursor:pointer;transition:all .15s;background:var(--card)}
+.av-upload-drop:hover{border-color:var(--blue);background:#EBF2FC}
+.av-chip{padding:6px 11px;border-radius:20px;border:1px solid var(--border);background:var(--card);font-size:11px;font-weight:700;color:var(--text);cursor:pointer;font-family:inherit}
+.av-chip:hover{border-color:var(--blue);color:var(--blue)}
+@keyframes spin{to{transform:rotate(360deg)}}
 .av-level-badge{margin:12px 20px;display:inline-flex;align-items:center;gap:8px;background:#FFF7F0;border:1.5px solid #FED7AA;border-radius:10px;padding:8px 12px;font-size:12px;font-weight:700;color:#92400E}
 .av-section-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;padding:4px 20px 10px;display:flex;align-items:center;justify-content:space-between}
 .av-env-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 20px 16px}
@@ -1076,11 +1093,18 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
         <i class="ph ph-image" style="font-size:12px"></i> Sfondo
       </button>
       <div class="hero-bg-picker" id="heroBgPicker">
-        <button class="hero-bg-opt" onclick="setHeroBg('linear-gradient(160deg,#D42B2B 0%,#7B1111 100%)')"><div class="hero-bg-swatch" style="background:linear-gradient(135deg,#D42B2B,#7B1111)"></div> Rosso classico</button>
-        <button class="hero-bg-opt" onclick="setHeroBg('linear-gradient(160deg,#285EA7 0%,#0F3060 100%)')"><div class="hero-bg-swatch" style="background:linear-gradient(135deg,#285EA7,#0F3060)"></div> Ocean Blue</button>
-        <button class="hero-bg-opt" onclick="setHeroBg('linear-gradient(160deg,#0F172A 0%,#1e3a5f 50%,#285EA7 100%)')"><div class="hero-bg-swatch" style="background:linear-gradient(135deg,#0F172A,#285EA7)"></div> Notte adriatica</button>
-        <button class="hero-bg-opt" onclick="setHeroBg('linear-gradient(160deg,#14532d 0%,#16A34A 100%)')"><div class="hero-bg-swatch" style="background:linear-gradient(135deg,#14532d,#16A34A)"></div> Foresta</button>
-        <button class="hero-bg-opt" onclick="setHeroBg('linear-gradient(160deg,#7C3AED 0%,#4C1D95 100%)')"><div class="hero-bg-swatch" style="background:linear-gradient(135deg,#7C3AED,#4C1D95)"></div> Viola cosmo</button>
+        <div style="font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin:4px 6px 8px">Sfumature moderne</div>
+        <button class="hero-bg-opt" onclick="setHeroBg('linear-gradient(135deg,#D42B2B 0%,#FF6B35 50%,#FFB347 100%)')"><div class="hero-bg-swatch" style="background:linear-gradient(135deg,#D42B2B,#FF6B35,#FFB347)"></div> Tirana Sunset</button>
+        <button class="hero-bg-opt" onclick="setHeroBg('linear-gradient(135deg,#0F2027 0%,#203A43 50%,#2C5364 100%)')"><div class="hero-bg-swatch" style="background:linear-gradient(135deg,#0F2027,#203A43,#2C5364)"></div> Notte adriatica</button>
+        <button class="hero-bg-opt" onclick="setHeroBg('linear-gradient(135deg,#2BC0E4 0%,#EAECC6 100%)')"><div class="hero-bg-swatch" style="background:linear-gradient(135deg,#2BC0E4,#EAECC6)"></div> Adriatic Wave</button>
+        <button class="hero-bg-opt" onclick="setHeroBg('linear-gradient(135deg,#11998e 0%,#38ef7d 100%)')"><div class="hero-bg-swatch" style="background:linear-gradient(135deg,#11998e,#38ef7d)"></div> Aurora del Drin</button>
+        <button class="hero-bg-opt" onclick="setHeroBg('linear-gradient(135deg,#FFB75E 0%,#ED8F03 100%)')"><div class="hero-bg-swatch" style="background:linear-gradient(135deg,#FFB75E,#ED8F03)"></div> Skanderbeg Gold</button>
+        <button class="hero-bg-opt" onclick="setHeroBg('linear-gradient(135deg,#434343 0%,#000000 100%)')"><div class="hero-bg-swatch" style="background:linear-gradient(135deg,#434343,#000)"></div> Bunker Concrete</button>
+        <button class="hero-bg-opt" onclick="setHeroBg('linear-gradient(135deg,#8E0E00 0%,#1F1C18 100%)')"><div class="hero-bg-swatch" style="background:linear-gradient(135deg,#8E0E00,#1F1C18)"></div> Rilindja Notturna</button>
+        <button class="hero-bg-opt" onclick="setHeroBg('linear-gradient(135deg,#FFAFBD 0%,#FFC3A0 100%)')"><div class="hero-bg-swatch" style="background:linear-gradient(135deg,#FFAFBD,#FFC3A0)"></div> Shqipëri Dawn</button>
+        <button class="hero-bg-opt" onclick="setHeroBg('linear-gradient(135deg,#7F00FF 0%,#E100FF 100%)')"><div class="hero-bg-swatch" style="background:linear-gradient(135deg,#7F00FF,#E100FF)"></div> Cosmo Viola</button>
+        <button class="hero-bg-opt" onclick="setHeroBg('linear-gradient(135deg,#360033 0%,#0b8793 100%)')"><div class="hero-bg-swatch" style="background:linear-gradient(135deg,#360033,#0b8793)"></div> Mediterraneo</button>
+        <button class="hero-bg-opt" onclick="setHeroBg('linear-gradient(135deg,#3E1F0F 0%,#A0522D 100%)')"><div class="hero-bg-swatch" style="background:linear-gradient(135deg,#3E1F0F,#A0522D)"></div> Espresso</button>
         <button class="hero-bg-opt" onclick="setHeroBgImg()"><div class="hero-bg-swatch" style="background:var(--bg);border:1px dashed #999"></div> Da Unsplash…</button>
       </div>
       <!-- Avatar -->
@@ -1544,7 +1568,16 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
   <!-- Trip cards — renderizzati da JS (renderTripCards) -->
   <div class="itin-cards" id="itinCards"></div>
 
-  <!-- ILLI•AI Travel Advisor -->
+
+</div>
+
+<!-- ═══ ILLI•AI VIEW (tab dedicata) ═══ -->
+<div class="illi-view" id="illiView">
+  <div class="illi-view-hdr">
+    <h2><img src="illi-ai.svg" alt="ILLI•AI"> ILLI•AI</h2>
+    <p>La tua mascot e Travel Advisor. Ti guida nell'uso della piattaforma e suggerisce luoghi autentici.</p>
+  </div>
+  <!-- ILLI•AI Travel Advisor (chat) -->
   <div class="poiai-section">
     <div class="poiai-header">
       <div class="poiai-avatar-wrap">
@@ -1572,12 +1605,11 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
     </div>
     <div class="poiai-input-bar">
       <input class="poiai-input" id="poiaiInput" type="text"
-        placeholder="es. Dove mangiare a Tirana con vista?"
+        placeholder="es. Dove mangiare a Tirana con vista? · Come si crea un itinerario?"
         onkeydown="if(event.key==='Enter')sendPoiAIMsg()"/>
       <button class="poiai-send" onclick="sendPoiAIMsg()"><i class="ph ph-paper-plane-tilt"></i></button>
     </div>
   </div>
-
 </div>
 
 <!-- ═══ SHEET: ADD POI ═══ -->
@@ -3069,6 +3101,7 @@ function showTab(tab){
   document.getElementById('itinView').classList.toggle('active',tab==='itin');
   const poiV=document.getElementById('poiView');           if(poiV)        poiV.classList.toggle('active',tab==='poi');
   const compV=document.getElementById('companionsView');   if(compV) compV.classList.toggle('active',tab==='companions');
+  const illiV=document.getElementById('illiView');         if(illiV)      illiV.classList.toggle('active',tab==='illi');
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   const nm=document.getElementById('nav-'+tab);if(nm)nm.classList.add('active');
   const onMap=tab==='map';
@@ -3156,20 +3189,81 @@ function centerMapOnPoi(lat,lng){ showTab('map'); if(map) map.setView([lat,lng],
    ILLI•AI — Apri chat (dalla bottom nav)
 ══════════════════════════════════════════ */
 function openIlliAI(){
-  // L'AI vive dentro la tab Itinerari (sezione .poiai-section).
-  // Apriamo Itinerari e scrolliamo alla sezione AI con focus sull'input.
-  showTab('itin');
-  setTimeout(() => {
-    const sec = document.querySelector('.poiai-section');
-    if(sec){
-      sec.scrollIntoView({behavior:'smooth', block:'start'});
-      const inp = document.getElementById('poiaiInput');
-      if(inp) setTimeout(()=>inp.focus(), 350);
-    }
-    // Marca il button ILLI•AI come attivo (visivamente)
-    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-    const il = document.getElementById('nav-illi'); if(il) il.classList.add('active');
+  // ILLI•AI ha il suo spazio dedicato: tab #illiView
+  showTab('illi');
+  setTimeout(()=>{
+    const inp = document.getElementById('poiaiInput');
+    if(inp) inp.focus();
   }, 380);
+}
+
+/* ══════════════════════════════════════════
+   AVATAR — Upload / Unsplash / AI (Pollinations)
+══════════════════════════════════════════ */
+function setAvTab(t){
+  document.querySelectorAll('.av-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.avtab===t));
+  document.getElementById('avPaneUpload').style.display   = t==='upload'   ? '' : 'none';
+  document.getElementById('avPaneUnsplash').style.display = t==='unsplash' ? '' : 'none';
+  document.getElementById('avPaneAI').style.display       = t==='ai'       ? '' : 'none';
+}
+function setProfileAvatar(src){
+  const img = document.querySelector('#profileAvatarImg img');
+  if(img) img.src = src;
+  try { localStorage.setItem('poilove_avatar', src); } catch(_){}
+  closeAvPopup();
+  if(typeof showToast==='function') showToast('✓ Avatar aggiornato');
+}
+function uploadAvatarFile(e){
+  const file = e.target.files && e.target.files[0];
+  if(!file) return;
+  if(!file.type.startsWith('image/')){ if(typeof showToast==='function') showToast('Seleziona un\'immagine valida'); return; }
+  if(file.size > 5*1024*1024){ if(typeof showToast==='function') showToast('Immagine > 5 MB, troppo grande'); return; }
+  const reader = new FileReader();
+  reader.onload = () => {
+    const preview = document.getElementById('avUploadPreview');
+    const dataUrl = reader.result;
+    preview.innerHTML = `
+      <img src="${dataUrl}" style="width:180px;height:180px;border-radius:50%;object-fit:cover;display:block;margin:0 auto 10px;border:3px solid var(--red)">
+      <button class="av-gen-btn" id="avUploadConfirmBtn"><i class="ph-fill ph-check"></i> Usa questa foto</button>`;
+    document.getElementById('avUploadConfirmBtn').addEventListener('click', ()=> setProfileAvatar(dataUrl));
+  };
+  reader.readAsDataURL(file);
+}
+function searchUnsplashAvatar(){
+  const q = (document.getElementById('avUnsplashQ').value || '').trim();
+  if(!q) return;
+  const grid = document.getElementById('avUnsplashGrid');
+  grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--muted)"><i class="ph ph-circle-notch" style="animation:spin 1s linear infinite;font-size:18px"></i> Carico…</div>';
+  // Unsplash Source API: restituisce un'immagine random per la query
+  // Genera 6 URL con seed diversi per ottenere immagini diverse
+  const seeds = [];
+  for(let i=0;i<6;i++) seeds.push(Date.now() + i*1000 + Math.floor(Math.random()*9999));
+  const html = seeds.map(s => {
+    const url = `https://source.unsplash.com/400x400/?${encodeURIComponent(q)}&sig=${s}`;
+    return `<img src="${url}" loading="lazy" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;cursor:pointer;border:2px solid transparent;transition:border-color .15s" onclick="setProfileAvatar(this.src)" onmouseover="this.style.borderColor='var(--red)'" onmouseout="this.style.borderColor='transparent'">`;
+  }).join('');
+  grid.innerHTML = html;
+}
+function generateAIAvatar(){
+  const raw = (document.getElementById('avAiPrompt').value || '').trim();
+  if(!raw){ if(typeof showToast==='function') showToast('Scrivi una descrizione'); return; }
+  // Prompt enhancement per qualità: aggiunge keywords da fotografia
+  const enhanced = `portrait avatar, ${raw}, professional headshot, soft natural lighting, high detail, vibrant colors, sharp focus, depth of field, centered composition`;
+  const seed = Math.floor(Math.random()*99999);
+  const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(enhanced)}?width=512&height=512&nologo=true&model=flux&seed=${seed}`;
+  const result = document.getElementById('avAiResult');
+  result.innerHTML = `<div style="padding:30px 20px;text-align:center;color:var(--muted)"><i class="ph ph-circle-notch" style="font-size:24px;animation:spin 1s linear infinite;color:var(--red)"></i><div style="margin-top:10px;font-size:13px">ILLI•AI sta dipingendo… <small style="opacity:.6">(può richiedere 10-25 sec)</small></div></div>`;
+  const img = new Image();
+  img.onload = () => {
+    result.innerHTML = `
+      <img src="${url}" style="width:200px;height:200px;border-radius:50%;object-fit:cover;display:block;margin:0 auto 12px;border:3px solid var(--red);box-shadow:0 8px 24px rgba(212,43,43,.25)">
+      <button class="av-gen-btn" id="avAiUseBtn"><i class="ph-fill ph-check"></i> Usa questo avatar</button>
+      <button class="av-gen-btn" id="avAiAgainBtn" style="background:transparent;color:var(--text);border:1.5px solid var(--border);margin-top:8px"><i class="ph ph-arrows-clockwise"></i> Genera un altro</button>`;
+    document.getElementById('avAiUseBtn').addEventListener('click', ()=> setProfileAvatar(url));
+    document.getElementById('avAiAgainBtn').addEventListener('click', generateAIAvatar);
+  };
+  img.onerror = () => { result.innerHTML = '<div style="padding:30px;text-align:center;color:var(--red);font-size:13px">Errore di rete. Riprova fra qualche secondo.</div>'; };
+  img.src = url;
 }
 
 /* ══════════════════════════════════════════
@@ -5561,35 +5655,68 @@ async function confirmPhotoPicker(){
   </div>
 </div>
 
-<!-- ═══ AVATAR POPUP ═══ -->
+<!-- ═══ AVATAR POPUP — 3 tab: Upload · Unsplash · AI ILLI ═══ -->
 <div class="av-popup-overlay" id="avPopupOv" onclick="if(event.target===this)closeAvPopup()">
   <div class="av-popup">
     <div class="av-popup-handle"></div>
     <div class="av-popup-head">
       <div>
-        <div class="av-popup-title">Trasforma il tuo avatar</div>
-        <div class="av-popup-sub">Scegli un ambiente. ILLI•AI genererà 3 varianti del tuo avatar in stile scelto, basate sul tuo livello.</div>
+        <div class="av-popup-title">Cambia avatar</div>
+        <div class="av-popup-sub">Carica una tua foto, scegli da Unsplash, oppure fattela dipingere da ILLI•AI.</div>
       </div>
       <button class="av-popup-close" onclick="closeAvPopup()"><i class="ph ph-x"></i></button>
     </div>
-    <div class="av-level-badge" id="avLevelBadge">
-      <i class="ph-fill ph-star" style="color:#F97316"></i>
-      <span id="avLevelText">Amatore · 87 love</span>
+
+    <!-- Tabs Switcher -->
+    <div class="av-tabs">
+      <button class="av-tab-btn active" data-avtab="upload"   onclick="setAvTab('upload')"><i class="ph ph-upload-simple"></i> Upload</button>
+      <button class="av-tab-btn"        data-avtab="unsplash" onclick="setAvTab('unsplash')"><i class="ph ph-image"></i> Unsplash</button>
+      <button class="av-tab-btn"        data-avtab="ai"       onclick="setAvTab('ai')"><i class="ph-fill ph-sparkle"></i> ILLI•AI</button>
     </div>
-    <div class="av-section-lbl">
-      <span>Scegli l'ambiente</span>
-      <span style="font-weight:400;font-size:9px">poi AI genererà varianti</span>
+
+    <!-- Pane: UPLOAD -->
+    <div class="av-pane" id="avPaneUpload">
+      <div class="av-upload-drop" onclick="document.getElementById('avUploadFile').click()">
+        <i class="ph ph-cloud-arrow-up" style="font-size:36px;color:var(--blue)"></i>
+        <div style="font-size:13px;font-weight:700;margin-top:6px">Carica una foto</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:3px">JPG, PNG · max 5 MB</div>
+        <input type="file" id="avUploadFile" accept="image/*" style="display:none" onchange="uploadAvatarFile(event)">
+      </div>
+      <div id="avUploadPreview" style="margin-top:14px;text-align:center"></div>
     </div>
-    <div class="av-env-grid" id="avEnvGrid">
-      <!-- popolato da JS -->
+
+    <!-- Pane: UNSPLASH -->
+    <div class="av-pane" id="avPaneUnsplash" style="display:none">
+      <div style="display:flex;gap:6px;margin-bottom:10px">
+        <input id="avUnsplashQ" type="text" placeholder="Cerca: portrait, montagne, mare…" style="flex:1;height:40px;border:1.5px solid var(--border);border-radius:11px;padding:0 14px;font-size:13px;font-family:inherit;outline:none;background:var(--card);color:var(--text)" onkeydown="if(event.key==='Enter')searchUnsplashAvatar()">
+        <button onclick="searchUnsplashAvatar()" style="height:40px;padding:0 16px;border-radius:11px;background:var(--blue);color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit"><i class="ph ph-magnifying-glass"></i></button>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+        <button class="av-chip" onclick="document.getElementById('avUnsplashQ').value='portrait';searchUnsplashAvatar()">👤 Portrait</button>
+        <button class="av-chip" onclick="document.getElementById('avUnsplashQ').value='mountains';searchUnsplashAvatar()">⛰️ Monti</button>
+        <button class="av-chip" onclick="document.getElementById('avUnsplashQ').value='sea';searchUnsplashAvatar()">🌊 Mare</button>
+        <button class="av-chip" onclick="document.getElementById('avUnsplashQ').value='city';searchUnsplashAvatar()">🏙️ Città</button>
+        <button class="av-chip" onclick="document.getElementById('avUnsplashQ').value='animal';searchUnsplashAvatar()">🐾 Animali</button>
+        <button class="av-chip" onclick="document.getElementById('avUnsplashQ').value='abstract';searchUnsplashAvatar()">🎨 Astratto</button>
+      </div>
+      <div id="avUnsplashGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px"></div>
     </div>
-    <button class="av-gen-btn" onclick="requestAvatarGen()">
-      <i class="ph-fill ph-magic-wand"></i>
-      Genera il mio avatar AI
-    </button>
-    <div class="av-gen-warning">
-      <i class="ph ph-info" style="font-size:14px;flex-shrink:0;margin-top:1px"></i>
-      La generazione sarà disponibile dopo il lancio ufficiale dell'app. Le scelte di ambiente vengono salvate ora.
+
+    <!-- Pane: AI -->
+    <div class="av-pane" id="avPaneAI" style="display:none">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:8px">Descrivi come vuoi essere ritratto/a. ILLI•AI userà <strong>Flux</strong> per dipingere.</div>
+      <textarea id="avAiPrompt" rows="3" placeholder="Es: ritratto stile cinematografico, illuminazione calda, montagne sullo sfondo, espressione serena" style="width:100%;border:1.5px solid var(--border);border-radius:11px;padding:10px 14px;font-size:13px;font-family:inherit;outline:none;background:var(--card);color:var(--text);resize:vertical;line-height:1.5;box-sizing:border-box"></textarea>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin:10px 0">
+        <button class="av-chip" onclick="document.getElementById('avAiPrompt').value+=' stile cartoon Pixar'">Cartoon</button>
+        <button class="av-chip" onclick="document.getElementById('avAiPrompt').value+=' fotografia cinematografica realistica'">Cinematic</button>
+        <button class="av-chip" onclick="document.getElementById('avAiPrompt').value+=' anime giapponese moderno'">Anime</button>
+        <button class="av-chip" onclick="document.getElementById('avAiPrompt').value+=' pittura ad olio rinascimentale'">Olio</button>
+        <button class="av-chip" onclick="document.getElementById('avAiPrompt').value+=' street photography Tirana'">Street Tirana</button>
+      </div>
+      <button class="av-gen-btn" onclick="generateAIAvatar()">
+        <i class="ph-fill ph-sparkle"></i> Genera con ILLI•AI
+      </button>
+      <div id="avAiResult" style="margin-top:14px;text-align:center"></div>
     </div>
   </div>
 </div>
