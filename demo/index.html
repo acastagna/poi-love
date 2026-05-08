@@ -162,8 +162,43 @@ button{touch-action:manipulation}
 #lang-strip .cr-bot{font-size:8px;font-weight:500;color:rgba(255,255,255,.65);letter-spacing:.2px;white-space:nowrap}
 
 /* ── VIEWS ── */
-.profile-view,.itin-view{position:fixed;inset:0 0 106px 0;z-index:100;background:var(--bg);overflow-y:auto;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.72,0,1);-webkit-overflow-scrolling:touch}
-.profile-view.active,.itin-view.active{transform:translateY(0)}
+.profile-view,.itin-view,.poi-view,.companions-view{position:fixed;inset:0 0 106px 0;z-index:100;background:var(--bg);overflow-y:auto;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.72,0,1);-webkit-overflow-scrolling:touch}
+.profile-view.active,.itin-view.active,.poi-view.active,.companions-view.active{transform:translateY(0)}
+/* Sub-tabs per Tab POI */
+.poi-subtabs{display:flex;gap:4px;padding:8px;background:var(--card);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:5}
+.poi-subtab{flex:1;height:36px;border:none;background:transparent;border-radius:9px;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;font-family:inherit}
+.poi-subtab.active{background:var(--red);color:#fff}
+.poi-list-empty{text-align:center;padding:40px 20px;color:var(--muted);font-size:13px}
+.poi-list-row{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--border)}
+.poi-list-row .pi-emoji{font-size:22px;width:36px;text-align:center;flex-shrink:0}
+.poi-list-row .pi-info{flex:1;min-width:0}
+.poi-list-row .pi-name{font-size:14px;font-weight:700;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.poi-list-row .pi-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.poi-list-row .pi-dist{font-size:11px;color:var(--blue);font-weight:700;flex-shrink:0;background:#EBF2FC;padding:3px 8px;border-radius:8px}
+.poi-list-row .pi-actions{display:flex;gap:6px;flex-shrink:0}
+.poi-list-row .pi-act-btn{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.poi-list-row .pi-act-btn:hover{color:var(--red);border-color:var(--red)}
+/* Compagnie: card e status indicator */
+.comp-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin:10px 14px}
+.comp-card.left{opacity:.6;border-style:dashed}
+.comp-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.comp-name{font-size:15px;font-weight:800;color:var(--ink);flex:1}
+.comp-status{font-size:18px}
+.comp-code{display:inline-block;background:#EBF2FC;color:var(--blue);font-family:monospace;font-size:13px;font-weight:900;letter-spacing:3px;padding:4px 10px;border-radius:8px;margin-right:6px}
+.comp-meta{font-size:11px;color:var(--muted);margin-top:4px}
+.comp-friends{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+.friend-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid var(--border)}
+.friend-avatar{width:30px;height:30px;border-radius:50%;background:#EBF2FC;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--blue);flex-shrink:0}
+.friend-name{flex:1;font-size:13px;color:var(--ink);font-weight:600}
+.friend-status{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:800;text-transform:uppercase;padding:3px 8px;border-radius:7px;letter-spacing:.4px}
+.friend-status .dot{width:7px;height:7px;border-radius:50%;display:inline-block}
+.fs-traveling{background:rgba(34,197,94,0.15);color:#16a34a}
+.fs-traveling .dot{background:#22c55e;animation:pulseDot 1.4s ease-in-out infinite}
+.fs-still{background:rgba(255,255,255,0.06);color:var(--muted)}
+.fs-still .dot{background:#9ca3af}
+.fs-stopped{background:rgba(212,43,43,0.12);color:var(--red)}
+.fs-stopped .dot{background:var(--red);animation:pulseDot 1.1s ease-in-out infinite}
+@keyframes pulseDot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
 
 /* ── SHEETS ── */
 .sheet-overlay{position:fixed;inset:0;z-index:400;pointer-events:none}
@@ -413,7 +448,7 @@ button{touch-action:manipulation}
   #map{inset:0 50% 0 0}
 
   /* Pannelli contenuto: metà destra */
-  .profile-view,.itin-view{left:50%}
+  .profile-view,.itin-view,.poi-view,.companions-view{left:50%}
   .nav-bar{left:50%;right:0}
 
   /* Detail sheet overlay: ancorato alla metà destra */
@@ -733,7 +768,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 .cal-day.today{background:var(--red);color:#fff;font-weight:900}
 .cal-day.stop-day{background:#DCFCE7;color:#16A34A;font-weight:700}
 .cal-day.selecting{background:#FFF0F0;color:var(--red);font-weight:700}
-/* POI•AI Travel Advisor */
+/* ILLI•AI Travel Advisor */
 .poiai-section{margin:0 20px 28px;background:var(--card);border-radius:18px;overflow:hidden;box-shadow:0 4px 20px rgba(40,94,167,.12)}
 .poiai-header{background:linear-gradient(135deg,#0F172A 0%,#1e3a5f 50%,#285EA7 100%);padding:14px 16px;display:flex;align-items:center;gap:12px}
 .poiai-avatar-wrap{position:relative;flex-shrink:0}
@@ -864,7 +899,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
       <i class="ph-fill ph-users-three"></i>
       <span class="compagnia-badge" id="compagniaBadge">0</span>
     </div>
-    <span>Compagnia</span>
+    <span>Compagni di Viaggio</span>
   </button>
 </div>
 
@@ -875,20 +910,20 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
     <div class="sh-handle"></div>
     <div class="sh-head">
       <div>
-        <div class="sh-title">🧭 Compagnia</div>
+        <div class="sh-title">🧭 Compagni di Viaggio</div>
         <div class="sh-sub">Condividi la tua posizione GPS in tempo reale con gli amici</div>
       </div>
       <button class="sh-close" onclick="closeSheet('compagniaOv','compagniaBg','compagniaSheet')"><i class="ph ph-x"></i></button>
     </div>
     <div class="sh-body" style="padding-bottom:24px">
-      <p style="font-size:13px;color:var(--muted);margin-bottom:4px;margin-top:8px">Crea una nuova compagnia o inserisci il codice ricevuto da un amico:</p>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:4px;margin-top:8px">Crea un nuovo gruppo di compagni di viaggio o inserisci il codice ricevuto da un amico:</p>
       <div class="compagnia-code-row">
         <input class="compagnia-code-in" id="compagniaCode" type="text" maxlength="6" placeholder="ABC123"
           onkeydown="if(event.key==='Enter')joinOrCreateCompagnia()"/>
         <button class="compagnia-join-btn" onclick="joinOrCreateCompagnia()">Unisciti</button>
       </div>
       <p class="compagnia-hint">
-        Lascia il campo vuoto per <strong>creare</strong> una nuova compagnia e ottenere il codice da condividere.<br>
+        Lascia il campo vuoto per <strong>creare</strong> un nuovo gruppo di compagni di viaggio e ottenere il codice da condividere.<br>
         In albanese: <em>shoqëri</em> · In inglese: <em>travel party</em>
       </p>
       <button class="compagnia-stop vis" id="compagniaStopBtn" onclick="stopCompagnia();closeSheet('compagniaOv','compagniaBg','compagniaSheet')" style="display:none">
@@ -925,19 +960,25 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
   </button>
 </div>
 
-<!-- BOTTOM NAV -->
+<!-- BOTTOM NAV (6 tab: Mappa · POI · Itinerari · Compagni · Profilo · Sicurezza) -->
 <nav class="bottom-nav">
   <button class="nav-item active" id="nav-map" onclick="showTab('map')">
     <i class="ph-fill ph-map-trifold"></i><span class="nav-lbl" data-t="nav_map">Mappa</span>
   </button>
+  <button class="nav-item" id="nav-poi" onclick="showTab('poi')">
+    <i class="ph-fill ph-map-pin"></i><span class="nav-lbl" data-t="nav_poi">POI</span>
+  </button>
   <button class="nav-item" id="nav-itin" onclick="showTab('itin')">
     <i class="ph-fill ph-path"></i><span class="nav-lbl" data-t="nav_itin">Itinerari</span>
+  </button>
+  <button class="nav-item" id="nav-companions" onclick="showTab('companions')">
+    <i class="ph-fill ph-users-three"></i><span class="nav-lbl" data-t="nav_companions">Compagni</span>
   </button>
   <button class="nav-item" id="nav-profile" onclick="showTab('profile')">
     <i class="ph ph-user-circle"></i><span class="nav-lbl" data-t="nav_profile">Profilo</span>
   </button>
   <button class="nav-item nav-sos" onclick="openSOS()" title="Sicurezza">
-    <i class="ph-fill ph-shield-warning"></i><span class="nav-lbl">Sicurezza</span>
+    <i class="ph-fill ph-shield-warning"></i><span class="nav-lbl">SOS</span>
   </button>
 </nav>
 
@@ -1376,6 +1417,31 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
   </div>
 </div><!-- /trip-landing -->
 
+<!-- ═══ POI VIEW (Miei · Loved · Vicini) ═══ -->
+<div class="poi-view" id="poiView">
+  <div class="poi-subtabs">
+    <button class="poi-subtab active" data-subtab="mine"  onclick="setPoiSubtab('mine')">📍 I miei POI</button>
+    <button class="poi-subtab"        data-subtab="loved" onclick="setPoiSubtab('loved')">❤️ Loved</button>
+    <button class="poi-subtab"        data-subtab="near"  onclick="setPoiSubtab('near')">🧭 Vicini</button>
+  </div>
+  <div id="poi-list-area"></div>
+</div>
+
+<!-- ═══ COMPAGNI DI VIAGGIO VIEW ═══ -->
+<div class="companions-view" id="companionsView">
+  <div style="padding:16px 14px 8px">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+      <i class="ph-fill ph-users-three" style="color:var(--blue);font-size:22px"></i>
+      <div style="font-size:18px;font-weight:900;color:var(--ink)">Compagni di Viaggio</div>
+    </div>
+    <div style="font-size:12px;color:var(--muted);line-height:1.4">Le tue compagnie attive e quelle a cui hai partecipato. Tocca <strong>+</strong> per crearne una nuova.</div>
+  </div>
+  <div id="companions-list"></div>
+  <div style="padding:14px;color:var(--muted);font-size:11px;text-align:center;border-top:1px solid var(--border);margin-top:14px">
+    👀 = scadenza · 🥰 = per sempre · 🟢 in viaggio · ⚪ offline · 🔴 fermo da +1g
+  </div>
+</div>
+
 <!-- ═══ ITINERARY VIEW ═══ -->
 <div class="itin-view" id="itinView">
 
@@ -1399,7 +1465,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
   <!-- Trip cards — renderizzati da JS (renderTripCards) -->
   <div class="itin-cards" id="itinCards"></div>
 
-  <!-- POI•AI Travel Advisor -->
+  <!-- ILLI•AI Travel Advisor -->
   <div class="poiai-section">
     <div class="poiai-header">
       <div class="poiai-avatar-wrap">
@@ -1416,14 +1482,14 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
         <div class="poiai-avatar-dot"></div>
       </div>
       <div class="poiai-header-text">
-        <div class="poiai-title">POI•AI Travel Advisor</div>
+        <div class="poiai-title">ILLI•AI Travel Advisor</div>
         <div class="poiai-sub">Suggerisce, pianifica, aggiunge tappe</div>
       </div>
       <div class="poiai-badge">AI</div>
       <button class="poiai-voice-btn" id="poiaiVoiceBtn" onclick="togglePoiAIVoice()" title="Rispondi a voce"><i class="ph ph-microphone"></i></button>
     </div>
     <div class="poiai-msgs" id="poiaiMsgs">
-      <div class="poiai-msg ai">Ciao! Sono il tuo POI•AI Travel Advisor. Posso suggerire tappe, ristoranti, cultura locale — e aggiungerli direttamente ai tuoi itinerari. Su quale viaggio lavoriamo oggi? 🗺️</div>
+      <div class="poiai-msg ai">Ciao! Sono <strong>ILLI•AI</strong>, la mascot di POI•LOVE — il tuo cuore-amico per scoprire luoghi e capire l'app. Posso suggerirti tappe, ristoranti, esperienze culturali, oppure aiutarti a usare POI•LOVE (POI, itinerari, compagni di viaggio). Da dove iniziamo? 💞</div>
     </div>
     <div class="poiai-input-bar">
       <input class="poiai-input" id="poiaiInput" type="text"
@@ -2905,9 +2971,9 @@ Rispondi solo con il testo della descrizione, senza virgolette, in ${langLabel}.
     if(generated){
       ta.value=generated;
       updateChar();
-      showToast(isGenerate?'✨ Descrizione generata da POI•AI!':'✨ Testo sintetizzato da POI•AI!');
+      showToast(isGenerate?'✨ Descrizione generata da ILLI•AI!':'✨ Testo sintetizzato da ILLI•AI!');
     } else {
-      showToast('POI•AI non ha risposto.');
+      showToast('ILLI•AI non ha risposto.');
     }
   } catch(err){
     showToast('Errore AI: '+err.message);
@@ -2922,21 +2988,140 @@ Rispondi solo con il testo della descrizione, senza virgolette, in ${langLabel}.
 function showTab(tab){
   document.getElementById('profileView').classList.toggle('active',tab==='profile');
   document.getElementById('itinView').classList.toggle('active',tab==='itin');
+  const poiV=document.getElementById('poiView');           if(poiV)        poiV.classList.toggle('active',tab==='poi');
+  const compV=document.getElementById('companionsView');   if(compV) compV.classList.toggle('active',tab==='companions');
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   const nm=document.getElementById('nav-'+tab);if(nm)nm.classList.add('active');
   const onMap=tab==='map';
   const fab=document.getElementById('fab');
   const fabMenu=document.getElementById('fabMenu');
   fab.style.display=onMap?'flex':'none';
-  // Reset FAB senza impostare style.opacity inline (bug: overriderebbe la classe .open)
   fabMenu.classList.remove('open');
   fab.classList.remove('open');
-  fabMenu.style.opacity=''; // pulisce qualsiasi inline style residuo
+  fabMenu.style.opacity='';
   document.querySelectorAll('.map-types')[0].style.display=onMap?'flex':'none';
   const tbRight=document.getElementById('tbRight');
   if(tbRight)tbRight.style.display=onMap?'flex':'none';
   if(tab==='map'&&map)setTimeout(()=>map.invalidateSize(),50);
   if(tab==='profile')togglePublicProfile(false);
+  if(tab==='poi') renderPoiTab();
+  if(tab==='companions') renderCompanionsTab();
+}
+
+/* ══════════════════════════════════════════
+   TAB POI — render dinamico (Miei / Loved / Vicini)
+══════════════════════════════════════════ */
+let poiSubtab = 'mine'; // mine | loved | near
+function setPoiSubtab(t){ poiSubtab=t; renderPoiTab(); }
+function renderPoiTab(){
+  const list = document.getElementById('poi-list-area');
+  if(!list) return;
+  // tab buttons attivi
+  document.querySelectorAll('.poi-subtab').forEach(b => b.classList.toggle('active', b.dataset.subtab===poiSubtab));
+  // Genera lista in base al sub-tab. Per la demo usiamo l'array DEMO_POI globale.
+  const all = (typeof POIS!=='undefined'?POIS:[]);
+  let items = [];
+  if(poiSubtab==='mine')       items = all.filter(p => p.author && /(io|tu|me)/i.test(p.author)).slice();
+  else if(poiSubtab==='loved') items = all.filter(p => p._loved).slice();
+  else if(poiSubtab==='near')  items = all.slice().sort((a,b)=>{
+    const ha = gpsPos? haversineKm(gpsPos.lat,gpsPos.lng,a.lat,a.lng):0;
+    const hb = gpsPos? haversineKm(gpsPos.lat,gpsPos.lng,b.lat,b.lng):0;
+    return ha-hb;
+  });
+  // Se vuoto in 'mine' o 'loved', mostriamo i primi 5 di tutti come stub per la demo
+  if(items.length===0 && poiSubtab!=='near') items = all.slice(0,5);
+  if(items.length===0){
+    list.innerHTML = '<div class="poi-list-empty">Nessun POI ancora. Tocca <strong>+</strong> per crearne uno.</div>';
+    return;
+  }
+  list.innerHTML = items.map(p=>{
+    const dist = (poiSubtab==='near' && gpsPos)? haversineKm(gpsPos.lat,gpsPos.lng,p.lat,p.lng).toFixed(1)+' km' : '';
+    const emoji = ({Cultura:'🏛️',Cibo:'🍽️',Natura:'🌿',Bar:'☕',Storia:'🏰'})[p.cat]||'📍';
+    if(poiSubtab==='near'){
+      // Lista semplice — riga di testo, niente bottoni
+      return `<div class="poi-list-row" onclick="centerMapOnPoi(${p.lat},${p.lng})" style="cursor:pointer">
+        <div class="pi-emoji">${emoji}</div>
+        <div class="pi-info">
+          <div class="pi-name">${p.name}</div>
+          <div class="pi-sub">${p.cat||''} · ${p.address||''}</div>
+        </div>
+        <div class="pi-dist">${dist}</div>
+      </div>`;
+    }
+    return `<div class="poi-list-row">
+      <div class="pi-emoji">${emoji}</div>
+      <div class="pi-info">
+        <div class="pi-name">${p.name}</div>
+        <div class="pi-sub">${p.cat||''} · ❤️ ${p.love||0}</div>
+      </div>
+      <div class="pi-actions">
+        <button class="pi-act-btn" title="Apri sulla mappa" onclick="centerMapOnPoi(${p.lat},${p.lng})"><i class="ph ph-map-pin"></i></button>
+        <button class="pi-act-btn" title="Modifica"><i class="ph ph-pencil"></i></button>
+        <button class="pi-act-btn" title="Condividi"><i class="ph ph-share-network"></i></button>
+        ${poiSubtab==='mine'?'<button class="pi-act-btn" title="Elimina" style="color:var(--red);border-color:var(--red)"><i class="ph ph-trash"></i></button>':''}
+      </div>
+    </div>`;
+  }).join('');
+}
+function haversineKm(lat1,lng1,lat2,lng2){
+  const R=6371,toRad=d=>d*Math.PI/180;
+  const dLat=toRad(lat2-lat1),dLng=toRad(lng2-lng1);
+  const a=Math.sin(dLat/2)**2+Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLng/2)**2;
+  return 2*R*Math.asin(Math.sqrt(a));
+}
+function centerMapOnPoi(lat,lng){ showTab('map'); if(map) map.setView([lat,lng],16); }
+
+/* ══════════════════════════════════════════
+   TAB COMPAGNI DI VIAGGIO — lista compagnie + amici live
+══════════════════════════════════════════ */
+function renderCompanionsTab(){
+  const root = document.getElementById('companions-list');
+  if(!root) return;
+  // DEMO data — in produzione viene da Supabase
+  const compagnie = [
+    { name:'Tirana Weekend', code:'TR2026', forever:false, expires:'2026-05-20', joined:true,
+      friends:[
+        {name:'Liri V.',  status:'traveling'},
+        {name:'Marco S.', status:'traveling'},
+        {name:'Anna B.',  status:'still'}
+      ]
+    },
+    { name:'Cuori in Cammino', code:'LOVE99', forever:true, expires:null, joined:true,
+      friends:[
+        {name:'Elena R.', status:'stopped'},
+        {name:'Davide T.', status:'still'}
+      ]
+    },
+    { name:'Balcani 2025', code:'BLK425', forever:false, expires:'2025-09-30', joined:false,
+      friends:[]
+    }
+  ];
+  root.innerHTML = compagnie.map(c=>{
+    const statusEmoji = c.forever ? '🥰' : '👀';
+    const statusTxt   = c.forever ? 'Per sempre' : (c.expires ? 'Scade '+c.expires : 'In corso');
+    const friends = c.friends.map(f=>{
+      const cls = f.status==='traveling' ? 'fs-traveling' : f.status==='stopped' ? 'fs-stopped' : 'fs-still';
+      const lbl = f.status==='traveling' ? 'In viaggio' : f.status==='stopped' ? 'Fermo' : 'Offline';
+      const initials = f.name.split(' ').map(s=>s[0]).join('').slice(0,2).toUpperCase();
+      return `<div class="friend-row">
+        <div class="friend-avatar">${initials}</div>
+        <div class="friend-name">${f.name}</div>
+        <span class="friend-status ${cls}"><span class="dot"></span>${lbl}</span>
+      </div>`;
+    }).join('');
+    if(!c.joined){
+      return `<div class="comp-card left">
+        <div class="comp-row"><div class="comp-name">${c.name}</div><div class="comp-status" title="${statusTxt}">${statusEmoji}</div></div>
+        <div><span class="comp-code">${c.code}</span><span class="comp-meta">Sei uscito · ${statusTxt}</span></div>
+        <div style="margin-top:10px"><button class="comp-code" style="background:var(--red);color:#fff;border:none;cursor:pointer;letter-spacing:.5px;padding:8px 14px;font-size:11px">Richiedi accesso</button></div>
+      </div>`;
+    }
+    return `<div class="comp-card">
+      <div class="comp-row"><div class="comp-name">${c.name}</div><div class="comp-status" title="${statusTxt}">${statusEmoji}</div></div>
+      <div><span class="comp-code">${c.code}</span><span class="comp-meta">${statusTxt}</span></div>
+      <div class="comp-friends">${friends}</div>
+    </div>`;
+  }).join('');
 }
 
 /* ══════════════════════════════════════════
@@ -3379,7 +3564,7 @@ function selectAvStyle(name){
   renderAvEnvGrid();
 }
 function requestAvatarGen(){
-  showToast(`🎨 Ambiente scelto: ${avSelEnv} — il tuo avatar sarà generato da POI•AI`);
+  showToast(`🎨 Ambiente scelto: ${avSelEnv} — il tuo avatar sarà generato da ILLI•AI`);
   closeAvPopup();
 }
 
@@ -3764,7 +3949,7 @@ function selectEnv(idx){
   showToast('Ambiente selezionato!');
 }
 function requestAvatarGen(){
-  showToast('🎨 Ambiente selezionato — avatar generato da POI•AI');
+  showToast('🎨 Ambiente selezionato — avatar generato da ILLI•AI');
 }
 
 /* ══════════════════════════════════════════
@@ -4653,13 +4838,13 @@ document.addEventListener('click',e=>{
 });
 
 /* ══════════════════════════════════════════
-   POI•AI TRAVEL ADVISOR
+   ILLI•AI TRAVEL ADVISOR
 ══════════════════════════════════════════ */
 /* ═══════════════════════════════════════════════════════
-   POI•AI — Groq · llama-3.3-70b-versatile
+   ILLI•AI — Groq · llama-3.3-70b-versatile
    Formato OpenAI-compatible. MVP front-end.
 ═══════════════════════════════════════════════════════ */
-// POI•AI key — XOR-encoded, decoded at runtime
+// ILLI•AI key — XOR-encoded, decoded at runtime
 const GROQ_KEY=[96,116,108,88,52,53,125,116,87,49,114,106,118,127,99,108,81,52,96,65,95,94,86,73,80,64,99,126,101,52,65,94,70,116,96,126,116,86,83,102,62,64,84,106,108,64,55,63,75,78,117,102,100,63,106,84].map(n=>String.fromCharCode(n^7)).join('');
 const GROQ_URL='https://api.groq.com/openai/v1/chat/completions';
 const GROQ_MODEL='llama-3.3-70b-versatile';
@@ -4673,18 +4858,34 @@ function _buildPoiAISystemPrompt(){
   const langLabel=lang==='it'?'italiano':lang==='sq'?'albanese':'English';
   const locationCtx=gpsPos?`L'utente è circa a ${gpsPos.lat.toFixed(3)},${gpsPos.lng.toFixed(3)}.`:'';
 
-  return `Sei POI•AI, il Travel Advisor integrato nell'app POI•LOVE — mappa comunitaria di luoghi autentici nei Balcani e nel mondo.
-Compito: suggerire luoghi di interesse (POI), ristoranti, esperienze culturali, tappe per itinerari. Rispondi sempre in ${langLabel}.
-${locationCtx}
-Itinerari attivi: ${tripNames}.
-${activePoiName?`POI visualizzato ora: "${activePoiName}".`:''}
+  return `Sei ILLI•AI, la mascot ufficiale e Travel Advisor di POI•LOVE — mappa comunitaria dei luoghi amati nei Balcani e nel mondo. Ti chiamano "ILLI" per affetto: sei il piccolo cuore-amico che accompagna chi ama un luogo.
 
-REGOLA CRITICA: quando suggerisci luoghi concreti inserisci SEMPRE in fondo questa sezione (formato esatto, nessuna variazione):
+PERSONALITÀ: calorosa, complice, mai banale. Parli con calore mediterraneo + curiosità balcanica. Mai formale. Niente "Certo!", niente "Ottima domanda!". Vai al punto con un sorriso.
+
+DOPPIO RUOLO:
+1. **Travel Advisor** — suggerisci POI, ristoranti, esperienze culturali, tappe per itinerari.
+2. **Guida d'uso piattaforma** — se l'utente chiede "come faccio a…" o sembra bloccato, spiega in 1-2 frasi come usare POI•LOVE:
+   - Aggiungere POI: tasto + (FAB) → "Crea POI" → GPS, foto, 200 caratteri, tag.
+   - Mettere LOVE: tap sul cuore nel POI per salvarlo. I tuoi LOVE sono nella tab POI → "Loved".
+   - Itinerari: FAB → "Crea Itinerario" → tappe + cover. La gestione è nella tab Itinerari.
+   - Compagni di Viaggio: FAB → "Crea Compagnia" (codice 6 cifre da condividere). La gestione + amici live è nella tab Compagni di Viaggio.
+   - Tab POI: i miei POI / i miei LOVE / vicini.
+   - Sicurezza (SOS): tab dedicata in basso a destra, per emergenze.
+
+CONTESTO LIVE:
+- Lingua corrente: ${langLabel}.
+${locationCtx}
+- Itinerari dell'utente: ${tripNames}.
+${activePoiName?`- POI aperto adesso: "${activePoiName}".`:''}
+
+REGOLA CRITICA — luoghi concreti: quando suggerisci POI/ristoranti/esperienze, inserisci SEMPRE in fondo questa sezione (formato esatto, nessuna variazione):
 ===PLACES===
 ["Nome Luogo 1","Nome Luogo 2","Nome Luogo 3"]
 ===END===
 
-Stile: breve (max 4 frasi), concreto, con personalità. Niente elenchi puntati. Se non ci sono luoghi da suggerire ometti la sezione PLACES.`.trim();
+Se non ci sono luoghi da suggerire (es. risposta a "come faccio a…"), ometti completamente la sezione PLACES.
+
+STILE: breve (max 4 frasi), concreto. Niente elenchi puntati nella risposta visibile. Rispondi sempre in ${langLabel}.`.trim();
 }
 
 async function sendPoiAIMsg(){
@@ -4746,12 +4947,12 @@ async function sendPoiAIMsg(){
   }catch(err){
     const loadEl=document.getElementById(loadId);
     if(loadEl) loadEl.outerHTML=`<div class="poiai-msg ai" style="color:var(--red)"><i class="ph ph-warning"></i> ${err.message}</div>`;
-    console.error('POI•AI:',err);
+    console.error('ILLI•AI:',err);
   }
 }
 
 /* ══════════════════════════════════════════
-   POI•AI VOICE (Web Speech API)
+   ILLI•AI VOICE (Web Speech API)
 ══════════════════════════════════════════ */
 let voiceOn=false;
 function togglePoiAIVoice(){
@@ -5225,7 +5426,7 @@ async function confirmPhotoPicker(){
     <div class="av-popup-head">
       <div>
         <div class="av-popup-title">Trasforma il tuo avatar</div>
-        <div class="av-popup-sub">Scegli un ambiente. POI•AI genererà 3 varianti del tuo avatar in stile scelto, basate sul tuo livello.</div>
+        <div class="av-popup-sub">Scegli un ambiente. ILLI•AI genererà 3 varianti del tuo avatar in stile scelto, basate sul tuo livello.</div>
       </div>
       <button class="av-popup-close" onclick="closeAvPopup()"><i class="ph ph-x"></i></button>
     </div>

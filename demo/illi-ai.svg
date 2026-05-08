@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="ILLI•AI mascot">
+  <!-- Cuore-corpo rosso POI•LOVE -->
+  <path d="M60 100 C20 70, 5 45, 25 28 C40 16, 55 22, 60 35 C65 22, 80 16, 95 28 C115 45, 100 70, 60 100 Z"
+        fill="#D42B2B" stroke="#A01E1E" stroke-width="2" stroke-linejoin="round"/>
+  <!-- Riflesso luminoso -->
+  <ellipse cx="42" cy="42" rx="9" ry="6" fill="rgba(255,255,255,0.25)"/>
+  <!-- Occhi (bianchi + iride nera) -->
+  <circle cx="46" cy="52" r="6" fill="#fff"/>
+  <circle cx="74" cy="52" r="6" fill="#fff"/>
+  <circle cx="47" cy="53" r="3" fill="#1C1C1C"/>
+  <circle cx="75" cy="53" r="3" fill="#1C1C1C"/>
+  <!-- Brillio negli occhi -->
+  <circle cx="48" cy="51" r="1" fill="#fff"/>
+  <circle cx="76" cy="51" r="1" fill="#fff"/>
+  <!-- Sorriso curvo -->
+  <path d="M48 70 Q60 80 72 70" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <!-- Antennina con punto (pulsa nelle animazioni CSS) -->
+  <line x1="60" y1="22" x2="60" y2="10" stroke="#A01E1E" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="60" cy="8" r="3.5" fill="#FFD700"/>
+</svg>
