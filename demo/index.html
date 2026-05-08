@@ -72,10 +72,10 @@ button{touch-action:manipulation}
 .mt-btn.route-active{background:#7C3AED;color:#fff}
 
 /* ── FAB ── */
-/* FAB z-index: sopra tab/sheet (400), SOTTO popup come av-popup (600) e photoPicker (8500) */
-.fab{position:fixed;bottom:120px;left:50%;transform:translateX(-50%);z-index:500;width:60px;height:60px;border-radius:30px;background:var(--red);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 22px rgba(212,43,43,.45);font-size:28px;color:#fff;transition:transform .25s,background .25s}
+/* FAB z-index: sopra nav (300), SOTTO sheet (400) e popup. Sempre cliccabile su mappa/tab ma non interferisce con form di creazione */
+.fab{position:fixed;bottom:120px;left:50%;transform:translateX(-50%);z-index:350;width:60px;height:60px;border-radius:30px;background:var(--red);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 22px rgba(212,43,43,.45);font-size:28px;color:#fff;transition:transform .25s,background .25s}
 .fab.open{transform:translateX(-50%) rotate(45deg)}
-.fab-menu{position:fixed;bottom:190px;left:50%;transform:translateX(-50%) translateY(10px);z-index:499;display:flex;flex-direction:column;gap:9px;align-items:center;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
+.fab-menu{position:fixed;bottom:190px;left:50%;transform:translateX(-50%) translateY(10px);z-index:349;display:flex;flex-direction:column;gap:9px;align-items:center;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
 .fab-menu.open{opacity:1;pointer-events:all;transform:translateX(-50%) translateY(0)}
 .fab-opt{background:var(--card);border:none;border-radius:22px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px;box-shadow:0 4px 18px rgba(0,0,0,.14);white-space:nowrap;transition:transform .15s}
 .fab-opt:active{transform:scale(.96)}
@@ -898,7 +898,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
     <span class="tb-logo-txt">POI•LOVE</span>
   </div>
   <div class="tb-right" id="tbRight">
-    <button class="tb-btn icon-only" onclick="centerMap()" title="Centra mappa"><i class="ph ph-crosshair-simple"></i></button>
+    <button class="tb-btn icon-only" onclick="centerMap()" title="Centra mappa"><i class="ph-duotone ph-crosshair-simple"></i></button>
     <button class="tb-btn icon-only" id="langBtn" onclick="cycleLang()" title="Cambia lingua">🇮🇹</button>
   </div>
 </div>
@@ -911,19 +911,19 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 </div>
 
 <!-- FAB -->
-<button class="fab" id="fab" onclick="toggleFab()"><i class="ph ph-plus"></i></button>
+<button class="fab" id="fab" onclick="toggleFab()"><i class="ph-duotone ph-plus"></i></button>
 <div class="fab-menu" id="fabMenu">
   <button class="fab-opt" onclick="openAddPOI()">
-    <div class="fab-opt-icon" style="background:#FFF0F0;color:var(--red)"><i class="ph-fill ph-map-pin"></i></div>
+    <div class="fab-opt-icon" style="background:#FFF0F0;color:var(--red)"><i class="ph-duotone ph-map-pin"></i></div>
     <span data-t="fab_poi">Segna un luogo</span>
   </button>
   <button class="fab-opt" onclick="openAddStop()">
-    <div class="fab-opt-icon" style="background:#EBF2FC;color:var(--blue)"><i class="ph ph-path"></i></div>
+    <div class="fab-opt-icon" style="background:#EBF2FC;color:var(--blue)"><i class="ph-duotone ph-path"></i></div>
     <span data-t="fab_itin">Tappa Itinerario</span>
   </button>
   <button class="fab-opt" id="compagniaFabBtn" onclick="closeFab();openCompagniaSheet()" style="position:relative">
     <div class="fab-opt-icon" style="background:#F0FDF4;color:#16A34A;position:relative">
-      <i class="ph-fill ph-users-three"></i>
+      <i class="ph-duotone ph-users-three"></i>
       <span class="compagnia-badge" id="compagniaBadge">0</span>
     </div>
     <span>Compagni di Viaggio</span>
@@ -940,14 +940,14 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
         <div class="sh-title">🧭 Compagni di Viaggio</div>
         <div class="sh-sub">Condividi la tua posizione GPS in tempo reale con gli amici</div>
       </div>
-      <button class="sh-close" onclick="closeSheet('compagniaOv','compagniaBg','compagniaSheet')"><i class="ph ph-x"></i></button>
+      <button class="sh-close" onclick="closeSheet('compagniaOv','compagniaBg','compagniaSheet')"><i class="ph-duotone ph-x"></i></button>
     </div>
     <div class="sh-body" style="padding-bottom:24px">
 
       <!-- ╭─ UNISCITI a una compagnia esistente ─╮ -->
       <details class="comp-section" style="margin-bottom:14px;background:#f5f0e8;border-radius:12px;padding:10px 14px">
         <summary style="font-size:13px;font-weight:700;color:var(--text);cursor:pointer;list-style:none;display:flex;align-items:center;gap:6px">
-          <i class="ph ph-sign-in" style="color:var(--blue)"></i> Hai già un codice? Unisciti
+          <i class="ph-duotone ph-sign-in" style="color:var(--blue)"></i> Hai già un codice? Unisciti
         </summary>
         <div style="margin-top:10px">
           <div class="compagnia-code-row">
@@ -960,7 +960,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 
       <!-- ╭─ CREA nuova compagnia ─╮ -->
       <div style="font-size:13px;font-weight:800;color:var(--text);margin:8px 0 10px;display:flex;align-items:center;gap:6px">
-        <i class="ph-fill ph-plus-circle" style="color:var(--red);font-size:18px"></i> Crea un nuovo gruppo
+        <i class="ph-duotone ph-plus-circle" style="color:var(--red);font-size:18px"></i> Crea un nuovo gruppo
       </div>
 
       <!-- Nome -->
@@ -972,29 +972,29 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px" id="compTypeRow">
         <label class="comp-type-opt" style="cursor:pointer">
           <input type="radio" name="compType" value="forever" onchange="onCompTypeChange()" style="display:none">
-          <div class="comp-type-card" data-type="forever"><i class="ph-fill ph-heart-straight" style="color:var(--red);font-size:18px"></i><span>Per sempre</span></div>
+          <div class="comp-type-card" data-type="forever"><i class="ph-duotone ph-heart-straight" style="color:var(--red);font-size:18px"></i><span>Per sempre</span></div>
         </label>
         <label class="comp-type-opt" style="cursor:pointer">
           <input type="radio" name="compType" value="trip" checked onchange="onCompTypeChange()" style="display:none">
-          <div class="comp-type-card active" data-type="trip"><i class="ph-fill ph-airplane-tilt" style="color:var(--blue);font-size:18px"></i><span>Un viaggio</span></div>
+          <div class="comp-type-card active" data-type="trip"><i class="ph-duotone ph-airplane-tilt" style="color:var(--blue);font-size:18px"></i><span>Un viaggio</span></div>
         </label>
         <label class="comp-type-opt" style="cursor:pointer">
           <input type="radio" name="compType" value="dinner" onchange="onCompTypeChange()" style="display:none">
-          <div class="comp-type-card" data-type="dinner"><i class="ph-fill ph-fork-knife" style="color:#16A34A;font-size:18px"></i><span>Una cena</span></div>
+          <div class="comp-type-card" data-type="dinner"><i class="ph-duotone ph-fork-knife" style="color:#16A34A;font-size:18px"></i><span>Una cena</span></div>
         </label>
       </div>
 
       <!-- Date/Ore (solo per trip/dinner) -->
       <div id="compDateBlock" style="margin-bottom:12px">
         <label style="display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">
-          <i class="ph ph-calendar-blank" style="font-size:13px"></i> Inizio
+          <i class="ph-duotone ph-calendar-blank" style="font-size:13px"></i> Inizio
         </label>
         <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:6px;margin-bottom:10px">
           <input id="compStartDate" type="date" style="height:42px;border:1.5px solid var(--border);border-radius:11px;padding:0 12px;font-size:13px;font-family:inherit;background:var(--card);color:var(--text);outline:none;box-sizing:border-box">
           <input id="compStartTime" type="time" style="height:42px;border:1.5px solid var(--border);border-radius:11px;padding:0 12px;font-size:13px;font-family:inherit;background:var(--card);color:var(--text);outline:none;box-sizing:border-box">
         </div>
         <label style="display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">
-          <i class="ph ph-calendar-check" style="font-size:13px"></i> Fine
+          <i class="ph-duotone ph-calendar-check" style="font-size:13px"></i> Fine
         </label>
         <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:6px">
           <input id="compEndDate" type="date" style="height:42px;border:1.5px solid var(--border);border-radius:11px;padding:0 12px;font-size:13px;font-family:inherit;background:var(--card);color:var(--text);outline:none;box-sizing:border-box">
@@ -1008,20 +1008,20 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 
       <!-- Inviti -->
       <label style="display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">
-        <i class="ph ph-paper-plane-tilt" style="font-size:13px"></i> Invita amici (email separate da virgola)
+        <i class="ph-duotone ph-paper-plane-tilt" style="font-size:13px"></i> Invita amici (email separate da virgola)
       </label>
       <input id="compInvites" type="text" placeholder="liri@example.com, marco@..." style="width:100%;height:42px;border:1.5px solid var(--border);border-radius:11px;padding:0 14px;font-size:13px;font-family:inherit;outline:none;background:var(--card);color:var(--text);margin-bottom:14px;box-sizing:border-box"/>
 
       <!-- Azione: crea + condividi -->
       <button onclick="createCompagnia()" style="width:100%;height:48px;border-radius:14px;background:var(--red);color:#fff;border:none;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;letter-spacing:.3px">
-        <i class="ph-fill ph-users-three"></i> Crea gruppo e ottieni codice
+        <i class="ph-duotone ph-users-three"></i> Crea gruppo e ottieni codice
       </button>
       <p style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5;text-align:center">
         Otterrai un codice di 6 caratteri da condividere con i tuoi compagni di viaggio. Anche WhatsApp, link diretto o QR code.
       </p>
 
       <button class="compagnia-stop vis" id="compagniaStopBtn" onclick="stopCompagnia();closeSheet('compagniaOv','compagniaBg','compagniaSheet')" style="display:none;margin-top:14px">
-        <i class="ph ph-stop-circle"></i> Lascia il gruppo
+        <i class="ph-duotone ph-stop-circle"></i> Lascia il gruppo
       </button>
     </div>
   </div>
@@ -1057,25 +1057,25 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 <!-- BOTTOM NAV (7 tab: Mappa · ILLI•AI · POI · Itinerari · Compagni · Profilo · SOS) -->
 <nav class="bottom-nav">
   <button class="nav-item active" id="nav-map" onclick="showTab('map')">
-    <i class="ph-fill ph-map-trifold"></i><span class="nav-lbl" data-t="nav_map">Mappa</span>
+    <i class="ph-duotone ph-map-trifold"></i><span class="nav-lbl" data-t="nav_map">Mappa</span>
   </button>
   <button class="nav-item nav-illi" id="nav-illi" onclick="openIlliAI()" title="ILLI•AI Travel Advisor">
-    <i class="ph-fill ph-sparkle"></i><span class="nav-lbl">ILLI•AI</span>
+    <i class="ph-duotone ph-sparkle"></i><span class="nav-lbl">ILLI•AI</span>
   </button>
   <button class="nav-item" id="nav-poi" onclick="showTab('poi')">
-    <i class="ph-fill ph-map-pin"></i><span class="nav-lbl" data-t="nav_poi">POI</span>
+    <i class="ph-duotone ph-map-pin"></i><span class="nav-lbl" data-t="nav_poi">POI</span>
   </button>
   <button class="nav-item" id="nav-itin" onclick="showTab('itin')">
-    <i class="ph-fill ph-path"></i><span class="nav-lbl" data-t="nav_itin">Itinerari</span>
+    <i class="ph-duotone ph-path"></i><span class="nav-lbl" data-t="nav_itin">Itinerari</span>
   </button>
   <button class="nav-item" id="nav-companions" onclick="showTab('companions')">
-    <i class="ph-fill ph-users-three"></i><span class="nav-lbl" data-t="nav_companions">Compagni</span>
+    <i class="ph-duotone ph-users-three"></i><span class="nav-lbl" data-t="nav_companions">Compagni</span>
   </button>
   <button class="nav-item" id="nav-profile" onclick="showTab('profile')">
-    <i class="ph ph-user-circle"></i><span class="nav-lbl" data-t="nav_profile">Profilo</span>
+    <i class="ph-duotone ph-user-circle"></i><span class="nav-lbl" data-t="nav_profile">Profilo</span>
   </button>
   <button class="nav-item nav-sos" onclick="openSOS()" title="Sicurezza">
-    <i class="ph-fill ph-shield-warning"></i><span class="nav-lbl">SOS</span>
+    <i class="ph-duotone ph-shield-warning"></i><span class="nav-lbl">SOS</span>
   </button>
 </nav>
 
@@ -1091,7 +1091,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
     <div class="profile-hero" id="profileHero">
       <!-- Cambio sfondo hero -->
       <button class="hero-bg-btn" onclick="toggleHeroBgPicker(event)" id="heroBgBtn">
-        <i class="ph ph-image" style="font-size:12px"></i> Sfondo
+        <i class="ph-duotone ph-image" style="font-size:12px"></i> Sfondo
       </button>
       <div class="hero-bg-picker" id="heroBgPicker">
         <div style="font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin:4px 6px 8px">Sfumature moderne</div>
@@ -1113,27 +1113,27 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
         <div class="profile-avatar" id="profileAvatarImg">
           <img src="https://ui-avatars.com/api/?name=Alessandro+C&background=D42B2B&color=fff&size=200" alt="avatar"/>
         </div>
-        <div class="avatar-edit"><i class="ph ph-sparkle"></i></div>
+        <div class="avatar-edit"><i class="ph-duotone ph-sparkle"></i></div>
       </div>
       <div class="profile-name" id="myProfileName">Alessandro C.</div>
       <!-- Vanity URL — subito sotto il nome. Click = copia, icona matita = modifica -->
       <div class="profile-vanity" id="myVanityUrl" onclick="copyMyVanityUrl()" style="margin:4px auto 0">
-        <i class="ph ph-at"></i>
+        <i class="ph-duotone ph-at"></i>
         <span id="myVanityTxt">poilove.com/@tu</span>
-        <span class="profile-vanity-edit" onclick="event.stopPropagation();openVanityEdit()" title="Modifica handle"><i class="ph ph-pencil-simple"></i></span>
+        <span class="profile-vanity-edit" onclick="event.stopPropagation();openVanityEdit()" title="Modifica handle"><i class="ph-duotone ph-pencil-simple"></i></span>
       </div>
       <!-- Bio opzionale -->
       <div class="profile-bio" id="myProfileBio" onclick="editProfileBio()" style="display:none"></div>
       <!-- Riga info: email, livello, link condivisione -->
       <div class="profile-info-row" id="profileInfoRow">
         <span class="prof-info-chip" id="profEmailChip" data-visible="1" onclick="toggleProfileField('email')">
-          <i class="ph ph-envelope"></i><span id="profEmailTxt">it@altrostile.app</span>
+          <i class="ph-duotone ph-envelope"></i><span id="profEmailTxt">it@altrostile.app</span>
         </span>
         <span class="prof-info-chip level-chip" id="profLevelChip">
-          <i class="ph ph-star"></i><span id="profLevelTxt">Lv.1 Explorer</span>
+          <i class="ph-duotone ph-star"></i><span id="profLevelTxt">Lv.1 Explorer</span>
         </span>
         <span class="prof-info-chip share-chip" onclick="copyMyProfileLink()">
-          <i class="ph ph-share-network"></i>
+          <i class="ph-duotone ph-share-network"></i>
         </span>
       </div>
       <div class="prof-badge" id="profBadge" onclick="changeAvatar()"></div>
@@ -1141,17 +1141,17 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
     </div>
     <div class="profile-stats" onclick="onProfileStatsTap()">
       <div class="stat-item">
-        <i class="ph ph-map-pin"></i>
+        <i class="ph-duotone ph-map-pin"></i>
         <div class="stat-v" id="statPoi">12</div>
         <div class="stat-l" data-t="stat_poi">POI</div>
       </div>
       <div class="stat-item">
-        <i class="ph-fill ph-heart" style="color:var(--red)"></i>
+        <i class="ph-duotone ph-heart" style="color:var(--red)"></i>
         <div class="stat-v" id="statLove">87</div>
         <div class="stat-l" data-t="stat_love">Love</div>
       </div>
       <div class="stat-item">
-        <i class="ph ph-list-bullets"></i>
+        <i class="ph-duotone ph-list-bullets"></i>
         <div class="stat-v" id="statList">3</div>
         <div class="stat-l" data-t="stat_list">Liste</div>
       </div>
@@ -1164,13 +1164,13 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
           <div class="pub-toggle-title" data-t="prof_pub_toggle">Come ti vedono gli altri</div>
           <div class="pub-toggle-sub">Anteprima del tuo profilo pubblico: POI, itinerari, follower</div>
         </div>
-        <i class="ph ph-caret-right pub-toggle-arrow"></i>
+        <i class="ph-duotone ph-caret-right pub-toggle-arrow"></i>
       </button>
       <div class="profile-sec">
         <div class="prof-sec-lbl">
           <span data-t="prof_lists">Le mie liste</span>
           <button class="prof-sec-add" onclick="openAddList()">
-            <i class="ph ph-plus"></i> <span data-t="prof_new_list">Nuova lista</span>
+            <i class="ph-duotone ph-plus"></i> <span data-t="prof_new_list">Nuova lista</span>
           </button>
         </div>
         <div id="listsContainer">
@@ -1179,8 +1179,8 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
             <div class="list-info"><div class="list-name">Lista libera</div><div class="list-meta">5 POI</div></div>
             <span class="list-vis lv-pub">Pubblica</span>
             <div class="list-actions">
-              <button class="list-act-btn list-act-share" title="Copia link" onclick="event.stopPropagation();copyListLink('lista-libera')"><i class="ph ph-share-network"></i></button>
-              <button class="list-act-btn" title="Modifica" onclick="event.stopPropagation();editList(this,'Lista libera','lv-pub')"><i class="ph ph-pencil-simple"></i></button>
+              <button class="list-act-btn list-act-share" title="Copia link" onclick="event.stopPropagation();copyListLink('lista-libera')"><i class="ph-duotone ph-share-network"></i></button>
+              <button class="list-act-btn" title="Modifica" onclick="event.stopPropagation();editList(this,'Lista libera','lv-pub')"><i class="ph-duotone ph-pencil-simple"></i></button>
             </div>
           </div>
           <div class="list-item">
@@ -1188,8 +1188,8 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
             <div class="list-info"><div class="list-name">Tirana Top</div><div class="list-meta">4 POI</div></div>
             <span class="list-vis lv-pub">Pubblica</span>
             <div class="list-actions">
-              <button class="list-act-btn list-act-share" title="Copia link" onclick="event.stopPropagation();copyListLink('tirana-top')"><i class="ph ph-share-network"></i></button>
-              <button class="list-act-btn" title="Modifica" onclick="event.stopPropagation();editList(this,'Tirana Top','lv-pub')"><i class="ph ph-pencil-simple"></i></button>
+              <button class="list-act-btn list-act-share" title="Copia link" onclick="event.stopPropagation();copyListLink('tirana-top')"><i class="ph-duotone ph-share-network"></i></button>
+              <button class="list-act-btn" title="Modifica" onclick="event.stopPropagation();editList(this,'Tirana Top','lv-pub')"><i class="ph-duotone ph-pencil-simple"></i></button>
             </div>
           </div>
           <div class="list-item">
@@ -1197,7 +1197,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
             <div class="list-info"><div class="list-name">Segreti</div><div class="list-meta">3 POI</div></div>
             <span class="list-vis lv-prv">Privata</span>
             <div class="list-actions">
-              <button class="list-act-btn" title="Modifica" onclick="event.stopPropagation();editList(this,'Segreti','lv-prv')"><i class="ph ph-pencil-simple"></i></button>
+              <button class="list-act-btn" title="Modifica" onclick="event.stopPropagation();editList(this,'Segreti','lv-prv')"><i class="ph-duotone ph-pencil-simple"></i></button>
             </div>
           </div>
         </div>
@@ -1207,11 +1207,11 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
         <div class="prof-sec-lbl"><span>Le mie rotte storiche</span><span style="font-size:10px;font-weight:400;color:var(--muted)">selezionate sulla mappa</span></div>
         <div id="myRoutesContainer">
           <div class="route-item">
-            <div class="route-dot" style="background:#EBF2FC"><i class="ph ph-person-simple-walk" style="color:var(--blue)"></i></div>
+            <div class="route-dot" style="background:#EBF2FC"><i class="ph-duotone ph-person-simple-walk" style="color:var(--blue)"></i></div>
             <div><div class="route-name">Via Egnatia</div><div class="route-meta">Albania · Macedonia · Grecia</div></div>
           </div>
           <div class="route-item">
-            <div class="route-dot" style="background:#FFF5F5"><i class="ph ph-person-simple-run" style="color:var(--red)"></i></div>
+            <div class="route-dot" style="background:#FFF5F5"><i class="ph-duotone ph-person-simple-run" style="color:var(--red)"></i></div>
             <div><div class="route-name">Terre Illiriche</div><div class="route-meta">Popoli antichi dei Balcani</div></div>
           </div>
         </div>
@@ -1234,7 +1234,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
                 <div class="u-name">Mirela K. <span class="rel-badge friend">Amico</span></div>
                 <div class="u-meta">18 POI · Tirana · <span class="pos-share-timer" data-until="1d">📍 ancora 23h</span></div>
               </div>
-              <button class="u-action u-pos-btn" onclick="event.stopPropagation();toggleLocDurPicker('ldup-mirela')"><i class="ph ph-map-trifold"></i></button>
+              <button class="u-action u-pos-btn" onclick="event.stopPropagation();toggleLocDurPicker('ldup-mirela')"><i class="ph-duotone ph-map-trifold"></i></button>
             </div>
             <div class="loc-dur-picker" id="ldup-mirela">
               <div class="loc-dur-title">Condividi posizione per:</div>
@@ -1255,7 +1255,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
                 <div class="u-name">Arben S. <span class="rel-badge follow">Seguo</span></div>
                 <div class="u-meta">7 POI · Shkodër</div>
               </div>
-              <button class="u-action u-pos-btn" onclick="event.stopPropagation();toggleLocDurPicker('ldup-arben')"><i class="ph ph-map-trifold"></i></button>
+              <button class="u-action u-pos-btn" onclick="event.stopPropagation();toggleLocDurPicker('ldup-arben')"><i class="ph-duotone ph-map-trifold"></i></button>
             </div>
             <div class="loc-dur-picker" id="ldup-arben">
               <div class="loc-dur-title">Condividi posizione per:</div>
@@ -1276,7 +1276,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
                 <div class="u-name">Liri V. <span class="rel-badge follow">Seguo</span></div>
                 <div class="u-meta">31 POI · Tirana</div>
               </div>
-              <button class="u-action u-pos-btn" onclick="event.stopPropagation();toggleLocDurPicker('ldup-liri')"><i class="ph ph-map-trifold"></i></button>
+              <button class="u-action u-pos-btn" onclick="event.stopPropagation();toggleLocDurPicker('ldup-liri')"><i class="ph-duotone ph-map-trifold"></i></button>
             </div>
             <div class="loc-dur-picker" id="ldup-liri">
               <div class="loc-dur-title">Condividi posizione per:</div>
@@ -1300,14 +1300,14 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
           <div class="user-row">
             <div class="u-avatar"><img src="https://ui-avatars.com/api/?name=U+B&background=6B6B6B&color=fff&size=80" alt=""></div>
             <div class="u-info"><div class="u-name">Utente bloccato</div><div class="u-meta">Non vede i tuoi contenuti</div></div>
-            <button class="u-action danger" onclick="showToast('Utente sbloccato')"><i class="ph ph-lock-open" style="font-size:12px"></i> Sblocca</button>
+            <button class="u-action danger" onclick="showToast('Utente sbloccato')"><i class="ph-duotone ph-lock-open" style="font-size:12px"></i> Sblocca</button>
           </div>
         </div>
       </div>
 
       <div class="profile-sec">
         <div class="prof-sec-lbl"><span data-t="prof_tags">I miei tag</span>
-          <button class="add-tag-btn" onclick="showTagInput()"><i class="ph ph-plus"></i> <span data-t="prof_new_tag">Aggiungi</span></button>
+          <button class="add-tag-btn" onclick="showTagInput()"><i class="ph-duotone ph-plus"></i> <span data-t="prof_new_tag">Aggiungi</span></button>
         </div>
         <div class="tags-cloud" id="tagsContainer">
           <span class="tag-chip">storia</span>
@@ -1320,37 +1320,37 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
       <div class="profile-sec">
         <div class="prof-sec-lbl">
           <span data-t="prof_my_poi">I miei POI</span>
-          <button class="prof-sec-add" onclick="openAddPOI()"><i class="ph ph-plus"></i> <span data-t="prof_add_poi">Aggiungi</span></button>
+          <button class="prof-sec-add" onclick="openAddPOI()"><i class="ph-duotone ph-plus"></i> <span data-t="prof_add_poi">Aggiungi</span></button>
         </div>
         <div class="poi-board" id="poiBoard">
           <div class="poi-card" id="pcard-1">
             <div class="poi-card-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/New_Bazaar_Tirana.jpg/320px-New_Bazaar_Tirana.jpg')">
-              <div class="poi-card-vis"><i class="ph ph-globe"></i> Pubblico</div>
+              <div class="poi-card-vis"><i class="ph-duotone ph-globe"></i> Pubblico</div>
             </div>
             <div class="poi-card-body">
               <div class="poi-card-name">Pazari i Ri</div>
               <div class="poi-card-desc">Il mercato più bello dei Balcani.</div>
               <div class="poi-card-footer">
-                <div class="poi-card-love"><i class="ph-fill ph-heart"></i> 56</div>
+                <div class="poi-card-love"><i class="ph-duotone ph-heart"></i> 56</div>
                 <div class="poi-card-actions">
-                  <button class="poi-card-btn" onclick="editPOI('pcard-1')"><i class="ph ph-pencil-simple"></i></button>
-                  <button class="poi-card-btn pcb-del" onclick="deletePOI('pcard-1')"><i class="ph ph-trash"></i></button>
+                  <button class="poi-card-btn" onclick="editPOI('pcard-1')"><i class="ph-duotone ph-pencil-simple"></i></button>
+                  <button class="poi-card-btn pcb-del" onclick="deletePOI('pcard-1')"><i class="ph-duotone ph-trash"></i></button>
                 </div>
               </div>
             </div>
           </div>
           <div class="poi-card" id="pcard-2">
             <div class="poi-card-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Blloku_Tirana.jpg/320px-Blloku_Tirana.jpg')">
-              <div class="poi-card-vis"><i class="ph ph-lock-simple"></i> Privato</div>
+              <div class="poi-card-vis"><i class="ph-duotone ph-lock-simple"></i> Privato</div>
             </div>
             <div class="poi-card-body">
               <div class="poi-card-name">Blloku</div>
               <div class="poi-card-desc">Quartiere liberato nel '91.</div>
               <div class="poi-card-footer">
-                <div class="poi-card-love"><i class="ph-fill ph-heart"></i> 41</div>
+                <div class="poi-card-love"><i class="ph-duotone ph-heart"></i> 41</div>
                 <div class="poi-card-actions">
-                  <button class="poi-card-btn" onclick="editPOI('pcard-2')"><i class="ph ph-pencil-simple"></i></button>
-                  <button class="poi-card-btn pcb-del" onclick="deletePOI('pcard-2')"><i class="ph ph-trash"></i></button>
+                  <button class="poi-card-btn" onclick="editPOI('pcard-2')"><i class="ph-duotone ph-pencil-simple"></i></button>
+                  <button class="poi-card-btn pcb-del" onclick="deletePOI('pcard-2')"><i class="ph-duotone ph-trash"></i></button>
                 </div>
               </div>
             </div>
@@ -1360,10 +1360,10 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
       <!-- DEV MODE PANEL — visibile solo con token 321PaLa -->
       <div class="profile-sec" id="devModeSection" style="display:none">
         <div class="dev-panel">
-          <div class="dev-panel-title"><i class="ph ph-flask"></i> Dev Mode — Multi-Profilo</div>
+          <div class="dev-panel-title"><i class="ph-duotone ph-flask"></i> Dev Mode — Multi-Profilo</div>
           <div id="devProfilesList"></div>
           <button class="dev-add-profile-btn" onclick="addDevProfile()">
-            <i class="ph ph-plus"></i> Nuovo profilo test
+            <i class="ph-duotone ph-plus"></i> Nuovo profilo test
           </button>
         </div>
       </div>
@@ -1373,7 +1373,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
   <!-- TOKEN MODAL -->
   <div id="tokenModal">
     <div class="token-box">
-      <div class="token-title"><i class="ph ph-key" style="color:var(--blue);font-size:24px;display:block;margin-bottom:8px"></i>Accesso sviluppatore</div>
+      <div class="token-title"><i class="ph-duotone ph-key" style="color:var(--blue);font-size:24px;display:block;margin-bottom:8px"></i>Accesso sviluppatore</div>
       <div class="token-sub">Inserisci il codice per sbloccare funzionalità avanzate di test</div>
       <input class="token-in" id="tokenInput" type="password" placeholder="••••••" maxlength="10"
         onkeydown="if(event.key==='Enter')verifyToken()"/>
@@ -1386,10 +1386,10 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
   <div id="publicProfile" class="public-profile-view">
     <div class="pub-header">
       <button class="back-btn" onclick="togglePublicProfile(false)">
-        <i class="ph ph-arrow-left"></i> <span data-t="back">Indietro</span>
+        <i class="ph-duotone ph-arrow-left"></i> <span data-t="back">Indietro</span>
       </button>
       <button class="back-profile-btn" onclick="togglePublicProfile(false)">
-        <i class="ph ph-user-circle"></i> <span>Ritorna al tuo profilo</span>
+        <i class="ph-duotone ph-user-circle"></i> <span>Ritorna al tuo profilo</span>
       </button>
       <div class="profile-avatar-wrap" style="cursor:default">
         <div class="profile-avatar">
@@ -1400,26 +1400,26 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
       <div class="profile-email" id="pubProfileEmail">it@altrostile.app</div>
       <!-- Vanity URL — cliccabile per copiare -->
       <div class="profile-vanity" id="pubVanityUrl" onclick="copyVanityUrl()">
-        <i class="ph ph-link"></i>
+        <i class="ph-duotone ph-link"></i>
         <span id="pubVanityTxt">poilove.com?@alessandrocastagna</span>
       </div>
       <div class="prof-badge" id="pubProfileBadge" style="background:rgba(245,158,11,.2);color:#FDE68A;border-color:rgba(245,158,11,.3)">
-        <i class="ph-fill ph-star" style="color:#FDE68A"></i>
+        <i class="ph-duotone ph-star" style="color:#FDE68A"></i>
         <span id="pubProfileBadgeTxt">Amatore · 87 love</span>
       </div>
       <div class="pub-actions">
         <button class="pub-action-btn follow" id="pubFollowBtn" onclick="togglePublicFollow()">
-          <i class="ph ph-user-plus"></i> <span id="pubFollowLbl">Segui</span>
+          <i class="ph-duotone ph-user-plus"></i> <span id="pubFollowLbl">Segui</span>
         </button>
         <button class="pub-action-btn connect" id="pubConnectBtn" onclick="togglePublicConnect()">
-          <i class="ph ph-handshake"></i> <span id="pubConnectLbl">Collegati</span>
+          <i class="ph-duotone ph-handshake"></i> <span id="pubConnectLbl">Collegati</span>
         </button>
         <button class="pub-action-btn share-loc" id="pubShareLocBtn" onclick="toggleLocDurPicker()"
           style="background:rgba(34,197,94,.2);color:#16A34A">
-          <i class="ph ph-navigation-arrow"></i> <span id="pubShareLocLbl">Condividi posizione</span>
+          <i class="ph-duotone ph-navigation-arrow"></i> <span id="pubShareLocLbl">Condividi posizione</span>
         </button>
         <button class="pub-action-btn block" id="pubBlockBtn" onclick="togglePublicBlock()">
-          <i class="ph ph-prohibit"></i> <span id="pubBlockLbl">Blocca</span>
+          <i class="ph-duotone ph-prohibit"></i> <span id="pubBlockLbl">Blocca</span>
         </button>
       </div>
       <!-- Duration picker per condivisione posizione -->
@@ -1434,30 +1434,30 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
       </div>
     </div>
     <div class="profile-stats">
-      <div class="stat-item"><i class="ph ph-map-pin"></i><div class="stat-v">7</div><div class="stat-l">POI pub.</div></div>
-      <div class="stat-item"><i class="ph-fill ph-heart" style="color:var(--red)"></i><div class="stat-v">87</div><div class="stat-l">Love tot.</div></div>
-      <div class="stat-item"><i class="ph ph-route"></i><div class="stat-v">2</div><div class="stat-l">Itinerari</div></div>
+      <div class="stat-item"><i class="ph-duotone ph-map-pin"></i><div class="stat-v">7</div><div class="stat-l">POI pub.</div></div>
+      <div class="stat-item"><i class="ph-duotone ph-heart" style="color:var(--red)"></i><div class="stat-v">87</div><div class="stat-l">Love tot.</div></div>
+      <div class="stat-item"><i class="ph-duotone ph-route"></i><div class="stat-v">2</div><div class="stat-l">Itinerari</div></div>
     </div>
     <div class="profile-body">
       <!-- Stesso verde toggle — torna al tuo profilo -->
       <button class="pub-toggle-card" onclick="togglePublicProfile(false)">
-        <div class="pub-toggle-icon"><i class="ph-fill ph-arrow-left"></i></div>
+        <div class="pub-toggle-icon"><i class="ph-duotone ph-arrow-left"></i></div>
         <div class="pub-toggle-text">
           <div class="pub-toggle-title">Torna al tuo profilo</div>
           <div class="pub-toggle-sub">Esci dall'anteprima pubblica e torna alla tua area privata</div>
         </div>
-        <i class="ph ph-caret-right pub-toggle-arrow"></i>
+        <i class="ph-duotone ph-caret-right pub-toggle-arrow"></i>
       </button>
       <div class="profile-sec">
         <div class="prof-sec-lbl">POI pubblici</div>
         <div class="poi-board">
           <div class="poi-card">
             <div class="poi-card-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Blloku_Tirana.jpg/320px-Blloku_Tirana.jpg')"></div>
-            <div class="poi-card-body"><div class="poi-card-name">Blloku</div><div class="poi-card-footer"><div class="poi-card-love"><i class="ph-fill ph-heart"></i> 41</div></div></div>
+            <div class="poi-card-body"><div class="poi-card-name">Blloku</div><div class="poi-card-footer"><div class="poi-card-love"><i class="ph-duotone ph-heart"></i> 41</div></div></div>
           </div>
           <div class="poi-card">
             <div class="poi-card-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/New_Bazaar_Tirana.jpg/320px-New_Bazaar_Tirana.jpg')"></div>
-            <div class="poi-card-body"><div class="poi-card-name">Pazari i Ri</div><div class="poi-card-footer"><div class="poi-card-love"><i class="ph-fill ph-heart"></i> 56</div></div></div>
+            <div class="poi-card-body"><div class="poi-card-name">Pazari i Ri</div><div class="poi-card-footer"><div class="poi-card-love"><i class="ph-duotone ph-heart"></i> 56</div></div></div>
           </div>
         </div>
       </div>
@@ -1472,12 +1472,12 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
     <div class="tlp-hero-overlay"></div>
     <div class="tlp-hero-top">
       <img src="https://poilove.com/img/logo-horizontal.svg" alt="POI•LOVE" class="tlp-logo" onerror="this.style.display='none'">
-      <a href="/" class="tlp-open-app">Apri l'app <i class="ph ph-arrow-right"></i></a>
+      <a href="/" class="tlp-open-app">Apri l'app <i class="ph-duotone ph-arrow-right"></i></a>
     </div>
     <div class="tlp-hero-content">
-      <div class="tlp-badge" id="tlpBadge"><i class="ph-fill ph-map-pin"></i> Destinazione</div>
+      <div class="tlp-badge" id="tlpBadge"><i class="ph-duotone ph-map-pin"></i> Destinazione</div>
       <h1 class="tlp-title" id="tlpTitle">Titolo Itinerario</h1>
-      <div class="tlp-dates" id="tlpDates"><i class="ph ph-calendar"></i> Date</div>
+      <div class="tlp-dates" id="tlpDates"><i class="ph-duotone ph-calendar"></i> Date</div>
       <!-- Companions -->
       <div class="tlp-companions" id="tlpCompanions"></div>
     </div>
@@ -1492,13 +1492,13 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 
     <!-- Tappe -->
     <div class="tlp-section">
-      <div class="tlp-section-lbl"><i class="ph ph-path"></i> Tappe del viaggio</div>
+      <div class="tlp-section-lbl"><i class="ph-duotone ph-path"></i> Tappe del viaggio</div>
       <div class="tlp-stops" id="tlpStops"></div>
     </div>
 
     <!-- POI lungo la rotta -->
     <div class="tlp-section" id="tlpPoisSection" style="display:none">
-      <div class="tlp-section-lbl"><i class="ph-fill ph-heart" style="color:var(--red)"></i> POI•LOVE lungo la rotta</div>
+      <div class="tlp-section-lbl"><i class="ph-duotone ph-heart" style="color:var(--red)"></i> POI•LOVE lungo la rotta</div>
       <div class="tlp-poi-grid" id="tlpPoiGrid"></div>
     </div>
 
@@ -1506,10 +1506,10 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
     <div class="tlp-cta-block">
       <p class="tlp-cta-text">Vuoi seguire questo itinerario o pianificarne uno simile?</p>
       <a href="/" class="tlp-cta-btn">
-        <i class="ph-fill ph-heart"></i> Apri POI•LOVE
+        <i class="ph-duotone ph-heart"></i> Apri POI•LOVE
       </a>
       <button class="tlp-share-btn" onclick="shareTripLanding()">
-        <i class="ph ph-share-network"></i> Condividi
+        <i class="ph-duotone ph-share-network"></i> Condividi
       </button>
     </div>
 
@@ -1524,9 +1524,9 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 <!-- ═══ POI VIEW (Miei · Loved · Vicini) ═══ -->
 <div class="poi-view" id="poiView">
   <div class="poi-subtabs">
-    <button class="poi-subtab active" data-subtab="mine"  onclick="setPoiSubtab('mine')"><i class="ph-fill ph-map-pin"></i> I miei POI</button>
-    <button class="poi-subtab"        data-subtab="loved" onclick="setPoiSubtab('loved')"><i class="ph-fill ph-heart"></i> Loved</button>
-    <button class="poi-subtab"        data-subtab="near"  onclick="setPoiSubtab('near')"><i class="ph-fill ph-compass"></i> Vicini</button>
+    <button class="poi-subtab active" data-subtab="mine"  onclick="setPoiSubtab('mine')"><i class="ph-duotone ph-map-pin"></i> I miei POI</button>
+    <button class="poi-subtab"        data-subtab="loved" onclick="setPoiSubtab('loved')"><i class="ph-duotone ph-heart"></i> Loved</button>
+    <button class="poi-subtab"        data-subtab="near"  onclick="setPoiSubtab('near')"><i class="ph-duotone ph-compass"></i> Vicini</button>
   </div>
   <div id="poi-list-area"></div>
 </div>
@@ -1535,7 +1535,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 <div class="companions-view" id="companionsView">
   <div style="padding:16px 14px 8px">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-      <i class="ph-fill ph-users-three" style="color:var(--blue);font-size:22px"></i>
+      <i class="ph-duotone ph-users-three" style="color:var(--blue);font-size:22px"></i>
       <div style="font-size:18px;font-weight:900;color:var(--ink)">Compagni di Viaggio</div>
     </div>
     <div style="font-size:12px;color:var(--muted);line-height:1.4">Le tue compagnie attive e quelle a cui hai partecipato. Tocca <strong>+</strong> per crearne una nuova.</div>
@@ -1551,15 +1551,15 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 
   <!-- Topbar -->
   <div class="itin-topbar">
-    <div class="itin-title"><i class="ph-fill ph-navigation" style="color:var(--red);font-size:20px;margin-right:6px"></i>Itinerari</div>
+    <div class="itin-title"><i class="ph-duotone ph-navigation" style="color:var(--red);font-size:20px;margin-right:6px"></i>Itinerari</div>
     <button class="itin-new-btn" onclick="openNewTrip()">
-      <i class="ph ph-plus" style="font-size:14px"></i> Nuovo
+      <i class="ph-duotone ph-plus" style="font-size:14px"></i> Nuovo
     </button>
   </div>
 
   <!-- Ricerca destinazione -->
   <div class="itin-search-wrap">
-    <i class="ph ph-magnifying-glass itin-search-icon"></i>
+    <i class="ph-duotone ph-magnifying-glass itin-search-icon"></i>
     <input class="itin-search" id="itinSearchIn" type="text"
       placeholder="Cerca destinazione… es. Sarajevo, Bosnia"
       oninput="onItinSearch(this.value)" autocomplete="off"/>
@@ -1599,7 +1599,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
         <div class="poiai-sub">Suggerisce, pianifica, aggiunge tappe</div>
       </div>
       <div class="poiai-badge">AI</div>
-      <button class="poiai-voice-btn" id="poiaiVoiceBtn" onclick="togglePoiAIVoice()" title="Rispondi a voce"><i class="ph ph-microphone"></i></button>
+      <button class="poiai-voice-btn" id="poiaiVoiceBtn" onclick="togglePoiAIVoice()" title="Rispondi a voce"><i class="ph-duotone ph-microphone"></i></button>
     </div>
     <div class="poiai-msgs" id="poiaiMsgs">
       <div class="poiai-msg ai">Ciao! Sono <strong>ILLI•AI</strong>, la mascot di POI•LOVE — il tuo cuore-amico per scoprire luoghi e capire l'app. Posso suggerirti tappe, ristoranti, esperienze culturali, oppure aiutarti a usare POI•LOVE (POI, itinerari, compagni di viaggio). Da dove iniziamo? 💞</div>
@@ -1608,7 +1608,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
       <input class="poiai-input" id="poiaiInput" type="text"
         placeholder="es. Dove mangiare a Tirana con vista? · Come si crea un itinerario?"
         onkeydown="if(event.key==='Enter')sendPoiAIMsg()"/>
-      <button class="poiai-send" onclick="sendPoiAIMsg()"><i class="ph ph-paper-plane-tilt"></i></button>
+      <button class="poiai-send" onclick="sendPoiAIMsg()"><i class="ph-duotone ph-paper-plane-tilt"></i></button>
     </div>
   </div>
 </div>
@@ -1622,13 +1622,13 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
       <div>
         <div class="sh-title" data-t="add_title">Salva questo posto</div>
         <div class="sh-sub" style="color:var(--red);font-weight:700;font-size:11px;margin-top:3px;display:flex;align-items:center;gap:4px">
-          <i class="ph ph-lightning" style="font-size:11px"></i>
+          <i class="ph-duotone ph-lightning" style="font-size:11px"></i>
           <span data-t="add_challenge">Riesci in 60 secondi?</span>
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:8px">
-        <div class="sh-timer" id="timerBadge"><i class="ph ph-timer" style="font-size:13px"></i> <span id="timerTime">0:00</span></div>
-        <button class="sh-close" id="closeAddPoiBtn"><i class="ph ph-x"></i></button>
+        <div class="sh-timer" id="timerBadge"><i class="ph-duotone ph-timer" style="font-size:13px"></i> <span id="timerTime">0:00</span></div>
+        <button class="sh-close" id="closeAddPoiBtn"><i class="ph-duotone ph-x"></i></button>
       </div>
     </div>
     <div class="congrats" id="congratsBanner">
@@ -1654,21 +1654,21 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
       <!-- DOVE SI TROVA -->
       <div class="sec-lbl" data-t="lbl_where">Dove si trova</div>
       <div class="loc-tabs">
-        <button class="loc-tab active" onclick="setLocTab(this,'gps')"><i class="ph ph-crosshair-simple"></i><span data-t="loc_gps">GPS Live</span></button>
-        <button class="loc-tab" onclick="setLocTab(this,'exif')"><i class="ph ph-image"></i><span data-t="loc_exif">Foto EXIF</span></button>
-        <button class="loc-tab" onclick="setLocTab(this,'addr')"><i class="ph ph-house"></i><span data-t="loc_addr">Indirizzo</span></button>
-        <button class="loc-tab" onclick="setLocTab(this,'map')"><i class="ph ph-cursor"></i><span data-t="loc_map">Tocca mappa</span></button>
+        <button class="loc-tab active" onclick="setLocTab(this,'gps')"><i class="ph-duotone ph-crosshair-simple"></i><span data-t="loc_gps">GPS Live</span></button>
+        <button class="loc-tab" onclick="setLocTab(this,'exif')"><i class="ph-duotone ph-image"></i><span data-t="loc_exif">Foto EXIF</span></button>
+        <button class="loc-tab" onclick="setLocTab(this,'addr')"><i class="ph-duotone ph-house"></i><span data-t="loc_addr">Indirizzo</span></button>
+        <button class="loc-tab" onclick="setLocTab(this,'map')"><i class="ph-duotone ph-cursor"></i><span data-t="loc_map">Tocca mappa</span></button>
       </div>
       <!-- EXIF hint — appare quando la foto ha dati GPS -->
       <div class="loc-hint" id="locHint">
-        <i class="ph ph-image" style="font-size:13px;flex-shrink:0"></i>
+        <i class="ph-duotone ph-image" style="font-size:13px;flex-shrink:0"></i>
         <span class="loc-hint-name" id="locHintName"></span>
         <button class="loc-hint-accept" onclick="acceptExifName()" data-t="loc_hint_use">Usa come nome</button>
       </div>
 
       <!-- GPS: spinner mentre rileva -->
       <div class="loc-panel loc-gps-loading" id="locGpsLoading">
-        <i class="ph ph-spinner-gap" style="animation:spin 1s linear infinite;font-size:18px;color:var(--blue);flex-shrink:0"></i>
+        <i class="ph-duotone ph-spinner-gap" style="animation:spin 1s linear infinite;font-size:18px;color:var(--blue);flex-shrink:0"></i>
         <div>
           <div style="font-size:12px;font-weight:700;color:var(--text)">Rilevamento GPS…</div>
           <div style="font-size:10px;color:var(--muted)">Attendi qualche secondo</div>
@@ -1677,7 +1677,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 
       <!-- Indirizzo: campo di testo + risultati -->
       <div class="loc-panel" id="locAddrPanel" style="display:none">
-        <i class="ph ph-magnifying-glass" style="font-size:15px;color:var(--muted);flex-shrink:0"></i>
+        <i class="ph-duotone ph-magnifying-glass" style="font-size:15px;color:var(--muted);flex-shrink:0"></i>
         <div style="flex:1">
           <input type="text" class="loc-addr-in" id="locAddrIn"
             placeholder="Es: Pazari i Ri, Tirana…"
@@ -1689,7 +1689,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 
       <!-- Mappa: istruzione tap -->
       <div class="loc-panel loc-map-tip" id="locMapTip" style="display:none">
-        <i class="ph ph-cursor" style="font-size:18px;color:var(--blue);flex-shrink:0"></i>
+        <i class="ph-duotone ph-cursor" style="font-size:18px;color:var(--blue);flex-shrink:0"></i>
         <div>
           <div style="font-size:12px;font-weight:700;color:var(--text)">Tocca la mappa</div>
           <div style="font-size:10px;color:var(--muted)">Un tocco breve imposta la posizione del POI</div>
@@ -1709,16 +1709,16 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
           <div class="loc-coords" id="locCoords" onclick="copyCoords(this)" title="Tap per copiare">41.3275, 19.8189</div>
           <!-- Link condivisione inline -->
           <div class="loc-share-mini" id="locShareMini">
-            <i class="ph ph-link" style="font-size:10px"></i>
+            <i class="ph-duotone ph-link" style="font-size:10px"></i>
             <span id="locShareTxt" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">poilove.com?at=…</span>
-            <button class="loc-copy-mini" onclick="copyCoords(document.getElementById('locShareTxt'))"><i class="ph ph-copy"></i></button>
+            <button class="loc-copy-mini" onclick="copyCoords(document.getElementById('locShareTxt'))"><i class="ph-duotone ph-copy"></i></button>
           </div>
         </div>
       </div>
 
       <!-- Suggerimento: usa il nome del luogo come nome POI -->
       <div class="loc-name-hint" id="locNameHint" style="display:none">
-        <i class="ph ph-sparkle" style="font-size:12px;color:var(--blue)"></i>
+        <i class="ph-duotone ph-sparkle" style="font-size:12px;color:var(--blue)"></i>
         <span id="locNameHintTxt" style="flex:1;font-size:11px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
         <button class="loc-hint-accept" onclick="useDetectedName()">Usa come nome</button>
       </div>
@@ -1727,13 +1727,13 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
       <div class="sec-lbl"><span data-t="lbl_photos">Foto</span></div>
       <div class="photo-row">
         <div class="photo-slot" id="pslot-0" onclick="triggerPhoto(0)">
-          <i class="ph ph-camera" id="picon-0"></i><span class="slot-lbl" id="plbl-0" data-t="ph_main">Principale</span>
+          <i class="ph-duotone ph-camera" id="picon-0"></i><span class="slot-lbl" id="plbl-0" data-t="ph_main">Principale</span>
         </div>
         <div class="photo-slot" id="pslot-1" onclick="triggerPhoto(1)">
-          <i class="ph ph-plus" id="picon-1"></i><span class="slot-lbl" id="plbl-1" data-t="ph_2">Foto 2</span>
+          <i class="ph-duotone ph-plus" id="picon-1"></i><span class="slot-lbl" id="plbl-1" data-t="ph_2">Foto 2</span>
         </div>
         <div class="photo-slot" id="pslot-2" onclick="triggerPhoto(2)">
-          <i class="ph ph-plus" id="picon-2"></i><span class="slot-lbl" id="plbl-2" data-t="ph_3">Foto 3</span>
+          <i class="ph-duotone ph-plus" id="picon-2"></i><span class="slot-lbl" id="plbl-2" data-t="ph_3">Foto 3</span>
         </div>
       </div>
       <input type="file" id="photoInput0" accept="image/*" style="display:none" onchange="handlePhoto(this,0)">
@@ -1747,8 +1747,8 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
         <span id="charCount" style="font-size:10px;color:var(--muted)">0 / 1000</span>
       </div>
       <div class="story-actions">
-        <button class="voice-btn" id="voiceBtn" onclick="toggleVoice()"><i class="ph ph-microphone"></i> <span id="voiceBtnLbl">Dett.</span></button>
-        <button class="ai-btn" id="aiSumBtn" onclick="aiSummarize()"><i class="ph ph-sparkle"></i> <span id="aiSumLbl">AI</span></button>
+        <button class="voice-btn" id="voiceBtn" onclick="toggleVoice()"><i class="ph-duotone ph-microphone"></i> <span id="voiceBtnLbl">Dett.</span></button>
+        <button class="ai-btn" id="aiSumBtn" onclick="aiSummarize()"><i class="ph-duotone ph-sparkle"></i> <span id="aiSumLbl">AI</span></button>
       </div>
       <textarea class="field-in field-ta" id="storyIn" placeholder="L'anima di questo posto… (fino a 1000 caratteri)" maxlength="1000" oninput="updateChar();const lbl=document.getElementById('aiSumLbl');if(lbl)lbl.textContent=this.value.trim().length<20?'Genera':'Riassumi'"></textarea>
 
@@ -1776,24 +1776,24 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
         <button class="chip sel-b" onclick="toggleList(this)">Lista libera</button>
         <button class="chip" onclick="toggleList(this)">Tirana Top</button>
         <button class="chip" onclick="toggleList(this)">Segreti</button>
-        <button class="chip chip-add" onclick="openAddList()"><i class="ph ph-plus" style="font-size:11px"></i> Nuova</button>
+        <button class="chip chip-add" onclick="openAddList()"><i class="ph-duotone ph-plus" style="font-size:11px"></i> Nuova</button>
       </div>
 
       <!-- TAG INLINE -->
       <div class="sec-lbl">
         <span>Tag</span>
-        <button class="add-tag-btn" style="font-size:10px" onclick="showSheetTagInput()"><i class="ph ph-plus"></i> Tag</button>
+        <button class="add-tag-btn" style="font-size:10px" onclick="showSheetTagInput()"><i class="ph-duotone ph-plus"></i> Tag</button>
       </div>
       <div class="tag-chips-wrap" id="sheetTagsContainer">
-        <span class="tag-chip-inline">storia<button class="tag-chip-rm" onclick="removeSheetTag(this)"><i class="ph ph-x"></i></button></span>
-        <span class="tag-chip-inline">cultura<button class="tag-chip-rm" onclick="removeSheetTag(this)"><i class="ph ph-x"></i></button></span>
+        <span class="tag-chip-inline">storia<button class="tag-chip-rm" onclick="removeSheetTag(this)"><i class="ph-duotone ph-x"></i></button></span>
+        <span class="tag-chip-inline">cultura<button class="tag-chip-rm" onclick="removeSheetTag(this)"><i class="ph-duotone ph-x"></i></button></span>
       </div>
 
       <!-- ROTTE STORICHE -->
       <div class="sec-lbl" data-t="lbl_route">Rotta Storica</div>
       <button class="route-trigger" onclick="toggleRoutes(this)">
         <span id="routeLabel" data-t="route_none">Nessuna rotta storica</span>
-        <i class="ph ph-caret-down" id="routeArrow"></i>
+        <i class="ph-duotone ph-caret-down" id="routeArrow"></i>
       </button>
       <div class="route-options" id="routeOptions">
         <button class="route-opt sel" onclick="selectRoute(this,'none')">
@@ -1821,19 +1821,19 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
       <div class="sec-lbl" data-t="lbl_vis">Visibilità</div>
       <div class="vis-row" id="poiVisRow">
         <button class="vis-opt sel-pub" onclick="setVis(this,'poi','pub')">
-          <i class="ph ph-globe"></i><span data-t="vis_pub_btn">Pubblico</span>
+          <i class="ph-duotone ph-globe"></i><span data-t="vis_pub_btn">Pubblico</span>
         </button>
         <button class="vis-opt" onclick="setVis(this,'poi','prv')">
-          <i class="ph ph-lock-simple"></i><span data-t="vis_prv_btn">Privato</span>
+          <i class="ph-duotone ph-lock-simple"></i><span data-t="vis_prv_btn">Privato</span>
         </button>
         <button class="vis-opt" onclick="setVis(this,'poi','share')">
-          <i class="ph ph-link"></i><span data-t="vis_share_btn">Condividi</span>
+          <i class="ph-duotone ph-link"></i><span data-t="vis_share_btn">Condividi</span>
         </button>
       </div>
       <div class="share-link-row" id="shareLinkRow">
-        <i class="ph ph-link" style="color:var(--orange);flex-shrink:0"></i>
+        <i class="ph-duotone ph-link" style="color:var(--orange);flex-shrink:0"></i>
         <span class="share-link-txt" id="shareLinkTxt">https://poilove.com/p/41.3275,19.8189</span>
-        <button class="share-copy-btn" onclick="copyShareLink()"><i class="ph ph-copy"></i></button>
+        <button class="share-copy-btn" onclick="copyShareLink()"><i class="ph-duotone ph-copy"></i></button>
       </div>
 
       <!-- REGISTRA GPS + GOOGLE -->
@@ -1860,7 +1860,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
         <div class="sh-title" data-t="stop_title">Tappa Itinerario</div>
         <div class="sh-sub" data-t="stop_sub">Senza foto. Pianifica ora, racconta quando ci sei.</div>
       </div>
-      <button class="sh-close" id="closeAddStopBtn"><i class="ph ph-x"></i></button>
+      <button class="sh-close" id="closeAddStopBtn"><i class="ph-duotone ph-x"></i></button>
     </div>
     <div class="sh-body">
 
@@ -1892,14 +1892,14 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
         <button class="chip sel-b" onclick="toggleList(this)">Tirana 2026</button>
         <button class="chip" onclick="toggleList(this)">Da fare</button>
         <button class="chip" onclick="toggleList(this)">Preferiti</button>
-        <button class="chip chip-add" onclick="openAddList()"><i class="ph ph-plus" style="font-size:11px"></i> Nuova</button>
+        <button class="chip chip-add" onclick="openAddList()"><i class="ph-duotone ph-plus" style="font-size:11px"></i> Nuova</button>
       </div>
 
       <!-- Tag persistenti -->
       <div class="sec-lbl" style="justify-content:space-between">
         <span>Tag</span>
         <button class="chip chip-add" style="font-size:10px;padding:3px 9px" onclick="showStopTagInput()">
-          <i class="ph ph-plus" style="font-size:10px"></i> Aggiungi
+          <i class="ph-duotone ph-plus" style="font-size:10px"></i> Aggiungi
         </button>
       </div>
       <div class="tag-chips-wrap" id="stopTagsContainer">
@@ -1909,8 +1909,8 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
       <!-- Visibilità -->
       <div class="sec-lbl" data-t="stop_lbl_vis">Visibilità Itinerario</div>
       <div class="vis-row">
-        <button class="vis-opt sel-pub" onclick="setVis(this,'stop','pub')"><i class="ph ph-globe"></i><span data-t="itin_pub">Pubblico</span></button>
-        <button class="vis-opt" onclick="setVis(this,'stop','prv')"><i class="ph ph-lock-simple"></i><span data-t="itin_prv">Privato</span></button>
+        <button class="vis-opt sel-pub" onclick="setVis(this,'stop','pub')"><i class="ph-duotone ph-globe"></i><span data-t="itin_pub">Pubblico</span></button>
+        <button class="vis-opt" onclick="setVis(this,'stop','prv')"><i class="ph-duotone ph-lock-simple"></i><span data-t="itin_prv">Privato</span></button>
       </div>
 
       <!-- Data prevista -->
@@ -1931,16 +1931,16 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
     <div class="sh-handle" id="addListHandle"></div>
     <div class="sh-head">
       <div><div class="sh-title">Nuova Lista</div><div class="sh-sub">Crea una raccolta personale</div></div>
-      <button class="sh-close" id="closeAddListBtn"><i class="ph ph-x"></i></button>
+      <button class="sh-close" id="closeAddListBtn"><i class="ph-duotone ph-x"></i></button>
     </div>
     <div class="sh-body">
       <div class="sec-lbl">Nome della lista</div>
       <input class="field-in" type="text" id="newListName" placeholder="es. Tramonti da Favola" style="margin-bottom:14px"/>
       <div class="sec-lbl">Visibilità</div>
       <div class="vis-row" style="margin-bottom:20px">
-        <button class="vis-opt sel-pub" onclick="setVis(this,'list','pub')"><i class="ph ph-globe"></i><span>Pubblica</span></button>
-        <button class="vis-opt" onclick="setVis(this,'list','prv')"><i class="ph ph-lock-simple"></i><span>Privata</span></button>
-        <button class="vis-opt" onclick="setVis(this,'list','share')"><i class="ph ph-link"></i><span>Link</span></button>
+        <button class="vis-opt sel-pub" onclick="setVis(this,'list','pub')"><i class="ph-duotone ph-globe"></i><span>Pubblica</span></button>
+        <button class="vis-opt" onclick="setVis(this,'list','prv')"><i class="ph-duotone ph-lock-simple"></i><span>Privata</span></button>
+        <button class="vis-opt" onclick="setVis(this,'list','share')"><i class="ph-duotone ph-link"></i><span>Link</span></button>
       </div>
       <button class="save-btn ready" onclick="saveNewList()">Crea lista</button>
     </div>
@@ -1953,27 +1953,27 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
   <div class="sheet" id="detailSheet">
     <div class="sh-handle" id="detailHandle"></div>
     <!-- Bottone X di chiusura (fix desktop: il sheet copre tutto il backdrop) -->
-    <button class="sh-close" onclick="closeDetail()" title="Chiudi" style="position:absolute;top:12px;right:14px;z-index:5"><i class="ph ph-x"></i></button>
+    <button class="sh-close" onclick="closeDetail()" title="Chiudi" style="position:absolute;top:12px;right:14px;z-index:5"><i class="ph-duotone ph-x"></i></button>
     <div style="padding:4px 20px 0">
       <div class="detail-photos" id="detailPhotos"></div>
-      <div class="detail-tag" id="detailTag"><i class="ph ph-tag" style="font-size:11px"></i> Cultura</div>
+      <div class="detail-tag" id="detailTag"><i class="ph-duotone ph-tag" style="font-size:11px"></i> Cultura</div>
       <div class="detail-name" id="detailName">—</div>
-      <div class="detail-loc"><i class="ph ph-map-pin"></i><span id="detailAddress">—</span></div>
-      <div class="detail-coords"><i class="ph ph-crosshair-simple"></i><span id="detailCoordsText">—</span></div>
+      <div class="detail-loc"><i class="ph-duotone ph-map-pin"></i><span id="detailAddress">—</span></div>
+      <div class="detail-coords"><i class="ph-duotone ph-crosshair-simple"></i><span id="detailCoordsText">—</span></div>
       <div class="detail-share-link" id="detailShareLink">
-        <i class="ph ph-link" style="color:var(--orange)"></i>
+        <i class="ph-duotone ph-link" style="color:var(--orange)"></i>
         <span id="detailShareLinkTxt" style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
-        <button style="border:none;background:none;cursor:pointer;color:var(--orange)" onclick="copyDetailLink()"><i class="ph ph-copy"></i></button>
+        <button style="border:none;background:none;cursor:pointer;color:var(--orange)" onclick="copyDetailLink()"><i class="ph-duotone ph-copy"></i></button>
       </div>
       <div class="detail-desc" id="detailDesc">—</div>
       <div class="detail-footer" style="margin-bottom:10px">
         <div class="detail-actions">
-          <button class="detail-action-btn da-nav" onclick="openNavigation()"><i class="ph ph-navigation-arrow"></i><span>Naviga</span></button>
-          <button class="detail-action-btn" onclick="shareDetail()"><i class="ph ph-share-network"></i><span>Condividi</span></button>
-          <button class="detail-action-btn" id="editPoiBtn" onclick="openEditPOI()" style="display:none;background:#EBF2FC;border-color:var(--blue);color:var(--blue)"><i class="ph ph-pencil-simple"></i><span>Modifica</span></button>
+          <button class="detail-action-btn da-nav" onclick="openNavigation()"><i class="ph-duotone ph-navigation-arrow"></i><span>Naviga</span></button>
+          <button class="detail-action-btn" onclick="shareDetail()"><i class="ph-duotone ph-share-network"></i><span>Condividi</span></button>
+          <button class="detail-action-btn" id="editPoiBtn" onclick="openEditPOI()" style="display:none;background:#EBF2FC;border-color:var(--blue);color:var(--blue)"><i class="ph-duotone ph-pencil-simple"></i><span>Modifica</span></button>
         </div>
         <button class="love-btn" id="loveBtn" onclick="toggleLove()">
-          <i class="ph ph-heart" id="loveHeart"></i>
+          <i class="ph-duotone ph-heart" id="loveHeart"></i>
           <span class="love-cnt" id="loveCnt">24</span>
         </button>
       </div>
@@ -1992,14 +1992,14 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
     <div class="save-modal-title" id="saveModalTitle"></div>
     <div class="save-modal-sub" id="saveModalSub"></div>
     <div class="save-modal-poi">
-      <i class="ph-fill ph-map-pin" style="font-size:20px;color:var(--red);flex-shrink:0"></i>
+      <i class="ph-duotone ph-map-pin" style="font-size:20px;color:var(--red);flex-shrink:0"></i>
       <div>
         <div class="save-modal-poi-name" id="saveModalPoiName"></div>
         <div class="save-modal-poi-coords" id="saveModalPoiCoords"></div>
       </div>
     </div>
     <button class="save-modal-close" onclick="closeSaveModal()">
-      <i class="ph ph-check-circle"></i> Vai alla mappa
+      <i class="ph-duotone ph-check-circle"></i> Vai alla mappa
     </button>
   </div>
 </div>
@@ -2011,7 +2011,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
     <div class="sh-handle" id="sosHandle"></div>
     <div class="sh-head">
       <div><div class="sh-title" style="color:#DC2626"><i class="ph-duotone ph-warning-circle"></i> Segnalazione</div><div class="sh-sub">POI•LOVE è una community sicura</div></div>
-      <button class="sh-close" id="closeSosBtn"><i class="ph ph-x"></i></button>
+      <button class="sh-close" id="closeSosBtn"><i class="ph-duotone ph-x"></i></button>
     </div>
     <div class="sos-sheet-content">
       <div class="sos-alert-box">
@@ -2035,7 +2035,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
         <div><div style="font-weight:800">Spam o account falso</div><div style="font-size:11px;font-weight:400;margin-top:2px;opacity:.7">Profilo non autentico o comportamento automatizzato</div></div>
       </button>
       <div class="sos-moderation-note">
-        <i class="ph ph-shield-check" style="font-size:14px;margin-right:4px"></i>
+        <i class="ph-duotone ph-shield-check" style="font-size:14px;margin-right:4px"></i>
         <strong>Come gestiamo le segnalazioni:</strong> ogni report viene analizzato entro 24h. L'utente segnalato non riceve notifica di chi ha segnalato. In caso di pericolo imminente il team può bloccare l'account in 15 minuti e coopera con le autorità competenti.
       </div>
     </div>
@@ -2189,7 +2189,7 @@ function addDBMarker(p) {
   const label = p.name.length > 11 ? p.name.substring(0, 11) + '…' : p.name;
   const icon = L.divIcon({
     className: '',
-    html: `<div class="poi-marker"><div class="poi-bubble"><i class="ph-fill ph-map-pin" style="font-size:15px;color:#fff;pointer-events:none"></i><div class="poi-badge">${p.love_count || 0}</div></div><div class="poi-tail"></div><div class="poi-label">${label}</div></div>`,
+    html: `<div class="poi-marker"><div class="poi-bubble"><i class="ph-duotone ph-map-pin" style="font-size:15px;color:#fff;pointer-events:none"></i><div class="poi-badge">${p.love_count || 0}</div></div><div class="poi-tail"></div><div class="poi-label">${label}</div></div>`,
     iconSize: [36, 58], iconAnchor: [18, 58]
   });
   L.marker([p.lat, p.lng], { icon }).addTo(map).on('click', () => openDBDetail(p));
@@ -2211,11 +2211,11 @@ function openDBDetail(p) {
   } else {
     const d = document.createElement('div');
     d.className = 'detail-no-photo';
-    d.innerHTML = '<i class="ph ph-image-broken"></i>';
+    d.innerHTML = '<i class="ph-duotone ph-image-broken"></i>';
     ph.appendChild(d);
   }
   // ── Metadati ──
-  document.getElementById('detailTag').innerHTML = `<i class="ph ph-tag" style="font-size:11px"></i> ${p.category || 'Luogo'}`;
+  document.getElementById('detailTag').innerHTML = `<i class="ph-duotone ph-tag" style="font-size:11px"></i> ${p.category || 'Luogo'}`;
   document.getElementById('detailName').textContent = p.name;
   document.getElementById('detailAddr').textContent = p.address || '';
   document.getElementById('detailDesc').textContent = p.description || '';
@@ -2552,7 +2552,7 @@ function initMap(){
   POIS.forEach((p,i)=>{
     const icon=L.divIcon({
       className:'',
-      html:`<div class="poi-marker"><div class="poi-bubble"><i class="ph-fill ph-map-pin" style="font-size:15px;color:#fff;pointer-events:none"></i><div class="poi-badge">${p.love}</div></div><div class="poi-tail"></div><div class="poi-label">${p.name.length>11?p.name.substring(0,11)+'…':p.name}</div></div>`,
+      html:`<div class="poi-marker"><div class="poi-bubble"><i class="ph-duotone ph-map-pin" style="font-size:15px;color:#fff;pointer-events:none"></i><div class="poi-badge">${p.love}</div></div><div class="poi-tail"></div><div class="poi-label">${p.name.length>11?p.name.substring(0,11)+'…':p.name}</div></div>`,
       iconSize:[36,58],iconAnchor:[18,58]
     });
     L.marker([p.lat,p.lng],{icon}).addTo(map).on('click',()=>openDetail(i));
@@ -2679,7 +2679,7 @@ function showAcSuggestion(items){
   if(!items.length){drop.classList.remove('open');return;}
   drop.innerHTML=items.map(item=>`
     <div class="ac-item" onclick="selectAcItem('${item.name.replace(/'/g,"\\'")}',${item.lat},${item.lng})">
-      <i class="ph ph-map-pin"></i>
+      <i class="ph-duotone ph-map-pin"></i>
       <div><div class="ac-item-name">${item.name}</div><div class="ac-item-addr">${item.addr}</div></div>
     </div>`).join('');
   drop.classList.add('open');
@@ -2751,10 +2751,10 @@ function checkTripLandingPage(){
   if(titleEl) titleEl.textContent = trip ? trip.name : slug.replace(/-/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
 
   const badgeEl = document.getElementById('tlpBadge');
-  if(badgeEl) badgeEl.innerHTML = `<i class="ph-fill ph-map-pin"></i> ${trip?.badge || trip?.dest || 'Viaggio'}`;
+  if(badgeEl) badgeEl.innerHTML = `<i class="ph-duotone ph-map-pin"></i> ${trip?.badge || trip?.dest || 'Viaggio'}`;
 
   const datesEl = document.getElementById('tlpDates');
-  if(datesEl && trip?.dates) datesEl.innerHTML = `<i class="ph ph-calendar"></i> ${trip.dates}`;
+  if(datesEl && trip?.dates) datesEl.innerHTML = `<i class="ph-duotone ph-calendar"></i> ${trip.dates}`;
 
   // ── Companions ──
   const compEl = document.getElementById('tlpCompanions');
@@ -2902,7 +2902,7 @@ function handlePhoto(input,idx){
     photoData[idx]=e.target.result;
     const slot=document.getElementById('pslot-'+idx);
     slot.classList.add('has-photo');
-    slot.innerHTML=`<div class="ph-preview" style="background-image:url('${e.target.result}')"></div><button class="ph-remove" onclick="removePhoto(event,${idx})"><i class="ph ph-x"></i></button>`;
+    slot.innerHTML=`<div class="ph-preview" style="background-image:url('${e.target.result}')"></div><button class="ph-remove" onclick="removePhoto(event,${idx})"><i class="ph-duotone ph-x"></i></button>`;
     showToast(lang==='sq'?'Foto shtuar!':lang==='en'?'Photo added!':'Foto aggiunta!');
   };
   reader.readAsDataURL(file);
@@ -2999,8 +2999,8 @@ function removePhoto(e,idx){
   const slot=document.getElementById('pslot-'+idx);
   slot.classList.remove('has-photo');
   slot.innerHTML=idx===0
-    ?`<i class="ph ph-camera"></i><span class="slot-lbl">Principale</span>`
-    :`<i class="ph ph-plus"></i><span class="slot-lbl">Foto ${idx+1}</span>`;
+    ?`<i class="ph-duotone ph-camera"></i><span class="slot-lbl">Principale</span>`
+    :`<i class="ph-duotone ph-plus"></i><span class="slot-lbl">Foto ${idx+1}</span>`;
   document.getElementById('photoInput'+idx).value='';
   if(idx===0){
     document.getElementById('locHint').classList.remove('show');
@@ -3060,7 +3060,7 @@ async function aiSummarize(){
   // Se c'è già testo lungo, lo sintetizza; altrimenti genera da zero
   const isGenerate=existingText.length<20;
   const btnEl=document.querySelector('.ai-btn');
-  if(btnEl){btnEl.disabled=true;btnEl.innerHTML='<i class="ph ph-circle-notch" style="animation:spin 1s linear infinite"></i>';}
+  if(btnEl){btnEl.disabled=true;btnEl.innerHTML='<i class="ph-duotone ph-circle-notch" style="animation:spin 1s linear infinite"></i>';}
 
   const langLabel=lang==='it'?'italiano':lang==='sq'?'albanese':'English';
   let prompt;
@@ -3092,7 +3092,7 @@ Rispondi solo con il testo della descrizione, senza virgolette, in ${langLabel}.
   } catch(err){
     showToast('Errore AI: '+err.message);
   } finally {
-    if(btnEl){btnEl.disabled=false;btnEl.innerHTML='<i class="ph ph-sparkle"></i> <span>'+(isGenerate?'Genera':'Riassumi')+'</span>';}
+    if(btnEl){btnEl.disabled=false;btnEl.innerHTML='<i class="ph-duotone ph-sparkle"></i> <span>'+(isGenerate?'Genera':'Riassumi')+'</span>';}
   }
 }
 
@@ -3173,10 +3173,10 @@ function renderPoiTab(){
         <div class="pi-sub">${p.cat||''} · ❤️ ${p.love||0}</div>
       </div>
       <div class="pi-actions">
-        <button class="pi-act-btn" title="Apri sulla mappa" onclick="centerMapOnPoi(${p.lat},${p.lng})"><i class="ph ph-map-pin"></i></button>
-        <button class="pi-act-btn" title="Modifica"><i class="ph ph-pencil"></i></button>
-        <button class="pi-act-btn" title="Condividi"><i class="ph ph-share-network"></i></button>
-        ${poiSubtab==='mine'?'<button class="pi-act-btn" title="Elimina" style="color:var(--red);border-color:var(--red)"><i class="ph ph-trash"></i></button>':''}
+        <button class="pi-act-btn" title="Apri sulla mappa" onclick="centerMapOnPoi(${p.lat},${p.lng})"><i class="ph-duotone ph-map-pin"></i></button>
+        <button class="pi-act-btn" title="Modifica"><i class="ph-duotone ph-pencil"></i></button>
+        <button class="pi-act-btn" title="Condividi"><i class="ph-duotone ph-share-network"></i></button>
+        ${poiSubtab==='mine'?'<button class="pi-act-btn" title="Elimina" style="color:var(--red);border-color:var(--red)"><i class="ph-duotone ph-trash"></i></button>':''}
       </div>
     </div>`;
   }).join('');
@@ -3228,7 +3228,7 @@ function uploadAvatarFile(e){
     const dataUrl = reader.result;
     preview.innerHTML = `
       <img src="${dataUrl}" style="width:180px;height:180px;border-radius:50%;object-fit:cover;display:block;margin:0 auto 10px;border:3px solid var(--red)">
-      <button class="av-gen-btn" id="avUploadConfirmBtn"><i class="ph-fill ph-check"></i> Usa questa foto</button>`;
+      <button class="av-gen-btn" id="avUploadConfirmBtn"><i class="ph-duotone ph-check"></i> Usa questa foto</button>`;
     document.getElementById('avUploadConfirmBtn').addEventListener('click', ()=> setProfileAvatar(dataUrl));
   };
   reader.readAsDataURL(file);
@@ -3237,7 +3237,7 @@ function searchUnsplashAvatar(){
   const q = (document.getElementById('avUnsplashQ').value || '').trim();
   if(!q) return;
   const grid = document.getElementById('avUnsplashGrid');
-  grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--muted)"><i class="ph ph-circle-notch" style="animation:spin 1s linear infinite;font-size:18px"></i> Carico…</div>';
+  grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--muted)"><i class="ph-duotone ph-circle-notch" style="animation:spin 1s linear infinite;font-size:18px"></i> Carico…</div>';
   // Unsplash Source API: restituisce un'immagine random per la query
   // Genera 6 URL con seed diversi per ottenere immagini diverse
   const seeds = [];
@@ -3256,13 +3256,13 @@ function generateAIAvatar(){
   const seed = Math.floor(Math.random()*99999);
   const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(enhanced)}?width=512&height=512&nologo=true&model=flux&seed=${seed}`;
   const result = document.getElementById('avAiResult');
-  result.innerHTML = `<div style="padding:30px 20px;text-align:center;color:var(--muted)"><i class="ph ph-circle-notch" style="font-size:24px;animation:spin 1s linear infinite;color:var(--red)"></i><div style="margin-top:10px;font-size:13px">ILLI•AI sta dipingendo… <small style="opacity:.6">(può richiedere 10-25 sec)</small></div></div>`;
+  result.innerHTML = `<div style="padding:30px 20px;text-align:center;color:var(--muted)"><i class="ph-duotone ph-circle-notch" style="font-size:24px;animation:spin 1s linear infinite;color:var(--red)"></i><div style="margin-top:10px;font-size:13px">ILLI•AI sta dipingendo… <small style="opacity:.6">(può richiedere 10-25 sec)</small></div></div>`;
   const img = new Image();
   img.onload = () => {
     result.innerHTML = `
       <img src="${url}" style="width:200px;height:200px;border-radius:50%;object-fit:cover;display:block;margin:0 auto 12px;border:3px solid var(--red);box-shadow:0 8px 24px rgba(212,43,43,.25)">
-      <button class="av-gen-btn" id="avAiUseBtn"><i class="ph-fill ph-check"></i> Usa questo avatar</button>
-      <button class="av-gen-btn" id="avAiAgainBtn" style="background:transparent;color:var(--text);border:1.5px solid var(--border);margin-top:8px"><i class="ph ph-arrows-clockwise"></i> Genera un altro</button>`;
+      <button class="av-gen-btn" id="avAiUseBtn"><i class="ph-duotone ph-check"></i> Usa questo avatar</button>
+      <button class="av-gen-btn" id="avAiAgainBtn" style="background:transparent;color:var(--text);border:1.5px solid var(--border);margin-top:8px"><i class="ph-duotone ph-arrows-clockwise"></i> Genera un altro</button>`;
     document.getElementById('avAiUseBtn').addEventListener('click', ()=> setProfileAvatar(url));
     document.getElementById('avAiAgainBtn').addEventListener('click', generateAIAvatar);
   };
@@ -3484,9 +3484,9 @@ function openDetail(idx){
   if(p.photos&&p.photos.length>0){
     p.photos.forEach(url=>{const d=document.createElement('div');d.className='detail-photo';d.style.backgroundImage=`url('${url}')`;ph.appendChild(d);});
   } else {
-    const d=document.createElement('div');d.className='detail-no-photo';d.innerHTML='<i class="ph ph-image-broken"></i>';ph.appendChild(d);
+    const d=document.createElement('div');d.className='detail-no-photo';d.innerHTML='<i class="ph-duotone ph-image-broken"></i>';ph.appendChild(d);
   }
-  document.getElementById('detailTag').innerHTML=`<i class="ph ph-tag" style="font-size:11px"></i> ${p.cat}`;
+  document.getElementById('detailTag').innerHTML=`<i class="ph-duotone ph-tag" style="font-size:11px"></i> ${p.cat}`;
   document.getElementById('detailName').textContent=p.name;
   document.getElementById('detailAddress').textContent=p.address||'Tiranë, Albania';
   document.getElementById('detailCoordsText').textContent=`${p.lat.toFixed(4)}, ${p.lng.toFixed(4)}`;
@@ -3673,7 +3673,7 @@ function onLocAddrInput(val){
           const sub=r.display_name.split(',').slice(1,3).join(',').trim();
           const lat2=parseFloat(r.lat),lng2=parseFloat(r.lon);
           return `<div class="loc-addr-item" onclick="selectLocAddr('${name.replace(/'/g,"\\'")}',${lat2},${lng2})">
-            <i class="ph ph-map-pin" style="font-size:13px;color:var(--blue);flex-shrink:0;margin-top:2px"></i>
+            <i class="ph-duotone ph-map-pin" style="font-size:13px;color:var(--blue);flex-shrink:0;margin-top:2px"></i>
             <div><div class="loc-addr-item-name">${name}</div><div class="loc-addr-item-sub">${sub}</div></div>
           </div>`;
         }).join('');
@@ -3751,7 +3751,7 @@ function addSheetTag(text){
   const container=document.getElementById('sheetTagsContainer');
   const chip=document.createElement('span');
   chip.className='tag-chip-inline';
-  chip.innerHTML=`${text}<button class="tag-chip-rm" onclick="removeSheetTag(this)"><i class="ph ph-x"></i></button>`;
+  chip.innerHTML=`${text}<button class="tag-chip-rm" onclick="removeSheetTag(this)"><i class="ph-duotone ph-x"></i></button>`;
   container.insertBefore(chip,container.lastChild);
 }
 function removeSheetTag(btn){btn.closest('.tag-chip-inline').remove()}
@@ -4016,8 +4016,8 @@ async function savePOI(){
     [0,1,2].forEach(i=>{
       const sl=document.getElementById('pslot-'+i);
       if(sl){sl.classList.remove('has-photo');sl.innerHTML=i===0
-        ?`<i class="ph ph-camera"></i><span class="slot-lbl">Principale</span>`
-        :`<i class="ph ph-plus"></i><span class="slot-lbl">Foto ${i+1}</span>`;}
+        ?`<i class="ph-duotone ph-camera"></i><span class="slot-lbl">Principale</span>`
+        :`<i class="ph-duotone ph-plus"></i><span class="slot-lbl">Foto ${i+1}</span>`;}
     });
     exifSuggestedName=''; exifCache=null;
     window._unsplashSlots={};
@@ -4029,7 +4029,7 @@ async function savePOI(){
   if(map){
     const icon=L.divIcon({
       className:'',
-      html:`<div class="poi-marker"><div class="poi-bubble" style="background:var(--blue)"><i class="ph-fill ph-map-pin" style="font-size:15px;color:#fff;pointer-events:none"></i><div class="poi-badge">0</div></div><div class="poi-tail" style="border-top-color:var(--blue)"></div><div class="poi-label" style="background:rgba(40,94,167,.85)">${name.length>11?name.substring(0,11)+'…':name}</div></div>`,
+      html:`<div class="poi-marker"><div class="poi-bubble" style="background:var(--blue)"><i class="ph-duotone ph-map-pin" style="font-size:15px;color:#fff;pointer-events:none"></i><div class="poi-badge">0</div></div><div class="poi-tail" style="border-top-color:var(--blue)"></div><div class="poi-label" style="background:rgba(40,94,167,.85)">${name.length>11?name.substring(0,11)+'…':name}</div></div>`,
       iconSize:[36,58],iconAnchor:[18,58]
     });
     tempMarker=L.marker([lat2,lng2],{icon}).addTo(map);
@@ -4064,8 +4064,8 @@ async function savePOI(){
     if(slot){
       slot.classList.remove('has-photo');
       slot.innerHTML=i===0
-        ?`<i class="ph ph-camera"></i><span class="slot-lbl">Principale</span>`
-        :`<i class="ph ph-plus"></i><span class="slot-lbl">Foto ${i+1}</span>`;
+        ?`<i class="ph-duotone ph-camera"></i><span class="slot-lbl">Principale</span>`
+        :`<i class="ph-duotone ph-plus"></i><span class="slot-lbl">Foto ${i+1}</span>`;
     }
     const inp=document.getElementById('photoInput'+i);
     if(inp)inp.value='';
@@ -4532,7 +4532,7 @@ function renderPubPOIBoard(pois){
     return `<div class="poi-card" onclick="openDBDetail(${JSON.stringify(p).replace(/"/g,'&quot;')})">
       <div class="poi-card-img" style="background-image:url('${img}')"></div>
       <div class="poi-card-body"><div class="poi-card-name">${p.name}</div>
-      <div class="poi-card-footer"><div class="poi-card-love"><i class="ph-fill ph-heart"></i> ${p.love_count||0}</div></div></div>
+      <div class="poi-card-footer"><div class="poi-card-love"><i class="ph-duotone ph-heart"></i> ${p.love_count||0}</div></div></div>
     </div>`;
   }).join('');
 }
@@ -4604,7 +4604,7 @@ function openEditPOI(){
       const slot=document.getElementById('pslot-'+i);
       if(slot){
         slot.classList.add('has-photo');
-        slot.innerHTML=`<div class="ph-preview" style="background-image:url('${url}')"></div><button class="ph-remove" onclick="removePhoto(event,${i})"><i class="ph ph-x"></i></button>`;
+        slot.innerHTML=`<div class="ph-preview" style="background-image:url('${url}')"></div><button class="ph-remove" onclick="removePhoto(event,${i})"><i class="ph-duotone ph-x"></i></button>`;
       }
     });
     checkSave();
@@ -4744,27 +4744,27 @@ function renderTripCardHTML(t){
   <div class="trip-card" id="tc-${t.id}">
     <div class="trip-cover" style="background-image:url('${t.cover}')">
       <div class="trip-cover-overlay"></div>
-      <div class="trip-cover-badge"><i class="ph-fill ph-map-pin" style="font-size:11px"></i> ${t.badge}</div>
+      <div class="trip-cover-badge"><i class="ph-duotone ph-map-pin" style="font-size:11px"></i> ${t.badge}</div>
       <div class="trip-cover-dates">${t.dates}</div>
-      <button class="trip-cover-change" onclick="changeTripCover('${t.id}')"><i class="ph ph-image" style="font-size:10px"></i> Cover</button>
+      <button class="trip-cover-change" onclick="changeTripCover('${t.id}')"><i class="ph-duotone ph-image" style="font-size:10px"></i> Cover</button>
     </div>
     <div class="trip-vis-bar">
-      <button class="trip-vis-btn${t.visibility==='pub'?' active-pub':''}" onclick="setTripVis('${t.id}','pub')"><i class="ph ph-globe"></i> Pubblico</button>
-      <button class="trip-vis-btn${t.visibility==='friends'?' active-friends':''}" onclick="setTripVis('${t.id}','friends')"><i class="ph ph-users"></i> Amici</button>
-      <button class="trip-vis-btn${t.visibility==='prv'?' active-prv':''}" onclick="setTripVis('${t.id}','prv')"><i class="ph ph-lock-simple"></i> Privato</button>
-      <button class="trip-share-btn" onclick="shareTripLink('${t.id}')"><i class="ph ph-share-network"></i> Link</button>
+      <button class="trip-vis-btn${t.visibility==='pub'?' active-pub':''}" onclick="setTripVis('${t.id}','pub')"><i class="ph-duotone ph-globe"></i> Pubblico</button>
+      <button class="trip-vis-btn${t.visibility==='friends'?' active-friends':''}" onclick="setTripVis('${t.id}','friends')"><i class="ph-duotone ph-users"></i> Amici</button>
+      <button class="trip-vis-btn${t.visibility==='prv'?' active-prv':''}" onclick="setTripVis('${t.id}','prv')"><i class="ph-duotone ph-lock-simple"></i> Privato</button>
+      <button class="trip-share-btn" onclick="shareTripLink('${t.id}')"><i class="ph-duotone ph-share-network"></i> Link</button>
     </div>
     <div class="trip-body">
       <div class="trip-name">${t.name}</div>
       <div class="trip-meta">
-        <span><i class="ph ph-map-pin"></i> <span id="stopcount-${t.id}">${t.stops.length}</span> tappe</span>
-        <span><i class="ph ph-users"></i> ${t.companions.length} compagni</span>
-        <span><i class="ph ph-heart" style="color:var(--red)"></i> ${t.id==='trip1'?'24':'—'}</span>
+        <span><i class="ph-duotone ph-map-pin"></i> <span id="stopcount-${t.id}">${t.stops.length}</span> tappe</span>
+        <span><i class="ph-duotone ph-users"></i> ${t.companions.length} compagni</span>
+        <span><i class="ph-duotone ph-heart" style="color:var(--red)"></i> ${t.id==='trip1'?'24':'—'}</span>
       </div>
       <div class="trip-footer">
         <div class="trip-companions">${compsHtml}</div>
         <button class="trip-open-btn" onclick="toggleTripDetail('${t.id}')">
-          <i class="ph ph-caret-down" id="${t.id}Arrow"></i> Dettaglio
+          <i class="ph-duotone ph-caret-down" id="${t.id}Arrow"></i> Dettaglio
         </button>
       </div>
     </div>
@@ -4777,7 +4777,7 @@ function renderTripCardHTML(t){
         <div class="trip-detail-header">Tappe pianificate</div>
         <div class="stops-list" id="stops-${t.id}">${renderTripStopsHTML(t)}</div>
         <button class="itin-new-btn" style="width:100%;justify-content:center;margin:4px 0 16px;background:#f5f0e8;color:var(--blue);font-size:12px" onclick="addNewStop('${t.id}')">
-          <i class="ph ph-plus"></i> Aggiungi tappa
+          <i class="ph-duotone ph-plus"></i> Aggiungi tappa
         </button>
       </div>
     </div>
@@ -4795,7 +4795,7 @@ function renderTripStopsHTML(t){
       ondragover="dragOver(event)"
       ondrop="dropStop(event,'${t.id}',${i})"
       ondragend="dragEnd(event)">
-      <span class="stop-drag-handle"><i class="ph ph-dots-six-vertical"></i></span>
+      <span class="stop-drag-handle"><i class="ph-duotone ph-dots-six-vertical"></i></span>
       <div class="stop-dot" style="background:${s.iconBg}"><i class="${s.icon}" style="color:${s.iconColor};font-size:12px"></i></div>
       <div class="stop-content">
         <div class="stop-info" onclick="openStopDetail('${t.id}','${s.id}')">
@@ -4805,8 +4805,8 @@ function renderTripStopsHTML(t){
         </div>
         <div class="stop-actions">
           <button class="stop-act-btn act-pause${susp?' paused':''}" onclick="suspendStop('${t.id}','${s.id}')"><i class="ph ${susp?'ph-play':'ph-pause'}" style="font-size:13px"></i> ${susp?'Riprendi':'Sospendi'}</button>
-          <button class="stop-act-btn act-edit" onclick="openStopDetail('${t.id}','${s.id}')"><i class="ph ph-pencil-simple" style="font-size:13px"></i> Modifica</button>
-          <button class="stop-act-btn act-del" onclick="deleteStop('${t.id}','${s.id}')"><i class="ph ph-trash" style="font-size:13px"></i> Elimina</button>
+          <button class="stop-act-btn act-edit" onclick="openStopDetail('${t.id}','${s.id}')"><i class="ph-duotone ph-pencil-simple" style="font-size:13px"></i> Modifica</button>
+          <button class="stop-act-btn act-del" onclick="deleteStop('${t.id}','${s.id}')"><i class="ph-duotone ph-trash" style="font-size:13px"></i> Elimina</button>
         </div>
       </div>
     </div>`;
@@ -4846,9 +4846,9 @@ function renderMiniCal(tripId){
   const today=new Date();
   let html=`
     <div class="mini-cal-header" style="margin-bottom:0;padding-bottom:8px">
-      <button class="mini-cal-nav" onclick="calNav('${tripId}',-1)"><i class="ph ph-caret-left"></i></button>
+      <button class="mini-cal-nav" onclick="calNav('${tripId}',-1)"><i class="ph-duotone ph-caret-left"></i></button>
       <span>${MONTHS[month]} ${year}</span>
-      <button class="mini-cal-nav" onclick="calNav('${tripId}',1)"><i class="ph ph-caret-right"></i></button>
+      <button class="mini-cal-nav" onclick="calNav('${tripId}',1)"><i class="ph-duotone ph-caret-right"></i></button>
     </div>
     <div class="mini-cal-days">${DAYS.map(d=>`<div class="cal-day-lbl">${d}</div>`).join('')}`;
   for(let i=0;i<offset;i++)html+=`<div></div>`;
@@ -5061,7 +5061,7 @@ function onItinSearch(val){
         if(!results.length){drop.classList.remove('open');return;}
         drop.innerHTML=results.slice(0,5).map(r=>`
           <div class="ac-item" onclick="selectItinDest('${r.display_name.split(',')[0].replace(/'/g,"\\'")}','${r.lat}','${r.lon}')">
-            <i class="ph ph-map-pin"></i>
+            <i class="ph-duotone ph-map-pin"></i>
             <div>
               <div class="ac-item-name">${r.display_name.split(',')[0]}</div>
               <div class="ac-item-addr">${r.display_name.split(',').slice(1,3).join(',').trim()}</div>
@@ -5144,7 +5144,7 @@ async function sendPoiAIMsg(){
 
   const loadId='pai-load-'+Date.now();
   msgs.innerHTML+=`<div class="poiai-msg ai" id="${loadId}" style="opacity:.65">
-    <i class="ph ph-circle-notch" style="animation:spin 1s linear infinite;font-size:14px;margin-right:6px"></i>Sto pensando…
+    <i class="ph-duotone ph-circle-notch" style="animation:spin 1s linear infinite;font-size:14px;margin-right:6px"></i>Sto pensando…
   </div>`;
   msgs.scrollTop=msgs.scrollHeight;
 
@@ -5175,14 +5175,14 @@ async function sendPoiAIMsg(){
       .replace(/</g,'&lt;').replace(/\n/g,'<br>');
 
     const tripSel=Object.values(TRIPS).map((t,i)=>`<button class="poiai-trip-chip${i===0?' sel':''}" onclick="document.querySelectorAll('.poiai-trip-chip').forEach(b=>b.classList.remove('sel'));this.classList.add('sel');window._paiTrip='${t.id}'">${t.name.split(' ').slice(0,3).join(' ')}</button>`).join('');
-    const chips=places.map(p=>`<button class="poiai-place-chip" onclick="addAISuggestionAsStop(window._paiTrip||'trip1','${p.replace(/'/g,"\\'").replace(/"/g,'&quot;')}')"><i class="ph ph-plus-circle"></i> ${p}</button>`).join('');
+    const chips=places.map(p=>`<button class="poiai-place-chip" onclick="addAISuggestionAsStop(window._paiTrip||'trip1','${p.replace(/'/g,"\\'").replace(/"/g,'&quot;')}')"><i class="ph-duotone ph-plus-circle"></i> ${p}</button>`).join('');
 
     const loadEl=document.getElementById(loadId);
     if(loadEl) loadEl.outerHTML=`
       <div class="poiai-msg ai">
         ${cleanText}
         ${chips?`<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px">${chips}</div>`:''}
-        ${chips&&Object.keys(TRIPS).length?`<div style="margin-top:8px;font-size:10px;color:var(--muted)"><i class="ph ph-arrow-down"></i> Aggiungi a:</div><div class="poiai-trip-selector">${tripSel}</div>`:''}
+        ${chips&&Object.keys(TRIPS).length?`<div style="margin-top:8px;font-size:10px;color:var(--muted)"><i class="ph-duotone ph-arrow-down"></i> Aggiungi a:</div><div class="poiai-trip-selector">${tripSel}</div>`:''}
       </div>`;
     window._paiTrip=Object.keys(TRIPS)[0]||'trip1';
     msgs.scrollTop=msgs.scrollHeight;
@@ -5190,7 +5190,7 @@ async function sendPoiAIMsg(){
 
   }catch(err){
     const loadEl=document.getElementById(loadId);
-    if(loadEl) loadEl.outerHTML=`<div class="poiai-msg ai" style="color:var(--red)"><i class="ph ph-warning"></i> ${err.message}</div>`;
+    if(loadEl) loadEl.outerHTML=`<div class="poiai-msg ai" style="color:var(--red)"><i class="ph-duotone ph-warning"></i> ${err.message}</div>`;
     console.error('ILLI•AI:',err);
   }
 }
@@ -5204,7 +5204,7 @@ function togglePoiAIVoice(){
   const btn=document.getElementById('poiaiVoiceBtn');
   if(btn){
     btn.classList.toggle('on',voiceOn);
-    btn.innerHTML=voiceOn?'<i class="ph-fill ph-microphone"></i>':'<i class="ph ph-microphone"></i>';
+    btn.innerHTML=voiceOn?'<i class="ph-duotone ph-microphone"></i>':'<i class="ph-duotone ph-microphone"></i>';
   }
   if(!voiceOn&&window.speechSynthesis)window.speechSynthesis.cancel();
   showToast(voiceOn?'🎙️ Voce attivata':'🔇 Voce disattivata');
@@ -5271,7 +5271,7 @@ function showStopAcSuggestion(items){
   if(!items.length){drop.classList.remove('open');return;}
   drop.innerHTML=items.map(item=>`
     <div class="ac-item" onclick="selectStopAcItem('${item.name.replace(/'/g,"\\'")}',${item.lat},${item.lng})">
-      <i class="ph ph-map-pin"></i>
+      <i class="ph-duotone ph-map-pin"></i>
       <div>
         <div class="ac-item-name">${item.name}</div>
         <div class="ac-item-addr">${item.addr}</div>
@@ -5303,7 +5303,7 @@ function renderStopTags(){
   persistentTags.forEach((t,i)=>{
     const chip=document.createElement('span');
     chip.className='tag-chip-inline';
-    chip.innerHTML=`${t}<button class="tag-chip-rm" onclick="removeStopTag(${i})"><i class="ph ph-x"></i></button>`;
+    chip.innerHTML=`${t}<button class="tag-chip-rm" onclick="removeStopTag(${i})"><i class="ph-duotone ph-x"></i></button>`;
     container.appendChild(chip);
   });
   // Spazio per nuovi tag
@@ -5387,7 +5387,7 @@ function renderDevProfiles(){
         <div class="dev-profile-name">${p.name}${activeDevProfileIdx===i?' <span style=\'color:var(--green);font-size:10px\'>● attivo</span>':''}</div>
         <div class="dev-profile-email">${p.email||''}</div>
       </div>
-      <button style="background:none;border:none;color:var(--muted);cursor:pointer;padding:6px;flex-shrink:0" onclick="removeDevProfile(event,${i})"><i class="ph ph-x" style="font-size:13px"></i></button>
+      <button style="background:none;border:none;color:var(--muted);cursor:pointer;padding:6px;flex-shrink:0" onclick="removeDevProfile(event,${i})"><i class="ph-duotone ph-x" style="font-size:13px"></i></button>
     </div>
   `).join('');
 }
@@ -5526,7 +5526,7 @@ function searchUnsplash(){
   const q=document.getElementById('photoPickerSearch')?.value?.trim();
   if(!q){showToast('Inserisci un termine di ricerca');return;}
   const grid=document.getElementById('photoPickerGrid');
-  grid.innerHTML='<div class="photo-picker-loading"><i class="ph ph-spinner-gap" style="animation:spin 1s linear infinite;display:block;font-size:28px;margin-bottom:8px"></i>Cerco foto…</div>';
+  grid.innerHTML='<div class="photo-picker-loading"><i class="ph-duotone ph-spinner-gap" style="animation:spin 1s linear infinite;display:block;font-size:28px;margin-bottom:8px"></i>Cerco foto…</div>';
   photoPickerSelected=null;
   document.getElementById('photoPickerConfirm').classList.remove('show');
   // loremflickr.com: keyword-based, gratuito, senza API key, CORS-safe per img tag
@@ -5538,7 +5538,7 @@ function searchUnsplash(){
       <img src="${url}" alt="" loading="lazy"
         onload="this.parentNode.querySelector('.ph-spinner')?.remove()"
         onerror="this.src='https://picsum.photos/seed/${seed+i}/400/400';this.onerror=null">
-      <i class="ph ph-spinner-gap ph-spinner" style="position:absolute;inset:0;margin:auto;font-size:22px;color:var(--muted);animation:spin 1s linear infinite"></i>
+      <i class="ph-duotone ph-spinner-gap ph-spinner" style="position:absolute;inset:0;margin:auto;font-size:22px;color:var(--muted);animation:spin 1s linear infinite"></i>
       <div class="unsplash-attr">Flickr CC</div>
     </div>
   `).join('');
@@ -5615,7 +5615,7 @@ async function confirmPhotoPicker(){
   const slot=document.getElementById('pslot-'+idx);
   if(slot){
     slot.classList.add('has-photo');
-    slot.innerHTML=`<div class="ph-preview" style="background-image:url('${url}')"></div><button class="ph-remove" onclick="removePhoto(event,${idx})"><i class="ph ph-x"></i></button>`;
+    slot.innerHTML=`<div class="ph-preview" style="background-image:url('${url}')"></div><button class="ph-remove" onclick="removePhoto(event,${idx})"><i class="ph-duotone ph-x"></i></button>`;
   }
   checkSave();
   closePhotoPicker();
@@ -5639,10 +5639,10 @@ async function confirmPhotoPicker(){
     <div class="photo-picker-handle"></div>
     <div class="photo-picker-head">
       <div class="photo-picker-head-title">
-        <i class="ph ph-images" style="color:var(--blue);margin-right:5px"></i>
+        <i class="ph-duotone ph-images" style="color:var(--blue);margin-right:5px"></i>
         <span id="photoPickerTitle">Scegli una foto</span>
       </div>
-      <button style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:22px;padding:0" onclick="closePhotoPicker()"><i class="ph ph-x"></i></button>
+      <button style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:22px;padding:0" onclick="closePhotoPicker()"><i class="ph-duotone ph-x"></i></button>
     </div>
     <div class="photo-picker-search-row">
       <input class="photo-picker-search" id="photoPickerSearch" type="text" placeholder="Cerca su Unsplash…"
@@ -5653,7 +5653,7 @@ async function confirmPhotoPicker(){
       <div class="photo-picker-loading">Inserisci una parola chiave e cerca 🔍</div>
     </div>
     <button class="photo-picker-upload-btn" onclick="triggerPickerUpload()">
-      <i class="ph ph-upload-simple" style="font-size:16px"></i>
+      <i class="ph-duotone ph-upload-simple" style="font-size:16px"></i>
       <span id="photoPickerUploadLbl">Carica dal tuo dispositivo</span>
     </button>
     <input type="file" id="photoPickerFileIn" accept="image/*" style="display:none" onchange="handlePickerUpload(this)">
@@ -5672,20 +5672,20 @@ async function confirmPhotoPicker(){
         <div class="av-popup-title">Cambia avatar</div>
         <div class="av-popup-sub">Carica una tua foto, scegli da Unsplash, oppure fattela dipingere da ILLI•AI.</div>
       </div>
-      <button class="av-popup-close" onclick="closeAvPopup()"><i class="ph ph-x"></i></button>
+      <button class="av-popup-close" onclick="closeAvPopup()"><i class="ph-duotone ph-x"></i></button>
     </div>
 
     <!-- Tabs Switcher -->
     <div class="av-tabs">
-      <button class="av-tab-btn active" data-avtab="upload"   onclick="setAvTab('upload')"><i class="ph ph-upload-simple"></i> Upload</button>
-      <button class="av-tab-btn"        data-avtab="unsplash" onclick="setAvTab('unsplash')"><i class="ph ph-image"></i> Unsplash</button>
-      <button class="av-tab-btn"        data-avtab="ai"       onclick="setAvTab('ai')"><i class="ph-fill ph-sparkle"></i> ILLI•AI</button>
+      <button class="av-tab-btn active" data-avtab="upload"   onclick="setAvTab('upload')"><i class="ph-duotone ph-upload-simple"></i> Upload</button>
+      <button class="av-tab-btn"        data-avtab="unsplash" onclick="setAvTab('unsplash')"><i class="ph-duotone ph-image"></i> Unsplash</button>
+      <button class="av-tab-btn"        data-avtab="ai"       onclick="setAvTab('ai')"><i class="ph-duotone ph-sparkle"></i> ILLI•AI</button>
     </div>
 
     <!-- Pane: UPLOAD -->
     <div class="av-pane" id="avPaneUpload">
       <div class="av-upload-drop" onclick="document.getElementById('avUploadFile').click()">
-        <i class="ph ph-cloud-arrow-up" style="font-size:36px;color:var(--blue)"></i>
+        <i class="ph-duotone ph-cloud-arrow-up" style="font-size:36px;color:var(--blue)"></i>
         <div style="font-size:13px;font-weight:700;margin-top:6px">Carica una foto</div>
         <div style="font-size:11px;color:var(--muted);margin-top:3px">JPG, PNG · max 5 MB</div>
         <input type="file" id="avUploadFile" accept="image/*" style="display:none" onchange="uploadAvatarFile(event)">
@@ -5697,7 +5697,7 @@ async function confirmPhotoPicker(){
     <div class="av-pane" id="avPaneUnsplash" style="display:none">
       <div style="display:flex;gap:6px;margin-bottom:10px">
         <input id="avUnsplashQ" type="text" placeholder="Cerca: portrait, montagne, mare…" style="flex:1;height:40px;border:1.5px solid var(--border);border-radius:11px;padding:0 14px;font-size:13px;font-family:inherit;outline:none;background:var(--card);color:var(--text)" onkeydown="if(event.key==='Enter')searchUnsplashAvatar()">
-        <button onclick="searchUnsplashAvatar()" style="height:40px;padding:0 16px;border-radius:11px;background:var(--blue);color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit"><i class="ph ph-magnifying-glass"></i></button>
+        <button onclick="searchUnsplashAvatar()" style="height:40px;padding:0 16px;border-radius:11px;background:var(--blue);color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit"><i class="ph-duotone ph-magnifying-glass"></i></button>
       </div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
         <button class="av-chip" onclick="document.getElementById('avUnsplashQ').value='portrait';searchUnsplashAvatar()">👤 Portrait</button>
@@ -5722,7 +5722,7 @@ async function confirmPhotoPicker(){
         <button class="av-chip" onclick="document.getElementById('avAiPrompt').value+=' street photography Tirana'">Street Tirana</button>
       </div>
       <button class="av-gen-btn" onclick="generateAIAvatar()">
-        <i class="ph-fill ph-sparkle"></i> Genera con ILLI•AI
+        <i class="ph-duotone ph-sparkle"></i> Genera con ILLI•AI
       </button>
       <div id="avAiResult" style="margin-top:14px;text-align:center"></div>
     </div>
@@ -5735,7 +5735,7 @@ async function confirmPhotoPicker(){
     <div class="stop-detail-handle"></div>
     <div class="stop-detail-head">
       <div class="stop-detail-title" id="stopDetailTitle">Tappa</div>
-      <button class="stop-detail-close" onclick="closeStopDetail()"><i class="ph ph-x"></i></button>
+      <button class="stop-detail-close" onclick="closeStopDetail()"><i class="ph-duotone ph-x"></i></button>
     </div>
     <div class="stop-detail-body">
       <div class="stop-detail-status" id="stopDetailStatus"></div>
@@ -5744,18 +5744,18 @@ async function confirmPhotoPicker(){
       <div class="sec-lbl" style="margin-bottom:6px">Note personali</div>
       <textarea class="stop-detail-note" id="stopDetailNote" placeholder="Aggiungi note, promemoria, info pratiche…"></textarea>
       <div class="stop-invite-section">
-        <div class="stop-invite-title"><i class="ph ph-users-three" style="font-size:14px"></i> Invita qualcuno a questa tappa</div>
+        <div class="stop-invite-title"><i class="ph-duotone ph-users-three" style="font-size:14px"></i> Invita qualcuno a questa tappa</div>
         <div class="stop-invite-row">
-          <button class="stop-invite-btn" onclick="inviteToStop('amico')"><i class="ph ph-handshake"></i> Amico</button>
-          <button class="stop-invite-btn" onclick="inviteToStop('follower')"><i class="ph ph-user-circle-plus"></i> Follower</button>
+          <button class="stop-invite-btn" onclick="inviteToStop('amico')"><i class="ph-duotone ph-handshake"></i> Amico</button>
+          <button class="stop-invite-btn" onclick="inviteToStop('follower')"><i class="ph-duotone ph-user-circle-plus"></i> Follower</button>
         </div>
         <div class="stop-follower-warning" id="followerWarning">
-          <i class="ph ph-shield-warning" style="font-size:18px;flex-shrink:0;color:#D97706"></i>
+          <i class="ph-duotone ph-shield-warning" style="font-size:18px;flex-shrink:0;color:#D97706"></i>
           <div><b>Attenzione:</b> se non conosci personalmente questa persona, ti consigliamo di <b>attivare la condivisione della posizione</b> con qualcuno di fiducia prima di incontrarla in un luogo fisico.</div>
         </div>
       </div>
       <button class="level-ai-btn" style="background:var(--card);border-color:var(--red);color:var(--red)" onclick="saveStopDetail()">
-        <i class="ph ph-floppy-disk"></i> Salva modifiche
+        <i class="ph-duotone ph-floppy-disk"></i> Salva modifiche
       </button>
     </div>
   </div>
@@ -5782,8 +5782,8 @@ async function confirmPhotoPicker(){
         <div class="vanity-qr-label">QR del tuo profilo</div>
         <div class="vanity-qr-url" id="vanityQrUrl">poilove.com/@...</div>
         <div class="vanity-qr-btns">
-          <button class="vanity-qr-btn" onclick="copyVanityLink()"><i class="ph ph-link"></i> Copia link</button>
-          <button class="vanity-qr-btn primary" onclick="downloadQR()"><i class="ph ph-download-simple"></i> Scarica QR</button>
+          <button class="vanity-qr-btn" onclick="copyVanityLink()"><i class="ph-duotone ph-link"></i> Copia link</button>
+          <button class="vanity-qr-btn primary" onclick="downloadQR()"><i class="ph-duotone ph-download-simple"></i> Scarica QR</button>
         </div>
       </div>
     </div>
