@@ -102,6 +102,13 @@ button{touch-action:manipulation}
 .compagnia-hint{font-size:11px;color:var(--muted);margin-top:8px;line-height:1.6}
 .compagnia-stop{width:100%;height:44px;border-radius:14px;background:#FEE2E2;color:#DC2626;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;display:none}
 .compagnia-stop.vis{display:block}
+/* Compagni di Viaggio — type cards (Per sempre / Viaggio / Cena) */
+.comp-type-card{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 8px;border:1.5px solid var(--border);border-radius:11px;background:var(--card);color:var(--text);font-size:11px;font-weight:700;text-align:center;transition:all .15s;cursor:pointer}
+.comp-type-card.active{border-color:var(--red);background:#FFF0F0;color:var(--red)}
+.comp-type-card span{display:block;font-size:11px}
+/* ILLI•AI nav button: glow soft */
+.nav-item.nav-illi i{color:var(--blue)}
+.nav-item.nav-illi.active i,.nav-item.nav-illi:hover i{color:var(--red)}
 
 /* ── PHOTO PICKER (Unsplash + Upload) ── */
 #photoPickerOv{position:fixed;inset:0;z-index:8500;background:rgba(0,0,0,.55);display:none;align-items:flex-end;justify-content:center}
@@ -442,10 +449,12 @@ button{touch-action:manipulation}
 .poi-card-btn{width:24px;height:24px;border-radius:7px;border:none;background:#f5f0e8;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted);transition:all .15s}
 .pcb-del:active{background:#FEE2E2;color:var(--red)}
 
-/* ── Desktop: split 50/50 — mappa sinistra, contenuto destra ── */
+/* ── Desktop: mappa fullscreen di default · split 50/50 SOLO quando una tab è attiva ── */
 @media(min-width:1024px){
-  /* Mappa: occupa la metà sinistra, altezza intera */
-  #map{inset:0 50% 0 0}
+  /* Mappa fullscreen quando si è sulla tab Mappa */
+  #map{inset:0}
+  /* Quando una tab non-mappa è attiva (POI/Itinerari/Compagni/Profilo), mappa va a metà sinistra */
+  body.tab-active #map{inset:0 50% 0 0}
 
   /* Pannelli contenuto: metà destra */
   .profile-view,.itin-view,.poi-view,.companions-view{left:50%}
@@ -916,18 +925,85 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
       <button class="sh-close" onclick="closeSheet('compagniaOv','compagniaBg','compagniaSheet')"><i class="ph ph-x"></i></button>
     </div>
     <div class="sh-body" style="padding-bottom:24px">
-      <p style="font-size:13px;color:var(--muted);margin-bottom:4px;margin-top:8px">Crea un nuovo gruppo di compagni di viaggio o inserisci il codice ricevuto da un amico:</p>
-      <div class="compagnia-code-row">
-        <input class="compagnia-code-in" id="compagniaCode" type="text" maxlength="6" placeholder="ABC123"
-          onkeydown="if(event.key==='Enter')joinOrCreateCompagnia()"/>
-        <button class="compagnia-join-btn" onclick="joinOrCreateCompagnia()">Unisciti</button>
+
+      <!-- ╭─ UNISCITI a una compagnia esistente ─╮ -->
+      <details class="comp-section" style="margin-bottom:14px;background:#f5f0e8;border-radius:12px;padding:10px 14px">
+        <summary style="font-size:13px;font-weight:700;color:var(--text);cursor:pointer;list-style:none;display:flex;align-items:center;gap:6px">
+          <i class="ph ph-sign-in" style="color:var(--blue)"></i> Hai già un codice? Unisciti
+        </summary>
+        <div style="margin-top:10px">
+          <div class="compagnia-code-row">
+            <input class="compagnia-code-in" id="compagniaCode" type="text" maxlength="6" placeholder="ABC123"
+              onkeydown="if(event.key==='Enter')joinOrCreateCompagnia()"/>
+            <button class="compagnia-join-btn" onclick="joinOrCreateCompagnia()">Unisciti</button>
+          </div>
+        </div>
+      </details>
+
+      <!-- ╭─ CREA nuova compagnia ─╮ -->
+      <div style="font-size:13px;font-weight:800;color:var(--text);margin:8px 0 10px;display:flex;align-items:center;gap:6px">
+        <i class="ph-fill ph-plus-circle" style="color:var(--red);font-size:18px"></i> Crea un nuovo gruppo
       </div>
-      <p class="compagnia-hint">
-        Lascia il campo vuoto per <strong>creare</strong> un nuovo gruppo di compagni di viaggio e ottenere il codice da condividere.<br>
-        In albanese: <em>shoqëri</em> · In inglese: <em>travel party</em>
+
+      <!-- Nome -->
+      <label style="display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">Nome del gruppo</label>
+      <input id="compNewName" type="text" maxlength="40" placeholder="Es: Tirana Weekend, Cena del giovedì…" style="width:100%;height:42px;border:1.5px solid var(--border);border-radius:11px;padding:0 14px;font-size:14px;font-family:inherit;outline:none;background:var(--card);color:var(--text);margin-bottom:12px;box-sizing:border-box"/>
+
+      <!-- Tipo -->
+      <label style="display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Durata</label>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px" id="compTypeRow">
+        <label class="comp-type-opt" style="cursor:pointer">
+          <input type="radio" name="compType" value="forever" onchange="onCompTypeChange()" style="display:none">
+          <div class="comp-type-card" data-type="forever"><i class="ph-fill ph-heart-straight" style="color:var(--red);font-size:18px"></i><span>Per sempre</span></div>
+        </label>
+        <label class="comp-type-opt" style="cursor:pointer">
+          <input type="radio" name="compType" value="trip" checked onchange="onCompTypeChange()" style="display:none">
+          <div class="comp-type-card active" data-type="trip"><i class="ph-fill ph-airplane-tilt" style="color:var(--blue);font-size:18px"></i><span>Un viaggio</span></div>
+        </label>
+        <label class="comp-type-opt" style="cursor:pointer">
+          <input type="radio" name="compType" value="dinner" onchange="onCompTypeChange()" style="display:none">
+          <div class="comp-type-card" data-type="dinner"><i class="ph-fill ph-fork-knife" style="color:#16A34A;font-size:18px"></i><span>Una cena</span></div>
+        </label>
+      </div>
+
+      <!-- Date/Ore (solo per trip/dinner) -->
+      <div id="compDateBlock" style="margin-bottom:12px">
+        <label style="display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">
+          <i class="ph ph-calendar-blank" style="font-size:13px"></i> Inizio
+        </label>
+        <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:6px;margin-bottom:10px">
+          <input id="compStartDate" type="date" style="height:42px;border:1.5px solid var(--border);border-radius:11px;padding:0 12px;font-size:13px;font-family:inherit;background:var(--card);color:var(--text);outline:none;box-sizing:border-box">
+          <input id="compStartTime" type="time" style="height:42px;border:1.5px solid var(--border);border-radius:11px;padding:0 12px;font-size:13px;font-family:inherit;background:var(--card);color:var(--text);outline:none;box-sizing:border-box">
+        </div>
+        <label style="display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">
+          <i class="ph ph-calendar-check" style="font-size:13px"></i> Fine
+        </label>
+        <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:6px">
+          <input id="compEndDate" type="date" style="height:42px;border:1.5px solid var(--border);border-radius:11px;padding:0 12px;font-size:13px;font-family:inherit;background:var(--card);color:var(--text);outline:none;box-sizing:border-box">
+          <input id="compEndTime" type="time" style="height:42px;border:1.5px solid var(--border);border-radius:11px;padding:0 12px;font-size:13px;font-family:inherit;background:var(--card);color:var(--text);outline:none;box-sizing:border-box">
+        </div>
+      </div>
+
+      <!-- Descrizione -->
+      <label style="display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">Descrizione (opzionale)</label>
+      <textarea id="compDesc" maxlength="200" rows="2" placeholder="Es: Cena al Pazari il giovedì sera per festeggiare l'arrivo di Liri" style="width:100%;border:1.5px solid var(--border);border-radius:11px;padding:10px 14px;font-size:13px;font-family:inherit;outline:none;background:var(--card);color:var(--text);margin-bottom:12px;resize:vertical;box-sizing:border-box;line-height:1.4"></textarea>
+
+      <!-- Inviti -->
+      <label style="display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">
+        <i class="ph ph-paper-plane-tilt" style="font-size:13px"></i> Invita amici (email separate da virgola)
+      </label>
+      <input id="compInvites" type="text" placeholder="liri@example.com, marco@..." style="width:100%;height:42px;border:1.5px solid var(--border);border-radius:11px;padding:0 14px;font-size:13px;font-family:inherit;outline:none;background:var(--card);color:var(--text);margin-bottom:14px;box-sizing:border-box"/>
+
+      <!-- Azione: crea + condividi -->
+      <button onclick="createCompagnia()" style="width:100%;height:48px;border-radius:14px;background:var(--red);color:#fff;border:none;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;letter-spacing:.3px">
+        <i class="ph-fill ph-users-three"></i> Crea gruppo e ottieni codice
+      </button>
+      <p style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5;text-align:center">
+        Otterrai un codice di 6 caratteri da condividere con i tuoi compagni di viaggio. Anche WhatsApp, link diretto o QR code.
       </p>
-      <button class="compagnia-stop vis" id="compagniaStopBtn" onclick="stopCompagnia();closeSheet('compagniaOv','compagniaBg','compagniaSheet')" style="display:none">
-        <i class="ph ph-stop-circle"></i> Lascia la compagnia
+
+      <button class="compagnia-stop vis" id="compagniaStopBtn" onclick="stopCompagnia();closeSheet('compagniaOv','compagniaBg','compagniaSheet')" style="display:none;margin-top:14px">
+        <i class="ph ph-stop-circle"></i> Lascia il gruppo
       </button>
     </div>
   </div>
@@ -960,10 +1036,13 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
   </button>
 </div>
 
-<!-- BOTTOM NAV (6 tab: Mappa · POI · Itinerari · Compagni · Profilo · Sicurezza) -->
+<!-- BOTTOM NAV (7 tab: Mappa · ILLI•AI · POI · Itinerari · Compagni · Profilo · SOS) -->
 <nav class="bottom-nav">
   <button class="nav-item active" id="nav-map" onclick="showTab('map')">
     <i class="ph-fill ph-map-trifold"></i><span class="nav-lbl" data-t="nav_map">Mappa</span>
+  </button>
+  <button class="nav-item nav-illi" id="nav-illi" onclick="openIlliAI()" title="ILLI•AI Travel Advisor">
+    <i class="ph-fill ph-sparkle"></i><span class="nav-lbl">ILLI•AI</span>
   </button>
   <button class="nav-item" id="nav-poi" onclick="showTab('poi')">
     <i class="ph-fill ph-map-pin"></i><span class="nav-lbl" data-t="nav_poi">POI</span>
@@ -1420,9 +1499,9 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 <!-- ═══ POI VIEW (Miei · Loved · Vicini) ═══ -->
 <div class="poi-view" id="poiView">
   <div class="poi-subtabs">
-    <button class="poi-subtab active" data-subtab="mine"  onclick="setPoiSubtab('mine')">📍 I miei POI</button>
-    <button class="poi-subtab"        data-subtab="loved" onclick="setPoiSubtab('loved')">❤️ Loved</button>
-    <button class="poi-subtab"        data-subtab="near"  onclick="setPoiSubtab('near')">🧭 Vicini</button>
+    <button class="poi-subtab active" data-subtab="mine"  onclick="setPoiSubtab('mine')"><i class="ph-fill ph-map-pin"></i> I miei POI</button>
+    <button class="poi-subtab"        data-subtab="loved" onclick="setPoiSubtab('loved')"><i class="ph-fill ph-heart"></i> Loved</button>
+    <button class="poi-subtab"        data-subtab="near"  onclick="setPoiSubtab('near')"><i class="ph-fill ph-compass"></i> Vicini</button>
   </div>
   <div id="poi-list-area"></div>
 </div>
@@ -2993,6 +3072,8 @@ function showTab(tab){
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   const nm=document.getElementById('nav-'+tab);if(nm)nm.classList.add('active');
   const onMap=tab==='map';
+  // Toggle body.tab-active per CSS desktop: mappa fullscreen su map / split 50/50 sulle altre
+  document.body.classList.toggle('tab-active', !onMap);
   const fab=document.getElementById('fab');
   const fabMenu=document.getElementById('fabMenu');
   fab.style.display=onMap?'flex':'none';
@@ -3070,6 +3151,67 @@ function haversineKm(lat1,lng1,lat2,lng2){
   return 2*R*Math.asin(Math.sqrt(a));
 }
 function centerMapOnPoi(lat,lng){ showTab('map'); if(map) map.setView([lat,lng],16); }
+
+/* ══════════════════════════════════════════
+   ILLI•AI — Apri chat (dalla bottom nav)
+══════════════════════════════════════════ */
+function openIlliAI(){
+  // L'AI vive dentro la tab Itinerari (sezione .poiai-section).
+  // Apriamo Itinerari e scrolliamo alla sezione AI con focus sull'input.
+  showTab('itin');
+  setTimeout(() => {
+    const sec = document.querySelector('.poiai-section');
+    if(sec){
+      sec.scrollIntoView({behavior:'smooth', block:'start'});
+      const inp = document.getElementById('poiaiInput');
+      if(inp) setTimeout(()=>inp.focus(), 350);
+    }
+    // Marca il button ILLI•AI come attivo (visivamente)
+    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+    const il = document.getElementById('nav-illi'); if(il) il.classList.add('active');
+  }, 380);
+}
+
+/* ══════════════════════════════════════════
+   COMPAGNI DI VIAGGIO — gestione form creazione
+══════════════════════════════════════════ */
+function onCompTypeChange(){
+  const sel = document.querySelector('input[name="compType"]:checked')?.value || 'trip';
+  document.querySelectorAll('.comp-type-card').forEach(c => c.classList.toggle('active', c.dataset.type===sel));
+  const dateBlock = document.getElementById('compDateBlock');
+  if(dateBlock) dateBlock.style.display = (sel==='forever') ? 'none' : 'block';
+}
+function createCompagnia(){
+  const name = (document.getElementById('compNewName')?.value || '').trim();
+  if(!name){
+    if(typeof showToast==='function') showToast('Nome del gruppo obbligatorio');
+    else alert('Nome del gruppo obbligatorio');
+    return;
+  }
+  const type = document.querySelector('input[name="compType"]:checked')?.value || 'trip';
+  const startDate = document.getElementById('compStartDate')?.value || '';
+  const startTime = document.getElementById('compStartTime')?.value || '';
+  const endDate   = document.getElementById('compEndDate')?.value   || '';
+  const endTime   = document.getElementById('compEndTime')?.value   || '';
+  const desc      = (document.getElementById('compDesc')?.value     || '').trim();
+  const invites   = (document.getElementById('compInvites')?.value  || '').trim();
+  // Genera codice 6 caratteri
+  const alphabet = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+  let code = '';
+  for(let i=0;i<6;i++) code += alphabet[Math.floor(Math.random()*alphabet.length)];
+
+  const typeLabel = type==='forever' ? 'Per sempre 🥰' : type==='dinner' ? 'Una cena 🍽️' : 'Un viaggio ✈️';
+  const range = type==='forever' ? '' : (startDate? `${startDate} ${startTime} → ${endDate} ${endTime}` : '');
+
+  if(typeof showToast==='function') showToast(`✓ "${name}" creato! Codice: ${code} — ${typeLabel}${range?' · '+range:''}`);
+  else alert(`Gruppo "${name}" creato!\nCodice: ${code}\n${typeLabel}\n${range}\n${desc?'Descrizione: '+desc:''}\n${invites?'Inviti inviati a: '+invites:''}`);
+
+  // Copia codice in clipboard (fail-silent)
+  if(navigator.clipboard) navigator.clipboard.writeText(code).catch(()=>{});
+
+  closeSheet('compagniaOv','compagniaBg','compagniaSheet');
+  if(document.getElementById('companionsView')?.classList.contains('active')) renderCompanionsTab();
+}
 
 /* ══════════════════════════════════════════
    TAB COMPAGNI DI VIAGGIO — lista compagnie + amici live
