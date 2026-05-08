@@ -3,6 +3,80 @@
 
 ---
 
+## 🔄 Sessione 2026-05-08 — Tutto LIVE in produzione
+
+**Architettura attiva e funzionante:**
+
+| URL pubblico | Cartella repo | Cosa serve | SSL |
+|---|---|---|---|
+| `https://poilove.com/` | `web/` | Presentazione progetto v9 17:09 (612 KB) + PDF v5 + notarizzazione SHA-256 (hash `2e543e7a...`) | Let's Encrypt R13 (scade 6 ago 2026) |
+| `https://demo.poilove.com/` | `demo/` | Webapp ufficiale 341 KB (7 tab: Mappa · ILLI•AI · POI · Itinerari · Compagni · Profilo · SOS) | Let's Encrypt R13 |
+| `https://sal.poilove.com/` | `sal/` | SAL v2.4 — finestra presentazioni 13-17 Maggio (root = il SAL completo, no redirect) | Let's Encrypt R13 |
+| `https://media.poilove.com/` | `plesk-media-server/` | Media server PHP (foto upload + card SHA-256) | Let's Encrypt R13 |
+
+**Plesk Git pull-based deploy** (modalità Manuale, no auto-deploy GitHub Actions):
+- Subscription `poilove.com` (id 124) — 4 domini
+- Repo Git collegati con deploy SSH key id GitHub `150897309` (read-only)
+- 3 repo bare locali in Plesk: `git/poi-love-web.git`, `git/poi-love.git` (demo), `git/poi-love-sal.git`
+- Document root personalizzato per ogni dominio: punta alla **sotto-cartella** del repo
+  - poilove.com → `httpdocs/web`
+  - demo.poilove.com → `demo.poilove.com/demo`
+  - sal.poilove.com → `sal.poilove.com/sal`
+- Cache-Control no-cache + kill-switch JS per evitare cache PWA stale della vecchia webapp
+
+**Workflow operativo definitivo:**
+```
+Locale (Claude) → git push origin main
+                       ↓
+Plesk → dominio → Git → "Estrai ora" (pull) → "Implementa ora" (deploy)
+                                     ↓
+                                sito live
+```
+Sempre **2 click** in sequenza: Estrai (git pull) + Implementa (rsync to docroot).
+
+**Workflow GitHub Actions disabilitati**: `deploy-web.yml` e `pages.yml` sono in `workflow_dispatch only` (non scattano da soli al push). Solo `deploy-media-server.yml` resta attivo (media server già live, deploy continuo).
+
+**Roadmap aggiornata (SAL v2.4):**
+- 27 Apr → 6 Mag · ✅ Webapp HTML + Infrastruttura
+- 7-9 Maggio · 🔄 Rifinitura demo + ILLI•AI mascot + Compagni form
+- **10-12 Maggio · pre-presentazione** (slide demo, dry-run, dress rehearsal)
+- **13-17 Maggio · 🎤 Finestra presentazioni** (5 giorni hand-picked, partner+investitori)
+- 18 Mag → Giugno · 🚀 Pre-lancio Tirana
+- **Giugno 2026 · Lancio Tirana fisico**
+
+**Webapp demo features chiave (commit `9bdc402`):**
+- Bottom nav 7 tab (Mappa · ILLI•AI · POI · Itinerari · Compagni · Profilo · SOS)
+- Mappa fullscreen su tab Mappa, 50/50 desktop sulle altre
+- ILLI•AI tab dedicata (#illiView) con chat Travel Advisor + guida piattaforma
+- ILLI•AI prompt sistema doppio ruolo (suggerimenti viaggio + how-to app)
+- ILLI•AI mascot SVG in `demo/illi-ai.svg`
+- POI tab con 3 sub-tab: Miei · Loved · Vicini (haversine sort)
+- Compagni di Viaggio: form CREA completo (Per sempre/Viaggio/Cena · date+ora · descrizione · inviti · codice 6 char) + lista compagnie con status amici live (🟢 in viaggio · ⚪ offline · 🔴 fermo +1g)
+- Profilo: 12 sfondi gradient moderni (Tirana Sunset · Aurora del Drin · Skanderbeg Gold · ecc.) + Avatar modal 3 tab (Upload · Unsplash · AI Pollinations/Flux con prompt enhancement)
+- 232 icone Phosphor variante **duotone** ovunque
+- POI detail close fix (X button + Escape)
+- FAB z-index 350 (sopra nav, sotto sheet/popup)
+
+**Setup secrets GitHub** (già configurati, non toccare):
+- DEPLOY_SECRET, PLESK_HOST, PLESK_USER, PLESK_SSH_KEY, PLESK_PORT, PLESK_PATH, PLESK_WEB_PATH
+
+**Path locale (mac)**: `/Users/alessandrocastagna/AI (produzione)/POI•LOVE/POI•LOVE/`
+
+**Repository GitHub**: https://github.com/acastagna/poi-love (public, MIT)
+
+**Ultimi commit chiave**:
+- `19f55a0` architettura 4 sotto-domini (cartelle web/demo/sal)
+- `feef947` bottom nav 6 tab + ILLI•AI + Compagni
+- `cec8667` mappa fullscreen + ILLI•AI tab + form Compagni
+- `69769ad` 12 sfondi + Avatar 3 tab + Pollinations
+- `a5e615a` fix POI detail close
+- `307125f / 1fbb4fc` fix FAB z-index
+- `9bdc402` icone Phosphor duotone (232 occorrenze)
+- `3561cce` sal/index.html = SAL completo (no redirect)
+- `279a814` kill-switch SW + no-cache headers su poilove.com
+
+---
+
 ## ⚡ Aggiornamento 2026-05-08 — Architettura a 4 sotto-domini
 
 **IMPORTANTE:** L'architettura è stata divisa in 4 ambiti separati. NON è più "tutto in `web/`".
