@@ -1,0 +1,43 @@
+# ══════════════════════════════════════════════════════
+#  POI•LOVE — .htaccess ROOT  (httpdocs/.htaccess)
+#  Deploy via GitHub Actions → web/ → httpdocs/
+# ══════════════════════════════════════════════════════
+
+Options -Indexes
+RewriteEngine On
+
+# ── 1. Redirect /demo → / ──────────────────────────────
+RewriteRule ^demo/?$ / [R=301,L]
+RewriteRule ^demo/(.*)$ /$1 [R=301,L]
+
+# ── 2. Trip / Itinerary landing pages ──────────────────
+#    /trip/slug  →  serve index.html (SPA gestisce il routing)
+RewriteRule ^trip/([A-Za-z0-9_\-]+)/?$ /index.html [L]
+
+# ── 3. Liste pubbliche ─────────────────────────────────
+RewriteRule ^list/([A-Za-z0-9_\-]+)/?$ /index.html [L]
+
+# ── 4. Profilo utente ──────────────────────────────────
+RewriteRule ^@([A-Za-z0-9_\.\-]+)/?$ /index.html [L]
+
+# ── 5. Redirect vecchi link /p/lat,lng → /?at=lat,lng ──
+RewriteRule ^p/([0-9\.\-]+,[0-9\.\-]+)/?$ /?at=$1 [R=302,L]
+
+# ── 6. Redirect /p/uuid → /?poi=uuid ──────────────────
+RewriteRule ^p/([0-9a-f\-]{36})/?$ /?poi=$1 [R=302,L,NC]
+
+# ── 7. Fallback /p/* → / ──────────────────────────────
+RewriteRule ^p/(.*)$ / [R=302,L]
+
+# ── 8. /presentation → cartella separata ──────────────
+#    Nessuna regola: Apache serve httpdocs/presentation/index.html
+
+# ── Cache statica ──────────────────────────────────────
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/html "access plus 0 seconds"
+  ExpiresByType application/javascript "access plus 1 week"
+  ExpiresByType text/css "access plus 1 week"
+  ExpiresByType image/svg+xml "access plus 1 month"
+  ExpiresByType application/manifest+json "access plus 1 day"
+</IfModule>

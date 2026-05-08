@@ -1,0 +1,60 @@
+# =============================================================================
+# POI•LOVE — GitHub Actions: Deploy web/ → poilove.com (root)
+# Trigger: push su main con modifiche in web/
+# Destinazione: httpdocs/ (ROOT di poilove.com) via SSH + rsync
+# Secrets richiesti: PLESK_HOST, PLESK_USER, PLESK_SSH_KEY, PLESK_PORT, PLESK_WEB_PATH
+# Cultural Bridge OS · MIT License
+# =============================================================================
+
+name: Deploy → poilove.com (root)
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'web/**'
+      - '.github/workflows/deploy-web.yml'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Sync web/ → httpdocs/ su Plesk
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.PLESK_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p "${{ secrets.PLESK_PORT }}" -H "${{ secrets.PLESK_HOST }}" \
+            >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Deploy via rsync → root httpdocs/
+        run: |
+          rsync -avz \
+            --exclude='.git' \
+            --exclude='*.md' \
+            -e "ssh -i ~/.ssh/deploy_key -p ${{ secrets.PLESK_PORT }} -o StrictHostKeyChecking=no" \
+            web/ \
+            "${{ secrets.PLESK_USER }}@${{ secrets.PLESK_HOST }}:${{ secrets.PLESK_WEB_PATH }}/"
+
+      - name: Health check
+        run: |
+          sleep 4
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://poilove.com/")
+          echo "Health check: $STATUS"
+          if [ "$STATUS" != "200" ]; then
+            echo "::warning::poilove.com risponde $STATUS"
+          else
+            echo "::notice::Deploy OK — poilove.com risponde 200"
+          fi
+
+      - name: Cleanup SSH key
+        if: always()
+        run: rm -f ~/.ssh/deploy_key

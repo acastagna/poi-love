@@ -1,54 +1,70 @@
 <?php
-/**
- * POI•LOVE — Media Server: Upload Foto
- *
- * POST /media/upload.php
- *
- * Headers richiesti:
- *   Authorization: Bearer <supabase_jwt>
- *   X-POI-ID: <poi_uuid>
- *
- * Body: multipart/form-data
- *   photos[]  — da 1 a 3 file immagine
- *
- * Response 200:
- *   { "ok": true, "data": { "poi_id": "...", "urls": [...], "count": N } }
- *
- * Response 4xx/5xx:
- *   { "ok": false, "error": "..." }
- */
+// =============================================================================
+// POI•LOVE — media.poilove.com — upload.php
+// Endpoint: POST /upload.php
+// Cultural Bridge OS · MIT License
+// =============================================================================
+// Accetta fino a 3 immagini per POI, le processa in WebP ottimizzato,
+// le salva nella struttura /poi/{uuid}/ e restituisce gli URL pubblici.
+//
+// Request (multipart/form-data):
+//   Authorization: Bearer {supabase_access_token}
+//   poi_id:        UUID del POI (obbligatorio)
+//   photos[]:      File immagine (max 3, max 5MB cad.)
+//
+// Response 200:
+//   { "ok": true, "urls": ["https://media.poilove.com/poi/...webp", ...] }
+//
+// Response errore:
+//   { "ok": false, "error": "messaggio" }
+// =============================================================================
 
-require_once __DIR__ . '/helpers.php';
+declare(strict_types=1);
 
-// ─── CORS + preflight ───────────────────────────────
-handle_cors();
+// Bootstrap
+require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/helpers/response.php';
+require_once __DIR__ . '/helpers/auth.php';
+require_once __DIR__ . '/helpers/image.php';
 
-// ─── Solo POST ─────────────────────────────────────
+// ---------------------------------------------------------------------------
+// 1. Metodo HTTP
+// ---------------------------------------------------------------------------
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    json_error('Method not allowed', 405);
+    method_not_allowed(['POST', 'OPTIONS']);
 }
 
-// ─── Autenticazione ────────────────────────────────
-$user_id = authenticate_request();
+// ---------------------------------------------------------------------------
+// 2. Autenticazione JWT Supabase
+// ---------------------------------------------------------------------------
+$user = require_auth(); // termina con 401 se non valido
 
-// ─── Leggi POI ID dall'header ──────────────────────
-$poi_id = trim($_SERVER['HTTP_X_POI_ID'] ?? '');
-if (!$poi_id) {
-    json_error('Missing X-POI-ID header');
-}
-if (!validate_poi_id($poi_id)) {
-    json_error('Invalid POI ID format');
-}
+// ---------------------------------------------------------------------------
+// 3. Validazione input: poi_id
+// ---------------------------------------------------------------------------
+$poi_id = trim($_POST['poi_id'] ?? '');
 
-// ─── Controlla che ci siano file ───────────────────
-if (empty($_FILES['photos'])) {
-    json_error('No photos field in request');
+if (empty($poi_id)) {
+    error_response('poi_id obbligatorio');
 }
 
-// Normalizza struttura $_FILES['photos'] (gestisce sia singolo che multiplo)
+// Valida formato UUID v4
+if (!preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i', $poi_id)) {
+    error_response('poi_id non valido (deve essere UUID v4)');
+}
+
+// ---------------------------------------------------------------------------
+// 4. Verifica file in arrivo
+// ---------------------------------------------------------------------------
+if (!isset($_FILES['photos'])) {
+    error_response('Nessuna foto ricevuta. Campo richiesto: photos[]');
+}
+
+// Normalizza struttura $_FILES['photos'] (gestisce sia photos[] che photos)
 $files = $_FILES['photos'];
+
+// Se è stato inviato un singolo file (non array), lo trasforma in array
 if (!is_array($files['name'])) {
-    // Singolo file — converti in array
     $files = [
         'name'     => [$files['name']],
         'type'     => [$files['type']],
@@ -60,84 +76,116 @@ if (!is_array($files['name'])) {
 
 $file_count = count($files['name']);
 
-// ─── Validazione numero file ───────────────────────
 if ($file_count === 0) {
-    json_error('No files uploaded');
+    error_response('Nessun file ricevuto');
 }
+
 if ($file_count > MAX_PHOTOS_PER_POI) {
-    json_error('Max ' . MAX_PHOTOS_PER_POI . ' photos per POI allowed');
+    error_response('Troppi file. Massimo ' . MAX_PHOTOS_PER_POI . ' foto per POI');
 }
 
-// ─── Crea cartella POI ─────────────────────────────
-$poi_dir = safe_poi_dir($poi_id);
-if (!is_dir($poi_dir)) {
-    if (!mkdir($poi_dir, 0755, true)) {
-        json_error('Cannot create upload directory', 500);
+// ---------------------------------------------------------------------------
+// 5. Verifica che la cartella storage esista / sia scrivibile
+// ---------------------------------------------------------------------------
+$poi_storage_dir = STORAGE_BASE_PATH . '/' . preg_replace('/[^a-f0-9\-]/i', '', $poi_id);
+
+if (!is_dir($poi_storage_dir)) {
+    if (!mkdir($poi_storage_dir, 0755, true)) {
+        error_log("POI•LOVE upload: impossibile creare directory $poi_storage_dir");
+        error_response('Errore storage server', 500);
     }
-    // Proteggi la cartella da listing
-    file_put_contents($poi_dir . '/.htaccess', "Options -Indexes\n");
 }
 
-// ─── Processa ogni file ────────────────────────────
-$saved_urls = [];
-$errors     = [];
+if (!is_writable($poi_storage_dir)) {
+    error_log("POI•LOVE upload: directory non scrivibile $poi_storage_dir");
+    error_response('Errore permessi storage', 500);
+}
+
+// ---------------------------------------------------------------------------
+// 6. Conta foto esistenti per questo POI (limite 3 totali)
+// ---------------------------------------------------------------------------
+$existing_photos = glob($poi_storage_dir . '/*.webp') ?: [];
+$existing_count  = count($existing_photos);
+
+if ($existing_count + $file_count > MAX_PHOTOS_PER_POI) {
+    $remaining = MAX_PHOTOS_PER_POI - $existing_count;
+    if ($remaining <= 0) {
+        error_response("Il POI ha già il massimo di " . MAX_PHOTOS_PER_POI . " foto");
+    }
+    error_response("Puoi aggiungere ancora $remaining foto (hai già $existing_count)");
+}
+
+// ---------------------------------------------------------------------------
+// 7. Processa e salva ogni foto
+// ---------------------------------------------------------------------------
+$uploaded_urls   = [];
+$uploaded_paths  = []; // per rollback in caso di errore parziale
+$errors          = [];
 
 for ($i = 0; $i < $file_count; $i++) {
-    // Errore upload PHP
-    if ($files['error'][$i] !== UPLOAD_ERR_OK) {
-        $errors[] = "File $i: upload error code " . $files['error'][$i];
+    $upload_error = $files['error'][$i];
+
+    // Errore PHP upload
+    if ($upload_error !== UPLOAD_ERR_OK) {
+        $php_errors = [
+            UPLOAD_ERR_INI_SIZE   => 'File troppo grande (php.ini)',
+            UPLOAD_ERR_FORM_SIZE  => 'File troppo grande (form)',
+            UPLOAD_ERR_PARTIAL    => 'Upload parziale — riprova',
+            UPLOAD_ERR_NO_FILE    => 'Nessun file inviato',
+            UPLOAD_ERR_NO_TMP_DIR => 'Cartella temporanea PHP mancante',
+            UPLOAD_ERR_CANT_WRITE => 'Impossibile scrivere su disco',
+            UPLOAD_ERR_EXTENSION  => 'Upload bloccato da estensione PHP',
+        ];
+        $errors[] = 'Foto ' . ($i + 1) . ': ' . ($php_errors[$upload_error] ?? 'Errore sconosciuto');
         continue;
     }
 
-    $tmp    = $files['tmp_name'][$i];
-    $size   = $files['size'][$i];
-    $orig   = strtolower($files['name'][$i]);
+    $tmp_path  = $files['tmp_name'][$i];
+    $file_size = $files['size'][$i];
 
-    // Dimensione
-    if ($size > MAX_FILE_SIZE) {
-        $mb = round(MAX_FILE_SIZE / 1024 / 1024);
-        $errors[] = "File $i exceeds maximum size of {$mb}MB";
+    // Genera percorso destinazione
+    $rel_path  = generate_safe_filename($poi_id);
+    $dest_path = STORAGE_BASE_PATH . '/' . $rel_path;
+
+    // Assicura che la sottocartella esista
+    $dest_dir = dirname($dest_path);
+    if (!is_dir($dest_dir)) {
+        mkdir($dest_dir, 0755, true);
+    }
+
+    // Processo immagine
+    $result = process_and_save_image($tmp_path, $file_size, $dest_path);
+
+    if (!$result['ok']) {
+        $errors[] = 'Foto ' . ($i + 1) . ': ' . $result['error'];
         continue;
     }
 
-    // MIME reale (non fidarsi dell'input client)
-    $finfo = finfo_open(FILEINFO_MIME_TYPE);
-    $mime  = finfo_file($finfo, $tmp);
-    finfo_close($finfo);
-
-    if (!in_array($mime, ALLOWED_MIME_TYPES, true)) {
-        $errors[] = "File $i has unsupported type: $mime";
-        continue;
-    }
-
-    // Slot foto: 1, 2, 3 — sovrascrive se già esiste
-    $slot      = $i + 1; // 1-indexed
-    $dest_name = "photo_{$slot}.jpg"; // convertiamo sempre in JPEG
-    $dest_path = $poi_dir . '/' . $dest_name;
-
-    // Resize + salvataggio
-    if (!resize_and_save($tmp, $dest_path, $mime)) {
-        $errors[] = "File $i could not be saved";
-        continue;
-    }
-
-    $saved_urls[] = MEDIA_BASE_URL . '/uploads/' . strtolower($poi_id) . '/' . $dest_name;
+    $uploaded_urls[]  = $result['url'];
+    $uploaded_paths[] = $result['path'];
 }
 
-// ─── Risposta ──────────────────────────────────────
-if (empty($saved_urls)) {
-    json_error('No photos were saved. Errors: ' . implode('; ', $errors), 422);
+// ---------------------------------------------------------------------------
+// 8. Gestione errori parziali
+// ---------------------------------------------------------------------------
+if (!empty($errors) && empty($uploaded_urls)) {
+    // Nessuna foto salvata — risposta di errore totale
+    error_response('Nessuna foto salvata', 422, implode('; ', $errors));
 }
 
+// ---------------------------------------------------------------------------
+// 9. Risposta successo
+// ---------------------------------------------------------------------------
 $response = [
-    'poi_id'  => $poi_id,
-    'user_id' => $user_id,
-    'urls'    => $saved_urls,
-    'count'   => count($saved_urls),
+    'urls'     => $uploaded_urls,
+    'poi_id'   => $poi_id,
+    'user_id'  => $user['id'],
+    'count'    => count($uploaded_urls),
 ];
 
+// Se ci sono stati errori parziali, li includiamo (non bloccanti)
 if (!empty($errors)) {
     $response['warnings'] = $errors;
 }
 
-json_ok($response, 201);
+success($response);

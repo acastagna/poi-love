@@ -1,24 +1,34 @@
-# ─── Secrets — MAI su GitHub ──────────────────────
-poi-love-app/.env
-poi-love-app/.env.local
-poi-love-app/.env.production
-plesk-media-server/config.php        # contiene JWT_SECRET e MEDIA_BASE_URL
+# Dipendenze
+node_modules/
+.pnp
+.pnp.js
 
-# ─── Node / Expo ──────────────────────────────────
-poi-love-app/node_modules/
-poi-love-app/.expo/
-poi-love-app/dist/
-poi-love-app/.metro-health-check*
+# Build Expo
+.expo/
+dist/
+web-build/
+ios/build/
+android/build/
+android/.gradle/
 
-# ─── iOS / Android build ──────────────────────────
-poi-love-app/ios/
-poi-love-app/android/
+# Variabili d'ambiente — MAI committare
+.env
+.env.local
+.env.*.local
+*.env
 
-# ─── macOS ────────────────────────────────────────
+# Cache e log
 .DS_Store
-**/.DS_Store
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# ─── Editor ───────────────────────────────────────
+# IDE
 .vscode/
 .idea/
 *.swp
+*.swo
+
+# OS
+Thumbs.db

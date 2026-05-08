@@ -1,62 +1,44 @@
 <?php
-/**
- * POI•LOVE — Media Server Configuration
- * Plesk PHP Upload API
- *
- * Copia questo file in /var/www/vhosts/[tuo-dominio]/httpdocs/media/
- * e adatta le costanti alla tua configurazione Plesk.
- */
+// =============================================================================
+// POI•LOVE — media.poilove.com — Configurazione
+// Cultural Bridge OS · MIT License
+// =============================================================================
+// ATTENZIONE: Non committare questo file con i valori reali su repository
+// pubblici. Usa variabili d'ambiente Plesk o .env (non versionato).
+// Questo file è il TEMPLATE — adatta i valori nel tuo Plesk.
+// =============================================================================
 
-// ═══════════════════════════════════════════════════
-//  CONFIGURAZIONE — modifica questi valori su Plesk
-// ═══════════════════════════════════════════════════
+// ---------------------------------------------------------------------------
+// Supabase
+// ---------------------------------------------------------------------------
+define('SUPABASE_URL',         'https://ptppxwlafswfhbueakjt.supabase.co');
+define('SUPABASE_ANON_KEY',    'YOUR_SUPABASE_ANON_KEY_HERE');
+// Supabase anon key pubblica — usata per validare il JWT dell'utente
+// Recuperala da: Supabase Dashboard → Settings → API → anon public
 
-// Dominio pubblico del media server (senza trailing slash)
-define('MEDIA_BASE_URL', 'https://media.poilove.com');
+// ---------------------------------------------------------------------------
+// Storage locale su Plesk
+// ---------------------------------------------------------------------------
+// Percorso assoluto della cartella dove salvare le immagini.
+// Su Plesk di solito: /var/www/vhosts/poilove.com/media.poilove.com/httpdocs/poi/
+// Adatta al tuo setup effettivo.
+define('STORAGE_BASE_PATH',    __DIR__ . '/poi');
+define('STORAGE_BASE_URL',     'https://media.poilove.com/poi');
 
-// Path assoluto dove salvare i file (deve essere scrivibile dal webserver)
-// Su Plesk solitamente: /var/www/vhosts/<dominio>/httpdocs/uploads
-define('UPLOAD_ROOT', __DIR__ . '/uploads');
+// ---------------------------------------------------------------------------
+// Limiti upload
+// ---------------------------------------------------------------------------
+define('MAX_FILE_SIZE',        5 * 1024 * 1024); // 5MB per singola immagine
+define('MAX_PHOTOS_PER_POI',   3);               // max 3 foto per POI (UX core)
+define('ALLOWED_MIME_TYPES',   ['image/jpeg', 'image/png', 'image/webp', 'image/heic']);
+define('OUTPUT_FORMAT',        'webp');           // converti tutto in WebP
+define('IMAGE_QUALITY',        82);               // qualità WebP (82% = ottimo bilanciamento)
+define('MAX_IMAGE_DIMENSION',  1200);             // px — lato più lungo
 
-// Secret usato per firmare il token di upload
-// Genera con: php -r "echo bin2hex(random_bytes(32));"
-// Deve essere lo stesso valore impostato in Supabase come secret ENV
-define('UPLOAD_SECRET', 'SOSTITUISCI_CON_SECRET_SICURO');
-
-// Supabase JWT secret (per validazione opzionale server-side del JWT)
-// Trova in: Supabase Dashboard → Settings → API → JWT Secret
-define('SUPABASE_JWT_SECRET', 'SOSTITUISCI_CON_SUPABASE_JWT_SECRET');
-
-// ═══════════════════════════════════════════════════
-//  LIMITI UPLOAD
-// ═══════════════════════════════════════════════════
-
-// Max foto per POI
-define('MAX_PHOTOS_PER_POI', 3);
-
-// Dimensione max per file (bytes) — default 8MB
-define('MAX_FILE_SIZE', 8 * 1024 * 1024);
-
-// Tipi MIME accettati
-define('ALLOWED_MIME_TYPES', ['image/jpeg', 'image/png', 'image/webp', 'image/heic']);
-
-// Estensioni accettate (lowercase)
-define('ALLOWED_EXTENSIONS', ['jpg', 'jpeg', 'png', 'webp', 'heic']);
-
-// Dimensione massima lato lungo dopo resize (px) — 0 = no resize
-define('MAX_IMAGE_DIMENSION', 1920);
-
-// Qualità JPEG output (1-100)
-define('JPEG_QUALITY', 85);
-
-// ═══════════════════════════════════════════════════
-//  CORS — domini autorizzati
-// ═══════════════════════════════════════════════════
-define('ALLOWED_ORIGINS', [
-    'https://poilove.com',
-    'https://www.poilove.com',
-    'https://acastagna.github.io',
-    'http://localhost:8081',   // Expo dev
-    'http://localhost:3000',   // Web dev
-    'exp://localhost:8081',    // Expo Go
-]);
+// ---------------------------------------------------------------------------
+// Sicurezza
+// ---------------------------------------------------------------------------
+define('API_VERSION',          '1.0.0');
+define('DEBUG_MODE',           false);            // MAI true in produzione!
+// In debug mode le risposte di errore sono verbose.
+// Attiva solo in sviluppo (accedi via IP Plesk diretto).

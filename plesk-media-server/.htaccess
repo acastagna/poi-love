@@ -1,41 +1,32 @@
-# POI•LOVE — Media Server .htaccess
-# Da mettere nella root della cartella /media/
+# POI•LOVE — media.poilove.com
+# Cultural Bridge OS · MIT License
 
-# ─── Sicurezza base ────────────────────────────────
 Options -Indexes
-ServerSignature Off
+ErrorDocument 403 /403.html
+ErrorDocument 404 /403.html
 
-# ─── Blocca accesso diretto ai file PHP tranne entry points ───
-<FilesMatch "^(upload|delete)\.php$">
-    Order Allow,Deny
-    Allow from all
+# --- Blocca accesso diretto a config e helpers ---
+<FilesMatch "(^config\.php$)">
+    Require all denied
 </FilesMatch>
 
-<FilesMatch "^(config|helpers)\.php$">
-    Order Deny,Allow
-    Deny from all
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    # Risposta 204 alle preflight OPTIONS
+    RewriteCond %{REQUEST_METHOD} =OPTIONS
+    RewriteRule ^ - [R=204,L]
+</IfModule>
+
+# --- CORS ---
+<IfModule mod_headers.c>
+    Header always set Access-Control-Allow-Origin "*"
+    Header always set Access-Control-Allow-Methods "POST, DELETE, OPTIONS"
+    Header always set Access-Control-Allow-Headers "Authorization, Content-Type"
+</IfModule>
+
+# --- Cache immagini ---
+<FilesMatch "\.(jpg|jpeg|png|webp|gif)$">
+    <IfModule mod_headers.c>
+        Header set Cache-Control "public, max-age=31536000"
+    </IfModule>
 </FilesMatch>
-
-# ─── Blocca accesso a file nascosti ───────────────
-<FilesMatch "^\.">
-    Order Deny,Allow
-    Deny from all
-</FilesMatch>
-
-# ─── Solo GET sugli upload statici ────────────────
-<Directory "uploads">
-    Options -Indexes -ExecCGI
-    <FilesMatch "\.php$">
-        Deny from all
-    </FilesMatch>
-</Directory>
-
-# ─── Cache header per immagini ────────────────────
-<FilesMatch "\.(jpg|jpeg|png|webp)$">
-    Header set Cache-Control "public, max-age=31536000, immutable"
-</FilesMatch>
-
-# ─── MIME types ───────────────────────────────────
-AddType image/jpeg .jpg .jpeg
-AddType image/png  .png
-AddType image/webp .webp

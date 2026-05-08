@@ -1,0 +1,20 @@
+{
+  "name": "POI•LOVE",
+  "short_name": "POI•LOVE",
+  "description": "La mappa dei luoghi che ami davvero",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#EAE4D8",
+  "theme_color": "#D42B2B",
+  "icons": [
+    {
+      "src": "https://poilove.com/img/logo-symbol.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["travel", "social", "navigation"],
+  "lang": "it"
+}
