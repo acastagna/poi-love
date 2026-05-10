@@ -1709,7 +1709,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 
 <!-- ═══ SHEET: ADD POI ═══ -->
 <div class="sheet-overlay" id="addPoiOv">
-  <div class="sheet-backdrop" id="addPoiBg"></div>
+  <div class="sheet-backdrop" id="addPoiBg" onclick="closeSheet('addPoiOv','addPoiBg','addPoiSheet')"></div>
   <div class="sheet" id="addPoiSheet">
     <div class="sh-handle" id="addPoiHandle"></div>
     <div class="sh-head">
@@ -1946,7 +1946,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 
 <!-- ═══ SHEET: ADD STOP ═══ -->
 <div class="sheet-overlay" id="addStopOv">
-  <div class="sheet-backdrop" id="addStopBg"></div>
+  <div class="sheet-backdrop" id="addStopBg" onclick="closeSheet('addStopOv','addStopBg','addStopSheet')"></div>
   <div class="sheet" id="addStopSheet">
     <div class="sh-handle" id="addStopHandle"></div>
     <div class="sh-head">
@@ -2020,7 +2020,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 
 <!-- ═══ SHEET: ADD LIST ═══ -->
 <div class="sheet-overlay" id="addListOv">
-  <div class="sheet-backdrop" id="addListBg"></div>
+  <div class="sheet-backdrop" id="addListBg" onclick="closeSheet('addListOv','addListBg','addListSheet')"></div>
   <div class="sheet" id="addListSheet">
     <div class="sh-handle" id="addListHandle"></div>
     <div class="sh-head">
@@ -2043,7 +2043,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 
 <!-- ═══ SHEET: DETAIL POI ═══ -->
 <div class="sheet-overlay" id="detailOv">
-  <div class="sheet-backdrop" id="detailBg"></div>
+  <div class="sheet-backdrop" id="detailBg" onclick="closeDetail()"></div>
   <div class="sheet" id="detailSheet">
     <div class="sh-handle" id="detailHandle"></div>
     <!-- Bottone X di chiusura (fix desktop: il sheet copre tutto il backdrop) -->
@@ -2100,7 +2100,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 
 <!-- SOS SHEET -->
 <div class="sheet-overlay" id="sosOv">
-  <div class="sheet-backdrop" id="sosBg"></div>
+  <div class="sheet-backdrop" id="sosBg" onclick="closeSheet('sosOv','sosBg','sosSheet')"></div>
   <div class="sheet" id="sosSheet">
     <div class="sh-handle" id="sosHandle"></div>
     <div class="sh-head">
@@ -2238,12 +2238,28 @@ async function runConnectionDiagnostics(){
       report.missing.push("profiles.cover_type (text, default 'gradient')");
     }
 
-    // 6. Bucket storage poi_photos
+    // 6. Bucket storage poi_photos (fallback per upload foto)
     try {
       const { data: buckets } = await sb.storage.listBuckets();
       report.storagePoiPhotos = !!(buckets||[]).find(b=>b.name==='poi_photos');
-      if(!report.storagePoiPhotos) report.warnings.push("Bucket 'poi_photos' non trovato — gli upload foto falliranno");
+      if(!report.storagePoiPhotos) report.warnings.push("Bucket 'poi_photos' non trovato — fallback non disponibile");
     } catch(e) { report.warnings.push('Storage non leggibile: '+e.message); }
+
+    // 7. Media server PHP (architettura voluta — primario per upload foto)
+    try {
+      const r = await fetch(`${MEDIA_SERVER_URL}/test.php`, { mode:'cors' });
+      const j = await r.json();
+      const supaCheck = (j.checks||[]).find(c=>c.name==='Supabase Connectivity');
+      const storageCheck = (j.checks||[]).find(c=>c.name==='Storage Directory');
+      report.mediaServer = j.overall === 'ok';
+      report.mediaServerSupabase = supaCheck?.status === 'ok';
+      report.mediaServerStorage = storageCheck?.status === 'ok';
+      if(!report.mediaServerSupabase){
+        report.warnings.push('media.poilove.com NON valida JWT (DNS server lato Plesk non risolve supabase.co)');
+      }
+    } catch(e) {
+      report.warnings.push('media.poilove.com non raggiungibile: '+e.message);
+    }
 
     // Report
     const ok = report.supabase && report.profiles && report.lists && report.pois;
@@ -2256,6 +2272,9 @@ async function runConnectionDiagnostics(){
     console.log('lists         :', report.lists?'✅':'❌');
     console.log('pois          :', report.pois?'✅':'❌');
     console.log('Storage poi_photos:', report.storagePoiPhotos?'✅':'❌');
+    console.log('Media server   :', report.mediaServer?'✅':'❌');
+    console.log('  └─ Supabase JWT validation:', report.mediaServerSupabase?'✅':'❌ (server non risolve supabase.co)');
+    console.log('  └─ Storage scrivibile     :', report.mediaServerStorage?'✅':'❌');
     if(report.warnings.length){ console.warn('Warnings:', report.warnings); }
     if(report.missing.length){
       console.warn('SCHEMA MANCANTE — eseguire questo SQL in Supabase:');
@@ -2572,6 +2591,56 @@ function openDBDetail(p) {
   openSheet('detailOv', 'detailBg', 'detailSheet');
 }
 
+/* ══════════════════════════════════════════
+   UPLOAD FOTO — media.poilove.com (PHP server)
+   Architettura voluta: upload diretto su media server che converte
+   in WebP ottimizzato. Fallback Supabase Storage se server giù.
+══════════════════════════════════════════ */
+const MEDIA_SERVER_URL = 'https://media.poilove.com';
+
+async function uploadPhotosToMediaServer(files, poiId){
+  const urls = [];
+  if(!currentUser || !files.length) return urls;
+  // Recupera il JWT dell'utente per autenticare la richiesta al media server
+  const { data: { session } } = await sb.auth.getSession();
+  const jwt = session?.access_token;
+  if(!jwt){ console.warn('[poilove] no JWT, skip upload'); return urls; }
+
+  const fd = new FormData();
+  fd.append('poi_id', poiId || `tmp-${Date.now()}`);
+  files.forEach(f => fd.append('photos[]', f));
+
+  try {
+    const res = await fetch(`${MEDIA_SERVER_URL}/upload.php`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${jwt}` },
+      body: fd
+    });
+    const json = await res.json().catch(()=>({ok:false}));
+    if(json.ok && Array.isArray(json.urls)){
+      urls.push(...json.urls);
+      console.log('[poilove] media server upload OK:', urls.length, 'foto');
+      return urls;
+    }
+    throw new Error(json.error || `HTTP ${res.status}`);
+  } catch(e) {
+    console.warn('[poilove] media server upload failed, fallback Supabase Storage:', e.message);
+  }
+
+  // FALLBACK: Supabase Storage (bucket poi_photos)
+  for (const file of files) {
+    try {
+      const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+      const path = `${currentUser.id}/${Date.now()}_${Math.random().toString(36).substr(2,6)}.${ext}`;
+      const { error: upErr } = await sb.storage.from('poi_photos').upload(path, file, { cacheControl: '3600', upsert: false });
+      if (upErr) { console.warn('[poilove] storage skip:', upErr.message); continue; }
+      const { data: urlData } = sb.storage.from('poi_photos').getPublicUrl(path);
+      urls.push(urlData.publicUrl);
+    } catch(e) { console.warn('[poilove] storage error:', e); }
+  }
+  return urls;
+}
+
 // ── SAVE POI reale ──
 async function savePOIToDB(data) {
   if (!currentUser) {
@@ -2587,20 +2656,14 @@ async function savePOIToDB(data) {
     updated_at: new Date().toISOString()
   }, { onConflict: 'id' });
 
-  // Upload foto su Storage (con fallback silenzioso se bucket non raggiungibile)
+  // Upload foto: PRIMA prova media.poilove.com (architettura voluta — converte in WebP),
+  // FALLBACK Supabase Storage se il media server è down o non raggiungibile.
   const photoUrls = [];
-  for (const file of data.files || []) {
-    if (!file) continue;
-    try {
-      const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
-      const path = `${currentUser.id}/${Date.now()}_${Math.random().toString(36).substr(2,6)}.${ext}`;
-      const { error: upErr } = await sb.storage.from('poi_photos').upload(path, file, { cacheControl: '3600', upsert: false });
-      if (upErr) { console.warn('Photo upload skip:', upErr.message); continue; }
-      const { data: urlData } = sb.storage.from('poi_photos').getPublicUrl(path);
-      photoUrls.push(urlData.publicUrl);
-    } catch(e) { console.warn('Photo upload error:', e); }
+  const filesToUpload = (data.files || []).filter(Boolean);
+  if (filesToUpload.length) {
+    photoUrls.push(...await uploadPhotosToMediaServer(filesToUpload, data.poi_id_temp));
   }
-  // Includi URL Unsplash scelti (non file reali, già URL stringa)
+  // Includi URL Unsplash/Wikimedia scelti (già stringhe)
   for (const url of data.unsplashUrls || []) {
     if (url) photoUrls.push(url);
   }
@@ -3492,34 +3555,182 @@ function renderPoiTab(){
     list.innerHTML = '<div class="poi-list-empty">Nessun POI ancora. Tocca <strong>+</strong> per crearne uno.</div>';
     return;
   }
-  list.innerHTML = items.map(p=>{
+  // Memorizza index per accesso rapido nelle azioni (e clicabilità riga)
+  // Salvo direttamente l'oggetto p in una mappa globale: _poiTabIndex[id] = p
+  if(!window._poiTabIndex) window._poiTabIndex = {};
+  list.innerHTML = items.map((p,idx)=>{
+    const key = p.id || `idx_${idx}`;
+    window._poiTabIndex[key] = p;
     const dist = (poiSubtab==='near' && gpsPos)? haversineKm(gpsPos.lat,gpsPos.lng,p.lat,p.lng).toFixed(1)+' km' : '';
-    const emoji = ({Cultura:'🏛️',Cibo:'🍽️',Natura:'🌿',Bar:'☕',Storia:'🏰'})[p.cat]||'📍';
+    const emoji = ({Cultura:'🏛️',Cibo:'🍽️',Natura:'🌿',Bar:'☕',Storia:'🏰'})[p.cat||p.category]||'📍';
+    const isMine = currentUser?.id && p.author_id===currentUser.id;
+    // Etichetta visibilità con colore zona
+    const vis = p.visibility || 'community';
+    const visIcon = vis==='private'?'ph-lock-simple':vis==='friends'?'ph-users':'ph-globe';
+    const visLbl = vis==='private'?'Privato':vis==='friends'?'Amici':'Pubblico';
+
     if(poiSubtab==='near'){
-      // Lista semplice — riga di testo, niente bottoni
-      return `<div class="poi-list-row" onclick="centerMapOnPoi(${p.lat},${p.lng})" style="cursor:pointer">
-        <div class="pi-emoji">${emoji}</div>
-        <div class="pi-info">
+      // Lista vicini: click apre dettaglio, "Naviga" lancia maps esterne
+      return `<div class="poi-list-row" data-poi-key="${key}" style="cursor:pointer">
+        <div class="pi-emoji" onclick="openPoiFromTab('${key}')">${emoji}</div>
+        <div class="pi-info" onclick="openPoiFromTab('${key}')">
           <div class="pi-name">${p.name}</div>
-          <div class="pi-sub">${p.cat||''} · ${p.address||''}</div>
+          <div class="pi-sub">${p.cat||p.category||''} · ${p.address||''}</div>
+        </div>
+        <div class="pi-actions">
+          <button class="pi-act-btn" title="Apri sulla mappa" onclick="event.stopPropagation();centerMapOnPoi(${p.lat},${p.lng})"><i class="ph-duotone ph-crosshair"></i></button>
+          <button class="pi-act-btn" title="Naviga verso (Maps esterne)" onclick="event.stopPropagation();navigateToPoi(${p.lat},${p.lng},'${(p.name||'').replace(/'/g,'')}')"><i class="ph-duotone ph-navigation-arrow"></i></button>
         </div>
         <div class="pi-dist">${dist}</div>
       </div>`;
     }
-    return `<div class="poi-list-row">
-      <div class="pi-emoji">${emoji}</div>
-      <div class="pi-info">
+
+    // Lista Miei/Loved: click apre dettaglio, azioni complete
+    return `<div class="poi-list-row" data-poi-key="${key}">
+      <div class="pi-emoji" onclick="openPoiFromTab('${key}')" style="cursor:pointer">${emoji}</div>
+      <div class="pi-info" onclick="openPoiFromTab('${key}')" style="cursor:pointer">
         <div class="pi-name">${p.name}</div>
-        <div class="pi-sub">${p.cat||''} · ❤️ ${p.love||0}</div>
+        <div class="pi-sub"><i class="ph-duotone ${visIcon}" style="font-size:10px"></i> ${visLbl} · ❤️ ${p.love||p.love_count||0}</div>
       </div>
       <div class="pi-actions">
+        <button class="pi-act-btn" title="Naviga verso" onclick="navigateToPoi(${p.lat},${p.lng},'${(p.name||'').replace(/'/g,'')}')"><i class="ph-duotone ph-navigation-arrow"></i></button>
         <button class="pi-act-btn" title="Apri sulla mappa" onclick="centerMapOnPoi(${p.lat},${p.lng})"><i class="ph-duotone ph-map-pin"></i></button>
-        <button class="pi-act-btn" title="Modifica"><i class="ph-duotone ph-pencil"></i></button>
-        <button class="pi-act-btn" title="Condividi"><i class="ph-duotone ph-share-network"></i></button>
-        ${poiSubtab==='mine'?'<button class="pi-act-btn" title="Elimina" style="color:var(--red);border-color:var(--red)"><i class="ph-duotone ph-trash"></i></button>':''}
+        <button class="pi-act-btn" title="Condividi" onclick="sharePoiByKey('${key}')"><i class="ph-duotone ph-share-network"></i></button>
+        ${isMine||poiSubtab==='mine'?`<button class="pi-act-btn" title="Visibilità" onclick="cyclePoiVisibility('${key}')"><i class="ph-duotone ${visIcon}"></i></button>`:''}
+        ${vis==='community'?`<button class="pi-act-btn" title="Suggerisci a Google Maps" onclick="suggestToGoogleMaps('${key}')"><i class="ph-duotone ph-google-logo"></i></button>`:''}
+        ${isMine||poiSubtab==='mine'?`<button class="pi-act-btn" title="Modifica" onclick="editPoiByKey('${key}')"><i class="ph-duotone ph-pencil-simple"></i></button>`:''}
+        ${isMine||poiSubtab==='mine'?`<button class="pi-act-btn" title="Elimina" style="color:var(--red);border-color:var(--red)" onclick="deletePoiByKey('${key}')"><i class="ph-duotone ph-trash"></i></button>`:''}
       </div>
     </div>`;
   }).join('');
+}
+
+/* ══════════════════════════════════════════
+   AZIONI POI dalla lista (Miei / Loved / Vicini)
+   Tutte le azioni leggono il POI da window._poiTabIndex.
+══════════════════════════════════════════ */
+function _poiFromKey(key){ return (window._poiTabIndex||{})[key]; }
+
+function openPoiFromTab(key){
+  const p = _poiFromKey(key);
+  if(!p) return;
+  // Centro la mappa sul POI per contesto, poi apro il dettaglio
+  centerMapOnPoi(p.lat, p.lng);
+  setTimeout(()=>openDBDetail(p), 250);
+}
+
+// Apri Maps esterne con itinerario (sceglie automaticamente l'app più consona)
+function navigateToPoi(lat, lng, name){
+  const isApple = /iPhone|iPad|iPod|Mac/.test(navigator.userAgent);
+  const q = encodeURIComponent(name||'');
+  // Su iOS/macOS apre Apple Maps; altrove Google Maps. L'utente sceglie l'app dal browser.
+  const url = isApple
+    ? `https://maps.apple.com/?daddr=${lat},${lng}&q=${q}`
+    : `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&destination_place_id=${q}`;
+  window.open(url, '_blank', 'noopener');
+  showToast?.(`🧭 Naviga verso ${name||'POI'}`);
+}
+
+// Condivisione: usa Web Share API se disponibile, altrimenti clipboard + toast
+async function sharePoiByKey(key){
+  const p = _poiFromKey(key);
+  if(!p) return;
+  const url = p.id
+    ? `https://demo.poilove.com/?poi=${p.id}`
+    : `https://www.google.com/maps?q=${p.lat},${p.lng}`;
+  const text = `${p.name} — ${p.address||''}`;
+  if(navigator.share){
+    try{
+      await navigator.share({ title: p.name, text, url });
+      return;
+    }catch(_){}
+  }
+  if(navigator.clipboard){
+    await navigator.clipboard.writeText(`${text}\n${url}`);
+    showToast?.('🔗 Link copiato');
+  } else {
+    prompt('Copia il link:', url);
+  }
+}
+
+// Cicla visibilità community → friends → private → community
+async function cyclePoiVisibility(key){
+  const p = _poiFromKey(key);
+  if(!p) return;
+  const order = ['community','friends','private'];
+  const cur = p.visibility || 'community';
+  const next = order[(order.indexOf(cur)+1)%order.length];
+  p.visibility = next;
+  // Persistenza su Supabase se disponibile
+  if(p.id && currentUser?.id && sb){
+    const { error } = await sb.from('pois').update({ visibility: next }).eq('id', p.id).eq('author_id', currentUser.id);
+    if(error){
+      showToast?.('⚠ Errore salvando visibilità');
+      console.warn('[poilove] cyclePoiVisibility:', error.message);
+      return;
+    }
+  }
+  const lblMap = { community:'Pubblico 🌍', friends:'Amici 👥', private:'Privato 🔒' };
+  showToast?.(`Visibilità → ${lblMap[next]}`);
+  renderPoiTab();
+}
+
+// "Suggerisci a Google Maps" — apre la pagina di Google Maps per quel punto
+// con i campi pre-compilati per "Add a missing place" (link standard Google)
+function suggestToGoogleMaps(key){
+  const p = _poiFromKey(key);
+  if(!p) return;
+  // Apre Google Maps centrato sul punto, da lì l'utente può cliccare "Add a missing place"
+  // con i dati che lui stesso può confermare (Google non accetta API esterne per questo)
+  const q = encodeURIComponent(`${p.name} ${p.address||''}`);
+  const url = `https://www.google.com/maps/search/?api=1&query=${q}&center=${p.lat},${p.lng}`;
+  window.open(url, '_blank', 'noopener');
+  // Marca il POI come 'suggested_google' nel DB se è un POI mio
+  if(p.id && currentUser?.id===p.author_id && sb){
+    sb.from('pois').update({ visibility: 'suggested_google' }).eq('id', p.id).then(()=>{
+      p.visibility = 'suggested_google';
+      showToast?.('📤 Aperto su Google Maps · POI marcato come "suggerito"');
+    });
+  } else {
+    showToast?.('📤 Aperto su Google Maps');
+  }
+}
+
+// Modifica: apre il sheet AddPOI con i dati pre-compilati
+function editPoiByKey(key){
+  const p = _poiFromKey(key);
+  if(!p) return;
+  // Riusa la funzione editPOI esistente passando un id DOM se c'è, altrimenti
+  // setta currentPOI e apre il dettaglio in modalità "modifica"
+  if(typeof editPOIByObject==='function') return editPOIByObject(p);
+  // Fallback: apri il dettaglio (da lì c'è il bottone Modifica)
+  openDBDetail(p);
+  showToast?.('Tocca "Modifica" nel dettaglio');
+}
+
+// Elimina con conferma
+async function deletePoiByKey(key){
+  const p = _poiFromKey(key);
+  if(!p) return;
+  if(!confirm(`Eliminare "${p.name}"?\nQuesta azione non può essere annullata.`)) return;
+  if(p.id && currentUser?.id && sb){
+    const { error } = await sb.from('pois').delete().eq('id', p.id).eq('author_id', currentUser.id);
+    if(error){
+      showToast?.('⚠ Errore eliminazione: '+error.message);
+      return;
+    }
+  }
+  // Rimuovi anche da array locale POIS se presente
+  if(typeof POIS!=='undefined'){
+    const i = POIS.findIndex(x=>x.id===p.id || (x.name===p.name && x.lat===p.lat));
+    if(i>=0) POIS.splice(i,1);
+  }
+  delete window._poiTabIndex[key];
+  renderPoiTab();
+  showToast?.(`🗑 "${p.name}" eliminato`);
+  // Aggiorna stat profilo
+  const s = document.getElementById('statPoi');
+  if(s) s.textContent = Math.max(0, parseInt(s.textContent)-1);
 }
 function haversineKm(lat1,lng1,lat2,lng2){
   const R=6371,toRad=d=>d*Math.PI/180;
@@ -3970,9 +4181,33 @@ function openDetail(idx){
   openSheet('detailOv','detailBg','detailSheet');
 }
 function closeDetail(){closeSheet('detailOv','detailBg','detailSheet')}
-// Tasto Escape chiude il POI detail (fix desktop)
+// ESC universale: chiude il primo sheet/popup/overlay aperto trovato
 document.addEventListener('keydown', e => {
-  if(e.key==='Escape' && document.getElementById('detailBg')?.classList.contains('vis')) closeDetail();
+  if(e.key!=='Escape') return;
+  // 1. Trip detail overlay (itinerari)
+  const tdOv = document.getElementById('tripDetailOv');
+  if(tdOv?.classList.contains('open')){ closeTripDetail(); return; }
+  // 2. Avatar / BG popup
+  for(const id of ['avPopupOv','bgPopupOv','photoPickerOv']){
+    const el = document.getElementById(id);
+    if(el?.classList.contains('open')){ el.classList.remove('open'); return; }
+  }
+  // 3. Public profile
+  if(document.getElementById('publicProfile')?.style.display==='block'){
+    if(typeof togglePublicProfile==='function'){ togglePublicProfile(false); return; }
+  }
+  // 4. Qualunque sheet aperto (cerca .sheet.open)
+  const openSheetEl = document.querySelector('.sheet.open');
+  if(openSheetEl){
+    const sheetId = openSheetEl.id;                            // es. detailSheet
+    const base = sheetId.replace(/Sheet$/,'');                  // es. detail
+    const ov = document.getElementById(base+'Ov');
+    const bg = document.getElementById(base+'Bg');
+    if(bg && bg.classList.contains('vis')) closeSheet(ov?.id||(base+'Ov'), bg.id, sheetId);
+    return;
+  }
+  // 5. Hero bg picker / token modal / vanity edit ecc.
+  document.getElementById('heroBgPicker')?.classList.remove('open');
 });
 function toggleLove(){
   const btn=document.getElementById('loveBtn'),heart=document.getElementById('loveHeart'),cnt=document.getElementById('loveCnt');
@@ -5241,14 +5476,11 @@ function openEditPOI(){
 
 async function savePOIEdit(data){
   if(!editingPOIId||!currentUser) return null;
-  const photoUrls=[];
-  for(const file of data.files||[]){
-    if(!file) continue;
-    const ext=file.name.split('.').pop();
-    const path=`${currentUser.id}/${Date.now()}_edit.${ext}`;
-    const {error:upErr}=await sb.storage.from('poi_photos').upload(path,file,{cacheControl:'3600',upsert:false});
-    if(!upErr){const {data:u}=sb.storage.from('poi_photos').getPublicUrl(path);photoUrls.push(u.publicUrl);}
-  }
+  // Usa media.poilove.com (con fallback Supabase Storage) invece dell'upload diretto
+  const newFiles = (data.files || []).filter(Boolean);
+  const photoUrls = newFiles.length
+    ? await uploadPhotosToMediaServer(newFiles, editingPOIId)
+    : [];
   // Mantieni foto esistenti se non è stato uploadato niente di nuovo
   const finalPhotos=photoUrls.length?photoUrls:(Array.isArray(currentPOI?.photos)?currentPOI.photos:[]);
   const {data:updated,error}=await sb.from('pois').update({

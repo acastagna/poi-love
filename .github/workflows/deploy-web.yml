@@ -9,14 +9,13 @@
 name: Deploy → poilove.com (root)
 
 on:
-  # Auto-deploy DISATTIVATO 2026-05-08: usiamo Plesk Git pull manuale.
-  # Per pubblicare su poilove.com: vai su Plesk → poilove.com → Git → "Pull updates"
-  # (Per riattivare l'auto-deploy SSH+rsync, decommenta il blocco "push" sotto)
-  # push:
-  #   branches: [main]
-  #   paths:
-  #     - 'web/**'
-  #     - '.github/workflows/deploy-web.yml'
+  # Auto-deploy RIATTIVATO 2026-05-10 (era disattivato 2026-05-08).
+  # Push su main + path matching → SSH+rsync verso httpdocs/ poilove.com
+  push:
+    branches: [main]
+    paths:
+      - 'web/**'
+      - '.github/workflows/deploy-web.yml'
   workflow_dispatch:
 
 jobs:

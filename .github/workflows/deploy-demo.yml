@@ -1,0 +1,72 @@
+# =============================================================================
+# POI•LOVE — GitHub Actions: Deploy demo/ → demo.poilove.com
+# Trigger: push su main con modifiche in demo/
+# Destinazione: /var/www/vhosts/poilove.com/demo.poilove.com/demo/ via SSH+rsync
+# Cultural Bridge OS · MIT License
+# =============================================================================
+#
+# SECRETS RICHIESTI (alcuni già presenti dalla setup web/media):
+#   PLESK_HOST       → IP/hostname server (riusa quello esistente)
+#   PLESK_USER       → username SSH Plesk (riusa)
+#   PLESK_SSH_KEY    → chiave SSH privata (riusa)
+#   PLESK_PORT       → porta SSH (riusa)
+#   PLESK_DEMO_PATH  → path assoluto cartella demo on Plesk (NUOVO)
+#                      es: /var/www/vhosts/poilove.com/demo.poilove.com/demo
+#
+# NOTA: il document root di demo.poilove.com punta alla sotto-cartella `demo/`
+# del repo Git pull-based, non a `httpdocs/`. Vedi CLAUDE.md.
+# =============================================================================
+
+name: Deploy → demo.poilove.com
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'demo/**'
+      - '.github/workflows/deploy-demo.yml'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Sync demo/ → Plesk demo.poilove.com
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.PLESK_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p "${{ secrets.PLESK_PORT }}" -H "${{ secrets.PLESK_HOST }}" \
+            >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Deploy via rsync → demo.poilove.com docroot
+        run: |
+          rsync -avz --delete \
+            --exclude='.git' \
+            --exclude='*.md' \
+            --exclude='.DS_Store' \
+            -e "ssh -i ~/.ssh/deploy_key -p ${{ secrets.PLESK_PORT }} -o StrictHostKeyChecking=no" \
+            demo/ \
+            "${{ secrets.PLESK_USER }}@${{ secrets.PLESK_HOST }}:${{ secrets.PLESK_DEMO_PATH }}/"
+
+      - name: Health check
+        run: |
+          sleep 4
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://demo.poilove.com/")
+          SIZE=$(curl -s -o /dev/null -w "%{size_download}" "https://demo.poilove.com/")
+          echo "Health check: HTTP $STATUS, ${SIZE} bytes"
+          if [ "$STATUS" != "200" ]; then
+            echo "::warning::demo.poilove.com risponde $STATUS"
+          else
+            echo "::notice::Deploy OK — demo.poilove.com ${SIZE} bytes"
+          fi
+
+      - name: Cleanup SSH key
+        if: always()
+        run: rm -f ~/.ssh/deploy_key
