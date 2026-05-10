@@ -37,6 +37,30 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # ⚠️ Guardia di sicurezza: blocca subito se i secret critici sono vuoti.
+      # Senza questo controllo, rsync con --delete rischia di sincronizzare verso "/"
+      # del server (root filesystem) e cancellare altri vhost.
+      - name: Verifica secrets richiesti
+        env:
+          DEMO_PATH: ${{ secrets.PLESK_DEMO_PATH }}
+          PLESK_HOST: ${{ secrets.PLESK_HOST }}
+          PLESK_USER: ${{ secrets.PLESK_USER }}
+        run: |
+          if [ -z "$DEMO_PATH" ]; then
+            echo "::error::PLESK_DEMO_PATH non configurato. Aggiungilo in Settings → Secrets → Actions"
+            echo "Valore atteso: /var/www/vhosts/poilove.com/demo.poilove.com/demo"
+            exit 1
+          fi
+          if [[ "$DEMO_PATH" != /var/www/vhosts/poilove.com/* ]]; then
+            echo "::error::PLESK_DEMO_PATH deve iniziare con /var/www/vhosts/poilove.com/ (sicurezza)"
+            exit 1
+          fi
+          if [ -z "$PLESK_HOST" ] || [ -z "$PLESK_USER" ]; then
+            echo "::error::PLESK_HOST o PLESK_USER non configurati"
+            exit 1
+          fi
+          echo "✓ Tutti i secret presenti, target: $PLESK_USER@$PLESK_HOST:$DEMO_PATH"
+
       - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
@@ -45,9 +69,11 @@ jobs:
           ssh-keyscan -p "${{ secrets.PLESK_PORT }}" -H "${{ secrets.PLESK_HOST }}" \
             >> ~/.ssh/known_hosts 2>/dev/null
 
+      # NB: niente --delete per sicurezza. Se servirà sync stretto, abilitarlo
+      # solo dopo aver verificato il path con un dry-run.
       - name: Deploy via rsync → demo.poilove.com docroot
         run: |
-          rsync -avz --delete \
+          rsync -avz \
             --exclude='.git' \
             --exclude='*.md' \
             --exclude='.DS_Store' \

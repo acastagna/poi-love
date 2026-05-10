@@ -28,6 +28,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # ⚠️ Guardia di sicurezza: blocca se PLESK_WEB_PATH non è in /var/www/vhosts/poilove.com/
+      - name: Verifica secrets richiesti
+        env:
+          WEB_PATH: ${{ secrets.PLESK_WEB_PATH }}
+        run: |
+          if [ -z "$WEB_PATH" ]; then
+            echo "::error::PLESK_WEB_PATH non configurato"
+            exit 1
+          fi
+          if [[ "$WEB_PATH" != /var/www/vhosts/poilove.com/* ]]; then
+            echo "::error::PLESK_WEB_PATH deve iniziare con /var/www/vhosts/poilove.com/"
+            exit 1
+          fi
+          echo "✓ Target: $WEB_PATH"
+
       - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
