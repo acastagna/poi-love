@@ -1,5 +1,69 @@
 # POI•LOVE — CLAUDE.md
 > Leggi questo file per intero prima di ogni sessione. È la fonte di verità del progetto.
+> Vedi anche `STORICO-LAVORI.md` per il registro cronologico delle sessioni.
+
+---
+
+## 🟢 STATO AL 10/05/2026 sera — Da dove riprende la prossima sessione
+
+**HEAD GitHub `main`**: `47fb29b`
+**Commit recenti**:
+```
+47fb29b  chore(demo): inverti ordine chip lingua → EN · SQ · IT
+1df6ff5  feat(demo): chip lingua glassmorphism nell'auth overlay
+d3daf48  feat(demo): traduzioni IT/SQ/EN complete + auto-detect dispositivo
+ccf721b  feat(demo+sal+web): auth restyle + 2 cuori animati + logo SVG ufficiali
+2185737  docs: incident report 10/05/2026 + REGOLE HARD per Claude
+04e2e71  (08/05) stato pre-disastro
+```
+
+**Stato live siti**:
+
+| URL | Live HEAD | Note |
+|---|---|---|
+| https://demo.poilove.com/ | `47fb29b` (414 KB) ✅ | aggiornato oggi — auth nuovo + cuori + logo SVG + EN/SQ/IT |
+| https://poilove.com/ | `04e2e71` (08/05) | **da pullare** (`web/img/` aggiunto in `ccf721b`) |
+| https://sal.poilove.com/ | `04e2e71` (08/05) | **da pullare** (`sal/img/` aggiunto in `ccf721b`, logo path relativo) |
+| https://media.poilove.com/test.php | OK con 503 applicativo | DNS server-side non risolve `*.supabase.co` (problema pre-esistente) |
+
+**Branch backup attivo** (con feature in attesa di re-merge):
+- `origin/wip/2026-05-10-task7-auth` → `4f38c83`
+- Contiene: lista POI cliccabile + bottoni completi, chiusura overlay ESC universale, sistema colori per zone, itinerari griglia quadrata, sfondo profilo AI, salvataggio reale Supabase, email mailto, upload via media.poilove.com, diagnostica boot, migration SQL `002_profile_cover.sql`
+- **Da cherry-pickare** una funzione alla volta nelle prossime sessioni (skip dei workflow rischiosi)
+
+### 📋 Quick start prossima sessione (in ordine)
+
+1. **Leggere `STORICO-LAVORI.md` sezione 10/05** per capire cosa è successo
+2. **Leggere REGOLE HARD** sotto in questo file (NON negoziabili dopo l'incident del 10/05)
+3. **Plesk pull `web/` e `sal/`** per allineare i 2 sotto-domini al HEAD GitHub
+4. **Test Google OAuth live** sul demo (bottone G nell'auth overlay)
+5. **Setup OAuth provider** in ordine difficoltà:
+   1. X (Twitter) — gratuito, ~10-15 min
+   2. LinkedIn OIDC — gratuito, ~10 min
+   3. Facebook — gratuito ma richiede privacy policy URL + App Review Meta, ~15-25 min
+   4. Apple Sign In — RIMANDATO a giugno 2026 (lancio prodotto, $99/anno Developer Program)
+6. **Migration SQL `002_profile_cover.sql`** in Supabase SQL Editor (cover_url + cover_type) — quando riportiamo lo sfondo profilo AI da `wip`
+7. **Riportare feature da `wip/2026-05-10-task7-auth`** una alla volta:
+   - Lista POI cliccabile + bottoni completi
+   - Chiusura overlay ESC universale + tap-out
+   - Sistema colori per zone
+   - Itinerari griglia quadrata
+   - Sfondo profilo AI (richiede SQL migration)
+   - Salvataggio reale Supabase
+   - Email inviti compagni mailto
+   - Upload via media.poilove.com con fallback Supabase Storage
+   - Diagnostica connessione al boot
+8. **Fix DNS server-side media.poilove.com** (richiede SSH server) — `8.8.8.8` in `/etc/resolv.conf` di poilove.com_*** subscription
+9. **Eventualmente** rigenerare SSH key Plesk + secret `PLESK_SSH_KEY` per riattivare auto-deploy GitHub Actions (opzionale)
+
+### ⚠️ Quello che la prossima sessione NON deve fare senza ack
+
+- Modificare `.github/workflows/*.yml`
+- Eseguire `gh secret set`, `gh workflow run`, `gh secret delete`
+- Eseguire `git push --force` o `--force-with-lease`
+- Riattivare `push:` trigger nei workflow disattivati
+- Usare `--delete` in rsync
+- Usare scrittura SSH su `/var/www/vhosts/poilove.com/`
 
 ---
 
