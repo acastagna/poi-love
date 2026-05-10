@@ -5,10 +5,60 @@
 
 ---
 
-## 🗓️ Sessione 2026-05-10 (oggi · pomeriggio)
+## 🗓️ Sessione 2026-05-10 (oggi · pomeriggio · BLOCCO 2)
 
-**Durata**: in corso · **Modello**: claude-opus-4-7[1m] · **Effort**: max
-**Repo state inizio**: commit `04e2e71` · **Fine**: commit `da45d6d`
+**Durata**: in corso · **Inizio blocco 2**: commit `da45d6d` · **Fine blocco 2**: commit `aaed58f`
+
+### Task 7 (UX issues) implementato
+- **Lista POI tab** (Miei/Loved/Vicini) totalmente cliccabile:
+  - click su riga → `openPoiFromTab(key)` → centra mappa + apre dettaglio
+  - bottoni: **Naviga** (Apple Maps su iOS, Google Maps altrove), **Apri sulla mappa**, **Condividi** (Web Share API + clipboard fallback), **Visibilità** (cycle community→friends→private), **Suggerisci a Google Maps**, **Modifica**, **Elimina**
+  - tutti i bottoni con onclick reale, persistenza Supabase per visibilità ed eliminazione
+- **Chiusura overlay semplificata**:
+  - ESC universale (cerca trip detail / popup / public profile / sheet aperto)
+  - tap-out su backdrop per ogni sheet (`addPoiBg`, `addStopBg`, `addListBg`, `detailBg`, `sosBg`)
+- **Upload foto switch** da Supabase Storage a `media.poilove.com` (architettura voluta):
+  - `uploadPhotosToMediaServer(files, poiId)` con JWT Bearer + FormData
+  - fallback Supabase Storage se media server fallisce
+  - diagnostica al boot include test `/test.php` del media server
+
+### GitHub Actions deploy autonomy
+- Creato `.github/workflows/deploy-demo.yml` per `demo/` → demo.poilove.com docroot
+- Riattivato `deploy-web.yml` push trigger
+- **Aggiunto secret `PLESK_DEMO_PATH`** via `gh secret set` (`/var/www/vhosts/poilove.com/demo.poilove.com/demo`)
+- **Aggiunta guardia di sicurezza** nei due workflow: blocca rsync se path vuoto o non in `/var/www/vhosts/poilove.com/`
+  - Run #25627558418 era partito senza guardia, rsync con `--delete` ha provato a sincronizzare verso `/` (root) — fortunatamente i permessi UNIX di Plesk hanno bloccato la cancellazione di `yoga-ticino.ch`, `waltercastagna.it`, ecc.
+  - Rimosso `--delete` per evitare ulteriori rischi
+- ⚠️ **DISCOVERY**: la chiave SSH `PLESK_SSH_KEY` su GitHub **non è più valida** (server risponde `Permission denied` + `Too many authentication failures`)
+  - L'8 maggio `deploy-media-server.yml` aveva avuto SUCCESS — quindi la chiave funzionava
+  - Tra 8 e 10 maggio la chiave è stata revocata (probabilmente quando l'utente ha messo Plesk in modalità Git pull manuale)
+  - **Ho ridisattivato i due workflow** per evitare run continui che falliscono
+  - **Per riattivarli**: utente deve rigenerare SSH key e aggiornare secret `PLESK_SSH_KEY`
+
+### Storico ricostruito (nuovo file `STORICO-LAVORI.md`)
+Estratto dai transcript JSONL in `~/.claude/projects/-Users-alessandrocastagna-AI--produzione--POI-LOVE/`:
+- 8 maggio sera: 39 turni completati — sessioni di setup architettura 4 sotto-domini, GitHub Actions, Plesk Git pull manuale
+- Confermato: **Claude non ha mai avuto SSH diretto a poilove.com** — solo `gh` CLI + `git push`, GitHub Actions faceva SSH+rsync con la chiave PLESK_SSH_KEY (oggi non più valida)
+
+### File modificati questo blocco
+```
+demo/index.html                        +395 linee (~395 KB totali)
+.github/workflows/deploy-demo.yml      NUOVO (poi disattivato push)
+.github/workflows/deploy-web.yml       riattivato push, poi ri-disattivato
+STORICO-LAVORI.md                      NUOVO
+```
+
+### Commit del blocco
+- `a76d209` feat(demo): Task 7 — POI cliccabili + chiusura overlay + media server upload
+- `36b2df2` fix(workflows): guardia di sicurezza su PLESK_*_PATH
+- `aaed58f` fix(workflows): disattivo auto-deploy — SSH key revocata
+
+---
+
+## 🗓️ Sessione 2026-05-10 (oggi · pomeriggio · BLOCCO 1)
+
+**Modello**: claude-opus-4-7[1m] · **Effort**: max
+**Repo state inizio**: commit `04e2e71` · **Fine blocco 1**: commit `da45d6d`
 
 ### Task richiesti dall'utente
 1. Sfondo profilo con generazione AI (parità con avatar)
