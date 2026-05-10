@@ -1146,50 +1146,50 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
     </div>
   </div>
   <img class="auth-logo" src="img/logo-completo.svg" onerror="this.src='https://demo.poilove.com/img/logo-completo.svg'" alt="POI•LOVE">
-  <h3 class="auth-tagline">i luoghi del cuore</h3>
+  <h3 class="auth-tagline" data-t="auth_tagline">i luoghi del cuore</h3>
 
   <!-- 1. ID Apple — bottone primary in alto -->
-  <button class="auth-btn auth-btn-apple" onclick="signInWithApple()">
+  <button class="auth-btn auth-btn-apple" onclick="signInWithApple()" data-tt="auth_continue_apple">
     <svg viewBox="0 0 24 24"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
-    ID Apple
+    <span data-t="auth_apple">ID Apple</span>
   </button>
 
   <!-- 2. Biometria (passkey/WebAuthn) — Android Credential Manager · iOS Face/Touch · desktop -->
   <button class="auth-btn auth-btn-passkey" id="authPasskeyBtn" onclick="signInWithPasskey()">
-    <i class="ph-duotone ph-fingerprint"></i> Accedi con Biometria
+    <i class="ph-duotone ph-fingerprint"></i> <span data-t="auth_passkey">Accedi con Biometria</span>
   </button>
 
   <!-- 3. Riga social compatta — Google · Facebook · LinkedIn · X (4 al 25%) -->
   <div class="auth-socials">
-    <button class="auth-social-btn gg" onclick="signInWithGoogle()" aria-label="Continua con Google" title="Continua con Google">
+    <button class="auth-social-btn gg" onclick="signInWithGoogle()" data-tt="auth_continue_google" aria-label="Continue with Google">
       <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
     </button>
-    <button class="auth-social-btn fb" onclick="signInWithFacebook()" aria-label="Continua con Facebook" title="Continua con Facebook">
+    <button class="auth-social-btn fb" onclick="signInWithFacebook()" data-tt="auth_continue_fb" aria-label="Continue with Facebook">
       <svg viewBox="0 0 24 24" fill="#fff"><path d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.79-4.69 4.53-4.69 1.31 0 2.69.24 2.69.24v2.97h-1.52c-1.49 0-1.96.93-1.96 1.89v2.27h3.33l-.53 3.49h-2.8V24C19.61 23.1 24 18.1 24 12.07z"/></svg>
     </button>
-    <button class="auth-social-btn li" onclick="signInWithLinkedIn()" aria-label="Continua con LinkedIn" title="Continua con LinkedIn">
+    <button class="auth-social-btn li" onclick="signInWithLinkedIn()" data-tt="auth_continue_li" aria-label="Continue with LinkedIn">
       <svg viewBox="0 0 24 24" fill="#fff"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.67H9.35V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.07 2.07 0 1 1 0-4.14 2.07 2.07 0 0 1 0 4.14zM7.12 20.45H3.55V9h3.57v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/></svg>
     </button>
-    <button class="auth-social-btn tw" onclick="signInWithTwitter()" aria-label="Continua con X" title="Continua con X">
+    <button class="auth-social-btn tw" onclick="signInWithTwitter()" data-tt="auth_continue_x" aria-label="Continue with X">
       <svg viewBox="0 0 24 24" fill="#fff"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231 5.45-6.231zm-1.16 17.52h1.833L7.084 4.126H5.117L17.083 19.77z"/></svg>
     </button>
   </div>
 
-  <div class="auth-divider">oppure con magic link via email</div>
+  <div class="auth-divider" data-t="auth_or_magic">oppure con magic link via email</div>
   <div class="auth-magic">
     <div class="auth-email-row">
-      <input class="auth-email-in" id="authEmailIn" type="email" placeholder="la-tua@email.com"
+      <input class="auth-email-in" id="authEmailIn" type="email" data-tp="auth_email_ph" placeholder="la-tua@email.com"
         onkeydown="if(event.key==='Enter')sendMagicLink()"/>
-      <button class="auth-email-send" onclick="sendMagicLink()">Invia link</button>
+      <button class="auth-email-send" onclick="sendMagicLink()" data-t="auth_email_send">Invia link</button>
     </div>
   </div>
   <div class="auth-footer">
-    Accedendo accetti i Termini di servizio di POI•LOVE<br>
-    Progetto Open Source · MIT License · © 2026 321.AL
+    <span data-t="auth_terms">Accedendo accetti i Termini di servizio di POI•LOVE</span><br>
+    <span data-t="auth_oss">Progetto Open Source · MIT License · © 2026 321.AL</span>
   </div>
   <!-- DEMO BYPASS -->
   <button class="auth-demo-btn" onclick="enterDemoMode()">
-    <i class="ph-duotone ph-eye"></i> Esplora in modalità demo
+    <i class="ph-duotone ph-eye"></i> <span data-t="auth_demo">Esplora in modalità demo</span>
   </button>
 </div>
 
@@ -2222,7 +2222,7 @@ function enterDemoMode() {
   if (typeof initMap === 'function') {
     try { initMap(); } catch(e) {}
   }
-  showToast('Modalità demo attiva 👁');
+  showToast(t('auth_demo_active'));
 }
 // ──────────────────────────────────────────────────────────
 
@@ -2369,7 +2369,7 @@ function onAuthStateUpdate(event) {
     } catch(_){}
     const meta = currentUser.user_metadata || {};
     const fname = (meta.full_name || meta.name || currentUser.email?.split('@')[0] || '').split(' ')[0];
-    showToast(fname ? `👋 Bentornato, ${fname}!` : '👋 Bentornato!');
+    showToast(fname ? `👋 ${t('auth_welcome_back')}, ${fname}!` : `👋 ${t('auth_welcome_back')}!`);
   } else {
     overlay.style.display = 'flex';
   }
@@ -2453,73 +2453,48 @@ const AUTH_REDIRECT = (location.origin && location.origin.startsWith('http'))
   ? location.origin + location.pathname
   : 'https://demo.poilove.com/';
 
+function _providerErrorToast(name, error){
+  if(!error) return;
+  if(/provider.*not.*enabled|disabled/i.test(error.message||'')){
+    showToast(`⚠ ${name} ${t('auth_provider_off')}`);
+  } else {
+    showToast(`Error ${name}: ${error.message}`);
+  }
+}
+
 async function signInWithGoogle() {
   const { error } = await sb.auth.signInWithOAuth({
-    provider: 'google',
-    options: { redirectTo: AUTH_REDIRECT }
+    provider: 'google', options: { redirectTo: AUTH_REDIRECT }
   });
-  if (error) showToast('Errore Google: ' + error.message);
+  _providerErrorToast('Google', error);
 }
 
 async function signInWithLinkedIn() {
-  // Provider LinkedIn (OIDC) — richiede abilitazione in Supabase → Auth → Providers
   const { error } = await sb.auth.signInWithOAuth({
-    provider: 'linkedin_oidc',
-    options: { redirectTo: AUTH_REDIRECT }
+    provider: 'linkedin_oidc', options: { redirectTo: AUTH_REDIRECT }
   });
-  if (error) {
-    if (/provider.*not.*enabled|disabled/i.test(error.message||'')) {
-      showToast('⚠ LinkedIn non ancora attivato (Supabase → Auth → Providers)');
-    } else {
-      showToast('Errore LinkedIn: ' + error.message);
-    }
-  }
+  _providerErrorToast('LinkedIn', error);
 }
 
 async function signInWithFacebook() {
-  // Provider Facebook — richiede abilitazione in Supabase → Auth → Providers
   const { error } = await sb.auth.signInWithOAuth({
-    provider: 'facebook',
-    options: { redirectTo: AUTH_REDIRECT }
+    provider: 'facebook', options: { redirectTo: AUTH_REDIRECT }
   });
-  if (error) {
-    if (/provider.*not.*enabled|disabled/i.test(error.message||'')) {
-      showToast('⚠ Facebook non ancora attivato (Supabase → Auth → Providers)');
-    } else {
-      showToast('Errore Facebook: ' + error.message);
-    }
-  }
+  _providerErrorToast('Facebook', error);
 }
 
 async function signInWithApple() {
-  // Provider Apple — richiede abilitazione in Supabase → Auth → Providers
-  // (Apple Developer Program: Service ID + Team ID + Key ID + private key .p8)
   const { error } = await sb.auth.signInWithOAuth({
-    provider: 'apple',
-    options: { redirectTo: AUTH_REDIRECT }
+    provider: 'apple', options: { redirectTo: AUTH_REDIRECT }
   });
-  if (error) {
-    if (/provider.*not.*enabled|disabled/i.test(error.message||'')) {
-      showToast('⚠ Apple non ancora attivato (Supabase → Auth → Providers)');
-    } else {
-      showToast('Errore Apple: ' + error.message);
-    }
-  }
+  _providerErrorToast('Apple', error);
 }
 
 async function signInWithTwitter() {
-  // Provider X (Twitter) — richiede abilitazione in Supabase → Auth → Providers
   const { error } = await sb.auth.signInWithOAuth({
-    provider: 'twitter',
-    options: { redirectTo: AUTH_REDIRECT }
+    provider: 'twitter', options: { redirectTo: AUTH_REDIRECT }
   });
-  if (error) {
-    if (/provider.*not.*enabled|disabled/i.test(error.message||'')) {
-      showToast('⚠ X (Twitter) non ancora attivato (Supabase → Auth → Providers)');
-    } else {
-      showToast('Errore X: ' + error.message);
-    }
-  }
+  _providerErrorToast('X', error);
 }
 
 /* ── PASSKEY (WebAuthn) — biometric login per Android/iOS/desktop ──
@@ -2546,22 +2521,21 @@ async function signInWithPasskey(){
   }
   // Fallback pulito: magic link verso l'email memorizzata
   document.getElementById('authEmailIn').value = lastEmail;
-  showToast(`🔐 Riconnessione a ${lastEmail}…`);
+  showToast(`🔐 ${t('auth_passkey_as')} ${lastEmail}…`);
   return sendMagicLink();
 }
 
 async function sendMagicLink() {
   const email = document.getElementById('authEmailIn')?.value?.trim();
-  if (!email || !email.includes('@')) { showToast('Inserisci una email valida'); return; }
-  // Memorizza l'email per "ricordami" / passkey shortcut
+  if (!email || !email.includes('@')) { showToast(t('auth_email_invalid')); return; }
   try { localStorage.setItem('poilove_last_email', email); } catch(_){}
   const { error } = await sb.auth.signInWithOtp({
     email,
     options: { emailRedirectTo: AUTH_REDIRECT }
   });
-  if (error) showToast('Errore: ' + error.message);
+  if (error) showToast('Error: ' + error.message);
   else {
-    showToast('📧 Link inviato! Controlla la mail.');
+    showToast(t('auth_link_sent'));
     document.getElementById('authEmailIn').value = '';
   }
 }
@@ -2575,7 +2549,7 @@ async function sendMagicLink() {
     const lastEmail = localStorage.getItem('poilove_last_email');
     if(lastEmail){
       const handle = lastEmail.split('@')[0];
-      btn.innerHTML = `<i class="ph-duotone ph-fingerprint"></i> Accedi come <strong style="margin-left:4px">${handle}</strong>`;
+      btn.innerHTML = `<i class="ph-duotone ph-fingerprint"></i> ${t('auth_passkey_as')} <strong style="margin-left:4px">${handle}</strong>`;
     }
     // Verifica disponibilità WebAuthn (per stile, non blocco — il fallback magic link funziona sempre)
     if(window.PublicKeyCredential && navigator.credentials){
@@ -2964,29 +2938,89 @@ function generateAvatar(){
    TRANSLATIONS
 ══════════════════════════════════════════ */
 const T={
-  it:{nav_map:'Mappa',nav_itin:'Itinerari',nav_profile:'Profilo',mt_street:'Stradale',mt_sat:'Satellite',mt_routes:'Rotte Storiche',fab_poi:'Segna un luogo',fab_itin:'Tappa Itinerario',add_title:'Salva questo posto',add_sub:'Aggiungi un luogo che ami',add_challenge:'Riesci in 60 secondi?',loc_hint_use:'Usa come nome',congrats:'',lbl_name:'Nome del posto',req:'OBBLIGATORIO',lbl_where:'Dove si trova',loc_gps:'GPS Live',loc_exif:'Foto EXIF',loc_addr:'Indirizzo',loc_map:'Tocca mappa',lbl_photos:'Foto',ph_main:'Principale',ph_2:'Foto 2',ph_3:'Foto 3',ph_hint:'Non sei sul posto? Puoi aggiungere foto in seguito.',lbl_story:'Racconta',lbl_cat:'Categorie',lbl_list:'Aggiungi a una lista',lbl_route:'Rotta Storica',route_none:'Nessuna rotta storica',lbl_vis:'Visibilità',vis_pub_btn:'Pubblico',vis_prv_btn:'Privato',vis_share_btn:'Condividi',save_disabled:'Inserisci il nome per continuare',save_ready:'Segna sulla mappa',google_suggest:'Consiglia a Google Maps',stop_title:'Tappa Itinerario',stop_sub:'Senza foto. Pianifica ora, racconta quando ci sei.',stop_lbl_name:'Nome della tappa',stop_lbl_cat:'Categoria',stop_lbl_vis:'Visibilità Itinerario',itin_pub:'Pubblico',itin_prv:'Privato',stop_lbl_date:'Data prevista',stop_save:'Aggiungi tappa',stat_poi:'POI',stat_love:'Love',stat_list:'Liste',prof_lists:'Le mie liste',prof_new_list:'Nuova lista',prof_tags:'I miei tag',prof_new_tag:'Aggiungi',prof_my_poi:'I miei POI',prof_add_poi:'Aggiungi',prof_pub_toggle:'Come mi vedono gli altri',itin_h:'Itinerari di Viaggio',itin_desc:'Pianifica le tue tappe prima di partire. Trova compagni di viaggio. Trasforma ogni tappa in un POI quando sei sul posto.',itin_open:'Apri Itinerari',itin_note:'Demo con mappa, mini-calendario, GPS live e compagni.',back:'Indietro',cr_top:'Creazione di POI•LOVE di 321.AL',cr_bot:'Progetto Open Source · Ideazione e Dir. Creativa: Alessandro Castagna© · Licenza MIT',},
-  sq:{nav_map:'Harta',nav_itin:'Itinerare',nav_profile:'Profili',mt_street:'Rrugore',mt_sat:'Satelitor',mt_routes:'Rrugët Historike',fab_poi:'Shëno një vend',fab_itin:'Stacion Itinerarit',add_title:'Ruaj këtë vend',add_sub:'Shto një vend që e do',add_challenge:'Arrin brenda 60 sekondave?',loc_hint_use:'Përdor si emër',congrats:'',lbl_name:'Emri i vendit',req:'E DETYRUESHME',lbl_where:'Ku ndodhet',loc_gps:'GPS Live',loc_exif:'EXIF Foto',loc_addr:'Adresë',loc_map:'Prek hartën',lbl_photos:'Foto',ph_main:'Kryesore',ph_2:'Foto 2',ph_3:'Foto 3',ph_hint:'Nuk jeni aty? Mund të shtoni foto më vonë.',lbl_story:'Trego',lbl_cat:'Kategori',lbl_list:'Shto në listë',lbl_route:'Rrugë Historike',route_none:'Asnjë rrugë historike',lbl_vis:'Dukshmëria',vis_pub_btn:'Publik',vis_prv_btn:'Privat',vis_share_btn:'Nda',save_disabled:'Fut emrin për të vazhduar',save_ready:'Shëno në hartë',google_suggest:'Sugjeroni te Google Maps',stop_title:'Stacion Itinerarit',stop_sub:'Pa foto. Planifiko tani, trego kur je aty.',stop_lbl_name:'Emri i stacionit',stop_lbl_cat:'Kategori',stop_lbl_vis:'Dukshmëria Itinerarit',itin_pub:'Publik',itin_prv:'Privat',stop_lbl_date:'Data e planifikuar',stop_save:'Shto stacionin',stat_poi:'POI',stat_love:'Love',stat_list:'Lista',prof_lists:'Listat e mia',prof_new_list:'Listë e re',prof_tags:'Etiketat e mia',prof_new_tag:'Shto',prof_my_poi:'POI-të e mia',prof_add_poi:'Shto',prof_pub_toggle:'Si më shohin të tjerët',itin_h:'Itinerare Udhëtimi',itin_desc:'Planifikoni stacionet para nisjes. Gjeni shokë udhëtimi.',itin_open:'Hap Itineraret',itin_note:'Demo me hartë, mini-kalendar, GPS live.',back:'Kthehu',cr_top:'Krijim i POI•LOVE nga 321.AL',cr_bot:'Projekt Open Source · Ide dhe Drejtim Krijues: Alessandro Castagna© · Liçensë MIT',},
-  en:{nav_map:'Map',nav_itin:'Itineraries',nav_profile:'Profile',mt_street:'Street',mt_sat:'Satellite',mt_routes:'Historic Routes',fab_poi:'Mark a place',fab_itin:'Itinerary Stop',add_title:'Save this place',add_sub:'Add a place you love',add_challenge:'Can you do it in 60 seconds?',loc_hint_use:'Use as name',congrats:'',lbl_name:'Place name',req:'REQUIRED',lbl_where:'Where is it',loc_gps:'GPS Live',loc_exif:'Photo EXIF',loc_addr:'Address',loc_map:'Tap map',lbl_photos:'Photos',ph_main:'Main',ph_2:'Photo 2',ph_3:'Photo 3',ph_hint:"Not there yet? You can add photos later.",lbl_story:'Tell your story',lbl_cat:'Categories',lbl_list:'Add to a list',lbl_route:'Historic Route',route_none:'No historic route',lbl_vis:'Visibility',vis_pub_btn:'Public',vis_prv_btn:'Private',vis_share_btn:'Share',save_disabled:'Enter the name to continue',save_ready:'Mark on map',google_suggest:'Suggest to Google Maps',stop_title:'Itinerary Stop',stop_sub:"No photos. Plan now, tell the story when you're there.",stop_lbl_name:'Stop name',stop_lbl_cat:'Category',stop_lbl_vis:'Itinerary Visibility',itin_pub:'Public',itin_prv:'Private',stop_lbl_date:'Planned date',stop_save:'Add stop',stat_poi:'POI',stat_love:'Love',stat_list:'Lists',prof_lists:'My lists',prof_new_list:'New list',prof_tags:'My tags',prof_new_tag:'Add',prof_my_poi:'My POIs',prof_add_poi:'Add',prof_pub_toggle:'How others see me',itin_h:'Travel Itineraries',itin_desc:'Plan your stops before you leave. Find travel companions.',itin_open:'Open Itineraries',itin_note:'Demo with map, mini-calendar, live GPS and companions.',back:'Back',cr_top:'POI•LOVE created by 321.AL',cr_bot:'Open Source Project · Creative Direction: Alessandro Castagna© · MIT License',}
+  it:{nav_map:'Mappa',nav_itin:'Itinerari',nav_profile:'Profilo',mt_street:'Stradale',mt_sat:'Satellite',mt_routes:'Rotte Storiche',fab_poi:'Segna un luogo',fab_itin:'Tappa Itinerario',add_title:'Salva questo posto',add_sub:'Aggiungi un luogo che ami',add_challenge:'Riesci in 60 secondi?',loc_hint_use:'Usa come nome',congrats:'',lbl_name:'Nome del posto',req:'OBBLIGATORIO',lbl_where:'Dove si trova',loc_gps:'GPS Live',loc_exif:'Foto EXIF',loc_addr:'Indirizzo',loc_map:'Tocca mappa',lbl_photos:'Foto',ph_main:'Principale',ph_2:'Foto 2',ph_3:'Foto 3',ph_hint:'Non sei sul posto? Puoi aggiungere foto in seguito.',lbl_story:'Racconta',lbl_cat:'Categorie',lbl_list:'Aggiungi a una lista',lbl_route:'Rotta Storica',route_none:'Nessuna rotta storica',lbl_vis:'Visibilità',vis_pub_btn:'Pubblico',vis_prv_btn:'Privato',vis_share_btn:'Condividi',save_disabled:'Inserisci il nome per continuare',save_ready:'Segna sulla mappa',google_suggest:'Consiglia a Google Maps',stop_title:'Tappa Itinerario',stop_sub:'Senza foto. Pianifica ora, racconta quando ci sei.',stop_lbl_name:'Nome della tappa',stop_lbl_cat:'Categoria',stop_lbl_vis:'Visibilità Itinerario',itin_pub:'Pubblico',itin_prv:'Privato',stop_lbl_date:'Data prevista',stop_save:'Aggiungi tappa',stat_poi:'POI',stat_love:'Love',stat_list:'Liste',prof_lists:'Le mie liste',prof_new_list:'Nuova lista',prof_tags:'I miei tag',prof_new_tag:'Aggiungi',prof_my_poi:'I miei POI',prof_add_poi:'Aggiungi',prof_pub_toggle:'Come mi vedono gli altri',itin_h:'Itinerari di Viaggio',itin_desc:'Pianifica le tue tappe prima di partire. Trova compagni di viaggio. Trasforma ogni tappa in un POI quando sei sul posto.',itin_open:'Apri Itinerari',itin_note:'Demo con mappa, mini-calendario, GPS live e compagni.',back:'Indietro',cr_top:'Creazione di POI•LOVE di 321.AL',cr_bot:'Progetto Open Source · Ideazione e Dir. Creativa: Alessandro Castagna© · Licenza MIT',
+    /* Auth overlay */
+    auth_tagline:'i luoghi del cuore',auth_apple:'ID Apple',auth_passkey:'Accedi con Biometria',auth_passkey_as:'Accedi come',auth_or_magic:'oppure con magic link via email',auth_email_ph:'la-tua@email.com',auth_email_send:'Invia link',auth_terms:'Accedendo accetti i Termini di servizio di POI•LOVE',auth_oss:'Progetto Open Source · MIT License · © 2026 321.AL',auth_demo:'Esplora in modalità demo',auth_continue_google:'Continua con Google',auth_continue_apple:'Continua con Apple',auth_continue_li:'Continua con LinkedIn',auth_continue_fb:'Continua con Facebook',auth_continue_x:'Continua con X',auth_email_invalid:'Inserisci una email valida',auth_link_sent:'📧 Link inviato! Controlla la mail.',auth_welcome_back:'Bentornato',auth_provider_off:'non ancora attivato (Supabase → Auth → Providers)',auth_demo_active:'Modalità demo attiva 👁',
+    /* POI list actions */
+    act_navigate:'Naviga verso',act_open_map:'Apri sulla mappa',act_share:'Condividi',act_visibility:'Visibilità',act_suggest_google:'Suggerisci a Google Maps',act_edit:'Modifica',act_delete:'Elimina',vis_pub_lbl:'Pubblico',vis_friends_lbl:'Amici',vis_prv_lbl:'Privato',vis_changed:'Visibilità',toast_link_copied:'🔗 Link copiato',toast_navigate_to:'🧭 Naviga verso',toast_google_opened:'📤 Aperto su Google Maps',toast_google_marked:'📤 Aperto su Google Maps · POI marcato come "suggerito"',delete_confirm:'Eliminare',delete_confirm_warn:'Questa azione non può essere annullata.',delete_done:'eliminato',delete_error:'Errore eliminazione:',vis_save_error:'Errore salvando visibilità',poi_not_found:'POI non trovato',edit_in_detail:'Tocca "Modifica" nel dettaglio',
+    /* Itinerari overlay */
+    trip_open_btn:'Apri',trip_change_cover:'Cambia copertina',trip_close:'Chiudi',trip_calendar:'Calendario viaggio',trip_map:'Mappa itinerario',trip_stops:'Tappe pianificate',trip_add_stop:'Aggiungi tappa',
+    /* Profile background popup */
+    bg_change_title:'Cambia sfondo profilo',bg_change_sub:'Carica una tua foto, scegli un paesaggio, oppure fattelo dipingere da ILLI•AI.',bg_tab_upload:'Upload',bg_tab_landscapes:'Paesaggi',bg_upload_drop_title:"Carica un'immagine panoramica",bg_upload_drop_sub:'JPG, PNG · max 8 MB · meglio se larga',bg_search_ph:'Cerca: tirana, mare, montagne…',bg_use_photo:'Usa questa foto',bg_loading:'Carico…',bg_painting:'ILLI•AI sta dipingendo lo sfondo…',bg_painting_long:'(può richiedere 15-30 sec)',bg_use_bg:'Usa questo sfondo',bg_generate_again:'Genera un altro',bg_ai_prompt_ph:'Es: panorama di Tirana al tramonto, luci calde, montagne sullo sfondo, atmosfera cinematografica',bg_generate_btn:'Genera con ILLI•AI',bg_describe:"Descrivi lo sfondo del tuo profilo. ILLI•AI genererà un'immagine panoramica con Flux.",bg_error_size:'Immagine > 8 MB, troppo grande',bg_error_invalid:"Seleziona un'immagine valida",bg_updated:'🖼 Sfondo aggiornato',bg_gradient_updated:'🎨 Sfondo aggiornato',bg_landscape_updated:'🖼 Sfondo paesaggio aggiornato',bg_writeprompt:'Scrivi una descrizione',
+    /* Avatar popup */
+    av_change_title:'Cambia avatar',av_change_sub:'Carica una tua foto, scegli da Unsplash, oppure fattela dipingere da ILLI•AI.',av_tab_upload:'Upload',av_tab_unsplash:'Unsplash',av_upload_drop_title:'Carica una foto',av_upload_drop_sub:'JPG, PNG · max 5 MB',av_use_photo:'Usa questa foto',av_painting:'ILLI•AI sta dipingendo…',av_painting_long:'(può richiedere 10-25 sec)',av_use_avatar:'Usa questo avatar',av_generate_again:'Genera un altro',av_search_ph:'Cerca: portrait, montagne, mare…',av_ai_prompt_ph:'Es: ritratto stile cinematografico, illuminazione calda, montagne sullo sfondo, espressione serena',av_describe:'Descrivi come vuoi essere ritratto/a. ILLI•AI userà Flux per dipingere.',av_avatar_updated:'✓ Avatar aggiornato',av_error_size:'Immagine > 5 MB, troppo grande',
+    /* Common toasts */
+    toast_login_required:'⚠️ Accedi per salvare il POI',toast_no_user:'Nessun utente selezionato',toast_bio_updated:'Bio aggiornata',toast_invite_ready:'📧 Invito pronto per',toast_invite_dest1:'destinatario',toast_invite_destN:'destinatari',toast_only_local:'⚠ Lista salvata solo localmente',toast_list_added:'+ Lista',toast_tag_added:'+ Tag',
+    /* Follow */
+    follow_now:'Stai seguendo',follow_no_more:'Non segui più',},
+  sq:{nav_map:'Harta',nav_itin:'Itinerare',nav_profile:'Profili',mt_street:'Rrugore',mt_sat:'Satelitor',mt_routes:'Rrugët Historike',fab_poi:'Shëno një vend',fab_itin:'Stacion Itinerarit',add_title:'Ruaj këtë vend',add_sub:'Shto një vend që e do',add_challenge:'Arrin brenda 60 sekondave?',loc_hint_use:'Përdor si emër',congrats:'',lbl_name:'Emri i vendit',req:'E DETYRUESHME',lbl_where:'Ku ndodhet',loc_gps:'GPS Live',loc_exif:'EXIF Foto',loc_addr:'Adresë',loc_map:'Prek hartën',lbl_photos:'Foto',ph_main:'Kryesore',ph_2:'Foto 2',ph_3:'Foto 3',ph_hint:'Nuk jeni aty? Mund të shtoni foto më vonë.',lbl_story:'Trego',lbl_cat:'Kategori',lbl_list:'Shto në listë',lbl_route:'Rrugë Historike',route_none:'Asnjë rrugë historike',lbl_vis:'Dukshmëria',vis_pub_btn:'Publik',vis_prv_btn:'Privat',vis_share_btn:'Nda',save_disabled:'Fut emrin për të vazhduar',save_ready:'Shëno në hartë',google_suggest:'Sugjeroni te Google Maps',stop_title:'Stacion Itinerarit',stop_sub:'Pa foto. Planifiko tani, trego kur je aty.',stop_lbl_name:'Emri i stacionit',stop_lbl_cat:'Kategori',stop_lbl_vis:'Dukshmëria Itinerarit',itin_pub:'Publik',itin_prv:'Privat',stop_lbl_date:'Data e planifikuar',stop_save:'Shto stacionin',stat_poi:'POI',stat_love:'Love',stat_list:'Lista',prof_lists:'Listat e mia',prof_new_list:'Listë e re',prof_tags:'Etiketat e mia',prof_new_tag:'Shto',prof_my_poi:'POI-të e mia',prof_add_poi:'Shto',prof_pub_toggle:'Si më shohin të tjerët',itin_h:'Itinerare Udhëtimi',itin_desc:'Planifikoni stacionet para nisjes. Gjeni shokë udhëtimi.',itin_open:'Hap Itineraret',itin_note:'Demo me hartë, mini-kalendar, GPS live.',back:'Kthehu',cr_top:'Krijim i POI•LOVE nga 321.AL',cr_bot:'Projekt Open Source · Ide dhe Drejtim Krijues: Alessandro Castagna© · Liçensë MIT',
+    /* Auth overlay */
+    auth_tagline:'vendet e zemrës',auth_apple:'Apple ID',auth_passkey:'Hyr me biometri',auth_passkey_as:'Hyr si',auth_or_magic:'ose me link magjik via email',auth_email_ph:'email-juaj@email.com',auth_email_send:'Dërgo linkun',auth_terms:'Duke hyrë pranoni Kushtet e shërbimit të POI•LOVE',auth_oss:'Projekt Open Source · Liçensë MIT · © 2026 321.AL',auth_demo:'Eksploro në modalitet demo',auth_continue_google:'Vazhdo me Google',auth_continue_apple:'Vazhdo me Apple',auth_continue_li:'Vazhdo me LinkedIn',auth_continue_fb:'Vazhdo me Facebook',auth_continue_x:'Vazhdo me X',auth_email_invalid:'Vendos një email të vlefshëm',auth_link_sent:'📧 Linku u dërgua! Kontrollo postën.',auth_welcome_back:'Mirëserdhe',auth_provider_off:'nuk është aktivuar ende (Supabase → Auth → Providers)',auth_demo_active:'Modaliteti demo aktiv 👁',
+    /* POI list actions */
+    act_navigate:'Navigo te',act_open_map:'Hap në hartë',act_share:'Nda',act_visibility:'Dukshmëria',act_suggest_google:'Sugjero te Google Maps',act_edit:'Redakto',act_delete:'Fshi',vis_pub_lbl:'Publik',vis_friends_lbl:'Miq',vis_prv_lbl:'Privat',vis_changed:'Dukshmëria',toast_link_copied:'🔗 Linku u kopjua',toast_navigate_to:'🧭 Navigo te',toast_google_opened:'📤 Hapur në Google Maps',toast_google_marked:'📤 Hapur në Google Maps · POI shënuar si "i sugjeruar"',delete_confirm:'Fshi',delete_confirm_warn:'Ky veprim nuk mund të zhbëhet.',delete_done:'u fshi',delete_error:'Gabim fshirjeje:',vis_save_error:'Gabim duke ruajtur dukshmërinë',poi_not_found:'POI nuk u gjet',edit_in_detail:'Prek "Redakto" në detaj',
+    /* Itinerari overlay */
+    trip_open_btn:'Hap',trip_change_cover:'Ndrysho kopertinën',trip_close:'Mbyll',trip_calendar:'Kalendari i udhëtimit',trip_map:'Harta e itinerarit',trip_stops:'Stacionet e planifikuara',trip_add_stop:'Shto stacion',
+    /* Profile background popup */
+    bg_change_title:'Ndrysho sfondin e profilit',bg_change_sub:'Ngarko një foto tënde, zgjidh një peizazh, ose lëre ILLI•AI ta vizatojë.',bg_tab_upload:'Ngarko',bg_tab_landscapes:'Peizazhe',bg_upload_drop_title:'Ngarko një imazh panoramik',bg_upload_drop_sub:'JPG, PNG · max 8 MB · më mirë e gjerë',bg_search_ph:'Kërko: tirana, det, male…',bg_use_photo:'Përdor këtë foto',bg_loading:'Po ngarkohet…',bg_painting:'ILLI•AI po vizaton sfondin…',bg_painting_long:'(mund të zgjasë 15-30 sek)',bg_use_bg:'Përdor këtë sfond',bg_generate_again:'Gjenero një tjetër',bg_ai_prompt_ph:'P.sh.: panorama e Tiranës në perëndim, drita të ngrohta, male në sfond, atmosferë kinematografike',bg_generate_btn:'Gjenero me ILLI•AI',bg_describe:'Përshkruaj sfondin e profilit. ILLI•AI do të gjenerojë një imazh panoramik me Flux.',bg_error_size:'Imazhi > 8 MB, shumë i madh',bg_error_invalid:'Zgjidh një imazh të vlefshëm',bg_updated:'🖼 Sfondi u përditësua',bg_gradient_updated:'🎨 Sfondi u përditësua',bg_landscape_updated:'🖼 Sfondi peizazh u përditësua',bg_writeprompt:'Shkruaj një përshkrim',
+    /* Avatar popup */
+    av_change_title:'Ndrysho avatarin',av_change_sub:'Ngarko një foto tënde, zgjidh nga Unsplash, ose lëre ILLI•AI ta vizatojë.',av_tab_upload:'Ngarko',av_tab_unsplash:'Unsplash',av_upload_drop_title:'Ngarko një foto',av_upload_drop_sub:'JPG, PNG · max 5 MB',av_use_photo:'Përdor këtë foto',av_painting:'ILLI•AI po vizaton…',av_painting_long:'(mund të zgjasë 10-25 sek)',av_use_avatar:'Përdor këtë avatar',av_generate_again:'Gjenero një tjetër',av_search_ph:'Kërko: portrait, male, det…',av_ai_prompt_ph:'P.sh.: portret kinematografik, ndriçim i ngrohtë, male në sfond, shprehje e qetë',av_describe:'Përshkruaj si do të portretizohesh. ILLI•AI do të përdorë Flux për të vizatuar.',av_avatar_updated:'✓ Avatari u përditësua',av_error_size:'Imazhi > 5 MB, shumë i madh',
+    /* Common toasts */
+    toast_login_required:'⚠️ Hyni për të ruajtur POI-n',toast_no_user:'Asnjë përdorues i zgjedhur',toast_bio_updated:'Bio u përditësua',toast_invite_ready:'📧 Ftesa gati për',toast_invite_dest1:'marrës',toast_invite_destN:'marrës',toast_only_local:'⚠ Lista u ruajt vetëm lokalisht',toast_list_added:'+ Listë',toast_tag_added:'+ Etiketë',
+    /* Follow */
+    follow_now:'Po ndjek',follow_no_more:'Nuk ndjek më',},
+  en:{nav_map:'Map',nav_itin:'Itineraries',nav_profile:'Profile',mt_street:'Street',mt_sat:'Satellite',mt_routes:'Historic Routes',fab_poi:'Mark a place',fab_itin:'Itinerary Stop',add_title:'Save this place',add_sub:'Add a place you love',add_challenge:'Can you do it in 60 seconds?',loc_hint_use:'Use as name',congrats:'',lbl_name:'Place name',req:'REQUIRED',lbl_where:'Where is it',loc_gps:'GPS Live',loc_exif:'Photo EXIF',loc_addr:'Address',loc_map:'Tap map',lbl_photos:'Photos',ph_main:'Main',ph_2:'Photo 2',ph_3:'Photo 3',ph_hint:"Not there yet? You can add photos later.",lbl_story:'Tell your story',lbl_cat:'Categories',lbl_list:'Add to a list',lbl_route:'Historic Route',route_none:'No historic route',lbl_vis:'Visibility',vis_pub_btn:'Public',vis_prv_btn:'Private',vis_share_btn:'Share',save_disabled:'Enter the name to continue',save_ready:'Mark on map',google_suggest:'Suggest to Google Maps',stop_title:'Itinerary Stop',stop_sub:"No photos. Plan now, tell the story when you're there.",stop_lbl_name:'Stop name',stop_lbl_cat:'Category',stop_lbl_vis:'Itinerary Visibility',itin_pub:'Public',itin_prv:'Private',stop_lbl_date:'Planned date',stop_save:'Add stop',stat_poi:'POI',stat_love:'Love',stat_list:'Lists',prof_lists:'My lists',prof_new_list:'New list',prof_tags:'My tags',prof_new_tag:'Add',prof_my_poi:'My POIs',prof_add_poi:'Add',prof_pub_toggle:'How others see me',itin_h:'Travel Itineraries',itin_desc:'Plan your stops before you leave. Find travel companions.',itin_open:'Open Itineraries',itin_note:'Demo with map, mini-calendar, live GPS and companions.',back:'Back',cr_top:'POI•LOVE created by 321.AL',cr_bot:'Open Source Project · Creative Direction: Alessandro Castagna© · MIT License',
+    /* Auth overlay */
+    auth_tagline:'places of the heart',auth_apple:'Apple ID',auth_passkey:'Sign in with Biometrics',auth_passkey_as:'Sign in as',auth_or_magic:'or with magic link via email',auth_email_ph:'your@email.com',auth_email_send:'Send link',auth_terms:'By signing in you accept POI•LOVE Terms of Service',auth_oss:'Open Source Project · MIT License · © 2026 321.AL',auth_demo:'Explore in demo mode',auth_continue_google:'Continue with Google',auth_continue_apple:'Continue with Apple',auth_continue_li:'Continue with LinkedIn',auth_continue_fb:'Continue with Facebook',auth_continue_x:'Continue with X',auth_email_invalid:'Enter a valid email',auth_link_sent:'📧 Link sent! Check your mail.',auth_welcome_back:'Welcome back',auth_provider_off:'not yet enabled (Supabase → Auth → Providers)',auth_demo_active:'Demo mode active 👁',
+    /* POI list actions */
+    act_navigate:'Navigate to',act_open_map:'Open on map',act_share:'Share',act_visibility:'Visibility',act_suggest_google:'Suggest to Google Maps',act_edit:'Edit',act_delete:'Delete',vis_pub_lbl:'Public',vis_friends_lbl:'Friends',vis_prv_lbl:'Private',vis_changed:'Visibility',toast_link_copied:'🔗 Link copied',toast_navigate_to:'🧭 Navigate to',toast_google_opened:'📤 Opened in Google Maps',toast_google_marked:'📤 Opened in Google Maps · POI marked as "suggested"',delete_confirm:'Delete',delete_confirm_warn:'This action cannot be undone.',delete_done:'deleted',delete_error:'Delete error:',vis_save_error:'Error saving visibility',poi_not_found:'POI not found',edit_in_detail:'Tap "Edit" in detail',
+    /* Itinerari overlay */
+    trip_open_btn:'Open',trip_change_cover:'Change cover',trip_close:'Close',trip_calendar:'Trip calendar',trip_map:'Itinerary map',trip_stops:'Planned stops',trip_add_stop:'Add stop',
+    /* Profile background popup */
+    bg_change_title:'Change profile background',bg_change_sub:'Upload a photo, pick a landscape, or have ILLI•AI paint it for you.',bg_tab_upload:'Upload',bg_tab_landscapes:'Landscapes',bg_upload_drop_title:'Upload a panoramic image',bg_upload_drop_sub:'JPG, PNG · max 8 MB · wide preferred',bg_search_ph:'Search: tirana, sea, mountains…',bg_use_photo:'Use this photo',bg_loading:'Loading…',bg_painting:'ILLI•AI is painting the background…',bg_painting_long:'(may take 15-30 sec)',bg_use_bg:'Use this background',bg_generate_again:'Generate another',bg_ai_prompt_ph:'E.g. Tirana skyline at sunset, warm lights, mountains in the background, cinematic atmosphere',bg_generate_btn:'Generate with ILLI•AI',bg_describe:'Describe your profile background. ILLI•AI will generate a panoramic image with Flux.',bg_error_size:'Image > 8 MB, too big',bg_error_invalid:'Please select a valid image',bg_updated:'🖼 Background updated',bg_gradient_updated:'🎨 Background updated',bg_landscape_updated:'🖼 Landscape background updated',bg_writeprompt:'Write a description',
+    /* Avatar popup */
+    av_change_title:'Change avatar',av_change_sub:'Upload a photo, pick from Unsplash, or have ILLI•AI paint it for you.',av_tab_upload:'Upload',av_tab_unsplash:'Unsplash',av_upload_drop_title:'Upload a photo',av_upload_drop_sub:'JPG, PNG · max 5 MB',av_use_photo:'Use this photo',av_painting:'ILLI•AI is painting…',av_painting_long:'(may take 10-25 sec)',av_use_avatar:'Use this avatar',av_generate_again:'Generate another',av_search_ph:'Search: portrait, mountains, sea…',av_ai_prompt_ph:'E.g. cinematic portrait, warm lighting, mountains in the background, calm expression',av_describe:'Describe how you want to be portrayed. ILLI•AI will use Flux to paint.',av_avatar_updated:'✓ Avatar updated',av_error_size:'Image > 5 MB, too big',
+    /* Common toasts */
+    toast_login_required:'⚠️ Sign in to save the POI',toast_no_user:'No user selected',toast_bio_updated:'Bio updated',toast_invite_ready:'📧 Invitation ready for',toast_invite_dest1:'recipient',toast_invite_destN:'recipients',toast_only_local:'⚠ List saved only locally',toast_list_added:'+ List',toast_tag_added:'+ Tag',
+    /* Follow */
+    follow_now:'Now following',follow_no_more:'Unfollowed',}
 };
+
+/* Helper: t('key', fallback) — usato in JS dinamico */
+function t(key, fallback){ return (T[lang]&&T[lang][key]) || (T.it&&T.it[key]) || fallback || key; }
 
 const LANGS=['it','sq','en'];
 let lang='it';
-const nl=(navigator.language||'').substring(0,2);
-if(nl==='sq')lang='sq'; else if(nl!=='it')lang='en';
+// 1) Preferenza utente salvata localmente
+try{ const saved=localStorage.getItem('poilove_lang'); if(saved && LANGS.includes(saved)) lang=saved; else throw 0; }
+catch(_){
+  // 2) Lingua del dispositivo (navigator.language)
+  const nl=(navigator.language||navigator.userLanguage||'').substring(0,2).toLowerCase();
+  if(nl==='sq')lang='sq'; else if(nl!=='it')lang='en';
+}
 
 const LANG_FLAGS={it:'🇮🇹',sq:'🇦🇱',en:'🇬🇧'};
 function applyLang(l){
   lang=l;
+  try{ localStorage.setItem('poilove_lang', l); }catch(_){}
   const btn=document.getElementById('langBtn');
   if(btn)btn.textContent=LANG_FLAGS[l]||l.toUpperCase();
-  const t=T[l];
+  const tx=T[l];
   const crTop=document.getElementById('cr-top');
   const crBot=document.getElementById('cr-bot');
-  if(crTop&&t)crTop.textContent=t.cr_top;
-  if(crBot&&t)crBot.textContent=t.cr_bot;
+  if(crTop&&tx)crTop.textContent=tx.cr_top;
+  if(crBot&&tx)crBot.textContent=tx.cr_bot;
   document.documentElement.lang=l;
+  // 1) Testo dei nodi: data-t="key"
   document.querySelectorAll('[data-t]').forEach(el=>{
-    const k=el.dataset.t;if(t[k]!==undefined)el.textContent=t[k];
+    const k=el.dataset.t;if(tx[k]!==undefined)el.textContent=tx[k];
+  });
+  // 2) Title/tooltip: data-tt="key"
+  document.querySelectorAll('[data-tt]').forEach(el=>{
+    const k=el.dataset.tt;if(tx[k]!==undefined){el.setAttribute('title',tx[k]);el.setAttribute('aria-label',tx[k]);}
+  });
+  // 3) Placeholder: data-tp="key"
+  document.querySelectorAll('[data-tp]').forEach(el=>{
+    const k=el.dataset.tp;if(tx[k]!==undefined)el.setAttribute('placeholder',tx[k]);
   });
 }
 function cycleLang(){applyLang(LANGS[(LANGS.indexOf(lang)+1)%LANGS.length])}
@@ -3631,6 +3665,9 @@ function renderPoiTab(){
     const visIcon = vis==='private'?'ph-lock-simple':vis==='friends'?'ph-users':'ph-globe';
     const visLbl = vis==='private'?'Privato':vis==='friends'?'Amici':'Pubblico';
 
+    // Etichetta visibilità tradotta
+    const visLblT = vis==='private' ? t('vis_prv_lbl','Privato') : vis==='friends' ? t('vis_friends_lbl','Amici') : t('vis_pub_lbl','Pubblico');
+
     if(poiSubtab==='near'){
       // Lista vicini: click apre dettaglio, "Naviga" lancia maps esterne
       return `<div class="poi-list-row" data-poi-key="${key}" style="cursor:pointer">
@@ -3640,8 +3677,8 @@ function renderPoiTab(){
           <div class="pi-sub">${p.cat||p.category||''} · ${p.address||''}</div>
         </div>
         <div class="pi-actions">
-          <button class="pi-act-btn" title="Apri sulla mappa" onclick="event.stopPropagation();centerMapOnPoi(${p.lat},${p.lng})"><i class="ph-duotone ph-crosshair"></i></button>
-          <button class="pi-act-btn" title="Naviga verso (Maps esterne)" onclick="event.stopPropagation();navigateToPoi(${p.lat},${p.lng},'${(p.name||'').replace(/'/g,'')}')"><i class="ph-duotone ph-navigation-arrow"></i></button>
+          <button class="pi-act-btn" data-tt="act_open_map" title="${t('act_open_map')}" onclick="event.stopPropagation();centerMapOnPoi(${p.lat},${p.lng})"><i class="ph-duotone ph-crosshair"></i></button>
+          <button class="pi-act-btn" data-tt="act_navigate" title="${t('act_navigate')}" onclick="event.stopPropagation();navigateToPoi(${p.lat},${p.lng},'${(p.name||'').replace(/'/g,'')}')"><i class="ph-duotone ph-navigation-arrow"></i></button>
         </div>
         <div class="pi-dist">${dist}</div>
       </div>`;
@@ -3652,16 +3689,16 @@ function renderPoiTab(){
       <div class="pi-emoji" onclick="openPoiFromTab('${key}')" style="cursor:pointer">${emoji}</div>
       <div class="pi-info" onclick="openPoiFromTab('${key}')" style="cursor:pointer">
         <div class="pi-name">${p.name}</div>
-        <div class="pi-sub"><i class="ph-duotone ${visIcon}" style="font-size:10px"></i> ${visLbl} · ❤️ ${p.love||p.love_count||0}</div>
+        <div class="pi-sub"><i class="ph-duotone ${visIcon}" style="font-size:10px"></i> ${visLblT} · ❤️ ${p.love||p.love_count||0}</div>
       </div>
       <div class="pi-actions">
-        <button class="pi-act-btn" title="Naviga verso" onclick="navigateToPoi(${p.lat},${p.lng},'${(p.name||'').replace(/'/g,'')}')"><i class="ph-duotone ph-navigation-arrow"></i></button>
-        <button class="pi-act-btn" title="Apri sulla mappa" onclick="centerMapOnPoi(${p.lat},${p.lng})"><i class="ph-duotone ph-map-pin"></i></button>
-        <button class="pi-act-btn" title="Condividi" onclick="sharePoiByKey('${key}')"><i class="ph-duotone ph-share-network"></i></button>
-        ${isMine||poiSubtab==='mine'?`<button class="pi-act-btn" title="Visibilità" onclick="cyclePoiVisibility('${key}')"><i class="ph-duotone ${visIcon}"></i></button>`:''}
-        ${vis==='community'?`<button class="pi-act-btn" title="Suggerisci a Google Maps" onclick="suggestToGoogleMaps('${key}')"><i class="ph-duotone ph-google-logo"></i></button>`:''}
-        ${isMine||poiSubtab==='mine'?`<button class="pi-act-btn" title="Modifica" onclick="editPoiByKey('${key}')"><i class="ph-duotone ph-pencil-simple"></i></button>`:''}
-        ${isMine||poiSubtab==='mine'?`<button class="pi-act-btn" title="Elimina" style="color:var(--red);border-color:var(--red)" onclick="deletePoiByKey('${key}')"><i class="ph-duotone ph-trash"></i></button>`:''}
+        <button class="pi-act-btn" data-tt="act_navigate" title="${t('act_navigate')}" onclick="navigateToPoi(${p.lat},${p.lng},'${(p.name||'').replace(/'/g,'')}')"><i class="ph-duotone ph-navigation-arrow"></i></button>
+        <button class="pi-act-btn" data-tt="act_open_map" title="${t('act_open_map')}" onclick="centerMapOnPoi(${p.lat},${p.lng})"><i class="ph-duotone ph-map-pin"></i></button>
+        <button class="pi-act-btn" data-tt="act_share" title="${t('act_share')}" onclick="sharePoiByKey('${key}')"><i class="ph-duotone ph-share-network"></i></button>
+        ${isMine||poiSubtab==='mine'?`<button class="pi-act-btn" data-tt="act_visibility" title="${t('act_visibility')}" onclick="cyclePoiVisibility('${key}')"><i class="ph-duotone ${visIcon}"></i></button>`:''}
+        ${vis==='community'?`<button class="pi-act-btn" data-tt="act_suggest_google" title="${t('act_suggest_google')}" onclick="suggestToGoogleMaps('${key}')"><i class="ph-duotone ph-google-logo"></i></button>`:''}
+        ${isMine||poiSubtab==='mine'?`<button class="pi-act-btn" data-tt="act_edit" title="${t('act_edit')}" onclick="editPoiByKey('${key}')"><i class="ph-duotone ph-pencil-simple"></i></button>`:''}
+        ${isMine||poiSubtab==='mine'?`<button class="pi-act-btn" data-tt="act_delete" title="${t('act_delete')}" style="color:var(--red);border-color:var(--red)" onclick="deletePoiByKey('${key}')"><i class="ph-duotone ph-trash"></i></button>`:''}
       </div>
     </div>`;
   }).join('');
@@ -3685,12 +3722,11 @@ function openPoiFromTab(key){
 function navigateToPoi(lat, lng, name){
   const isApple = /iPhone|iPad|iPod|Mac/.test(navigator.userAgent);
   const q = encodeURIComponent(name||'');
-  // Su iOS/macOS apre Apple Maps; altrove Google Maps. L'utente sceglie l'app dal browser.
   const url = isApple
     ? `https://maps.apple.com/?daddr=${lat},${lng}&q=${q}`
     : `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&destination_place_id=${q}`;
   window.open(url, '_blank', 'noopener');
-  showToast?.(`🧭 Naviga verso ${name||'POI'}`);
+  showToast?.(`${t('toast_navigate_to')} ${name||'POI'}`);
 }
 
 // Condivisione: usa Web Share API se disponibile, altrimenti clipboard + toast
@@ -3709,9 +3745,9 @@ async function sharePoiByKey(key){
   }
   if(navigator.clipboard){
     await navigator.clipboard.writeText(`${text}\n${url}`);
-    showToast?.('🔗 Link copiato');
+    showToast?.(t('toast_link_copied'));
   } else {
-    prompt('Copia il link:', url);
+    prompt('Link:', url);
   }
 }
 
@@ -3723,38 +3759,37 @@ async function cyclePoiVisibility(key){
   const cur = p.visibility || 'community';
   const next = order[(order.indexOf(cur)+1)%order.length];
   p.visibility = next;
-  // Persistenza su Supabase se disponibile
   if(p.id && currentUser?.id && sb){
     const { error } = await sb.from('pois').update({ visibility: next }).eq('id', p.id).eq('author_id', currentUser.id);
     if(error){
-      showToast?.('⚠ Errore salvando visibilità');
+      showToast?.('⚠ '+t('vis_save_error'));
       console.warn('[poilove] cyclePoiVisibility:', error.message);
       return;
     }
   }
-  const lblMap = { community:'Pubblico 🌍', friends:'Amici 👥', private:'Privato 🔒' };
-  showToast?.(`Visibilità → ${lblMap[next]}`);
+  const lblMap = {
+    community: `${t('vis_pub_lbl')} 🌍`,
+    friends:   `${t('vis_friends_lbl')} 👥`,
+    private:   `${t('vis_prv_lbl')} 🔒`
+  };
+  showToast?.(`${t('vis_changed')} → ${lblMap[next]}`);
   renderPoiTab();
 }
 
 // "Suggerisci a Google Maps" — apre la pagina di Google Maps per quel punto
-// con i campi pre-compilati per "Add a missing place" (link standard Google)
 function suggestToGoogleMaps(key){
   const p = _poiFromKey(key);
   if(!p) return;
-  // Apre Google Maps centrato sul punto, da lì l'utente può cliccare "Add a missing place"
-  // con i dati che lui stesso può confermare (Google non accetta API esterne per questo)
   const q = encodeURIComponent(`${p.name} ${p.address||''}`);
   const url = `https://www.google.com/maps/search/?api=1&query=${q}&center=${p.lat},${p.lng}`;
   window.open(url, '_blank', 'noopener');
-  // Marca il POI come 'suggested_google' nel DB se è un POI mio
   if(p.id && currentUser?.id===p.author_id && sb){
     sb.from('pois').update({ visibility: 'suggested_google' }).eq('id', p.id).then(()=>{
       p.visibility = 'suggested_google';
-      showToast?.('📤 Aperto su Google Maps · POI marcato come "suggerito"');
+      showToast?.(t('toast_google_marked'));
     });
   } else {
-    showToast?.('📤 Aperto su Google Maps');
+    showToast?.(t('toast_google_opened'));
   }
 }
 
@@ -3762,35 +3797,30 @@ function suggestToGoogleMaps(key){
 function editPoiByKey(key){
   const p = _poiFromKey(key);
   if(!p) return;
-  // Riusa la funzione editPOI esistente passando un id DOM se c'è, altrimenti
-  // setta currentPOI e apre il dettaglio in modalità "modifica"
   if(typeof editPOIByObject==='function') return editPOIByObject(p);
-  // Fallback: apri il dettaglio (da lì c'è il bottone Modifica)
   openDBDetail(p);
-  showToast?.('Tocca "Modifica" nel dettaglio');
+  showToast?.(t('edit_in_detail'));
 }
 
 // Elimina con conferma
 async function deletePoiByKey(key){
   const p = _poiFromKey(key);
   if(!p) return;
-  if(!confirm(`Eliminare "${p.name}"?\nQuesta azione non può essere annullata.`)) return;
+  if(!confirm(`${t('delete_confirm')} "${p.name}"?\n${t('delete_confirm_warn')}`)) return;
   if(p.id && currentUser?.id && sb){
     const { error } = await sb.from('pois').delete().eq('id', p.id).eq('author_id', currentUser.id);
     if(error){
-      showToast?.('⚠ Errore eliminazione: '+error.message);
+      showToast?.(`⚠ ${t('delete_error')} ${error.message}`);
       return;
     }
   }
-  // Rimuovi anche da array locale POIS se presente
   if(typeof POIS!=='undefined'){
     const i = POIS.findIndex(x=>x.id===p.id || (x.name===p.name && x.lat===p.lat));
     if(i>=0) POIS.splice(i,1);
   }
   delete window._poiTabIndex[key];
   renderPoiTab();
-  showToast?.(`🗑 "${p.name}" eliminato`);
-  // Aggiorna stat profilo
+  showToast?.(`🗑 "${p.name}" ${t('delete_done')}`);
   const s = document.getElementById('statPoi');
   if(s) s.textContent = Math.max(0, parseInt(s.textContent)-1);
 }
@@ -3841,7 +3871,7 @@ function setProfileAvatar(src){
     });
   }
   closeAvPopup();
-  if(typeof showToast==='function') showToast('✓ Avatar aggiornato');
+  if(typeof showToast==='function') showToast(t('av_avatar_updated'));
 }
 function uploadAvatarFile(e){
   const file = e.target.files && e.target.files[0];
@@ -3925,14 +3955,14 @@ function applyHeroBgImage(url){
   if(pubH) pubH.style.background = css;
   saveProfileCover(url, 'image');
   closeBgPopup();
-  if(typeof showToast==='function') showToast('🖼 Sfondo aggiornato');
+  if(typeof showToast==='function') showToast(t('bg_updated'));
 }
 // Upload sfondo dal device — direttamente dal mini picker
 function uploadHeroBgFile(e){
   const file = e.target.files && e.target.files[0];
   if(!file) return;
-  if(!file.type.startsWith('image/')){ showToast?.('Seleziona un\'immagine valida'); return; }
-  if(file.size > 8*1024*1024){ showToast?.('Immagine > 8 MB, troppo grande'); return; }
+  if(!file.type.startsWith('image/')){ showToast?.(t('bg_error_invalid')); return; }
+  if(file.size > 8*1024*1024){ showToast?.(t('bg_error_size')); return; }
   const reader = new FileReader();
   reader.onload = () => applyHeroBgImage(reader.result);
   reader.readAsDataURL(file);
@@ -3942,8 +3972,8 @@ function uploadHeroBgFile(e){
 function uploadBgFile(e){
   const file = e.target.files && e.target.files[0];
   if(!file) return;
-  if(!file.type.startsWith('image/')){ showToast?.('Seleziona un\'immagine valida'); return; }
-  if(file.size > 8*1024*1024){ showToast?.('Immagine > 8 MB, troppo grande'); return; }
+  if(!file.type.startsWith('image/')){ showToast?.(t('bg_error_invalid')); return; }
+  if(file.size > 8*1024*1024){ showToast?.(t('bg_error_size')); return; }
   const reader = new FileReader();
   reader.onload = () => {
     const preview = document.getElementById('bgUploadPreview');
@@ -4595,7 +4625,7 @@ function setHeroBg(gradient){
   if(pubH) pubH.style.background=gradient;
   document.getElementById('heroBgPicker').classList.remove('open');
   saveProfileCover(gradient,'gradient');
-  showToast('🎨 Sfondo aggiornato');
+  showToast(t('bg_gradient_updated'));
 }
 function setHeroBgImg(){
   document.getElementById('heroBgPicker').classList.remove('open');
@@ -5291,7 +5321,7 @@ function editProfileBio(){
   el.textContent=trimmed;
   el.style.display=trimmed?'block':'none';
   // Salva in Supabase se loggato
-  if(currentUser&&sb) sb.from('profiles').update({bio:trimmed}).eq('id',currentUser.id).then(()=>showToast('Bio aggiornata'));
+  if(currentUser&&sb) sb.from('profiles').update({bio:trimmed}).eq('id',currentUser.id).then(()=>showToast(t('toast_bio_updated')));
 }
 
 /* ── Aggiorna livello nel chip ── */
