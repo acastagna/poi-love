@@ -1223,16 +1223,16 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
     <i class="ph-duotone ph-eye"></i> <span data-t="auth_demo">Esplora in modalità demo</span>
   </button>
 
-  <!-- Selettore lingua — chip ultramoderni glassmorphism -->
+  <!-- Selettore lingua — chip ultramoderni glassmorphism (EN · SQ · IT) -->
   <div class="auth-lang-row" role="group" aria-label="Language selector">
-    <button class="auth-lang-chip" data-lang="it" onclick="applyLang('it')" aria-label="Italiano">
-      <span class="flag">🇮🇹</span> IT
+    <button class="auth-lang-chip" data-lang="en" onclick="applyLang('en')" aria-label="English">
+      <span class="flag">🇬🇧</span> EN
     </button>
     <button class="auth-lang-chip" data-lang="sq" onclick="applyLang('sq')" aria-label="Shqip">
       <span class="flag">🇦🇱</span> SQ
     </button>
-    <button class="auth-lang-chip" data-lang="en" onclick="applyLang('en')" aria-label="English">
-      <span class="flag">🇬🇧</span> EN
+    <button class="auth-lang-chip" data-lang="it" onclick="applyLang('it')" aria-label="Italiano">
+      <span class="flag">🇮🇹</span> IT
     </button>
   </div>
 </div>
@@ -3032,7 +3032,7 @@ const T={
 /* Helper: t('key', fallback) — usato in JS dinamico */
 function t(key, fallback){ return (T[lang]&&T[lang][key]) || (T.it&&T.it[key]) || fallback || key; }
 
-const LANGS=['it','sq','en'];
+const LANGS=['en','sq','it'];
 let lang='it';
 // 1) Preferenza utente salvata localmente
 try{ const saved=localStorage.getItem('poilove_lang'); if(saved && LANGS.includes(saved)) lang=saved; else throw 0; }
