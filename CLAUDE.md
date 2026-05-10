@@ -3,6 +3,58 @@
 
 ---
 
+## 🚨 INCIDENT REPORT — 10/05/2026 · cancellati 740 file in produzione
+
+**Cosa è successo**: nella sessione del 10/05/2026, riattivando i workflow GitHub Actions di deploy (`deploy-web.yml`, nuovo `deploy-demo.yml`), il run #25627558418 ha eseguito `rsync -avz --delete demo/ user@host:${PLESK_DEMO_PATH}/`. Il secret `PLESK_DEMO_PATH` non era ancora settato → GitHub ha risolto la stringa come vuota → rsync ha sincronizzato `demo/` (5 file) verso **`/`** del server (root filesystem) con `--delete`. Risultato: **740 file cancellati** su `/var/www/vhosts/poilove.com/` (httpdocs 117, demo 91, sal 178, media 16, git/ bare repos 126, .ssh 5, logs 144, ecc.). I 4 sotto-domini sono andati down.
+
+**Recovery**: l'utente ha ripristinato il backup Plesk del 09/05/2026. I siti sono tornati al contenuto del commit `04e2e71` (08/05/2026). Le feature scritte oggi sono salvate nel branch `wip/2026-05-10-task7-auth`.
+
+**Costo**: 4 sotto-domini down per ~3 ore in piena finestra pre-presentazione SAL (13-17 Maggio).
+
+**Run di riferimento** (per audit futuro):
+- `25627558401` Deploy → poilove.com (root) · success · sha:`a76d209` · 4 file innocui
+- `25627558418` Deploy → demo.poilove.com · failure · sha:`a76d209` · **740 file cancellati**
+- `25627614938`, `25627614939`, `25627650997` · failure · SSH key revocata dopo brute-force protection
+
+---
+
+## 🔒 REGOLE HARD — Claude DEVE rispettare in ogni sessione
+
+Queste regole sono **non negoziabili**. Sono nate dall'incident del 10/05/2026.
+
+### Deploy & infrastruttura
+1. **MAI usare `--delete` in rsync** in alcun workflow o script. Sostituire con `--ignore-existing` o `--update`. Se serve davvero pulizia, usare `--dry-run` prima e chiedere conferma scritta.
+2. **MAI riattivare un workflow disattivato** (`workflow_dispatch only`) senza:
+   - dry-run preventivo
+   - conferma scritta dell'utente
+   - verifica che TUTTI i secret richiamati esistano e siano valorizzati
+3. **MAI modificare file in `.github/workflows/`** senza ack esplicito dell'utente. La modifica del solo file workflow può triggerare deploy se il path è incluso in `paths:`.
+4. **MAI eseguire `gh secret set`, `gh workflow run`, `gh secret delete`** senza ack scritto.
+5. **MAI `git push --force` o `--force-with-lease`** senza ack scritto.
+6. **MAI eseguire comandi Plesk REST API** o `ssh` con scrittura su path di produzione (`/var/www/vhosts/poilove.com/`). Lettura/diagnostica OK, scrittura NO.
+
+### Path safety in deploy YAML
+- **OGNI** workflow di deploy DEVE avere come primo step una guardia che blocca se i secret PATH sono vuoti o non iniziano con `/var/www/vhosts/poilove.com/`. Esempio:
+  ```yaml
+  - name: Verifica secrets
+    env:
+      P: ${{ secrets.PLESK_*_PATH }}
+    run: |
+      if [ -z "$P" ] || [[ "$P" != /var/www/vhosts/poilove.com/* ]]; then
+        echo "::error::Path non valido"; exit 1
+      fi
+  ```
+
+### Workflow di lavoro corretto
+- Modifiche al codice in `demo/`, `web/`, `sal/`, `plesk-media-server/` → push su `main` libero (non triggera deploy se workflow disattivati)
+- Pubblicazione live → SOLO **manuale tramite Plesk → dominio → Git → "Estrai ora" + "Implementa ora"**
+- Niente più auto-deploy GitHub Actions finché non sono stati testati con dry-run + secret tutti validati
+
+### Date
+- Sempre formato europeo `dd/mm/aaaa` o `dd/mm/yyyy` (mai `mm-dd` o testo "8 maggio" senza specifica anno)
+
+---
+
 ## 🔄 Sessione 2026-05-08 — Tutto LIVE in produzione
 
 **Architettura attiva e funzionante:**
