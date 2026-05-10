@@ -3,6 +3,70 @@
 
 ---
 
+## 🔄 Sessione 2026-05-10 — Auth completa, sfondo AI, griglia itinerari, salvataggio reale
+
+**Modifiche chiave su `demo/index.html` (+848 -117, ora 384 KB):**
+
+### 🔐 Auth overlay completamente rifatto
+- Logo POI•LOVE + `<h3>i luoghi del cuore</h3>` (rimossi titolo+tagline lunghi)
+- 4 social compatti: **Google · Apple · LinkedIn · Facebook**
+- **Passkey/WebAuthn**: bottone "Continua come {nome}" che appare quando il device supporta `PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()` o quando in `localStorage` c'è `poilove_last_email` — fallback pulito a magic link
+- Magic link Supabase OTP (era già attivo)
+- "Esplora demo" con icona Phosphor duotone (`ph-eye`)
+- "Ricordami" automatico: snapshot in `localStorage.poilove_remembered_user` + `getSession()` skip overlay
+- `AUTH_REDIRECT` dinamico (origine corrente) — funziona anche su sotto-domini di test
+
+### 🎨 Sistema colori per zone identitarie (ispirato a EvoLab/Video Gallery)
+| Zona | Variabile | Colore | Soft (14% alpha) |
+|---|---|---|---|
+| Mappa | `--clr-map` | `#285EA7` | `--clr-map-soft` |
+| ILLI•AI | `--clr-illi` | `#7C3AED` | `--clr-illi-soft` |
+| POI | `--clr-poi` | `#D42B2B` | `--clr-poi-soft` |
+| Itinerari | `--clr-itin` | `#16A34A` | `--clr-itin-soft` |
+| Compagni | `--clr-comp` | `#F97316` | `--clr-comp-soft` |
+| Profilo | `--clr-prof` | `#0EA5E9` | `--clr-prof-soft` |
+| SOS | `--clr-sos` | `#DC2626` | `--clr-sos-soft` |
+
+- Bottom nav: icona della tab attiva prende il colore della zona + underline sottile sopra
+- Container delle 5 viste taggate: `class="zone-prof"`, `zone-poi`, `zone-comp`, `zone-itin`, `zone-illi`
+- Pattern automatico (Video Gallery style): dentro una zona, qualsiasi `.cb.on`, `<input type=range>` (accent), `.sv` o `.zone-accent` eredita il colore della zona
+
+### 📐 Itinerari — griglia quadrata responsive
+- `.itin-cards` da flex-column a `grid` 2/3/4 colonne (768px e 1200px breakpoints)
+- Card con `aspect-ratio:1/1` cliccabile → dettaglio in **overlay full-screen dedicato** (non più espansione inline)
+- Cleanup mappa Leaflet alla chiusura per evitare memory leak
+
+### 🪄 Sfondo profilo AI (parità con avatar)
+- Nuovo popup `#bgPopupOv` 3 tab: **Upload · Paesaggi · ILLI•AI**
+- Pollinations Flux 1280×512 (formato hero panoramico)
+- Salvataggio in `profiles.cover_url` + `cover_type` + fallback localStorage
+- Sfondo propagato su `#profileHero`, `#lang-strip` e `.pub-header` (lato pubblico)
+
+### 💾 Salvataggio reale su Supabase (era cosmetico)
+- **Avatar/cover/bio** → upsert in `profiles` (era solo localStorage)
+- **Liste** → `sb.from('lists').insert()` + `loadMyLists()` al login
+- **Tag** → `localStorage.poilove_tags` (no schema cambia)
+- **Follow** → `sb.from('follows').insert/delete` (era cosmetico)
+- **Avatar/sfondo lato pubblico** sincronizzati con `syncOwnPublicPreview()`
+
+### 📧 Email reali per inviti compagni
+- `createCompagnia()` ora usa `mailto:` con destinatari + oggetto + corpo precompilato (codice + link)
+- Apre il client mail dell'utente (Mail.app, Gmail web, Outlook…)
+
+### 🔍 Diagnostica connessione al boot
+- `runConnectionDiagnostics()` logga in console (group): Supabase OK?, schema profiles OK?, colonne `cover_url`/`cover_type` esistono?, bucket `poi_photos` esiste?
+- Toast non bloccante se ci sono problemi
+- `window.__poilove_diag` per ispezione manuale
+
+### 🛠 Migration SQL nuova
+- `database/migrations/002_profile_cover.sql` — aggiunge `cover_url` (text) e `cover_type` (text default 'gradient', check constraint)
+
+### 📚 Riferimento EvoLab
+- Setup auth full-stack maturo: `tools-forma/apps/api/src/routes/auth/{oauth,webauthn,index}.ts` (Fastify+Drizzle+Postgres) — base se in futuro POI•LOVE vuole self-host invece di Supabase managed
+- Sistema colori Video Gallery (`tools-videogallery/public/video-gallery.html` linee 105-130) — preso come riferimento per le zone identitarie
+
+---
+
 ## 🔄 Sessione 2026-05-08 — Tutto LIVE in produzione
 
 **Architettura attiva e funzionante:**

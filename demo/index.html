@@ -24,7 +24,54 @@
   --red:#D42B2B;--blue:#285EA7;--bg:#EAE4D8;
   --card:#FDFAF5;--text:#1C1C1C;--muted:#6B6B6B;
   --border:rgba(0,0,0,.09);--green:#22C55E;--orange:#F97316;
+  /* ── SISTEMA COLORI PER ZONE IDENTITARIE (ispirato a EvoLab/Video Gallery)
+        Ogni tab/sezione ha un colore identitario. Gli stati .active e gli accent
+        ereditano automaticamente via selettori .tab-X .control:active, ecc. */
+  --clr-map:#285EA7;       /* blu POI•VOICE — Mappa */
+  --clr-illi:#7C3AED;      /* viola — ILLI•AI */
+  --clr-poi:#D42B2B;       /* rosso POI•LOVE — POI */
+  --clr-itin:#16A34A;      /* verde — Itinerari */
+  --clr-comp:#F97316;      /* arancio — Compagni di Viaggio */
+  --clr-prof:#0EA5E9;      /* azzurro — Profilo */
+  --clr-sos:#DC2626;       /* rosso intenso — SOS */
+  /* Helpers per fade/glow consistenti */
+  --clr-map-soft:rgba(40,94,167,.14);
+  --clr-illi-soft:rgba(124,58,237,.14);
+  --clr-poi-soft:rgba(212,43,43,.14);
+  --clr-itin-soft:rgba(22,163,74,.14);
+  --clr-comp-soft:rgba(249,115,22,.14);
+  --clr-prof-soft:rgba(14,165,233,.14);
+  --clr-sos-soft:rgba(220,38,38,.14);
 }
+/* Bottom nav: l'icona della tab attiva prende il colore della propria zona */
+.bottom-nav #nav-map.active i      { color: var(--clr-map);  }
+.bottom-nav #nav-illi.active i     { color: var(--clr-illi); }
+.bottom-nav #nav-poi.active i      { color: var(--clr-poi);  }
+.bottom-nav #nav-itin.active i     { color: var(--clr-itin); }
+.bottom-nav #nav-companions.active i{ color: var(--clr-comp);}
+.bottom-nav #nav-profile.active i  { color: var(--clr-prof); }
+.bottom-nav .nav-sos i             { color: var(--clr-sos);  }
+.bottom-nav .active .nav-lbl       { color: inherit; }
+/* Highlight underline sotto la tab attiva (sottile, identità di zona) */
+.bottom-nav .nav-item.active::before{
+  content:'';position:absolute;left:25%;right:25%;top:0;height:2px;
+  border-radius:0 0 3px 3px;background:currentColor;opacity:.85
+}
+.bottom-nav .nav-item{position:relative}
+/* Zone wrappers — classe applicabile a un container per dichiarare la zona attiva */
+.zone-map      { --zone:var(--clr-map);  --zone-soft:var(--clr-map-soft); }
+.zone-illi     { --zone:var(--clr-illi); --zone-soft:var(--clr-illi-soft); }
+.zone-poi      { --zone:var(--clr-poi);  --zone-soft:var(--clr-poi-soft); }
+.zone-itin     { --zone:var(--clr-itin); --zone-soft:var(--clr-itin-soft); }
+.zone-comp     { --zone:var(--clr-comp); --zone-soft:var(--clr-comp-soft); }
+.zone-prof     { --zone:var(--clr-prof); --zone-soft:var(--clr-prof-soft); }
+.zone-sos      { --zone:var(--clr-sos);  --zone-soft:var(--clr-sos-soft); }
+/* Pattern automatico dentro una zona: bottoni .on, range slider, valori numerici */
+[class*="zone-"] .cb.on,
+[class*="zone-"] .rb.on{ background:var(--zone); border-color:var(--zone); color:#fff }
+[class*="zone-"] input[type=range]{ accent-color:var(--zone) }
+[class*="zone-"] .sv,
+[class*="zone-"] .zone-accent{ color:var(--zone) }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;font-family:'Inter',sans-serif;touch-action:manipulation}
 html,body{height:100%;overflow:hidden;background:var(--bg)}
 i.ph,i.ph-fill{line-height:1;pointer-events:none}
@@ -47,10 +94,21 @@ button{touch-action:manipulation}
 
 /* ── AUTH OVERLAY ── */
 #authOverlay{position:fixed;inset:0;z-index:9000;background:linear-gradient(160deg,#1a0a0a 0%,#2d1515 40%,#0f1e35 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;gap:0}
-.auth-logo{height:48px;margin-bottom:24px}
-.auth-title{font-size:28px;font-weight:900;color:#fff;letter-spacing:-.5px;margin-bottom:6px}
-.auth-title span{color:var(--red)}
-.auth-sub{font-size:14px;color:rgba(255,255,255,.55);margin-bottom:36px;text-align:center;line-height:1.5;max-width:280px}
+.auth-logo{height:88px;margin-bottom:18px}
+.auth-tagline{font-size:18px;font-weight:700;color:rgba(255,255,255,.85);letter-spacing:.3px;margin:0 0 36px;text-align:center;line-height:1.3}
+/* Pulsanti social — riga compatta con icone */
+.auth-socials{display:flex;gap:10px;width:100%;max-width:320px;margin-bottom:14px}
+.auth-social-btn{flex:1;height:52px;border-radius:26px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:0;transition:transform .15s,opacity .15s,box-shadow .15s;font-family:inherit;color:#fff;font-size:0}
+.auth-social-btn:active{transform:scale(.95)}
+.auth-social-btn:hover{box-shadow:0 6px 20px rgba(0,0,0,.35)}
+.auth-social-btn svg{width:22px;height:22px;flex-shrink:0}
+.auth-social-btn.gg{background:#fff}
+.auth-social-btn.ap{background:#000;border:1.5px solid rgba(255,255,255,.12)}
+.auth-social-btn.li{background:#0A66C2}
+.auth-social-btn.fb{background:#1877F2}
+.auth-btn-passkey{background:rgba(255,255,255,.06);color:#fff;border:1.5px solid rgba(255,255,255,.18);max-width:320px;margin-bottom:12px;font-size:14px}
+.auth-btn-passkey:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.35)}
+.auth-btn-passkey i{color:var(--bl,#1E6FFF)}
 .auth-btn{width:100%;max-width:320px;height:52px;border-radius:26px;border:none;cursor:pointer;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px;transition:transform .15s,opacity .15s;font-family:inherit}
 .auth-btn:active{transform:scale(.97)}
 .auth-btn-google{background:#fff;color:#1C1C1C;box-shadow:0 4px 20px rgba(0,0,0,.35);margin-bottom:12px}
@@ -64,6 +122,9 @@ button{touch-action:manipulation}
 .auth-email-send{height:48px;border-radius:24px;border:none;background:var(--red);color:#fff;font-size:13px;font-weight:700;padding:0 18px;cursor:pointer;font-family:inherit;flex-shrink:0;transition:opacity .15s}
 .auth-email-send:active{opacity:.8}
 .auth-footer{margin-top:32px;font-size:10px;color:rgba(255,255,255,.2);text-align:center;line-height:1.6}
+.auth-demo-btn{margin-top:20px;background:transparent;border:1.5px solid rgba(255,255,255,.25);color:rgba(255,255,255,.6);font-size:13px;font-weight:700;padding:10px 22px;border-radius:24px;cursor:pointer;font-family:inherit;letter-spacing:.3px;transition:all .2s;display:inline-flex;align-items:center;gap:8px}
+.auth-demo-btn:hover{border-color:rgba(255,255,255,.6);color:#fff}
+.auth-demo-btn i{font-size:18px}
 
 /* ── MAP TYPES ── */
 .map-types{position:fixed;top:56px;left:14px;z-index:200;display:flex;gap:5px}
@@ -712,35 +773,47 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 .itin-search-icon{position:absolute;left:32px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--muted);pointer-events:none}
 .itin-ac-drop{position:absolute;top:100%;left:20px;right:20px;background:var(--card);border:1.5px solid var(--blue);border-radius:11px;box-shadow:0 8px 24px rgba(0,0,0,.14);z-index:20;overflow:hidden;display:none}
 .itin-ac-drop.open{display:block}
-/* Trip cards */
-.itin-cards{padding:0 20px;display:flex;flex-direction:column;gap:14px;padding-bottom:20px}
-.trip-card{border-radius:18px;overflow:hidden;background:var(--card);box-shadow:0 4px 20px rgba(0,0,0,.09)}
-.trip-cover{height:150px;background-size:cover;background-position:center;position:relative}
-.trip-cover-overlay{position:absolute;inset:0;background:linear-gradient(transparent 25%,rgba(0,0,0,.68))}
-.trip-cover-badge{position:absolute;top:12px;left:12px;background:rgba(255,255,255,.22);backdrop-filter:blur(8px);border-radius:10px;padding:4px 10px;font-size:10px;font-weight:800;color:#fff;display:flex;align-items:center;gap:5px}
-.trip-cover-dates{position:absolute;bottom:10px;left:14px;font-size:11px;font-weight:700;color:rgba(255,255,255,.9)}
-.trip-cover-change{position:absolute;top:12px;right:12px;background:rgba(0,0,0,.35);border:none;color:#fff;border-radius:8px;padding:4px 8px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px}
-/* Visibility + share bar */
-.trip-vis-bar{display:flex;align-items:center;gap:6px;padding:10px 14px;border-bottom:1px solid var(--border)}
+/* Trip cards — griglia quadrata responsive (2 col mobile / 3 col desktop) */
+.itin-cards{padding:0 20px 20px;display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media(min-width:768px){.itin-cards{grid-template-columns:repeat(3,1fr);gap:16px}}
+@media(min-width:1200px){.itin-cards{grid-template-columns:repeat(4,1fr)}}
+.trip-card{border-radius:18px;overflow:hidden;background:var(--card);box-shadow:0 4px 20px rgba(0,0,0,.09);cursor:pointer;transition:transform .15s,box-shadow .15s;display:flex;flex-direction:column}
+.trip-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.14)}
+.trip-card:active{transform:translateY(0)}
+.trip-cover{aspect-ratio:1/1;background-size:cover;background-position:center;position:relative}
+.trip-cover-overlay{position:absolute;inset:0;background:linear-gradient(transparent 35%,rgba(0,0,0,.78))}
+.trip-cover-badge{position:absolute;top:10px;left:10px;background:rgba(255,255,255,.22);backdrop-filter:blur(8px);border-radius:8px;padding:3px 8px;font-size:9px;font-weight:800;color:#fff;display:flex;align-items:center;gap:4px;max-width:calc(100% - 20px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.trip-cover-dates{position:absolute;bottom:8px;left:10px;right:10px;font-size:10px;font-weight:700;color:rgba(255,255,255,.95);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.trip-cover-change{position:absolute;top:10px;right:10px;background:rgba(0,0,0,.45);border:none;color:#fff;border-radius:8px;padding:4px 6px;font-size:9px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:3px}
+/* Visibility + share bar (ora dentro overlay dettaglio) */
+.trip-vis-bar{display:flex;align-items:center;gap:6px;padding:10px 14px;border-bottom:1px solid var(--border);flex-wrap:wrap}
 .trip-vis-btn{height:26px;padding:0 10px;border-radius:13px;border:1.5px solid var(--border);background:none;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--muted);transition:all .15s;display:flex;align-items:center;gap:4px}
 .trip-vis-btn.active-pub{background:#DCFCE7;border-color:#16A34A;color:#16A34A}
 .trip-vis-btn.active-friends{background:#EBF2FC;border-color:var(--blue);color:var(--blue)}
 .trip-vis-btn.active-prv{background:#f5f0e8;border-color:#C8BFB0;color:var(--muted)}
 .trip-share-btn{margin-left:auto;height:26px;padding:0 10px;border-radius:13px;background:var(--red);border:none;color:#fff;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px}
-/* Trip body */
-.trip-body{padding:12px 16px 14px}
-.trip-name{font-size:17px;font-weight:900;color:var(--text);margin-bottom:5px}
-.trip-meta{display:flex;gap:12px;font-size:11px;color:var(--muted);margin-bottom:10px;flex-wrap:wrap}
-.trip-meta span{display:flex;align-items:center;gap:4px}
-.trip-footer{display:flex;align-items:center;gap:8px}
+/* Trip body — compatto sotto cover quadrata */
+.trip-body{padding:10px 12px 12px;display:flex;flex-direction:column;gap:6px}
+.trip-name{font-size:13px;font-weight:900;color:var(--text);line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.5em}
+@media(min-width:768px){.trip-name{font-size:14px}}
+.trip-meta{display:flex;gap:8px;font-size:10px;color:var(--muted);flex-wrap:wrap}
+.trip-meta span{display:flex;align-items:center;gap:3px}
+.trip-footer{display:flex;align-items:center;gap:6px;margin-top:2px}
 .trip-companions{display:flex}
-.trip-comp-av{width:24px;height:24px;border-radius:50%;border:2px solid var(--card);overflow:hidden;margin-left:-6px}
+.trip-comp-av{width:20px;height:20px;border-radius:50%;border:2px solid var(--card);overflow:hidden;margin-left:-5px}
 .trip-comp-av:first-child{margin-left:0}
 .trip-comp-av img{width:100%;height:100%;object-fit:cover}
-.trip-open-btn{margin-left:auto;height:30px;padding:0 14px;background:var(--blue);color:#fff;border:none;border-radius:15px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px}
-/* Trip detail espandibile */
-.trip-detail{display:none;border-top:1px solid var(--border)}
-.trip-detail.open{display:block}
+.trip-open-btn{margin-left:auto;height:24px;padding:0 8px;background:transparent;color:var(--blue);border:none;border-radius:12px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:3px}
+/* Trip detail — ora apre in overlay dedicato */
+.trip-detail-ov{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.55);display:none;align-items:flex-end;justify-content:center}
+.trip-detail-ov.open{display:flex}
+.trip-detail-sheet{width:100%;max-width:720px;max-height:92vh;background:var(--bg);border-radius:20px 20px 0 0;overflow-y:auto;-webkit-overflow-scrolling:touch;animation:tdSlideUp .3s ease-out}
+@media(min-width:768px){.trip-detail-sheet{border-radius:20px;max-height:88vh}}
+@keyframes tdSlideUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+.trip-detail-hdr{position:sticky;top:0;background:var(--bg);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);z-index:2}
+.trip-detail-hdr-title{font-size:16px;font-weight:900;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.trip-detail-close{background:none;border:none;cursor:pointer;color:var(--muted);font-size:20px;padding:4px;border-radius:8px}
+.trip-detail-close:hover{background:#f5f0e8;color:var(--text)}
 .trip-detail-section{padding:12px 16px 0}
 .trip-detail-header{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
 /* Mappa itinerario */
@@ -1030,13 +1103,30 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 <!-- AUTH OVERLAY -->
 <div id="authOverlay" style="display:none">
   <img class="auth-logo" src="https://poilove.com/img/logo-completo.svg" onerror="this.style.display='none'" alt="POI•LOVE">
-  <div class="auth-title">POI<span>•</span>LOVE</div>
-  <div class="auth-sub">La mappa dei luoghi che ami davvero.<br>Accedi per salvare i tuoi posti e dare LOVE.</div>
-  <button class="auth-btn auth-btn-google" onclick="signInWithGoogle()">
-    <svg width="22" height="22" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-    Continua con Google
+  <h3 class="auth-tagline">i luoghi del cuore</h3>
+
+  <!-- Riga 1: Google · Apple · LinkedIn · Facebook -->
+  <div class="auth-socials">
+    <button class="auth-social-btn gg" onclick="signInWithGoogle()" aria-label="Continua con Google" title="Continua con Google">
+      <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+    </button>
+    <button class="auth-social-btn ap" onclick="signInWithApple()" aria-label="Continua con Apple" title="Continua con Apple">
+      <svg viewBox="0 0 24 24" fill="#fff"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
+    </button>
+    <button class="auth-social-btn li" onclick="signInWithLinkedIn()" aria-label="Continua con LinkedIn" title="Continua con LinkedIn">
+      <svg viewBox="0 0 24 24" fill="#fff"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.67H9.35V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.07 2.07 0 1 1 0-4.14 2.07 2.07 0 0 1 0 4.14zM7.12 20.45H3.55V9h3.57v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/></svg>
+    </button>
+    <button class="auth-social-btn fb" onclick="signInWithFacebook()" aria-label="Continua con Facebook" title="Continua con Facebook">
+      <svg viewBox="0 0 24 24" fill="#fff"><path d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.79-4.69 4.53-4.69 1.31 0 2.69.24 2.69.24v2.97h-1.52c-1.49 0-1.96.93-1.96 1.89v2.27h3.33l-.53 3.49h-2.8V24C19.61 23.1 24 18.1 24 12.07z"/></svg>
+    </button>
+  </div>
+
+  <!-- Riga 2: Passkey biometrica (Android Credential Manager / iOS Face ID / desktop) -->
+  <button class="auth-btn auth-btn-passkey" id="authPasskeyBtn" onclick="signInWithPasskey()" style="display:none">
+    <i class="ph-duotone ph-fingerprint" style="font-size:20px"></i> Continua con biometria
   </button>
-  <div class="auth-divider">OPPURE</div>
+
+  <div class="auth-divider">oppure con magic link via email</div>
   <div class="auth-magic">
     <div class="auth-email-row">
       <input class="auth-email-in" id="authEmailIn" type="email" placeholder="la-tua@email.com"
@@ -1049,8 +1139,8 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
     Progetto Open Source · MIT License · © 2026 321.AL
   </div>
   <!-- DEMO BYPASS -->
-  <button onclick="enterDemoMode()" style="margin-top:20px;background:transparent;border:1.5px solid rgba(255,255,255,0.25);color:rgba(255,255,255,0.6);font-size:13px;font-weight:700;padding:10px 28px;border-radius:24px;cursor:pointer;font-family:inherit;letter-spacing:.3px;transition:all .2s" onmouseover="this.style.borderColor='rgba(255,255,255,0.6)';this.style.color='#fff'" onmouseout="this.style.borderColor='rgba(255,255,255,0.25)';this.style.color='rgba(255,255,255,0.6)'">
-    👁 Esplora in modalità demo
+  <button class="auth-demo-btn" onclick="enterDemoMode()">
+    <i class="ph-duotone ph-eye"></i> Esplora in modalità demo
   </button>
 </div>
 
@@ -1086,7 +1176,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 </div>
 
 <!-- ═══ PROFILE VIEW ═══ -->
-<div class="profile-view" id="profileView">
+<div class="profile-view zone-prof" id="profileView">
   <div id="privateProfile">
     <div class="profile-hero" id="profileHero">
       <!-- Cambio sfondo hero -->
@@ -1106,7 +1196,11 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
         <button class="hero-bg-opt" onclick="setHeroBg('linear-gradient(135deg,#7F00FF 0%,#E100FF 100%)')"><div class="hero-bg-swatch" style="background:linear-gradient(135deg,#7F00FF,#E100FF)"></div> Cosmo Viola</button>
         <button class="hero-bg-opt" onclick="setHeroBg('linear-gradient(135deg,#360033 0%,#0b8793 100%)')"><div class="hero-bg-swatch" style="background:linear-gradient(135deg,#360033,#0b8793)"></div> Mediterraneo</button>
         <button class="hero-bg-opt" onclick="setHeroBg('linear-gradient(135deg,#3E1F0F 0%,#A0522D 100%)')"><div class="hero-bg-swatch" style="background:linear-gradient(135deg,#3E1F0F,#A0522D)"></div> Espresso</button>
-        <button class="hero-bg-opt" onclick="setHeroBgImg()"><div class="hero-bg-swatch" style="background:var(--bg);border:1px dashed #999"></div> Da Unsplash…</button>
+        <button class="hero-bg-opt" onclick="setHeroBgImg()"><div class="hero-bg-swatch" style="background:var(--bg);border:1px dashed #999"></div> Casuale paesaggio</button>
+        <div style="height:1px;background:var(--border);margin:6px 4px"></div>
+        <button class="hero-bg-opt" onclick="openBgPopup()"><div class="hero-bg-swatch" style="background:linear-gradient(135deg,#D42B2B,#7C3AED)"></div> 🪄 Genera con ILLI•AI</button>
+        <button class="hero-bg-opt" onclick="document.getElementById('heroBgUploadFile').click()"><div class="hero-bg-swatch" style="background:#f5f0e8;display:flex;align-items:center;justify-content:center"><i class="ph-duotone ph-upload-simple" style="font-size:11px;color:var(--muted)"></i></div> Carica foto…</button>
+        <input type="file" id="heroBgUploadFile" accept="image/*" style="display:none" onchange="uploadHeroBgFile(event)">
       </div>
       <!-- Avatar -->
       <div class="profile-avatar-wrap" onclick="changeAvatar()">
@@ -1158,7 +1252,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
     </div>
     <div class="profile-body">
       <!-- CARD: come ti vedono gli altri -->
-      <button class="pub-toggle-card" onclick="togglePublicProfile(true)">
+      <button class="pub-toggle-card" onclick="currentViewedUser=null;togglePublicProfile(true)">
         <div class="pub-toggle-icon"><i class="ph-duotone ph-eye"></i></div>
         <div class="pub-toggle-text">
           <div class="pub-toggle-title" data-t="prof_pub_toggle">Come ti vedono gli altri</div>
@@ -1522,7 +1616,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 </div><!-- /trip-landing -->
 
 <!-- ═══ POI VIEW (Miei · Loved · Vicini) ═══ -->
-<div class="poi-view" id="poiView">
+<div class="poi-view zone-poi" id="poiView">
   <div class="poi-subtabs">
     <button class="poi-subtab active" data-subtab="mine"  onclick="setPoiSubtab('mine')"><i class="ph-duotone ph-map-pin"></i> I miei POI</button>
     <button class="poi-subtab"        data-subtab="loved" onclick="setPoiSubtab('loved')"><i class="ph-duotone ph-heart"></i> Loved</button>
@@ -1532,7 +1626,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 </div>
 
 <!-- ═══ COMPAGNI DI VIAGGIO VIEW ═══ -->
-<div class="companions-view" id="companionsView">
+<div class="companions-view zone-comp" id="companionsView">
   <div style="padding:16px 14px 8px">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
       <i class="ph-duotone ph-users-three" style="color:var(--blue);font-size:22px"></i>
@@ -1547,7 +1641,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 </div>
 
 <!-- ═══ ITINERARY VIEW ═══ -->
-<div class="itin-view" id="itinView">
+<div class="itin-view zone-itin" id="itinView">
 
   <!-- Topbar -->
   <div class="itin-topbar">
@@ -1573,7 +1667,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 </div>
 
 <!-- ═══ ILLI•AI VIEW (tab dedicata) ═══ -->
-<div class="illi-view" id="illiView">
+<div class="illi-view zone-illi" id="illiView">
   <div class="illi-view-hdr">
     <h2><img src="illi-ai.svg" alt="ILLI•AI"> ILLI•AI</h2>
     <p>La tua mascot e Travel Advisor. Ti guida nell'uso della piattaforma e suggerisce luoghi autentici.</p>
@@ -2094,8 +2188,95 @@ sb.auth.getSession().then(({ data: { session } }) => {
   currentUser = session?.user ?? null;
   const overlay = document.getElementById('authOverlay');
   if (overlay) overlay.style.display = currentUser ? 'none' : 'flex';
-  if (currentUser) syncProfileFromAuth();
+  if (currentUser) {
+    syncProfileFromAuth();
+    if(typeof loadMyLists==='function') loadMyLists();
+    if(typeof loadMyTags==='function') loadMyTags();
+  } else {
+    // Anche senza login carica i tag locali (non richiedono auth)
+    if(typeof loadMyTags==='function') setTimeout(loadMyTags,400);
+  }
+  // Avvia diagnostica connessione/schema (non bloccante)
+  setTimeout(()=>{ try{ runConnectionDiagnostics(); }catch(_){} }, 800);
 });
+
+/* ══════════════════════════════════════════
+   DIAGNOSTICA CONNESSIONE — verifica Supabase, schema, storage
+   Esegue al boot, log su console, niente popup invasivi.
+══════════════════════════════════════════ */
+async function runConnectionDiagnostics(){
+  const report = { supabase:false, profiles:false, lists:false, pois:false,
+                   coverUrl:false, coverType:false, storagePoiPhotos:false,
+                   missing:[], warnings:[] };
+  try {
+    // 1. Health check Supabase REST (anon è sufficiente per leggere lo schema pubblico)
+    const { error: e1 } = await sb.from('profiles').select('id',{head:true,count:'exact'}).limit(1);
+    report.supabase = !e1;
+    report.profiles = !e1;
+    if(e1) report.warnings.push('profiles non accessibile: '+e1.message);
+
+    // 2. Lists table
+    const { error: e2 } = await sb.from('lists').select('id',{head:true,count:'exact'}).limit(1);
+    report.lists = !e2;
+    if(e2) report.warnings.push('lists non accessibile: '+e2.message);
+
+    // 3. POIs table
+    const { error: e3 } = await sb.from('pois').select('id',{head:true,count:'exact'}).limit(1);
+    report.pois = !e3;
+    if(e3) report.warnings.push('pois non accessibile: '+e3.message);
+
+    // 4. Colonna cover_url (la nostra aggiunta per lo sfondo profilo)
+    const { error: e4 } = await sb.from('profiles').select('cover_url').limit(0);
+    report.coverUrl = !e4 || !/cover_url/i.test(e4.message||'');
+    if(e4 && /column.*cover_url/i.test(e4.message||'')){
+      report.missing.push('profiles.cover_url (text)');
+    }
+    // 5. Colonna cover_type
+    const { error: e5 } = await sb.from('profiles').select('cover_type').limit(0);
+    report.coverType = !e5 || !/cover_type/i.test(e5.message||'');
+    if(e5 && /column.*cover_type/i.test(e5.message||'')){
+      report.missing.push("profiles.cover_type (text, default 'gradient')");
+    }
+
+    // 6. Bucket storage poi_photos
+    try {
+      const { data: buckets } = await sb.storage.listBuckets();
+      report.storagePoiPhotos = !!(buckets||[]).find(b=>b.name==='poi_photos');
+      if(!report.storagePoiPhotos) report.warnings.push("Bucket 'poi_photos' non trovato — gli upload foto falliranno");
+    } catch(e) { report.warnings.push('Storage non leggibile: '+e.message); }
+
+    // Report
+    const ok = report.supabase && report.profiles && report.lists && report.pois;
+    const tag='[poilove diagnostics]';
+    console.group(tag+' connessione e schema');
+    console.log('Supabase REST :', report.supabase?'✅':'❌');
+    console.log('profiles      :', report.profiles?'✅':'❌');
+    console.log('  cover_url   :', report.coverUrl?'✅':'❌ (manca colonna)');
+    console.log('  cover_type  :', report.coverType?'✅':'❌ (manca colonna)');
+    console.log('lists         :', report.lists?'✅':'❌');
+    console.log('pois          :', report.pois?'✅':'❌');
+    console.log('Storage poi_photos:', report.storagePoiPhotos?'✅':'❌');
+    if(report.warnings.length){ console.warn('Warnings:', report.warnings); }
+    if(report.missing.length){
+      console.warn('SCHEMA MANCANTE — eseguire questo SQL in Supabase:');
+      console.warn(`ALTER TABLE profiles ADD COLUMN IF NOT EXISTS cover_url text;\nALTER TABLE profiles ADD COLUMN IF NOT EXISTS cover_type text DEFAULT 'gradient';`);
+    }
+    console.groupEnd();
+
+    // Toast leggero solo se ci sono problemi e l'utente è loggato
+    if(currentUser){
+      if(!ok){
+        showToast?.('⚠ Connessione DB parziale — vedi console');
+      } else if(report.missing.length){
+        showToast?.('⚠ Schema profilo da aggiornare — vedi console');
+      }
+    }
+    window.__poilove_diag = report; // Per ispezione manuale
+    return report;
+  } catch(e) {
+    console.error('[poilove diagnostics] errore:', e);
+  }
+}
 
 function onAuthStateUpdate(event) {
   const overlay = document.getElementById('authOverlay');
@@ -2104,7 +2285,23 @@ function onAuthStateUpdate(event) {
     overlay.style.display = 'none';
     syncProfileFromAuth();
     loadPOIsFromDB();
-    showToast('👋 Bentornato!');
+    // Carica dati utente persistenti
+    if(typeof loadMyLists==='function') loadMyLists();
+    if(typeof loadMyTags==='function') loadMyTags();
+    // "Ricordami" — salva snapshot leggero per pre-fill UX al prossimo avvio
+    try {
+      if(currentUser.email) localStorage.setItem('poilove_last_email', currentUser.email);
+      const meta = currentUser.user_metadata || {};
+      const snapshot = {
+        email: currentUser.email,
+        name: meta.full_name || meta.name || currentUser.email?.split('@')[0],
+        avatar: meta.avatar_url || meta.picture || ''
+      };
+      localStorage.setItem('poilove_remembered_user', JSON.stringify(snapshot));
+    } catch(_){}
+    const meta = currentUser.user_metadata || {};
+    const fname = (meta.full_name || meta.name || currentUser.email?.split('@')[0] || '').split(' ')[0];
+    showToast(fname ? `👋 Bentornato, ${fname}!` : '👋 Bentornato!');
   } else {
     overlay.style.display = 'flex';
   }
@@ -2113,18 +2310,65 @@ function onAuthStateUpdate(event) {
 function syncProfileFromAuth() {
   const meta = currentUser?.user_metadata || {};
   const name = meta.full_name || meta.name || currentUser?.email?.split('@')[0] || 'Utente';
-  const avatar = meta.avatar_url || meta.picture || '';
-  // Aggiorna UI profilo
+  const authAvatar = meta.avatar_url || meta.picture || '';
+  // Aggiorna UI profilo (nome)
   const pname = document.getElementById('profileName');
   if (pname) pname.textContent = name;
-  const pav = document.querySelector('.profile-avatar img');
-  if (pav && avatar) pav.src = avatar;
-  // Upsert profilo — NON sovrascrive username se già impostato dall'utente
-  sb.from('profiles').upsert({
-    id: currentUser.id,
-    avatar_url: avatar,
-    updated_at: new Date().toISOString()
-  }, { onConflict: 'id', ignoreDuplicates: false }).then(() => {});
+  const pubName = document.getElementById('pubProfileName');
+  if (pubName) pubName.textContent = name;
+  const pubEmail = document.getElementById('pubProfileEmail');
+  if (pubEmail) pubEmail.textContent = currentUser?.email || '';
+  // Avatar di partenza dall'auth (se non c'è uno custom in DB, useremo questo)
+  const pav = document.querySelector('#profileAvatarImg img');
+  const pubAv = document.querySelector('#publicProfile .profile-avatar img');
+  if (pav && authAvatar) pav.src = authAvatar;
+  if (pubAv && authAvatar) pubAv.src = authAvatar;
+  // Fallback locale (avatar custom salvato in localStorage)
+  try{
+    const localAv = localStorage.getItem('poilove_avatar');
+    if(localAv){ if(pav) pav.src=localAv; if(pubAv) pubAv.src=localAv; }
+  }catch(_){}
+  // Upsert profilo — NON sovrascrive avatar custom se già più recente.
+  // Inseriamo l'avatar auth solo se il profilo non ne ha uno.
+  sb.from('profiles').select('avatar_url,cover_url,cover_type,bio').eq('id',currentUser.id).single()
+    .then(({data})=>{
+      // Se nel DB c'è un avatar custom, prevale
+      if(data?.avatar_url){
+        if(pav) pav.src=data.avatar_url;
+        if(pubAv) pubAv.src=data.avatar_url;
+      } else if(authAvatar){
+        // Salva quello dell'auth come iniziale
+        sb.from('profiles').upsert({
+          id: currentUser.id,
+          avatar_url: authAvatar,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'id' }).then(()=>{});
+      }
+      // Cover salvato in DB
+      if(data?.cover_url){
+        const type = data.cover_type || (/^linear-gradient|^radial-gradient/.test(data.cover_url)?'gradient':'image');
+        if(type==='gradient'){
+          document.getElementById('profileHero').style.background=data.cover_url;
+          document.getElementById('lang-strip').style.background=data.cover_url;
+          const pubH=document.querySelector('#publicProfile .pub-header');
+          if(pubH) pubH.style.background=data.cover_url;
+        } else {
+          const css=`linear-gradient(rgba(0,0,0,.35),rgba(0,0,0,.55)),url('${data.cover_url}') center/cover`;
+          document.getElementById('profileHero').style.background=css;
+          document.getElementById('lang-strip').style.background=css;
+          const pubH=document.querySelector('#publicProfile .pub-header');
+          if(pubH) pubH.style.background=css;
+        }
+      } else {
+        // Fallback locale
+        loadProfileCover();
+      }
+      // Bio
+      if(data?.bio){
+        const bioEl=document.getElementById('myProfileBio');
+        if(bioEl){ bioEl.textContent=data.bio; bioEl.style.display='block'; }
+      }
+    });
   // Carica handle personalizzato dal DB (ha priorità sul nome Google)
   loadMyVanityHandle();
   // Aggiorna email chip nel profilo
@@ -2133,31 +2377,104 @@ function syncProfileFromAuth() {
   // Carica contatore POI per livello
   if(sb) sb.from('pois').select('id',{count:'exact',head:true}).eq('author_id',currentUser.id)
     .then(({count})=>{ if(typeof count==='number') updateLevelChip(count); });
-  // Mostra bio se presente
-  if(sb) sb.from('profiles').select('bio').eq('id',currentUser.id).single()
-    .then(({data})=>{
-      if(data?.bio){
-        const bioEl=document.getElementById('myProfileBio');
-        if(bioEl){bioEl.textContent=data.bio;bioEl.style.display='block';}
-      }
-    });
 }
 
 // ── LOGIN ──
+// URL di redirect = origine corrente (funziona sia su demo.poilove.com sia in locale)
+const AUTH_REDIRECT = (location.origin && location.origin.startsWith('http'))
+  ? location.origin + location.pathname
+  : 'https://demo.poilove.com/';
+
 async function signInWithGoogle() {
   const { error } = await sb.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo: 'https://poilove.com' }
+    options: { redirectTo: AUTH_REDIRECT }
   });
-  if (error) showToast('Errore: ' + error.message);
+  if (error) showToast('Errore Google: ' + error.message);
+}
+
+async function signInWithLinkedIn() {
+  // Provider LinkedIn (OIDC) — richiede abilitazione in Supabase → Auth → Providers
+  const { error } = await sb.auth.signInWithOAuth({
+    provider: 'linkedin_oidc',
+    options: { redirectTo: AUTH_REDIRECT }
+  });
+  if (error) {
+    if (/provider.*not.*enabled|disabled/i.test(error.message||'')) {
+      showToast('⚠ LinkedIn non ancora attivato (Supabase → Auth → Providers)');
+    } else {
+      showToast('Errore LinkedIn: ' + error.message);
+    }
+  }
+}
+
+async function signInWithFacebook() {
+  // Provider Facebook — richiede abilitazione in Supabase → Auth → Providers
+  const { error } = await sb.auth.signInWithOAuth({
+    provider: 'facebook',
+    options: { redirectTo: AUTH_REDIRECT }
+  });
+  if (error) {
+    if (/provider.*not.*enabled|disabled/i.test(error.message||'')) {
+      showToast('⚠ Facebook non ancora attivato (Supabase → Auth → Providers)');
+    } else {
+      showToast('Errore Facebook: ' + error.message);
+    }
+  }
+}
+
+async function signInWithApple() {
+  // Provider Apple — richiede abilitazione in Supabase → Auth → Providers
+  // (Apple Developer Program: Service ID + Team ID + Key ID + private key .p8)
+  const { error } = await sb.auth.signInWithOAuth({
+    provider: 'apple',
+    options: { redirectTo: AUTH_REDIRECT }
+  });
+  if (error) {
+    if (/provider.*not.*enabled|disabled/i.test(error.message||'')) {
+      showToast('⚠ Apple non ancora attivato (Supabase → Auth → Providers)');
+    } else {
+      showToast('Errore Apple: ' + error.message);
+    }
+  }
+}
+
+/* ── PASSKEY (WebAuthn) — biometric login per Android/iOS/desktop ──
+   MVP: usa email memorizzata nel device per spedire magic link senza re-digitarla.
+   Quando il backend webauthn (Edge Function Supabase) sarà attivo, qui verrà
+   sostituito il flow con navigator.credentials.create/get + verifica server-side. */
+async function signInWithPasskey(){
+  const lastEmail = localStorage.getItem('poilove_last_email');
+  if(!lastEmail){
+    // Prima volta: chiedi l'email e fai magic link
+    const email = prompt('Inserisci l\'email per attivare l\'accesso biometrico:');
+    if(!email||!email.includes('@')) return;
+    localStorage.setItem('poilove_last_email', email);
+    document.getElementById('authEmailIn').value = email;
+    return sendMagicLink();
+  }
+  // Tentativo WebAuthn nativo (se backend non è ancora pronto, fallback magic link)
+  if(window.PublicKeyCredential && navigator.credentials){
+    try {
+      // Solo prova di disponibilità; vero flow richiede challenge server-side
+      const ok = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+      if(!ok) throw new Error('No platform authenticator');
+    } catch(_){}
+  }
+  // Fallback pulito: magic link verso l'email memorizzata
+  document.getElementById('authEmailIn').value = lastEmail;
+  showToast(`🔐 Riconnessione a ${lastEmail}…`);
+  return sendMagicLink();
 }
 
 async function sendMagicLink() {
   const email = document.getElementById('authEmailIn')?.value?.trim();
   if (!email || !email.includes('@')) { showToast('Inserisci una email valida'); return; }
+  // Memorizza l'email per "ricordami" / passkey shortcut
+  try { localStorage.setItem('poilove_last_email', email); } catch(_){}
   const { error } = await sb.auth.signInWithOtp({
     email,
-    options: { emailRedirectTo: 'https://poilove.com' }
+    options: { emailRedirectTo: AUTH_REDIRECT }
   });
   if (error) showToast('Errore: ' + error.message);
   else {
@@ -2165,6 +2482,29 @@ async function sendMagicLink() {
     document.getElementById('authEmailIn').value = '';
   }
 }
+
+// Mostra il bottone passkey solo se device supporta WebAuthn + abbiamo un'email memorizzata
+(async function detectPasskey(){
+  try {
+    const btn = document.getElementById('authPasskeyBtn');
+    if(!btn) return;
+    const hasEmail = !!localStorage.getItem('poilove_last_email');
+    const hasWebAuthn = !!(window.PublicKeyCredential && navigator.credentials);
+    let hasPlatformAuth = false;
+    if(hasWebAuthn){
+      try { hasPlatformAuth = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(); }
+      catch(_){}
+    }
+    // Mostra il bottone se almeno uno dei due (email memorizzata o platform authenticator)
+    if(hasEmail || hasPlatformAuth){
+      btn.style.display = 'flex';
+      const lbl = hasEmail
+        ? `Continua come ${localStorage.getItem('poilove_last_email').split('@')[0]}`
+        : 'Continua con biometria';
+      btn.innerHTML = `<i class="ph-duotone ph-fingerprint" style="font-size:20px"></i> ${lbl}`;
+    }
+  } catch(_){}
+})();
 
 async function signOut() {
   await sb.auth.signOut();
@@ -3213,7 +3553,20 @@ function setAvTab(t){
 function setProfileAvatar(src){
   const img = document.querySelector('#profileAvatarImg img');
   if(img) img.src = src;
+  // Sincronizza anche header pubblico (visibile in "Come ti vedono gli altri")
+  const pubImg = document.querySelector('#publicProfile .profile-avatar img');
+  if(pubImg) pubImg.src = src;
   try { localStorage.setItem('poilove_avatar', src); } catch(_){}
+  // Salva su Supabase profiles.avatar_url (best-effort)
+  if(currentUser?.id && sb){
+    sb.from('profiles').upsert({
+      id: currentUser.id,
+      avatar_url: src,
+      updated_at: new Date().toISOString()
+    },{onConflict:'id'}).then(({error})=>{
+      if(error) console.warn('[poilove] avatar upsert error:',error.message);
+    });
+  }
   closeAvPopup();
   if(typeof showToast==='function') showToast('✓ Avatar aggiornato');
 }
@@ -3271,6 +3624,101 @@ function generateAIAvatar(){
 }
 
 /* ══════════════════════════════════════════
+   SFONDO PROFILO — Upload / Wikimedia / AI (Pollinations)
+   Riusa la stessa UX del popup avatar.
+══════════════════════════════════════════ */
+function openBgPopup(){
+  document.getElementById('heroBgPicker')?.classList.remove('open');
+  document.getElementById('bgPopupOv').classList.add('open');
+}
+function closeBgPopup(){
+  document.getElementById('bgPopupOv').classList.remove('open');
+}
+function setBgTab(t){
+  document.querySelectorAll('[data-bgtab]').forEach(b => b.classList.toggle('active', b.dataset.bgtab===t));
+  document.getElementById('bgPaneUpload').style.display   = t==='upload'   ? '' : 'none';
+  document.getElementById('bgPaneUnsplash').style.display = t==='unsplash' ? '' : 'none';
+  document.getElementById('bgPaneAI').style.display       = t==='ai'       ? '' : 'none';
+}
+// Applica lo sfondo (URL immagine) al profilo privato + pubblico, e salva
+function applyHeroBgImage(url){
+  const css = `linear-gradient(rgba(0,0,0,.35),rgba(0,0,0,.55)),url('${url}') center/cover`;
+  const hero = document.getElementById('profileHero');
+  const lang = document.getElementById('lang-strip');
+  if(hero) hero.style.background = css;
+  if(lang) lang.style.background = css;
+  // Sincronizza header pubblico (se presente)
+  const pubH = document.querySelector('#publicProfile .pub-header');
+  if(pubH) pubH.style.background = css;
+  saveProfileCover(url, 'image');
+  closeBgPopup();
+  if(typeof showToast==='function') showToast('🖼 Sfondo aggiornato');
+}
+// Upload sfondo dal device — direttamente dal mini picker
+function uploadHeroBgFile(e){
+  const file = e.target.files && e.target.files[0];
+  if(!file) return;
+  if(!file.type.startsWith('image/')){ showToast?.('Seleziona un\'immagine valida'); return; }
+  if(file.size > 8*1024*1024){ showToast?.('Immagine > 8 MB, troppo grande'); return; }
+  const reader = new FileReader();
+  reader.onload = () => applyHeroBgImage(reader.result);
+  reader.readAsDataURL(file);
+  document.getElementById('heroBgPicker')?.classList.remove('open');
+}
+// Upload sfondo dal popup grande
+function uploadBgFile(e){
+  const file = e.target.files && e.target.files[0];
+  if(!file) return;
+  if(!file.type.startsWith('image/')){ showToast?.('Seleziona un\'immagine valida'); return; }
+  if(file.size > 8*1024*1024){ showToast?.('Immagine > 8 MB, troppo grande'); return; }
+  const reader = new FileReader();
+  reader.onload = () => {
+    const preview = document.getElementById('bgUploadPreview');
+    const dataUrl = reader.result;
+    preview.innerHTML = `
+      <img src="${dataUrl}" style="width:100%;max-width:380px;aspect-ratio:16/7;object-fit:cover;border-radius:12px;display:block;margin:0 auto 10px;border:2px solid var(--blue)">
+      <button class="av-gen-btn" id="bgUploadConfirmBtn"><i class="ph-duotone ph-check"></i> Usa questa foto</button>`;
+    document.getElementById('bgUploadConfirmBtn').addEventListener('click', ()=> applyHeroBgImage(dataUrl));
+  };
+  reader.readAsDataURL(file);
+}
+function searchUnsplashBg(){
+  const q = (document.getElementById('bgUnsplashQ').value || '').trim();
+  if(!q) return;
+  const grid = document.getElementById('bgUnsplashGrid');
+  grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--muted)"><i class="ph-duotone ph-circle-notch" style="animation:spin 1s linear infinite;font-size:18px"></i> Carico…</div>';
+  const seeds = [];
+  for(let i=0;i<6;i++) seeds.push(Date.now() + i*1000 + Math.floor(Math.random()*9999));
+  const html = seeds.map(s => {
+    const url = `https://source.unsplash.com/800x450/?${encodeURIComponent(q)}&sig=${s}`;
+    return `<img src="${url}" loading="lazy" style="width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:10px;cursor:pointer;border:2px solid transparent;transition:border-color .15s" onclick="applyHeroBgImage(this.src)" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='transparent'">`;
+  }).join('');
+  grid.innerHTML = html;
+}
+function generateAIBg(){
+  const raw = (document.getElementById('bgAiPrompt').value || '').trim();
+  if(!raw){ showToast?.('Scrivi una descrizione'); return; }
+  // Prompt enhancement per paesaggio panoramico
+  const enhanced = `panoramic landscape, ${raw}, cinematic wide shot, soft natural lighting, high detail, vibrant colors, no people, no text, professional photography`;
+  const seed = Math.floor(Math.random()*99999);
+  // 1280x512 — formato profilo (stretto e largo) ideale per hero
+  const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(enhanced)}?width=1280&height=512&nologo=true&model=flux&seed=${seed}`;
+  const result = document.getElementById('bgAiResult');
+  result.innerHTML = `<div style="padding:30px 20px;text-align:center;color:var(--muted)"><i class="ph-duotone ph-circle-notch" style="font-size:24px;animation:spin 1s linear infinite;color:var(--blue)"></i><div style="margin-top:10px;font-size:13px">ILLI•AI sta dipingendo lo sfondo… <small style="opacity:.6">(può richiedere 15-30 sec)</small></div></div>`;
+  const img = new Image();
+  img.onload = () => {
+    result.innerHTML = `
+      <img src="${url}" style="width:100%;max-width:420px;aspect-ratio:16/7;object-fit:cover;border-radius:12px;display:block;margin:0 auto 12px;border:2px solid var(--blue);box-shadow:0 8px 24px rgba(40,94,167,.25)">
+      <button class="av-gen-btn" id="bgAiUseBtn"><i class="ph-duotone ph-check"></i> Usa questo sfondo</button>
+      <button class="av-gen-btn" id="bgAiAgainBtn" style="background:transparent;color:var(--text);border:1.5px solid var(--border);margin-top:8px"><i class="ph-duotone ph-arrows-clockwise"></i> Genera un altro</button>`;
+    document.getElementById('bgAiUseBtn').addEventListener('click', ()=> applyHeroBgImage(url));
+    document.getElementById('bgAiAgainBtn').addEventListener('click', generateAIBg);
+  };
+  img.onerror = () => { result.innerHTML = '<div style="padding:30px;text-align:center;color:var(--red);font-size:13px">Errore di rete. Riprova fra qualche secondo.</div>'; };
+  img.src = url;
+}
+
+/* ══════════════════════════════════════════
    COMPAGNI DI VIAGGIO — gestione form creazione
 ══════════════════════════════════════════ */
 function onCompTypeChange(){
@@ -3302,10 +3750,33 @@ function createCompagnia(){
   const range = type==='forever' ? '' : (startDate? `${startDate} ${startTime} → ${endDate} ${endTime}` : '');
 
   if(typeof showToast==='function') showToast(`✓ "${name}" creato! Codice: ${code} — ${typeLabel}${range?' · '+range:''}`);
-  else alert(`Gruppo "${name}" creato!\nCodice: ${code}\n${typeLabel}\n${range}\n${desc?'Descrizione: '+desc:''}\n${invites?'Inviti inviati a: '+invites:''}`);
+  else alert(`Gruppo "${name}" creato!\nCodice: ${code}\n${typeLabel}\n${range}\n${desc?'Descrizione: '+desc:''}`);
 
   // Copia codice in clipboard (fail-silent)
   if(navigator.clipboard) navigator.clipboard.writeText(code).catch(()=>{});
+
+  // Invio email reale via mailto: (apre il client mail dell'utente con tutto precompilato)
+  if(invites){
+    const recipients = invites.split(/[,;\s]+/).map(s=>s.trim()).filter(s=>s.includes('@'));
+    if(recipients.length){
+      const senderName = currentUser?.user_metadata?.full_name || currentUser?.user_metadata?.name || 'Un amico';
+      const joinUrl = `https://demo.poilove.com/?join=${code}`;
+      const subject = `${senderName} ti ha invitato a unirti a "${name}" su POI•LOVE`;
+      const body =
+        `Ciao!\n\n` +
+        `${senderName} ti invita a unirti a "${name}" — ${typeLabel}.\n` +
+        (range ? `📅 ${range}\n` : '') +
+        (desc ? `\n${desc}\n` : '') +
+        `\n🔑 Codice gruppo: ${code}\n` +
+        `🔗 Link diretto: ${joinUrl}\n\n` +
+        `Su POI•LOVE pianifichiamo viaggi insieme, scopriamo luoghi del cuore e ci ritroviamo sulla mappa.\n\n` +
+        `A presto,\n${senderName}`;
+      const href = `mailto:${encodeURIComponent(recipients.join(','))}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      // Apre il client email dell'utente (Gmail, Mail.app, Outlook…)
+      window.location.href = href;
+      setTimeout(()=>showToast?.(`📧 Invito pronto per ${recipients.length} destinatar${recipients.length===1?'io':'i'}`),300);
+    }
+  }
 
   closeSheet('compagniaOv','compagniaBg','compagniaSheet');
   if(document.getElementById('companionsView')?.classList.contains('active')) renderCompanionsTab();
@@ -3785,6 +4256,8 @@ function changeAvatar(){
   renderAvEnvGrid();
   document.getElementById('avPopupOv').classList.add('open');
 }
+// Alias backward-compat (chiamato da generateAvatar)
+function openAvPopup(){ changeAvatar(); }
 function closeAvPopup(){
   document.getElementById('avPopupOv').classList.remove('open');
 }
@@ -3820,7 +4293,11 @@ function toggleHeroBgPicker(e){
 function setHeroBg(gradient){
   document.getElementById('profileHero').style.background=gradient;
   document.getElementById('lang-strip').style.background=gradient;
+  // Sincronizza header pubblico
+  const pubH=document.querySelector('#publicProfile .pub-header');
+  if(pubH) pubH.style.background=gradient;
   document.getElementById('heroBgPicker').classList.remove('open');
+  saveProfileCover(gradient,'gradient');
   showToast('🎨 Sfondo aggiornato');
 }
 function setHeroBgImg(){
@@ -3832,10 +4309,57 @@ function setHeroBgImg(){
     'https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/Kotor_Montenegro_%281%29.jpg/800px-Kotor_Montenegro_%281%29.jpg',
   ];
   const url=imgs[Math.floor(Math.random()*imgs.length)];
-  const imgBg=`linear-gradient(rgba(0,0,0,.45),rgba(0,0,0,.65)),url('${url}') center/cover`;
-  document.getElementById('profileHero').style.background=imgBg;
-  document.getElementById('lang-strip').style.background=imgBg;
-  showToast('🖼 Sfondo paesaggio aggiornato');
+  applyHeroBgImage(url);
+}
+
+/* ── Salvataggio sfondo profilo (Supabase + localStorage) ──
+   Salva sia il valore del CSS background (gradient o url) sia il "cover_url" originale,
+   così il profilo pubblico può ricostruire lo sfondo senza il layer scuro.            */
+async function saveProfileCover(value, type){
+  try{ localStorage.setItem('poilove_cover', JSON.stringify({value,type})); }catch(_){}
+  // Salva su Supabase profiles.cover_url (richiede colonna esistente)
+  if(currentUser?.id && sb){
+    try{
+      const payload={ id:currentUser.id, updated_at:new Date().toISOString() };
+      payload.cover_url = type==='gradient' ? value : value; // string in entrambi i casi
+      payload.cover_type = type;
+      const { error } = await sb.from('profiles').upsert(payload,{onConflict:'id'});
+      if(error){
+        // Se la colonna non esiste, fallback silenzioso (resta in localStorage)
+        if(/column.*cover_url|cover_type/i.test(error.message||'')){
+          console.warn('[poilove] Aggiungi colonne profiles.cover_url + cover_type — vedi SQL in CLAUDE.md');
+        } else {
+          console.warn('[poilove] saveProfileCover error:',error.message);
+        }
+      }
+    }catch(e){ console.warn('[poilove] saveProfileCover exception:',e); }
+  }
+}
+// Carica e applica lo sfondo salvato (Supabase prioritario, fallback localStorage)
+async function loadProfileCover(){
+  let cover=null;
+  if(currentUser?.id && sb){
+    try{
+      const { data } = await sb.from('profiles').select('cover_url,cover_type').eq('id',currentUser.id).single();
+      if(data?.cover_url){ cover={value:data.cover_url, type:data.cover_type||(/^linear-gradient|^radial-gradient/.test(data.cover_url)?'gradient':'image')}; }
+    }catch(_){}
+  }
+  if(!cover){
+    try{ cover=JSON.parse(localStorage.getItem('poilove_cover')||'null'); }catch(_){ }
+  }
+  if(!cover) return;
+  if(cover.type==='gradient'){
+    document.getElementById('profileHero').style.background=cover.value;
+    document.getElementById('lang-strip').style.background=cover.value;
+    const pubH=document.querySelector('#publicProfile .pub-header');
+    if(pubH) pubH.style.background=cover.value;
+  } else {
+    const css=`linear-gradient(rgba(0,0,0,.35),rgba(0,0,0,.55)),url('${cover.value}') center/cover`;
+    document.getElementById('profileHero').style.background=css;
+    document.getElementById('lang-strip').style.background=css;
+    const pubH=document.querySelector('#publicProfile .pub-header');
+    if(pubH) pubH.style.background=css;
+  }
 }
 document.addEventListener('click',e=>{
   if(!e.target.closest('#heroBgBtn')&&!e.target.closest('#heroBgPicker'))
@@ -3844,6 +4368,40 @@ document.addEventListener('click',e=>{
 function togglePublicProfile(show){
   document.getElementById('privateProfile').style.display=show?'none':'block';
   document.getElementById('publicProfile').style.display=show?'block':'none';
+  if(show){
+    // Se non si sta visualizzando un altro utente (chiamata da "Come ti vedono gli altri"),
+    // popola il public profile con i dati dell'utente corrente.
+    if(!currentViewedUser || currentViewedUser.__own){
+      syncOwnPublicPreview();
+    }
+  }
+}
+// Popola #publicProfile con i dati dell'utente corrente: avatar, nome, sfondo, vanity, bio
+function syncOwnPublicPreview(){
+  // Avatar dal profilo privato (è già stato sincronizzato in syncProfileFromAuth)
+  const myAv = document.querySelector('#profileAvatarImg img')?.src;
+  const pubAv = document.querySelector('#publicProfile .profile-avatar img');
+  if(myAv && pubAv) pubAv.src=myAv;
+  // Nome
+  const myName = document.getElementById('myProfileName')?.textContent;
+  const pubName = document.getElementById('pubProfileName');
+  if(myName && pubName) pubName.textContent=myName;
+  // Email
+  const pubEmail = document.getElementById('pubProfileEmail');
+  if(pubEmail) pubEmail.textContent = currentUser?.email || document.getElementById('profEmailTxt')?.textContent || '';
+  // Vanity URL
+  const myVanity = document.getElementById('myVanityTxt')?.textContent;
+  const pubVanity = document.getElementById('pubVanityTxt');
+  if(myVanity && pubVanity) pubVanity.textContent=myVanity;
+  // Sfondo: copia dallo style del profileHero
+  const heroBg = document.getElementById('profileHero')?.style.background;
+  const pubH = document.querySelector('#publicProfile .pub-header');
+  if(heroBg && pubH) pubH.style.background=heroBg;
+  // Nascondi azioni "follow/connect" sul proprio profilo
+  ['pubFollowBtn','pubConnectBtn','pubShareLocBtn','pubBlockBtn','locDurPicker'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.style.display='none';
+  });
 }
 function showTagInput(){
   const container=document.getElementById('tagsContainer');
@@ -3864,15 +4422,54 @@ function addTag(text){
   const container=document.getElementById('tagsContainer');
   const chip=document.createElement('span');chip.className='tag-chip';chip.textContent=t;
   container.insertBefore(chip,container.lastElementChild);
+  // Persistenza locale (i tag non hanno una tabella dedicata)
+  try{
+    const arr=JSON.parse(localStorage.getItem('poilove_tags')||'[]');
+    if(!arr.includes(t)){ arr.push(t); localStorage.setItem('poilove_tags',JSON.stringify(arr)); }
+  }catch(_){}
   showToast(`+ Tag "${t}"`);
 }
-function saveNewList(){
+// Ricarica i tag salvati al ritorno sul profilo
+function loadMyTags(){
+  try{
+    const arr=JSON.parse(localStorage.getItem('poilove_tags')||'[]');
+    const container=document.getElementById('tagsContainer');
+    if(!container||!arr.length) return;
+    const addBtn=container.lastElementChild;
+    arr.forEach(t=>{
+      // Evita duplicati se già presenti nel DOM
+      const exists=Array.from(container.querySelectorAll('.tag-chip')).some(el=>el.textContent===t);
+      if(exists) return;
+      const chip=document.createElement('span');chip.className='tag-chip';chip.textContent=t;
+      container.insertBefore(chip,addBtn);
+    });
+  }catch(_){}
+}
+async function saveNewList(){
   const name=document.getElementById('newListName').value.trim();
   if(!name){showToast('Inserisci un nome');return;}
   const colors=['#D42B2B','#285EA7','#22C55E','#D48B2B','#7C3AED'];
   const container=document.getElementById('listsContainer');
   const color=colors[container.children.length%colors.length];
+
+  // Salvataggio reale su Supabase (se loggato)
+  let listId=null;
+  if(currentUser?.id && sb){
+    const { data, error } = await sb.from('lists').insert({
+      owner_id: currentUser.id,
+      name: name,
+      is_public: true
+    }).select('id').single();
+    if(error){
+      console.warn('[poilove] insert lista error:',error.message);
+      showToast('⚠ Lista salvata solo localmente');
+    } else {
+      listId=data.id;
+    }
+  }
+
   const item=document.createElement('div');item.className='list-item';
+  if(listId) item.dataset.listId=listId;
   item.innerHTML=`<div class="list-dot" style="background:${color}"></div><div class="list-info"><div class="list-name">${name}</div><div class="list-meta">0 POI</div></div><span class="list-vis lv-pub">Pubblica</span>`;
   container.appendChild(item);
   const statEl=document.getElementById('statList');if(statEl)statEl.textContent=parseInt(statEl.textContent)+1;
@@ -3882,6 +4479,33 @@ function saveNewList(){
   closeSheet('addListOv','addListBg','addListSheet');
   showToast(`+ Lista "${name}"`);
   document.getElementById('newListName').value='';
+}
+// Carica le liste dell'utente da Supabase e le rende nel container
+async function loadMyLists(){
+  if(!currentUser?.id || !sb) return;
+  const { data, error } = await sb.from('lists').select('id,name,is_public').eq('owner_id',currentUser.id).order('created_at',{ascending:true});
+  if(error||!data) return;
+  const container=document.getElementById('listsContainer');
+  if(!container) return;
+  // Mantieni solo liste già rese (con dataset.listId) e quelle hardcoded di partenza —
+  // aggiungi solo quelle nuove non ancora presenti
+  const existingIds=new Set(Array.from(container.querySelectorAll('[data-list-id]')).map(el=>el.dataset.listId));
+  const colors=['#D42B2B','#285EA7','#22C55E','#D48B2B','#7C3AED'];
+  let idx=container.children.length;
+  data.forEach(l=>{
+    if(existingIds.has(l.id)) return;
+    const color=colors[idx++%colors.length];
+    const item=document.createElement('div');
+    item.className='list-item';
+    item.dataset.listId=l.id;
+    const visClass=l.is_public?'lv-pub':'lv-prv';
+    const visLbl=l.is_public?'Pubblica':'Privata';
+    item.innerHTML=`<div class="list-dot" style="background:${color}"></div><div class="list-info"><div class="list-name">${l.name}</div><div class="list-meta">0 POI</div></div><span class="list-vis ${visClass}">${visLbl}</span>`;
+    container.appendChild(item);
+  });
+  // Aggiorna stat
+  const statEl=document.getElementById('statList');
+  if(statEl) statEl.textContent=container.querySelectorAll('.list-item').length;
 }
 function deletePOI(id){
   const card=document.getElementById(id);if(!card)return;
@@ -4641,18 +5265,37 @@ async function savePOIEdit(data){
    PROFILO PUBBLICO — Segui / Collegati / Blocca
 ══════════════════════════════════════════ */
 let pubFollowing=false,pubConnected=false,pubBlocked=false;
-function togglePublicFollow(){
+async function togglePublicFollow(){
   pubFollowing=!pubFollowing;
   const btn=document.getElementById('pubFollowBtn');
   const lbl=document.getElementById('pubFollowLbl');
   btn.classList.toggle('active',pubFollowing);
   btn.querySelector('i').className=pubFollowing?'ph ph-user-check':'ph ph-user-plus';
+  const targetName=currentViewedUser?.username||currentViewedUser?.user_metadata?.full_name||'utente';
   if(lbl)lbl.textContent=pubFollowing
     ?(lang==='it'?'Segui già':lang==='sq'?'Ndjekës':'Following')
     :(lang==='it'?'Segui':lang==='sq'?'Ndiq':'Follow');
+  // Persistenza reale su Supabase (raccolta dati): inserisce/cancella in `follows`
+  if(currentUser?.id && currentViewedUser?.id && currentUser.id!==currentViewedUser.id && sb){
+    try{
+      if(pubFollowing){
+        const { error } = await sb.from('follows').insert({
+          follower_id: currentUser.id,
+          following_id: currentViewedUser.id
+        });
+        if(error && !/duplicate|unique/i.test(error.message||'')){
+          console.warn('[poilove] follow insert error:',error.message);
+        }
+      } else {
+        await sb.from('follows').delete()
+          .eq('follower_id', currentUser.id)
+          .eq('following_id', currentViewedUser.id);
+      }
+    }catch(e){ console.warn('[poilove] follow toggle exception:',e); }
+  }
   showToast(pubFollowing
-    ?(lang==='it'?'Stai seguendo Alessandro C.':lang==='sq'?'Po ndjek Alessandro C.':'Now following Alessandro C.')
-    :(lang==='it'?'Non segui più Alessandro C.':lang==='sq'?'Nuk ndjek më':'Unfollowed Alessandro C.'));
+    ?(lang==='it'?`Stai seguendo ${targetName}`:lang==='sq'?`Po ndjek ${targetName}`:`Now following ${targetName}`)
+    :(lang==='it'?`Non segui più ${targetName}`:lang==='sq'?'Nuk ndjek më':`Unfollowed ${targetName}`));
 }
 function togglePublicConnect(){
   pubConnected=!pubConnected;
@@ -4735,50 +5378,28 @@ function renderTripCards(){
 }
 
 function renderTripCardHTML(t){
-  const compsHtml=t.companions.slice(0,4).map((n,i)=>{
+  const compsHtml=t.companions.slice(0,3).map((n,i)=>{
     const bg=['285EA7','D42B2B','22C55E','F97316'];
     return `<div class="trip-comp-av"><img src="https://ui-avatars.com/api/?name=${encodeURIComponent(n)}&background=${bg[i%4]}&color=fff&size=48" alt=""></div>`;
   }).join('');
-  const visClass={pub:'active-pub',friends:'active-friends',prv:'active-prv'};
+  // Card compatta cliccabile — il dettaglio si apre in overlay
   return `
-  <div class="trip-card" id="tc-${t.id}">
+  <div class="trip-card" id="tc-${t.id}" onclick="openTripDetail('${t.id}')">
     <div class="trip-cover" style="background-image:url('${t.cover}')">
       <div class="trip-cover-overlay"></div>
-      <div class="trip-cover-badge"><i class="ph-duotone ph-map-pin" style="font-size:11px"></i> ${t.badge}</div>
+      <div class="trip-cover-badge"><i class="ph-duotone ph-map-pin" style="font-size:9px"></i> ${t.badge}</div>
       <div class="trip-cover-dates">${t.dates}</div>
-      <button class="trip-cover-change" onclick="changeTripCover('${t.id}')"><i class="ph-duotone ph-image" style="font-size:10px"></i> Cover</button>
-    </div>
-    <div class="trip-vis-bar">
-      <button class="trip-vis-btn${t.visibility==='pub'?' active-pub':''}" onclick="setTripVis('${t.id}','pub')"><i class="ph-duotone ph-globe"></i> Pubblico</button>
-      <button class="trip-vis-btn${t.visibility==='friends'?' active-friends':''}" onclick="setTripVis('${t.id}','friends')"><i class="ph-duotone ph-users"></i> Amici</button>
-      <button class="trip-vis-btn${t.visibility==='prv'?' active-prv':''}" onclick="setTripVis('${t.id}','prv')"><i class="ph-duotone ph-lock-simple"></i> Privato</button>
-      <button class="trip-share-btn" onclick="shareTripLink('${t.id}')"><i class="ph-duotone ph-share-network"></i> Link</button>
+      <button class="trip-cover-change" onclick="event.stopPropagation();changeTripCover('${t.id}')" title="Cambia copertina"><i class="ph-duotone ph-image" style="font-size:10px"></i></button>
     </div>
     <div class="trip-body">
       <div class="trip-name">${t.name}</div>
       <div class="trip-meta">
         <span><i class="ph-duotone ph-map-pin"></i> <span id="stopcount-${t.id}">${t.stops.length}</span> tappe</span>
-        <span><i class="ph-duotone ph-users"></i> ${t.companions.length} compagni</span>
-        <span><i class="ph-duotone ph-heart" style="color:var(--red)"></i> ${t.id==='trip1'?'24':'—'}</span>
+        <span><i class="ph-duotone ph-users"></i> ${t.companions.length}</span>
       </div>
       <div class="trip-footer">
         <div class="trip-companions">${compsHtml}</div>
-        <button class="trip-open-btn" onclick="toggleTripDetail('${t.id}')">
-          <i class="ph-duotone ph-caret-down" id="${t.id}Arrow"></i> Dettaglio
-        </button>
-      </div>
-    </div>
-    <div class="trip-detail" id="td-${t.id}">
-      <div class="trip-detail-section">
-        <div class="trip-detail-header">Calendario viaggio</div>
-        <div class="mini-cal" id="miniCal-${t.id}"></div>
-        <div class="trip-detail-header">Mappa itinerario</div>
-        <div class="itin-map" id="itin-map-${t.id}"></div>
-        <div class="trip-detail-header">Tappe pianificate</div>
-        <div class="stops-list" id="stops-${t.id}">${renderTripStopsHTML(t)}</div>
-        <button class="itin-new-btn" style="width:100%;justify-content:center;margin:4px 0 16px;background:#f5f0e8;color:var(--blue);font-size:12px" onclick="addNewStop('${t.id}')">
-          <i class="ph-duotone ph-plus"></i> Aggiungi tappa
-        </button>
+        <span class="trip-open-btn"><i class="ph-duotone ph-arrow-up-right"></i> Apri</span>
       </div>
     </div>
   </div>`;
@@ -4813,23 +5434,66 @@ function renderTripStopsHTML(t){
   }).join('');
 }
 
-/* ── TOGGLE DETAIL ── */
-function toggleTripDetail(tripId){
-  const detail=document.getElementById('td-'+tripId);
-  const arrow=document.getElementById(tripId+'Arrow');
-  if(!detail)return;
-  const wasOpen=detail.classList.contains('open');
-  detail.classList.toggle('open');
-  if(arrow)arrow.className=wasOpen?'ph ph-caret-down':'ph ph-caret-up';
-  if(!wasOpen){
-    const t=TRIPS[tripId];
-    if(t){
-      if(!CAL_STATE[tripId])CAL_STATE[tripId]={year:t.calYear,month:t.calMonth};
-      renderMiniCal(tripId);
-      setTimeout(()=>initItinMap(tripId),180);
-    }
+/* ── OPEN/CLOSE TRIP DETAIL OVERLAY ── */
+let _activeTripDetailId=null;
+function openTripDetail(tripId){
+  const t=TRIPS[tripId];
+  if(!t)return;
+  _activeTripDetailId=tripId;
+  // Crea overlay se non esiste
+  let ov=document.getElementById('tripDetailOv');
+  if(!ov){
+    ov=document.createElement('div');
+    ov.id='tripDetailOv';
+    ov.className='trip-detail-ov';
+    ov.addEventListener('click',e=>{ if(e.target===ov)closeTripDetail(); });
+    document.body.appendChild(ov);
   }
+  ov.innerHTML=`
+    <div class="trip-detail-sheet" id="tripDetailSheet">
+      <div class="trip-detail-hdr">
+        <div class="trip-detail-hdr-title">${t.name}</div>
+        <button class="trip-detail-close" onclick="closeTripDetail()" aria-label="Chiudi"><i class="ph-duotone ph-x"></i></button>
+      </div>
+      <div class="trip-vis-bar">
+        <button class="trip-vis-btn${t.visibility==='pub'?' active-pub':''}" onclick="setTripVis('${t.id}','pub')"><i class="ph-duotone ph-globe"></i> Pubblico</button>
+        <button class="trip-vis-btn${t.visibility==='friends'?' active-friends':''}" onclick="setTripVis('${t.id}','friends')"><i class="ph-duotone ph-users"></i> Amici</button>
+        <button class="trip-vis-btn${t.visibility==='prv'?' active-prv':''}" onclick="setTripVis('${t.id}','prv')"><i class="ph-duotone ph-lock-simple"></i> Privato</button>
+        <button class="trip-share-btn" onclick="shareTripLink('${t.id}')"><i class="ph-duotone ph-share-network"></i> Link</button>
+      </div>
+      <div class="trip-detail-section">
+        <div class="trip-detail-header">Calendario viaggio</div>
+        <div class="mini-cal" id="miniCal-${t.id}"></div>
+        <div class="trip-detail-header">Mappa itinerario</div>
+        <div class="itin-map" id="itin-map-${t.id}"></div>
+        <div class="trip-detail-header">Tappe pianificate</div>
+        <div class="stops-list" id="stops-${t.id}">${renderTripStopsHTML(t)}</div>
+        <button class="itin-new-btn" style="width:100%;justify-content:center;margin:4px 0 16px;background:#f5f0e8;color:var(--blue);font-size:12px" onclick="addNewStop('${t.id}')">
+          <i class="ph-duotone ph-plus"></i> Aggiungi tappa
+        </button>
+      </div>
+    </div>`;
+  ov.classList.add('open');
+  document.body.style.overflow='hidden';
+  if(!CAL_STATE[tripId])CAL_STATE[tripId]={year:t.calYear,month:t.calMonth};
+  renderMiniCal(tripId);
+  setTimeout(()=>initItinMap(tripId),180);
 }
+function closeTripDetail(){
+  const ov=document.getElementById('tripDetailOv');
+  if(ov)ov.classList.remove('open');
+  document.body.style.overflow='';
+  // Cleanup mappa associata
+  if(_activeTripDetailId&&itinMaps[_activeTripDetailId]){
+    try{itinMaps[_activeTripDetailId].remove();}catch(_){}
+    delete itinMaps[_activeTripDetailId];
+  }
+  _activeTripDetailId=null;
+}
+// Backward-compat: toggleTripDetail apre l'overlay
+function toggleTripDetail(tripId){ openTripDetail(tripId); }
+// Escape chiude
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&document.getElementById('tripDetailOv')?.classList.contains('open'))closeTripDetail(); });
 
 /* ── MINI-CALENDAR ── */
 function renderMiniCal(tripId){
@@ -5725,6 +6389,73 @@ async function confirmPhotoPicker(){
         <i class="ph-duotone ph-sparkle"></i> Genera con ILLI•AI
       </button>
       <div id="avAiResult" style="margin-top:14px;text-align:center"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ HERO BACKGROUND POPUP — 3 tab: Upload · Wikimedia · AI ILLI ═══ -->
+<div class="av-popup-overlay" id="bgPopupOv" onclick="if(event.target===this)closeBgPopup()">
+  <div class="av-popup">
+    <div class="av-popup-handle"></div>
+    <div class="av-popup-head">
+      <div>
+        <div class="av-popup-title">Cambia sfondo profilo</div>
+        <div class="av-popup-sub">Carica una tua foto, scegli un paesaggio, oppure fattelo dipingere da ILLI•AI.</div>
+      </div>
+      <button class="av-popup-close" onclick="closeBgPopup()"><i class="ph-duotone ph-x"></i></button>
+    </div>
+
+    <!-- Tabs Switcher -->
+    <div class="av-tabs">
+      <button class="av-tab-btn active" data-bgtab="upload"   onclick="setBgTab('upload')"><i class="ph-duotone ph-upload-simple"></i> Upload</button>
+      <button class="av-tab-btn"        data-bgtab="unsplash" onclick="setBgTab('unsplash')"><i class="ph-duotone ph-image"></i> Paesaggi</button>
+      <button class="av-tab-btn"        data-bgtab="ai"       onclick="setBgTab('ai')"><i class="ph-duotone ph-sparkle"></i> ILLI•AI</button>
+    </div>
+
+    <!-- Pane: UPLOAD -->
+    <div class="av-pane" id="bgPaneUpload">
+      <div class="av-upload-drop" onclick="document.getElementById('bgUploadFile').click()">
+        <i class="ph-duotone ph-cloud-arrow-up" style="font-size:36px;color:var(--blue)"></i>
+        <div style="font-size:13px;font-weight:700;margin-top:6px">Carica un'immagine panoramica</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:3px">JPG, PNG · max 8 MB · meglio se larga</div>
+        <input type="file" id="bgUploadFile" accept="image/*" style="display:none" onchange="uploadBgFile(event)">
+      </div>
+      <div id="bgUploadPreview" style="margin-top:14px;text-align:center"></div>
+    </div>
+
+    <!-- Pane: PAESAGGI (Unsplash + Wikimedia) -->
+    <div class="av-pane" id="bgPaneUnsplash" style="display:none">
+      <div style="display:flex;gap:6px;margin-bottom:10px">
+        <input id="bgUnsplashQ" type="text" placeholder="Cerca: tirana, mare, montagne…" style="flex:1;height:40px;border:1.5px solid var(--border);border-radius:11px;padding:0 14px;font-size:13px;font-family:inherit;outline:none;background:var(--card);color:var(--text)" onkeydown="if(event.key==='Enter')searchUnsplashBg()">
+        <button onclick="searchUnsplashBg()" style="height:40px;padding:0 16px;border-radius:11px;background:var(--blue);color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit"><i class="ph-duotone ph-magnifying-glass"></i></button>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+        <button class="av-chip" onclick="document.getElementById('bgUnsplashQ').value='tirana albania';searchUnsplashBg()">🇦🇱 Tirana</button>
+        <button class="av-chip" onclick="document.getElementById('bgUnsplashQ').value='balkans landscape';searchUnsplashBg()">⛰️ Balcani</button>
+        <button class="av-chip" onclick="document.getElementById('bgUnsplashQ').value='adriatic sea';searchUnsplashBg()">🌊 Adriatico</button>
+        <button class="av-chip" onclick="document.getElementById('bgUnsplashQ').value='sunset mountains';searchUnsplashBg()">🌄 Tramonto</button>
+        <button class="av-chip" onclick="document.getElementById('bgUnsplashQ').value='vintage architecture';searchUnsplashBg()">🏛 Vintage</button>
+        <button class="av-chip" onclick="document.getElementById('bgUnsplashQ').value='abstract art';searchUnsplashBg()">🎨 Astratto</button>
+      </div>
+      <div id="bgUnsplashGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px"></div>
+    </div>
+
+    <!-- Pane: AI -->
+    <div class="av-pane" id="bgPaneAI" style="display:none">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:8px">Descrivi lo sfondo del tuo profilo. ILLI•AI genererà un'immagine panoramica con <strong>Flux</strong>.</div>
+      <textarea id="bgAiPrompt" rows="3" placeholder="Es: panorama di Tirana al tramonto, luci calde, montagne sullo sfondo, atmosfera cinematografica" style="width:100%;border:1.5px solid var(--border);border-radius:11px;padding:10px 14px;font-size:13px;font-family:inherit;outline:none;background:var(--card);color:var(--text);resize:vertical;line-height:1.5;box-sizing:border-box"></textarea>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin:10px 0">
+        <button class="av-chip" onclick="document.getElementById('bgAiPrompt').value+=' panorama urbano cinematografico'">Cinematic</button>
+        <button class="av-chip" onclick="document.getElementById('bgAiPrompt').value+=' acquerello stile illustrazione'">Acquerello</button>
+        <button class="av-chip" onclick="document.getElementById('bgAiPrompt').value+=' tramonto caldo pastello'">Tramonto</button>
+        <button class="av-chip" onclick="document.getElementById('bgAiPrompt').value+=' notte stellata neon'">Neon</button>
+        <button class="av-chip" onclick="document.getElementById('bgAiPrompt').value+=' montagne dei Balcani al mattino'">Balcani</button>
+        <button class="av-chip" onclick="document.getElementById('bgAiPrompt').value+=' minimal astratto colori caldi'">Minimal</button>
+      </div>
+      <button class="av-gen-btn" onclick="generateAIBg()">
+        <i class="ph-duotone ph-sparkle"></i> Genera con ILLI•AI
+      </button>
+      <div id="bgAiResult" style="margin-top:14px;text-align:center"></div>
     </div>
   </div>
 </div>
