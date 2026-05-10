@@ -9,13 +9,14 @@
 name: Deploy → poilove.com (root)
 
 on:
-  # Auto-deploy RIATTIVATO 2026-05-10 (era disattivato 2026-05-08).
-  # Push su main + path matching → SSH+rsync verso httpdocs/ poilove.com
-  push:
-    branches: [main]
-    paths:
-      - 'web/**'
-      - '.github/workflows/deploy-web.yml'
+  # Auto-deploy DISATTIVATO 2026-05-10: chiave SSH PLESK_SSH_KEY non valida
+  # ("Permission denied, Too many authentication failures").
+  # Dopo aver rigenerato la chiave e aggiornato il secret, decommentare push:
+  # push:
+  #   branches: [main]
+  #   paths:
+  #     - 'web/**'
+  #     - '.github/workflows/deploy-web.yml'
   workflow_dispatch:
 
 jobs:

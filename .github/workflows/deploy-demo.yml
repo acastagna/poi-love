@@ -20,11 +20,14 @@
 name: Deploy → demo.poilove.com
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'demo/**'
-      - '.github/workflows/deploy-demo.yml'
+  # Auto-deploy DISATTIVATO 2026-05-10: la chiave SSH PLESK_SSH_KEY è stata
+  # revocata sul server (Permission denied). Dopo aver rigenerato la chiave
+  # e aggiornato il secret, decommentare il blocco push: sotto.
+  # push:
+  #   branches: [main]
+  #   paths:
+  #     - 'demo/**'
+  #     - '.github/workflows/deploy-demo.yml'
   workflow_dispatch:
 
 jobs:
