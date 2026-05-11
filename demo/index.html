@@ -3279,7 +3279,24 @@ let map,tileStreet,tileSat,tileLabels,routeLayer,currentPOI;
 let gpsPos=null,gpsRegistered=false;
 
 function initMap(){
-  map=L.map('map',{zoomControl:false,attributionControl:true}).setView(CENTER,15);
+  map=L.map('map',{zoomControl:false,attributionControl:true,doubleClickZoom:false}).setView(CENTER,15);
+  // Doppio clic / doppio tap su mappa: reverse-geocoding + popup OSM
+  map.on('dblclick', async e => {
+    const { lat, lng } = e.latlng;
+    showToast?.('🔍 Cerco cosa c\'è qui…');
+    let name = `Punto ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+    try{
+      const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1&zoom=18`,
+        { headers:{'Accept-Language': (typeof lang!=='undefined'?lang:'it')} });
+      if(r.ok){
+        const data = await r.json();
+        const dn = (data?.display_name||'');
+        const first = dn.split(',')[0]?.trim();
+        if(first) name = first;
+      }
+    }catch(err){}
+    onSearchPickPlace(lat, lng, name);
+  });
   tileStreet=L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
   tileSat=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19});
   // Etichette trasparenti da sovrapporre al satellite
