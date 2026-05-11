@@ -1742,6 +1742,13 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
           </button>
         </div>
       </div>
+      <!-- LOGOUT -->
+      <div class="profile-sec" style="text-align:center;padding:24px 16px 40px">
+        <button onclick="if(confirm('Uscire da POI•LOVE?')) signOut().then(()=>location.reload())"
+          style="background:transparent;border:1.5px solid var(--red);color:var(--red);font-weight:600;font-size:14px;padding:12px 28px;border-radius:13px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:8px;transition:all .2s">
+          <i class="ph-duotone ph-sign-out"></i> Esci
+        </button>
+      </div>
     </div><!-- /profile-body -->
   </div><!-- /#privateProfile -->
 
