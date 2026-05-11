@@ -4034,7 +4034,15 @@ function renderPoiTab(){
     const key = p.id || `idx_${idx}`;
     window._poiTabIndex[key] = p;
     const dist = (poiSubtab==='near' && gpsPos)? haversineKm(gpsPos.lat,gpsPos.lng,p.lat,p.lng).toFixed(1)+' km' : '';
-    const emoji = ({Cultura:'🏛️',Cibo:'🍽️',Natura:'🌿',Bar:'☕',Storia:'🏰'})[p.cat||p.category]||'📍';
+    // Icone Phosphor duotone per categoria — niente più emoji "orrendi"
+    const catIcon = ({
+      Cultura:'ph-building-columns', Cibo:'ph-fork-knife', Natura:'ph-tree',
+      Bar:'ph-coffee', Storia:'ph-castle-turret', Festa:'ph-music-notes',
+      Lavoro:'ph-briefcase', Pernottare:'ph-bed', Pratico:'ph-wrench',
+      Benessere:'ph-flower-lotus', Love:'ph-heart', Audioguida:'ph-headphones',
+      Mappa:'ph-map-trifold', 'Open Source':'ph-code'
+    })[p.cat||p.category] || 'ph-map-pin';
+    const emoji = `<i class="ph-duotone ${catIcon}" style="font-size:22px;color:var(--red)"></i>`;
     const isMine = currentUser?.id && p.author_id===currentUser.id;
     // Etichetta visibilità con colore zona
     const vis = p.visibility || 'community';
@@ -4065,7 +4073,7 @@ function renderPoiTab(){
       <div class="pi-emoji" onclick="openPoiFromTab('${key}')" style="cursor:pointer">${emoji}</div>
       <div class="pi-info" onclick="openPoiFromTab('${key}')" style="cursor:pointer">
         <div class="pi-name">${p.name}</div>
-        <div class="pi-sub"><i class="ph-duotone ${visIcon}" style="font-size:10px"></i> ${visLblT} · ❤️ ${p.love||p.love_count||0}</div>
+        <div class="pi-sub"><i class="ph-duotone ${visIcon}" style="font-size:10px"></i> ${visLblT} · <i class="ph-duotone ph-heart" style="color:var(--red);font-size:11px;vertical-align:-1px"></i> ${p.love||p.love_count||0}</div>
       </div>
       <div class="pi-actions">
         <button class="pi-act-btn" data-tt="act_navigate" title="${t('act_navigate')}" onclick="navigateToPoi(${p.lat},${p.lng},'${(p.name||'').replace(/'/g,'')}')"><i class="ph-duotone ph-navigation-arrow"></i></button>
