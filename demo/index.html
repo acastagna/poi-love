@@ -196,7 +196,7 @@ button{touch-action:manipulation}
 }
 
 /* ── MAP TYPES ── */
-.map-types{position:fixed;top:56px;left:14px;z-index:200;display:flex;gap:5px}
+.map-types{position:fixed;top:14px;left:14px;z-index:200;display:flex;gap:5px}
 .mt-btn{height:28px;padding:0 10px;border-radius:8px;background:var(--card);border:none;cursor:pointer;font-size:10px;font-weight:700;color:var(--muted);box-shadow:0 2px 8px rgba(0,0,0,.1);transition:all .15s}
 .mt-btn.active{background:var(--blue);color:#fff}
 .mt-btn.route-active{background:#7C3AED;color:#fff}
@@ -974,6 +974,18 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 .poiai-trip-selector{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
 .poiai-trip-chip{padding:4px 10px;border-radius:8px;border:1.5px solid var(--border);background:#f5f0e8;font-size:10px;font-weight:700;color:var(--muted);cursor:pointer;transition:all .15s}
 .poiai-trip-chip.sel{background:#EBF2FC;border-color:var(--blue);color:var(--blue)}
+/* ── AI Place Card: nome + 4 azioni (Crea POI · Naviga · Aggiungi · Condividi) ── */
+.ai-place-card{background:#fff;border:1px solid #E5DACA;border-radius:10px;padding:9px 11px;margin-top:8px;display:flex;flex-direction:column;gap:7px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.ai-place-card-name{font-size:12px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:6px;line-height:1.3}
+.ai-place-card-name i{font-size:14px;color:var(--red);flex-shrink:0}
+.ai-place-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.ai-place-action-btn{height:30px;border-radius:7px;border:1px solid var(--border);background:#f8f4ec;font-family:inherit;font-size:9px;font-weight:700;color:var(--muted);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:0;transition:all .12s;letter-spacing:.2px}
+.ai-place-action-btn:active{transform:scale(.95)}
+.ai-place-action-btn i{font-size:13px}
+.ai-place-action-btn.poi{color:var(--red);border-color:#FBD0D0;background:#FFF5F5}
+.ai-place-action-btn.nav{color:var(--blue);border-color:#CBDDF5;background:#EBF2FC}
+.ai-place-action-btn.add{color:#16A34A;border-color:#A7E5B4;background:#DCFCE7}
+.ai-place-action-btn.share{color:#7C3AED;border-color:#D8C5F8;background:#F3EBFC}
 .poiai-input-bar{display:flex;gap:8px;padding:10px 14px;border-top:1px solid var(--border);background:#fafaf8}
 .poiai-input{flex:1;background:#f5f0e8;border:1.5px solid transparent;border-radius:20px;padding:9px 14px;font-size:12px;font-family:inherit;outline:none;color:var(--text);transition:border-color .2s}
 .poiai-input:focus{border-color:var(--blue)}
@@ -6413,14 +6425,26 @@ async function sendPoiAIMsg(){
       .replace(/</g,'&lt;').replace(/\n/g,'<br>');
 
     const tripSel=Object.values(TRIPS).map((t,i)=>`<button class="poiai-trip-chip${i===0?' sel':''}" onclick="document.querySelectorAll('.poiai-trip-chip').forEach(b=>b.classList.remove('sel'));this.classList.add('sel');window._paiTrip='${t.id}'">${t.name.split(' ').slice(0,3).join(' ')}</button>`).join('');
-    const chips=places.map(p=>`<button class="poiai-place-chip" onclick="addAISuggestionAsStop(window._paiTrip||'trip1','${p.replace(/'/g,"\\'").replace(/"/g,'&quot;')}')"><i class="ph-duotone ph-plus-circle"></i> ${p}</button>`).join('');
+    // Nuovo render: mini-card per luogo con 4 azioni (Crea POI · Naviga · Aggiungi · Condividi)
+    const placeCards=places.map(p=>{
+      const safe=p.replace(/'/g,"\\'").replace(/"/g,'&quot;');
+      return `<div class="ai-place-card">
+        <div class="ai-place-card-name"><i class="ph-duotone ph-map-pin"></i><span>${p}</span></div>
+        <div class="ai-place-actions">
+          <button class="ai-place-action-btn poi"   onclick="aiPlaceCreatePOI('${safe}')"  title="Crea POI"><i class="ph-duotone ph-plus-circle"></i><span>POI</span></button>
+          <button class="ai-place-action-btn nav"   onclick="aiPlaceNavigate('${safe}')"   title="Naviga"><i class="ph-duotone ph-navigation-arrow"></i><span>Naviga</span></button>
+          <button class="ai-place-action-btn add"   onclick="aiPlaceAddToTrip('${safe}')"  title="Aggiungi a itinerario/lista"><i class="ph-duotone ph-list-plus"></i><span>Aggiungi</span></button>
+          <button class="ai-place-action-btn share" onclick="aiPlaceShare('${safe}')"     title="Condividi"><i class="ph-duotone ph-share-network"></i><span>Condividi</span></button>
+        </div>
+      </div>`;
+    }).join('');
 
     const loadEl=document.getElementById(loadId);
     if(loadEl) loadEl.outerHTML=`
       <div class="poiai-msg ai">
         ${cleanText}
-        ${chips?`<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px">${chips}</div>`:''}
-        ${chips&&Object.keys(TRIPS).length?`<div style="margin-top:8px;font-size:10px;color:var(--muted)"><i class="ph-duotone ph-arrow-down"></i> Aggiungi a:</div><div class="poiai-trip-selector">${tripSel}</div>`:''}
+        ${placeCards}
+        ${placeCards&&Object.keys(TRIPS).length?`<div style="margin-top:8px;font-size:10px;color:var(--muted)"><i class="ph-duotone ph-arrow-down"></i> Itinerario di destinazione per "Aggiungi":</div><div class="poiai-trip-selector">${tripSel}</div>`:''}
       </div>`;
     window._paiTrip=Object.keys(TRIPS)[0]||'trip1';
     msgs.scrollTop=msgs.scrollHeight;
@@ -6455,6 +6479,41 @@ function speakText(text){
   utter.rate=1.05;
   utter.pitch=1;
   window.speechSynthesis.speak(utter);
+}
+
+/* ══════════════════════════════════════════
+   AI Place actions — Crea POI / Naviga / Aggiungi / Condividi
+══════════════════════════════════════════ */
+// Crea POI da suggerimento AI: apre la sheet "Aggiungi POI" e pre-compila il nome
+function aiPlaceCreatePOI(placeName){
+  if(typeof openAddPOI==='function') openAddPOI();
+  setTimeout(()=>{
+    const nm=document.getElementById('poiNameIn');
+    if(nm){ nm.value=placeName; nm.dispatchEvent(new Event('input',{bubbles:true})); nm.focus(); }
+    showToast?.(`📍 Compila i dettagli per "${placeName}"`);
+  },280);
+}
+// Naviga verso il luogo via Google Maps (search by name)
+function aiPlaceNavigate(placeName){
+  const url=`https://maps.google.com/maps?q=${encodeURIComponent(placeName)}`;
+  window.open(url,'_blank','noopener');
+}
+// Aggiungi alle liste/itinerari — riusa addAISuggestionAsStop col trip selezionato
+function aiPlaceAddToTrip(placeName){
+  const tripId = window._paiTrip || Object.keys(TRIPS||{})[0];
+  if(!tripId){ showToast?.('Crea prima un itinerario nella tab Itinerari'); return; }
+  addAISuggestionAsStop(tripId, placeName);
+}
+// Condividi via Web Share API + fallback clipboard
+async function aiPlaceShare(placeName){
+  const url=`https://maps.google.com/maps?q=${encodeURIComponent(placeName)}`;
+  const title=`POI•LOVE · ${placeName}`;
+  const text=`Ho scoperto "${placeName}" con ILLI•AI su POI•LOVE`;
+  try{
+    if(navigator.share){ await navigator.share({title,text,url}); return; }
+    await navigator.clipboard.writeText(`${text}\n${url}`);
+    showToast?.('🔗 Link copiato negli appunti');
+  }catch(e){ /* user cancel: silenzioso */ }
 }
 
 function addAISuggestionAsStop(tripId,placeName){
