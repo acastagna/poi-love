@@ -223,6 +223,9 @@ button{touch-action:manipulation}
 /* Popup Leaflet con azioni search */
 .map-search-popup-title{font-weight:800;font-size:13px;margin-bottom:8px;color:var(--text);line-height:1.3}
 .map-search-popup-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;min-width:240px}
+/* Forzo Leaflet a NON tagliare contenuto dinamico */
+.leaflet-popup-content{max-height:none !important;width:auto !important}
+.leaflet-popup-content-wrapper{max-height:none !important}
 .mt-btn{height:28px;padding:0 10px;border-radius:8px;background:var(--card);border:none;cursor:pointer;font-size:10px;font-weight:700;color:var(--muted);box-shadow:0 2px 8px rgba(0,0,0,.1);transition:all .15s}
 .mt-btn.active{background:var(--blue);color:#fff}
 .mt-btn.route-active{background:#7C3AED;color:#fff}
@@ -403,6 +406,41 @@ button{touch-action:manipulation}
 .pub-profile-action.toggle.on{background:#16A34A;color:#fff;border-color:#16A34A}
 .pub-profile-bio{font-size:12px;color:var(--text);line-height:1.5;background:#f8f4ec;border-radius:10px;padding:10px 12px;margin-top:10px}
 .pub-profile-empty{font-size:11px;color:var(--muted);text-align:center;padding:8px;font-style:italic}
+/* ── NAV PICKER POPUP — scelta navigatore (Apple/Google/Waze) ── */
+#navPickerOv{position:fixed;inset:0;z-index:9200;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);padding:18px}
+#navPickerOv.show{display:flex}
+.nav-picker-card{width:100%;max-width:340px;background:var(--card);border-radius:18px;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.4)}
+.nav-picker-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 6px}
+.nav-picker-title{font-size:15px;font-weight:900;color:var(--text)}
+.nav-picker-close{width:28px;height:28px;border-radius:14px;background:#f5f0e8;border:none;cursor:pointer;color:var(--muted);font-size:13px;display:flex;align-items:center;justify-content:center}
+.nav-picker-target{padding:0 16px 8px;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:5px}
+.nav-picker-target i{font-size:13px;color:var(--red)}
+.nav-picker-list{padding:6px 10px 12px}
+.nav-picker-opt{width:100%;display:flex;align-items:center;gap:11px;padding:11px 12px;border:1px solid var(--border);border-radius:11px;background:#fff;font-family:inherit;font-size:13px;font-weight:700;color:var(--text);cursor:pointer;transition:all .12s;margin-bottom:6px}
+.nav-picker-opt:hover{background:#f8f4ec;border-color:var(--blue)}
+.nav-picker-opt:active{transform:scale(.98)}
+.nav-picker-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.nav-picker-icon.apple{background:#000;color:#fff}
+.nav-picker-icon.google{background:#4285F4;color:#fff}
+.nav-picker-icon.waze{background:#33CCFF;color:#fff}
+
+/* ── MAP POPUP SUB-MENU MODAL (Aggiungi / Condividi) ── */
+#mapPopupSubmenuOv{position:fixed;inset:0;z-index:9300;background:rgba(0,0,0,.5);display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);padding:0}
+#mapPopupSubmenuOv.show{display:flex}
+.map-popup-submenu-card{width:100%;max-width:430px;background:var(--card);border-radius:22px 22px 0 0;padding:14px 14px 24px;box-shadow:0 -10px 30px rgba(0,0,0,.3);animation:smSlide .25s ease-out}
+@keyframes smSlide{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.map-popup-submenu-handle{width:42px;height:4px;background:#C8BFB0;border-radius:2px;margin:0 auto 10px}
+.map-popup-submenu-title{font-size:14px;font-weight:900;color:var(--text);margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.map-popup-submenu-title i{color:var(--red)}
+.map-popup-submenu-sub{font-size:11px;color:var(--muted);margin-bottom:12px}
+.map-popup-submenu-row{display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:11px;cursor:pointer;font-size:13px;color:var(--text);font-weight:700;background:#f8f4ec;border:1px solid var(--border);width:100%;text-align:left;font-family:inherit;transition:all .12s;margin-bottom:6px}
+.map-popup-submenu-row:hover{background:#ede7dc;border-color:var(--blue)}
+.map-popup-submenu-row:active{transform:scale(.98)}
+.map-popup-submenu-row i{font-size:18px;flex-shrink:0;width:30px;text-align:center}
+.map-popup-submenu-row.add i{color:#16A34A}
+.map-popup-submenu-row.illi i{color:#7C3AED}
+.map-popup-submenu-row.share i{color:var(--blue)}
+
 /* ── LIST DETAIL POPUP — apre la lista per modificare/vedere POI ── */
 #listDetailOv{position:fixed;inset:0;z-index:9100;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);padding:18px}
 #listDetailOv.show{display:flex}
@@ -4018,13 +4056,8 @@ function openPoiFromTab(key){
 
 // Apri Maps esterne con itinerario (sceglie automaticamente l'app più consona)
 function navigateToPoi(lat, lng, name){
-  const isApple = /iPhone|iPad|iPod|Mac/.test(navigator.userAgent);
-  const q = encodeURIComponent(name||'');
-  const url = isApple
-    ? `https://maps.apple.com/?daddr=${lat},${lng}&q=${q}`
-    : `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&destination_place_id=${q}`;
-  window.open(url, '_blank', 'noopener');
-  showToast?.(`${t('toast_navigate_to')} ${name||'POI'}`);
+  // Tutte le navigazioni passano dal nav picker (Apple/Google/Waze)
+  openNavPicker(lat, lng, name||'');
 }
 
 // Condivisione: usa Web Share API se disponibile, altrimenti clipboard + toast
@@ -4248,13 +4281,14 @@ function onSearchPickPlace(lat,lng,name){
     })
   }).addTo(map);
   const safe=(name||'').replace(/'/g,"\\'").replace(/"/g,'&quot;');
+  setMapPopupCtx(lat, lng, name);
   _mapSearchTransientMarker.bindPopup(`
     <div class="map-search-popup-title">${(name||'').replace(/</g,'&lt;')}</div>
     <div class="map-search-popup-actions">
       <button class="ai-place-action-btn poi"   onclick="aiPlaceCreatePOI('${safe}');closeMapSearchMarker()"><i class="ph-duotone ph-plus-circle"></i><span>POI</span></button>
-      <button class="ai-place-action-btn nav"   onclick="aiPlaceNavigate('${safe}')"><i class="ph-duotone ph-navigation-arrow"></i><span>Naviga</span></button>
-      <button class="ai-place-action-btn add"   onclick="aiPlaceAddToTrip('${safe}')"><i class="ph-duotone ph-list-plus"></i><span>Aggiungi</span></button>
-      <button class="ai-place-action-btn share" onclick="aiPlaceShare('${safe}')"><i class="ph-duotone ph-share-network"></i><span>Condividi</span></button>
+      <button class="ai-place-action-btn nav"   onclick="openNavPicker(${lat},${lng},'${safe}')"><i class="ph-duotone ph-navigation-arrow"></i><span>Naviga</span></button>
+      <button class="ai-place-action-btn add"   onclick="toggleMapPopupSubmenu('add')"><i class="ph-duotone ph-list-plus"></i><span>Aggiungi</span></button>
+      <button class="ai-place-action-btn share" onclick="toggleMapPopupSubmenu('share')"><i class="ph-duotone ph-share-network"></i><span>Condividi</span></button>
     </div>
   `,{minWidth:260, autoPan:true}).openPopup();
   // v1.5: POI vicini entro 2km
@@ -4356,6 +4390,134 @@ async function renderItinLists(){
     `;
     cont.appendChild(card);
   });
+}
+
+/* ══════════════════════════════════════════
+   NAV PICKER — selettore navigatore (Apple/Google/Waze)
+══════════════════════════════════════════ */
+let _navTarget = null; // { lat, lng, name } — lat/lng possono essere null (search by name)
+function openNavPicker(lat, lng, name){
+  _navTarget = { lat, lng, name: name||'' };
+  const tgt = document.getElementById('navPickerTargetTxt');
+  if(tgt){
+    tgt.textContent = name || (lat!=null ? `${(+lat).toFixed(5)}, ${(+lng).toFixed(5)}` : '—');
+  }
+  // Nascondi Apple Maps su Android (non funzionerà)
+  const isApple = /iPhone|iPad|iPod|Mac/.test(navigator.userAgent);
+  const appleOpt = document.getElementById('navOptApple');
+  if(appleOpt) appleOpt.style.display = isApple ? '' : 'none';
+  document.getElementById('navPickerOv').classList.add('show');
+}
+function closeNavPicker(){
+  document.getElementById('navPickerOv').classList.remove('show');
+}
+function navGo(app){
+  if(!_navTarget) return closeNavPicker();
+  const { lat, lng, name } = _navTarget;
+  const hasCoords = lat!=null && lng!=null && !isNaN(+lat) && !isNaN(+lng);
+  const q = encodeURIComponent(name||'');
+  let url;
+  if(app==='apple'){
+    url = hasCoords
+      ? `https://maps.apple.com/?daddr=${lat},${lng}&q=${q}`
+      : `https://maps.apple.com/?q=${q}`;
+  } else if(app==='waze'){
+    url = hasCoords
+      ? `https://www.waze.com/ul?ll=${lat}%2C${lng}&navigate=yes&q=${q}`
+      : `https://www.waze.com/ul?q=${q}`;
+  } else {
+    url = hasCoords
+      ? `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`
+      : `https://www.google.com/maps?q=${q}`;
+  }
+  window.open(url, '_blank', 'noopener');
+  closeNavPicker();
+  showToast?.(`🧭 ${name||'Destinazione'}`);
+}
+
+/* ══════════════════════════════════════════
+   MAP SEARCH POPUP — sub-menu Aggiungi/Condividi
+══════════════════════════════════════════ */
+let _mapPopupCtx = null; // { lat, lng, name }
+function setMapPopupCtx(lat,lng,name){ _mapPopupCtx = { lat, lng, name }; }
+function toggleMapPopupSubmenu(which){
+  if(!_mapPopupCtx) return;
+  const ov = document.getElementById('mapPopupSubmenuOv');
+  const title = document.getElementById('mapPopupSubmenuTitle');
+  const sub = document.getElementById('mapPopupSubmenuSub');
+  const list = document.getElementById('mapPopupSubmenuList');
+  if(which==='add'){
+    title.innerHTML = `<i class="ph-duotone ph-list-plus"></i><span>Aggiungi "${_mapPopupCtx.name}"</span>`;
+    sub.textContent = 'Dove vuoi aggiungere questo luogo?';
+    list.innerHTML = `
+      <button class="map-popup-submenu-row add" onclick="closeMapPopupSubmenu();addPlaceToItinerary()"><i class="ph-duotone ph-navigation"></i><span>All'itinerario</span></button>
+      <button class="map-popup-submenu-row add" onclick="closeMapPopupSubmenu();addPlaceToHistoricRoute()"><i class="ph-duotone ph-scroll"></i><span>Alla rotta storica</span></button>
+      <button class="map-popup-submenu-row illi" onclick="closeMapPopupSubmenu();askIlliAbout()"><i class="ph-duotone ph-sparkle"></i><span>Chiedi a ILLI•AI di raccontarmela</span></button>`;
+  } else if(which==='share'){
+    title.innerHTML = `<i class="ph-duotone ph-share-network"></i><span>Condividi "${_mapPopupCtx.name}"</span>`;
+    sub.textContent = 'Con chi vuoi condividere questo luogo?';
+    list.innerHTML = `
+      <button class="map-popup-submenu-row share" onclick="closeMapPopupSubmenu();sharePlaceWithFriend()"><i class="ph-duotone ph-users-three"></i><span>Con un amico</span></button>
+      <button class="map-popup-submenu-row share" onclick="closeMapPopupSubmenu();sharePlaceViaGoogle()"><i class="ph-duotone ph-google-logo"></i><span>Su Google Maps</span></button>
+      <button class="map-popup-submenu-row share" onclick="closeMapPopupSubmenu();sharePlaceToContact()"><i class="ph-duotone ph-paper-plane-tilt"></i><span>Con un contatto preciso</span></button>`;
+  }
+  ov.classList.add('show');
+}
+function closeMapPopupSubmenu(){
+  document.getElementById('mapPopupSubmenuOv').classList.remove('show');
+}
+// Aggiungi → all'itinerario (usa aiPlaceAddToTrip esistente)
+function addPlaceToItinerary(){
+  if(!_mapPopupCtx) return;
+  aiPlaceAddToTrip(_mapPopupCtx.name);
+}
+// Aggiungi → alla rotta storica (placeholder per ora — feature V2)
+function addPlaceToHistoricRoute(){
+  if(!_mapPopupCtx) return;
+  showToast?.(`🏛 "${_mapPopupCtx.name}" sarà aggiungibile a una rotta storica (presto)`);
+}
+// Aggiungi → ILLI•AI racconta
+function askIlliAbout(){
+  if(!_mapPopupCtx) return;
+  const { lat, lng, name } = _mapPopupCtx;
+  closeMapSearchMarker();
+  showTab('illi');
+  setTimeout(()=>{
+    const input = document.getElementById('poiaiInput');
+    if(input){
+      input.value = `Raccontami "${name}" (coordinate ${(+lat).toFixed(5)}, ${(+lng).toFixed(5)}). Cosa c'è in questo luogo? Storia, perché è interessante, cosa offre e cosa fare nelle vicinanze.`;
+      if(typeof sendPoiAIMsg==='function') sendPoiAIMsg();
+    }
+  }, 350);
+}
+// Condividi → con un amico (compagni di viaggio)
+function sharePlaceWithFriend(){
+  if(!_mapPopupCtx) return;
+  showToast?.(`👥 Apri la tab Compagni e seleziona chi vuole conoscere "${_mapPopupCtx.name}"`);
+  showTab('companions');
+  closeMapSearchMarker();
+}
+// Condividi → Google Maps link
+function sharePlaceViaGoogle(){
+  if(!_mapPopupCtx) return;
+  const { lat, lng, name } = _mapPopupCtx;
+  const url = `https://www.google.com/maps?q=${lat},${lng}`;
+  window.open(url, '_blank', 'noopener');
+}
+// Condividi → contatto preciso (Web Share API)
+async function sharePlaceToContact(){
+  if(!_mapPopupCtx) return;
+  const { lat, lng, name } = _mapPopupCtx;
+  const url = `https://www.google.com/maps?q=${lat},${lng}`;
+  const text = `Ti consiglio "${name}" — l'ho trovato su POI•LOVE`;
+  try{
+    if(navigator.share){
+      await navigator.share({ title: name, text, url });
+    } else {
+      await navigator.clipboard.writeText(`${text}\n${url}`);
+      showToast?.('🔗 Link copiato negli appunti');
+    }
+  }catch(e){}
 }
 
 // Apre profilo pubblico dell'autore del POI corrente nel detail sheet
@@ -5085,7 +5247,8 @@ function toggleLove(){
   cnt.textContent=parseInt(cnt.textContent)+(loved?1:-1);
 }
 function openNavigation(){
-  if(currentPOI)window.open(`https://maps.google.com/maps?daddr=${currentPOI.lat},${currentPOI.lng}&directionsmode=walking`,'_blank');
+  if(!currentPOI) return;
+  openNavPicker(currentPOI.lat, currentPOI.lng, currentPOI.name||'');
 }
 function shareDetail(){
   const txt=document.getElementById('detailShareLinkTxt').textContent;
@@ -7008,10 +7171,9 @@ function aiPlaceCreatePOI(placeName){
     showToast?.(`📍 Compila i dettagli per "${placeName}"`);
   },280);
 }
-// Naviga verso il luogo via Google Maps (search by name)
+// Naviga verso il luogo: apre il nav picker (Apple/Google/Waze)
 function aiPlaceNavigate(placeName){
-  const url=`https://maps.google.com/maps?q=${encodeURIComponent(placeName)}`;
-  window.open(url,'_blank','noopener');
+  openNavPicker(null, null, placeName);
 }
 // Aggiungi alle liste/itinerari — riusa addAISuggestionAsStop col trip selezionato
 function aiPlaceAddToTrip(placeName){
@@ -7241,16 +7403,16 @@ function switchDevProfile(idx){
   showToast(`👤 ${p.name}`);
 }
 
-// ── Attivazione con 5 tap rapidi sulla stats bar ──
-let _ptaps=0, _ptimer=null;
+// ── Attivazione con doppio tap veloce sul badge-label ──
+let _devLastTap=0;
 function onProfileStatsTap(){
-  _ptaps++;
-  clearTimeout(_ptimer);
-  _ptimer=setTimeout(()=>_ptaps=0,1000);
-  if(_ptaps>=5){
-    _ptaps=0;
-    if(devMode) showToast('Dev Mode attivo ✓ — tap 5× sulla tua email per disattivare');
+  const now=Date.now();
+  if(now-_devLastTap < 350){
+    _devLastTap=0;
+    if(devMode) showToast('Dev Mode attivo ✓ — doppio tap email per disattivare');
     else openTokenModal();
+  } else {
+    _devLastTap=now;
   }
 }
 
@@ -7444,6 +7606,41 @@ async function confirmPhotoPicker(){
   }
 }
 </script>
+
+<!-- ═══ MAP POPUP SUB-MENU MODAL (Aggiungi / Condividi) ═══ -->
+<div id="mapPopupSubmenuOv" onclick="if(event.target===this)closeMapPopupSubmenu()">
+  <div class="map-popup-submenu-card">
+    <div class="map-popup-submenu-handle"></div>
+    <div class="map-popup-submenu-title" id="mapPopupSubmenuTitle"><i class="ph-duotone ph-list-plus"></i><span>Aggiungi</span></div>
+    <div class="map-popup-submenu-sub" id="mapPopupSubmenuSub">—</div>
+    <div id="mapPopupSubmenuList"></div>
+  </div>
+</div>
+
+<!-- ═══ NAV PICKER POPUP — scelta navigatore (Apple/Google/Waze) ═══ -->
+<div id="navPickerOv" onclick="if(event.target===this)closeNavPicker()">
+  <div class="nav-picker-card">
+    <div class="nav-picker-head">
+      <div class="nav-picker-title">Naviga verso</div>
+      <button class="nav-picker-close" onclick="closeNavPicker()" aria-label="Chiudi"><i class="ph-duotone ph-x"></i></button>
+    </div>
+    <div class="nav-picker-target"><i class="ph-duotone ph-map-pin"></i><span id="navPickerTargetTxt">—</span></div>
+    <div class="nav-picker-list">
+      <button class="nav-picker-opt" id="navOptApple" onclick="navGo('apple')">
+        <div class="nav-picker-icon apple"><i class="ph-duotone ph-apple-logo"></i></div>
+        <div>Apple Maps</div>
+      </button>
+      <button class="nav-picker-opt" onclick="navGo('google')">
+        <div class="nav-picker-icon google"><i class="ph-duotone ph-map-trifold"></i></div>
+        <div>Google Maps</div>
+      </button>
+      <button class="nav-picker-opt" onclick="navGo('waze')">
+        <div class="nav-picker-icon waze"><i class="ph-duotone ph-car-profile"></i></div>
+        <div>Waze</div>
+      </button>
+    </div>
+  </div>
+</div>
 
 <!-- ═══ LIST DETAIL POPUP — apre una lista per modificare/vedere POI ═══ -->
 <div id="listDetailOv" onclick="if(event.target===this)closeListDetail()">
