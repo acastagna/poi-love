@@ -7,6 +7,177 @@
 
 ---
 
+## 🗓️ 11/05/2026 — Beta-ready per Tirana: 16 commit, UX overhaul
+
+**Contesto**: l'utente parte per Tirana il 12/05/2026 e vuole **usare** la webapp dal vivo durante la presentazione (finestra SAL 13-17/05). Sessione di un giorno intero focalizzata su rendere la demo solida end-to-end.
+
+**HEAD inizio sessione**: `b2e764f`
+**HEAD fine sessione**: `3bc28c0` — **16 commit pushati su `origin/main`**
+
+### 📋 Briefing iniziale → priorità identificate
+
+Bloccanti per "uso reale" a Tirana:
+1. Login Google OAuth test live (mai testato dopo restyle)
+2. Lista POI cliccabile con azioni complete
+3. Salvataggio profilo reale Supabase (avatar/cover/bio)
+4. Upload foto con fallback Supabase Storage (media.poilove.com 503 DNS)
+5. Migration SQL `002_profile_cover.sql`
+
+Polish UX richiesti durante la sessione (priorità utente):
+6. Header POI detail (brand-pill copriva sub-nav "I miei POI" su mobile)
+7. Foto POI in griglia 33%
+8. Contatori profilo cliccabili → navigazione
+9. Sub-tab Liste/Itinerari nella tab Itinerari
+10. Photo picker semplificato (2 quadrati Camera/Galleria)
+11. Compagni / Liste / Autori POI cliccabili
+12. Nav picker unificato (Apple/Google/Waze)
+13. Risultati ILLI•AI azionabili (4 azioni + askIlliAbout)
+14. Map search bar con Nominatim + popup 4 azioni
+15. Doppio clic mappa → popup OSM
+16. Mascot ILLI•AI (Midjourney v8.1)
+
+### ✅ Commit ricostruiti (HEAD: 3bc28c0)
+
+| # | SHA | Tema |
+|---|---|---|
+| 1 | `881fcbb` | fascetta brand v1 + foto POI griglia 33% + statTap navigazione + sub-tab Liste/Itinerari |
+| 2 | `187c0b9` | fascia brand spostata in basso (tra nav e credit), topbar trasparente |
+| 3 | `fa82eb8` | logo SVG → logo-bianco.png (1000x188 RGBA, fornito utente) |
+| 4 | `1720f30` | brand-strip logo height 20→14px (arioso) |
+| 5 | `8e89c40` | photo picker → popup centrale 2 quadrati (Galleria + Fotocamera) |
+| 6 | `b35d8ab` | ILLI•AI place suggestions con 4 azioni colorate + map-types allineati |
+| 7 | `32c7aa6` | photo source desktop-aware (Foto/Cartella) + inversione File/Rullino mobile |
+| 8 | `a3b6dd4` | map search bar (POI locali + Nominatim OSM) con marker + 4 azioni + POI vicini |
+| 9 | `048e70a` | photo picker mobile semplificato + compagni/liste/autore POI cliccabili (popup pubblici) |
+| 10 | `f6513fb` | nav picker universale (Apple/Google/Waze) + modal Aggiungi/Condividi + askIlliAbout + dblTap dev mode |
+| 11 | `c104503` | doppio clic/tap mappa → reverse-geocoding Nominatim → popup OSM con 4 azioni |
+| 12 | `5e4ae06` | chat ILLI•AI riempie altezza fino a 5px sopra il FAB |
+| 13 | `1a93074` | matita Modifica POI fixata + modal Aggiungi/Condividi al centro + sub-livelli scelta itinerario/rotta |
+| 14 | `6e610ca` | doppio tap mobile fix (detector custom su click event con timing 350ms) |
+| 15 | `fcc8445` | nuova mascot ILLI•AI PNG (Midjourney v8.1) — sostituiti header tab + avatar chat |
+| 16 | `3bc28c0` | ILLI•AI tab: rimossa testata duplicata + fix residuo blu in basso quando inactive |
+
+### 🎨 Feature complete della sessione
+
+**Layout**
+- Fascia brand nera con `logo-bianco.png` centrato tra bottom-nav e credit (PNG 1000x188 dall'utente)
+- Topbar in alto trasparente, niente brand-pill che copra elementi
+- Bottoni map-types (Stradale/Satellite/Rotte Storiche) allineati con centra+lingua
+
+**POI**
+- Foto in griglia 3×33% (badge "+N" sull'ultima se >3)
+- Lista "I miei POI" con bottoni azione + **matita Modifica funzionante** (anche su POI demo senza id, usa id locale temp)
+- Autore POI cliccabile (chevron ›) → apre profilo pubblico
+
+**Photo picker**
+- Mobile: 2 quadrati `Fotocamera (sx) · Galleria (dx)`. Galleria apre direttamente input file nativo (iOS mostra "Libreria foto / Scatta / Scegli file")
+- Desktop: 2 quadrati `Foto (sx) · Cartella locale (dx)`, entrambi file picker SO
+- Detection via `matchMedia('(pointer: coarse)')` + safety net `innerWidth<900`
+
+**Profilo**
+- Contatori POI/Love/Liste cliccabili → navigazione tab corretta (POI sub Miei/Loved, Itin sub Liste)
+- `refreshProfileStats()` count exact su Supabase (`pois.author_id`, `loves.user_id`, `lists.owner_id`)
+- Liste cliccabili → popup dettaglio con POI inclusi, Rinomina/Condividi/Elimina/Toggle vis
+- Dev mode 5 tap → **doppio tap veloce** (350ms window) sul badge-label
+
+**Tab Itinerari**
+- 2 sub-tab "Itinerari" / "Liste" stile pillola (icone diverse, stesso layout)
+- Bottone +Nuovo cambia azione in base al sub-tab attivo
+- Liste lette da Supabase quando loggato, fallback DOM profilo
+
+**Map search bar**
+- Sempre visibile sotto i map-types in tab Mappa
+- Autocomplete debounce 280ms (>=2 char): sezione "I tuoi POI" (max 3) + sezione "Luoghi" (Nominatim max 3)
+- Tap POI locale → centra mappa + apre detail
+- Tap luogo OSM → centra + marker temporaneo blu + popup 4 azioni
+- POI vicini entro 2km (haversine) toast
+
+**Popup OSM (search + dblclick mappa)** — universale
+- Apertura: search bar OPPURE doppio clic/tap mappa (con reverse-geocoding Nominatim)
+- 4 bottoni colorati: 🔴 POI (apre form precompilato) · 🔵 Naviga · 🟢 Aggiungi · 🟣 Condividi
+- **Naviga** → nav picker unificato (Apple Maps / Google Maps / Waze, Apple nascosto su Android)
+- **Aggiungi** → modal centrato con 3 voci:
+  - All'itinerario → sub-modal con lista trip + "Crea nuovo itinerario"
+  - Alla rotta storica → sub-modal con Via Egnatia, Terre Illiriche + "Crea nuova rotta con ILLI•AI"
+  - Chiedi a ILLI•AI di raccontarmela → manda prompt automatico in chat con coordinate
+- **Condividi** → modal centrato: Con un amico (tab Compagni) · Su Google Maps · Con un contatto preciso (Web Share API)
+
+**ILLI•AI**
+- Mascot nuova PNG (Midjourney v8.1) — headband rosso "ILLI", motivo tradizionale albanese, cuore al petto
+- Testata duplicata rimossa, resta solo header chat operativo
+- Chat occupa tutta l'altezza fino a 5px sopra il FAB
+- Risposte ILLI•AI: ogni place suggerito diventa mini-card con 4 azioni colorate (POI/Naviga/Aggiungi/Condividi)
+
+**Profilo pubblico altri utenti** (popup centrato)
+- Accessibile da: friend-row in Compagni, riga autore in POI detail
+- Avatar iniziali, nome, handle, status pill, stats POI/Liste/Follower, bio, 3 POI pubblici cliccabili
+- 3 azioni: Segui (toggle) · Connetti · Condividi posizione (toggle)
+- Bug fix critico: ID collision `pubProfileName` → rinominati tutti `pubPopX`
+
+### 🐛 Bug fix in corso d'opera
+
+1. ID collision `pubProfileName` vs view profilo pubblico embedded → `getElementById` ritornava sempre il primo, mostrava "—"
+2. Popup Leaflet non ridimensiona dinamicamente con sub-menu inline → sostituito con modal centrato esterno
+3. Doppio click su mobile inconsistente → detector custom su `click` event (timing 350ms)
+4. Matita "Modifica POI" non apriva il form → `editPoiByKey` → `editPOIByObject` inesistente; cambiato per chiamare direttamente `openEditPOI` con currentPOI settato
+5. Residuo blu visibile sopra la nav quando ILLI•AI non attiva → `inset:0 0 136px 0` + `translateY(100%)` sposta solo dell'altezza elemento; fix con `inset:0` + `padding-bottom:215px`
+6. Markers Leaflet sopra view ILLI•AI → z-index 100 troppo basso, alzato a 200 (sopra map z=1, sotto nav z=300)
+
+### 🎯 Asset aggiunti
+
+- `demo/img/logo-bianco.png` (1000×188 RGBA, ~11KB) — logo POI♥LOVE bianco per fascia brand inferiore
+- `demo/img/illi-ai.png` (~992KB, Midjourney v8.1) — mascot ILLI con headband, motivo tradizionale, cuore al petto
+
+### 📂 File modificato
+
+- `demo/index.html` (8070 righe, era ~6850): +~1200 righe net (CSS popup, modal, sub-menu, JS handler nav picker / public profile / list detail / map search / askIlliAbout)
+- `STORICO-LAVORI.md` (questo aggiornamento)
+
+### 🔌 Live status fine sessione
+
+| URL | HTTP | Note |
+|---|---|---|
+| https://demo.poilove.com/ | 200 | da pullare su Plesk (HEAD live: `47fb29b` del 10/05, GitHub: `3bc28c0` del 11/05) |
+| https://poilove.com/ | 200 | da pullare (logo SVG nuovo, sal/img/) |
+| https://sal.poilove.com/ | 200 | da pullare |
+| https://media.poilove.com/test.php | 503 | DNS server-side rotto (pre-esistente) |
+
+### 🛡️ Regole hard rispettate
+
+- ✅ Nessun `--delete` in rsync
+- ✅ Nessun workflow GitHub Actions modificato/riattivato
+- ✅ Nessun `git push --force`
+- ✅ Nessun `gh secret set` / `gh workflow run`
+- ✅ Nessuna scrittura SSH su `/var/www/vhosts/poilove.com/`
+- ✅ Date sempre `dd/mm/yyyy`
+
+### ⚠️ Bloccanti del briefing mattutino — STATO
+
+| # | Cosa | Stato |
+|---|---|---|
+| 1 | Test Google OAuth live | ⏸ rimandato (utente in viaggio domani) |
+| 2 | Lista POI cliccabile + bottoni | ✅ già in main + matita Modifica fixata oggi |
+| 3 | Salvataggio profilo reale Supabase | ⏸ non affrontato (richiede sb auth attivo) |
+| 4 | Upload foto Storage fallback | ⏸ non affrontato (DNS server-side pre-existing) |
+| 5 | Migration SQL `002_profile_cover.sql` | ⏸ da eseguire su Supabase SQL Editor |
+
+### 🚀 Da pullare su Plesk a fine sessione
+
+L'utente deve fare manualmente:
+- **demo.poilove.com** → Plesk → Git → Estrai ora + Implementa ora (per portare live tutti i 16 commit)
+- **poilove.com** → idem (per logo svg nuovo in `web/img/`)
+- **sal.poilove.com** → idem
+
+### 🗺️ Da fare dopo Tirana (V2)
+
+- **Rotte storiche con AI**: data model `routes` (tappe, periodo, storia narrativa), flow ILLI•AI per generazione assistita, editor visuale, landing pages `/route/slug`
+- **Salvataggio profilo reale Supabase**: avatar/cover/bio/lists/follows con persistence vera (richiede sb auth attivo)
+- **Upload foto Storage fallback**: media.poilove.com 503 DNS server-side + fallback Supabase Storage
+- **OAuth provider aggiuntivi**: X, LinkedIn, Facebook (oggi bottoni nell'auth danno errore "provider not configured")
+- **App mobile Expo**: push 17 file TypeScript già scaffolded, test su device, build EAS
+
+---
+
 ## 🗓️ 10/05/2026 — Auth completo + cuori + logo SVG + multilingue + chip lingua + INCIDENT 740 file
 
 ### ⚠️ INCIDENT — 740 file cancellati in produzione

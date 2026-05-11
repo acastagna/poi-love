@@ -4,57 +4,61 @@
 
 ---
 
-## 🟢 STATO AL 10/05/2026 sera — Da dove riprende la prossima sessione
+## 🟢 STATO AL 11/05/2026 sera — Beta-ready per Tirana
 
-**HEAD GitHub `main`**: `47fb29b`
-**Commit recenti**:
+**Partenza utente**: 12/05/2026 per Tirana, presentazione SAL finestra 13-17/05.
+
+**HEAD GitHub `main`**: `3bc28c0`
+**Commit di oggi (11/05) — 16 push su origin/main**:
 ```
-47fb29b  chore(demo): inverti ordine chip lingua → EN · SQ · IT
-1df6ff5  feat(demo): chip lingua glassmorphism nell'auth overlay
-d3daf48  feat(demo): traduzioni IT/SQ/EN complete + auto-detect dispositivo
-ccf721b  feat(demo+sal+web): auth restyle + 2 cuori animati + logo SVG ufficiali
-2185737  docs: incident report 10/05/2026 + REGOLE HARD per Claude
-04e2e71  (08/05) stato pre-disastro
+3bc28c0 fix(demo): ILLI•AI tab — testata duplicata rimossa + residuo blu fixato
+fcc8445 feat(demo): nuova mascot ILLI•AI (PNG Midjourney v8.1)
+6e610ca fix(demo): doppio tap su mobile — detector custom su click event
+1a93074 fix(demo): matita Modifica POI + modal al centro + sub-livelli scelta itin/rotta
+5e4ae06 fix(demo): chat ILLI•AI riempie altezza fino a 5px sopra il FAB
+c104503 feat(demo): doppio clic/tap mappa → popup OSM con 4 azioni (reverse geo)
+f6513fb feat(demo): nav picker (Apple/Google/Waze) + modal Aggiungi/Condividi + askIlliAbout + dblTap dev
+048e70a feat(demo): photo picker mobile semplificato + compagni/liste/autore POI cliccabili
+a3b6dd4 feat(demo): map search bar (POI locali + Nominatim) con marker + 4 azioni
+32c7aa6 feat(demo): photo source desktop-aware + inversione File/Rullino mobile
+b35d8ab feat(demo): ILLI•AI place suggestions con 4 azioni + map-types allineati
+8e89c40 feat(demo): photo picker → popup centrale 2 quadrati
+1720f30 chore(demo): brand-strip logo height 20→14px
+fa82eb8 chore(demo): brand-strip usa logo-bianco.png (1000x188 RGBA)
+187c0b9 fix(demo): sposta fascia brand in basso, topbar trasparente
+881fcbb feat(demo): fascetta nera v1 + foto griglia 33% + stat tap-nav + sub-tab Liste
 ```
 
 **Stato live siti**:
 
 | URL | Live HEAD | Note |
 |---|---|---|
-| https://demo.poilove.com/ | `47fb29b` (414 KB) ✅ | aggiornato oggi — auth nuovo + cuori + logo SVG + EN/SQ/IT |
-| https://poilove.com/ | `04e2e71` (08/05) | **da pullare** (`web/img/` aggiunto in `ccf721b`) |
-| https://sal.poilove.com/ | `04e2e71` (08/05) | **da pullare** (`sal/img/` aggiunto in `ccf721b`, logo path relativo) |
-| https://media.poilove.com/test.php | OK con 503 applicativo | DNS server-side non risolve `*.supabase.co` (problema pre-esistente) |
+| https://demo.poilove.com/ | `47fb29b` (10/05) | **DA PULLARE** su Plesk — 16 commit nuovi |
+| https://poilove.com/ | `04e2e71` (08/05) | da pullare |
+| https://sal.poilove.com/ | `04e2e71` (08/05) | da pullare |
+| https://media.poilove.com/test.php | 503 | DNS server-side rotto (pre-esistente) |
 
-**Branch backup attivo** (con feature in attesa di re-merge):
-- `origin/wip/2026-05-10-task7-auth` → `4f38c83`
-- Contiene: lista POI cliccabile + bottoni completi, chiusura overlay ESC universale, sistema colori per zone, itinerari griglia quadrata, sfondo profilo AI, salvataggio reale Supabase, email mailto, upload via media.poilove.com, diagnostica boot, migration SQL `002_profile_cover.sql`
-- **Da cherry-pickare** una funzione alla volta nelle prossime sessioni (skip dei workflow rischiosi)
+**Branch backup ancora attivo**:
+- `origin/wip/2026-05-10-task7-auth` → `4f38c83` (feature in attesa di re-merge: salvataggio profilo Supabase, upload media, diagnostica boot, migration SQL — molte già reimplementate o riassorbite oggi).
 
-### 📋 Quick start prossima sessione (in ordine)
+### 📋 Quick start prossima sessione (in ordine, post-Tirana)
 
-1. **Leggere `STORICO-LAVORI.md` sezione 10/05** per capire cosa è successo
-2. **Leggere REGOLE HARD** sotto in questo file (NON negoziabili dopo l'incident del 10/05)
-3. **Plesk pull `web/` e `sal/`** per allineare i 2 sotto-domini al HEAD GitHub
-4. **Test Google OAuth live** sul demo (bottone G nell'auth overlay)
-5. **Setup OAuth provider** in ordine difficoltà:
-   1. X (Twitter) — gratuito, ~10-15 min
-   2. LinkedIn OIDC — gratuito, ~10 min
-   3. Facebook — gratuito ma richiede privacy policy URL + App Review Meta, ~15-25 min
-   4. Apple Sign In — RIMANDATO a giugno 2026 (lancio prodotto, $99/anno Developer Program)
-6. **Migration SQL `002_profile_cover.sql`** in Supabase SQL Editor (cover_url + cover_type) — quando riportiamo lo sfondo profilo AI da `wip`
-7. **Riportare feature da `wip/2026-05-10-task7-auth`** una alla volta:
-   - Lista POI cliccabile + bottoni completi
-   - Chiusura overlay ESC universale + tap-out
-   - Sistema colori per zone
-   - Itinerari griglia quadrata
-   - Sfondo profilo AI (richiede SQL migration)
-   - Salvataggio reale Supabase
-   - Email inviti compagni mailto
-   - Upload via media.poilove.com con fallback Supabase Storage
-   - Diagnostica connessione al boot
-8. **Fix DNS server-side media.poilove.com** (richiede SSH server) — `8.8.8.8` in `/etc/resolv.conf` di poilove.com_*** subscription
-9. **Eventualmente** rigenerare SSH key Plesk + secret `PLESK_SSH_KEY` per riattivare auto-deploy GitHub Actions (opzionale)
+1. **Leggere `STORICO-LAVORI.md` sezione 11/05** per il dettaglio completo della giornata
+2. **Leggere REGOLE HARD** sotto in questo file (non negoziabili dopo incident 10/05)
+3. **Plesk pull `demo/`, `web/`, `sal/`** per allineare i sotto-domini al HEAD GitHub `3bc28c0`
+4. **Bloccanti del briefing rimasti** (richiedono Supabase auth attivo):
+   - Test Google OAuth live sul demo (`signInWithGoogle()` già esiste, mai testato dopo restyle)
+   - Salvataggio reale profilo (avatar/cover/bio/lists/follows)
+   - Upload foto via media.poilove.com con fallback Supabase Storage
+   - Migration SQL `002_profile_cover.sql` (Supabase SQL Editor)
+5. **Setup altri OAuth provider** (bottoni X/LinkedIn/Facebook esistono ma danno errore "provider not configured"):
+   - X (Twitter) — gratis, ~10-15 min
+   - LinkedIn OIDC — gratis, ~10 min
+   - Facebook — gratis ma richiede privacy policy + App Review Meta, ~15-25 min
+   - Apple Sign In — RIMANDATO a giugno (lancio Tirana, $99/anno Developer)
+6. **Rotte storiche con AI** (V2): data model `routes`, flow ILLI•AI per creazione, editor tappe, landing `/route/slug` — già linkato da modal "Crea nuova rotta con ILLI•AI" nel popup OSM
+7. **Fix DNS server-side media.poilove.com** (SSH server): `8.8.8.8` in `/etc/resolv.conf`
+8. **App Expo**: push 17 file TypeScript già scaffolded, test su device, build EAS
 
 ### ⚠️ Quello che la prossima sessione NON deve fare senza ack
 
