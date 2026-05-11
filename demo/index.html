@@ -344,9 +344,8 @@ button{touch-action:manipulation}
 .profile-view,.itin-view,.poi-view,.companions-view,.illi-view{position:fixed;inset:0 0 136px 0;z-index:100;background:var(--bg);overflow-y:auto;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.72,0,1);-webkit-overflow-scrolling:touch}
 .profile-view.active,.itin-view.active,.poi-view.active,.companions-view.active,.illi-view.active{transform:translateY(0)}
 /* ILLI•AI dedicated view: scuro, focalizzato sul chat */
-.illi-view{background:linear-gradient(180deg,#0F172A 0%,#1e3a5f 60%,#285EA7 100%);color:#fff;display:flex;flex-direction:column;inset:0 0 215px 0;overflow:hidden}
-.illi-view-hdr{flex-shrink:0}
-.illi-view .poiai-section{margin:14px 14px 0 14px;border-radius:18px 18px 0 0;flex:1;min-height:0;display:flex;flex-direction:column}
+.illi-view{background:linear-gradient(180deg,#0F172A 0%,#1e3a5f 60%,#285EA7 100%);color:#fff;display:flex;flex-direction:column;overflow:hidden;inset:0;padding-bottom:215px;z-index:200}
+.illi-view .poiai-section{margin:14px;border-radius:18px;flex:1;min-height:0;display:flex;flex-direction:column}
 .illi-view .poiai-msgs{flex:1;min-height:0;max-height:none}
 .illi-view .poiai-input-bar{flex-shrink:0}
 .illi-view-hdr{padding:18px 20px 6px;color:#fff}
@@ -1959,13 +1958,9 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 
 </div>
 
-<!-- ═══ ILLI•AI VIEW (tab dedicata) ═══ -->
+<!-- ═══ ILLI•AI VIEW (tab dedicata) — header chat unico, niente testata duplicata ═══ -->
 <div class="illi-view zone-illi" id="illiView">
-  <div class="illi-view-hdr">
-    <h2><img src="img/illi-ai.png" alt="ILLI•AI"> ILLI•AI</h2>
-    <p>La tua mascot e Travel Advisor. Ti guida nell'uso della piattaforma e suggerisce luoghi autentici.</p>
-  </div>
-  <!-- ILLI•AI Travel Advisor (chat) -->
+  <!-- ILLI•AI Travel Advisor (chat, è l'unica testata) -->
   <div class="poiai-section">
     <div class="poiai-header">
       <div class="poiai-avatar-wrap">
