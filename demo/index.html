@@ -197,6 +197,32 @@ button{touch-action:manipulation}
 
 /* ── MAP TYPES ── */
 .map-types{position:fixed;top:14px;left:14px;z-index:200;display:flex;gap:5px}
+/* ── MAP SEARCH BAR ── */
+.map-search-wrap{position:fixed;top:58px;left:14px;right:14px;z-index:210;display:none}
+.map-search-wrap.show{display:block}
+.map-search-in{width:100%;background:#fff;border:1.5px solid var(--border);border-radius:22px;padding:10px 36px 10px 38px;font-size:13px;font-family:inherit;outline:none;color:var(--text);box-shadow:0 4px 14px rgba(0,0,0,.12);transition:border-color .15s,box-shadow .15s}
+.map-search-in:focus{border-color:var(--blue);box-shadow:0 6px 18px rgba(40,94,167,.18)}
+.map-search-icon{position:absolute;left:14px;top:14px;font-size:15px;color:var(--muted);pointer-events:none;z-index:2}
+.map-search-clear{position:absolute;right:8px;top:9px;width:26px;height:26px;border-radius:13px;background:rgba(0,0,0,.06);border:none;cursor:pointer;color:var(--muted);display:none;align-items:center;justify-content:center;font-size:13px;z-index:2}
+.map-search-clear.show{display:flex}
+.map-search-clear:active{transform:scale(.9)}
+.map-search-drop{position:absolute;top:50px;left:0;right:0;background:#fff;border-radius:14px;box-shadow:0 10px 28px rgba(0,0,0,.18);z-index:211;max-height:340px;overflow-y:auto;display:none;border:1px solid var(--border)}
+.map-search-drop.show{display:block}
+.map-search-section{padding:4px 0}
+.map-search-section+.map-search-section{border-top:1px solid #f0ebe0}
+.map-search-section-lbl{font-size:10px;font-weight:800;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;padding:8px 14px 4px;display:flex;align-items:center;gap:4px}
+.map-search-item{display:flex;align-items:center;gap:10px;padding:9px 14px;cursor:pointer;transition:background .12s}
+.map-search-item:hover,.map-search-item:active{background:#f5f0e8}
+.map-search-item-icon{width:32px;height:32px;border-radius:9px;background:#FFF5F5;color:var(--red);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.map-search-item-icon.osm{background:#EBF2FC;color:var(--blue)}
+.map-search-item-text{flex:1;min-width:0}
+.map-search-item-name{font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.map-search-item-meta{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.map-search-empty{padding:18px;text-align:center;color:var(--muted);font-size:12px}
+.map-search-loading{padding:14px;text-align:center;color:var(--muted);font-size:12px;display:flex;align-items:center;justify-content:center;gap:6px}
+/* Popup Leaflet con azioni search */
+.map-search-popup-title{font-weight:800;font-size:13px;margin-bottom:8px;color:var(--text);line-height:1.3}
+.map-search-popup-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;min-width:240px}
 .mt-btn{height:28px;padding:0 10px;border-radius:8px;background:var(--card);border:none;cursor:pointer;font-size:10px;font-weight:700;color:var(--muted);box-shadow:0 2px 8px rgba(0,0,0,.1);transition:all .15s}
 .mt-btn.active{background:var(--blue);color:#fff}
 .mt-btn.route-active{background:#7C3AED;color:#fff}
@@ -1091,6 +1117,20 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
   <button class="mt-btn active" onclick="setMapType('street',this)" data-t="mt_street">Stradale</button>
   <button class="mt-btn" onclick="setMapType('satellite',this)" data-t="mt_sat">Satellite</button>
   <button class="mt-btn" onclick="setMapType('routes',this)" data-t="mt_routes">Rotte Storiche</button>
+</div>
+
+<!-- MAP SEARCH BAR -->
+<div class="map-search-wrap show" id="mapSearchWrap">
+  <i class="ph-duotone ph-magnifying-glass map-search-icon"></i>
+  <input class="map-search-in" id="mapSearchIn" type="text"
+    placeholder="Cerca un POI o un luogo (es. Blloku, Tirana)…"
+    oninput="onMapSearch(this.value)"
+    onfocus="onMapSearchFocus()"
+    autocomplete="off"/>
+  <button class="map-search-clear" id="mapSearchClear" onclick="clearMapSearch()" aria-label="Cancella">
+    <i class="ph-duotone ph-x"></i>
+  </button>
+  <div class="map-search-drop" id="mapSearchDrop"></div>
 </div>
 
 <!-- FAB -->
@@ -3808,6 +3848,10 @@ function showTab(tab){
   document.querySelectorAll('.map-types')[0].style.display=onMap?'flex':'none';
   const tbRight=document.getElementById('tbRight');
   if(tbRight)tbRight.style.display=onMap?'flex':'none';
+  // Map search bar visibile solo su tab Mappa
+  const msw=document.getElementById('mapSearchWrap');
+  if(msw) msw.classList.toggle('show', onMap);
+  if(!onMap){ clearMapSearch?.(); }
   if(tab==='map'&&map)setTimeout(()=>map.invalidateSize(),50);
   if(tab==='profile'){togglePublicProfile(false); refreshProfileStats();}
   if(tab==='poi') renderPoiTab();
@@ -4020,6 +4064,161 @@ function haversineKm(lat1,lng1,lat2,lng2){
   return 2*R*Math.asin(Math.sqrt(a));
 }
 function centerMapOnPoi(lat,lng){ showTab('map'); if(map) map.setView([lat,lng],16); }
+
+/* ══════════════════════════════════════════
+   MAP SEARCH — POI locali + Nominatim OSM
+══════════════════════════════════════════ */
+let _mapSearchTimer = null;
+let _mapSearchToken = 0;
+let _mapSearchTransientMarker = null;
+
+function onMapSearchFocus(){
+  const v = document.getElementById('mapSearchIn')?.value.trim();
+  if(v) onMapSearch(v);
+}
+function onMapSearch(q){
+  const drop=document.getElementById('mapSearchDrop');
+  const clearBtn=document.getElementById('mapSearchClear');
+  if(!drop) return;
+  clearTimeout(_mapSearchTimer);
+  q=(q||'').trim();
+  if(clearBtn) clearBtn.classList.toggle('show', !!q);
+  if(q.length<2){ drop.classList.remove('show'); return; }
+  drop.innerHTML='<div class="map-search-loading"><i class="ph-duotone ph-circle-notch" style="animation:spin 1s linear infinite;font-size:14px"></i>Cerco…</div>';
+  drop.classList.add('show');
+  _mapSearchTimer=setTimeout(()=>runMapSearch(q), 280);
+}
+async function runMapSearch(q){
+  const drop=document.getElementById('mapSearchDrop');
+  if(!drop) return;
+  const token=++_mapSearchToken;
+
+  // 1. POI locali (POIS array) con match parziale case-insensitive
+  const pois=(typeof POIS!=='undefined'?POIS:[]);
+  const ql=q.toLowerCase();
+  const matched=pois
+    .map((p,i)=>({p,i}))
+    .filter(o=>o.p && o.p.name && o.p.name.toLowerCase().includes(ql))
+    .slice(0,3);
+
+  // 2. Nominatim OSM geocoding (max 3)
+  let places=[];
+  try{
+    const r=await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=3&addressdetails=1`,
+      { headers:{'Accept-Language': (typeof lang!=='undefined'?lang:'it')} });
+    if(r.ok && token===_mapSearchToken){
+      const data=await r.json();
+      places=(data||[]).slice(0,3);
+    }
+  }catch(e){ /* offline: salta OSM */ }
+  if(token!==_mapSearchToken) return;
+
+  let html='';
+  if(matched.length){
+    html+='<div class="map-search-section"><div class="map-search-section-lbl"><i class="ph-duotone ph-heart" style="color:var(--red);font-size:11px"></i> I tuoi POI</div>';
+    matched.forEach(o=>{
+      const p=o.p, idx=o.i;
+      const meta=(p.address||p.cat||p.category||'').toString().replace(/</g,'&lt;');
+      html+=`<div class="map-search-item" onclick="onSearchPickPOI(${idx})">
+        <div class="map-search-item-icon"><i class="ph-duotone ph-map-pin"></i></div>
+        <div class="map-search-item-text">
+          <div class="map-search-item-name">${(p.name||'').replace(/</g,'&lt;')}</div>
+          <div class="map-search-item-meta">${meta}</div>
+        </div>
+      </div>`;
+    });
+    html+='</div>';
+  }
+  if(places.length){
+    html+='<div class="map-search-section"><div class="map-search-section-lbl"><i class="ph-duotone ph-globe" style="font-size:11px"></i> Luoghi</div>';
+    places.forEach(pl=>{
+      const dn=(pl.display_name||'').toString();
+      const name=dn.split(',')[0].trim();
+      const rest=dn.split(',').slice(1).join(',').trim();
+      const safeName=name.replace(/'/g,"\\'").replace(/"/g,'&quot;');
+      html+=`<div class="map-search-item" onclick="onSearchPickPlace(${pl.lat},${pl.lon},'${safeName}')">
+        <div class="map-search-item-icon osm"><i class="ph-duotone ph-compass"></i></div>
+        <div class="map-search-item-text">
+          <div class="map-search-item-name">${name.replace(/</g,'&lt;')}</div>
+          <div class="map-search-item-meta">${rest.replace(/</g,'&lt;')}</div>
+        </div>
+      </div>`;
+    });
+    html+='</div>';
+  }
+  if(!html) html='<div class="map-search-empty">Nessun risultato</div>';
+  drop.innerHTML=html;
+  drop.classList.add('show');
+}
+function clearMapSearch(){
+  const input=document.getElementById('mapSearchIn');
+  const drop=document.getElementById('mapSearchDrop');
+  const clearBtn=document.getElementById('mapSearchClear');
+  if(input) input.value='';
+  if(drop) drop.classList.remove('show');
+  if(clearBtn) clearBtn.classList.remove('show');
+  closeMapSearchMarker();
+}
+function clearMapSearchDropOnly(){
+  document.getElementById('mapSearchDrop')?.classList.remove('show');
+  document.getElementById('mapSearchIn')?.blur();
+}
+function onSearchPickPOI(idx){
+  clearMapSearchDropOnly();
+  const p=POIS[idx];
+  if(!p||!map) return;
+  map.setView([p.lat,p.lng], 17);
+  if(typeof openDetail==='function') openDetail(idx);
+}
+function onSearchPickPlace(lat,lng,name){
+  clearMapSearchDropOnly();
+  if(!map||typeof L==='undefined') return;
+  lat=+lat; lng=+lng;
+  map.setView([lat,lng], 16);
+  closeMapSearchMarker();
+  _mapSearchTransientMarker = L.marker([lat,lng],{
+    icon: L.divIcon({
+      html: `<div class="poi-marker"><div class="poi-bubble" style="background:var(--blue)"><i class="ph-duotone ph-map-trifold" style="font-size:14px;color:#fff;pointer-events:none"></i></div><div class="poi-tail" style="background:var(--blue)"></div><div class="poi-label" style="background:var(--blue)">${(name||'').replace(/</g,'&lt;')}</div></div>`,
+      className:'', iconSize:[40,52], iconAnchor:[20,52]
+    })
+  }).addTo(map);
+  const safe=(name||'').replace(/'/g,"\\'").replace(/"/g,'&quot;');
+  _mapSearchTransientMarker.bindPopup(`
+    <div class="map-search-popup-title">${(name||'').replace(/</g,'&lt;')}</div>
+    <div class="map-search-popup-actions">
+      <button class="ai-place-action-btn poi"   onclick="aiPlaceCreatePOI('${safe}');closeMapSearchMarker()"><i class="ph-duotone ph-plus-circle"></i><span>POI</span></button>
+      <button class="ai-place-action-btn nav"   onclick="aiPlaceNavigate('${safe}')"><i class="ph-duotone ph-navigation-arrow"></i><span>Naviga</span></button>
+      <button class="ai-place-action-btn add"   onclick="aiPlaceAddToTrip('${safe}')"><i class="ph-duotone ph-list-plus"></i><span>Aggiungi</span></button>
+      <button class="ai-place-action-btn share" onclick="aiPlaceShare('${safe}')"><i class="ph-duotone ph-share-network"></i><span>Condividi</span></button>
+    </div>
+  `,{minWidth:260, autoPan:true}).openPopup();
+  // v1.5: POI vicini entro 2km
+  renderMapSearchNearby(lat,lng);
+}
+function closeMapSearchMarker(){
+  if(_mapSearchTransientMarker && map){
+    try{ map.removeLayer(_mapSearchTransientMarker); }catch(e){}
+  }
+  _mapSearchTransientMarker=null;
+}
+function renderMapSearchNearby(lat,lng){
+  const pois=(typeof POIS!=='undefined'?POIS:[]);
+  if(typeof haversineKm!=='function'||!pois.length) return;
+  const near=pois
+    .filter(p=>p && p.lat && p.lng)
+    .map(p=>({...p, _d: haversineKm(lat,lng,p.lat,p.lng)}))
+    .filter(p=>p._d<=2)
+    .sort((a,b)=>a._d-b._d);
+  if(near.length) showToast?.(`📍 ${near.length} POI nelle vicinanze (entro 2 km)`);
+}
+// Chiudi dropdown su click fuori (mantieni click sui risultati)
+document.addEventListener('click', e=>{
+  const wrap=document.getElementById('mapSearchWrap');
+  if(!wrap) return;
+  if(!wrap.contains(e.target)){
+    document.getElementById('mapSearchDrop')?.classList.remove('show');
+  }
+});
 
 /* ══════════════════════════════════════════
    ITIN SUB-TABS — Itinerari / Liste
