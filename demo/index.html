@@ -3498,11 +3498,47 @@ function triggerPhoto(idx){
 
 /* ══════════════════════════════════════════
    PHOTO SOURCE POPUP — 2 quadrati separati
-   Galleria → Rullino / File   ·   Fotocamera (capture)
+   Mobile  : Galleria (→ File/Rullino) · Fotocamera (capture)
+   Desktop : Foto                      · Cartella locale
 ══════════════════════════════════════════ */
 let _photoSourceSlot = null; // 0|1|2 = slot POI
+function _isDesktopPhotoFlow(){
+  // Touch device (pointer coarse) → flusso mobile (Galleria + Fotocamera)
+  // Safety net: anche su pointer fine, se viewport stretta è mobile (browser ristretto / DevTools emulation)
+  if(window.matchMedia('(pointer: coarse)').matches) return false;
+  if(window.innerWidth < 900) return false;
+  return true;
+}
+function _renderPhotoSourcePopup(){
+  const grid=document.querySelector('#photoSourceOv .photo-source-grid');
+  if(!grid) return;
+  if(_isDesktopPhotoFlow()){
+    // Desktop: Foto (sinistra) · Cartella locale (destra) — entrambi file picker
+    grid.innerHTML=`
+      <button class="photo-source-tile" onclick="openPhotoSourceDesktopFoto()">
+        <i class="ph-duotone ph-image"></i>
+        <span>Foto</span>
+      </button>
+      <button class="photo-source-tile" onclick="openPhotoSourceDesktopCartella()">
+        <i class="ph-duotone ph-folder-open"></i>
+        <span>Cartella locale</span>
+      </button>`;
+  } else {
+    // Mobile: Galleria (sinistra) · Fotocamera (destra)
+    grid.innerHTML=`
+      <button class="photo-source-tile" onclick="openPhotoSourceGallery()">
+        <i class="ph-duotone ph-image"></i>
+        <span>Galleria</span>
+      </button>
+      <button class="photo-source-tile" onclick="openPhotoSourceCamera()">
+        <i class="ph-duotone ph-camera"></i>
+        <span>Fotocamera</span>
+      </button>`;
+  }
+}
 function openPhotoSource(slot){
   _photoSourceSlot = slot;
+  _renderPhotoSourcePopup();
   document.getElementById('photoSourceOv').classList.add('show');
 }
 function closePhotoSource(){
@@ -3518,6 +3554,16 @@ function closePhotoGallery(){
 function openPhotoSourceCamera(){
   closePhotoSource();
   document.getElementById('photoCameraIn').click();
+}
+// Desktop: entrambi aprono il file picker del SO — su Mac la sidebar "Foto" è
+// raggiungibile dal picker; su Windows il dialog include la libreria Foto.
+function openPhotoSourceDesktopFoto(){
+  closePhotoSource();
+  document.getElementById('photoRollIn').click();
+}
+function openPhotoSourceDesktopCartella(){
+  closePhotoSource();
+  document.getElementById('photoFileIn').click();
 }
 function pickFromRoll(){
   closePhotoGallery();
@@ -6945,17 +6991,17 @@ async function confirmPhotoPicker(){
   </div>
 </div>
 
-<!-- ═══ PHOTO GALLERY — 2 quadrati: Rullino / File ═══ -->
+<!-- ═══ PHOTO GALLERY — 2 quadrati: File (sx) / Rullino (dx) — solo mobile ═══ -->
 <div id="photoGalleryOv" onclick="if(event.target===this)closePhotoGallery()">
   <button class="photo-source-close" onclick="closePhotoGallery()" aria-label="Chiudi"><i class="ph-duotone ph-x"></i></button>
   <div class="photo-source-grid">
-    <button class="photo-source-tile" onclick="pickFromRoll()">
-      <i class="ph-duotone ph-images-square"></i>
-      <span>Rullino</span>
-    </button>
     <button class="photo-source-tile" onclick="pickFromFiles()">
       <i class="ph-duotone ph-folder-open"></i>
       <span>File</span>
+    </button>
+    <button class="photo-source-tile" onclick="pickFromRoll()">
+      <i class="ph-duotone ph-images-square"></i>
+      <span>Rullino</span>
     </button>
   </div>
 </div>
