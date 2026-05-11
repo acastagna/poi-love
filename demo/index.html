@@ -3285,8 +3285,15 @@ let gpsPos=null,gpsRegistered=false;
 function initMap(){
   map=L.map('map',{zoomControl:false,attributionControl:true,doubleClickZoom:false}).setView(CENTER,15);
   // Doppio clic / doppio tap su mappa: reverse-geocoding + popup OSM
-  map.on('dblclick', async e => {
-    const { lat, lng } = e.latlng;
+  // Su mobile Leaflet a volte salta l'evento dblclick → aggancio anche un
+  // detector custom su click con timing 350ms (più Leaflet dblclick come fallback)
+  let _mapTapTs = 0;
+  let _mapDblHandling = false;
+  async function _handleMapDoubleTap(latlng){
+    if(_mapDblHandling) return;
+    _mapDblHandling = true;
+    setTimeout(()=>_mapDblHandling=false, 900);
+    const { lat, lng } = latlng;
     showToast?.('🔍 Cerco cosa c\'è qui…');
     let name = `Punto ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
     try{
@@ -3300,7 +3307,19 @@ function initMap(){
       }
     }catch(err){}
     onSearchPickPlace(lat, lng, name);
+  }
+  map.on('click', e => {
+    // Se è attivo il "tap-on-map per aggiungere POI", non intercettare
+    if(typeof mapTapListenerActive!=='undefined' && mapTapListenerActive) return;
+    const now = Date.now();
+    if(now - _mapTapTs < 350){
+      _mapTapTs = 0;
+      _handleMapDoubleTap(e.latlng);
+    } else {
+      _mapTapTs = now;
+    }
   });
+  map.on('dblclick', e => _handleMapDoubleTap(e.latlng));
   tileStreet=L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
   tileSat=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19});
   // Etichette trasparenti da sovrapporre al satellite
