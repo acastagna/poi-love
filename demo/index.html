@@ -427,12 +427,12 @@ button{touch-action:manipulation}
 .nav-picker-icon.google{background:#4285F4;color:#fff}
 .nav-picker-icon.waze{background:#33CCFF;color:#fff}
 
-/* ── MAP POPUP SUB-MENU MODAL (Aggiungi / Condividi) ── */
-#mapPopupSubmenuOv{position:fixed;inset:0;z-index:9300;background:rgba(0,0,0,.5);display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);padding:0}
+/* ── MAP POPUP SUB-MENU MODAL (Aggiungi / Condividi) — al centro ── */
+#mapPopupSubmenuOv{position:fixed;inset:0;z-index:9300;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);padding:18px}
 #mapPopupSubmenuOv.show{display:flex}
-.map-popup-submenu-card{width:100%;max-width:430px;background:var(--card);border-radius:22px 22px 0 0;padding:14px 14px 24px;box-shadow:0 -10px 30px rgba(0,0,0,.3);animation:smSlide .25s ease-out}
-@keyframes smSlide{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.map-popup-submenu-handle{width:42px;height:4px;background:#C8BFB0;border-radius:2px;margin:0 auto 10px}
+.map-popup-submenu-card{width:100%;max-width:380px;background:var(--card);border-radius:22px;padding:16px 16px 18px;box-shadow:0 20px 50px rgba(0,0,0,.4);animation:smPop .22s ease-out}
+@keyframes smPop{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
+.map-popup-submenu-handle{display:none}
 .map-popup-submenu-title{font-size:14px;font-weight:900;color:var(--text);margin-bottom:4px;display:flex;align-items:center;gap:6px}
 .map-popup-submenu-title i{color:var(--red)}
 .map-popup-submenu-sub{font-size:11px;color:var(--muted);margin-bottom:12px}
@@ -443,6 +443,7 @@ button{touch-action:manipulation}
 .map-popup-submenu-row.add i{color:#16A34A}
 .map-popup-submenu-row.illi i{color:#7C3AED}
 .map-popup-submenu-row.share i{color:var(--blue)}
+.map-popup-row-arrow{margin-left:auto;color:var(--muted) !important;font-size:14px !important;width:auto !important}
 
 /* ── LIST DETAIL POPUP — apre la lista per modificare/vedere POI ── */
 #listDetailOv{position:fixed;inset:0;z-index:9100;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);padding:18px}
@@ -4148,9 +4149,9 @@ function suggestToGoogleMaps(key){
 function editPoiByKey(key){
   const p = _poiFromKey(key);
   if(!p) return;
-  if(typeof editPOIByObject==='function') return editPOIByObject(p);
-  openDBDetail(p);
-  showToast?.(t('edit_in_detail'));
+  // Setta currentPOI e apre direttamente il form di edit (anche senza id, per demo POI)
+  currentPOI = { ...p, id: p.id || ('local-'+(p.name||'').toLowerCase().replace(/\W+/g,'-')||'local') };
+  if(typeof openEditPOI==='function') openEditPOI();
 }
 
 // Elimina con conferma
@@ -4470,8 +4471,8 @@ function toggleMapPopupSubmenu(which){
     title.innerHTML = `<i class="ph-duotone ph-list-plus"></i><span>Aggiungi "${_mapPopupCtx.name}"</span>`;
     sub.textContent = 'Dove vuoi aggiungere questo luogo?';
     list.innerHTML = `
-      <button class="map-popup-submenu-row add" onclick="closeMapPopupSubmenu();addPlaceToItinerary()"><i class="ph-duotone ph-navigation"></i><span>All'itinerario</span></button>
-      <button class="map-popup-submenu-row add" onclick="closeMapPopupSubmenu();addPlaceToHistoricRoute()"><i class="ph-duotone ph-scroll"></i><span>Alla rotta storica</span></button>
+      <button class="map-popup-submenu-row add" onclick="showPlaceTripChooser()"><i class="ph-duotone ph-path"></i><span>All'itinerario</span><i class="ph-duotone ph-caret-right map-popup-row-arrow"></i></button>
+      <button class="map-popup-submenu-row add" onclick="showPlaceHistoricRouteChooser()"><i class="ph-duotone ph-scroll"></i><span>Alla rotta storica</span><i class="ph-duotone ph-caret-right map-popup-row-arrow"></i></button>
       <button class="map-popup-submenu-row illi" onclick="closeMapPopupSubmenu();askIlliAbout()"><i class="ph-duotone ph-sparkle"></i><span>Chiedi a ILLI•AI di raccontarmela</span></button>`;
   } else if(which==='share'){
     title.innerHTML = `<i class="ph-duotone ph-share-network"></i><span>Condividi "${_mapPopupCtx.name}"</span>`;
@@ -4485,6 +4486,86 @@ function toggleMapPopupSubmenu(which){
 }
 function closeMapPopupSubmenu(){
   document.getElementById('mapPopupSubmenuOv').classList.remove('show');
+}
+
+// Sub-livello: scelta itinerario tra quelli esistenti
+function showPlaceTripChooser(){
+  if(!_mapPopupCtx) return;
+  const title = document.getElementById('mapPopupSubmenuTitle');
+  const sub = document.getElementById('mapPopupSubmenuSub');
+  const list = document.getElementById('mapPopupSubmenuList');
+  title.innerHTML = `<i class="ph-duotone ph-path"></i><span>"${_mapPopupCtx.name}" a quale itinerario?</span>`;
+  sub.textContent = 'Seleziona un itinerario esistente o creane uno nuovo:';
+  const trips = (typeof TRIPS!=='undefined') ? Object.values(TRIPS) : [];
+  if(trips.length){
+    list.innerHTML = trips.map(tr=>`
+      <button class="map-popup-submenu-row add" onclick="closeMapPopupSubmenu();aiPlaceAddToTripById('${tr.id}')">
+        <i class="ph-duotone ph-navigation"></i><span>${(tr.name||'').replace(/</g,'&lt;')}</span>
+      </button>`).join('') + `
+      <button class="map-popup-submenu-row" onclick="closeMapPopupSubmenu();openNewTrip?.()">
+        <i class="ph-duotone ph-plus-circle"></i><span>Crea nuovo itinerario</span>
+      </button>
+      <button class="map-popup-submenu-row" onclick="toggleMapPopupSubmenu('add')" style="background:transparent;border-color:transparent;color:var(--muted);justify-content:center">
+        <i class="ph-duotone ph-arrow-left"></i><span>Indietro</span>
+      </button>`;
+  } else {
+    list.innerHTML = `
+      <div style="padding:14px;text-align:center;color:var(--muted);font-size:12px">Nessun itinerario ancora. Creane uno per aggiungere "${_mapPopupCtx.name}".</div>
+      <button class="map-popup-submenu-row" onclick="closeMapPopupSubmenu();openNewTrip?.()">
+        <i class="ph-duotone ph-plus-circle"></i><span>Crea nuovo itinerario</span>
+      </button>
+      <button class="map-popup-submenu-row" onclick="toggleMapPopupSubmenu('add')" style="background:transparent;border-color:transparent;color:var(--muted);justify-content:center">
+        <i class="ph-duotone ph-arrow-left"></i><span>Indietro</span>
+      </button>`;
+  }
+}
+function aiPlaceAddToTripById(tripId){
+  if(!_mapPopupCtx) return;
+  if(typeof addAISuggestionAsStop==='function') addAISuggestionAsStop(tripId, _mapPopupCtx.name);
+  else showToast?.(`Aggiunto "${_mapPopupCtx.name}"`);
+}
+
+// Rotte storiche: per ora hardcoded (Via Egnatia, Terre Illiriche)
+const _HISTORIC_ROUTES = [
+  {id:'r-egnatia', name:'Via Egnatia',     meta:'Albania · Macedonia · Grecia'},
+  {id:'r-illire',  name:'Terre Illiriche', meta:'Popoli antichi dei Balcani'}
+];
+function showPlaceHistoricRouteChooser(){
+  if(!_mapPopupCtx) return;
+  const title = document.getElementById('mapPopupSubmenuTitle');
+  const sub = document.getElementById('mapPopupSubmenuSub');
+  const list = document.getElementById('mapPopupSubmenuList');
+  title.innerHTML = `<i class="ph-duotone ph-scroll"></i><span>"${_mapPopupCtx.name}" a quale rotta?</span>`;
+  sub.textContent = 'Seleziona una rotta storica o creane una nuova:';
+  list.innerHTML = _HISTORIC_ROUTES.map(r=>`
+    <button class="map-popup-submenu-row add" onclick="closeMapPopupSubmenu();addPlaceToHistoricRouteById('${r.id}','${r.name}')">
+      <i class="ph-duotone ph-scroll"></i>
+      <span style="display:flex;flex-direction:column;align-items:flex-start;gap:1px">
+        <span>${r.name}</span>
+        <span style="font-size:10px;font-weight:600;color:var(--muted)">${r.meta}</span>
+      </span>
+    </button>`).join('') + `
+    <button class="map-popup-submenu-row illi" onclick="closeMapPopupSubmenu();createHistoricRouteWithAI()">
+      <i class="ph-duotone ph-sparkle"></i><span>Crea nuova rotta con ILLI•AI</span>
+    </button>
+    <button class="map-popup-submenu-row" onclick="toggleMapPopupSubmenu('add')" style="background:transparent;border-color:transparent;color:var(--muted);justify-content:center">
+      <i class="ph-duotone ph-arrow-left"></i><span>Indietro</span>
+    </button>`;
+}
+function addPlaceToHistoricRouteById(routeId, routeName){
+  if(!_mapPopupCtx) return;
+  showToast?.(`🏛 "${_mapPopupCtx.name}" aggiunto alla rotta "${routeName}"`);
+}
+function createHistoricRouteWithAI(){
+  if(!_mapPopupCtx) return;
+  showTab?.('illi');
+  setTimeout(()=>{
+    const input = document.getElementById('poiaiInput');
+    if(input){
+      input.value = `Aiutami a creare una nuova rotta storica che includa "${_mapPopupCtx.name}" (coordinate ${(+_mapPopupCtx.lat).toFixed(5)}, ${(+_mapPopupCtx.lng).toFixed(5)}). Suggeriscimi nome, periodo storico, altre tappe coerenti e una breve storia narrativa.`;
+      if(typeof sendPoiAIMsg==='function') sendPoiAIMsg();
+    }
+  }, 350);
 }
 // Aggiungi → all'itinerario (usa aiPlaceAddToTrip esistente)
 function addPlaceToItinerary(){
@@ -6492,8 +6573,9 @@ function startLocShare(duration){
 let editingPOIId=null; // id del POI in editing
 
 function openEditPOI(){
-  if(!currentPOI||!currentPOI.id) return;
-  editingPOIId=currentPOI.id;
+  if(!currentPOI) return;
+  // Permetti edit anche per POI demo senza id (fallback locale)
+  editingPOIId = currentPOI.id || ('local-'+Date.now());
   closeDetail();
   // Pre-fill form
   setTimeout(()=>{
