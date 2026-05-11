@@ -244,6 +244,18 @@ button{touch-action:manipulation}
 /* ── PHOTO PICKER (Unsplash + Upload) ── */
 #photoPickerOv{position:fixed;inset:0;z-index:8500;background:rgba(0,0,0,.55);display:none;align-items:flex-end;justify-content:center}
 #photoPickerOv.show{display:flex}
+
+/* ── PHOTO SOURCE: 2 quadrati separati (centro schermo) ── */
+#photoSourceOv,#photoGalleryOv{position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.62);display:none;align-items:center;justify-content:center;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+#photoSourceOv.show,#photoGalleryOv.show{display:flex}
+.photo-source-grid{display:flex;gap:18px;padding:0 16px;align-items:center;justify-content:center}
+.photo-source-tile{width:138px;height:138px;border-radius:24px;background:#fff;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;box-shadow:0 14px 36px rgba(0,0,0,.32);transition:transform .15s,box-shadow .15s;font-family:inherit;padding:0}
+.photo-source-tile:active{transform:scale(.94)}
+.photo-source-tile:hover{box-shadow:0 18px 44px rgba(0,0,0,.4)}
+.photo-source-tile i{font-size:46px;color:var(--red)}
+.photo-source-tile span{font-size:14px;font-weight:800;color:var(--text);letter-spacing:.2px}
+.photo-source-close{position:absolute;top:24px;right:24px;width:42px;height:42px;border-radius:21px;background:rgba(255,255,255,.18);border:none;cursor:pointer;color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
+.photo-source-close:active{transform:scale(.92)}
 .photo-picker-sheet{width:100%;max-width:480px;background:var(--card);border-radius:22px 22px 0 0;padding:0 0 env(safe-area-inset-bottom,0);max-height:90vh;display:flex;flex-direction:column;overflow:hidden}
 .photo-picker-handle{width:40px;height:4px;background:rgba(0,0,0,.15);border-radius:2px;margin:10px auto 0}
 .photo-picker-head{padding:12px 16px 8px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
@@ -3468,8 +3480,48 @@ const photoFiles=[null,null,null]; // File object reali per upload Supabase
 let exifSuggestedName='';
 let exifCache=null; // { lat, lng, name, street } — ultimo risultato EXIF disponibile
 function triggerPhoto(idx){
-  // Apre il Photo Picker (Unsplash + Upload) invece del file input diretto
-  openPhotoPicker(idx);
+  // Nuovo flusso: popup centrale a 2 quadrati (Galleria + Fotocamera)
+  openPhotoSource(idx);
+}
+
+/* ══════════════════════════════════════════
+   PHOTO SOURCE POPUP — 2 quadrati separati
+   Galleria → Rullino / File   ·   Fotocamera (capture)
+══════════════════════════════════════════ */
+let _photoSourceSlot = null; // 0|1|2 = slot POI
+function openPhotoSource(slot){
+  _photoSourceSlot = slot;
+  document.getElementById('photoSourceOv').classList.add('show');
+}
+function closePhotoSource(){
+  document.getElementById('photoSourceOv').classList.remove('show');
+}
+function openPhotoSourceGallery(){
+  closePhotoSource();
+  document.getElementById('photoGalleryOv').classList.add('show');
+}
+function closePhotoGallery(){
+  document.getElementById('photoGalleryOv').classList.remove('show');
+}
+function openPhotoSourceCamera(){
+  closePhotoSource();
+  document.getElementById('photoCameraIn').click();
+}
+function pickFromRoll(){
+  closePhotoGallery();
+  document.getElementById('photoRollIn').click();
+}
+function pickFromFiles(){
+  closePhotoGallery();
+  document.getElementById('photoFileIn').click();
+}
+function handlePhotoSourceFile(input){
+  const slot = _photoSourceSlot;
+  if(slot===null || slot<0 || slot>2){ input.value=''; return; }
+  if(!input.files || !input.files[0]){ input.value=''; return; }
+  // Riusa la logica esistente di handlePhoto (lo slot POI gestisce upload + EXIF + preview)
+  handlePhoto(input, slot);
+  input.value=''; // reset per consentire re-selezione stesso file
 }
 function handlePhoto(input,idx){
   const file=input.files[0];
@@ -6819,7 +6871,42 @@ async function confirmPhotoPicker(){
 }
 </script>
 
-<!-- ═══ PHOTO PICKER (Unsplash + Upload) ═══ -->
+<!-- ═══ PHOTO SOURCE — Popup centrale a 2 quadrati ═══ -->
+<div id="photoSourceOv" onclick="if(event.target===this)closePhotoSource()">
+  <button class="photo-source-close" onclick="closePhotoSource()" aria-label="Chiudi"><i class="ph-duotone ph-x"></i></button>
+  <div class="photo-source-grid">
+    <button class="photo-source-tile" onclick="openPhotoSourceGallery()">
+      <i class="ph-duotone ph-image"></i>
+      <span>Galleria</span>
+    </button>
+    <button class="photo-source-tile" onclick="openPhotoSourceCamera()">
+      <i class="ph-duotone ph-camera"></i>
+      <span>Fotocamera</span>
+    </button>
+  </div>
+</div>
+
+<!-- ═══ PHOTO GALLERY — 2 quadrati: Rullino / File ═══ -->
+<div id="photoGalleryOv" onclick="if(event.target===this)closePhotoGallery()">
+  <button class="photo-source-close" onclick="closePhotoGallery()" aria-label="Chiudi"><i class="ph-duotone ph-x"></i></button>
+  <div class="photo-source-grid">
+    <button class="photo-source-tile" onclick="pickFromRoll()">
+      <i class="ph-duotone ph-images-square"></i>
+      <span>Rullino</span>
+    </button>
+    <button class="photo-source-tile" onclick="pickFromFiles()">
+      <i class="ph-duotone ph-folder-open"></i>
+      <span>File</span>
+    </button>
+  </div>
+</div>
+
+<!-- Input file nascosti — uno per ogni sorgente -->
+<input type="file" id="photoCameraIn" accept="image/*" capture="environment" style="display:none" onchange="handlePhotoSourceFile(this)">
+<input type="file" id="photoRollIn"   accept="image/*"                       style="display:none" onchange="handlePhotoSourceFile(this)">
+<input type="file" id="photoFileIn"   accept="image/*"                       style="display:none" onchange="handlePhotoSourceFile(this)">
+
+<!-- ═══ PHOTO PICKER LEGACY (Unsplash + Upload) — usato per cover itinerari ═══ -->
 <div id="photoPickerOv" onclick="if(event.target===this)closePhotoPicker()">
   <div class="photo-picker-sheet">
     <div class="photo-picker-handle"></div>
