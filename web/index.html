@@ -502,6 +502,32 @@ h3{font-family:"Ubuntu",sans-serif;font-size:16px;font-weight:700;color:var(--mu
 .vis-prose p:last-child{margin-bottom:0}
 .vis-prose strong{color:var(--ink);font-weight:700}
 
+/* ══ DEMO HERO — invito a provare demo.poilove.com ══ */
+.demo-hero{padding:80px 24px 72px;background:linear-gradient(180deg,#FFFEF9 0%,#EAE4D8 100%);text-align:center;position:relative;overflow:hidden}
+.demo-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at top,rgba(212,43,43,.08) 0%,transparent 60%);pointer-events:none}
+.demo-hero-inner{max-width:920px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:28px;position:relative;z-index:1}
+.demo-hero-illi{width:280px;height:280px;border-radius:50%;overflow:hidden;background:linear-gradient(135deg,rgba(212,43,43,.12),rgba(212,43,43,.04));box-shadow:0 24px 70px -12px rgba(212,43,43,.35),inset 0 0 0 1px rgba(212,43,43,.1);border:4px solid #fff;display:flex;align-items:center;justify-content:center;animation:illi-float 4s ease-in-out infinite}
+.demo-hero-illi img{width:100%;height:100%;object-fit:cover;display:block}
+@keyframes illi-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.demo-hero-eyebrow{font-family:"Ubuntu",sans-serif;font-size:11px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:#D42B2B;margin-bottom:4px}
+.demo-hero-title{font-family:"Ubuntu",sans-serif;font-size:clamp(34px,5vw,56px);font-weight:900;line-height:1.05;letter-spacing:-1.5px;color:var(--ink);margin:0 0 14px}
+.demo-hero-title em{font-style:italic;color:#D42B2B;font-weight:900}
+.demo-hero-sub{font-size:clamp(15px,1.6vw,18px);line-height:1.65;color:var(--mid);font-weight:400;max-width:620px;margin:0 auto 24px}
+.demo-hero-sub strong{color:var(--ink);font-weight:700}
+.demo-hero-cta{display:inline-flex;align-items:center;gap:14px;background:#D42B2B;color:#fff;font-family:"Ubuntu",sans-serif;font-size:clamp(18px,2vw,22px);font-weight:800;padding:22px 52px;border-radius:18px;text-decoration:none;letter-spacing:.3px;box-shadow:0 14px 36px -10px rgba(212,43,43,.55),0 4px 12px rgba(212,43,43,.2);transition:transform .25s,box-shadow .25s,background .25s}
+.demo-hero-cta:hover{transform:translateY(-3px);box-shadow:0 22px 50px -10px rgba(212,43,43,.65),0 6px 18px rgba(212,43,43,.25);background:#B92121}
+.demo-hero-cta:active{transform:translateY(-1px)}
+.demo-hero-cta svg{width:20px;height:20px}
+.demo-hero-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;font-size:12px;color:#888;font-weight:500;letter-spacing:.3px;margin-top:14px}
+.demo-hero-meta span{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;background:rgba(255,255,255,.7);border:1px solid rgba(212,43,43,.15);border-radius:99px;backdrop-filter:blur(6px)}
+@media(max-width:640px){
+  .demo-hero{padding:48px 20px 56px}
+  .demo-hero-illi{width:200px;height:200px;border-width:3px}
+  .demo-hero-cta{padding:18px 38px}
+  .demo-hero-meta{gap:6px}
+  .demo-hero-meta span{font-size:11px;padding:4px 10px}
+}
+
 </style>
   <!-- ══ FAVICON ══ -->
   <link rel="icon" type="image/svg+xml" href="/img/favicon.svg">
@@ -739,6 +765,31 @@ h3{font-family:"Ubuntu",sans-serif;font-size:16px;font-weight:700;color:var(--mu
     </button>
   </div>
 </div>
+
+<!-- ══ HERO INVITO DEMO ══ -->
+<section class="demo-hero">
+  <div class="demo-hero-inner">
+    <div class="demo-hero-illi">
+      <img src="img/illi-ai.png" alt="ILLI•AI — la guida di POI•LOVE">
+    </div>
+    <div>
+      <div class="demo-hero-eyebrow">ILLI•AI · La tua guida nel viaggio</div>
+      <h1 class="demo-hero-title">Prova POI•LOVE <em>adesso.</em></h1>
+      <p class="demo-hero-sub">
+        La mappa comunitaria dei luoghi amati è già viva. <strong>ILLI•AI</strong> ti accompagna a scoprire, raccontare e salvare i posti che ti restano nel cuore. Apri la demo, accedi con Google, segna il tuo primo POI in 60 secondi.
+      </p>
+      <a href="https://demo.poilove.com" target="_blank" rel="noopener" class="demo-hero-cta">
+        Apri la Demo
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <div class="demo-hero-meta">
+        <span>🌐 demo.poilove.com</span>
+        <span>🔐 Login Google</span>
+        <span>🇮🇹 🇬🇧 🇦🇱 3 lingue</span>
+      </div>
+    </div>
+  </div>
+</section>
 
 <div class="page">
 <!-- 00 VISIONE -->
