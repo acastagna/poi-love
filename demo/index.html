@@ -3265,11 +3265,11 @@ function cycleLang(){applyLang(LANGS[(LANGS.indexOf(lang)+1)%LANGS.length])}
 ══════════════════════════════════════════ */
 const CENTER=[41.3275,19.8189];
 const POIS=[
-  {lat:41.3264,lng:19.8193,cat:'Cultura',name:'Blloku',desc:"Quartiere liberato nel '91. Caffè, storia, energia vibrante.",address:'Rruga Ismail Qemali, Tiranë',love:41,photos:['https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Blloku_Tirana.jpg/400px-Blloku_Tirana.jpg'],author:'Alessandro C.'},
-  {lat:41.3275,lng:19.8212,cat:'Cultura',name:"Xhamia Et'hem Beut",desc:'Moschea ottomana del 1823. Capolavoro di tilework.',address:'Sheshi Skënderbej, Tiranë',love:24,photos:['https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Mosque_of_Ethem_Bey.jpg/400px-Mosque_of_Ethem_Bey.jpg'],author:'Alessandro C.'},
-  {lat:41.3293,lng:19.8180,cat:'Cultura',name:'Piramida di Tirana',desc:"Costruita nel 1988 come museo per Enver Hoxha. Oggi spazio culturale.",address:'Bulevardi Dëshmorët e Kombit, Tiranë',love:18,photos:['https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Pyramid_of_Tirana_2022.jpg/400px-Pyramid_of_Tirana_2022.jpg'],author:'Liri V.'},
-  {lat:41.3236,lng:19.8162,cat:'Cibo',name:'Pazari i Ri',desc:'Il mercato più autentico dei Balcani. Odori di spezie, vita vera.',address:'Rruga Luigj Gurakuqi, Tiranë',love:56,photos:['https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/New_Bazaar_Tirana.jpg/400px-New_Bazaar_Tirana.jpg'],author:'Mirela K.'},
-  {lat:41.3320,lng:19.8242,cat:'Natura',name:'Liqeni Artificial',desc:'Il lago artificiale è il polmone verde di Tirana. Al tramonto è pura magia.',address:'Parku Kombëtar, Tiranë',love:33,photos:[],author:'Arben S.'},
+  {lat:41.3264,lng:19.8193,cat:'Cultura',name:'Blloku',desc:"Quartiere liberato nel '91. Caffè, storia, energia vibrante.",address:'Rruga Ismail Qemali, Tiranë',love:0,photos:['https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Blloku_Tirana.jpg/400px-Blloku_Tirana.jpg'],author:'@admin'},
+  {lat:41.3275,lng:19.8212,cat:'Cultura',name:"Xhamia Et'hem Beut",desc:'Moschea ottomana del 1823. Capolavoro di tilework.',address:'Sheshi Skënderbej, Tiranë',love:0,photos:['https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Mosque_of_Ethem_Bey.jpg/400px-Mosque_of_Ethem_Bey.jpg'],author:'@admin'},
+  {lat:41.3293,lng:19.8180,cat:'Cultura',name:'Piramida di Tirana',desc:"Costruita nel 1988 come museo per Enver Hoxha. Oggi spazio culturale.",address:'Bulevardi Dëshmorët e Kombit, Tiranë',love:0,photos:['https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Pyramid_of_Tirana_2022.jpg/400px-Pyramid_of_Tirana_2022.jpg'],author:'@admin'},
+  {lat:41.3236,lng:19.8162,cat:'Cibo',name:'Pazari i Ri',desc:'Il mercato più autentico dei Balcani. Odori di spezie, vita vera.',address:'Rruga Luigj Gurakuqi, Tiranë',love:0,photos:['https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/New_Bazaar_Tirana.jpg/400px-New_Bazaar_Tirana.jpg'],author:'@admin'},
+  {lat:41.3320,lng:19.8242,cat:'Natura',name:'Liqeni Artificial',desc:'Il lago artificiale è il polmone verde di Tirana. Al tramonto è pura magia.',address:'Parku Kombëtar, Tiranë',love:0,photos:[],author:'@admin'},
 ];
 
 let map,tileStreet,tileSat,tileLabels,routeLayer,currentPOI;
@@ -6712,36 +6712,7 @@ function togglePublicBlock(){
 /* ══════════════════════════════════════════
    TRIPS — Data Model
 ══════════════════════════════════════════ */
-const TRIPS={
-  trip1:{
-    id:'trip1', name:'Alla scoperta di Tirana', dest:'Tirana, Albania',
-    cover:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Pyramid_of_Tirana_2022.jpg/800px-Pyramid_of_Tirana_2022.jpg',
-    badge:'Albania', dates:'14 – 18 Giu 2026',
-    calYear:2026, calMonth:5, calStart:14, calEnd:18,
-    visibility:'pub', shareId:'tirana-jun2026',
-    companions:['Mirela K','Liri V','Arben S'], stopIdSeq:6,
-    stops:[
-      {id:'s1',name:'Arrivo — Rinas Airport',date:'Dom 14 Giu · 10:30',status:'done',icon:'ph-fill ph-check',iconBg:'#DCFCE7',iconColor:'#16A34A',suspended:false},
-      {id:'s2',name:"Xhamia Et'hem Beut",date:'Lun 15 Giu · mattina',status:'planned',icon:'ph ph-building-columns',iconBg:'#EBF2FC',iconColor:'var(--blue)',suspended:false},
-      {id:'s3',name:'Pazari i Ri — Pranzo',date:'Lun 15 Giu · 13:00',status:'planned',icon:'ph ph-fork-knife',iconBg:'#FFF7F0',iconColor:'var(--orange)',suspended:false},
-      {id:'s4',name:'Piramida di Tirana',date:'Mar 16 Giu · pomeriggio',status:'planned',icon:'ph ph-triangle',iconBg:'#f5f0e8',iconColor:'#7C3AED',suspended:false},
-      {id:'s5',name:'Liqeni Artificial — tramonto',date:'Mer 17 Giu · 19:00',status:'planned',icon:'ph ph-tree',iconBg:'#f0fdf4',iconColor:'#16A34A',suspended:false},
-    ]
-  },
-  trip2:{
-    id:'trip2', name:'Rotta dei Balcani Occidentali', dest:'Balcani',
-    cover:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Mostar_stari_most.jpg/800px-Mostar_stari_most.jpg',
-    badge:'Balcani', dates:'Set 2026 — TBD',
-    calYear:2026, calMonth:8, calStart:5, calEnd:25,
-    visibility:'prv', shareId:'balkans-sep2026',
-    companions:['Liri V'], stopIdSeq:4,
-    stops:[
-      {id:'s1',name:'Sarajevo, Bosnia',date:'Data da definire',status:'planned',icon:'ph ph-map-pin',iconBg:'#EBF2FC',iconColor:'var(--blue)',suspended:false},
-      {id:'s2',name:'Mostar, Bosnia',date:'Data da definire',status:'planned',icon:'ph ph-map-pin',iconBg:'#EBF2FC',iconColor:'var(--blue)',suspended:false},
-      {id:'s3',name:'Kotor, Montenegro',date:'Data da definire',status:'planned',icon:'ph ph-map-pin',iconBg:'#EBF2FC',iconColor:'var(--blue)',suspended:false},
-    ]
-  }
-};
+const TRIPS={};
 
 const CAL_STATE={};
 const itinMaps={};
