@@ -83,14 +83,16 @@ button{touch-action:manipulation}
 .leaflet-control-attribution{font-size:9px;opacity:.3}
 
 /* ── TOPBAR ── */
-.topbar{position:fixed;top:0;left:0;right:0;z-index:300;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;pointer-events:none}
-.tb-logo{pointer-events:all;height:34px;background:var(--red);border-radius:17px;padding:0 12px;display:flex;align-items:center;gap:6px;box-shadow:0 3px 14px rgba(212,43,43,.38);cursor:pointer}
-.tb-logo img{height:20px;filter:brightness(0) invert(1)}
-.tb-logo-txt{color:#fff;font-size:13px;font-weight:800;letter-spacing:.2px}
-.tb-right{display:flex;gap:7px;pointer-events:all}
-.tb-btn{height:38px;border-radius:19px;background:var(--card);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,.13);padding:0 12px;font-size:18px;font-weight:700;color:var(--blue);gap:5px;transition:transform .15s}
+.topbar{position:fixed;top:0;left:0;right:0;z-index:300;display:flex;align-items:center;justify-content:space-between;padding:0 10px;height:44px;background:#0A0A0A;box-shadow:0 2px 10px rgba(0,0,0,.25)}
+.tb-logo{pointer-events:all;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);height:22px;display:flex;align-items:center;cursor:pointer}
+.tb-logo img{height:22px;filter:brightness(0) invert(1);display:block}
+.tb-logo-txt{display:none}
+.tb-right{display:flex;gap:6px;pointer-events:all;margin-left:auto}
+.tb-left{display:flex;gap:6px;pointer-events:all}
+.tb-btn{height:32px;border-radius:16px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0 10px;font-size:15px;font-weight:700;color:#fff;gap:5px;transition:all .15s}
+.tb-btn:hover{background:rgba(255,255,255,.18)}
 .tb-btn:active{transform:scale(.93)}
-.tb-btn.icon-only{width:44px;height:44px;border-radius:22px;padding:0;color:var(--muted);font-size:22px}
+.tb-btn.icon-only{width:32px;height:32px;border-radius:16px;padding:0;font-size:17px}
 
 /* ── AUTH OVERLAY ── */
 #authOverlay{position:fixed;inset:0;z-index:9000;background:linear-gradient(160deg,#1a0a0a 0%,#2d1515 40%,#0f1e35 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;gap:0;overflow:hidden}
@@ -296,7 +298,7 @@ button{touch-action:manipulation}
 #lang-strip .cr-bot{font-size:8px;font-weight:500;color:rgba(255,255,255,.65);letter-spacing:.2px;white-space:nowrap}
 
 /* ── VIEWS ── */
-.profile-view,.itin-view,.poi-view,.companions-view,.illi-view{position:fixed;inset:0 0 106px 0;z-index:100;background:var(--bg);overflow-y:auto;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.72,0,1);-webkit-overflow-scrolling:touch}
+.profile-view,.itin-view,.poi-view,.companions-view,.illi-view{position:fixed;inset:44px 0 106px 0;z-index:100;background:var(--bg);overflow-y:auto;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.72,0,1);-webkit-overflow-scrolling:touch}
 .profile-view.active,.itin-view.active,.poi-view.active,.companions-view.active,.illi-view.active{transform:translateY(0)}
 /* ILLI•AI dedicated view: scuro, focalizzato sul chat */
 .illi-view{background:linear-gradient(180deg,#0F172A 0%,#1e3a5f 60%,#285EA7 100%);color:#fff}
@@ -503,9 +505,10 @@ button{touch-action:manipulation}
 .poi-label{margin-top:3px;background:rgba(0,0,0,.72);backdrop-filter:blur(4px);color:#fff;font-size:9px;font-weight:700;border-radius:6px;padding:2px 6px;max-width:88px;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;letter-spacing:.2px;line-height:1.3}
 
 /* ── DETAIL SHEET ── */
-.detail-photos{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin-bottom:12px;padding-bottom:4px}
-.detail-photo{width:180px;height:120px;border-radius:12px;background-size:cover;background-position:center;flex-shrink:0}
-.detail-no-photo{width:100%;height:100px;border-radius:12px;background:#f0ebe0;display:flex;align-items:center;justify-content:center;font-size:32px;color:#C8BFB0}
+.detail-photos{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px}
+.detail-photo{width:100%;aspect-ratio:1;border-radius:10px;background-size:cover;background-position:center;background-color:#ede7dc;position:relative;overflow:hidden}
+.detail-photo-more{position:absolute;inset:0;background:rgba(0,0,0,.55);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;letter-spacing:.5px}
+.detail-no-photo{grid-column:1/-1;width:100%;height:120px;border-radius:12px;background:#f0ebe0;display:flex;align-items:center;justify-content:center;font-size:32px;color:#C8BFB0}
 .detail-tag{display:inline-flex;align-items:center;gap:4px;background:var(--bg);border-radius:8px;padding:4px 9px;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:6px}
 .detail-name{font-size:22px;font-weight:900;color:var(--text);line-height:1.2;margin-bottom:8px}
 .detail-loc{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);margin-bottom:4px}
@@ -828,7 +831,22 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 
 /* ── ITIN VIEW ── */
 .itin-view{background:var(--bg)}
-.itin-topbar{position:sticky;top:0;z-index:10;background:var(--bg);padding:52px 20px 12px;display:flex;align-items:center;justify-content:space-between}
+.itin-topbar{position:sticky;top:0;z-index:10;background:var(--bg);padding:14px 20px 10px;display:flex;align-items:center;justify-content:space-between}
+/* Sub-tabs Liste/Itinerari (stile identico a .poi-subtabs) */
+.itin-subtabs{display:flex;gap:4px;padding:6px 8px 8px;background:var(--card);border-bottom:1px solid var(--border);position:sticky;top:54px;z-index:9}
+.itin-subtab{flex:1;height:36px;border:none;background:transparent;border-radius:9px;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px}
+.itin-subtab.active{background:var(--red);color:#fff}
+.itin-subtab i{font-size:15px}
+.itin-lists-empty{padding:30px 24px;text-align:center;color:var(--muted);font-size:13px}
+.itin-list-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin:10px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:transform .12s}
+.itin-list-card:active{transform:scale(.98)}
+.itin-list-card-dot{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;flex-shrink:0}
+.itin-list-card-info{flex:1;min-width:0}
+.itin-list-card-name{font-size:14px;font-weight:800;color:var(--text)}
+.itin-list-card-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.itin-list-card-vis{font-size:10px;font-weight:700;padding:3px 8px;border-radius:7px;flex-shrink:0}
+.itin-list-card-vis.pub{background:#E0F2FE;color:#0369A1}
+.itin-list-card-vis.prv{background:#F3F4F6;color:#6B7280}
 .itin-title{font-size:22px;font-weight:900;color:var(--text)}
 .itin-new-btn{height:34px;padding:0 14px;border-radius:17px;background:var(--red);border:none;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px}
 /* Ricerca destinazione */
@@ -1031,12 +1049,13 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 
 <!-- TOPBAR -->
 <div class="topbar">
-  <div class="tb-logo" onclick="showTab('map')">
-    <img src="img/logo-symbol.svg" onerror="this.style.display='none'" alt="">
-    <span class="tb-logo-txt">POI•LOVE</span>
+  <div class="tb-left">
+    <button class="tb-btn icon-only" onclick="centerMap()" title="Centra mappa"><i class="ph-duotone ph-crosshair-simple"></i></button>
+  </div>
+  <div class="tb-logo" onclick="showTab('map')" title="POI•LOVE">
+    <img src="img/logo-completo.svg" onerror="this.outerHTML='<span style=\'color:#fff;font-weight:900;font-size:14px;letter-spacing:.5px\'>POI&bull;LOVE</span>'" alt="POI•LOVE">
   </div>
   <div class="tb-right" id="tbRight">
-    <button class="tb-btn icon-only" onclick="centerMap()" title="Centra mappa"><i class="ph-duotone ph-crosshair-simple"></i></button>
     <button class="tb-btn icon-only" id="langBtn" onclick="cycleLang()" title="Cambia lingua">🇮🇹</button>
   </div>
 </div>
@@ -1324,22 +1343,22 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
         </span>
       </div>
       <div class="prof-badge" id="profBadge" onclick="changeAvatar()"></div>
-      <div class="badge-label" id="badgeLabel"></div>
+      <div class="badge-label" id="badgeLabel" onclick="onProfileStatsTap()"></div>
     </div>
-    <div class="profile-stats" onclick="onProfileStatsTap()">
-      <div class="stat-item">
+    <div class="profile-stats">
+      <div class="stat-item" onclick="goToProfileStat('poi')" style="cursor:pointer">
         <i class="ph-duotone ph-map-pin"></i>
-        <div class="stat-v" id="statPoi">12</div>
+        <div class="stat-v" id="statPoi">0</div>
         <div class="stat-l" data-t="stat_poi">POI</div>
       </div>
-      <div class="stat-item">
+      <div class="stat-item" onclick="goToProfileStat('love')" style="cursor:pointer">
         <i class="ph-duotone ph-heart" style="color:var(--red)"></i>
-        <div class="stat-v" id="statLove">87</div>
+        <div class="stat-v" id="statLove">0</div>
         <div class="stat-l" data-t="stat_love">Love</div>
       </div>
-      <div class="stat-item">
+      <div class="stat-item" onclick="goToProfileStat('list')" style="cursor:pointer">
         <i class="ph-duotone ph-list-bullets"></i>
-        <div class="stat-v" id="statList">3</div>
+        <div class="stat-v" id="statList">0</div>
         <div class="stat-l" data-t="stat_list">Liste</div>
       </div>
     </div>
@@ -1738,24 +1757,39 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 
   <!-- Topbar -->
   <div class="itin-topbar">
-    <div class="itin-title"><i class="ph-duotone ph-navigation" style="color:var(--red);font-size:20px;margin-right:6px"></i>Itinerari</div>
-    <button class="itin-new-btn" onclick="openNewTrip()">
+    <div class="itin-title" id="itinTitle"><i class="ph-duotone ph-navigation" style="color:var(--red);font-size:20px;margin-right:6px"></i>Itinerari</div>
+    <button class="itin-new-btn" id="itinNewBtn" onclick="onItinNewClick()">
       <i class="ph-duotone ph-plus" style="font-size:14px"></i> Nuovo
     </button>
   </div>
 
-  <!-- Ricerca destinazione -->
-  <div class="itin-search-wrap">
-    <i class="ph-duotone ph-magnifying-glass itin-search-icon"></i>
-    <input class="itin-search" id="itinSearchIn" type="text"
-      placeholder="Cerca destinazione… es. Sarajevo, Bosnia"
-      oninput="onItinSearch(this.value)" autocomplete="off"/>
-    <div class="itin-ac-drop" id="itinAcDrop"></div>
+  <!-- Sub-tabs: Itinerari / Liste -->
+  <div class="itin-subtabs">
+    <button class="itin-subtab active" data-subtab="trips" onclick="setItinSubtab('trips')">
+      <i class="ph-duotone ph-navigation"></i> Itinerari
+    </button>
+    <button class="itin-subtab" data-subtab="lists" onclick="setItinSubtab('lists')">
+      <i class="ph-duotone ph-list-bullets"></i> Liste
+    </button>
   </div>
 
-  <!-- Trip cards — renderizzati da JS (renderTripCards) -->
-  <div class="itin-cards" id="itinCards"></div>
+  <!-- AREA: Itinerari (trip) -->
+  <div id="itin-trips-area">
+    <!-- Ricerca destinazione -->
+    <div class="itin-search-wrap">
+      <i class="ph-duotone ph-magnifying-glass itin-search-icon"></i>
+      <input class="itin-search" id="itinSearchIn" type="text"
+        placeholder="Cerca destinazione… es. Sarajevo, Bosnia"
+        oninput="onItinSearch(this.value)" autocomplete="off"/>
+      <div class="itin-ac-drop" id="itinAcDrop"></div>
+    </div>
+    <div class="itin-cards" id="itinCards"></div>
+  </div>
 
+  <!-- AREA: Liste -->
+  <div id="itin-lists-area" hidden>
+    <div id="itin-lists-container"></div>
+  </div>
 
 </div>
 
@@ -2636,17 +2670,12 @@ function addDBMarker(p) {
 
 function openDBDetail(p) {
   currentPOI = { ...p, idx: -1 };
-  // ── Foto: scroll orizzontale con tutti gli scatti ──
+  // ── Foto: griglia 3 col 33%, prime 3 con badge "+N" sull'ultima ──
   const photos = Array.isArray(p.photos) ? p.photos : (p.photos ? [p.photos] : []);
   const ph = document.getElementById('detailPhotos');
   ph.innerHTML = '';
   if (photos.length > 0) {
-    photos.forEach(url => {
-      const d = document.createElement('div');
-      d.className = 'detail-photo';
-      d.style.backgroundImage = `url('${url}')`;
-      ph.appendChild(d);
-    });
+    renderDetailPhotos(ph, photos);
   } else {
     const d = document.createElement('div');
     d.className = 'detail-no-photo';
@@ -3668,7 +3697,7 @@ function showTab(tab){
   const tbRight=document.getElementById('tbRight');
   if(tbRight)tbRight.style.display=onMap?'flex':'none';
   if(tab==='map'&&map)setTimeout(()=>map.invalidateSize(),50);
-  if(tab==='profile')togglePublicProfile(false);
+  if(tab==='profile'){togglePublicProfile(false); refreshProfileStats();}
   if(tab==='poi') renderPoiTab();
   if(tab==='companions') renderCompanionsTab();
 }
@@ -3879,6 +3908,111 @@ function haversineKm(lat1,lng1,lat2,lng2){
   return 2*R*Math.asin(Math.sqrt(a));
 }
 function centerMapOnPoi(lat,lng){ showTab('map'); if(map) map.setView([lat,lng],16); }
+
+/* ══════════════════════════════════════════
+   ITIN SUB-TABS — Itinerari / Liste
+══════════════════════════════════════════ */
+let itinSubtab = 'trips'; // trips | lists
+function setItinSubtab(t){
+  itinSubtab = t;
+  document.querySelectorAll('.itin-subtab').forEach(b => b.classList.toggle('active', b.dataset.subtab===t));
+  const tripsArea = document.getElementById('itin-trips-area');
+  const listsArea = document.getElementById('itin-lists-area');
+  if(tripsArea) tripsArea.hidden = (t!=='trips');
+  if(listsArea) listsArea.hidden = (t!=='lists');
+  // Aggiorno titolo + bottone "Nuovo"
+  const title = document.getElementById('itinTitle');
+  if(title){
+    title.innerHTML = (t==='lists')
+      ? '<i class="ph-duotone ph-list-bullets" style="color:var(--red);font-size:20px;margin-right:6px"></i>Liste'
+      : '<i class="ph-duotone ph-navigation" style="color:var(--red);font-size:20px;margin-right:6px"></i>Itinerari';
+  }
+  if(t==='lists') renderItinLists();
+}
+function onItinNewClick(){
+  if(itinSubtab==='lists'){ openAddList(); }
+  else { openNewTrip(); }
+}
+async function renderItinLists(){
+  const cont = document.getElementById('itin-lists-container');
+  if(!cont) return;
+  cont.innerHTML = '';
+  // Se loggato, carico le mie liste da Supabase
+  let lists = [];
+  if(currentUser && typeof sb!=='undefined' && sb){
+    try{
+      const { data, error } = await sb.from('lists')
+        .select('id,name,is_public,list_pois(count)')
+        .eq('owner_id', currentUser.id)
+        .order('id', { ascending: false });
+      if(!error && data) lists = data.map(l => ({
+        id: l.id, name: l.name, is_public: l.is_public,
+        count: l.list_pois?.[0]?.count || 0
+      }));
+    }catch(e){ console.warn('renderItinLists:', e); }
+  }
+  // Fallback demo: leggo dal DOM del profilo (se esistono liste hardcoded)
+  if(lists.length===0){
+    const profLists = document.querySelectorAll('#listsContainer .list-item');
+    profLists.forEach(li => {
+      const name = li.querySelector('.list-name')?.textContent || '—';
+      const meta = li.querySelector('.list-meta')?.textContent || '';
+      const isPub = !!li.querySelector('.lv-pub');
+      const m = meta.match(/(\d+)/);
+      lists.push({ id:null, name, is_public:isPub, count: m?+m[1]:0 });
+    });
+  }
+  if(lists.length===0){
+    cont.innerHTML = '<div class="itin-lists-empty">Ancora nessuna lista. Tocca <strong>Nuovo</strong> per crearne una.</div>';
+    return;
+  }
+  const palette = ['#D42B2B','#285EA7','#7C3AED','#16A34A','#F59E0B','#EC4899'];
+  lists.forEach((l, i) => {
+    const card = document.createElement('div');
+    card.className = 'itin-list-card';
+    card.innerHTML = `
+      <div class="itin-list-card-dot" style="background:${palette[i%palette.length]}"><i class="ph-duotone ph-list-bullets"></i></div>
+      <div class="itin-list-card-info">
+        <div class="itin-list-card-name">${l.name}</div>
+        <div class="itin-list-card-meta">${l.count} POI</div>
+      </div>
+      <span class="itin-list-card-vis ${l.is_public?'pub':'prv'}">${l.is_public?'Pubblica':'Privata'}</span>
+    `;
+    cont.appendChild(card);
+  });
+}
+
+/* ══════════════════════════════════════════
+   PROFILE STATS — tap counter = navigazione
+══════════════════════════════════════════ */
+function goToProfileStat(kind){
+  if(kind==='poi'){
+    showTab('poi');
+    if(typeof setPoiSubtab==='function') setPoiSubtab('mine');
+  } else if(kind==='love'){
+    showTab('poi');
+    if(typeof setPoiSubtab==='function') setPoiSubtab('loved');
+  } else if(kind==='list'){
+    showTab('itin');
+    if(typeof setItinSubtab==='function') setItinSubtab('lists');
+  }
+}
+async function refreshProfileStats(){
+  const sP=document.getElementById('statPoi');
+  const sL=document.getElementById('statLove');
+  const sLi=document.getElementById('statList');
+  if(!currentUser || typeof sb==='undefined' || !sb){ return; }
+  try{
+    const [pRes, lRes, liRes] = await Promise.all([
+      sb.from('pois').select('id', {count:'exact', head:true}).eq('author_id', currentUser.id),
+      sb.from('loves').select('user_id', {count:'exact', head:true}).eq('user_id', currentUser.id),
+      sb.from('lists').select('id', {count:'exact', head:true}).eq('owner_id', currentUser.id)
+    ]);
+    if(sP)  sP.textContent  = pRes?.count  ?? 0;
+    if(sL)  sL.textContent  = lRes?.count  ?? 0;
+    if(sLi) sLi.textContent = liRes?.count ?? 0;
+  }catch(e){ console.warn('refreshProfileStats:', e); }
+}
 
 /* ══════════════════════════════════════════
    ILLI•AI — Apri chat (dalla bottom nav)
@@ -4300,11 +4434,25 @@ function openAddList(){openSheet('addListOv','addListBg','addListSheet');setTime
 /* ══════════════════════════════════════════
    DETAIL
 ══════════════════════════════════════════ */
+// Helper: griglia 3 col 33%, prime 3 + badge "+N" sull'ultima
+function renderDetailPhotos(container, photos){
+  const MAX = 3;
+  const visible = photos.slice(0, MAX);
+  visible.forEach((url, i) => {
+    const d = document.createElement('div');
+    d.className = 'detail-photo';
+    d.style.backgroundImage = `url('${url}')`;
+    if (i === MAX - 1 && photos.length > MAX) {
+      d.innerHTML = `<div class="detail-photo-more">+${photos.length - MAX}</div>`;
+    }
+    container.appendChild(d);
+  });
+}
 function openDetail(idx){
   const p=POIS[idx];currentPOI=p;
   const ph=document.getElementById('detailPhotos');ph.innerHTML='';
   if(p.photos&&p.photos.length>0){
-    p.photos.forEach(url=>{const d=document.createElement('div');d.className='detail-photo';d.style.backgroundImage=`url('${url}')`;ph.appendChild(d);});
+    renderDetailPhotos(ph, p.photos);
   } else {
     const d=document.createElement('div');d.className='detail-no-photo';d.innerHTML='<i class="ph-duotone ph-image-broken"></i>';ph.appendChild(d);
   }
