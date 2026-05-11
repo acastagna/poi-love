@@ -83,16 +83,18 @@ button{touch-action:manipulation}
 .leaflet-control-attribution{font-size:9px;opacity:.3}
 
 /* ── TOPBAR ── */
-.topbar{position:fixed;top:0;left:0;right:0;z-index:300;display:flex;align-items:center;justify-content:space-between;padding:0 10px;height:44px;background:#0A0A0A;box-shadow:0 2px 10px rgba(0,0,0,.25)}
-.tb-logo{pointer-events:all;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);height:22px;display:flex;align-items:center;cursor:pointer}
-.tb-logo img{height:22px;filter:brightness(0) invert(1);display:block}
+.topbar{position:fixed;top:0;left:0;right:0;z-index:300;display:flex;align-items:center;justify-content:flex-end;padding:10px 14px;pointer-events:none;background:transparent}
+.tb-logo{display:none}
+.tb-logo img{display:none}
 .tb-logo-txt{display:none}
-.tb-right{display:flex;gap:6px;pointer-events:all;margin-left:auto}
-.tb-left{display:flex;gap:6px;pointer-events:all}
-.tb-btn{height:32px;border-radius:16px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0 10px;font-size:15px;font-weight:700;color:#fff;gap:5px;transition:all .15s}
-.tb-btn:hover{background:rgba(255,255,255,.18)}
+/* Fascia brand inferiore: tra bottom-nav (sopra) e lang-strip credit (sotto) */
+#brand-strip{position:fixed;bottom:50px;left:0;right:0;z-index:299;height:30px;background:#0A0A0A;display:flex;align-items:center;justify-content:center;pointer-events:none;border-top:1px solid rgba(255,255,255,.05)}
+#brand-strip img{height:18px;filter:brightness(0) invert(1);display:block;opacity:.92}
+.tb-right{display:flex;gap:7px;pointer-events:all}
+.tb-left{display:none}
+.tb-btn{height:38px;border-radius:19px;background:var(--card);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,.13);padding:0 12px;font-size:18px;font-weight:700;color:var(--blue);gap:5px;transition:transform .15s}
 .tb-btn:active{transform:scale(.93)}
-.tb-btn.icon-only{width:32px;height:32px;border-radius:16px;padding:0;font-size:17px}
+.tb-btn.icon-only{width:44px;height:44px;border-radius:22px;padding:0;color:var(--muted);font-size:22px}
 
 /* ── AUTH OVERLAY ── */
 #authOverlay{position:fixed;inset:0;z-index:9000;background:linear-gradient(160deg,#1a0a0a 0%,#2d1515 40%,#0f1e35 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;gap:0;overflow:hidden}
@@ -201,16 +203,16 @@ button{touch-action:manipulation}
 
 /* ── FAB ── */
 /* FAB z-index: sopra nav (300), SOTTO sheet (400) e popup. Sempre cliccabile su mappa/tab ma non interferisce con form di creazione */
-.fab{position:fixed;bottom:120px;left:50%;transform:translateX(-50%);z-index:350;width:60px;height:60px;border-radius:30px;background:var(--red);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 22px rgba(212,43,43,.45);font-size:28px;color:#fff;transition:transform .25s,background .25s}
+.fab{position:fixed;bottom:150px;left:50%;transform:translateX(-50%);z-index:350;width:60px;height:60px;border-radius:30px;background:var(--red);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 22px rgba(212,43,43,.45);font-size:28px;color:#fff;transition:transform .25s,background .25s}
 .fab.open{transform:translateX(-50%) rotate(45deg)}
-.fab-menu{position:fixed;bottom:190px;left:50%;transform:translateX(-50%) translateY(10px);z-index:349;display:flex;flex-direction:column;gap:9px;align-items:center;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
+.fab-menu{position:fixed;bottom:220px;left:50%;transform:translateX(-50%) translateY(10px);z-index:349;display:flex;flex-direction:column;gap:9px;align-items:center;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
 .fab-menu.open{opacity:1;pointer-events:all;transform:translateX(-50%) translateY(0)}
 .fab-opt{background:var(--card);border:none;border-radius:22px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px;box-shadow:0 4px 18px rgba(0,0,0,.14);white-space:nowrap;transition:transform .15s}
 .fab-opt:active{transform:scale(.96)}
 .fab-opt-icon{width:30px;height:30px;border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
 
 /* ── BOTTOM NAV ── */
-.bottom-nav{position:fixed;bottom:50px;left:0;right:0;z-index:300;height:56px;background:var(--card);border-top:1px solid var(--border);display:flex;align-items:stretch;box-shadow:0 -3px 16px rgba(0,0,0,.08)}
+.bottom-nav{position:fixed;bottom:80px;left:0;right:0;z-index:300;height:56px;background:var(--card);border-top:1px solid var(--border);display:flex;align-items:stretch;box-shadow:0 -3px 16px rgba(0,0,0,.08)}
 .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:none;background:none;cursor:pointer;padding:4px 0;transition:opacity .15s}
 .nav-item i{font-size:22px;color:var(--muted);transition:color .15s}
 .nav-item .nav-lbl{font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.3px;transition:color .15s}
@@ -298,7 +300,7 @@ button{touch-action:manipulation}
 #lang-strip .cr-bot{font-size:8px;font-weight:500;color:rgba(255,255,255,.65);letter-spacing:.2px;white-space:nowrap}
 
 /* ── VIEWS ── */
-.profile-view,.itin-view,.poi-view,.companions-view,.illi-view{position:fixed;inset:44px 0 106px 0;z-index:100;background:var(--bg);overflow-y:auto;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.72,0,1);-webkit-overflow-scrolling:touch}
+.profile-view,.itin-view,.poi-view,.companions-view,.illi-view{position:fixed;inset:0 0 136px 0;z-index:100;background:var(--bg);overflow-y:auto;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.72,0,1);-webkit-overflow-scrolling:touch}
 .profile-view.active,.itin-view.active,.poi-view.active,.companions-view.active,.illi-view.active{transform:translateY(0)}
 /* ILLI•AI dedicated view: scuro, focalizzato sul chat */
 .illi-view{background:linear-gradient(180deg,#0F172A 0%,#1e3a5f 60%,#285EA7 100%);color:#fff}
@@ -1047,17 +1049,17 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 <!-- ═══ MAP ═══ -->
 <div id="map"></div>
 
-<!-- TOPBAR -->
+<!-- TOPBAR (solo bottoni floating a destra, niente fascia/logo) -->
 <div class="topbar">
-  <div class="tb-left">
-    <button class="tb-btn icon-only" onclick="centerMap()" title="Centra mappa"><i class="ph-duotone ph-crosshair-simple"></i></button>
-  </div>
-  <div class="tb-logo" onclick="showTab('map')" title="POI•LOVE">
-    <img src="img/logo-completo.svg" onerror="this.outerHTML='<span style=\'color:#fff;font-weight:900;font-size:14px;letter-spacing:.5px\'>POI&bull;LOVE</span>'" alt="POI•LOVE">
-  </div>
   <div class="tb-right" id="tbRight">
+    <button class="tb-btn icon-only" onclick="centerMap()" title="Centra mappa"><i class="ph-duotone ph-crosshair-simple"></i></button>
     <button class="tb-btn icon-only" id="langBtn" onclick="cycleLang()" title="Cambia lingua">🇮🇹</button>
   </div>
+</div>
+
+<!-- BRAND STRIP — fascia nera sottile tra bottom-nav e credit -->
+<div id="brand-strip">
+  <img src="img/logo-completo.svg" alt="POI•LOVE" onerror="this.outerHTML='<span style=\'color:#fff;font-weight:900;font-size:11px;letter-spacing:1px\'>POI&bull;LOVE</span>'">
 </div>
 
 <!-- MAP TYPES -->
