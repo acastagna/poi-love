@@ -370,7 +370,61 @@ button{touch-action:manipulation}
 .comp-code{display:inline-block;background:#EBF2FC;color:var(--blue);font-family:monospace;font-size:13px;font-weight:900;letter-spacing:3px;padding:4px 10px;border-radius:8px;margin-right:6px}
 .comp-meta{font-size:11px;color:var(--muted);margin-top:4px}
 .comp-friends{margin-top:10px;display:flex;flex-direction:column;gap:6px}
-.friend-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid var(--border)}
+.friend-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid var(--border);cursor:pointer;transition:background .15s;border-radius:6px;padding-left:6px;padding-right:6px;margin:0 -6px}
+.friend-row:hover{background:#f5f0e8}
+.friend-row:active{background:#ede7dc}
+/* ── PUBLIC PROFILE POPUP (compagno / autore POI / amico) ── */
+#pubProfileOv{position:fixed;inset:0;z-index:9100;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);padding:18px}
+#pubProfileOv.show{display:flex}
+.pub-profile-card{width:100%;max-width:380px;max-height:88vh;background:var(--card);border-radius:22px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(0,0,0,.4)}
+.pub-profile-hero{background:linear-gradient(135deg,var(--red),#7B1111);padding:22px 18px 36px;position:relative;color:#fff;text-align:center}
+.pub-profile-close{position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:16px;background:rgba(255,255,255,.18);border:none;cursor:pointer;color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px}
+.pub-profile-avatar{width:74px;height:74px;border-radius:50%;background:rgba(255,255,255,.18);border:3px solid #fff;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:900;color:#fff;margin:0 auto 8px}
+.pub-profile-name{font-size:18px;font-weight:900;letter-spacing:.3px}
+.pub-profile-handle{font-size:12px;color:rgba(255,255,255,.78);margin-top:2px}
+.pub-profile-status-pill{display:inline-flex;align-items:center;gap:5px;background:rgba(0,0,0,.28);border-radius:14px;padding:5px 11px;font-size:10px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;margin-top:10px}
+.pub-profile-body{flex:1;overflow-y:auto;padding:14px 18px 16px}
+.pub-profile-stats{display:flex;gap:8px;margin:-22px 0 14px;background:#fff;border-radius:14px;padding:12px;box-shadow:0 4px 14px rgba(0,0,0,.08)}
+.pub-profile-stat{flex:1;text-align:center}
+.pub-profile-stat-v{font-size:18px;font-weight:900;color:var(--text)}
+.pub-profile-stat-l{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-top:1px}
+.pub-profile-sec-lbl{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin:14px 0 6px;display:flex;align-items:center;gap:5px}
+.pub-profile-poi-row{display:flex;align-items:center;gap:10px;padding:8px;border-radius:9px;background:#f8f4ec;margin-bottom:5px;cursor:pointer;transition:background .12s}
+.pub-profile-poi-row:hover{background:#ede7dc}
+.pub-profile-poi-icon{width:30px;height:30px;border-radius:8px;background:#FFF5F5;color:var(--red);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.pub-profile-poi-name{flex:1;font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pub-profile-poi-love{font-size:10px;font-weight:700;color:var(--red);display:flex;align-items:center;gap:3px;flex-shrink:0}
+.pub-profile-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.pub-profile-action{height:42px;border-radius:11px;border:1.5px solid var(--border);background:#f8f4ec;font-family:inherit;font-size:11px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;color:var(--text);transition:all .12s}
+.pub-profile-action:active{transform:scale(.97)}
+.pub-profile-action.primary{background:var(--red);color:#fff;border-color:var(--red)}
+.pub-profile-action.primary:hover{background:#B01E27}
+.pub-profile-action.secondary{background:var(--blue);color:#fff;border-color:var(--blue)}
+.pub-profile-action.toggle.on{background:#16A34A;color:#fff;border-color:#16A34A}
+.pub-profile-bio{font-size:12px;color:var(--text);line-height:1.5;background:#f8f4ec;border-radius:10px;padding:10px 12px;margin-top:10px}
+.pub-profile-empty{font-size:11px;color:var(--muted);text-align:center;padding:8px;font-style:italic}
+/* ── LIST DETAIL POPUP — apre la lista per modificare/vedere POI ── */
+#listDetailOv{position:fixed;inset:0;z-index:9100;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);padding:18px}
+#listDetailOv.show{display:flex}
+.list-detail-card{width:100%;max-width:380px;max-height:88vh;background:var(--card);border-radius:22px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(0,0,0,.4)}
+.list-detail-hero{padding:22px 18px 18px;position:relative;color:#fff}
+.list-detail-close{position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:16px;background:rgba(255,255,255,.22);border:none;cursor:pointer;color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px}
+.list-detail-name-row{display:flex;align-items:center;gap:10px}
+.list-detail-dot{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;background:rgba(255,255,255,.22);flex-shrink:0}
+.list-detail-name{font-size:18px;font-weight:900;flex:1;min-width:0;word-break:break-word}
+.list-detail-name-in{font-size:18px;font-weight:900;color:#fff;background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.3);border-radius:9px;padding:6px 10px;outline:none;font-family:inherit;width:100%}
+.list-detail-meta{font-size:11px;color:rgba(255,255,255,.78);margin-top:6px;display:flex;gap:10px;align-items:center}
+.list-detail-vis{font-size:10px;font-weight:800;padding:3px 9px;border-radius:7px;background:rgba(0,0,0,.22);cursor:pointer}
+.list-detail-body{flex:1;overflow-y:auto;padding:14px 18px 16px}
+.list-detail-poi-row{display:flex;align-items:center;gap:10px;padding:9px;border-radius:9px;background:#f8f4ec;margin-bottom:5px}
+.list-detail-poi-icon{width:30px;height:30px;border-radius:8px;background:#FFF5F5;color:var(--red);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.list-detail-poi-name{flex:1;font-size:12px;font-weight:700;color:var(--text);cursor:pointer}
+.list-detail-poi-remove{width:24px;height:24px;border-radius:12px;background:rgba(220,38,38,.1);color:#DC2626;border:none;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center}
+.list-detail-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.list-detail-action{height:42px;border-radius:11px;border:1.5px solid var(--border);background:#f8f4ec;font-family:inherit;font-size:10px;font-weight:800;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--text);transition:all .12s}
+.list-detail-action i{font-size:14px}
+.list-detail-action:active{transform:scale(.96)}
+.list-detail-action.danger{color:#DC2626;border-color:#FBD0D0;background:#FEF2F2}
 .friend-avatar{width:30px;height:30px;border-radius:50%;background:#EBF2FC;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--blue);flex-shrink:0}
 .friend-name{flex:1;font-size:13px;color:var(--ink);font-weight:600}
 .friend-status{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:800;text-transform:uppercase;padding:3px 8px;border-radius:7px;letter-spacing:.4px}
@@ -562,7 +616,10 @@ button{touch-action:manipulation}
 .da-nav{background:var(--blue);color:#fff;border-color:var(--blue)}
 .love-btn{height:38px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px;padding:0 14px;color:var(--muted);transition:all .2s;flex-shrink:0}
 .love-btn.loved{background:#FFF0F0;border-color:var(--red);color:var(--red)}
-.author-row{display:flex;align-items:center;gap:10px;padding:12px 0 0}
+.author-row{display:flex;align-items:center;gap:10px;padding:12px 8px;cursor:pointer;border-radius:10px;transition:background .15s;margin:0 -8px}
+.author-row:hover{background:#f5f0e8}
+.author-row:active{background:#ede7dc}
+.author-row::after{content:'›';margin-left:auto;font-size:22px;color:var(--muted);font-weight:300;line-height:1}
 .g-avatar{width:34px;height:34px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid var(--border)}
 .g-avatar img{width:100%;height:100%;object-fit:cover}
 .author-name{font-size:13px;font-weight:700;color:var(--text);flex:1}
@@ -2264,7 +2321,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
           <span class="love-cnt" id="loveCnt">24</span>
         </button>
       </div>
-      <div class="author-row" style="padding-top:8px;border-top:1px solid var(--border)">
+      <div class="author-row" style="padding-top:8px;border-top:1px solid var(--border)" onclick="openAuthorProfile()">
         <div class="g-avatar"><img src="https://ui-avatars.com/api/?name=A&background=D42B2B&color=fff&size=80" alt="" id="detailAuthorAvatar"/></div>
         <div class="author-name" id="detailAuthor">—</div>
       </div>
@@ -3564,17 +3621,25 @@ function _renderPhotoSourcePopup(){
         <span>Cartella locale</span>
       </button>`;
   } else {
-    // Mobile: Galleria (sinistra) · Fotocamera (destra)
+    // Mobile: Fotocamera (sinistra) · Galleria (destra)
+    // Galleria apre direttamente input file nativo iOS/Android che mostra già
+    // "Libreria foto / Scatta foto / Scegli file" come opzioni di sistema.
     grid.innerHTML=`
-      <button class="photo-source-tile" onclick="openPhotoSourceGallery()">
-        <i class="ph-duotone ph-image"></i>
-        <span>Galleria</span>
-      </button>
       <button class="photo-source-tile" onclick="openPhotoSourceCamera()">
         <i class="ph-duotone ph-camera"></i>
         <span>Fotocamera</span>
+      </button>
+      <button class="photo-source-tile" onclick="openPhotoSourceMobileGallery()">
+        <i class="ph-duotone ph-image"></i>
+        <span>Galleria</span>
       </button>`;
   }
+}
+// Mobile: bypass del sub-popup → usa direttamente il system picker che
+// su iOS Safari mostra le 3 opzioni native (Libreria foto / Scatta / Scegli file)
+function openPhotoSourceMobileGallery(){
+  closePhotoSource();
+  document.getElementById('photoRollIn').click();
 }
 function openPhotoSource(slot){
   _photoSourceSlot = slot;
@@ -4293,6 +4358,210 @@ async function renderItinLists(){
   });
 }
 
+// Apre profilo pubblico dell'autore del POI corrente nel detail sheet
+function openAuthorProfile(){
+  const authorName = document.getElementById('detailAuthor')?.textContent?.trim();
+  if(!authorName || authorName==='—' || authorName==='Anonimo'){
+    showToast?.('Profilo autore non disponibile');
+    return;
+  }
+  // Chiudi il detail sheet prima di aprire il popup profilo
+  if(typeof closeDetail==='function') closeDetail();
+  setTimeout(()=>openPublicProfile(authorName, 'still', 'author'), 200);
+}
+
+/* ══════════════════════════════════════════
+   LIST DETAIL — popup centrato: apre la lista per vedere/modificare
+══════════════════════════════════════════ */
+let _listDetailCtx = null; // { name, isPublic, color, sourceEl }
+function openListDetail(name, visClass, color, sourceEl){
+  _listDetailCtx = { name, isPublic: visClass!=='lv-prv', color: color||'#D42B2B', sourceEl: sourceEl||null };
+  const hero = document.getElementById('listDetailHero');
+  hero.style.background = `linear-gradient(135deg, ${_listDetailCtx.color}, #1a1a1a)`;
+  document.getElementById('listDetailName').textContent = name;
+  document.getElementById('listDetailDot').style.background = 'rgba(255,255,255,.25)';
+  const vis = document.getElementById('listDetailVis');
+  vis.textContent = _listDetailCtx.isPublic ? 'Pubblica' : 'Privata';
+  // POI demo: peschiamo 2-4 a caso da POIS per simulare contenuto
+  const pois = (typeof POIS!=='undefined' ? POIS : []);
+  const sample = pois.slice().sort(()=>Math.random()-0.5).slice(0, 2+Math.floor(Math.random()*3));
+  document.getElementById('listDetailCount').textContent = sample.length+' POI';
+  const list = document.getElementById('listDetailPoiList');
+  if(sample.length){
+    list.innerHTML = sample.map(p=>{
+      const idx = pois.indexOf(p);
+      return `<div class="list-detail-poi-row">
+        <div class="list-detail-poi-icon"><i class="ph-duotone ph-map-pin"></i></div>
+        <div class="list-detail-poi-name" onclick="closeListDetail(); if(typeof openDetail==='function') openDetail(${idx});">${(p.name||'').replace(/</g,'&lt;')}</div>
+        <button class="list-detail-poi-remove" title="Rimuovi dalla lista"><i class="ph-duotone ph-x"></i></button>
+      </div>`;
+    }).join('');
+  } else {
+    list.innerHTML = '<div class="pub-profile-empty">Lista ancora vuota — tocca un POI per aggiungerlo</div>';
+  }
+  document.getElementById('listDetailOv').classList.add('show');
+}
+function closeListDetail(){
+  document.getElementById('listDetailOv').classList.remove('show');
+  _listDetailCtx = null;
+}
+function toggleListVis(){
+  if(!_listDetailCtx) return;
+  _listDetailCtx.isPublic = !_listDetailCtx.isPublic;
+  const vis = document.getElementById('listDetailVis');
+  vis.textContent = _listDetailCtx.isPublic ? 'Pubblica' : 'Privata';
+  // Sync source DOM se presente
+  if(_listDetailCtx.sourceEl){
+    const visEl = _listDetailCtx.sourceEl.querySelector('.list-vis');
+    if(visEl){
+      visEl.className = 'list-vis '+(_listDetailCtx.isPublic?'lv-pub':'lv-prv');
+      visEl.textContent = _listDetailCtx.isPublic ? 'Pubblica' : 'Privata';
+    }
+  }
+  showToast?.(_listDetailCtx.isPublic?'🌐 Lista resa pubblica':'🔒 Lista resa privata');
+}
+function renameListDetail(){
+  if(!_listDetailCtx) return;
+  const nuovo = prompt('Nuovo nome lista:', _listDetailCtx.name);
+  if(nuovo===null) return;
+  const trimmed = nuovo.trim();
+  if(!trimmed) return;
+  _listDetailCtx.name = trimmed;
+  document.getElementById('listDetailName').textContent = trimmed;
+  if(_listDetailCtx.sourceEl){
+    const n = _listDetailCtx.sourceEl.querySelector('.list-name');
+    if(n) n.textContent = trimmed;
+  }
+  showToast?.('✓ Lista rinominata');
+}
+async function shareListDetail(){
+  if(!_listDetailCtx) return;
+  const slug = _listDetailCtx.name.toLowerCase().replace(/[^a-z0-9]+/g,'-');
+  const url = `${location.origin}/list/${slug}`;
+  const title = `POI•LOVE · Lista "${_listDetailCtx.name}"`;
+  try{
+    if(navigator.share){ await navigator.share({title, url}); return; }
+    await navigator.clipboard.writeText(url);
+    showToast?.('🔗 Link lista copiato');
+  }catch(e){}
+}
+function deleteListDetail(){
+  if(!_listDetailCtx) return;
+  if(!confirm(`Eliminare "${_listDetailCtx.name}"? L'azione è irreversibile.`)) return;
+  if(_listDetailCtx.sourceEl){
+    _listDetailCtx.sourceEl.remove();
+    const st = document.getElementById('statList');
+    if(st) st.textContent = Math.max(0, parseInt(st.textContent)-1);
+  }
+  closeListDetail();
+  showToast?.('🗑 Lista eliminata');
+}
+// Click su .list-item nel profilo → apri popup (escludendo i button azione)
+document.addEventListener('click', e=>{
+  const item = e.target.closest('.list-item');
+  if(!item) return;
+  // se ho cliccato un button di azione interno, ignoro (i loro onclick già stopPropagation)
+  if(e.target.closest('.list-act-btn')) return;
+  const name = item.querySelector('.list-name')?.textContent || '—';
+  const visEl = item.querySelector('.list-vis');
+  const visClass = visEl?.classList.contains('lv-prv') ? 'lv-prv' : 'lv-pub';
+  const color = item.querySelector('.list-dot')?.style.background || '#D42B2B';
+  openListDetail(name, visClass, color, item);
+});
+
+/* ══════════════════════════════════════════
+   PUBLIC PROFILE — popup centrato (compagno/autore POI/amico)
+══════════════════════════════════════════ */
+let _pubProfileCtx = null; // { name, status, kind, following:bool, shareLoc:bool }
+function openPublicProfile(name, status, kind){
+  // Ctx demo: in produzione carichi i dati reali da Supabase profiles + pois + follows
+  _pubProfileCtx = { name, status: status||'offline', kind: kind||'friend',
+                     following:false, shareLoc:false };
+  const initials = name.split(' ').map(s=>s[0]).join('').slice(0,2).toUpperCase();
+  document.getElementById('pubPopAvatar').textContent = initials;
+  document.getElementById('pubPopName').textContent  = name;
+  document.getElementById('pubPopHandle').textContent= '@'+name.toLowerCase().replace(/[^a-z0-9]+/g,'-');
+  // Status pill
+  const statusPill = document.getElementById('pubPopStatus');
+  const map = {
+    traveling:{icon:'ph-airplane-tilt', label:'In viaggio', bg:'rgba(34,197,94,.85)'},
+    still:    {icon:'ph-circle', label:'Offline',     bg:'rgba(0,0,0,.32)'},
+    stopped:  {icon:'ph-warning', label:'Fermo da +1g',bg:'rgba(220,38,38,.85)'}
+  };
+  const s = map[_pubProfileCtx.status] || map.still;
+  statusPill.innerHTML = `<i class="ph-duotone ${s.icon}"></i> ${s.label}`;
+  statusPill.style.display='inline-flex';
+  statusPill.style.background = s.bg;
+  // Stats placeholder (in demo)
+  document.getElementById('pubPopStatPoi').textContent  = Math.floor(Math.random()*30)+5;
+  document.getElementById('pubPopStatList').textContent = Math.floor(Math.random()*6)+1;
+  document.getElementById('pubPopStatFoll').textContent = Math.floor(Math.random()*100)+10;
+  // Bio
+  const bio = document.getElementById('pubPopBio');
+  bio.textContent = 'Esploratore curioso, ama luoghi autentici e cucina locale.';
+  bio.style.display='block';
+  // POI pubblici demo (3 random dai POIS)
+  const list = document.getElementById('pubPopPoiList');
+  const pois = (typeof POIS!=='undefined' ? POIS : []);
+  const sample = pois.slice().sort(()=>Math.random()-0.5).slice(0,3);
+  if(sample.length){
+    list.innerHTML = sample.map((p,i)=>`
+      <div class="pub-profile-poi-row" onclick="closePublicProfile(); if(typeof openDetail==='function') openDetail(${pois.indexOf(p)});">
+        <div class="pub-profile-poi-icon"><i class="ph-duotone ph-map-pin"></i></div>
+        <div class="pub-profile-poi-name">${(p.name||'').replace(/</g,'&lt;')}</div>
+        <div class="pub-profile-poi-love"><i class="ph-duotone ph-heart"></i>${p.love||p.love_count||0}</div>
+      </div>`).join('');
+  } else {
+    list.innerHTML = '<div class="pub-profile-empty">Nessun POI pubblico</div>';
+  }
+  // Reset toggle stato bottoni
+  const followBtn = document.getElementById('pubPopFollowBtn');
+  followBtn.innerHTML = '<i class="ph-duotone ph-user-plus"></i><span>Segui</span>';
+  followBtn.classList.remove('toggle','on');
+  const shareBtn = document.getElementById('pubPopShareLocBtn');
+  shareBtn.classList.remove('on');
+  shareBtn.innerHTML = '<i class="ph-duotone ph-map-trifold"></i><span>Condividi posizione</span>';
+  document.getElementById('pubProfileOv').classList.add('show');
+}
+function closePublicProfile(){
+  document.getElementById('pubProfileOv').classList.remove('show');
+  _pubProfileCtx = null;
+}
+function pubProfileToggleFollow(){
+  if(!_pubProfileCtx) return;
+  _pubProfileCtx.following = !_pubProfileCtx.following;
+  const btn = document.getElementById('pubPopFollowBtn');
+  if(_pubProfileCtx.following){
+    btn.classList.remove('primary');
+    btn.classList.add('toggle','on');
+    btn.innerHTML='<i class="ph-duotone ph-check"></i><span>Seguito</span>';
+    showToast?.(`✓ Segui ${_pubProfileCtx.name}`);
+  } else {
+    btn.classList.add('primary');
+    btn.classList.remove('toggle','on');
+    btn.innerHTML='<i class="ph-duotone ph-user-plus"></i><span>Segui</span>';
+  }
+}
+function pubProfileConnect(){
+  if(!_pubProfileCtx) return;
+  // In demo: solo toast. In produzione: invio richiesta connessione (Supabase)
+  showToast?.(`📨 Richiesta di connessione inviata a ${_pubProfileCtx.name}`);
+}
+function pubProfileToggleShareLoc(){
+  if(!_pubProfileCtx) return;
+  _pubProfileCtx.shareLoc = !_pubProfileCtx.shareLoc;
+  const btn = document.getElementById('pubPopShareLocBtn');
+  if(_pubProfileCtx.shareLoc){
+    btn.classList.add('on');
+    btn.innerHTML='<i class="ph-duotone ph-check"></i><span>Posizione condivisa</span>';
+    showToast?.(`📍 Stai condividendo la posizione con ${_pubProfileCtx.name}`);
+  } else {
+    btn.classList.remove('on');
+    btn.innerHTML='<i class="ph-duotone ph-map-trifold"></i><span>Condividi posizione</span>';
+    showToast?.(`📍 Condivisione posizione disattivata`);
+  }
+}
+
 /* ══════════════════════════════════════════
    PROFILE STATS — tap counter = navigazione
 ══════════════════════════════════════════ */
@@ -4610,7 +4879,8 @@ function renderCompanionsTab(){
       const cls = f.status==='traveling' ? 'fs-traveling' : f.status==='stopped' ? 'fs-stopped' : 'fs-still';
       const lbl = f.status==='traveling' ? 'In viaggio' : f.status==='stopped' ? 'Fermo' : 'Offline';
       const initials = f.name.split(' ').map(s=>s[0]).join('').slice(0,2).toUpperCase();
-      return `<div class="friend-row">
+      const safeName = f.name.replace(/'/g,"\\'").replace(/"/g,'&quot;');
+      return `<div class="friend-row" onclick="openPublicProfile('${safeName}','${f.status}','friend')">
         <div class="friend-avatar">${initials}</div>
         <div class="friend-name">${f.name}</div>
         <span class="friend-status ${cls}"><span class="dot"></span>${lbl}</span>
@@ -7174,6 +7444,62 @@ async function confirmPhotoPicker(){
   }
 }
 </script>
+
+<!-- ═══ LIST DETAIL POPUP — apre una lista per modificare/vedere POI ═══ -->
+<div id="listDetailOv" onclick="if(event.target===this)closeListDetail()">
+  <div class="list-detail-card">
+    <div class="list-detail-hero" id="listDetailHero">
+      <button class="list-detail-close" onclick="closeListDetail()"><i class="ph-duotone ph-x"></i></button>
+      <div class="list-detail-name-row">
+        <div class="list-detail-dot" id="listDetailDot"><i class="ph-duotone ph-list-bullets"></i></div>
+        <div style="flex:1;min-width:0">
+          <div class="list-detail-name" id="listDetailName">—</div>
+          <div class="list-detail-meta">
+            <span id="listDetailCount">0 POI</span>
+            <span class="list-detail-vis" id="listDetailVis" onclick="toggleListVis()">Pubblica</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="list-detail-body">
+      <div class="pub-profile-sec-lbl"><i class="ph-duotone ph-map-pin" style="color:var(--red);font-size:12px"></i> POI nella lista</div>
+      <div id="listDetailPoiList"></div>
+      <div class="list-detail-actions">
+        <button class="list-detail-action" onclick="renameListDetail()"><i class="ph-duotone ph-pencil-simple"></i><span>Rinomina</span></button>
+        <button class="list-detail-action" onclick="shareListDetail()"><i class="ph-duotone ph-share-network"></i><span>Condividi</span></button>
+        <button class="list-detail-action danger" onclick="deleteListDetail()"><i class="ph-duotone ph-trash"></i><span>Elimina</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PUBLIC PROFILE POPUP — Compagni / Autori POI / Amici ═══ -->
+<div id="pubProfileOv" onclick="if(event.target===this)closePublicProfile()">
+  <div class="pub-profile-card">
+    <div class="pub-profile-hero">
+      <button class="pub-profile-close" onclick="closePublicProfile()" aria-label="Chiudi"><i class="ph-duotone ph-x"></i></button>
+      <div class="pub-profile-avatar" id="pubPopAvatar">·</div>
+      <div class="pub-profile-name" id="pubPopName">—</div>
+      <div class="pub-profile-handle" id="pubPopHandle">@—</div>
+      <div class="pub-profile-status-pill" id="pubPopStatus" style="display:none"></div>
+    </div>
+    <div class="pub-profile-body">
+      <div class="pub-profile-stats">
+        <div class="pub-profile-stat"><div class="pub-profile-stat-v" id="pubPopStatPoi">0</div><div class="pub-profile-stat-l">POI</div></div>
+        <div class="pub-profile-stat"><div class="pub-profile-stat-v" id="pubPopStatList">0</div><div class="pub-profile-stat-l">Liste</div></div>
+        <div class="pub-profile-stat"><div class="pub-profile-stat-v" id="pubPopStatFoll">0</div><div class="pub-profile-stat-l">Follower</div></div>
+      </div>
+      <div class="pub-profile-bio" id="pubPopBio" style="display:none"></div>
+      <div class="pub-profile-sec-lbl"><i class="ph-duotone ph-map-pin" style="color:var(--red);font-size:12px"></i> POI pubblici</div>
+      <div id="pubPopPoiList"></div>
+      <div class="pub-profile-actions">
+        <button class="pub-profile-action primary"   id="pubPopFollowBtn" onclick="pubProfileToggleFollow()"><i class="ph-duotone ph-user-plus"></i><span>Segui</span></button>
+        <button class="pub-profile-action secondary" onclick="pubProfileConnect()"><i class="ph-duotone ph-link"></i><span>Connetti</span></button>
+        <button class="pub-profile-action toggle"    id="pubPopShareLocBtn" onclick="pubProfileToggleShareLoc()" style="grid-column:1/-1"><i class="ph-duotone ph-map-trifold"></i><span>Condividi posizione</span></button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- ═══ PHOTO SOURCE — Popup centrale a 2 quadrati ═══ -->
 <div id="photoSourceOv" onclick="if(event.target===this)closePhotoSource()">
