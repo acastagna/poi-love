@@ -352,7 +352,7 @@ button{touch-action:manipulation}
 .illi-view-hdr{padding:18px 20px 6px;color:#fff}
 .illi-view-hdr h2{font-size:22px;font-weight:900;margin:0;display:flex;align-items:center;gap:10px}
 .illi-view-hdr p{font-size:13px;color:rgba(255,255,255,0.65);margin:6px 0 0;line-height:1.5}
-.illi-view-hdr img{width:42px;height:42px;border-radius:50%;background:#fff;padding:4px}
+.illi-view-hdr img{width:48px;height:48px;border-radius:50%;background:#fff;object-fit:cover;box-shadow:0 2px 10px rgba(0,0,0,.25)}
 /* Sub-tabs per Tab POI */
 .poi-subtabs{display:flex;gap:4px;padding:8px;background:var(--card);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:5}
 .poi-subtab{flex:1;height:36px;border:none;background:transparent;border-radius:9px;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;font-family:inherit}
@@ -1084,7 +1084,8 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 .poiai-section{margin:0 20px 28px;background:var(--card);border-radius:18px;overflow:hidden;box-shadow:0 4px 20px rgba(40,94,167,.12)}
 .poiai-header{background:linear-gradient(135deg,#0F172A 0%,#1e3a5f 50%,#285EA7 100%);padding:14px 16px;display:flex;align-items:center;gap:12px}
 .poiai-avatar-wrap{position:relative;flex-shrink:0}
-.poiai-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--red),#FF6B35);display:flex;align-items:center;justify-content:center;border:2.5px solid rgba(255,255,255,.35);box-shadow:0 0 0 4px rgba(212,43,43,.25)}
+.poiai-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--red),#FF6B35);display:flex;align-items:center;justify-content:center;border:2.5px solid rgba(255,255,255,.35);box-shadow:0 0 0 4px rgba(212,43,43,.25);overflow:hidden}
+.poiai-avatar img{width:100%;height:100%;object-fit:cover;display:block}
 .poiai-avatar-dot{position:absolute;bottom:1px;right:1px;width:10px;height:10px;background:#22C55E;border-radius:50%;border:2px solid #1e3a5f}
 .poiai-header-text{flex:1}
 .poiai-title{color:#fff;font-size:14px;font-weight:900;letter-spacing:.2px}
@@ -1961,7 +1962,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 <!-- ═══ ILLI•AI VIEW (tab dedicata) ═══ -->
 <div class="illi-view zone-illi" id="illiView">
   <div class="illi-view-hdr">
-    <h2><img src="illi-ai.svg" alt="ILLI•AI"> ILLI•AI</h2>
+    <h2><img src="img/illi-ai.png" alt="ILLI•AI"> ILLI•AI</h2>
     <p>La tua mascot e Travel Advisor. Ti guida nell'uso della piattaforma e suggerisce luoghi autentici.</p>
   </div>
   <!-- ILLI•AI Travel Advisor (chat) -->
@@ -1969,14 +1970,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
     <div class="poiai-header">
       <div class="poiai-avatar-wrap">
         <div class="poiai-avatar">
-          <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="13" cy="13" r="13" fill="url(#poiag)"/>
-            <path d="M7 13 C7 9.686 9.686 7 13 7 C16.314 7 19 9.686 19 13" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
-            <circle cx="13" cy="16.5" r="3.2" fill="white"/>
-            <circle cx="9.5" cy="11.5" r="1.1" fill="white"/>
-            <circle cx="16.5" cy="11.5" r="1.1" fill="white"/>
-            <defs><linearGradient id="poiag" x1="0" y1="0" x2="26" y2="26" gradientUnits="userSpaceOnUse"><stop stop-color="#D42B2B"/><stop offset="1" stop-color="#285EA7"/></linearGradient></defs>
-          </svg>
+          <img src="img/illi-ai.png" alt="ILLI•AI">
         </div>
         <div class="poiai-avatar-dot"></div>
       </div>
