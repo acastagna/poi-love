@@ -3308,7 +3308,7 @@ const POIS=[
 ];
 
 let map,tileStreet,tileSat,tileLabels,routeLayer,currentPOI;
-let gpsPos=null,gpsRegistered=false;
+let gpsPos=null,gpsRegistered=false,userLocMarker=null;
 
 function initMap(){
   map=L.map('map',{zoomControl:false,attributionControl:true,doubleClickZoom:false}).setView(CENTER,15);
@@ -3363,13 +3363,23 @@ function initMap(){
     L.marker([p.lat,p.lng],{icon}).addTo(map).on('click',()=>openDetail(i));
   });
 
-  // Detect GPS — delega tutto a reverseGeocodeAndShow
+  // Detect GPS — centra mappa + marker "Tu sei qui"
   if(navigator.geolocation){
     navigator.geolocation.getCurrentPosition(pos=>{
       gpsPos={lat:pos.coords.latitude,lng:pos.coords.longitude};
+      // Centra la mappa sulla posizione reale
+      if(map) map.setView([gpsPos.lat,gpsPos.lng],15);
+      // Marker "Tu sei qui" (pallino blu)
+      if(!userLocMarker){
+        userLocMarker=L.circleMarker([gpsPos.lat,gpsPos.lng],{
+          radius:10,color:'#fff',fillColor:'#3B82F6',fillOpacity:1,weight:3
+        }).bindTooltip('📍 Tu sei qui',{permanent:false}).addTo(map);
+      } else {
+        userLocMarker.setLatLng([gpsPos.lat,gpsPos.lng]);
+      }
       // Se il form "Aggiungi POI" è aperto sul tab GPS, aggiorna UI
       if(locActiveTab==='gps') reverseGeocodeAndShow(gpsPos.lat,gpsPos.lng);
-    },()=>{});
+    },()=>{},{enableHighAccuracy:true,timeout:10000});
   }
 
   setTimeout(()=>map.invalidateSize(),200);
@@ -3411,7 +3421,21 @@ function setMapType(type,btn){
     btn.classList.add('route-active');
   }
 }
-function centerMap(){if(map)map.setView(CENTER,15)}
+function centerMap(){
+  if(!map) return;
+  if(gpsPos){ map.setView([gpsPos.lat,gpsPos.lng],16); }
+  else if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(pos=>{
+      gpsPos={lat:pos.coords.latitude,lng:pos.coords.longitude};
+      map.setView([gpsPos.lat,gpsPos.lng],16);
+      if(!userLocMarker){
+        userLocMarker=L.circleMarker([gpsPos.lat,gpsPos.lng],{
+          radius:10,color:'#fff',fillColor:'#3B82F6',fillOpacity:1,weight:3
+        }).bindTooltip('📍 Tu sei qui',{permanent:false}).addTo(map);
+      } else { userLocMarker.setLatLng([gpsPos.lat,gpsPos.lng]); }
+    },()=>map.setView(CENTER,15),{enableHighAccuracy:true,timeout:8000});
+  } else { map.setView(CENTER,15); }
+}
 
 /* ══════════════════════════════════════════
    GPS REGISTER
