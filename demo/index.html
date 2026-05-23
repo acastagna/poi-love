@@ -2831,14 +2831,13 @@ async function signOut() {
 
 // ── LOAD POIs da Supabase ──
 async function loadPOIsFromDB() {
-  // Carica tutti i POI accessibili (visibility potrebbe non essere ancora migrata)
+  // NB: la colonna nel DB è 'title' (non 'name') → alias inline title→name
   const { data, error } = await sb
     .from('pois')
-    .select('id,name,description,lat,lng,category,love_count,photos,author_id,profiles(username,avatar_url)')
+    .select('id,name:title,description,lat,lng,category,love_count,photos,author_id,profiles(username,avatar_url)')
     .order('love_count', { ascending: false })
     .limit(200);
   if (error) { console.warn('loadPOIs:', error.message); return; }
-  // Svuota marker esistenti (tranne quelli demo statici)
   data.forEach(p => addDBMarker(p));
 }
 
@@ -2962,14 +2961,21 @@ async function savePOIToDB(data) {
     if (url) photoUrls.push(url);
   }
 
+  // Normalizza la categoria all'enum DB (lowercase, snake_case, prima sola).
+  // Lo schema permette: cibo, lavoro, pernottare, natura, festa, cultura,
+  // pratico, benessere, love, audioguida, mappa, open_source.
+  const ENUM_CATS = ['cibo','lavoro','pernottare','natura','festa','cultura','pratico','benessere','love','audioguida','mappa','open_source'];
+  const firstCat = String(data.cat || '').split(',')[0].trim().toLowerCase().replace(/\s+/g,'_');
+  const safeCat = ENUM_CATS.includes(firstCat) ? firstCat : 'cultura';
+
   const insertPayload = {
     author_id: currentUser.id,
-    name: data.name,
-    description: data.desc,
-    category: data.cat,
+    title: (data.name || '').slice(0, 100),       // colonna DB è 'title', CHECK 1..100
+    description: (data.desc || '').slice(0, 200), // CHECK <=200
+    category: safeCat,                            // enum DB lowercase
     lat: data.lat,
     lng: data.lng,
-    address: data.address,
+    address: data.address || null,
     photos: photoUrls,
     love_count: 0
   };
@@ -2987,6 +2993,8 @@ async function savePOIToDB(data) {
     showToast(`❌ ${error.message || 'Errore salvataggio POI'}`);
     return null;
   }
+  // Alias title→name per il resto del codice che usa p.name
+  if (poi) poi.name = poi.title;
   return poi;
 }
 
@@ -6664,11 +6672,20 @@ async function savePOIEdit(data){
     : [];
   // Mantieni foto esistenti se non è stato uploadato niente di nuovo
   const finalPhotos=photoUrls.length?photoUrls:(Array.isArray(currentPOI?.photos)?currentPOI.photos:[]);
+  // Normalizza categoria all'enum DB (stesso mapping di savePOIToDB)
+  const ENUM_CATS=['cibo','lavoro','pernottare','natura','festa','cultura','pratico','benessere','love','audioguida','mappa','open_source'];
+  const firstCat=String(data.cat||'').split(',')[0].trim().toLowerCase().replace(/\s+/g,'_');
+  const safeCat=ENUM_CATS.includes(firstCat)?firstCat:'cultura';
   const {data:updated,error}=await sb.from('pois').update({
-    name:data.name,description:data.desc,category:data.cat,
-    address:data.address,photos:finalPhotos,updated_at:new Date().toISOString()
+    title:(data.name||'').slice(0,100),                  // colonna DB è 'title'
+    description:(data.desc||'').slice(0,200),
+    category:safeCat,
+    address:data.address||null,
+    photos:finalPhotos,
+    updated_at:new Date().toISOString()
   }).eq('id',editingPOIId).select().single();
-  if(error){console.error('editPOI:',error);showToast('Errore aggiornamento');return null;}
+  if(error){console.error('editPOI:',error);showToast(`❌ ${error.message||'Errore aggiornamento'}`);return null;}
+  if(updated) updated.name=updated.title;  // alias per il resto del codice
   editingPOIId=null;
   showToast('✅ POI aggiornato!');
   return updated;
