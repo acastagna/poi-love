@@ -6950,12 +6950,18 @@ function openEditPOI(){
     const nameIn=document.getElementById('poiNameIn');
     if(nameIn) nameIn.value=currentPOI.name||'';
     const storyIn=document.getElementById('storyIn');
-    if(storyIn) storyIn.value=currentPOI.description||'';
+    if(storyIn){ storyIn.value=(currentPOI.description||'').substring(0,200); updateChar(); }
     // Coordinate
     if(currentPOI.lat&&currentPOI.lng){
       document.getElementById('locCoords').textContent=`${currentPOI.lat.toFixed(6)}, ${currentPOI.lng.toFixed(6)}`;
       if(map) map.setView([currentPOI.lat,currentPOI.lng],16);
     }
+    // ── Pre-seleziona categoria ──
+    const editCat = currentPOI.category || currentPOI.cat || '';
+    document.querySelectorAll('#addPoiSheet .chip').forEach(c => {
+      const match = c.textContent.trim().toLowerCase() === editCat.toLowerCase();
+      c.classList.toggle('sel', match);
+    });
     // Preview foto esistenti
     const photos=Array.isArray(currentPOI.photos)?currentPOI.photos:(currentPOI.photos?[currentPOI.photos]:[]);
     photos.forEach((url,i)=>{
@@ -6967,8 +6973,10 @@ function openEditPOI(){
         slot.innerHTML=`<div class="ph-preview" style="background-image:url('${url}')"></div><button class="ph-remove" onclick="removePhoto(event,${i})"><i class="ph-duotone ph-x"></i></button>`;
       }
     });
+    // Scroll al top del form
+    document.getElementById('addPoiSheet')?.scrollTo({top:0, behavior:'instant'});
     checkSave();
-    // Cambia il testo del pulsante salva
+    // Cambia il testo del pulsante salva in "Aggiorna POI"
     const saveBtn=document.getElementById('saveBtn');
     if(saveBtn){ saveBtn.textContent='Aggiorna POI'; saveBtn.className='save-btn ready'; }
     showToast('✏️ Modifica il tuo POI');
