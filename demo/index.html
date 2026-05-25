@@ -2919,6 +2919,9 @@ async function loadPOIsFromDB() {
 
 function addDBMarker(p) {
   if (!map || !p.lat || !p.lng) return;
+  // Accumula i POI DB in un array globale (usato dal popup mappa e dalla tab Miei)
+  if (!window._dbPOIs) window._dbPOIs = [];
+  if (!window._dbPOIs.find(x => x.id === p.id)) window._dbPOIs.push(p);
   const label = p.name.length > 11 ? p.name.substring(0, 11) + '…' : p.name;
   const icon = L.divIcon({
     className: '',
@@ -4293,23 +4296,60 @@ function showTab(tab){
 ══════════════════════════════════════════ */
 let poiSubtab = 'mine'; // mine | loved | near
 function setPoiSubtab(t){ poiSubtab=t; renderPoiTab(); }
-function renderPoiTab(){
+async function renderPoiTab(){
   const list = document.getElementById('poi-list-area');
   if(!list) return;
   // tab buttons attivi
   document.querySelectorAll('.poi-subtab').forEach(b => b.classList.toggle('active', b.dataset.subtab===poiSubtab));
-  // Genera lista in base al sub-tab. Per la demo usiamo l'array DEMO_POI globale.
-  const all = (typeof POIS!=='undefined'?POIS:[]);
+
   let items = [];
-  if(poiSubtab==='mine')       items = all.filter(p => p.author && /(io|tu|me)/i.test(p.author)).slice();
-  else if(poiSubtab==='loved') items = all.filter(p => p._loved).slice();
-  else if(poiSubtab==='near')  items = all.slice().sort((a,b)=>{
-    const ha = gpsPos? haversineKm(gpsPos.lat,gpsPos.lng,a.lat,a.lng):0;
-    const hb = gpsPos? haversineKm(gpsPos.lat,gpsPos.lng,b.lat,b.lng):0;
-    return ha-hb;
-  });
-  // Se vuoto in 'mine' o 'loved', mostriamo i primi 5 di tutti come stub per la demo
-  if(items.length===0 && poiSubtab!=='near') items = all.slice(0,5);
+
+  if(poiSubtab==='mine') {
+    // ── Carica i POI dell'utente corrente da Supabase ──
+    if(currentUser && typeof sb !== 'undefined') {
+      list.innerHTML = '<div class="poi-list-empty" style="padding:24px 0"><i class="ph-duotone ph-spinner" style="font-size:24px;animation:spin 1s linear infinite"></i></div>';
+      const { data, error } = await sb.from('pois')
+        .select('id,name:title,description,lat,lng,category,love_count,photos,author_id,visibility,created_at')
+        .eq('author_id', currentUser.id)
+        .order('created_at', { ascending: false });
+      if(!error && Array.isArray(data)) items = data;
+      // Aggiorna anche _dbPOIs con i propri POI (per popup mappa)
+      if(Array.isArray(data)) data.forEach(p => {
+        if(!window._dbPOIs) window._dbPOIs = [];
+        if(!window._dbPOIs.find(x=>x.id===p.id)) window._dbPOIs.push(p);
+      });
+    } else {
+      // Fallback: usa i POI DB già in memoria oppure mock
+      const all = [...(window._dbPOIs||[]), ...(typeof POIS!=='undefined'?POIS:[])];
+      items = all.filter(p=>p.author_id && currentUser && p.author_id===currentUser.id);
+      if(!items.length) items = (typeof POIS!=='undefined'?POIS:[]).slice(0,5);
+    }
+  } else if(poiSubtab==='loved') {
+    const all = (typeof POIS!=='undefined'?POIS:[]);
+    items = all.filter(p => p._loved).slice();
+    if(items.length===0) items = all.slice(0,5);
+  } else if(poiSubtab==='near') {
+    // Combina POI mock + POI da DB per la lista vicini
+    const all = [...(typeof POIS!=='undefined'?POIS:[]), ...(window._dbPOIs||[])];
+    // Deduplica per id
+    const seen = new Set();
+    const deduped = all.filter(p=>{ if(!p||seen.has(p.id)) return false; seen.add(p.id); return true; });
+    items = deduped.filter(p=>p.lat&&p.lng).sort((a,b)=>{
+      const ha = gpsPos? haversineKm(gpsPos.lat,gpsPos.lng,a.lat,a.lng):0;
+      const hb = gpsPos? haversineKm(gpsPos.lat,gpsPos.lng,b.lat,b.lng):0;
+      return ha-hb;
+    });
+  }
+
+  // Se ancora vuoto in mine/loved, messaggio dedicato
+  if(items.length===0 && poiSubtab==='mine') {
+    list.innerHTML = '<div class="poi-list-empty">Nessun POI ancora. Tocca <strong>+</strong> per crearne uno.</div>';
+    return;
+  }
+  if(items.length===0 && poiSubtab!=='near') {
+    const all = (typeof POIS!=='undefined'?POIS:[]);
+    items = all.slice(0,5);
+  }
   if(items.length===0){
     list.innerHTML = '<div class="poi-list-empty">Nessun POI ancora. Tocca <strong>+</strong> per crearne uno.</div>';
     return;
@@ -4617,10 +4657,21 @@ function onSearchPickPlace(lat,lng,name){
   }).addTo(map);
   const safe=(name||'').replace(/'/g,"\\'").replace(/"/g,'&quot;');
   setMapPopupCtx(lat, lng, name);
+  // ── Controlla se esiste già un POI DB entro 50 m ──
+  const _nearby = (window._dbPOIs||[])
+    .filter(p=>p&&p.lat&&p.lng)
+    .map(p=>({...p, _d: haversineKm(lat,lng,p.lat,p.lng)}))
+    .filter(p=>p._d < 0.05)
+    .sort((a,b)=>a._d-b._d);
+  const _nearPOI = _nearby[0] || null;
+  const _poiBtn = _nearPOI
+    ? `<button class="ai-place-action-btn poi" style="background:rgba(59,130,246,.15);border-color:rgba(59,130,246,.4);color:#60a5fa" onclick="closeMapSearchMarker();openDBDetail(window._dbPOIs.find(x=>x.id==='${_nearPOI.id}'))"><i class="ph-duotone ph-pencil-simple"></i><span>Modifica</span></button>`
+    : `<button class="ai-place-action-btn poi" onclick="aiPlaceCreatePOI('${safe}');closeMapSearchMarker()"><i class="ph-duotone ph-plus-circle"></i><span>POI</span></button>`;
   _mapSearchTransientMarker.bindPopup(`
-    <div class="map-search-popup-title">${(name||'').replace(/</g,'&lt;')}</div>
+    <div class="map-search-popup-title">${(name||'').replace(/</g,'&lt;')}${_nearPOI?` <span style="font-size:10px;color:#60a5fa;font-weight:600">· POI vicino</span>`:''}
+    </div>
     <div class="map-search-popup-actions">
-      <button class="ai-place-action-btn poi"   onclick="aiPlaceCreatePOI('${safe}');closeMapSearchMarker()"><i class="ph-duotone ph-plus-circle"></i><span>POI</span></button>
+      ${_poiBtn}
       <button class="ai-place-action-btn nav"   onclick="openNavPicker(${lat},${lng},'${safe}')"><i class="ph-duotone ph-navigation-arrow"></i><span>Naviga</span></button>
       <button class="ai-place-action-btn add"   onclick="toggleMapPopupSubmenu('add')"><i class="ph-duotone ph-list-plus"></i><span>Aggiungi</span></button>
       <button class="ai-place-action-btn share" onclick="toggleMapPopupSubmenu('share')"><i class="ph-duotone ph-share-network"></i><span>Condividi</span></button>

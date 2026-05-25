@@ -957,24 +957,28 @@ async function checkSupabaseAuth() {
    SUPABASE STORAGE
 ════════════════════════════════════════ */
 async function checkSupabaseStorage() {
+  // La chiave anon non può listare tutti i bucket (/storage/v1/bucket → []).
+  // Usiamo POST /storage/v1/object/list/poi_photos — risponde 200 se il bucket
+  // esiste (anche se è vuoto), 404/400 se non esiste.
   const t0 = Date.now();
   try {
     const r = await fetchTimeout(
-      `${SB_URL}/storage/v1/bucket`,
-      { headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` } }
+      `${SB_URL}/storage/v1/object/list/poi_photos`,
+      {
+        method: 'POST',
+        headers: {
+          apikey: SB_KEY,
+          Authorization: `Bearer ${SB_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ prefix: '', limit: 1, offset: 0 })
+      }
     );
     const lat = Date.now() - t0;
-    if (r.ok) {
-      const buckets = await r.json();
-      const hasPoi = Array.isArray(buckets) && buckets.some(b => b.name === 'poi_photos');
-      setStatus('sb-storage', hasPoi ? 'ok' : 'warn', hasPoi ? 'BUCKET OK' : 'NO BUCKET', lat);
-      log(`Storage ${hasPoi ? '✅ bucket poi_photos trovato' : '⚠️ bucket poi_photos mancante'} — ${lat}ms`, hasPoi ? 'ok' : 'warn');
-      return hasPoi;
-    } else {
-      setStatus('sb-storage', 'err', `HTTP ${r.status}`, lat);
-      log(`Storage ❌ — HTTP ${r.status}`, 'err');
-      return false;
-    }
+    const hasPoi = r.status === 200;
+    setStatus('sb-storage', hasPoi ? 'ok' : 'warn', hasPoi ? 'BUCKET OK' : 'NO BUCKET', lat);
+    log(`Storage ${hasPoi ? '✅ bucket poi_photos trovato' : '⚠️ bucket poi_photos mancante'} — ${lat}ms`, hasPoi ? 'ok' : 'warn');
+    return hasPoi;
   } catch(e) {
     setStatus('sb-storage', 'err', 'OFFLINE', null);
     log(`Storage ❌ — ${e.message}`, 'err');
