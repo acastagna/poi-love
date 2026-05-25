@@ -3705,6 +3705,11 @@ function initMap(){
     onSearchPickPlace(lat, lng, name);
   }
   map.on('click', e => {
+    // Desktop split-view: click sulla mappa → chiude il pannello di destra e torna alla mappa fullscreen
+    if(document.body.classList.contains('tab-active')){
+      showTab('map');
+      return;
+    }
     // Se è attivo il "tap-on-map per aggiungere POI", non intercettare
     if(typeof mapTapListenerActive!=='undefined' && mapTapListenerActive) return;
     const now = Date.now();
