@@ -554,6 +554,7 @@ body.tab-active #mapQuickBtns{display:none}
 .sh-title{font-size:19px;font-weight:800;color:var(--text);line-height:1.2}
 .sh-sub{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.4}
 .sh-close{width:32px;height:32px;border-radius:16px;background:#ede7dc;border:none;cursor:pointer;font-size:17px;color:var(--muted);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;pointer-events:all}
+#closeAddPoiBtn{background:#DAEEFF;color:#1A7FC1}
 .sh-body{padding:14px 20px 0}
 .sh-timer{display:flex;align-items:center;gap:5px;background:#FFF5F5;border:1px solid #F7C1C1;border-radius:20px;padding:5px 10px;font-size:12px;font-weight:700;color:var(--red);flex-shrink:0}
 .congrats{border-radius:12px;padding:12px 16px;font-size:13px;font-weight:600;margin:10px 20px 0;line-height:1.6;display:none;gap:10px;align-items:flex-start}
@@ -698,7 +699,9 @@ body.tab-active #mapQuickBtns{display:none}
 .gps-register-bar button{height:30px;padding:0 14px;border-radius:15px;background:var(--blue);border:none;color:#fff;font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;font-family:inherit}
 
 /* ── MARKER ── */
-.poi-marker{display:flex;flex-direction:column;align-items:center;cursor:pointer;filter:drop-shadow(0 2px 6px rgba(212,43,43,.35));pointer-events:all;touch-action:manipulation}
+/* padding:5px espande l'area cliccabile di 5px su tutti i lati senza cambiare visivo;
+   il contenitore Leaflet non ha overflow:hidden quindi funziona correttamente */
+.poi-marker{display:flex;flex-direction:column;align-items:center;cursor:pointer;filter:drop-shadow(0 2px 6px rgba(212,43,43,.35));pointer-events:all;touch-action:manipulation;padding:5px}
 .poi-bubble{width:36px;height:36px;border-radius:50%;background:var(--red);border:2.5px solid #fff;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;position:relative}
 .poi-badge{position:absolute;top:-6px;right:-6px;background:#fff;color:var(--red);font-size:8px;font-weight:900;border-radius:6px;padding:1px 4px;border:1px solid var(--red)}
 .poi-tail{width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:8px solid var(--red);margin-top:-1px}
@@ -3018,7 +3021,7 @@ function addDBMarker(p) {
   const icon = L.divIcon({
     className: '',
     html: `<div class="poi-marker" onclick="${onclickJs}"><div class="poi-bubble"><i class="ph-duotone ph-map-pin" style="font-size:15px;color:#fff;pointer-events:none"></i><div class="poi-badge">${p.love_count || 0}</div></div><div class="poi-tail"></div><div class="poi-label">${label.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div></div>`,
-    iconSize: [36, 58], iconAnchor: [18, 58]
+    iconSize: [46, 68], iconAnchor: [23, 68]
   });
   // Nota: .on('click') rimosso — gestito dall'onclick inline per compatibilità mobile
   // Salva il marker per poterlo rimuovere dalla mappa al delete
@@ -3731,7 +3734,7 @@ function initMap(){
     const icon=L.divIcon({
       className:'',
       html:`<div class="poi-marker" onclick="event.stopPropagation();openDetail(${i})"><div class="poi-bubble"><i class="ph-duotone ph-map-pin" style="font-size:15px;color:#fff;pointer-events:none"></i><div class="poi-badge">${p.love}</div></div><div class="poi-tail"></div><div class="poi-label">${(p.name.length>11?p.name.substring(0,11)+'…':p.name).replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div></div>`,
-      iconSize:[36,58],iconAnchor:[18,58]
+      iconSize:[46,68],iconAnchor:[23,68]
     });
     L.marker([p.lat,p.lng],{icon}).addTo(map);
   });
@@ -5850,6 +5853,15 @@ function closeAddPOI(){
     if(sb2){sb2.textContent=T[lang]?.save_ready||'Salva questo posto';sb2.className='save-btn ready';}
   }
 }
+// Chiusura smart scheda "aggiungi POI":
+// — nome vuoto → chiude subito
+// — nome compilato → chiede conferma prima di annullare
+function smartCloseAddPOI(){
+  const nameVal=(document.getElementById('poiNameIn')?.value||'').trim();
+  if(!nameVal){closeAddPOI();return;}
+  const ok=confirm('Vuoi annullare la creazione di questo POI?\nIl nome che hai inserito andrà perso.');
+  if(ok) closeAddPOI();
+}
 function openAddStop(){closeFab();openSheet('addStopOv','addStopBg','addStopSheet')}
 function openAddList(){openSheet('addListOv','addListBg','addListSheet');setTimeout(()=>document.getElementById('newListName').focus(),350)}
 
@@ -6503,14 +6515,14 @@ window.addEventListener('DOMContentLoaded',()=>{
   // Voice
   initVoice();
   // Close buttons — explicit event listeners (fix mobile Safari)
-  document.getElementById('closeAddPoiBtn').addEventListener('click', closeAddPOI);
-  document.getElementById('closeAddPoiBtn').addEventListener('touchend', e=>{e.preventDefault();closeAddPOI()});
+  document.getElementById('closeAddPoiBtn').addEventListener('click', smartCloseAddPOI);
+  document.getElementById('closeAddPoiBtn').addEventListener('touchend', e=>{e.preventDefault();smartCloseAddPOI()});
   document.getElementById('closeAddStopBtn').addEventListener('click', ()=>closeSheet('addStopOv','addStopBg','addStopSheet'));
   document.getElementById('closeAddStopBtn').addEventListener('touchend', e=>{e.preventDefault();closeSheet('addStopOv','addStopBg','addStopSheet')});
   document.getElementById('closeAddListBtn').addEventListener('click', ()=>closeSheet('addListOv','addListBg','addListSheet'));
   document.getElementById('closeAddListBtn').addEventListener('touchend', e=>{e.preventDefault();closeSheet('addListOv','addListBg','addListSheet')});
   // Backdrop close
-  document.getElementById('addPoiBg').addEventListener('click',closeAddPOI);
+  document.getElementById('addPoiBg').addEventListener('click',smartCloseAddPOI);
   document.getElementById('addStopBg').addEventListener('click',()=>closeSheet('addStopOv','addStopBg','addStopSheet'));
   document.getElementById('addListBg').addEventListener('click',()=>closeSheet('addListOv','addListBg','addListSheet'));
   document.getElementById('detailBg').addEventListener('click',closeDetail);
@@ -6603,7 +6615,7 @@ async function savePOI(){
     const icon=L.divIcon({
       className:'',
       html:`<div class="poi-marker"><div class="poi-bubble" style="background:var(--blue)"><i class="ph-duotone ph-map-pin" style="font-size:15px;color:#fff;pointer-events:none"></i><div class="poi-badge">0</div></div><div class="poi-tail" style="border-top-color:var(--blue)"></div><div class="poi-label" style="background:rgba(40,94,167,.85)">${name.length>11?name.substring(0,11)+'…':name}</div></div>`,
-      iconSize:[36,58],iconAnchor:[18,58]
+      iconSize:[46,68],iconAnchor:[23,68]
     });
     tempMarker=L.marker([lat2,lng2],{icon}).addTo(map);
   }
