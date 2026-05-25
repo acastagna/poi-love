@@ -425,6 +425,11 @@ body.tab-active #mapQuickBtns{display:none}
 /* Compagnie: card e status indicator */
 .comp-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin:10px 14px}
 .comp-card.left{opacity:.6;border-style:dashed}
+/* ── Riga creatore compagnia ── */
+.comp-creator-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.comp-creator-av{width:28px;height:28px;border-radius:50%;object-fit:cover;border:2px solid #D97706;flex-shrink:0}
+.comp-creator-av-ph{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#D97706,#92400E);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:2px solid #D97706}
+.comp-creator-lbl{font-size:11px;font-weight:700;color:#D97706;display:flex;align-items:center;gap:4px;line-height:1.2}
 .comp-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
 .comp-name{font-size:15px;font-weight:800;color:var(--ink);flex:1}
 .comp-status{font-size:18px}
@@ -2529,6 +2534,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
           <button class="detail-action-btn da-nav" onclick="openNavigation()"><i class="ph-duotone ph-navigation-arrow"></i><span>Naviga</span></button>
           <button class="detail-action-btn" onclick="shareDetail()"><i class="ph-duotone ph-share-network"></i><span>Condividi</span></button>
           <button class="detail-action-btn" id="editPoiBtn" onclick="openEditPOI()" style="display:none;background:#EBF2FC;border-color:var(--blue);color:var(--blue)"><i class="ph-duotone ph-pencil-simple"></i><span>Modifica</span></button>
+          <button class="detail-action-btn" id="deletePoiBtn" onclick="deleteCurrentPOI()" style="display:none;background:#FFF0F0;border-color:var(--red);color:var(--red)"><i class="ph-duotone ph-trash"></i><span>Elimina</span></button>
         </div>
         <button class="love-btn" id="loveBtn" onclick="toggleLove()">
           <i class="ph-duotone ph-heart" id="loveHeart"></i>
@@ -3011,7 +3017,10 @@ function addDBMarker(p) {
     iconSize: [36, 58], iconAnchor: [18, 58]
   });
   // Nota: .on('click') rimosso — gestito dall'onclick inline per compatibilità mobile
-  L.marker([p.lat, p.lng], { icon }).addTo(map);
+  // Salva il marker per poterlo rimuovere dalla mappa al delete
+  if(!window._dbMarkers) window._dbMarkers = {};
+  const m = L.marker([p.lat, p.lng], { icon }).addTo(map);
+  window._dbMarkers[p.id] = m;
 }
 
 function openDBDetail(p) {
@@ -3040,10 +3049,44 @@ function openDBDetail(p) {
   if (coordEl && p.lat && p.lng) coordEl.textContent = `${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}`;
   // Aggiorna link condivisione — con ID se disponibile (link stabile)
   updateShareLink(p.lat || 0, p.lng || 0, p.id || null);
-  // Mostra "Modifica" solo se il POI appartiene all'utente corrente
+  // Mostra "Modifica" e "Elimina" solo se il POI appartiene all'utente corrente
+  const isOwner = !!(currentUser && currentUser.id === p.author_id);
   const editBtn = document.getElementById('editPoiBtn');
-  if (editBtn) editBtn.style.display = (currentUser && currentUser.id === p.author_id) ? 'flex' : 'none';
+  if (editBtn) editBtn.style.display = isOwner ? 'flex' : 'none';
+  const deleteBtn = document.getElementById('deletePoiBtn');
+  if (deleteBtn) deleteBtn.style.display = isOwner ? 'flex' : 'none';
   openSheet('detailOv', 'detailBg', 'detailSheet');
+}
+
+/* Elimina il POI attualmente aperto nel detail sheet (solo il proprietario può farlo) */
+async function deleteCurrentPOI(){
+  if(!currentPOI || !currentUser) return;
+  if(currentPOI.author_id !== currentUser.id){ showToast('⛔ Non puoi eliminare POI altrui'); return; }
+  const nm = currentPOI.name || 'questo POI';
+  // Popup di conferma — obbligatorio per evitare eliminazioni accidentali
+  const ok = confirm(`Eliminare "${nm}"?\n\nQuesta azione è irreversibile.\nIl POI sparirà dalla mappa e dal database.`);
+  if(!ok) return;
+  // Elimina da Supabase (RLS garantisce che solo il proprietario possa farlo)
+  if(currentPOI.id && typeof sb !== 'undefined'){
+    const { error } = await sb.from('pois').delete()
+      .eq('id', currentPOI.id)
+      .eq('author_id', currentUser.id);
+    if(error){ showToast(`⚠️ Errore: ${error.message}`); return; }
+  }
+  // Rimuovi marker dalla mappa
+  if(window._dbMarkers && window._dbMarkers[currentPOI.id]){
+    window._dbMarkers[currentPOI.id].remove();
+    delete window._dbMarkers[currentPOI.id];
+  }
+  // Rimuovi dall'array globale _dbPOIs
+  if(window._dbPOIs) window._dbPOIs = window._dbPOIs.filter(x => x.id !== currentPOI.id);
+  // Chiudi sheet + feedback visivo
+  closeDetail();
+  showToast(`🗑 "${nm}" eliminato`);
+  // Aggiorna tab POI e contatore profilo
+  if(document.getElementById('poiView')?.classList.contains('active')) renderPoiTab();
+  const statEl = document.getElementById('statPoi');
+  if(statEl) statEl.textContent = Math.max(0, parseInt(statEl.textContent||0) - 1);
 }
 
 /* ══════════════════════════════════════════
@@ -5590,7 +5633,9 @@ function createCompagnia(){
   for(let i=0;i<6;i++) code += alphabet[Math.floor(Math.random()*alphabet.length)];
 
   const newComp = { name, code, type, startDate, startTime, endDate, endTime, desc, joined:true,
-    forever: type==='forever', expires: endDate || null, friends:[], createdAt: Date.now() };
+    forever: type==='forever', expires: endDate || null, friends:[], createdAt: Date.now(),
+    creatorAvatar: currentUser?.user_metadata?.avatar_url || currentUser?.user_metadata?.picture || null,
+    creatorName: currentUser?.user_metadata?.full_name || currentUser?.user_metadata?.name || 'Tu' };
   const all = _getCompagnie();
   all.unshift(newComp);
   _saveCompagnie(all);
@@ -5663,11 +5708,22 @@ function renderCompanionsTab(){
       </div>`;
     }
     const safeCode = (c.code||'').replace(/'/g,"\\'");
-    return `<div class="comp-card" style="cursor:pointer" onclick="openEditCompagnia('${safeCode}')">
+    // Riga creatore: avatar + corona (solo per le compagnie create dall'utente corrente)
+    const creatorAvSrc = isMine ? (c.creatorAvatar || null) : null;
+    const creatorInitial = isMine ? ((c.creatorName||'T')[0].toUpperCase()) : 'T';
+    const creatorAv = creatorAvSrc
+      ? `<img src="${creatorAvSrc}" class="comp-creator-av" onerror="this.outerHTML='<div class=comp-creator-av-ph>${creatorInitial}</div>'">`
+      : `<div class="comp-creator-av-ph">${creatorInitial}</div>`;
+    const creatorRow = isMine ? `<div class="comp-creator-row">
+      ${creatorAv}
+      <span class="comp-creator-lbl"><i class="ph-duotone ph-crown" style="color:#D97706;font-size:14px"></i> Creatore della compagnia</span>
+    </div>` : '';
+    return `<div class="comp-card" style="cursor:pointer" onclick="${isMine?`openEditCompagnia('${safeCode}')`:''}" >
+      ${creatorRow}
       <div class="comp-row">
         <div class="comp-name">${c.name}</div>
         <div style="display:flex;align-items:center;gap:8px">
-          ${isMine?`<button style="background:none;border:none;cursor:pointer;color:var(--blue);padding:0;font-size:14px" title="Modifica" onclick="event.stopPropagation();openEditCompagnia('${safeCode}')"><i class="ph-duotone ph-pencil-simple"></i></button>`:''}
+          ${isMine?`<button style="background:none;border:none;cursor:pointer;color:var(--blue);padding:0;font-size:16px" title="Modifica" onclick="event.stopPropagation();openEditCompagnia('${safeCode}')"><i class="ph-duotone ph-pencil-simple"></i></button>`:''}
           <div class="comp-status" title="${statusTxt}">${statusEmoji}</div>
         </div>
       </div>
@@ -5878,6 +5934,7 @@ function checkSave(){
   const btn=document.getElementById('saveBtn');
   btn.className=v?'save-btn ready':'save-btn';
   btn.textContent=v?T[lang].save_ready:T[lang].save_disabled;
+  btn.disabled=!v; // blocco hard: senza nome il bottone non è cliccabile
 }
 function updateChar(){
   const v=document.getElementById('storyIn').value.length;
