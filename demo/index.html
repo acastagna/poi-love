@@ -841,6 +841,11 @@ body.tab-active #mapQuickBtns{display:none}
   .poi-card-img{aspect-ratio:4/3!important}
   .detail-photo{width:100%;height:auto;aspect-ratio:4/3;flex-shrink:0}
 
+  /* AddPOI desktop split-view: form a destra, mappa interattiva a sinistra */
+  body.addpoi-open #addPoiOv{left:50%;right:0;top:0;bottom:0}
+  body.addpoi-open #addPoiBg{background:rgba(0,0,0,.06);pointer-events:none}
+  body.addpoi-open #addPoiSheet{max-height:100vh;height:100%;border-radius:12px 12px 0 0}
+
   body::after{display:none}
 }
 
@@ -2252,7 +2257,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
       <div class="sec-lbl" data-t="lbl_where">Dove si trova</div>
       <div class="loc-tabs">
         <button class="loc-tab active" onclick="setLocTab(this,'gps')"><i class="ph-duotone ph-crosshair-simple"></i><span data-t="loc_gps">GPS Live</span></button>
-        <button class="loc-tab" onclick="setLocTab(this,'exif')"><i class="ph-duotone ph-image"></i><span data-t="loc_exif">Foto EXIF</span></button>
+        <button class="loc-tab" onclick="setLocTab(this,'exif')"><i class="ph-duotone ph-image"></i><span data-t="loc_exif">Posizione della foto</span></button>
         <button class="loc-tab" onclick="setLocTab(this,'addr')"><i class="ph-duotone ph-house"></i><span data-t="loc_addr">Indirizzo</span></button>
         <button class="loc-tab" onclick="setLocTab(this,'map')"><i class="ph-duotone ph-cursor"></i><span data-t="loc_map">Tocca mappa</span></button>
       </div>
@@ -5935,6 +5940,7 @@ function showCongrats(sec){
 function openAddPOI(){
   closeFab();
   openSheet('addPoiOv','addPoiBg','addPoiSheet');
+  if(window.innerWidth>=1024) document.body.classList.add('addpoi-open');
   timerSec=0;
   document.getElementById('timerTime').textContent='0:00';
   document.getElementById('congratsBanner').className='congrats';
@@ -5957,6 +5963,14 @@ function openAddPOI(){
 function closeAddPOI(){
   clearInterval(timerInterval);
   closeSheet('addPoiOv','addPoiBg','addPoiSheet');
+  document.body.classList.remove('addpoi-open');
+  // Pulisci listener tap mappa e pin visivo se attivi
+  if(mapTapListenerActive && map){
+    map.off('click',_mapTapLocHandler);
+    mapTapListenerActive=false;
+    map.getContainer().style.cursor='';
+  }
+  if(_locTapMarker && map){ map.removeLayer(_locTapMarker); _locTapMarker=null; }
   document.getElementById('acDrop').classList.remove('open');
   if(isRecording&&recognition){recognition.stop();isRecording=false;setVoiceBtnState(false);}
   // Reset modalità editing
@@ -6091,6 +6105,7 @@ function updateChar(){
 }
 let locActiveTab='gps'; // traccia tab attivo corrente
 let mapTapListenerActive=false;
+let _locTapMarker=null; // pin visivo sul tap mappa per "Tocca mappa"
 
 function setLocTab(btn,type){
   document.querySelectorAll('.loc-tab').forEach(t=>t.classList.remove('active'));
@@ -6101,12 +6116,13 @@ function setLocTab(btn,type){
   document.getElementById('locGpsLoading').style.display='none';
   document.getElementById('locAddrPanel').style.display='none';
   document.getElementById('locMapTip').style.display='none';
-  // Rimuovi listener tap mappa precedente
+  // Rimuovi listener tap mappa precedente e pin visivo
   if(mapTapListenerActive && map){
     map.off('click',_mapTapLocHandler);
     mapTapListenerActive=false;
     map.getContainer().style.cursor='';
   }
+  if(_locTapMarker && map){ map.removeLayer(_locTapMarker); _locTapMarker=null; }
 
   if(type==='gps'){
     if(gpsPos){
@@ -6130,7 +6146,10 @@ function setLocTab(btn,type){
     document.getElementById('locAddrPanel').style.display='flex';
     setTimeout(()=>document.getElementById('locAddrIn')?.focus(),200);
   } else if(type==='map'){
-    document.getElementById('locMapTip').style.display='flex';
+    const tip=document.getElementById('locMapTip');
+    tip.style.display='flex';
+    // Reset testo hint (potrebbe essere stato cambiato da un tap precedente)
+    tip.innerHTML='<i class="ph-duotone ph-cursor" style="font-size:18px;color:var(--blue);flex-shrink:0"></i><div><div style="font-size:12px;font-weight:700;color:var(--text)">Tocca la mappa</div><div style="font-size:10px;color:var(--muted)">Un tocco breve imposta la posizione del POI</div></div>';
     // Attiva click sulla mappa per settare posizione
     map.getContainer().style.cursor='crosshair';
     map.on('click',_mapTapLocHandler);
@@ -6140,10 +6159,19 @@ function setLocTab(btn,type){
 
 function _mapTapLocHandler(e){
   const {lat,lng}=e.latlng;
-  map.off('click',_mapTapLocHandler);
-  mapTapListenerActive=false;
-  map.getContainer().style.cursor='';
-  document.getElementById('locMapTip').style.display='none';
+  // Rimuovi pin precedente se esiste
+  if(_locTapMarker){ map.removeLayer(_locTapMarker); _locTapMarker=null; }
+  // Aggiungi pin visivo rosso (rimane finché non si cambia tab)
+  _locTapMarker=L.circleMarker([lat,lng],{
+    radius:9, color:'#DC2626', fillColor:'#EF4444',
+    fillOpacity:0.9, weight:3
+  }).addTo(map);
+  // Il listener rimane attivo — si può toccare di nuovo per cambiare posizione
+  const tip=document.getElementById('locMapTip');
+  if(tip){
+    tip.style.display='flex';
+    tip.innerHTML='<i class="ph-duotone ph-map-pin" style="font-size:18px;color:var(--red)"></i><span>Posizione impostata — tocca di nuovo per cambiare</span>';
+  }
   reverseGeocodeAndShow(lat,lng);
   showToast('📍 Posizione impostata sulla mappa');
 }
