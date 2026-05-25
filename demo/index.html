@@ -2537,7 +2537,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 
 <!-- ═══ SHEET: DETAIL POI ═══ -->
 <div class="sheet-overlay" id="detailOv">
-  <div class="sheet-backdrop" id="detailBg" onclick="closeDetail()"></div>
+  <div class="sheet-backdrop" id="detailBg"></div>
   <div class="sheet" id="detailSheet">
     <div class="sh-handle" id="detailHandle"></div>
     <!-- Bottone X chiusura -->
@@ -5798,8 +5798,15 @@ function closeFab(){
    SHEETS — generic open/close + swipe
 ══════════════════════════════════════════ */
 function openSheet(ovId,bgId,sheetId){
-  document.getElementById(bgId).classList.add('vis');
+  const bg=document.getElementById(bgId);
+  bg.classList.add('vis');
   document.getElementById(sheetId).classList.add('open');
+  // Anti-ghost-click: il backdrop non risponde per i primi 600ms dopo l'apertura.
+  // Su mobile (iOS/Android) il browser sintetizza un click ~300-450ms dopo il touchend
+  // che, senza questo guard, colpirebbe il backdrop appena reso pointer-events:all
+  // e chiuderebbe immediatamente lo sheet. Leaflet può sintetizzare un click aggiuntivo.
+  bg.style.pointerEvents='none';
+  setTimeout(()=>{ bg.style.pointerEvents=''; }, 600);
 }
 function closeSheet(ovId,bgId,sheetId){
   document.getElementById(bgId).classList.remove('vis');
