@@ -3107,10 +3107,10 @@ function openDBDetail(p) {
   // ── Metadati ──
   document.getElementById('detailTag').innerHTML = `<i class="ph-duotone ph-tag" style="font-size:11px"></i> ${p.category || 'Luogo'}`;
   document.getElementById('detailName').textContent = p.name;
-  document.getElementById('detailAddr').textContent = p.address || '';
+  document.getElementById('detailAddress').textContent = p.address || '';
   document.getElementById('detailDesc').textContent = p.description || '';
   document.getElementById('detailAuthor').textContent = p.profiles?.username || 'Anonimo';
-  document.getElementById('detailLoveCount').textContent = p.love_count || 0;
+  document.getElementById('loveCnt').textContent = p.love_count || 0;
   // Coordinate nel detail
   const coordEl = document.getElementById('detailCoordsText');
   if (coordEl && p.lat && p.lng) coordEl.textContent = `${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}`;
