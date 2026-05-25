@@ -3054,7 +3054,7 @@ function addDBMarker(p) {
   const safeId = String(p.id || '').replace(/[^a-zA-Z0-9\-_]/g, '');
   // onclick inline: più affidabile di Leaflet .on('click') su mobile (iOS Safari)
   // stopPropagation evita che il detector double-tap della mappa intercetti il tap
-  const onclickJs = `event.stopPropagation();(()=>{const p=(window._dbPOIs||[]).find(x=>x.id==='${safeId}');if(p)openDBDetail(p)})()`;
+  const onclickJs = `window._lastPoiMarkerClick=Date.now();event.stopPropagation();(()=>{const p=(window._dbPOIs||[]).find(x=>x.id==='${safeId}');if(p)openDBDetail(p)})()`;
   const icon = L.divIcon({
     className: '',
     html: `<div class="poi-marker" onclick="${onclickJs}"><div class="poi-bubble"><i class="ph-duotone ph-map-pin" style="font-size:15px;color:#fff;pointer-events:none"></i><div class="poi-badge">${p.love_count || 0}</div></div><div class="poi-tail"></div><div class="poi-label">${label.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div></div>`,
@@ -3745,22 +3745,22 @@ function initMap(){
     onSearchPickPlace(lat, lng, name);
   }
   map.on('click', e => {
-    // Desktop split-view: click sulla mappa → chiude il pannello di destra e torna alla mappa fullscreen
+    // Desktop split-view: click sulla mappa → chiude il pannello di destra
     if(document.body.classList.contains('tab-active')){
       showTab('map');
       return;
     }
-    // Se è attivo il "tap-on-map per aggiungere POI", non intercettare
+    // Se attivo il listener "scegli punto su mappa", non intercettare
     if(typeof mapTapListenerActive!=='undefined' && mapTapListenerActive) return;
-    const now = Date.now();
-    if(now - _mapTapTs < 350){
-      _mapTapTs = 0;
-      _handleMapDoubleTap(e.latlng);
-    } else {
-      _mapTapTs = now;
-    }
+    // GUARD: se un marker POI è stato cliccato negli ultimi 600ms, ignora
+    // (Leaflet mobile sintetizza un click sulla mappa anche quando il tap è sul marker)
+    if(Date.now() - (window._lastPoiMarkerClick||0) < 600) return;
   });
-  map.on('dblclick', e => _handleMapDoubleTap(e.latlng));
+  // Doppio click/tap su mappa vuota → crea nuovo POI (Leaflet gestisce dblclick anche su mobile)
+  map.on('dblclick', e => {
+    if(Date.now() - (window._lastPoiMarkerClick||0) < 600) return;
+    _handleMapDoubleTap(e.latlng);
+  });
   tileStreet=L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
   tileSat=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19});
   // Etichette trasparenti da sovrapporre al satellite
@@ -3770,7 +3770,7 @@ function initMap(){
   POIS.forEach((p,i)=>{
     const icon=L.divIcon({
       className:'',
-      html:`<div class="poi-marker" onclick="event.stopPropagation();openDetail(${i})"><div class="poi-bubble"><i class="ph-duotone ph-map-pin" style="font-size:15px;color:#fff;pointer-events:none"></i><div class="poi-badge">${p.love}</div></div><div class="poi-tail"></div><div class="poi-label">${(p.name.length>11?p.name.substring(0,11)+'…':p.name).replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div></div>`,
+      html:`<div class="poi-marker" onclick="window._lastPoiMarkerClick=Date.now();event.stopPropagation();openDetail(${i})"><div class="poi-bubble"><i class="ph-duotone ph-map-pin" style="font-size:15px;color:#fff;pointer-events:none"></i><div class="poi-badge">${p.love}</div></div><div class="poi-tail"></div><div class="poi-label">${(p.name.length>11?p.name.substring(0,11)+'…':p.name).replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div></div>`,
       iconSize:[46,68],iconAnchor:[23,68]
     });
     L.marker([p.lat,p.lng],{icon}).addTo(map);
