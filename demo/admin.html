@@ -957,25 +957,27 @@ async function checkSupabaseAuth() {
    SUPABASE STORAGE
 ════════════════════════════════════════ */
 async function checkSupabaseStorage() {
-  // La chiave anon non può listare tutti i bucket (/storage/v1/bucket → []).
-  // Usiamo POST /storage/v1/object/list/poi_photos — risponde 200 se il bucket
-  // esiste (anche se è vuoto), 404/400 se non esiste.
+  // Tecnica: GET /storage/v1/object/public/poi_photos/__check su un oggetto inesistente.
+  // - Bucket ESISTE  → HTTP 400, body.message contiene "Object not found"
+  // - Bucket MANCANTE → HTTP 400, body.message contiene "Bucket not found"
+  // - Funziona con anon key su bucket public, senza RLS policies.
   const t0 = Date.now();
   try {
     const r = await fetchTimeout(
-      `${SB_URL}/storage/v1/object/list/poi_photos`,
-      {
-        method: 'POST',
-        headers: {
-          apikey: SB_KEY,
-          Authorization: `Bearer ${SB_KEY}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ prefix: '', limit: 1, offset: 0 })
-      }
+      `${SB_URL}/storage/v1/object/public/poi_photos/__check`,
+      { headers: { apikey: SB_KEY } }
     );
     const lat = Date.now() - t0;
-    const hasPoi = r.status === 200;
+    let hasPoi = false;
+    try {
+      const body = await r.json();
+      const msg = (body?.message || body?.error || '').toLowerCase();
+      // "object not found" = bucket esiste ma oggetto no → OK
+      // "bucket not found" o "not found" senza object = bucket mancante
+      hasPoi = msg.includes('object not found') || r.status === 200;
+    } catch(_) {
+      hasPoi = r.status === 200;
+    }
     setStatus('sb-storage', hasPoi ? 'ok' : 'warn', hasPoi ? 'BUCKET OK' : 'NO BUCKET', lat);
     log(`Storage ${hasPoi ? '✅ bucket poi_photos trovato' : '⚠️ bucket poi_photos mancante'} — ${lat}ms`, hasPoi ? 'ok' : 'warn');
     return hasPoi;
