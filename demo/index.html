@@ -256,13 +256,27 @@ button{touch-action:manipulation}
 
 /* ── FAB ── */
 /* FAB z-index: sopra nav (300), SOTTO sheet (400) e popup. Sempre cliccabile su mappa/tab ma non interferisce con form di creazione */
-.fab{position:fixed;bottom:150px;left:50%;transform:translateX(-50%);z-index:350;width:60px;height:60px;border-radius:30px;background:var(--red);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 22px rgba(212,43,43,.45);font-size:28px;color:#fff;transition:transform .25s,background .25s}
+.fab{position:fixed;bottom:150px;left:50%;transform:translateX(-50%);z-index:350;width:60px;height:60px;border-radius:30px;background:rgba(212,43,43,.68);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1.5px solid rgba(255,255,255,.18);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 22px rgba(212,43,43,.4),inset 0 1px 0 rgba(255,255,255,.22);font-size:28px;color:#fff;transition:transform .25s,background .25s}
 .fab.open{transform:translateX(-50%) rotate(45deg)}
 .fab-menu{position:fixed;bottom:220px;left:50%;transform:translateX(-50%) translateY(10px);z-index:349;display:flex;flex-direction:column;gap:9px;align-items:center;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
 .fab-menu.open{opacity:1;pointer-events:all;transform:translateX(-50%) translateY(0)}
 .fab-opt{background:var(--card);border:none;border-radius:22px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px;box-shadow:0 4px 18px rgba(0,0,0,.14);white-space:nowrap;transition:transform .15s}
 .fab-opt:active{transform:scale(.96)}
 .fab-opt-icon{width:30px;height:30px;border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+/* ── MAP QUICK BUTTONS: POI · Itinerari · Compagni ── */
+/* Mobile: colonna verticale a destra, sotto la search bar */
+#mapQuickBtns{position:fixed;right:14px;top:112px;z-index:209;display:flex;flex-direction:column;align-items:center;gap:10px;pointer-events:all}
+body.tab-active #mapQuickBtns{display:none}
+.mqb{display:flex;flex-direction:column;align-items:center;gap:5px;border:none;background:none;padding:0;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent}
+.mqb-circle{width:50px;height:50px;border-radius:50%;background:rgba(161,98,7,.58);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1.5px solid rgba(255,220,80,.22);display:flex;align-items:center;justify-content:center;font-size:23px;color:#285EA7;box-shadow:0 4px 16px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.2);transition:transform .15s,background .15s}
+.mqb:active .mqb-circle,.mqb:hover .mqb-circle{background:rgba(161,98,7,.78);transform:scale(.93)}
+.mqb-lbl{font-size:9px;font-weight:800;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.6);letter-spacing:.4px;line-height:1;white-space:nowrap}
+/* Desktop ≥1024px: fila orizzontale centrata in cima alla mappa, label nascosta */
+@media(min-width:1024px){
+  #mapQuickBtns{top:14px;right:auto;left:50%;transform:translateX(-50%);flex-direction:row;gap:8px}
+  .mqb-circle{width:42px;height:42px;font-size:19px}
+  .mqb-lbl{display:none}
+}
 
 /* ── BOTTOM NAV ── */
 .bottom-nav{position:fixed;bottom:80px;left:0;right:0;z-index:300;height:56px;background:var(--card);border-top:1px solid var(--border);display:flex;align-items:stretch;box-shadow:0 -3px 16px rgba(0,0,0,.08)}
@@ -1276,6 +1290,26 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 
 <!-- FAB -->
 <button class="fab" id="fab" onclick="toggleFab()"><i class="ph-duotone ph-plus"></i></button>
+
+<!-- MAP QUICK BUTTONS: POI · Itinerari · Compagni
+     Mobile: colonna verticale a destra (right:14px, top:112px)
+     Desktop ≥1024px: fila orizzontale centrata in cima (left:50%)
+     Nascosti quando si è fuori dalla tab Mappa (body.tab-active) -->
+<div id="mapQuickBtns">
+  <button class="mqb" onclick="showTab('poi')" title="POI">
+    <div class="mqb-circle"><i class="ph-duotone ph-map-pin"></i></div>
+    <span class="mqb-lbl">POI</span>
+  </button>
+  <button class="mqb" onclick="showTab('itin')" title="Itinerari">
+    <div class="mqb-circle"><i class="ph-duotone ph-path"></i></div>
+    <span class="mqb-lbl">Itinerari</span>
+  </button>
+  <button class="mqb" onclick="showTab('companions')" title="Compagni">
+    <div class="mqb-circle"><i class="ph-duotone ph-users-three"></i></div>
+    <span class="mqb-lbl">Compagni</span>
+  </button>
+</div>
+
 <div class="fab-menu" id="fabMenu">
   <button class="fab-opt" onclick="openAddPOI()">
     <div class="fab-opt-icon" style="background:#FFF0F0;color:var(--red)"><i class="ph-duotone ph-map-pin"></i></div>
@@ -4330,6 +4364,10 @@ function showTab(tab){
   document.querySelectorAll('.map-types')[0].style.display=onMap?'flex':'none';
   const tbRight=document.getElementById('tbRight');
   if(tbRight)tbRight.style.display=onMap?'flex':'none';
+  // Map quick buttons (POI/Itinerari/Compagni): visibili solo su mappa
+  // CSS body.tab-active li nasconde già, ma sincronizziamo anche inline per robustezza
+  const mqb=document.getElementById('mapQuickBtns');
+  if(mqb) mqb.style.display=onMap?'flex':'none';
   // Map search bar visibile solo su tab Mappa
   const msw=document.getElementById('mapSearchWrap');
   if(msw) msw.classList.toggle('show', onMap);
