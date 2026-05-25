@@ -1,0 +1,28 @@
+name: Supabase Keepalive
+
+# Mantiene il progetto Supabase FREE attivo (evita la pausa dopo 7 giorni senza traffico).
+# Invia una richiesta GET alla tabella categories ogni 3 giorni.
+# Al go-live con piano PRO questo workflow può essere disattivato.
+
+on:
+  schedule:
+    - cron: '0 9 */3 * *'  # Ogni 3 giorni alle 09:00 UTC
+  workflow_dispatch:         # Eseguibile manualmente dal dashboard GitHub
+
+jobs:
+  keepalive:
+    name: Ping Supabase
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase REST API
+        run: |
+          HTTP=$(curl -s -o /dev/null -w "%{http_code}" \
+            "https://ptppxwlafswfhbueakjt.supabase.co/rest/v1/categories?limit=1&select=slug" \
+            -H "apikey: sb_publishable_PC1xQ8XiQK9jpzwsAlFLxw_E-PKN40V" \
+            --max-time 15)
+          echo "Supabase HTTP status: $HTTP"
+          if [ "$HTTP" != "200" ]; then
+            echo "⚠️ Supabase non risponde correttamente (status $HTTP)"
+            exit 1
+          fi
+          echo "✅ Supabase attivo — $(date -u '+%d/%m/%Y %H:%M UTC')"

@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>POI•LOVE — Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --red:    #D42B2B;
+      --red-dk: #B01E27;
+      --blue:   #285EA7;
+      --gold:   #C49A00;
+      --gold-lt:#FFF8DC;
+      --green:  #22C55E;
+      --yellow: #F59E0B;
+      --gray:   #6B7280;
+      --err:    #EF4444;
+      --bg:     #141312;
+      --card:   #1E1C1A;
+      --card2:  #272422;
+      --border: #2E2B28;
+      --text:   #FAF8F3;
+      --text2:  #A09890;
+      --radius: 14px;
+    }
+
+    body {
+      font-family: 'Ubuntu', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 0 0 80px;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 18px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-left { display: flex; align-items: center; gap: 14px; }
+    .header-logo {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--red);
+      letter-spacing: -0.3px;
+    }
+    .header-logo span { color: var(--text); font-weight: 400; }
+    .overall-badge {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      padding: 5px 13px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--gray);
+      flex-shrink: 0;
+    }
+    .dot.ok     { background: var(--green); box-shadow: 0 0 6px var(--green); }
+    .dot.warn   { background: var(--yellow); }
+    .dot.err    { background: var(--err); }
+    .dot.pulse  { animation: pulse 1.5s infinite; }
+    @keyframes pulse {
+      0%,100% { opacity:1; } 50% { opacity:0.4; }
+    }
+    .header-right { display: flex; align-items: center; gap: 10px; }
+    .last-check { font-size: 11px; color: var(--text2); }
+    .btn {
+      background: var(--card2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 7px 14px;
+      font-size: 12px;
+      font-family: 'Ubuntu', sans-serif;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background .15s, border-color .15s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn:hover { background: var(--border); }
+    .btn.primary { background: var(--red); border-color: var(--red); color: #fff; }
+    .btn.primary:hover { background: var(--red-dk); border-color: var(--red-dk); }
+    .btn.gold { background: var(--gold); border-color: var(--gold); color: #1a1400; }
+    .btn.gold:hover { filter: brightness(1.1); }
+
+    /* ── LAYOUT ── */
+    .container { max-width: 1100px; margin: 0 auto; padding: 28px 24px; }
+    .section-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--text2);
+      margin-bottom: 14px;
+    }
+    .section { margin-bottom: 36px; }
+
+    /* ── STATUS GRID ── */
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 10px;
+    }
+    .status-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .sc-header { display: flex; align-items: center; justify-content: space-between; }
+    .sc-name { font-size: 11px; color: var(--text2); font-weight: 500; }
+    .sc-status {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .5px;
+    }
+    .sc-status.ok   { color: var(--green); }
+    .sc-status.warn { color: var(--yellow); }
+    .sc-status.err  { color: var(--err); }
+    .sc-status.checking { color: var(--gray); }
+    .sc-latency { font-size: 10px; color: var(--text2); }
+    .sc-icon { font-size: 22px; }
+
+    /* ── METRICS ── */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      gap: 12px;
+    }
+    .metric-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 18px;
+    }
+    .mc-label { font-size: 11px; color: var(--text2); font-weight: 500; margin-bottom: 6px; text-transform: uppercase; letter-spacing: .8px; }
+    .mc-value { font-size: 34px; font-weight: 700; line-height: 1; }
+    .mc-value.loading { color: var(--gray); font-size: 20px; }
+    .mc-sub { font-size: 11px; color: var(--text2); margin-top: 4px; }
+
+    /* ── ISSUES ── */
+    .issues-list { display: flex; flex-direction: column; gap: 8px; }
+    .issue-row {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 13px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .issue-icon { font-size: 18px; flex-shrink: 0; }
+    .issue-body { flex: 1; min-width: 0; }
+    .issue-title { font-size: 13px; font-weight: 500; }
+    .issue-desc { font-size: 11px; color: var(--text2); margin-top: 2px; line-height: 1.4; }
+    .issue-badge {
+      flex-shrink: 0;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .5px;
+      border-radius: 99px;
+      padding: 3px 10px;
+      text-transform: uppercase;
+    }
+    .badge-open   { background: #3B1515; color: var(--err); border: 1px solid #6B2020; }
+    .badge-done   { background: #0F2E1A; color: var(--green); border: 1px solid #1A5C30; }
+    .badge-warn   { background: #2E2008; color: var(--yellow); border: 1px solid #5C4010; }
+    .badge-info   { background: #0D1F3C; color: #60A5FA; border: 1px solid #1A3A6B; }
+
+    /* ── GO-LIVE CHECKLIST ── */
+    .golive-box {
+      background: #1A1500;
+      border: 1.5px solid var(--gold);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+    .golive-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .golive-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--gold);
+    }
+    .golive-subtitle {
+      font-size: 11px;
+      color: #A09020;
+      margin-top: 2px;
+    }
+    .golive-emoji { font-size: 24px; }
+    .golive-section { margin-bottom: 18px; }
+    .golive-section-title {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #A09020;
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #2E2800;
+    }
+    .golive-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid #1E1A00;
+    }
+    .golive-item:last-child { border-bottom: none; }
+    .golive-cb {
+      width: 16px; height: 16px;
+      border: 1.5px solid #5A4A00;
+      border-radius: 4px;
+      flex-shrink: 0;
+      margin-top: 2px;
+      cursor: pointer;
+      position: relative;
+      background: transparent;
+      transition: background .15s, border-color .15s;
+    }
+    .golive-cb.checked {
+      background: var(--gold);
+      border-color: var(--gold);
+    }
+    .golive-cb.checked::after {
+      content: '✓';
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: #1a1400;
+      font-weight: 700;
+    }
+    .golive-text { flex: 1; }
+    .golive-text strong { font-size: 12px; font-weight: 500; color: #E8D060; display: block; line-height: 1.3; }
+    .golive-text small  { font-size: 11px; color: #806A10; line-height: 1.4; display: block; margin-top: 2px; }
+    .golive-priority {
+      flex-shrink: 0;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .5px;
+      border-radius: 99px;
+      padding: 2px 8px;
+    }
+    .p-critical { background: #3B1515; color: #FF6060; border: 1px solid #6B2020; }
+    .p-high     { background: #2E1A00; color: #FF9A40; border: 1px solid #5C3A00; }
+    .p-medium   { background: #1A2A00; color: #90D040; border: 1px solid #3A5A00; }
+    .p-low      { background: #0D1F3C; color: #60A5FA; border: 1px solid #1A3A6B; }
+
+    /* ── ACTIONS ── */
+    .actions-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .btn-lg {
+      padding: 12px 20px;
+      font-size: 13px;
+      border-radius: 10px;
+    }
+
+    /* ── PING RESULT ── */
+    .ping-result {
+      margin-top: 14px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      font-size: 12px;
+      line-height: 1.6;
+      display: none;
+      font-family: monospace;
+      white-space: pre-wrap;
+      color: var(--green);
+    }
+    .ping-result.visible { display: block; }
+    .ping-result.error { color: var(--err); }
+
+    /* ── LOG ── */
+    .log-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      font-size: 11px;
+      font-family: monospace;
+      max-height: 200px;
+      overflow-y: auto;
+      color: var(--text2);
+      line-height: 1.7;
+    }
+    .log-ok   { color: var(--green); }
+    .log-warn { color: var(--yellow); }
+    .log-err  { color: var(--err); }
+    .log-info { color: #60A5FA; }
+
+    /* ── LINKS ROW ── */
+    .links-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    /* ── FOOTER ── */
+    .footer {
+      text-align: center;
+      padding: 32px 24px 0;
+      font-size: 11px;
+      color: var(--text2);
+      line-height: 2;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      .header { padding: 14px 16px; flex-wrap: wrap; }
+      .container { padding: 20px 16px; }
+      .header-right .last-check { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════ HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div class="header-logo">POI•LOVE <span>Admin</span></div>
+    <div class="overall-badge">
+      <div class="dot pulse" id="overallDot"></div>
+      <span id="overallText">Controllo…</span>
+    </div>
+  </div>
+  <div class="header-right">
+    <span class="last-check" id="lastCheck">—</span>
+    <button class="btn" onclick="runAllChecks()">↻ Aggiorna</button>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- ═══════════════════════════════════════════ SERVICES STATUS -->
+  <div class="section">
+    <div class="section-title">Stato Servizi</div>
+    <div class="status-grid">
+
+      <div class="status-card">
+        <div class="sc-icon">🗄️</div>
+        <div class="sc-header">
+          <span class="sc-name">Supabase REST</span>
+          <div class="dot pulse" id="dot-sb-rest"></div>
+        </div>
+        <div class="sc-status checking" id="status-sb-rest">—</div>
+        <div class="sc-latency" id="lat-sb-rest"></div>
+      </div>
+
+      <div class="status-card">
+        <div class="sc-icon">🔐</div>
+        <div class="sc-header">
+          <span class="sc-name">Supabase Auth</span>
+          <div class="dot pulse" id="dot-sb-auth"></div>
+        </div>
+        <div class="sc-status checking" id="status-sb-auth">—</div>
+        <div class="sc-latency" id="lat-sb-auth"></div>
+      </div>
+
+      <div class="status-card">
+        <div class="sc-icon">🪣</div>
+        <div class="sc-header">
+          <span class="sc-name">Storage</span>
+          <div class="dot pulse" id="dot-sb-storage"></div>
+        </div>
+        <div class="sc-status checking" id="status-sb-storage">—</div>
+        <div class="sc-latency" id="lat-sb-storage"></div>
+      </div>
+
+      <div class="status-card">
+        <div class="sc-icon">🖼️</div>
+        <div class="sc-header">
+          <span class="sc-name">media.poilove.com</span>
+          <div class="dot pulse" id="dot-media"></div>
+        </div>
+        <div class="sc-status checking" id="status-media">—</div>
+        <div class="sc-latency" id="lat-media"></div>
+      </div>
+
+      <div class="status-card">
+        <div class="sc-icon">📱</div>
+        <div class="sc-header">
+          <span class="sc-name">demo.poilove.com</span>
+          <div class="dot pulse" id="dot-demo"></div>
+        </div>
+        <div class="sc-status checking" id="status-demo">—</div>
+        <div class="sc-latency" id="lat-demo"></div>
+      </div>
+
+      <div class="status-card">
+        <div class="sc-icon">📊</div>
+        <div class="sc-header">
+          <span class="sc-name">sal.poilove.com</span>
+          <div class="dot pulse" id="dot-sal"></div>
+        </div>
+        <div class="sc-status checking" id="status-sal">—</div>
+        <div class="sc-latency" id="lat-sal"></div>
+      </div>
+
+      <div class="status-card">
+        <div class="sc-icon">🌐</div>
+        <div class="sc-header">
+          <span class="sc-name">poilove.com</span>
+          <div class="dot pulse" id="dot-web"></div>
+        </div>
+        <div class="sc-status checking" id="status-web">—</div>
+        <div class="sc-latency" id="lat-web"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ DB METRICS -->
+  <div class="section">
+    <div class="section-title">Database — Metriche Live</div>
+    <div class="metrics-grid">
+
+      <div class="metric-card">
+        <div class="mc-label">👤 Utenti iscritti</div>
+        <div class="mc-value loading" id="metric-users">…</div>
+        <div class="mc-sub" id="metric-users-sub"></div>
+      </div>
+
+      <div class="metric-card">
+        <div class="mc-label">📍 POI pubblici</div>
+        <div class="mc-value loading" id="metric-pois">…</div>
+        <div class="mc-sub" id="metric-pois-sub"></div>
+      </div>
+
+      <div class="metric-card">
+        <div class="mc-label">❤️ Loves totali</div>
+        <div class="mc-value loading" id="metric-loves">…</div>
+        <div class="mc-sub" id="metric-loves-sub"></div>
+      </div>
+
+      <div class="metric-card">
+        <div class="mc-label">📋 Liste pubbliche</div>
+        <div class="mc-value loading" id="metric-lists">…</div>
+        <div class="mc-sub" id="metric-lists-sub"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ KNOWN ISSUES -->
+  <div class="section">
+    <div class="section-title">Problemi Noti — Stato Attuale</div>
+    <div class="issues-list">
+
+      <div class="issue-row">
+        <div class="issue-icon">🔐</div>
+        <div class="issue-body">
+          <div class="issue-title">Google OAuth — redirect URL non configurato</div>
+          <div class="issue-desc">Aggiungere <code>https://demo.poilove.com</code> in Supabase Auth → URL Configuration → Allowed Redirect URLs. Senza questo, nessun utente riesce a registrarsi.</div>
+        </div>
+        <div class="issue-badge badge-open" id="issue1-badge">APERTO</div>
+      </div>
+
+      <div class="issue-row">
+        <div class="issue-icon">👥</div>
+        <div class="issue-body">
+          <div class="issue-title">Profilo hardcoded — dati falsi visibili</div>
+          <div class="issue-desc">Mirela K., Arben S., Liri V., "87 love", "Amatore" sono HTML statico in demo/index.html (righe 1686–1860). Non vengono dal database.</div>
+        </div>
+        <div class="issue-badge badge-open">APERTO</div>
+      </div>
+
+      <div class="issue-row">
+        <div class="issue-icon">🗄️</div>
+        <div class="issue-body">
+          <div class="issue-title">INSERT policy mancante su profiles</div>
+          <div class="issue-desc">La tabella profiles ha SELECT e UPDATE ma non INSERT per utenti autenticati. Se il trigger handle_new_user fallisce, l'upsert JS fallisce silenziosamente e i POI non si salvano (FK violation).</div>
+        </div>
+        <div class="issue-badge badge-open" id="issue3-badge">APERTO</div>
+      </div>
+
+      <div class="issue-row">
+        <div class="issue-icon">📝</div>
+        <div class="issue-body">
+          <div class="issue-title">Description limit: DB 200 chars vs form 1000</div>
+          <div class="issue-desc">Il CHECK constraint in pois dice max 200 chars. Il form mostra "0 / 1000". Qualsiasi testo &gt; 200 chars fa fallire l'INSERT senza errore visibile.</div>
+        </div>
+        <div class="issue-badge badge-open" id="issue4-badge">APERTO</div>
+      </div>
+
+      <div class="issue-row">
+        <div class="issue-icon">🏠</div>
+        <div class="issue-body">
+          <div class="issue-title">Luoghi Personali (Casa/Lavoro) — solo localStorage</div>
+          <div class="issue-desc">Casa e Lavoro sono salvati solo nel browser locale. Si perdono pulendo i cookie. Non vanno mai su Supabase.</div>
+        </div>
+        <div class="issue-badge badge-warn">DA FARE</div>
+      </div>
+
+      <div class="issue-row">
+        <div class="issue-icon">🖼️</div>
+        <div class="issue-body">
+          <div class="issue-title">media.poilove.com — 503 + DNS server-side rotto</div>
+          <div class="issue-desc">Il server non risolve supabase.co. Fix: SSH → aggiungere nameserver 8.8.8.8 in /etc/resolv.conf. Upload foto usa il fallback Supabase Storage ma potrebbe non funzionare.</div>
+        </div>
+        <div class="issue-badge badge-open" id="issue6-badge">APERTO</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ GO-LIVE CHECKLIST -->
+  <div class="section">
+    <div class="golive-box">
+      <div class="golive-header">
+        <div class="golive-emoji">🚀</div>
+        <div>
+          <div class="golive-title">GO-LIVE CHECKLIST — Note per il Momento del Lancio</div>
+          <div class="golive-subtitle">Tutto ciò che va spostato, aggiornato o sistemato prima del lancio pubblico a Tirana · Giugno 2026</div>
+        </div>
+      </div>
+
+      <!-- INFRASTRUTTURA -->
+      <div class="golive-section">
+        <div class="golive-section-title">🏗️ Infrastruttura</div>
+
+        <div class="golive-item">
+          <div class="golive-cb" onclick="toggleCheck(this)"></div>
+          <div class="golive-text">
+            <strong>Upgrade Supabase FREE → PRO ($25/mese)</strong>
+            <small>Elimina la pausa automatica dopo 7 giorni. Indispensabile in produzione. Coincide con l'arrivo dei 3 sponsor (mese 9).</small>
+          </div>
+          <div class="golive-priority p-critical">CRITICO</div>
+        </div>
+
+        <div class="golive-item">
+          <div class="golive-cb" onclick="toggleCheck(this)"></div>
+          <div class="golive-text">
+            <strong>Fix DNS media.poilove.com — SSH server</strong>
+            <small>Aggiungere <code style="color:#C49A00">nameserver 8.8.8.8</code> in <code style="color:#C49A00">/etc/resolv.conf</code>. Poi riavviare PHP-FPM/Apache. Senza questo l'upload foto non funziona.</small>
+          </div>
+          <div class="golive-priority p-high">ALTO</div>
+        </div>
+
+        <div class="golive-item">
+          <div class="golive-cb" onclick="toggleCheck(this)"></div>
+          <div class="golive-text">
+            <strong>Disattivare keepalive GitHub Actions al passaggio a PRO</strong>
+            <small>Il workflow supabase-keepalive.yml diventa inutile con piano PRO. Disattivarlo dal dashboard GitHub (Settings → Actions).</small>
+          </div>
+          <div class="golive-priority p-low">BASSA</div>
+        </div>
+
+        <div class="golive-item">
+          <div class="golive-cb" onclick="toggleCheck(this)"></div>
+          <div class="golive-text">
+            <strong>Monitoring esterno (UptimeRobot o Better Stack)</strong>
+            <small>Aggiungere un monitor esterno su demo.poilove.com, sal.poilove.com e poilove.com. Avvisi via email/SMS se un sito va down.</small>
+          </div>
+          <div class="golive-priority p-medium">MEDIO</div>
+        </div>
+
+      </div>
+
+      <!-- ADMIN PANEL -->
+      <div class="golive-section">
+        <div class="golive-section-title">🛠️ Admin Panel — Questo File</div>
+
+        <div class="golive-item">
+          <div class="golive-cb" onclick="toggleCheck(this)"></div>
+          <div class="golive-text">
+            <strong>Spostare admin da demo.poilove.com/admin.html → admin.poilove.com</strong>
+            <small>Creare un sottodominio dedicato su Plesk. Copiare admin.html in una nuova cartella <code style="color:#C49A00">admin/</code> nel repo. Aggiornare document root in Plesk.</small>
+          </div>
+          <div class="golive-priority p-high">ALTO</div>
+        </div>
+
+        <div class="golive-item">
+          <div class="golive-cb" onclick="toggleCheck(this)"></div>
+          <div class="golive-text">
+            <strong>Aggiungere https://admin.poilove.com alle Supabase Redirect URLs</strong>
+            <small>Supabase Dashboard → Auth → URL Configuration → Allowed Redirect URLs.</small>
+          </div>
+          <div class="golive-priority p-high">ALTO</div>
+        </div>
+
+        <div class="golive-item">
+          <div class="golive-cb" onclick="toggleCheck(this)"></div>
+          <div class="golive-text">
+            <strong>Aggiungere autenticazione admin (solo Alessandro può accedere)</strong>
+            <small>Proteggere admin.html con login Supabase. Aggiungere controllo: se email non è it@altrostile.app → redirect.</small>
+          </div>
+          <div class="golive-priority p-critical">CRITICO</div>
+        </div>
+
+        <div class="golive-item">
+          <div class="golive-cb" onclick="toggleCheck(this)"></div>
+          <div class="golive-text">
+            <strong>Aggiungere sezione moderazione contenuti</strong>
+            <small>Lista POI segnalati, gestione utenti bloccati, overview contenuti recenti.</small>
+          </div>
+          <div class="golive-priority p-medium">MEDIO</div>
+        </div>
+
+      </div>
+
+      <!-- DATABASE -->
+      <div class="golive-section">
+        <div class="golive-section-title">🗄️ Database</div>
+
+        <div class="golive-item">
+          <div class="golive-cb" onclick="toggleCheck(this)"></div>
+          <div class="golive-text">
+            <strong>Eseguire migration 002_profile_cover.sql</strong>
+            <small>Aggiunge colonne <code style="color:#C49A00">cover_url</code> e <code style="color:#C49A00">cover_type</code> su profiles. File in database/migrations/.</small>
+          </div>
+          <div class="golive-priority p-high">ALTO</div>
+        </div>
+
+        <div class="golive-item">
+          <div class="golive-cb" onclick="toggleCheck(this)"></div>
+          <div class="golive-text">
+            <strong>Aggiungere INSERT policy su profiles (SQL già pronto)</strong>
+            <small>CREATE POLICY "Utente autenticato può creare il proprio profilo" ON public.profiles FOR INSERT WITH CHECK (auth.uid() = id);</small>
+          </div>
+          <div class="golive-priority p-critical">CRITICO</div>
+        </div>
+
+        <div class="golive-item">
+          <div class="golive-cb" onclick="toggleCheck(this)"></div>
+          <div class="golive-text">
+            <strong>Allineare description limit a 1000 chars (SQL già pronto)</strong>
+            <small>ALTER TABLE pois DROP CONSTRAINT pois_description_check; ALTER TABLE pois ADD CONSTRAINT pois_description_check CHECK (char_length(description) &lt;= 1000);</small>
+          </div>
+          <div class="golive-priority p-high">ALTO</div>
+        </div>
+
+        <div class="golive-item">
+          <div class="golive-cb" onclick="toggleCheck(this)"></div>
+          <div class="golive-text">
+            <strong>Seed data Tirana — minimo 50 POI reali</strong>
+            <small>Inserire POI reali (Pazari i Ri, Blloku, Xhamia Et'hem Bey, Piramida, Parku Rinia, ecc.) con foto e descrizioni in IT/SQ/EN. La mappa deve sembrare viva al lancio.</small>
+          </div>
+          <div class="golive-priority p-critical">CRITICO</div>
+        </div>
+
+      </div>
+
+      <!-- AUTH -->
+      <div class="golive-section">
+        <div class="golive-section-title">🔐 Autenticazione OAuth</div>
+
+        <div class="golive-item">
+          <div class="golive-cb" onclick="toggleCheck(this)"></div>
+          <div class="golive-text">
+            <strong>Testare Google OAuth end-to-end sul demo</strong>
+            <small>Login Google → verifica profilo creato su Supabase → aggiungi POI → verifica in mappa. Mai testato dopo restyle 11/05.</small>
+          </div>
+          <div class="golive-priority p-critical">CRITICO</div>
+        </div>
+
+        <div class="golive-item">
+          <div class="golive-cb" onclick="toggleCheck(this)"></div>
+          <div class="golive-text">
+            <strong>Configurare X (Twitter) OAuth</strong>
+            <small>Supabase Dashboard → Auth → Providers → Twitter. Gratis, ~10-15 min. Il bottone esiste già in demo.</small>
+          </div>
+          <div class="golive-priority p-medium">MEDIO</div>
+        </div>
+
+        <div class="golive-item">
+          <div class="golive-cb" onclick="toggleCheck(this)"></div>
+          <div class="golive-text">
+            <strong>Configurare LinkedIn OAuth</strong>
+            <small>Supabase Dashboard → Auth → Providers → LinkedIn OIDC. Gratis, ~10 min.</small>
+          </div>
+          <div class="golive-priority p-medium">MEDIO</div>
+        </div>
+
+        <div class="golive-item">
+          <div class="golive-cb" onclick="toggleCheck(this)"></div>
+          <div class="golive-text">
+            <strong>Configurare Facebook OAuth</strong>
+            <small>Richiede privacy policy pubblicata + App Review Meta. ~15-25 min più qualche giorno di approvazione.</small>
+          </div>
+          <div class="golive-priority p-low">BASSA</div>
+        </div>
+
+        <div class="golive-item">
+          <div class="golive-cb" onclick="toggleCheck(this)"></div>
+          <div class="golive-text">
+            <strong>Apple Sign In</strong>
+            <small>RIMANDATO post-Tirana. Richiede $99/anno Apple Developer. Da attivare prima del lancio App Store.</small>
+          </div>
+          <div class="golive-priority p-low">POSTICIPATO</div>
+        </div>
+
+      </div>
+
+      <!-- FRONTEND -->
+      <div class="golive-section">
+        <div class="golive-section-title">🎨 Frontend — demo/index.html</div>
+
+        <div class="golive-item">
+          <div class="golive-cb" onclick="toggleCheck(this)"></div>
+          <div class="golive-text">
+            <strong>Rimuovere HTML hardcoded profilo → caricare da Supabase</strong>
+            <small>Mirela K., Arben S., Liri V., "87 love", "Amatore" (righe 1686–1860) sono dati falsi. Sostituire con query reali a profiles, follows, pois.</small>
+          </div>
+          <div class="golive-priority p-critical">CRITICO</div>
+        </div>
+
+        <div class="golive-item">
+          <div class="golive-cb" onclick="toggleCheck(this)"></div>
+          <div class="golive-text">
+            <strong>Migrare Luoghi Personali (Casa/Lavoro) da localStorage → Supabase</strong>
+            <small>Creare tabella user_places o colonna JSONB su profiles. Caricare e salvare via Supabase per rendere i luoghi persistenti cross-device.</small>
+          </div>
+          <div class="golive-priority p-medium">MEDIO</div>
+        </div>
+
+        <div class="golive-item">
+          <div class="golive-cb" onclick="toggleCheck(this)"></div>
+          <div class="golive-text">
+            <strong>Test end-to-end completo: login → POI → lista → itinerario → compagnia</strong>
+            <small>Fare un test completo da utente nuovo, verificando che tutto il flusso funzioni senza bug.</small>
+          </div>
+          <div class="golive-priority p-critical">CRITICO</div>
+        </div>
+
+        <div class="golive-item">
+          <div class="golive-cb" onclick="toggleCheck(this)"></div>
+          <div class="golive-text">
+            <strong>Portare demo.poilove.com all'ultimo commit GitHub (ora su 47fb29b, HEAD 3bc28c0)</strong>
+            <small>Plesk → demo.poilove.com → Git → "Estrai ora" → "Implementa ora". Mancano 16 commit del 11/05.</small>
+          </div>
+          <div class="golive-priority p-high">ALTO</div>
+        </div>
+
+      </div>
+
+    </div><!-- /golive-box -->
+  </div>
+
+  <!-- ═══════════════════════════════════════════ AZIONI RAPIDE -->
+  <div class="section">
+    <div class="section-title">Azioni Rapide</div>
+    <div class="actions-grid">
+
+      <button class="btn btn-lg primary" onclick="pingSupabase()">
+        ⚡ Ping Supabase ora
+      </button>
+
+      <a class="btn btn-lg" href="https://supabase.com/dashboard/project/ptppxwlafswfhbueakjt" target="_blank">
+        🗄️ Supabase Dashboard
+      </a>
+
+      <a class="btn btn-lg" href="https://supabase.com/dashboard/project/ptppxwlafswfhbueakjt/auth/url-configuration" target="_blank">
+        🔐 Supabase Auth Config
+      </a>
+
+      <a class="btn btn-lg" href="https://supabase.com/dashboard/project/ptppxwlafswfhbueakjt/sql/new" target="_blank">
+        📝 SQL Editor
+      </a>
+
+      <a class="btn btn-lg" href="https://github.com/acastagna/poi-love" target="_blank">
+        🐙 GitHub Repository
+      </a>
+
+      <a class="btn btn-lg" href="https://github.com/acastagna/poi-love/actions" target="_blank">
+        ⚙️ GitHub Actions
+      </a>
+
+      <a class="btn btn-lg" href="https://demo.poilove.com/" target="_blank">
+        📱 Apri Demo
+      </a>
+
+      <a class="btn btn-lg" href="https://sal.poilove.com/" target="_blank">
+        📊 Apri SAL
+      </a>
+
+    </div>
+
+    <div id="pingResult" class="ping-result"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ LOG -->
+  <div class="section">
+    <div class="section-title">Log Diagnostica</div>
+    <div class="log-box" id="logBox">
+      <span class="log-info">In attesa del primo controllo…</span>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<div class="footer">
+  POI•LOVE Admin · Framework Cultural Bridge OS · MIT<br>
+  Alessandro Castagna · 321.al · it@altrostile.app<br>
+  <span id="footerTime"></span>
+</div>
+
+<script>
+/* ════════════════════════════════════════
+   CONFIGURAZIONE
+════════════════════════════════════════ */
+const SB_URL = 'https://ptppxwlafswfhbueakjt.supabase.co';
+const SB_KEY = 'sb_publishable_PC1xQ8XiQK9jpzwsAlFLxw_E-PKN40V';
+
+/* ════════════════════════════════════════
+   LOGGING
+════════════════════════════════════════ */
+const logBox = document.getElementById('logBox');
+function log(msg, type = 'info') {
+  const now = new Date().toLocaleTimeString('it-IT');
+  const span = document.createElement('div');
+  span.className = `log-${type}`;
+  span.textContent = `[${now}] ${msg}`;
+  logBox.appendChild(span);
+  logBox.scrollTop = logBox.scrollHeight;
+  if (logBox.children.length === 1 && logBox.children[0].classList.contains('log-info')) {
+    logBox.innerHTML = '';
+    logBox.appendChild(span);
+  }
+}
+function logClear() {
+  logBox.innerHTML = '';
+}
+
+/* ════════════════════════════════════════
+   UTILS
+════════════════════════════════════════ */
+async function fetchTimeout(url, options = {}, ms = 8000) {
+  const ctrl = new AbortController();
+  const tid = setTimeout(() => ctrl.abort(), ms);
+  try {
+    const r = await fetch(url, { ...options, signal: ctrl.signal });
+    clearTimeout(tid);
+    return r;
+  } catch(e) {
+    clearTimeout(tid);
+    throw e;
+  }
+}
+
+function setStatus(id, state, text, latency) {
+  const dot = document.getElementById(`dot-${id}`);
+  const stEl = document.getElementById(`status-${id}`);
+  const latEl = document.getElementById(`lat-${id}`);
+  if (dot) {
+    dot.className = `dot ${state === 'ok' ? 'ok' : state === 'warn' ? 'warn' : 'err'}`;
+  }
+  if (stEl) {
+    stEl.className = `sc-status ${state}`;
+    stEl.textContent = text;
+  }
+  if (latEl && latency != null) {
+    latEl.textContent = `${latency}ms`;
+  }
+}
+
+function setMetric(id, value, sub = '') {
+  const el = document.getElementById(`metric-${id}`);
+  const subEl = document.getElementById(`metric-${id}-sub`);
+  if (el) {
+    el.textContent = value ?? '—';
+    el.className = 'mc-value';
+  }
+  if (subEl) subEl.textContent = sub;
+}
+
+/* ════════════════════════════════════════
+   SUPABASE REST
+════════════════════════════════════════ */
+async function checkSupabaseRest() {
+  const t0 = Date.now();
+  try {
+    const r = await fetchTimeout(
+      `${SB_URL}/rest/v1/categories?limit=1&select=slug`,
+      { headers: { apikey: SB_KEY, Accept: 'application/json' } }
+    );
+    const lat = Date.now() - t0;
+    if (r.ok) {
+      setStatus('sb-rest', 'ok', 'ONLINE', lat);
+      log(`Supabase REST ✅ — ${lat}ms`, 'ok');
+      return true;
+    } else {
+      setStatus('sb-rest', 'err', `HTTP ${r.status}`, lat);
+      log(`Supabase REST ❌ — HTTP ${r.status}`, 'err');
+      return false;
+    }
+  } catch(e) {
+    setStatus('sb-rest', 'err', 'OFFLINE', null);
+    log(`Supabase REST ❌ — ${e.message}`, 'err');
+    return false;
+  }
+}
+
+/* ════════════════════════════════════════
+   SUPABASE AUTH
+════════════════════════════════════════ */
+async function checkSupabaseAuth() {
+  const t0 = Date.now();
+  try {
+    const r = await fetchTimeout(
+      `${SB_URL}/auth/v1/health`,
+      { headers: { apikey: SB_KEY } }
+    );
+    const lat = Date.now() - t0;
+    if (r.ok) {
+      setStatus('sb-auth', 'ok', 'ONLINE', lat);
+      log(`Supabase Auth ✅ — ${lat}ms`, 'ok');
+      return true;
+    } else {
+      setStatus('sb-auth', 'err', `HTTP ${r.status}`, lat);
+      log(`Supabase Auth ❌ — HTTP ${r.status}`, 'err');
+      return false;
+    }
+  } catch(e) {
+    setStatus('sb-auth', 'err', 'OFFLINE', null);
+    log(`Supabase Auth ❌ — ${e.message}`, 'err');
+    return false;
+  }
+}
+
+/* ════════════════════════════════════════
+   SUPABASE STORAGE
+════════════════════════════════════════ */
+async function checkSupabaseStorage() {
+  const t0 = Date.now();
+  try {
+    const r = await fetchTimeout(
+      `${SB_URL}/storage/v1/bucket`,
+      { headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` } }
+    );
+    const lat = Date.now() - t0;
+    if (r.ok) {
+      const buckets = await r.json();
+      const hasPoi = Array.isArray(buckets) && buckets.some(b => b.name === 'poi_photos');
+      setStatus('sb-storage', hasPoi ? 'ok' : 'warn', hasPoi ? 'BUCKET OK' : 'NO BUCKET', lat);
+      log(`Storage ${hasPoi ? '✅ bucket poi_photos trovato' : '⚠️ bucket poi_photos mancante'} — ${lat}ms`, hasPoi ? 'ok' : 'warn');
+      return hasPoi;
+    } else {
+      setStatus('sb-storage', 'err', `HTTP ${r.status}`, lat);
+      log(`Storage ❌ — HTTP ${r.status}`, 'err');
+      return false;
+    }
+  } catch(e) {
+    setStatus('sb-storage', 'err', 'OFFLINE', null);
+    log(`Storage ❌ — ${e.message}`, 'err');
+    return false;
+  }
+}
+
+/* ════════════════════════════════════════
+   MEDIA SERVER
+════════════════════════════════════════ */
+async function checkMedia() {
+  const t0 = Date.now();
+  try {
+    const r = await fetchTimeout('https://media.poilove.com/test.php', { mode: 'cors' }, 6000);
+    const lat = Date.now() - t0;
+    if (r.ok) {
+      let j = {};
+      try { j = await r.json(); } catch(_) {}
+      const isOk = j.overall === 'ok';
+      const dnsOk = (j.checks || []).find(c => c.name === 'Supabase Connectivity')?.status === 'ok';
+      setStatus('media', isOk ? 'ok' : 'warn', isOk ? 'ONLINE' : 'DEGRADATO', lat);
+      log(`media.poilove.com ${isOk ? '✅' : '⚠️'} overall:${j.overall} dns_supabase:${dnsOk ? 'ok' : 'KO'} — ${lat}ms`, isOk ? 'ok' : 'warn');
+      return isOk;
+    } else {
+      setStatus('media', 'err', `HTTP ${r.status}`, lat);
+      log(`media.poilove.com ❌ — HTTP ${r.status}`, 'err');
+      return false;
+    }
+  } catch(e) {
+    setStatus('media', 'err', '503 / OFFLINE', null);
+    log(`media.poilove.com ❌ — ${e.message} (DNS server-side rotto, fix: SSH /etc/resolv.conf)`, 'err');
+    return false;
+  }
+}
+
+/* ════════════════════════════════════════
+   SITI (no-cors — solo check raggiungibilità)
+════════════════════════════════════════ */
+async function checkSite(id, url, label) {
+  const t0 = Date.now();
+  try {
+    await fetchTimeout(url, { mode: 'no-cors' }, 6000);
+    const lat = Date.now() - t0;
+    setStatus(id, 'ok', 'ONLINE', lat);
+    log(`${label} ✅ — ${lat}ms`, 'ok');
+    return true;
+  } catch(e) {
+    setStatus(id, 'err', 'OFFLINE', null);
+    log(`${label} ❌ — ${e.message}`, 'err');
+    return false;
+  }
+}
+
+/* ════════════════════════════════════════
+   DB METRICS
+════════════════════════════════════════ */
+async function loadMetrics() {
+  const headers = { apikey: SB_KEY, Prefer: 'count=exact', Accept: 'application/json' };
+
+  async function getCount(table, filter = '') {
+    try {
+      const url = `${SB_URL}/rest/v1/${table}?select=id${filter ? '&' + filter : ''}&limit=1`;
+      const r = await fetchTimeout(url, { headers });
+      const cr = r.headers.get('Content-Range');
+      if (cr) {
+        const total = cr.split('/')[1];
+        return total === '*' ? null : parseInt(total, 10);
+      }
+      return null;
+    } catch { return null; }
+  }
+
+  const [users, pois, loves, lists] = await Promise.all([
+    getCount('profiles'),
+    getCount('pois', 'visibility=eq.community'),
+    getCount('loves'),
+    getCount('lists', 'visibility=eq.public'),
+  ]);
+
+  setMetric('users', users ?? '?', users === 0 ? 'Nessun utente ancora' : users === 1 ? '1 account registrato' : `${users} account registrati`);
+  setMetric('pois',  pois  ?? '?', pois === 0  ? 'Nessun POI pubblico' : `${pois} POI in community`);
+  setMetric('loves', loves ?? '?', loves === 0 ? 'Nessun love ancora'  : `${loves} love totali`);
+  setMetric('lists', lists ?? '?', lists === 0 ? 'Nessuna lista pubblica' : `${lists} liste pubbliche`);
+
+  log(`Metriche DB — utenti:${users ?? '?'} POI:${pois ?? '?'} loves:${loves ?? '?'} liste:${lists ?? '?'}`, 'info');
+}
+
+/* ════════════════════════════════════════
+   OVERALL STATUS
+════════════════════════════════════════ */
+function updateOverall(results) {
+  const oks = results.filter(Boolean).length;
+  const total = results.length;
+  const dot = document.getElementById('overallDot');
+  const text = document.getElementById('overallText');
+  dot.className = 'dot';
+  if (oks === total) {
+    dot.classList.add('ok');
+    text.textContent = `Tutti i servizi online (${total}/${total})`;
+  } else if (oks >= total - 1) {
+    dot.classList.add('warn');
+    text.textContent = `Degradato (${oks}/${total} online)`;
+  } else {
+    dot.classList.add('err');
+    text.textContent = `Problemi rilevati (${oks}/${total} online)`;
+  }
+}
+
+/* ════════════════════════════════════════
+   RUN ALL
+════════════════════════════════════════ */
+async function runAllChecks() {
+  logClear();
+  log('Avvio diagnostica completa…', 'info');
+
+  const [sbRest, sbAuth, sbStorage, media, demo, sal, web] = await Promise.all([
+    checkSupabaseRest(),
+    checkSupabaseAuth(),
+    checkSupabaseStorage(),
+    checkMedia(),
+    checkSite('demo', 'https://demo.poilove.com/', 'demo.poilove.com'),
+    checkSite('sal',  'https://sal.poilove.com/',  'sal.poilove.com'),
+    checkSite('web',  'https://poilove.com/',       'poilove.com'),
+  ]);
+
+  await loadMetrics();
+
+  updateOverall([sbRest, sbAuth, sbStorage, media, demo, sal, web]);
+
+  const now = new Date().toLocaleTimeString('it-IT');
+  document.getElementById('lastCheck').textContent = `Aggiornato alle ${now}`;
+  document.getElementById('footerTime').textContent = `Ultimo aggiornamento: ${new Date().toLocaleString('it-IT')}`;
+
+  log('Diagnostica completata.', 'info');
+}
+
+/* ════════════════════════════════════════
+   PING MANUALE SUPABASE
+════════════════════════════════════════ */
+async function pingSupabase() {
+  const el = document.getElementById('pingResult');
+  el.className = 'ping-result visible';
+  el.textContent = 'Invio ping a Supabase…';
+
+  const t0 = Date.now();
+  try {
+    const r = await fetchTimeout(
+      `${SB_URL}/rest/v1/categories?limit=1&select=slug`,
+      { headers: { apikey: SB_KEY, Accept: 'application/json' } }
+    );
+    const lat = Date.now() - t0;
+    if (r.ok) {
+      el.className = 'ping-result visible';
+      el.textContent = `✅ Supabase risponde — ${lat}ms\n${new Date().toLocaleString('it-IT')}\nProgetto attivo. Prossima pausa resettata di 7 giorni.`;
+      log(`Ping manuale ✅ — ${lat}ms — progetto Supabase mantenuto attivo`, 'ok');
+    } else {
+      el.className = 'ping-result visible error';
+      el.textContent = `❌ Supabase ha risposto HTTP ${r.status} — ${lat}ms\nControlla il dashboard Supabase.`;
+      log(`Ping manuale ❌ — HTTP ${r.status}`, 'err');
+    }
+  } catch(e) {
+    el.className = 'ping-result visible error';
+    el.textContent = `❌ Supabase non raggiungibile\n${e.message}\nIl progetto potrebbe essere in pausa. Apri il dashboard Supabase per riattivarlo.`;
+    log(`Ping manuale ❌ — ${e.message}`, 'err');
+  }
+}
+
+/* ════════════════════════════════════════
+   GO-LIVE CHECKLIST — persistenza locale
+════════════════════════════════════════ */
+function toggleCheck(el) {
+  el.classList.toggle('checked');
+  saveChecklist();
+}
+
+function saveChecklist() {
+  const boxes = document.querySelectorAll('.golive-cb');
+  const state = Array.from(boxes).map(b => b.classList.contains('checked'));
+  try { localStorage.setItem('poilove_golive_checks', JSON.stringify(state)); } catch(_) {}
+}
+
+function loadChecklist() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('poilove_golive_checks') || '[]');
+    const boxes = document.querySelectorAll('.golive-cb');
+    boxes.forEach((b, i) => { if (saved[i]) b.classList.add('checked'); });
+  } catch(_) {}
+}
+
+/* ════════════════════════════════════════
+   AUTO-REFRESH ogni 60 secondi
+════════════════════════════════════════ */
+let autoRefreshTimer = null;
+
+function startAutoRefresh() {
+  autoRefreshTimer = setInterval(runAllChecks, 60000);
+}
+
+/* ════════════════════════════════════════
+   INIT
+════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  loadChecklist();
+  runAllChecks();
+  startAutoRefresh();
+  document.getElementById('footerTime').textContent = `Avviato: ${new Date().toLocaleString('it-IT')}`;
+});
+</script>
+</body>
+</html>
