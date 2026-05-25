@@ -1301,7 +1301,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
     <div class="sh-handle"></div>
     <div class="sh-head">
       <div>
-        <div class="sh-title">🧭 Compagni di Viaggio</div>
+        <div class="sh-title" id="compSheetTitle">🧭 Compagni di Viaggio</div>
         <div class="sh-sub">Condividi la tua posizione GPS in tempo reale con gli amici</div>
       </div>
       <button class="sh-close" onclick="closeSheet('compagniaOv','compagniaBg','compagniaSheet')"><i class="ph-duotone ph-x"></i></button>
@@ -1377,7 +1377,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
       <input id="compInvites" type="text" placeholder="liri@example.com, marco@..." style="width:100%;height:42px;border:1.5px solid var(--border);border-radius:11px;padding:0 14px;font-size:13px;font-family:inherit;outline:none;background:var(--card);color:var(--text);margin-bottom:14px;box-sizing:border-box"/>
 
       <!-- Azione: crea + condividi -->
-      <button onclick="createCompagnia()" style="width:100%;height:48px;border-radius:14px;background:var(--red);color:#fff;border:none;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;letter-spacing:.3px">
+      <button id="compSaveBtn" onclick="createCompagnia()" style="width:100%;height:48px;border-radius:14px;background:var(--red);color:#fff;border:none;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;letter-spacing:.3px">
         <i class="ph-duotone ph-users-three"></i> Crea gruppo e ottieni codice
       </button>
       <p style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5;text-align:center">
@@ -1386,6 +1386,48 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 
       <button class="compagnia-stop vis" id="compagniaStopBtn" onclick="stopCompagnia();closeSheet('compagniaOv','compagniaBg','compagniaSheet')" style="display:none;margin-top:14px">
         <i class="ph-duotone ph-stop-circle"></i> Lascia il gruppo
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── SHEET NUOVO VIAGGIO ── -->
+<div class="sheet-overlay" id="newTripOv">
+  <div class="sheet-backdrop" id="newTripBg" onclick="closeNewTripSheet()"></div>
+  <div class="sheet" id="newTripSheet">
+    <div class="sh-handle"></div>
+    <div class="sh-head">
+      <div>
+        <div class="sh-title">✈️ Nuovo Viaggio</div>
+        <div class="sh-sub">Crea l'itinerario — poi aggiungi tappe e condividilo</div>
+      </div>
+      <button class="sh-close" onclick="closeNewTripSheet()"><i class="ph-duotone ph-x"></i></button>
+    </div>
+    <div class="sh-body" style="padding-bottom:28px">
+      <label style="display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">Nome del viaggio *</label>
+      <input id="newTripName" type="text" maxlength="60" placeholder="Es: Tirana Weekend, Albania Estate 2026…"
+        oninput="const _b=document.getElementById('newTripSaveBtn');_b.disabled=!this.value.trim();_b.style.opacity=this.value.trim()?'1':'.5'"
+        style="width:100%;height:42px;border:1.5px solid var(--border);border-radius:11px;padding:0 14px;font-size:14px;font-family:inherit;outline:none;background:var(--card);color:var(--text);margin-bottom:12px;box-sizing:border-box"/>
+
+      <label style="display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">Destinazione</label>
+      <input id="newTripDest" type="text" maxlength="60" placeholder="Es: Tirana, Albania"
+        style="width:100%;height:42px;border:1.5px solid var(--border);border-radius:11px;padding:0 14px;font-size:14px;font-family:inherit;outline:none;background:var(--card);color:var(--text);margin-bottom:12px;box-sizing:border-box"/>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+        <div>
+          <label style="display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px"><i class="ph-duotone ph-calendar-blank" style="font-size:12px"></i> Inizio</label>
+          <input id="newTripStart" type="date" style="width:100%;height:42px;border:1.5px solid var(--border);border-radius:11px;padding:0 12px;font-size:13px;font-family:inherit;background:var(--card);color:var(--text);outline:none;box-sizing:border-box">
+        </div>
+        <div>
+          <label style="display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px"><i class="ph-duotone ph-calendar-check" style="font-size:12px"></i> Fine</label>
+          <input id="newTripEnd" type="date" style="width:100%;height:42px;border:1.5px solid var(--border);border-radius:11px;padding:0 12px;font-size:13px;font-family:inherit;background:var(--card);color:var(--text);outline:none;box-sizing:border-box">
+        </div>
+      </div>
+
+      <button id="newTripSaveBtn" onclick="saveNewTrip()" disabled
+        style="width:100%;height:48px;border-radius:14px;background:var(--red);color:#fff;border:none;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;letter-spacing:.3px;opacity:.5;transition:opacity .2s"
+        oninput="this.style.opacity=this.disabled?'.5':'1'">
+        <i class="ph-duotone ph-airplane-tilt"></i> Crea viaggio
       </button>
     </div>
   </div>
@@ -5420,11 +5462,55 @@ function onCompTypeChange(){
   const dateBlock = document.getElementById('compDateBlock');
   if(dateBlock) dateBlock.style.display = (sel==='forever') ? 'none' : 'block';
 }
+// ── Compagnie: localStorage persistence ──
+let _editingCompCode = null; // null = crea, stringa = modifica
+
+function _getCompagnie(){
+  try{ return JSON.parse(localStorage.getItem('poi_compagnie')||'[]'); }catch(e){ return []; }
+}
+function _saveCompagnie(arr){
+  try{ localStorage.setItem('poi_compagnie', JSON.stringify(arr)); }catch(e){}
+}
+
+function openEditCompagnia(code){
+  const all = _getCompagnie();
+  const c = all.find(x=>x.code===code);
+  if(!c) return;
+  _editingCompCode = code;
+  // Pre-fill form
+  document.getElementById('compNewName').value = c.name || '';
+  document.getElementById('compDesc').value    = c.desc || '';
+  document.getElementById('compStartDate').value = c.startDate || '';
+  document.getElementById('compStartTime').value = c.startTime || '';
+  document.getElementById('compEndDate').value   = c.endDate   || '';
+  document.getElementById('compEndTime').value   = c.endTime   || '';
+  // Tipo
+  const typeInput = document.querySelector(`input[name="compType"][value="${c.type||'trip'}"]`);
+  if(typeInput){ typeInput.checked=true; onCompTypeChange?.(); }
+  // UI edit mode
+  const titleEl = document.getElementById('compSheetTitle');
+  if(titleEl) titleEl.textContent = '✏️ Modifica gruppo';
+  const saveBtn = document.getElementById('compSaveBtn');
+  if(saveBtn) saveBtn.innerHTML = '<i class="ph-duotone ph-floppy-disk"></i> Aggiorna gruppo';
+  openSheet('compagniaOv','compagniaBg','compagniaSheet');
+  document.getElementById('compagniaSheet')?.scrollTo({top:0,behavior:'instant'});
+}
+
+function _resetCompSheet(){
+  _editingCompCode = null;
+  const titleEl = document.getElementById('compSheetTitle');
+  if(titleEl) titleEl.textContent = '🧭 Compagni di Viaggio';
+  const saveBtn = document.getElementById('compSaveBtn');
+  if(saveBtn) saveBtn.innerHTML = '<i class="ph-duotone ph-users-three"></i> Crea gruppo e ottieni codice';
+  // Reset campi
+  ['compNewName','compDesc','compInvites','compStartDate','compStartTime','compEndDate','compEndTime']
+    .forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+}
+
 function createCompagnia(){
   const name = (document.getElementById('compNewName')?.value || '').trim();
   if(!name){
-    if(typeof showToast==='function') showToast('Nome del gruppo obbligatorio');
-    else alert('Nome del gruppo obbligatorio');
+    showToast?.('Nome del gruppo obbligatorio');
     return;
   }
   const type = document.querySelector('input[name="compType"]:checked')?.value || 'trip';
@@ -5434,45 +5520,57 @@ function createCompagnia(){
   const endTime   = document.getElementById('compEndTime')?.value   || '';
   const desc      = (document.getElementById('compDesc')?.value     || '').trim();
   const invites   = (document.getElementById('compInvites')?.value  || '').trim();
-  // Genera codice 6 caratteri
+
+  const typeLabel = type==='forever' ? 'Per sempre 🥰' : type==='dinner' ? 'Una cena 🍽️' : 'Un viaggio ✈️';
+  const range = type==='forever' ? '' : (startDate? `${startDate}${startTime?' '+startTime:''} → ${endDate}${endTime?' '+endTime:''}` : '');
+
+  if(_editingCompCode){
+    // ── MODIFICA compagnia esistente ──
+    const all = _getCompagnie();
+    const idx = all.findIndex(x=>x.code===_editingCompCode);
+    if(idx>=0){
+      all[idx] = {...all[idx], name, type, startDate, startTime, endDate, endTime, desc};
+      _saveCompagnie(all);
+      showToast?.(`✓ "${name}" aggiornato!`);
+    }
+    _resetCompSheet();
+    closeSheet('compagniaOv','compagniaBg','compagniaSheet');
+    renderCompanionsTab();
+    return;
+  }
+
+  // ── CREA nuova compagnia ──
   const alphabet = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
   let code = '';
   for(let i=0;i<6;i++) code += alphabet[Math.floor(Math.random()*alphabet.length)];
 
-  const typeLabel = type==='forever' ? 'Per sempre 🥰' : type==='dinner' ? 'Una cena 🍽️' : 'Un viaggio ✈️';
-  const range = type==='forever' ? '' : (startDate? `${startDate} ${startTime} → ${endDate} ${endTime}` : '');
+  const newComp = { name, code, type, startDate, startTime, endDate, endTime, desc, joined:true,
+    forever: type==='forever', expires: endDate || null, friends:[], createdAt: Date.now() };
+  const all = _getCompagnie();
+  all.unshift(newComp);
+  _saveCompagnie(all);
 
-  if(typeof showToast==='function') showToast(`✓ "${name}" creato! Codice: ${code} — ${typeLabel}${range?' · '+range:''}`);
-  else alert(`Gruppo "${name}" creato!\nCodice: ${code}\n${typeLabel}\n${range}\n${desc?'Descrizione: '+desc:''}`);
-
-  // Copia codice in clipboard (fail-silent)
+  showToast?.(`✓ "${name}" creato! Codice: ${code} — ${typeLabel}${range?' · '+range:''}`);
   if(navigator.clipboard) navigator.clipboard.writeText(code).catch(()=>{});
 
-  // Invio email reale via mailto: (apre il client mail dell'utente con tutto precompilato)
+  // Invio email
   if(invites){
     const recipients = invites.split(/[,;\s]+/).map(s=>s.trim()).filter(s=>s.includes('@'));
     if(recipients.length){
       const senderName = currentUser?.user_metadata?.full_name || currentUser?.user_metadata?.name || 'Un amico';
       const joinUrl = `https://demo.poilove.com/?join=${code}`;
       const subject = `${senderName} ti ha invitato a unirti a "${name}" su POI•LOVE`;
-      const body =
-        `Ciao!\n\n` +
-        `${senderName} ti invita a unirti a "${name}" — ${typeLabel}.\n` +
-        (range ? `📅 ${range}\n` : '') +
-        (desc ? `\n${desc}\n` : '') +
-        `\n🔑 Codice gruppo: ${code}\n` +
-        `🔗 Link diretto: ${joinUrl}\n\n` +
-        `Su POI•LOVE pianifichiamo viaggi insieme, scopriamo luoghi del cuore e ci ritroviamo sulla mappa.\n\n` +
-        `A presto,\n${senderName}`;
-      const href = `mailto:${encodeURIComponent(recipients.join(','))}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-      // Apre il client email dell'utente (Gmail, Mail.app, Outlook…)
-      window.location.href = href;
+      const body = `Ciao!\n\n${senderName} ti invita a unirti a "${name}" — ${typeLabel}.\n`+
+        (range?`📅 ${range}\n`:'')+( desc?`\n${desc}\n`:'')+
+        `\n🔑 Codice gruppo: ${code}\n🔗 Link diretto: ${joinUrl}\n\nA presto,\n${senderName}`;
+      window.location.href=`mailto:${encodeURIComponent(recipients.join(','))}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
       setTimeout(()=>showToast?.(`📧 Invito pronto per ${recipients.length} destinatar${recipients.length===1?'io':'i'}`),300);
     }
   }
 
+  _resetCompSheet();
   closeSheet('compagniaOv','compagniaBg','compagniaSheet');
-  if(document.getElementById('companionsView')?.classList.contains('active')) renderCompanionsTab();
+  renderCompanionsTab();
 }
 
 /* ══════════════════════════════════════════
@@ -5481,31 +5579,30 @@ function createCompagnia(){
 function renderCompanionsTab(){
   const root = document.getElementById('companions-list');
   if(!root) return;
-  // DEMO data — in produzione viene da Supabase
-  const compagnie = [
+
+  // Legge compagnie salvate + aggiunge demo solo se localStorage è vuoto
+  const saved = _getCompagnie();
+  const demoCompagnie = saved.length ? [] : [
     { name:'Tirana Weekend', code:'TR2026', forever:false, expires:'2026-05-20', joined:true,
-      friends:[
-        {name:'Liri V.',  status:'traveling'},
-        {name:'Marco S.', status:'traveling'},
-        {name:'Anna B.',  status:'still'}
-      ]
-    },
+      friends:[{name:'Liri V.',status:'traveling'},{name:'Marco S.',status:'traveling'},{name:'Anna B.',status:'still'}]},
     { name:'Cuori in Cammino', code:'LOVE99', forever:true, expires:null, joined:true,
-      friends:[
-        {name:'Elena R.', status:'stopped'},
-        {name:'Davide T.', status:'still'}
-      ]
-    },
-    { name:'Balcani 2025', code:'BLK425', forever:false, expires:'2025-09-30', joined:false,
-      friends:[]
-    }
+      friends:[{name:'Elena R.',status:'stopped'},{name:'Davide T.',status:'still'}]},
+    { name:'Balcani 2025', code:'BLK425', forever:false, expires:'2025-09-30', joined:false, friends:[]}
   ];
+  const compagnie = [...saved, ...demoCompagnie];
+
+  if(!compagnie.length){
+    root.innerHTML='<div class="poi-list-empty">Nessun gruppo ancora. Tocca <strong>+</strong> per crearne uno.</div>';
+    return;
+  }
+
   root.innerHTML = compagnie.map(c=>{
     const statusEmoji = c.forever ? '🥰' : '👀';
     const statusTxt   = c.forever ? 'Per sempre' : (c.expires ? 'Scade '+c.expires : 'In corso');
-    const friends = c.friends.map(f=>{
-      const cls = f.status==='traveling' ? 'fs-traveling' : f.status==='stopped' ? 'fs-stopped' : 'fs-still';
-      const lbl = f.status==='traveling' ? 'In viaggio' : f.status==='stopped' ? 'Fermo' : 'Offline';
+    const isMine = saved.some(x=>x.code===c.code); // solo le compagnie create da me sono modificabili
+    const friends = (c.friends||[]).map(f=>{
+      const cls = f.status==='traveling'?'fs-traveling':f.status==='stopped'?'fs-stopped':'fs-still';
+      const lbl = f.status==='traveling'?'In viaggio':f.status==='stopped'?'Fermo':'Offline';
       const initials = f.name.split(' ').map(s=>s[0]).join('').slice(0,2).toUpperCase();
       const safeName = f.name.replace(/'/g,"\\'").replace(/"/g,'&quot;');
       return `<div class="friend-row" onclick="openPublicProfile('${safeName}','${f.status}','friend')">
@@ -5516,15 +5613,21 @@ function renderCompanionsTab(){
     }).join('');
     if(!c.joined){
       return `<div class="comp-card left">
-        <div class="comp-row"><div class="comp-name">${c.name}</div><div class="comp-status" title="${statusTxt}">${statusEmoji}</div></div>
+        <div class="comp-row"><div class="comp-name">${c.name}</div><div class="comp-status">${statusEmoji}</div></div>
         <div><span class="comp-code">${c.code}</span><span class="comp-meta">Sei uscito · ${statusTxt}</span></div>
-        <div style="margin-top:10px"><button class="comp-code" style="background:var(--red);color:#fff;border:none;cursor:pointer;letter-spacing:.5px;padding:8px 14px;font-size:11px">Richiedi accesso</button></div>
       </div>`;
     }
-    return `<div class="comp-card">
-      <div class="comp-row"><div class="comp-name">${c.name}</div><div class="comp-status" title="${statusTxt}">${statusEmoji}</div></div>
+    const safeCode = (c.code||'').replace(/'/g,"\\'");
+    return `<div class="comp-card" style="cursor:pointer" onclick="openEditCompagnia('${safeCode}')">
+      <div class="comp-row">
+        <div class="comp-name">${c.name}</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          ${isMine?`<button style="background:none;border:none;cursor:pointer;color:var(--blue);padding:0;font-size:14px" title="Modifica" onclick="event.stopPropagation();openEditCompagnia('${safeCode}')"><i class="ph-duotone ph-pencil-simple"></i></button>`:''}
+          <div class="comp-status" title="${statusTxt}">${statusEmoji}</div>
+        </div>
+      </div>
       <div><span class="comp-code">${c.code}</span><span class="comp-meta">${statusTxt}</span></div>
-      <div class="comp-friends">${friends}</div>
+      ${friends?`<div class="comp-friends">${friends}</div>`:''}
     </div>`;
   }).join('');
 }
@@ -7085,6 +7188,11 @@ function togglePublicBlock(){
    TRIPS — Data Model
 ══════════════════════════════════════════ */
 const TRIPS={};
+// Ripristina i viaggi salvati in localStorage
+try{
+  const _savedTrips = JSON.parse(localStorage.getItem('poi_trips')||'{}');
+  Object.assign(TRIPS, _savedTrips);
+}catch(e){}
 
 const CAL_STATE={};
 const itinMaps={};
@@ -7430,7 +7538,54 @@ function changeTripCover(tripId){
   openTripCoverPicker(tripId);
 }
 function openNewTrip(){
-  showToast(lang==='it'?'Crea nuovo viaggio — disponibile nell\'app':lang==='sq'?'Udhëtim i ri — aktiv në aplikacion':'New trip — available in app');
+  // Reset form
+  ['newTripName','newTripDest','newTripStart','newTripEnd'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  const btn=document.getElementById('newTripSaveBtn');
+  if(btn){ btn.disabled=true; btn.style.opacity='.5'; }
+  openSheet('newTripOv','newTripBg','newTripSheet');
+}
+function closeNewTripSheet(){ closeSheet('newTripOv','newTripBg','newTripSheet'); }
+
+function saveNewTrip(){
+  const name = (document.getElementById('newTripName')?.value||'').trim();
+  if(!name) return;
+  const dest  = (document.getElementById('newTripDest')?.value||'').trim() || 'Destinazione';
+  const start = document.getElementById('newTripStart')?.value || '';
+  const end   = document.getElementById('newTripEnd')?.value   || '';
+
+  // Formatta date leggibili
+  const fmtDate = d => { if(!d) return ''; const p=d.split('-'); return `${p[2]}/${p[1]}/${p[0]}`; };
+  const dateStr = start ? (end&&end!==start ? `${fmtDate(start)} → ${fmtDate(end)}` : fmtDate(start)) : '';
+
+  const id = 'trip-'+Date.now();
+  const trip = {
+    id, name,
+    badge:  dest,
+    dates:  dateStr,
+    cover:  `https://source.unsplash.com/800x400/?${encodeURIComponent(dest.split(',')[0])},travel`,
+    companions: [],
+    stops:  [],
+    shareId: id,
+    calYear:  start ? parseInt(start.split('-')[0]) : new Date().getFullYear(),
+    calMonth: start ? parseInt(start.split('-')[1]) : new Date().getMonth()+1,
+    visibility: 'prv'
+  };
+  TRIPS[id] = trip;
+
+  // Persisti in localStorage
+  try{
+    const saved = JSON.parse(localStorage.getItem('poi_trips')||'{}');
+    saved[id] = trip;
+    localStorage.setItem('poi_trips', JSON.stringify(saved));
+  }catch(e){}
+
+  closeNewTripSheet();
+  renderTripCards();
+  showToast(`✈️ "${name}" creato! Tocca la card per aggiungere tappe.`);
+  // Passa alla tab itinerari se non già lì
+  if(typeof setItinSubtab==='function') setItinSubtab('trips');
 }
 
 /* ── ITINERARY SEARCH ── */
