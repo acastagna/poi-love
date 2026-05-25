@@ -675,7 +675,7 @@ button{touch-action:manipulation}
 .gps-register-bar button{height:30px;padding:0 14px;border-radius:15px;background:var(--blue);border:none;color:#fff;font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;font-family:inherit}
 
 /* ── MARKER ── */
-.poi-marker{display:flex;flex-direction:column;align-items:center;cursor:pointer;filter:drop-shadow(0 2px 6px rgba(212,43,43,.35))}
+.poi-marker{display:flex;flex-direction:column;align-items:center;cursor:pointer;filter:drop-shadow(0 2px 6px rgba(212,43,43,.35));pointer-events:all;touch-action:manipulation}
 .poi-bubble{width:36px;height:36px;border-radius:50%;background:var(--red);border:2.5px solid #fff;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;position:relative}
 .poi-badge{position:absolute;top:-6px;right:-6px;background:#fff;color:var(--red);font-size:8px;font-weight:900;border-radius:6px;padding:1px 4px;border:1px solid var(--red)}
 .poi-tail{width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:8px solid var(--red);margin-top:-1px}
@@ -2964,13 +2964,20 @@ function addDBMarker(p) {
   // Accumula i POI DB in un array globale (usato dal popup mappa e dalla tab Miei)
   if (!window._dbPOIs) window._dbPOIs = [];
   if (!window._dbPOIs.find(x => x.id === p.id)) window._dbPOIs.push(p);
-  const label = p.name.length > 11 ? p.name.substring(0, 11) + '…' : p.name;
+  const nm = p.name || '';
+  const label = nm.length > 11 ? nm.substring(0, 11) + '…' : nm;
+  // safeId: UUID contiene solo [a-f0-9\-], nessun rischio XSS
+  const safeId = String(p.id || '').replace(/[^a-zA-Z0-9\-_]/g, '');
+  // onclick inline: più affidabile di Leaflet .on('click') su mobile (iOS Safari)
+  // stopPropagation evita che il detector double-tap della mappa intercetti il tap
+  const onclickJs = `event.stopPropagation();(()=>{const p=(window._dbPOIs||[]).find(x=>x.id==='${safeId}');if(p)openDBDetail(p)})()`;
   const icon = L.divIcon({
     className: '',
-    html: `<div class="poi-marker"><div class="poi-bubble"><i class="ph-duotone ph-map-pin" style="font-size:15px;color:#fff;pointer-events:none"></i><div class="poi-badge">${p.love_count || 0}</div></div><div class="poi-tail"></div><div class="poi-label">${label}</div></div>`,
+    html: `<div class="poi-marker" onclick="${onclickJs}"><div class="poi-bubble"><i class="ph-duotone ph-map-pin" style="font-size:15px;color:#fff;pointer-events:none"></i><div class="poi-badge">${p.love_count || 0}</div></div><div class="poi-tail"></div><div class="poi-label">${label.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div></div>`,
     iconSize: [36, 58], iconAnchor: [18, 58]
   });
-  L.marker([p.lat, p.lng], { icon }).addTo(map).on('click', () => openDBDetail(p));
+  // Nota: .on('click') rimosso — gestito dall'onclick inline per compatibilità mobile
+  L.marker([p.lat, p.lng], { icon }).addTo(map);
 }
 
 function openDBDetail(p) {
@@ -3637,10 +3644,10 @@ function initMap(){
   POIS.forEach((p,i)=>{
     const icon=L.divIcon({
       className:'',
-      html:`<div class="poi-marker"><div class="poi-bubble"><i class="ph-duotone ph-map-pin" style="font-size:15px;color:#fff;pointer-events:none"></i><div class="poi-badge">${p.love}</div></div><div class="poi-tail"></div><div class="poi-label">${p.name.length>11?p.name.substring(0,11)+'…':p.name}</div></div>`,
+      html:`<div class="poi-marker" onclick="event.stopPropagation();openDetail(${i})"><div class="poi-bubble"><i class="ph-duotone ph-map-pin" style="font-size:15px;color:#fff;pointer-events:none"></i><div class="poi-badge">${p.love}</div></div><div class="poi-tail"></div><div class="poi-label">${(p.name.length>11?p.name.substring(0,11)+'…':p.name).replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div></div>`,
       iconSize:[36,58],iconAnchor:[18,58]
     });
-    L.marker([p.lat,p.lng],{icon}).addTo(map).on('click',()=>openDetail(i));
+    L.marker([p.lat,p.lng],{icon}).addTo(map);
   });
 
   // Detect GPS — centra mappa + marker "Tu sei qui"
