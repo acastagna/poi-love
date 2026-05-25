@@ -2226,13 +2226,13 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
       <!-- RACCONTA + VOCE + AI -->
       <div class="sec-lbl">
         <span data-t="lbl_story">Racconta</span>
-        <span id="charCount" style="font-size:10px;color:var(--muted)">0 / 1000</span>
+        <span id="charCount" style="font-size:10px;color:var(--muted)">0 / 200</span>
       </div>
       <div class="story-actions">
         <button class="voice-btn" id="voiceBtn" onclick="toggleVoice()"><i class="ph-duotone ph-microphone"></i> <span id="voiceBtnLbl">Dett.</span></button>
         <button class="ai-btn" id="aiSumBtn" onclick="aiSummarize()"><i class="ph-duotone ph-sparkle"></i> <span id="aiSumLbl">AI</span></button>
       </div>
-      <textarea class="field-in field-ta" id="storyIn" placeholder="L'anima di questo posto… (fino a 1000 caratteri)" maxlength="1000" oninput="updateChar();const lbl=document.getElementById('aiSumLbl');if(lbl)lbl.textContent=this.value.trim().length<20?'Genera':'Riassumi'"></textarea>
+      <textarea class="field-in field-ta" id="storyIn" placeholder="L'anima di questo posto… (fino a 200 caratteri)" maxlength="200" oninput="updateChar();const lbl=document.getElementById('aiSumLbl');if(lbl)lbl.textContent=this.value.trim().length<20?'Genera':'Riassumi'"></textarea>
 
       <!-- CATEGORIE -->
       <div class="sec-lbl">
@@ -4187,7 +4187,7 @@ function initVoice(){
   recognition.onresult=e=>{
     const transcript=Array.from(e.results).map(r=>r[0].transcript).join('');
     const ta=document.getElementById('storyIn');
-    ta.value=transcript.substring(0,1000);updateChar();
+    ta.value=transcript.substring(0,200);updateChar();
   };
   recognition.onend=()=>{isRecording=false;setVoiceBtnState(false)};
   recognition.onerror=()=>{isRecording=false;setVoiceBtnState(false)};
@@ -5683,8 +5683,8 @@ function checkSave(){
 function updateChar(){
   const v=document.getElementById('storyIn').value.length;
   const el=document.getElementById('charCount');
-  if(el)el.textContent=`${v} / 1000`;
-  el.style.color=v>900?'var(--red)':v>700?'var(--orange)':'var(--muted)';
+  if(el)el.textContent=`${v} / 200`;
+  el.style.color=v>180?'var(--red)':v>140?'var(--orange)':'var(--muted)';
 }
 let locActiveTab='gps'; // traccia tab attivo corrente
 let mapTapListenerActive=false;
