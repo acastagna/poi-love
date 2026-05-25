@@ -488,14 +488,14 @@
           <div class="issue-title">Google OAuth — redirect URL non configurato</div>
           <div class="issue-desc">Aggiungere <code>https://demo.poilove.com</code> in Supabase Auth → URL Configuration → Allowed Redirect URLs. Senza questo, nessun utente riesce a registrarsi.</div>
         </div>
-        <div class="issue-badge badge-open" id="issue1-badge">APERTO</div>
+        <div class="issue-badge badge-done" id="issue1-badge">✓ RISOLTO</div>
       </div>
 
       <div class="issue-row">
         <div class="issue-icon">👥</div>
         <div class="issue-body">
           <div class="issue-title">Profilo hardcoded — dati falsi visibili</div>
-          <div class="issue-desc">Mirela K., Arben S., Liri V., "87 love", "Amatore" sono HTML statico in demo/index.html (righe 1686–1860). Non vengono dal database.</div>
+          <div class="issue-desc">Mirela K., Arben S., Liri V., "87 love", "Amatore" sono HTML statico in demo/index.html (righe 1686–1860). Non vengono dal database. Da fare prima del lancio.</div>
         </div>
         <div class="issue-badge badge-open">APERTO</div>
       </div>
@@ -503,19 +503,19 @@
       <div class="issue-row">
         <div class="issue-icon">🗄️</div>
         <div class="issue-body">
-          <div class="issue-title">INSERT policy mancante su profiles</div>
-          <div class="issue-desc">La tabella profiles ha SELECT e UPDATE ma non INSERT per utenti autenticati. Se il trigger handle_new_user fallisce, l'upsert JS fallisce silenziosamente e i POI non si salvano (FK violation).</div>
+          <div class="issue-title">INSERT policy su profiles</div>
+          <div class="issue-desc">✓ Policy aggiunta il 25/05/2026 via SQL Editor. Il trigger handle_new_user è SECURITY DEFINER e crea il profilo al signup.</div>
         </div>
-        <div class="issue-badge badge-open" id="issue3-badge">APERTO</div>
+        <div class="issue-badge badge-done" id="issue3-badge">✓ RISOLTO</div>
       </div>
 
       <div class="issue-row">
         <div class="issue-icon">📝</div>
         <div class="issue-body">
-          <div class="issue-title">Description limit: DB 200 chars vs form 1000</div>
-          <div class="issue-desc">Il CHECK constraint in pois dice max 200 chars. Il form mostra "0 / 1000". Qualsiasi testo &gt; 200 chars fa fallire l'INSERT senza errore visibile.</div>
+          <div class="issue-title">Description limit allineato a 1000 chars</div>
+          <div class="issue-desc">✓ CHECK constraint aggiornato il 25/05/2026. DB e form ora concordano su 1000 caratteri max.</div>
         </div>
-        <div class="issue-badge badge-open" id="issue4-badge">APERTO</div>
+        <div class="issue-badge badge-done" id="issue4-badge">✓ RISOLTO</div>
       </div>
 
       <div class="issue-row">
@@ -530,10 +530,10 @@
       <div class="issue-row">
         <div class="issue-icon">🖼️</div>
         <div class="issue-body">
-          <div class="issue-title">media.poilove.com — 503 + DNS server-side rotto</div>
-          <div class="issue-desc">Il server non risolve supabase.co. Fix: SSH → aggiungere nameserver 8.8.8.8 in /etc/resolv.conf. Upload foto usa il fallback Supabase Storage ma potrebbe non funzionare.</div>
+          <div class="issue-title">media.poilove.com — CORS + Supabase connectivity</div>
+          <div class="issue-desc">✓ CORS headers aggiunti a test.php e upload.php il 25/05/2026. Server UP, Supabase raggiungibile. Bucket poi_photos mancante su Supabase Storage (fallback non disponibile, ma non critico).</div>
         </div>
-        <div class="issue-badge badge-open" id="issue6-badge">APERTO</div>
+        <div class="issue-badge badge-warn" id="issue6-badge">PARZIALE</div>
       </div>
 
     </div>
