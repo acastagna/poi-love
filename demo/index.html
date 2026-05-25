@@ -433,13 +433,22 @@ body.tab-active #mapQuickBtns{display:none}
 .comp-creator-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
 .comp-creator-av{width:28px;height:28px;border-radius:50%;object-fit:cover;border:2px solid #D97706;flex-shrink:0}
 .comp-creator-av-ph{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#D97706,#92400E);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:2px solid #D97706}
-.comp-creator-lbl{font-size:11px;font-weight:700;color:#D97706;display:flex;align-items:center;gap:4px;line-height:1.2}
+.comp-creator-lbl{font-size:11px;font-weight:700;color:#D97706;display:flex;align-items:center;gap:4px;line-height:1.2;flex:1}
 .comp-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
 .comp-name{font-size:15px;font-weight:800;color:var(--ink);flex:1}
 .comp-status{font-size:18px}
 .comp-code{display:inline-block;background:#EBF2FC;color:var(--blue);font-family:monospace;font-size:13px;font-weight:900;letter-spacing:3px;padding:4px 10px;border-radius:8px;margin-right:6px}
 .comp-meta{font-size:11px;color:var(--muted);margin-top:4px}
 .comp-friends{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+/* ── Riga azioni admin nella card ── */
+.comp-actions{display:flex;gap:6px;margin-top:12px;padding-top:10px;border-top:1px solid var(--border)}
+.comp-act{height:34px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:5px;padding:0 10px;transition:all .13s;-webkit-tap-highlight-color:transparent;white-space:nowrap}
+.comp-act:active{transform:scale(.95)}
+.comp-act.edit{color:var(--blue);border-color:var(--blue);background:#EBF2FC}
+.comp-act.adm{color:#D97706;border-color:#F59E0B;background:#FEF3C7}
+.comp-act.del{color:var(--red);border-color:var(--red);background:#FFF0F0;flex-shrink:0;padding:0 10px}
+.comp-act.del-off{color:var(--muted);border-color:var(--border);background:var(--bg);opacity:.45;cursor:default;flex-shrink:0;padding:0 10px}
+.comp-close-hint{font-size:10px;color:var(--muted);margin-top:6px;line-height:1.4}
 .friend-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid var(--border);cursor:pointer;transition:background .15s;border-radius:6px;padding-left:6px;padding-right:6px;margin:0 -6px}
 .friend-row:hover{background:#f5f0e8}
 .friend-row:active{background:#ede7dc}
@@ -5653,6 +5662,43 @@ function _resetCompSheet(){
     .forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
 }
 
+/* Chiude e scioglie una compagnia — solo se ≤ 2 membri totali */
+function deleteCompagnia(code){
+  const all = _getCompagnie();
+  const c = all.find(function(x){ return x.code===code; });
+  if(!c){ showToast('Compagnia non trovata'); return; }
+  const total = (c.friends||[]).length + 1;
+  if(total > 2){
+    showToast('⛔ Puoi chiudere il gruppo solo quando rimaste in 2');
+    return;
+  }
+  const ok = confirm(
+    'Chiudere "' + c.name + '"?\n\n' +
+    'Il gruppo verrà sciolto definitivamente.\n' +
+    'Questa azione è irreversibile.'
+  );
+  if(!ok) return;
+  _saveCompagnie(all.filter(function(x){ return x.code!==code; }));
+  renderCompanionsTab();
+  showToast('🗑 "' + c.name + '" chiusa');
+}
+
+/* Promuove tutti i partecipanti ad amministratori */
+function giveAdminToAll(code){
+  const all = _getCompagnie();
+  const idx = all.findIndex(function(x){ return x.code===code; });
+  if(idx<0) return;
+  const ok = confirm(
+    'Dare i permessi di amministratore a tutti i partecipanti di "' + all[idx].name + '"?\n\n' +
+    'Tutti potranno modificare e chiudere il gruppo.'
+  );
+  if(!ok) return;
+  all[idx].allAdmin = true;
+  _saveCompagnie(all);
+  renderCompanionsTab();
+  showToast('👑 Tutti i partecipanti sono ora amministratori');
+}
+
 function createCompagnia(){
   const name = (document.getElementById('compNewName')?.value || '').trim();
   if(!name){
@@ -5766,27 +5812,41 @@ function renderCompanionsTab(){
       </div>`;
     }
     const safeCode = (c.code||'').replace(/'/g,"\\'");
-    // Riga creatore: avatar + corona (solo per le compagnie create dall'utente corrente)
+    const friendsArr = c.friends || [];
+    const totalMembers = friendsArr.length + 1; // +1 = il creatore
+    const canClose = totalMembers <= 2;          // chiusura abilitata solo se ≤ 2 persone
+    const isAllAdmin = c.allAdmin === true;
+    // Riga creatore
     const creatorAvSrc = isMine ? (c.creatorAvatar || null) : null;
     const creatorInitial = isMine ? ((c.creatorName||'T')[0].toUpperCase()) : 'T';
     const creatorAv = creatorAvSrc
       ? `<img src="${creatorAvSrc}" class="comp-creator-av" onerror="this.outerHTML='<div class=comp-creator-av-ph>${creatorInitial}</div>'">`
       : `<div class="comp-creator-av-ph">${creatorInitial}</div>`;
+    const adminLabel = isAllAdmin ? 'Admin condivisa con tutti' : 'Creatore &amp; Amministratore';
     const creatorRow = isMine ? `<div class="comp-creator-row">
       ${creatorAv}
-      <span class="comp-creator-lbl"><i class="ph-duotone ph-crown" style="color:#D97706;font-size:14px"></i> Creatore della compagnia</span>
+      <span class="comp-creator-lbl"><i class="ph-duotone ph-crown" style="color:#D97706;font-size:14px"></i> ${adminLabel}</span>
+      <span style="font-size:10px;color:var(--muted);flex-shrink:0">${totalMembers} ${totalMembers===1?'membro':'membri'}</span>
     </div>` : '';
-    return `<div class="comp-card" style="cursor:pointer" onclick="${isMine?`openEditCompagnia('${safeCode}')`:''}" >
+    // Bottoni azione admin
+    const actEdit = `<button class="comp-act edit" onclick="event.stopPropagation();openEditCompagnia('${safeCode}')"><i class="ph-duotone ph-pencil-simple"></i> Modifica</button>`;
+    const actAdmin = (friendsArr.length > 0 && !isAllAdmin)
+      ? `<button class="comp-act adm" onclick="event.stopPropagation();giveAdminToAll('${safeCode}')"><i class="ph-duotone ph-crown"></i> Admin a tutti</button>`
+      : '';
+    const actDel = canClose
+      ? `<button class="comp-act del" title="Chiudi e scioglie il gruppo" onclick="event.stopPropagation();deleteCompagnia('${safeCode}')"><i class="ph-duotone ph-trash"></i></button>`
+      : `<button class="comp-act del-off" title="Disponibile solo quando rimangono in 2" disabled><i class="ph-duotone ph-trash"></i></button>`;
+    const actionsRow = isMine ? `<div class="comp-actions">${actEdit}${actAdmin}${actDel}</div>
+      ${!canClose?`<div class="comp-close-hint">🔒 Puoi chiudere il gruppo solo quando rimaste in 2 — ora ${totalMembers} ${totalMembers===1?'membro':'membri'}</div>`:''}` : '';
+    return `<div class="comp-card">
       ${creatorRow}
       <div class="comp-row">
         <div class="comp-name">${c.name}</div>
-        <div style="display:flex;align-items:center;gap:8px">
-          ${isMine?`<button style="background:none;border:none;cursor:pointer;color:var(--blue);padding:0;font-size:16px" title="Modifica" onclick="event.stopPropagation();openEditCompagnia('${safeCode}')"><i class="ph-duotone ph-pencil-simple"></i></button>`:''}
-          <div class="comp-status" title="${statusTxt}">${statusEmoji}</div>
-        </div>
+        <div class="comp-status" title="${statusTxt}">${statusEmoji}</div>
       </div>
       <div><span class="comp-code">${c.code}</span><span class="comp-meta">${statusTxt}</span></div>
       ${friends?`<div class="comp-friends">${friends}</div>`:''}
+      ${actionsRow}
     </div>`;
   }).join('');
 }
