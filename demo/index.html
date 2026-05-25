@@ -725,6 +725,24 @@ body.tab-active #mapQuickBtns{display:none}
 .da-nav{background:var(--blue);color:#fff;border-color:var(--blue)}
 .love-btn{height:38px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px;padding:0 14px;color:var(--muted);transition:all .2s;flex-shrink:0}
 .love-btn.loved{background:#FFF0F0;border-color:var(--red);color:var(--red)}
+/* ── Quick action bar nel detail sheet ── */
+.poi-quick-actions{display:flex;gap:8px;padding:12px 16px 14px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--border);background:var(--surface, #FFFDF9)}
+.poi-quick-actions::-webkit-scrollbar{display:none}
+.pqa-btn{display:flex;flex-direction:column;align-items:center;gap:5px;border:none;background:none;cursor:pointer;font-family:inherit;min-width:58px;-webkit-tap-highlight-color:transparent;flex-shrink:0;padding:0}
+.pqa-icon{width:52px;height:52px;border-radius:16px;background:#F4F0EB;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--text);transition:transform .13s,box-shadow .13s}
+.pqa-btn span{font-size:10px;font-weight:800;color:var(--muted);white-space:nowrap;letter-spacing:.2px}
+.pqa-btn:active .pqa-icon{transform:scale(.9)}
+.pqa-nav .pqa-icon{background:var(--blue);color:#fff;border-color:var(--blue);box-shadow:0 3px 10px rgba(40,94,167,.28)}
+.pqa-nav span{color:var(--blue)}
+.pqa-add .pqa-icon{background:#F0FAF4;color:#059669;border-color:#6EE7B7}
+.pqa-add span{color:#059669}
+.pqa-edit .pqa-icon{background:#EBF2FC;color:var(--blue);border-color:#93C5FD}
+.pqa-edit span{color:var(--blue)}
+.pqa-del .pqa-icon{background:#FFF0F0;color:var(--red);border-color:#FCA5A5}
+.pqa-del span{color:var(--red)}
+/* Love button grande e centrato */
+.love-row{display:flex;justify-content:center;margin:14px 0 10px}
+.love-btn-big{height:48px;border-radius:16px;font-size:16px;padding:0 36px;gap:8px}
 .author-row{display:flex;align-items:center;gap:10px;padding:12px 8px;cursor:pointer;border-radius:10px;transition:background .15s;margin:0 -8px}
 .author-row:hover{background:#f5f0e8}
 .author-row:active{background:#ede7dc}
@@ -2522,9 +2540,33 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
   <div class="sheet-backdrop" id="detailBg" onclick="closeDetail()"></div>
   <div class="sheet" id="detailSheet">
     <div class="sh-handle" id="detailHandle"></div>
-    <!-- Bottone X di chiusura (fix desktop: il sheet copre tutto il backdrop) -->
-    <button class="sh-close" onclick="closeDetail()" title="Chiudi" style="position:absolute;top:12px;right:14px;z-index:5"><i class="ph-duotone ph-x"></i></button>
-    <div style="padding:4px 20px 0">
+    <!-- Bottone X chiusura -->
+    <button class="sh-close" onclick="closeDetail()" title="Chiudi" style="position:absolute;top:12px;right:14px;z-index:6"><i class="ph-duotone ph-x"></i></button>
+    <!-- ── Quick action bar ── -->
+    <div class="poi-quick-actions" id="detailQuickActions">
+      <button class="pqa-btn pqa-nav" onclick="openNavigation()">
+        <div class="pqa-icon"><i class="ph-duotone ph-navigation-arrow"></i></div>
+        <span>Naviga</span>
+      </button>
+      <button class="pqa-btn pqa-add" onclick="addPoiToItinerary()">
+        <div class="pqa-icon"><i class="ph-duotone ph-plus-circle"></i></div>
+        <span>Aggiungi</span>
+      </button>
+      <button class="pqa-btn" onclick="shareDetail()">
+        <div class="pqa-icon"><i class="ph-duotone ph-share-network"></i></div>
+        <span>Condividi</span>
+      </button>
+      <button class="pqa-btn pqa-edit" id="detailEditBtn" onclick="openEditPOI()" style="display:none">
+        <div class="pqa-icon"><i class="ph-duotone ph-pencil-simple"></i></div>
+        <span>Modifica</span>
+      </button>
+      <button class="pqa-btn pqa-del" id="detailDeleteBtn" onclick="deleteCurrentPOI()" style="display:none">
+        <div class="pqa-icon"><i class="ph-duotone ph-trash"></i></div>
+        <span>Cancella</span>
+      </button>
+    </div>
+    <!-- ── Contenuto ── -->
+    <div style="padding:14px 20px 0">
       <div class="detail-photos" id="detailPhotos"></div>
       <div class="detail-tag" id="detailTag"><i class="ph-duotone ph-tag" style="font-size:11px"></i> Cultura</div>
       <div class="detail-name" id="detailName">—</div>
@@ -2536,19 +2578,14 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
         <button style="border:none;background:none;cursor:pointer;color:var(--orange)" onclick="copyDetailLink()"><i class="ph-duotone ph-copy"></i></button>
       </div>
       <div class="detail-desc" id="detailDesc">—</div>
-      <div class="detail-footer" style="margin-bottom:10px">
-        <div class="detail-actions">
-          <button class="detail-action-btn da-nav" onclick="openNavigation()"><i class="ph-duotone ph-navigation-arrow"></i><span>Naviga</span></button>
-          <button class="detail-action-btn" onclick="shareDetail()"><i class="ph-duotone ph-share-network"></i><span>Condividi</span></button>
-          <button class="detail-action-btn" id="editPoiBtn" onclick="openEditPOI()" style="display:none;background:#EBF2FC;border-color:var(--blue);color:var(--blue)"><i class="ph-duotone ph-pencil-simple"></i><span>Modifica</span></button>
-          <button class="detail-action-btn" id="deletePoiBtn" onclick="deleteCurrentPOI()" style="display:none;background:#FFF0F0;border-color:var(--red);color:var(--red)"><i class="ph-duotone ph-trash"></i><span>Elimina</span></button>
-        </div>
-        <button class="love-btn" id="loveBtn" onclick="toggleLove()">
+      <!-- Love button grande centrato -->
+      <div class="love-row">
+        <button class="love-btn love-btn-big" id="loveBtn" onclick="toggleLove()">
           <i class="ph-duotone ph-heart" id="loveHeart"></i>
           <span class="love-cnt" id="loveCnt">24</span>
         </button>
       </div>
-      <div class="author-row" style="padding-top:8px;border-top:1px solid var(--border)" onclick="openAuthorProfile()">
+      <div class="author-row" style="padding-top:8px;border-top:1px solid var(--border);margin-bottom:10px" onclick="openAuthorProfile()">
         <div class="g-avatar"><img src="https://ui-avatars.com/api/?name=A&background=D42B2B&color=fff&size=80" alt="" id="detailAuthorAvatar"/></div>
         <div class="author-name" id="detailAuthor">—</div>
       </div>
@@ -3056,11 +3093,11 @@ function openDBDetail(p) {
   if (coordEl && p.lat && p.lng) coordEl.textContent = `${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}`;
   // Aggiorna link condivisione — con ID se disponibile (link stabile)
   updateShareLink(p.lat || 0, p.lng || 0, p.id || null);
-  // Mostra "Modifica" e "Elimina" solo se il POI appartiene all'utente corrente
+  // Mostra "Modifica" e "Cancella" solo se il POI appartiene all'utente corrente
   const isOwner = !!(currentUser && currentUser.id === p.author_id);
-  const editBtn = document.getElementById('editPoiBtn');
+  const editBtn = document.getElementById('detailEditBtn');
   if (editBtn) editBtn.style.display = isOwner ? 'flex' : 'none';
-  const deleteBtn = document.getElementById('deletePoiBtn');
+  const deleteBtn = document.getElementById('detailDeleteBtn');
   if (deleteBtn) deleteBtn.style.display = isOwner ? 'flex' : 'none';
   openSheet('detailOv', 'detailBg', 'detailSheet');
 }
@@ -5900,6 +5937,9 @@ function openDetail(idx){
   document.getElementById('loveHeart').className='ph ph-heart';
   document.getElementById('detailAuthor').textContent=p.author||'—';
   updateShareLink(p.lat,p.lng);
+  // POI demo: bottoni owner sempre nascosti
+  const eB=document.getElementById('detailEditBtn');if(eB)eB.style.display='none';
+  const dB=document.getElementById('detailDeleteBtn');if(dB)dB.style.display='none';
   openSheet('detailOv','detailBg','detailSheet');
 }
 function closeDetail(){closeSheet('detailOv','detailBg','detailSheet')}
@@ -5945,6 +5985,16 @@ function shareDetail(){
   const txt=document.getElementById('detailShareLinkTxt').textContent;
   if(navigator.share)navigator.share({title:document.getElementById('detailName').textContent,url:txt});
   else navigator.clipboard&&navigator.clipboard.writeText(txt).then(()=>showToast('Link copiato!'));
+}
+// Aggiunge il POI corrente all'itinerario aprendone il form pre-compilato
+function addPoiToItinerary(){
+  if(!currentPOI) return;
+  closeDetail();
+  openSheet('addStopOv','addStopBg','addStopSheet');
+  setTimeout(()=>{
+    const el=document.getElementById('stopNameIn');
+    if(el){ el.value=currentPOI.name||''; el.dispatchEvent(new Event('input')); }
+  }, 320);
 }
 
 /* ══════════════════════════════════════════
