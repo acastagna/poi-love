@@ -720,17 +720,18 @@ body.tab-active #mapQuickBtns{display:none}
 #detailBg.vis{background:rgba(0,0,0,.52);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 #detailSheet{position:absolute;border-radius:26px;bottom:auto;left:50%;top:50%;width:min(400px,94vw);max-height:88vh;padding:0;transform:translate(-50%,calc(-50% + 28px));opacity:0;transition:transform .36s cubic-bezier(.32,.72,0,1),opacity .28s;overflow-y:auto;overflow-x:hidden;box-shadow:0 24px 64px rgba(0,0,0,.32),0 4px 16px rgba(0,0,0,.16)}
 #detailSheet.open{transform:translate(-50%,-50%);opacity:1}
-.pdm-close{position:absolute;top:12px;right:12px;z-index:20;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.88);backdrop-filter:blur(6px);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:#666;transition:background .15s;box-shadow:0 1px 6px rgba(0,0,0,.18)}
-.pdm-close:hover{background:#fff}
+/* X chiudi — fuori dalla card, posizionato via JS */
+.pdm-close-outer{position:fixed;z-index:600;width:34px;height:34px;border-radius:50%;background:#fff;border:none;cursor:pointer;display:none;align-items:center;justify-content:center;font-size:15px;color:#444;box-shadow:0 2px 14px rgba(0,0,0,.26),0 0 0 1px rgba(0,0,0,.07);transition:transform .15s;-webkit-tap-highlight-color:transparent}
+.pdm-close-outer:active{transform:scale(.88)}
 /* Foto strip */
-.pdm-photos{display:flex;gap:3px;overflow-x:auto;scrollbar-width:none;flex-shrink:0;background:#f0ebe0;border-radius:26px 26px 0 0;max-height:220px}
+.pdm-photos{display:flex;gap:3px;overflow-x:hidden;scrollbar-width:none;flex-shrink:0;background:#1c1c1e;border-radius:26px 26px 0 0;max-height:210px;position:relative}
 .pdm-photos::-webkit-scrollbar{display:none}
-.pdm-photo{flex:0 0 calc(33.333% - 2px);aspect-ratio:1;overflow:hidden;background:#f0ebe0;position:relative}
-.pdm-photos .pdm-photo:first-child{border-radius:26px 0 0 0}
-.pdm-photos:has(.pdm-photo:only-child) .pdm-photo{border-radius:26px 26px 0 0}
-.pdm-photos .pdm-photo:nth-child(3),.pdm-photos .pdm-photo:last-child:not(:first-child):not(:nth-child(3)){border-radius:0 26px 0 0}
-.pdm-photo img{width:100%;height:100%;object-fit:contain;display:block;background:#f0ebe0}
-.pdm-photo-more{position:absolute;inset:0;background:rgba(0,0,0,.48);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;letter-spacing:.3px}
+.pdm-photo{flex:0 0 calc(33.333% - 2px);aspect-ratio:1;overflow:hidden;background:#1c1c1e;position:relative}
+.pdm-photo img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s}
+.pdm-photo img:hover{transform:scale(1.04)}
+.pdm-photo-more{position:absolute;inset:0;background:rgba(0,0,0,.54);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;letter-spacing:.3px;backdrop-filter:blur(2px)}
+.pdm-photos::after{content:'';position:absolute;bottom:0;left:0;right:0;height:44px;background:linear-gradient(transparent,var(--card));pointer-events:none;z-index:2}
+.pdm-photo-counter{position:absolute;bottom:10px;right:12px;background:rgba(0,0,0,.52);color:#fff;font-size:9px;font-weight:800;padding:3px 9px;border-radius:12px;backdrop-filter:blur(4px);letter-spacing:.3px;z-index:3;pointer-events:none}
 .pdm-no-photo{height:80px;display:flex;align-items:center;justify-content:center;font-size:32px;color:#C8BFB0;background:#f0ebe0;border-radius:26px 26px 0 0}
 /* Barra azioni */
 .pdm-actions{display:flex;padding:14px 10px 14px;border-bottom:1px solid var(--border);background:var(--card);justify-content:space-evenly;flex-shrink:0}
@@ -748,33 +749,25 @@ body.tab-active #mapQuickBtns{display:none}
 .pdm-act-edit span{color:var(--blue)}
 .pdm-act-del .pdm-act-icon{background:#FFF0F0;color:var(--red);border-color:#FCA5A5}
 .pdm-act-del span{color:var(--red)}
-/* Categorie + tags */
-.pdm-cat-section{padding:14px 18px 12px;background:#F6F2EC}
-.pdm-section-lbl{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:8px}
-.pdm-tags-strip{display:flex;flex-wrap:wrap;gap:6px}
-.pdm-tag{display:inline-flex;align-items:center;gap:4px;border-radius:20px;padding:5px 11px;font-size:11px;font-weight:800;letter-spacing:.15px}
-.pdm-tag-cultura,.pdm-tag-cultura{background:#DBEAFE;color:#1E3A8A}
-.pdm-tag-cibo{background:#FFEDD5;color:#9A3412}
-.pdm-tag-natura{background:#DCFCE7;color:#14532D}
-.pdm-tag-arte{background:#EDE9FE;color:#4C1D95}
-.pdm-tag-nightlife{background:#FAE8FF;color:#86198F}
-.pdm-tag-storia{background:#FEF9C3;color:#713F12}
-.pdm-tag-sport{background:#CCFBF1;color:#134E4A}
-.pdm-tag-default{background:#E7E2DA;color:#6B6560}
+/* Hero band rossa — titolo + tags in bianco */
+.pdm-hero{background:var(--red);padding:18px 18px 16px}
+.pdm-hero-title{font-size:26px;font-weight:900;color:#fff;line-height:1.15;margin:0 0 12px;letter-spacing:-.4px;text-shadow:0 1px 4px rgba(0,0,0,.18)}
+.pdm-hero-tags{display:flex;flex-wrap:wrap;gap:7px}
+.pdm-hero-tag{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.4);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:800;color:#fff;letter-spacing:.2px;backdrop-filter:blur(4px)}
+.pdm-hero-tag i{font-size:13px;opacity:.85}
 /* Sezione bianca: itinerari + indirizzo + coordinate */
-.pdm-white-section{padding:14px 18px 10px;background:var(--card);border-top:1px solid var(--border)}
-.pdm-meta-row{display:flex;align-items:flex-start;gap:9px;font-size:12px;color:var(--muted);margin-bottom:8px;line-height:1.5}
-.pdm-meta-row i{font-size:15px;margin-top:0;flex-shrink:0;color:#D42B2B}
+.pdm-section-lbl{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:8px}
+.pdm-white-section{padding:14px 18px 12px;background:var(--card)}
+.pdm-meta-row{display:flex;align-items:flex-start;gap:9px;font-size:12px;color:var(--muted);margin-bottom:7px;line-height:1.5}
+.pdm-meta-row i{font-size:15px;flex-shrink:0;color:#D42B2B}
 .pdm-meta-row span{flex:1;word-break:break-word}
 .pdm-meta-row.coords i{color:var(--muted)}
-.pdm-meta-row.coords{font-family:monospace;font-size:11px}
-.pdm-itin-section{margin-bottom:12px}
+.pdm-meta-row.coords{font-family:monospace;font-size:10.5px}
+.pdm-itin-section{padding:12px 18px 4px;background:var(--card);border-bottom:1px solid var(--border)}
 .pdm-itin-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
-.pdm-itin-chip{display:inline-flex;align-items:center;gap:4px;background:#F0FAF4;border:1px solid #6EE7B7;border-radius:20px;padding:3px 10px;font-size:10px;font-weight:800;color:#065F46;cursor:pointer}
-/* Titolo grande */
-.pdm-title-section{padding:18px 18px 14px;background:var(--card);border-top:1px solid var(--border)}
-.pdm-title{font-size:26px;font-weight:900;color:var(--text);line-height:1.15;margin:0 0 12px;letter-spacing:-.4px}
-.pdm-share-link{font-size:10px;color:var(--orange);font-family:monospace;display:flex;align-items:center;gap:7px;background:#FFF7F0;border-radius:10px;padding:9px 12px;cursor:pointer;border:1px solid #FDE4C4}
+.pdm-itin-chip{display:inline-flex;align-items:center;gap:5px;background:#F0FAF4;border:1px solid #6EE7B7;border-radius:20px;padding:4px 12px;font-size:10px;font-weight:800;color:#065F46;cursor:pointer}
+/* Share link */
+.pdm-share-link{font-size:10px;color:var(--orange);font-family:monospace;display:flex;align-items:center;gap:7px;background:#FFF7F0;border-radius:10px;padding:9px 12px;cursor:pointer;border:1px solid #FDE4C4;margin:14px 18px 0}
 .pdm-share-link span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pdm-share-link button{border:none;background:none;cursor:pointer;color:var(--orange);font-size:14px;padding:0;flex-shrink:0}
 /* Love */
@@ -2627,9 +2620,9 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 <!-- ═══ SHEET: DETAIL POI ═══ -->
 <div class="sheet-overlay" id="detailOv">
   <div class="sheet-backdrop" id="detailBg"></div>
+  <!-- X chiusura — FUORI dalla card -->
+  <button class="pdm-close-outer" id="detailCloseOuter" onclick="closeDetail()" title="Chiudi"><i class="ph-duotone ph-x"></i></button>
   <div class="sheet" id="detailSheet">
-    <!-- X chiudi -->
-    <button class="pdm-close" onclick="closeDetail()" title="Chiudi"><i class="ph-duotone ph-x"></i></button>
     <!-- 1. Foto -->
     <div class="pdm-photos" id="detailPhotos"></div>
     <!-- 2. Azioni -->
@@ -2655,19 +2648,13 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
         <span>Cancella</span>
       </button>
     </div>
-    <!-- 3. Categorie + tag colorati -->
-    <div class="pdm-cat-section">
-      <div class="pdm-section-lbl">Categorie</div>
-      <div class="pdm-tags-strip" id="detailTagsStrip">
-        <span class="pdm-tag pdm-tag-default" id="detailTag"><i class="ph-duotone ph-tag"></i> Luogo</span>
-      </div>
+    <!-- 3. Itinerari pubblici (se presenti) -->
+    <div class="pdm-itin-section" id="detailItinSection" style="display:none">
+      <div class="pdm-section-lbl"><i class="ph-duotone ph-path" style="font-size:11px"></i> In itinerari</div>
+      <div class="pdm-itin-chips" id="detailItinChips"></div>
     </div>
-    <!-- 4. Sezione bianca: itinerari + indirizzo + coordinate -->
+    <!-- 4. Indirizzo + Coordinate -->
     <div class="pdm-white-section">
-      <div class="pdm-itin-section" id="detailItinSection" style="display:none">
-        <div class="pdm-section-lbl">In itinerari</div>
-        <div class="pdm-itin-chips" id="detailItinChips"></div>
-      </div>
       <div class="pdm-meta-row">
         <i class="ph-duotone ph-map-pin"></i>
         <span id="detailAddress">—</span>
@@ -2677,23 +2664,27 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
         <span id="detailCoordsText">—</span>
       </div>
     </div>
-    <!-- 5. Titolo grande + link -->
-    <div class="pdm-title-section">
-      <h2 class="pdm-title" id="detailName">—</h2>
-      <div class="pdm-share-link" id="detailShareLink" onclick="copyDetailLink()">
-        <i class="ph-duotone ph-link"></i>
-        <span id="detailShareLinkTxt"></span>
-        <button onclick="event.stopPropagation();copyDetailLink()" title="Copia link"><i class="ph-duotone ph-copy"></i></button>
+    <!-- 5. HERO ROSSO: titolo grande + tag bianchi -->
+    <div class="pdm-hero">
+      <h2 class="pdm-hero-title" id="detailName">—</h2>
+      <div class="pdm-hero-tags" id="detailTagsStrip">
+        <span class="pdm-hero-tag" id="detailTag"><i class="ph-duotone ph-tag"></i> Luogo</span>
       </div>
     </div>
-    <!-- 6. Love -->
+    <!-- 6. Link condivisione -->
+    <div class="pdm-share-link" id="detailShareLink" onclick="copyDetailLink()">
+      <i class="ph-duotone ph-link"></i>
+      <span id="detailShareLinkTxt"></span>
+      <button onclick="event.stopPropagation();copyDetailLink()" title="Copia link"><i class="ph-duotone ph-copy"></i></button>
+    </div>
+    <!-- 7. Love -->
     <div class="pdm-love-row">
       <button class="love-btn love-btn-big" id="loveBtn" onclick="toggleLove()">
         <i class="ph-duotone ph-heart" id="loveHeart"></i>
         <span class="love-cnt" id="loveCnt">0</span>
       </button>
     </div>
-    <!-- 7. Autore -->
+    <!-- 8. Autore -->
     <div class="pdm-author" onclick="openAuthorProfile()">
       <div class="pdm-author-avatar">
         <img src="https://ui-avatars.com/api/?name=A&background=D42B2B&color=fff&size=80" alt="" id="detailAuthorAvatar"/>
@@ -2704,7 +2695,6 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
       </div>
       <i class="ph-duotone ph-caret-right pdm-author-arrow"></i>
     </div>
-    <!-- descrizione nascosta (usata da JS, non mostrata nel nuovo layout) -->
     <div id="detailDesc" style="display:none"></div>
   </div>
 </div>
@@ -3296,13 +3286,14 @@ function openDBDetail(p) {
   } else {
     ph.innerHTML = '<div class="pdm-no-photo"><i class="ph-duotone ph-image-broken"></i></div>';
   }
-  // Tag categoria colorato
+  // Hero: tag bianco su rosso
   const cat = p.category || 'Luogo';
   const tag = document.getElementById('detailTag');
-  tag.className = `pdm-tag ${_tagClass(cat)}`;
+  tag.className = 'pdm-hero-tag';
   tag.innerHTML = `<i class="ph-duotone ph-tag"></i> ${cat}`;
-  // Metadati
+  // Hero: titolo grande
   document.getElementById('detailName').textContent = p.name;
+  // Indirizzo e coordinate
   document.getElementById('detailAddress').textContent = p.address || '';
   document.getElementById('detailDesc').textContent = p.description || '';
   const coordEl = document.getElementById('detailCoordsText');
@@ -3317,15 +3308,28 @@ function openDBDetail(p) {
   document.getElementById('detailAuthorMeta').textContent = '';
   document.getElementById('detailAuthorAvatar').src =
     `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=D42B2B&color=fff&size=80`;
+  // Itinerari pubblici del POI (se disponibili)
+  const itinSection = document.getElementById('detailItinSection');
+  const itinChips = document.getElementById('detailItinChips');
+  if(itinSection && p.trips && p.trips.length > 0){
+    itinChips.innerHTML = p.trips.map(t =>
+      `<span class="pdm-itin-chip"><i class="ph-duotone ph-path"></i>${t.name}</span>`
+    ).join('');
+    itinSection.style.display = 'block';
+  } else if(itinSection){
+    itinSection.style.display = 'none';
+  }
   // Link condivisione
   updateShareLink(p.lat || 0, p.lng || 0, p.id || null);
-  // Mostra Modifica/Cancella solo al proprietario
+  // Modifica/Cancella solo al proprietario
   const isOwner = !!(currentUser && currentUser.id === p.author_id);
   const editBtn = document.getElementById('detailEditBtn');
   if (editBtn) editBtn.style.display = isOwner ? 'flex' : 'none';
   const deleteBtn = document.getElementById('detailDeleteBtn');
   if (deleteBtn) deleteBtn.style.display = isOwner ? 'flex' : 'none';
   openSheet('detailOv', 'detailBg', 'detailSheet');
+  // Posiziona X fuori dalla card dopo l'animazione
+  setTimeout(positionDetailClose, 380);
 }
 
 /* deleteCurrentPOI — mantenuta per retrocompatibilità, usa il nuovo confirm modal */
@@ -6170,25 +6174,21 @@ function openAddList(){openSheet('addListOv','addListBg','addListSheet');setTime
 /* ══════════════════════════════════════════
    DETAIL
 ══════════════════════════════════════════ */
-// Render foto nel detail modal — fino a 3, quadrate, object-fit:contain
+// Render foto nel detail modal — fino a 3, cover, con gradient overlay e contatore
 function renderDetailPhotos(container, photos){
   const MAX = 3;
   const visible = photos.slice(0, MAX);
   const count = visible.length;
-  // Flex basis adattiva: 1 foto→100%, 2→50%, 3→33%
   const basis = count === 1 ? '100%' : count === 2 ? 'calc(50% - 1.5px)' : 'calc(33.333% - 2px)';
   visible.forEach((url, i) => {
     const d = document.createElement('div');
     d.className = 'pdm-photo';
     d.style.flex = `0 0 ${basis}`;
-    // Border radius angoli superiori
     if(count === 1) d.style.borderRadius = '26px 26px 0 0';
     else if(i === 0) d.style.borderRadius = '26px 0 0 0';
     else if(i === count - 1) d.style.borderRadius = '0 26px 0 0';
     const img = document.createElement('img');
-    img.src = url;
-    img.alt = '';
-    img.loading = 'lazy';
+    img.src = url; img.alt = ''; img.loading = 'lazy';
     d.appendChild(img);
     if (i === MAX - 1 && photos.length > MAX) {
       const more = document.createElement('div');
@@ -6198,6 +6198,13 @@ function renderDetailPhotos(container, photos){
     }
     container.appendChild(d);
   });
+  // Contatore "N foto" se più di 1
+  if(photos.length > 1){
+    const ctr = document.createElement('div');
+    ctr.className = 'pdm-photo-counter';
+    ctr.textContent = `${photos.length} foto`;
+    container.appendChild(ctr);
+  }
 }
 
 // Mappa il nome categoria → classe CSS colore tag
@@ -6205,6 +6212,21 @@ function _tagClass(cat){
   const map={cibo:'cibo',food:'cibo',ristorante:'cibo',cultura:'cultura',arte:'arte',art:'arte',
     natura:'natura',nature:'natura',nightlife:'nightlife',notte:'nightlife',storia:'storia',sport:'sport'};
   return 'pdm-tag-'+(map[(cat||'').toLowerCase()]||'default');
+}
+
+/* Posiziona il bottone X fuori dalla card dopo l'apertura del modal */
+function positionDetailClose(){
+  const sheet = document.getElementById('detailSheet');
+  const btn = document.getElementById('detailCloseOuter');
+  if(!sheet || !btn) return;
+  const r = sheet.getBoundingClientRect();
+  const bw = 34;
+  // Centro del bottone = angolo top-right della card
+  const x = Math.min(window.innerWidth - bw/2 - 6, r.right - bw/2 + 2);
+  const y = Math.max(bw/2 + 6, r.top - bw/2 + 2);
+  btn.style.left = (x - bw/2) + 'px';
+  btn.style.top  = (y - bw/2) + 'px';
+  btn.style.display = 'flex';
 }
 
 function openDetail(idx){
@@ -6215,13 +6237,14 @@ function openDetail(idx){
   } else {
     ph.innerHTML='<div class="pdm-no-photo"><i class="ph-duotone ph-image-broken"></i></div>';
   }
-  // Tag categoria
+  // Hero: tag
   const tag=document.getElementById('detailTag');
   const cat=p.cat||'Luogo';
-  tag.className=`pdm-tag ${_tagClass(cat)}`;
+  tag.className='pdm-hero-tag';
   tag.innerHTML=`<i class="ph-duotone ph-tag"></i> ${cat}`;
-  // Metadati
+  // Hero: titolo
   document.getElementById('detailName').textContent=p.name;
+  // Metadati
   document.getElementById('detailAddress').textContent=p.address||'Tiranë, Albania';
   document.getElementById('detailCoordsText').textContent=`${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}`;
   document.getElementById('detailDesc').textContent=p.desc||'';
@@ -6232,13 +6255,21 @@ function openDetail(idx){
   document.getElementById('detailAuthorMeta').textContent='';
   document.getElementById('detailAuthorAvatar').src=
     `https://ui-avatars.com/api/?name=${encodeURIComponent(p.author||'?')}&background=D42B2B&color=fff&size=80`;
+  // Itinerari: nascondi sezione (demo non ha dati itinerari per ora)
+  const itin=document.getElementById('detailItinSection');
+  if(itin) itin.style.display='none';
   updateShareLink(p.lat,p.lng);
-  // Nascondi edit/delete su POI demo
   const eB=document.getElementById('detailEditBtn');if(eB)eB.style.display='none';
   const dB=document.getElementById('detailDeleteBtn');if(dB)dB.style.display='none';
   openSheet('detailOv','detailBg','detailSheet');
+  // Posiziona X fuori dalla card dopo l'animazione
+  setTimeout(positionDetailClose, 380);
 }
-function closeDetail(){closeSheet('detailOv','detailBg','detailSheet')}
+function closeDetail(){
+  closeSheet('detailOv','detailBg','detailSheet');
+  const btn=document.getElementById('detailCloseOuter');
+  if(btn) btn.style.display='none';
+}
 // ESC universale: chiude il primo sheet/popup/overlay aperto trovato
 document.addEventListener('keydown', e => {
   if(e.key!=='Escape') return;
@@ -6973,6 +7004,8 @@ window.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('addStopBg').addEventListener('click',()=>closeSheet('addStopOv','addStopBg','addStopSheet'));
   document.getElementById('addListBg').addEventListener('click',()=>closeSheet('addListOv','addListBg','addListSheet'));
   document.getElementById('detailBg').addEventListener('click',closeDetail);
+  // Riposiziona X su resize
+  window.addEventListener('resize',()=>{ if(document.getElementById('detailSheet')?.classList.contains('open')) positionDetailClose(); });
   // Swipe to close
   initSwipe('addPoiHandle','addPoiSheet','addPoiBg');
   initSwipe('addStopHandle','addStopSheet','addStopBg');
