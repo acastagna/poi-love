@@ -7321,6 +7321,7 @@ let editingPOIId=null; // id del POI in editing
 
 function openEditPOI(){
   if(!currentPOI) return;
+  if(!currentUser || currentUser.id !== currentPOI.author_id){ showToast('⛔ Non puoi modificare POI altrui'); return; }
   // Permetti edit anche per POI demo senza id (fallback locale)
   editingPOIId = currentPOI.id || ('local-'+Date.now());
   closeDetail();
