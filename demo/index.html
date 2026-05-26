@@ -406,6 +406,10 @@ body.tab-active #mapQuickBtns{display:none}
 .pl-chip{display:flex;align-items:center;gap:10px;border-radius:13px;padding:9px 12px;cursor:pointer;transition:box-shadow .15s;border-left:4px solid transparent;border-top:1px solid var(--border);border-right:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--bg)}
 .pl-chip.pl-casa{border-left-color:#F59E0B}
 .pl-chip.pl-lavoro{border-left-color:var(--blue)}
+.pl-chip.pl-famiglia{border-left-color:#8B5CF6}
+.pl-chip.pl-salute{border-left-color:#10B981}
+.pl-chip.pl-sport{border-left-color:#F97316}
+.pl-chip.pl-preferito{border-left-color:#EF4444}
 .pl-chip:active{box-shadow:0 0 0 2px var(--red)}
 .pl-chip-icon{font-size:24px;flex-shrink:0;width:32px;text-align:center}
 .pl-chip-info{flex:1;min-width:0}
@@ -414,8 +418,8 @@ body.tab-active #mapQuickBtns{display:none}
 .pl-chip-acts{display:flex;gap:5px;flex-shrink:0}
 .pl-chip-btn{width:30px;height:30px;border-radius:9px;border:1px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:14px;transition:color .15s,border-color .15s}
 .pl-chip-btn:active{color:var(--red);border-color:var(--red)}
-.pl-add-row{display:flex;gap:8px;padding:10px 0 12px}
-.pl-add-btn{flex:1;height:42px;border-radius:12px;border:1.5px dashed var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px;font-weight:700;color:var(--muted);font-family:inherit;transition:border-color .2s,color .2s}
+.pl-add-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px 0 12px}
+.pl-add-btn{height:42px;border-radius:12px;border:1.5px dashed var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px;font-weight:700;color:var(--muted);font-family:inherit;transition:border-color .2s,color .2s}
 .pl-add-btn:active{border-color:var(--red);color:var(--red)}
 .poi-list-row{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--border)}
 .poi-list-row .pi-emoji{font-size:22px;width:36px;text-align:center;flex-shrink:0}
@@ -2189,10 +2193,22 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
     <div class="pl-chips" id="plChips"><!-- renderizzato via JS --></div>
     <div class="pl-add-row" id="plAddRow">
       <button class="pl-add-btn" id="plAddCasaBtn" onclick="openAddPersonalPlace('casa')">
-        <i class="ph-duotone ph-plus"></i> Casa
+        <i class="ph-duotone ph-house"></i> Casa
       </button>
       <button class="pl-add-btn" id="plAddLavoroBtn" onclick="openAddPersonalPlace('lavoro')">
-        <i class="ph-duotone ph-plus"></i> Lavoro
+        <i class="ph-duotone ph-briefcase"></i> Lavoro
+      </button>
+      <button class="pl-add-btn" id="plAddFamigliaBtn" onclick="openAddPersonalPlace('famiglia')">
+        <i class="ph-duotone ph-users-three"></i> Famiglia
+      </button>
+      <button class="pl-add-btn" id="plAddSaluteBtn" onclick="openAddPersonalPlace('salute')">
+        <i class="ph-duotone ph-first-aid"></i> Salute
+      </button>
+      <button class="pl-add-btn" id="plAddSportBtn" onclick="openAddPersonalPlace('sport')">
+        <i class="ph-duotone ph-barbell"></i> Sport
+      </button>
+      <button class="pl-add-btn" id="plAddPreferitoBtn" onclick="openAddPersonalPlace('preferito')">
+        <i class="ph-duotone ph-star"></i> Preferito
       </button>
     </div>
   </div>
@@ -3530,21 +3546,25 @@ let plPendingLat = null, plPendingLng = null;
 let plPendingAddr = '';
 const PL_MAX = 3;
 
+// Configurazione tipi luoghi personali
+const PL_TYPE_CFG = {
+  casa:      { icon:'ph-house',        color:'#F59E0B', label:'Casa',     max:PL_MAX },
+  lavoro:    { icon:'ph-briefcase',    color:'var(--blue)', label:'Lavoro', max:PL_MAX },
+  famiglia:  { icon:'ph-users-three',  color:'#8B5CF6', label:'Famiglia', max:1 },
+  salute:    { icon:'ph-first-aid',    color:'#10B981', label:'Salute',   max:1 },
+  sport:     { icon:'ph-barbell',      color:'#F97316', label:'Sport',    max:1 },
+  preferito: { icon:'ph-star',         color:'#EF4444', label:'Preferito',max:1 },
+};
+
 function renderPlaces(){
   const chips = document.getElementById('plChips');
-  const addCasaBtn = document.getElementById('plAddCasaBtn');
-  const addLavoroBtn = document.getElementById('plAddLavoroBtn');
   if(!chips) return;
-  const casas  = plPlaces.filter(p=>p.type==='casa');
-  const lavori = plPlaces.filter(p=>p.type==='lavoro');
   let html = '';
   plPlaces.forEach((p,i)=>{
-    const isCasa = p.type==='casa';
-    const icon   = isCasa ? 'ph-house' : 'ph-briefcase';
-    const color  = isCasa ? '#F59E0B' : 'var(--blue)';
-    const label  = p.word ? `${isCasa?'Casa':'Lavoro'} ${p.word}` : (isCasa?'Casa':'Lavoro');
+    const cfg = PL_TYPE_CFG[p.type] || { icon:'ph-map-pin', color:'var(--muted)', label:p.type||'Luogo' };
+    const label = p.word ? `${cfg.label} ${p.word}` : cfg.label;
     html += `<div class="pl-chip pl-${p.type}" onclick="goToPlPlace(${i})">
-      <i class="ph-duotone ${icon} pl-chip-icon" style="color:${color}"></i>
+      <i class="ph-duotone ${cfg.icon} pl-chip-icon" style="color:${cfg.color}"></i>
       <div class="pl-chip-info">
         <div class="pl-chip-name">${label}</div>
         <div class="pl-chip-addr">${p.address||'Posizione salvata'}</div>
@@ -3557,21 +3577,28 @@ function renderPlaces(){
     </div>`;
   });
   chips.innerHTML = html || '';
-  if(addCasaBtn)  addCasaBtn.style.display  = casas.length  >= PL_MAX ? 'none' : '';
-  if(addLavoroBtn) addLavoroBtn.style.display = lavori.length >= PL_MAX ? 'none' : '';
+  // Mostra/nascondi bottoni aggiungi per ciascun tipo
+  Object.entries(PL_TYPE_CFG).forEach(([type, cfg])=>{
+    const btn = document.getElementById(`plAdd${type.charAt(0).toUpperCase()+type.slice(1)}Btn`);
+    if(btn) btn.style.display = plPlaces.filter(p=>p.type===type).length >= cfg.max ? 'none' : '';
+  });
+}
+
+function _plLabel(p){
+  const cfg = PL_TYPE_CFG[p.type] || { label: p.type||'Luogo' };
+  return p.word ? `${cfg.label} ${p.word}` : cfg.label;
 }
 
 function goToPlPlace(i){
   const p = plPlaces[i]; if(!p) return;
   showTab('map');
   if(map) map.setView([p.lat,p.lng],17);
-  const label = p.word ? `${p.type==='casa'?'Casa':'Lavoro'} ${p.word}` : (p.type==='casa'?'Casa':'Lavoro');
-  showToast(`📍 ${label}`);
+  showToast(`📍 ${_plLabel(p)}`);
 }
 
 function sharePlPlace(i){
   const p = plPlaces[i]; if(!p) return;
-  const label = p.word ? `${p.type==='casa'?'Casa':'Lavoro'} ${p.word}` : (p.type==='casa'?'Casa':'Lavoro');
+  const label = _plLabel(p);
   const url = `https://demo.poilove.com/?lat=${p.lat.toFixed(6)}&lng=${p.lng.toFixed(6)}&label=${encodeURIComponent(label)}`;
   if(navigator.share){ navigator.share({title:label, url}); }
   else { navigator.clipboard?.writeText(url).then(()=>showToast('🔗 Link copiato!')); }
@@ -3584,12 +3611,18 @@ function removePlPlace(i){
   renderPlaces();
 }
 
+// Emoji titolo per ciascun tipo
+const PL_TYPE_EMOJI = {
+  casa:'🏠', lavoro:'💼', famiglia:'👨‍👩‍👧', salute:'🏥', sport:'🏋️', preferito:'⭐'
+};
+
 function openAddPersonalPlace(type){
   plCurrentType = type;
   plPendingLat = null; plPendingLng = null; plPendingAddr = '';
-  const isCasa = type==='casa';
-  document.getElementById('plSheetTitle').textContent = isCasa ? '🏠 Aggiungi Casa' : '💼 Aggiungi Lavoro';
-  document.getElementById('plSheetPrefix').textContent = (isCasa?'Casa':'Lavoro')+' ';
+  const cfg = PL_TYPE_CFG[type] || { label: type };
+  const emoji = PL_TYPE_EMOJI[type] || '📍';
+  document.getElementById('plSheetTitle').textContent = `${emoji} Aggiungi ${cfg.label}`;
+  document.getElementById('plSheetPrefix').textContent = cfg.label + ' ';
   document.getElementById('plSheetWord').value = '';
   document.getElementById('plSheetAddr').value = '';
   document.getElementById('plPosConfirm').style.display = 'none';
@@ -3610,8 +3643,8 @@ function closePlSheet(){
 
 function updatePlPreview(){
   const word = (document.getElementById('plSheetWord')?.value||'').trim();
-  const prefix = plCurrentType==='casa' ? 'Casa' : 'Lavoro';
-  const name = word ? `${prefix} ${word}` : prefix;
+  const cfg = PL_TYPE_CFG[plCurrentType] || { label: plCurrentType||'Luogo' };
+  const name = word ? `${cfg.label} ${word}` : cfg.label;
   const el = document.getElementById('plPreviewName');
   if(el) el.innerHTML = `Apparirà come: <strong>${name}</strong>`;
 }
@@ -3676,7 +3709,8 @@ function savePlPlace(){
   localStorage.setItem('pl_places', JSON.stringify(plPlaces));
   renderPlaces();
   closePlSheet();
-  const label = word ? `${plCurrentType==='casa'?'Casa':'Lavoro'} ${word}` : (plCurrentType==='casa'?'Casa':'Lavoro');
+  const cfg2 = PL_TYPE_CFG[plCurrentType] || { label: plCurrentType||'Luogo' };
+  const label = word ? `${cfg2.label} ${word}` : cfg2.label;
   showToast(`✓ ${label} salvato!`);
 }
 
@@ -3955,6 +3989,11 @@ function initMap(){
     onSearchPickPlace(lat, lng, name);
   }
   map.on('click', e => {
+    // GUARD PRIORITÀ ASSOLUTA: se un marker POI è stato toccato negli ultimi 600ms
+    // ignora il click sulla mappa. Leaflet sintetizza un 'click' sul map anche con
+    // bubblingMouseEvents:false — senza questo guard il tab-active check sotto
+    // chiamerebbe showTab('map') sovrascrivendo l'apertura del popup del marker.
+    if(Date.now() - (window._lastPoiMarkerClick||0) < 600) return;
     // Desktop split-view: click sulla mappa → chiude il pannello di destra
     if(document.body.classList.contains('tab-active')){
       showTab('map');
@@ -3962,9 +4001,6 @@ function initMap(){
     }
     // Se attivo il listener "scegli punto su mappa", non intercettare
     if(typeof mapTapListenerActive!=='undefined' && mapTapListenerActive) return;
-    // GUARD: se un marker POI è stato cliccato negli ultimi 600ms, ignora
-    // (Leaflet mobile sintetizza un click sulla mappa anche quando il tap è sul marker)
-    if(Date.now() - (window._lastPoiMarkerClick||0) < 600) return;
   });
   // Doppio click/tap su mappa vuota → crea nuovo POI (Leaflet gestisce dblclick anche su mobile)
   map.on('dblclick', e => {
