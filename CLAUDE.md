@@ -4,16 +4,16 @@
 
 ---
 
-## 🟢 STATO AL 26/05/2026 — Ownership guard + DB migrazione cover
+## 🟢 STATO AL 26/05/2026 — AI photo generation + Ownership guard + DB migrazione cover
 
-**HEAD GitHub `main`**: `914b2d4`
-**Ultimo commit**: `914b2d4 fix(demo): ownership guard su openEditPOI — solo il proprietario può modificare`
+**HEAD GitHub `main`**: `0b3b64f`
+**Ultimo commit**: `0b3b64f feat(demo): AI photo generation su POI senza foto — Pollinations.ai Flux`
 
 **Stato live siti**:
 
 | URL | Live HEAD | Note |
 |---|---|---|
-| https://demo.poilove.com/ | `914b2d4` (26/05) | ✅ allineato — ownership guard attivo |
+| https://demo.poilove.com/ | `914b2d4` (26/05) | ⚠️ da pullare — AI photos in main |
 | https://poilove.com/ | `04e2e71` (08/05) | da pullare |
 | https://sal.poilove.com/ | `04e2e71` (08/05) | da pullare |
 | https://media.poilove.com/test.php | 503 | DNS server-side rotto (pre-esistente) |
