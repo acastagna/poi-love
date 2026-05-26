@@ -6296,9 +6296,11 @@ function positionDetailClose(){
   if(!sheet || !btn) return;
   const r = sheet.getBoundingClientRect();
   const bw = 34;
-  // Centro del bottone = angolo top-right della card
-  const x = Math.min(window.innerWidth - bw/2 - 6, r.right - bw/2 + 2);
-  const y = Math.max(bw/2 + 6, r.top - bw/2 + 2);
+  // Diagonale 45° perfetta: gap simmetrico su X e Y → il centro è a uguale distanza
+  // dai due bordi (destra e top), bottone completamente fuori dalla card
+  const gap = 6; // px di spazio tra il bordo esterno del bottone e il bordo della card
+  const x = Math.min(window.innerWidth - bw/2 - 6, r.right + bw/2 + gap);
+  const y = Math.max(bw/2 + 6, r.top - bw/2 - gap);
   btn.style.left = (x - bw/2) + 'px';
   btn.style.top  = (y - bw/2) + 'px';
   btn.style.display = 'flex';
