@@ -728,23 +728,38 @@ body.tab-active #mapQuickBtns{display:none}
 .pdm-close-outer{position:fixed;z-index:600;width:34px;height:34px;border-radius:50%;background:#fff;border:none;cursor:pointer;display:none;align-items:center;justify-content:center;font-size:15px;color:#444;box-shadow:0 2px 14px rgba(0,0,0,.26),0 0 0 1px rgba(0,0,0,.07);transition:transform .15s;-webkit-tap-highlight-color:transparent}
 .pdm-close-outer:active{transform:scale(.88)}
 /* Foto strip */
-.pdm-photos{display:flex;gap:3px;overflow-x:hidden;scrollbar-width:none;flex-shrink:0;background:#1c1c1e;border-radius:26px 26px 0 0;max-height:210px;position:relative}
+/* ── PHOTO STRIP: 3 slot fissi ── */
+.pdm-photos{display:flex;gap:3px;overflow-x:hidden;scrollbar-width:none;flex-shrink:0;background:#1c1c1e;border-radius:26px 26px 0 0;position:relative}
 .pdm-photos::-webkit-scrollbar{display:none}
-.pdm-photo{flex:0 0 calc(33.333% - 2px);aspect-ratio:1;overflow:hidden;background:#1c1c1e;position:relative}
-.pdm-photo img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s}
-.pdm-photo img:hover{transform:scale(1.04)}
-.pdm-photo-more{position:absolute;inset:0;background:rgba(0,0,0,.54);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;letter-spacing:.3px;backdrop-filter:blur(2px)}
-.pdm-photos::after{content:'';position:absolute;bottom:0;left:0;right:0;height:44px;background:linear-gradient(transparent,var(--card));pointer-events:none;z-index:2}
-.pdm-photo-counter{position:absolute;bottom:10px;right:12px;background:rgba(0,0,0,.52);color:#fff;font-size:9px;font-weight:800;padding:3px 9px;border-radius:12px;backdrop-filter:blur(4px);letter-spacing:.3px;z-index:3;pointer-events:none}
-.pdm-no-photo{height:80px;display:flex;align-items:center;justify-content:center;font-size:32px;color:#C8BFB0;background:#f0ebe0;border-radius:26px 26px 0 0}
-/* AI photo generation */
-.pdm-photo-ai{background:#111;display:flex;align-items:center;justify-content:center}
-.pdm-ai-spinner{display:flex;flex-direction:column;align-items:center;gap:6px;color:rgba(255,255,255,.3)}
-.pdm-ai-spinner i{font-size:22px;animation:aiPulse 1.6s ease-in-out infinite}
-.pdm-ai-spinner span{font-size:8px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
-@keyframes aiPulse{0%,100%{opacity:.25;transform:scale(.92)}50%{opacity:.7;transform:scale(1.04)}}
-.pdm-ai-badge{position:absolute;bottom:38px;left:10px;background:rgba(0,0,0,.62);color:#FFD166;font-size:9px;font-weight:900;padding:3px 9px;border-radius:12px;display:flex;align-items:center;gap:4px;backdrop-filter:blur(6px);z-index:3;letter-spacing:.3px;border:1px solid rgba(255,209,102,.3)}
-.pdm-ai-badge i{font-size:11px}
+/* slot base — sempre 1/3 larghezza, quadrato */
+.pdm-photo-slot{flex:0 0 calc(33.333% - 2px);aspect-ratio:1;overflow:hidden;position:relative}
+/* slot con foto utente */
+.pdm-photo-slot.ps-user{background:#111}
+.pdm-photo-slot.ps-user img{width:100%;height:100%;object-fit:cover;display:block}
+/* slot AI (nero mentre carica) */
+.pdm-photo-slot.ps-ai{background:#111;display:flex;align-items:center;justify-content:center}
+.pdm-photo-slot.ps-ai img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .5s}
+/* slot vuoto (bianco caldo) */
+.pdm-photo-slot.ps-empty{background:#F5F1E8;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.pdm-slot-add-btn{width:38px;height:38px;border-radius:50%;border:2px dashed #C8BFB0;background:none;display:flex;align-items:center;justify-content:center;color:#C8BFB0;font-size:20px;cursor:pointer;transition:border-color .15s,color .15s}
+.pdm-photo-slot.ps-empty:hover .pdm-slot-add-btn,.pdm-photo-slot.ps-empty:active .pdm-slot-add-btn{border-color:var(--red);color:var(--red)}
+/* barra azioni su slot user / AI */
+.pdm-slot-acts{position:absolute;bottom:5px;right:4px;display:flex;gap:3px;z-index:5}
+.pdm-slot-act{width:26px;height:26px;border-radius:7px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;transition:transform .12s}
+.pdm-slot-act:active{transform:scale(.82)}
+.pdm-slot-act.sa-cam{background:rgba(255,255,255,.88);color:#333}
+.pdm-slot-act.sa-redo{background:rgba(255,209,102,.9);color:#6B4F00}
+.pdm-slot-act.sa-del{background:rgba(212,43,43,.85);color:#fff}
+/* AI badge (prima foto) */
+.pdm-ai-badge{position:absolute;top:7px;left:8px;background:rgba(0,0,0,.62);color:#FFD166;font-size:9px;font-weight:900;padding:3px 8px;border-radius:10px;display:flex;align-items:center;gap:4px;backdrop-filter:blur(6px);z-index:4;letter-spacing:.3px;border:1px solid rgba(255,209,102,.28);pointer-events:none}
+/* spinner AI loading */
+.pdm-ai-spinner{display:flex;flex-direction:column;align-items:center;gap:4px;color:rgba(255,255,255,.28)}
+.pdm-ai-spinner i{font-size:20px;animation:aiPulse 1.6s ease-in-out infinite}
+@keyframes aiPulse{0%,100%{opacity:.2;transform:scale(.9)}50%{opacity:.65;transform:scale(1.05)}}
+/* fade gradiente verso card */
+.pdm-photos::after{content:'';position:absolute;bottom:0;left:0;right:0;height:40px;background:linear-gradient(transparent,var(--card));pointer-events:none;z-index:2}
+/* counter */
+.pdm-photo-counter{position:absolute;bottom:8px;right:10px;background:rgba(0,0,0,.52);color:#fff;font-size:9px;font-weight:800;padding:3px 8px;border-radius:10px;backdrop-filter:blur(4px);letter-spacing:.3px;z-index:3;pointer-events:none;display:flex;align-items:center;gap:4px}
 /* Barra azioni */
 .pdm-actions{display:flex;padding:14px 10px 14px;border-bottom:1px solid var(--border);background:var(--card);justify-content:space-evenly;flex-shrink:0}
 .pdm-act{display:flex;flex-direction:column;align-items:center;gap:5px;border:none;background:none;cursor:pointer;font-family:inherit;min-width:52px;flex-shrink:0;-webkit-tap-highlight-color:transparent;padding:0}
@@ -3305,11 +3320,7 @@ function openDBDetail(p) {
   const photos = Array.isArray(p.photos) ? p.photos : (p.photos ? [p.photos] : []);
   const ph = document.getElementById('detailPhotos');
   ph.innerHTML = '';
-  if (photos.length > 0) {
-    renderDetailPhotos(ph, photos);
-  } else {
-    generateAIPhotos(ph, p.name, p.address||'', p.category||'Luogo');
-  }
+  renderPhotoStrip(ph, photos, p.name, p.address||'Tiranë, Albania', p.category||'Luogo');
   // Hero: tag bianco su rosso
   const cat = p.category || 'Luogo';
   const tag = document.getElementById('detailTag');
@@ -6219,41 +6230,19 @@ function openAddList(){openSheet('addListOv','addListBg','addListSheet');setTime
    DETAIL
 ══════════════════════════════════════════ */
 // Render foto nel detail modal — fino a 3, cover, con gradient overlay e contatore
-function renderDetailPhotos(container, photos){
-  const MAX = 3;
-  const visible = photos.slice(0, MAX);
-  const count = visible.length;
-  const basis = count === 1 ? '100%' : count === 2 ? 'calc(50% - 1.5px)' : 'calc(33.333% - 2px)';
-  visible.forEach((url, i) => {
-    const d = document.createElement('div');
-    d.className = 'pdm-photo';
-    d.style.flex = `0 0 ${basis}`;
-    if(count === 1) d.style.borderRadius = '26px 26px 0 0';
-    else if(i === 0) d.style.borderRadius = '26px 0 0 0';
-    else if(i === count - 1) d.style.borderRadius = '0 26px 0 0';
-    const img = document.createElement('img');
-    img.src = url; img.alt = ''; img.loading = 'lazy';
-    d.appendChild(img);
-    if (i === MAX - 1 && photos.length > MAX) {
-      const more = document.createElement('div');
-      more.className = 'pdm-photo-more';
-      more.textContent = `+${photos.length - MAX}`;
-      d.appendChild(more);
-    }
-    container.appendChild(d);
-  });
-  // Contatore "N foto" se più di 1
-  if(photos.length > 1){
-    const ctr = document.createElement('div');
-    ctr.className = 'pdm-photo-counter';
-    ctr.textContent = `${photos.length} foto`;
-    container.appendChild(ctr);
-  }
-}
+/* ══════════════════════════════════════════
+   PHOTO STRIP — sistema 3 slot fissi
+   container._slots = [{type:'user'|'ai'|'empty', url?, seed?}, ...]
+   container._meta  = {name, address, category}
+   Logica:
+     0 foto utente → 3 slot AI
+     1 foto        → slot 0 utente, slot 1-2 vuoti
+     2 foto        → slot 0-1 utente, slot 2 vuoto
+     3 foto        → 3 slot utente
+   Ogni slot ha bottoni azione sempre visibili.
+══════════════════════════════════════════ */
 
-/* Genera 3 foto AI via Pollinations.ai quando il POI non ha foto reali */
-function generateAIPhotos(container, name, address, category){
-  // Stile visivo per categoria
+function _photoPrompt(name, address, category){
   const styleMap = {
     cibo:'restaurant, food, warm lighting, bokeh',
     food:'restaurant, food photography, warm lighting',
@@ -6264,58 +6253,138 @@ function generateAIPhotos(container, name, address, category){
     storia:'ancient architecture, historical site',
     sport:'sports venue, outdoor activity',
   };
-  const catKey = (category||'').toLowerCase();
-  const style = styleMap[catKey] || 'travel photography, beautiful, atmospheric';
-  // Estrai città dall'indirizzo (ultime 1-2 parti dopo virgola)
+  const style = styleMap[(category||'').toLowerCase()] || 'travel photography, beautiful, atmospheric';
   const parts = (address||'Tirana, Albania').split(',');
   const city = parts.slice(-2).join(',').trim() || 'Tirana, Albania';
-  const basePrompt = `${name}, ${city}, ${style}, photorealistic, golden hour, 35mm film`;
-  const enc = encodeURIComponent(basePrompt);
-  // 3 semi diversi per variazione
-  const seeds = [
-    Math.floor(Math.random()*8000+100),
-    Math.floor(Math.random()*8000+100),
-    Math.floor(Math.random()*8000+100)
-  ];
+  return `${name}, ${city}, ${style}, photorealistic, golden hour, 35mm film`;
+}
+
+function _fillUserSlot(el, url, idx){
+  el.className = 'pdm-photo-slot ps-user';
+  el.innerHTML = '';
+  const img = document.createElement('img');
+  img.src = url; img.alt = ''; img.loading = 'lazy';
+  el.appendChild(img);
+  const acts = document.createElement('div');
+  acts.className = 'pdm-slot-acts';
+  acts.innerHTML =
+    `<button class="pdm-slot-act sa-cam" title="Sostituisci foto" onclick="_pickPhotoForSlot(${idx},this.closest('.pdm-photos'))"><i class="ph-duotone ph-camera"></i></button>` +
+    `<button class="pdm-slot-act sa-del" title="Elimina foto" onclick="_deleteSlot(${idx},this.closest('.pdm-photos'))"><i class="ph-duotone ph-trash"></i></button>`;
+  el.appendChild(acts);
+}
+
+function _fillAISlot(el, seed, name, address, category, idx){
+  el.className = 'pdm-photo-slot ps-ai';
+  el.innerHTML = `<div class="pdm-ai-spinner"><i class="ph-duotone ph-sparkle"></i><span>AI</span></div>`;
+  const enc = encodeURIComponent(_photoPrompt(name, address, category));
+  const img = document.createElement('img');
+  img.alt = name;
+  img.src = `https://image.pollinations.ai/prompt/${enc}?width=400&height=400&nologo=true&seed=${seed}&model=flux`;
+  img.onload = () => {
+    el.innerHTML = '';
+    img.style.opacity = '0';
+    el.appendChild(img);
+    requestAnimationFrame(()=>{ img.style.opacity='1'; });
+    if(idx === 0){
+      const badge = document.createElement('div');
+      badge.className = 'pdm-ai-badge';
+      badge.innerHTML = '<i class="ph-duotone ph-sparkle"></i> AI';
+      el.appendChild(badge);
+    }
+    const acts = document.createElement('div');
+    acts.className = 'pdm-slot-acts';
+    acts.innerHTML =
+      `<button class="pdm-slot-act sa-redo" title="Rigenera" onclick="_regenAISlot(${idx},this.closest('.pdm-photos'))"><i class="ph-duotone ph-arrows-clockwise"></i></button>` +
+      `<button class="pdm-slot-act sa-cam" title="Mia foto" onclick="_pickPhotoForSlot(${idx},this.closest('.pdm-photos'))"><i class="ph-duotone ph-camera"></i></button>` +
+      `<button class="pdm-slot-act sa-del" title="Elimina" onclick="_deleteSlot(${idx},this.closest('.pdm-photos'))"><i class="ph-duotone ph-trash"></i></button>`;
+    el.appendChild(acts);
+  };
+  img.onerror = () => {
+    el.innerHTML = `<div class="pdm-ai-spinner" style="color:rgba(255,255,255,.2)"><i class="ph-duotone ph-image-broken"></i></div>`;
+    const acts = document.createElement('div');
+    acts.className = 'pdm-slot-acts';
+    acts.innerHTML =
+      `<button class="pdm-slot-act sa-redo" title="Riprova" onclick="_regenAISlot(${idx},this.closest('.pdm-photos'))"><i class="ph-duotone ph-arrows-clockwise"></i></button>`;
+    el.appendChild(acts);
+  };
+  el.appendChild(img);
+}
+
+function _fillEmptySlot(el, idx){
+  el.className = 'pdm-photo-slot ps-empty';
+  el.innerHTML = '';
+  const btn = document.createElement('button');
+  btn.className = 'pdm-slot-add-btn';
+  btn.setAttribute('aria-label','Aggiungi foto');
+  btn.innerHTML = '<i class="ph-duotone ph-plus"></i>';
+  btn.onclick = (e)=>{ e.stopPropagation(); _pickPhotoForSlot(idx, btn.closest('.pdm-photos')); };
+  el.appendChild(btn);
+}
+
+function _renderAllSlots(container){
   container.innerHTML = '';
-  seeds.forEach((seed, i) => {
-    const wrap = document.createElement('div');
-    wrap.className = 'pdm-photo pdm-photo-ai';
-    wrap.style.flex = seeds.length === 1 ? '0 0 100%' : seeds.length === 2 ? 'calc(50% - 1.5px)' : 'calc(33.333% - 2px)';
-    if(i === 0) wrap.style.borderRadius = seeds.length > 1 ? '26px 0 0 0' : '26px 26px 0 0';
-    else if(i === seeds.length - 1) wrap.style.borderRadius = '0 26px 0 0';
-    // Spinner loading
-    wrap.innerHTML = `<div class="pdm-ai-spinner"><i class="ph-duotone ph-sparkle"></i><span>AI</span></div>`;
-    // Carica immagine
-    const img = document.createElement('img');
-    img.alt = name;
-    img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:none;transition:opacity .5s';
-    img.src = `https://image.pollinations.ai/prompt/${enc}?width=400&height=400&nologo=true&seed=${seed}&model=flux`;
-    img.onload = () => {
-      wrap.innerHTML = '';
-      img.style.display = 'block';
-      img.style.opacity = '0';
-      wrap.appendChild(img);
-      requestAnimationFrame(() => { img.style.opacity = '1'; });
-      // Badge "✨ AI" sulla prima foto
-      if(i === 0){
-        const badge = document.createElement('div');
-        badge.className = 'pdm-ai-badge';
-        badge.innerHTML = '<i class="ph-duotone ph-sparkle"></i> Generata da AI';
-        wrap.appendChild(badge);
-      }
-    };
-    img.onerror = () => {
-      wrap.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.2);font-size:20px;width:100%;height:100%"><i class="ph-duotone ph-image-broken"></i></div>';
-    };
-    wrap.appendChild(img);
-    container.appendChild(wrap);
+  const { name, address, category } = container._meta;
+  container._slots.forEach((s,i)=>{
+    const el = document.createElement('div');
+    if(s.type==='user')       _fillUserSlot(el, s.url, i);
+    else if(s.type==='ai')    _fillAISlot(el, s.seed, name, address, category, i);
+    else                      _fillEmptySlot(el, i);
+    container.appendChild(el);
   });
-  // Contatore
-  const ctr = document.createElement('div');
-  ctr.className = 'pdm-photo-counter';
-  ctr.textContent = '✨ 3 foto AI';
-  container.appendChild(ctr);
+  const nUser = container._slots.filter(s=>s.type==='user').length;
+  const nAI   = container._slots.filter(s=>s.type==='ai').length;
+  if(nUser > 0 || nAI > 0){
+    const ctr = document.createElement('div');
+    ctr.className = 'pdm-photo-counter';
+    if(nUser > 0 && nAI === 0)      ctr.innerHTML = `<i class="ph-duotone ph-camera"></i> ${nUser} foto`;
+    else if(nAI > 0 && nUser === 0) ctr.innerHTML = `<i class="ph-duotone ph-sparkle"></i> AI`;
+    else                            ctr.innerHTML = `<i class="ph-duotone ph-camera"></i> ${nUser} · <i class="ph-duotone ph-sparkle"></i> ${nAI}`;
+    container.appendChild(ctr);
+  }
+}
+
+function renderPhotoStrip(container, photos, name, address, category){
+  container._meta = { name, address, category };
+  const user = Array.isArray(photos) ? photos.slice(0,3) : [];
+  container._slots = [0,1,2].map(i => {
+    if(i < user.length)      return { type:'user', url: user[i] };
+    if(user.length === 0)    return { type:'ai', seed: Math.floor(Math.random()*8000+100) };
+    return { type:'empty' };
+  });
+  _renderAllSlots(container);
+}
+
+function _pickPhotoForSlot(idx, container){
+  if(!container) return;
+  const inp = document.createElement('input');
+  inp.type='file'; inp.accept='image/*';
+  inp.onchange = (e)=>{
+    const file = e.target.files?.[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev)=>{
+      container._slots[idx] = { type:'user', url: ev.target.result };
+      if(typeof currentPOI!=='undefined')
+        currentPOI.photos = container._slots.filter(s=>s.type==='user').map(s=>s.url);
+      _renderAllSlots(container);
+    };
+    reader.readAsDataURL(file);
+  };
+  inp.click();
+}
+
+function _regenAISlot(idx, container){
+  if(!container) return;
+  container._slots[idx] = { type:'ai', seed: Math.floor(Math.random()*8000+100) };
+  _renderAllSlots(container);
+}
+
+function _deleteSlot(idx, container){
+  if(!container) return;
+  container._slots[idx] = { type:'empty' };
+  if(typeof currentPOI!=='undefined')
+    currentPOI.photos = container._slots.filter(s=>s.type==='user').map(s=>s.url);
+  _renderAllSlots(container);
 }
 
 // Mappa il nome categoria → classe CSS colore tag
@@ -6345,11 +6414,7 @@ function positionDetailClose(){
 function openDetail(idx){
   const p=POIS[idx]; currentPOI=p;
   const ph=document.getElementById('detailPhotos'); ph.innerHTML='';
-  if(p.photos&&p.photos.length>0){
-    renderDetailPhotos(ph, p.photos);
-  } else {
-    generateAIPhotos(ph, p.name, p.address||'Tiranë, Albania', p.cat||'Luogo');
-  }
+  renderPhotoStrip(ph, p.photos||[], p.name, p.address||'Tiranë, Albania', p.cat||'Luogo');
   // Hero: tag
   const tag=document.getElementById('detailTag');
   const cat=p.cat||'Luogo';
