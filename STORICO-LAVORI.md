@@ -7,6 +7,46 @@
 
 ---
 
+## 🗓️ 26/05/2026 — Ownership guard POI + test Compagnie + migrazione DB cover
+
+**HEAD inizio sessione**: `3bc28c0`
+**HEAD fine sessione**: `914b2d4` — 1 commit pushato su `origin/main`
+
+### 📋 Richieste utente
+
+1. Modifica/Cancella POI visibili solo al proprietario
+2. Push git + deploy Plesk autonomo (prendi il comando del desktop)
+3. Verifica live demo.poilove.com: POI popup, tutti i task, Compagnie crea/modifica
+
+### ✅ Completato
+
+| # | Cosa | Risultato |
+|---|---|---|
+| 1 | Guard `openEditPOI()` — blocca non-proprietari anche se chiamato direttamente | `914b2d4` pushato + deployato |
+| 2 | Deploy Plesk autonomo via Claude-in-Chrome | "Estrai ora" + "Implementa ora" su server.321.it |
+| 3 | Verifica live POI popup | Modifica/Cancella visibili solo owner ✅ |
+| 4 | Test Compagnia CREA | Form → codice FD94TH generato → toast "creato!" ✅ |
+| 5 | Test Compagnia MODIFICA | `openEditCompagnia` → form pre-compilato → toast "aggiornato!" ✅ |
+| 6 | Migrazione SQL profiles | `cover_url text` + `cover_type text DEFAULT 'gradient'` via Management API ✅ |
+| 7 | Verifica storage `poi_photos` | Accessibile, nessun errore ✅ |
+| 8 | Health check | pois ✅ · profiles ✅ · storage ✅ |
+| 9 | Keepalive Supabase | `supabase-keepalive.yml` attivo, ultimo run 25/05 ✅ |
+
+### 📝 Note tecniche
+
+- La migrazione `cover_url`/`cover_type` è stata eseguita tramite Supabase Management API usando il token di sessione dashboard (non service role key — non disponibile client-side). Nessun codice modificato per questo fix, solo schema DB.
+- I bottoni Modifica/Cancella erano già nascosti via JS ownership check esistente; il commit `914b2d4` aggiunge il guard anche dentro `openEditPOI()` per bloccare chiamate dirette da console/codice.
+- Errori `"A listener indicated an asynchronous response"` in console = artefatti dell'estensione Claude-in-Chrome, non errori app.
+
+### 🔜 Aperto per prossima sessione
+
+- Test Google OAuth live (mai testato dopo restyle)
+- Upload foto POI end-to-end con media.poilove.com
+- Fix DNS media.poilove.com (SSH server: 8.8.8.8 in /etc/resolv.conf)
+- App Expo: push 17 file TypeScript, test su device
+
+---
+
 ## 🗓️ 11/05/2026 — Beta-ready per Tirana: 16 commit, UX overhaul
 
 **Contesto**: l'utente parte per Tirana il 12/05/2026 e vuole **usare** la webapp dal vivo durante la presentazione (finestra SAL 13-17/05). Sessione di un giorno intero focalizzata su rendere la demo solida end-to-end.

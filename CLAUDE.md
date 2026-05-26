@@ -4,61 +4,42 @@
 
 ---
 
-## 🟢 STATO AL 11/05/2026 sera — Beta-ready per Tirana
+## 🟢 STATO AL 26/05/2026 — Ownership guard + DB migrazione cover
 
-**Partenza utente**: 12/05/2026 per Tirana, presentazione SAL finestra 13-17/05.
-
-**HEAD GitHub `main`**: `3bc28c0`
-**Commit di oggi (11/05) — 16 push su origin/main**:
-```
-3bc28c0 fix(demo): ILLI•AI tab — testata duplicata rimossa + residuo blu fixato
-fcc8445 feat(demo): nuova mascot ILLI•AI (PNG Midjourney v8.1)
-6e610ca fix(demo): doppio tap su mobile — detector custom su click event
-1a93074 fix(demo): matita Modifica POI + modal al centro + sub-livelli scelta itin/rotta
-5e4ae06 fix(demo): chat ILLI•AI riempie altezza fino a 5px sopra il FAB
-c104503 feat(demo): doppio clic/tap mappa → popup OSM con 4 azioni (reverse geo)
-f6513fb feat(demo): nav picker (Apple/Google/Waze) + modal Aggiungi/Condividi + askIlliAbout + dblTap dev
-048e70a feat(demo): photo picker mobile semplificato + compagni/liste/autore POI cliccabili
-a3b6dd4 feat(demo): map search bar (POI locali + Nominatim) con marker + 4 azioni
-32c7aa6 feat(demo): photo source desktop-aware + inversione File/Rullino mobile
-b35d8ab feat(demo): ILLI•AI place suggestions con 4 azioni + map-types allineati
-8e89c40 feat(demo): photo picker → popup centrale 2 quadrati
-1720f30 chore(demo): brand-strip logo height 20→14px
-fa82eb8 chore(demo): brand-strip usa logo-bianco.png (1000x188 RGBA)
-187c0b9 fix(demo): sposta fascia brand in basso, topbar trasparente
-881fcbb feat(demo): fascetta nera v1 + foto griglia 33% + stat tap-nav + sub-tab Liste
-```
+**HEAD GitHub `main`**: `914b2d4`
+**Ultimo commit**: `914b2d4 fix(demo): ownership guard su openEditPOI — solo il proprietario può modificare`
 
 **Stato live siti**:
 
 | URL | Live HEAD | Note |
 |---|---|---|
-| https://demo.poilove.com/ | `47fb29b` (10/05) | **DA PULLARE** su Plesk — 16 commit nuovi |
+| https://demo.poilove.com/ | `914b2d4` (26/05) | ✅ allineato — ownership guard attivo |
 | https://poilove.com/ | `04e2e71` (08/05) | da pullare |
 | https://sal.poilove.com/ | `04e2e71` (08/05) | da pullare |
 | https://media.poilove.com/test.php | 503 | DNS server-side rotto (pre-esistente) |
 
-**Branch backup ancora attivo**:
-- `origin/wip/2026-05-10-task7-auth` → `4f38c83` (feature in attesa di re-merge: salvataggio profilo Supabase, upload media, diagnostica boot, migration SQL — molte già reimplementate o riassorbite oggi).
+**Supabase schema aggiornato 26/05**:
+- `profiles.cover_url text` — aggiunto ✅
+- `profiles.cover_type text DEFAULT 'gradient'` — aggiunto ✅
 
-### 📋 Quick start prossima sessione (in ordine, post-Tirana)
+**Supabase keepalive**: `supabase-keepalive.yml` attivo su GitHub Actions, ping ogni 3 giorni, ultimo run 25/05 ✅
 
-1. **Leggere `STORICO-LAVORI.md` sezione 11/05** per il dettaglio completo della giornata
+### 📋 Quick start prossima sessione
+
+1. **Leggere `STORICO-LAVORI.md`** (sezione 26/05 in cima) per il dettaglio completo
 2. **Leggere REGOLE HARD** sotto in questo file (non negoziabili dopo incident 10/05)
-3. **Plesk pull `demo/`, `web/`, `sal/`** per allineare i sotto-domini al HEAD GitHub `3bc28c0`
-4. **Bloccanti del briefing rimasti** (richiedono Supabase auth attivo):
+3. **Bloccanti rimasti** (richiedono Supabase auth attivo):
    - Test Google OAuth live sul demo (`signInWithGoogle()` già esiste, mai testato dopo restyle)
-   - Salvataggio reale profilo (avatar/cover/bio/lists/follows)
-   - Upload foto via media.poilove.com con fallback Supabase Storage
-   - Migration SQL `002_profile_cover.sql` (Supabase SQL Editor)
-5. **Setup altri OAuth provider** (bottoni X/LinkedIn/Facebook esistono ma danno errore "provider not configured"):
+   - Salvataggio reale profilo (avatar/cover/bio) — schema ora corretto
+   - Upload foto POI end-to-end via media.poilove.com con fallback Supabase Storage
+4. **Setup altri OAuth provider** (bottoni X/LinkedIn/Facebook esistono ma danno errore "provider not configured"):
    - X (Twitter) — gratis, ~10-15 min
    - LinkedIn OIDC — gratis, ~10 min
-   - Facebook — gratis ma richiede privacy policy + App Review Meta, ~15-25 min
-   - Apple Sign In — RIMANDATO a giugno (lancio Tirana, $99/anno Developer)
-6. **Rotte storiche con AI** (V2): data model `routes`, flow ILLI•AI per creazione, editor tappe, landing `/route/slug` — già linkato da modal "Crea nuova rotta con ILLI•AI" nel popup OSM
-7. **Fix DNS server-side media.poilove.com** (SSH server): `8.8.8.8` in `/etc/resolv.conf`
-8. **App Expo**: push 17 file TypeScript già scaffolded, test su device, build EAS
+   - Facebook — richiede privacy policy + App Review Meta, ~15-25 min
+   - Apple Sign In — RIMANDATO a giugno ($99/anno Developer)
+5. **Fix DNS server-side media.poilove.com** (SSH server): `8.8.8.8` in `/etc/resolv.conf`
+6. **App Expo**: push 17 file TypeScript già scaffolded, test su device, build EAS
+7. **Rotte storiche con AI** (V2): data model `routes`, flow ILLI•AI, editor tappe, landing `/route/slug`
 
 ### ⚠️ Quello che la prossima sessione NON deve fare senza ack
 
@@ -318,7 +299,8 @@ Il sito è live su **https://poilove.com** (non su GitHub Pages — quello è so
 ## Database Supabase — tabelle principali
 
 ```sql
-profiles       -- id (=auth.users.id), username, avatar_url, bio, updated_at
+profiles       -- id (=auth.users.id), username, avatar_url, bio, updated_at,
+               --   cover_url text, cover_type text DEFAULT 'gradient'  ← aggiunte 26/05
 pois           -- id, author_id→profiles.id, name, description, lat, lng,
                --   category, photos[], love_count, visibility, created_at
 lists          -- id, owner_id→profiles.id, name, is_public
@@ -328,6 +310,7 @@ follows        -- follower_id, following_id
 ```
 
 **⚠️ Nota critica:** `pois.author_id` è FK → `profiles.id` (NON `user_id`).
+**cover_type** valori: `'gradient'` (CSS gradient string) | `'image'` (URL immagine).
 
 **Visibility POI:** `'private'` | `'community'` | `'suggested_google'`
 
