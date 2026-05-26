@@ -716,46 +716,121 @@ body.tab-active #mapQuickBtns{display:none}
 .poi-tail{width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:8px solid var(--red);margin-top:-1px}
 .poi-label{margin-top:3px;background:rgba(0,0,0,.72);backdrop-filter:blur(4px);color:#fff;font-size:9px;font-weight:700;border-radius:6px;padding:2px 6px;max-width:88px;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;letter-spacing:.2px;line-height:1.3}
 
-/* ── DETAIL SHEET ── */
-.detail-photos{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px}
-.detail-photo{width:100%;aspect-ratio:1;border-radius:10px;background-size:cover;background-position:center;background-color:#ede7dc;position:relative;overflow:hidden}
-.detail-photo-more{position:absolute;inset:0;background:rgba(0,0,0,.55);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;letter-spacing:.5px}
-.detail-no-photo{grid-column:1/-1;width:100%;height:120px;border-radius:12px;background:#f0ebe0;display:flex;align-items:center;justify-content:center;font-size:32px;color:#C8BFB0}
-.detail-tag{display:inline-flex;align-items:center;gap:4px;background:var(--bg);border-radius:8px;padding:4px 9px;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:6px}
-.detail-name{font-size:22px;font-weight:900;color:var(--text);line-height:1.2;margin-bottom:8px}
-.detail-loc{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);margin-bottom:4px}
-.detail-coords{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);font-family:monospace;margin-bottom:10px}
-.detail-share-link{font-size:11px;color:var(--orange);font-family:monospace;margin-bottom:12px;display:flex;align-items:center;gap:6px;background:#FFF7F0;border-radius:8px;padding:7px 10px}
-.detail-desc{font-size:14px;color:var(--text);line-height:1.6;margin-bottom:16px}
-.detail-footer{display:flex;align-items:center;gap:10px}
-.detail-actions{display:flex;gap:7px;flex:1}
-.detail-action-btn{height:38px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px;padding:0 12px;color:var(--text);transition:all .15s}
-.detail-action-btn:active{transform:scale(.96)}
-.da-nav{background:var(--blue);color:#fff;border-color:var(--blue)}
+/* ── POI DETAIL MODAL ── */
+#detailBg.vis{background:rgba(0,0,0,.52);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+#detailSheet{position:absolute;border-radius:26px;bottom:auto;left:50%;top:50%;width:min(400px,94vw);max-height:88vh;padding:0;transform:translate(-50%,calc(-50% + 28px));opacity:0;transition:transform .36s cubic-bezier(.32,.72,0,1),opacity .28s;overflow-y:auto;overflow-x:hidden;box-shadow:0 24px 64px rgba(0,0,0,.32),0 4px 16px rgba(0,0,0,.16)}
+#detailSheet.open{transform:translate(-50%,-50%);opacity:1}
+.pdm-close{position:absolute;top:12px;right:12px;z-index:20;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.88);backdrop-filter:blur(6px);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:#666;transition:background .15s;box-shadow:0 1px 6px rgba(0,0,0,.18)}
+.pdm-close:hover{background:#fff}
+/* Foto strip */
+.pdm-photos{display:flex;gap:3px;overflow-x:auto;scrollbar-width:none;flex-shrink:0;background:#f0ebe0;border-radius:26px 26px 0 0;max-height:220px}
+.pdm-photos::-webkit-scrollbar{display:none}
+.pdm-photo{flex:0 0 calc(33.333% - 2px);aspect-ratio:1;overflow:hidden;background:#f0ebe0;position:relative}
+.pdm-photos .pdm-photo:first-child{border-radius:26px 0 0 0}
+.pdm-photos:has(.pdm-photo:only-child) .pdm-photo{border-radius:26px 26px 0 0}
+.pdm-photos .pdm-photo:nth-child(3),.pdm-photos .pdm-photo:last-child:not(:first-child):not(:nth-child(3)){border-radius:0 26px 0 0}
+.pdm-photo img{width:100%;height:100%;object-fit:contain;display:block;background:#f0ebe0}
+.pdm-photo-more{position:absolute;inset:0;background:rgba(0,0,0,.48);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;letter-spacing:.3px}
+.pdm-no-photo{height:80px;display:flex;align-items:center;justify-content:center;font-size:32px;color:#C8BFB0;background:#f0ebe0;border-radius:26px 26px 0 0}
+/* Barra azioni */
+.pdm-actions{display:flex;padding:14px 10px 14px;border-bottom:1px solid var(--border);background:var(--card);justify-content:space-evenly;flex-shrink:0}
+.pdm-act{display:flex;flex-direction:column;align-items:center;gap:5px;border:none;background:none;cursor:pointer;font-family:inherit;min-width:52px;flex-shrink:0;-webkit-tap-highlight-color:transparent;padding:0}
+.pdm-act-icon{width:46px;height:46px;border-radius:14px;background:#F4F0EB;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:21px;color:var(--text);transition:transform .13s,box-shadow .13s}
+.pdm-act:active .pdm-act-icon{transform:scale(.88)}
+.pdm-act span{font-size:9.5px;font-weight:800;color:var(--muted);white-space:nowrap;letter-spacing:.15px}
+.pdm-act-nav .pdm-act-icon{background:var(--blue);color:#fff;border-color:var(--blue);box-shadow:0 4px 12px rgba(40,94,167,.3)}
+.pdm-act-nav span{color:var(--blue)}
+.pdm-act-add .pdm-act-icon{background:#F0FAF4;color:#059669;border-color:#6EE7B7}
+.pdm-act-add span{color:#059669}
+.pdm-act-share .pdm-act-icon{background:#FFF7F0;color:#D97706;border-color:#FCD28A}
+.pdm-act-share span{color:#D97706}
+.pdm-act-edit .pdm-act-icon{background:#EBF2FC;color:var(--blue);border-color:#93C5FD}
+.pdm-act-edit span{color:var(--blue)}
+.pdm-act-del .pdm-act-icon{background:#FFF0F0;color:var(--red);border-color:#FCA5A5}
+.pdm-act-del span{color:var(--red)}
+/* Categorie + tags */
+.pdm-cat-section{padding:14px 18px 12px;background:#F6F2EC}
+.pdm-section-lbl{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:8px}
+.pdm-tags-strip{display:flex;flex-wrap:wrap;gap:6px}
+.pdm-tag{display:inline-flex;align-items:center;gap:4px;border-radius:20px;padding:5px 11px;font-size:11px;font-weight:800;letter-spacing:.15px}
+.pdm-tag-cultura,.pdm-tag-cultura{background:#DBEAFE;color:#1E3A8A}
+.pdm-tag-cibo{background:#FFEDD5;color:#9A3412}
+.pdm-tag-natura{background:#DCFCE7;color:#14532D}
+.pdm-tag-arte{background:#EDE9FE;color:#4C1D95}
+.pdm-tag-nightlife{background:#FAE8FF;color:#86198F}
+.pdm-tag-storia{background:#FEF9C3;color:#713F12}
+.pdm-tag-sport{background:#CCFBF1;color:#134E4A}
+.pdm-tag-default{background:#E7E2DA;color:#6B6560}
+/* Sezione bianca: itinerari + indirizzo + coordinate */
+.pdm-white-section{padding:14px 18px 10px;background:var(--card);border-top:1px solid var(--border)}
+.pdm-meta-row{display:flex;align-items:flex-start;gap:9px;font-size:12px;color:var(--muted);margin-bottom:8px;line-height:1.5}
+.pdm-meta-row i{font-size:15px;margin-top:0;flex-shrink:0;color:#D42B2B}
+.pdm-meta-row span{flex:1;word-break:break-word}
+.pdm-meta-row.coords i{color:var(--muted)}
+.pdm-meta-row.coords{font-family:monospace;font-size:11px}
+.pdm-itin-section{margin-bottom:12px}
+.pdm-itin-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.pdm-itin-chip{display:inline-flex;align-items:center;gap:4px;background:#F0FAF4;border:1px solid #6EE7B7;border-radius:20px;padding:3px 10px;font-size:10px;font-weight:800;color:#065F46;cursor:pointer}
+/* Titolo grande */
+.pdm-title-section{padding:18px 18px 14px;background:var(--card);border-top:1px solid var(--border)}
+.pdm-title{font-size:26px;font-weight:900;color:var(--text);line-height:1.15;margin:0 0 12px;letter-spacing:-.4px}
+.pdm-share-link{font-size:10px;color:var(--orange);font-family:monospace;display:flex;align-items:center;gap:7px;background:#FFF7F0;border-radius:10px;padding:9px 12px;cursor:pointer;border:1px solid #FDE4C4}
+.pdm-share-link span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pdm-share-link button{border:none;background:none;cursor:pointer;color:var(--orange);font-size:14px;padding:0;flex-shrink:0}
+/* Love */
+.pdm-love-row{padding:16px 18px 10px;display:flex;justify-content:center;background:var(--card)}
 .love-btn{height:38px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px;padding:0 14px;color:var(--muted);transition:all .2s;flex-shrink:0}
 .love-btn.loved{background:#FFF0F0;border-color:var(--red);color:var(--red)}
-/* ── Quick action bar nel detail sheet ── */
-.poi-quick-actions{display:flex;gap:8px;padding:12px 16px 14px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--border);background:var(--surface, #FFFDF9)}
-.poi-quick-actions::-webkit-scrollbar{display:none}
-.pqa-btn{display:flex;flex-direction:column;align-items:center;gap:5px;border:none;background:none;cursor:pointer;font-family:inherit;min-width:58px;-webkit-tap-highlight-color:transparent;flex-shrink:0;padding:0}
-.pqa-icon{width:52px;height:52px;border-radius:16px;background:#F4F0EB;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--text);transition:transform .13s,box-shadow .13s}
-.pqa-btn span{font-size:10px;font-weight:800;color:var(--muted);white-space:nowrap;letter-spacing:.2px}
-.pqa-btn:active .pqa-icon{transform:scale(.9)}
-.pqa-nav .pqa-icon{background:var(--blue);color:#fff;border-color:var(--blue);box-shadow:0 3px 10px rgba(40,94,167,.28)}
-.pqa-nav span{color:var(--blue)}
-.pqa-add .pqa-icon{background:#F0FAF4;color:#059669;border-color:#6EE7B7}
-.pqa-add span{color:#059669}
-.pqa-edit .pqa-icon{background:#EBF2FC;color:var(--blue);border-color:#93C5FD}
-.pqa-edit span{color:var(--blue)}
-.pqa-del .pqa-icon{background:#FFF0F0;color:var(--red);border-color:#FCA5A5}
-.pqa-del span{color:var(--red)}
-/* Love button grande e centrato */
-.love-row{display:flex;justify-content:center;margin:14px 0 10px}
-.love-btn-big{height:48px;border-radius:16px;font-size:16px;padding:0 36px;gap:8px}
-.author-row{display:flex;align-items:center;gap:10px;padding:12px 8px;cursor:pointer;border-radius:10px;transition:background .15s;margin:0 -8px}
-.author-row:hover{background:#f5f0e8}
-.author-row:active{background:#ede7dc}
-.author-row::after{content:'›';margin-left:auto;font-size:22px;color:var(--muted);font-weight:300;line-height:1}
+.love-btn-big{height:52px;border-radius:18px;font-size:18px;padding:0 44px;gap:10px;border-width:2px;box-shadow:0 2px 12px rgba(212,43,43,.1);transition:all .22s}
+.love-btn-big.loved{box-shadow:0 4px 22px rgba(212,43,43,.3)}
+.love-btn-big:active{transform:scale(.95)}
+/* Autore */
+.pdm-author{display:flex;align-items:center;gap:12px;padding:14px 18px 18px;background:var(--card);cursor:pointer;transition:background .15s;border-top:1px solid var(--border)}
+.pdm-author:hover{background:#f7f2ea}
+.pdm-author:active{background:#ede7dc}
+.pdm-author-avatar{width:42px;height:42px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid var(--border)}
+.pdm-author-avatar img{width:100%;height:100%;object-fit:cover}
+.pdm-author-info{flex:1;min-width:0}
+.pdm-author-handle{display:block;font-size:13px;font-weight:800;color:var(--text)}
+.pdm-author-meta{display:block;font-size:11px;color:var(--muted);margin-top:2px}
+.pdm-author-arrow{font-size:18px;color:var(--muted);flex-shrink:0}
+/* ── MICRO MODAL (disambiguation + confirm) ── */
+.micro-modal-ov{position:fixed;inset:0;z-index:800;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,0);pointer-events:none;transition:background .25s}
+.micro-modal-ov.open{background:rgba(0,0,0,.5);pointer-events:all;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.micro-modal{background:var(--card);border-radius:24px 24px 0 0;padding-bottom:env(safe-area-inset-bottom,12px);width:100%;max-width:480px;transform:translateY(100%);transition:transform .32s cubic-bezier(.32,.72,0,1);overflow:hidden}
+.micro-modal-ov.open .micro-modal{transform:translateY(0)}
+.micro-modal-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:12px auto 2px}
+.micro-modal-title{font-size:13px;font-weight:900;color:var(--text);padding:10px 20px 12px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border)}
+.micro-modal-title i{font-size:17px;color:var(--muted)}
+.micro-modal-sec-lbl{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);padding:12px 20px 5px}
+.micro-modal-opt{width:100%;display:flex;align-items:center;gap:14px;padding:12px 20px;border:none;background:none;cursor:pointer;font-family:inherit;text-align:left;transition:background .12s;-webkit-tap-highlight-color:transparent}
+.micro-modal-opt:active{background:#f5f0e8}
+.mmo-icon{width:42px;height:42px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.mmo-text{flex:1;min-width:0}
+.mmo-text strong{display:block;font-size:13px;font-weight:800;color:var(--text);line-height:1.2}
+.mmo-text span{display:block;font-size:11px;color:var(--muted);margin-top:2px}
+.mmo-arrow{font-size:16px;color:#D0C8BE;flex-shrink:0}
+.micro-modal-cancel{display:block;width:calc(100% - 32px);margin:6px 16px 12px;height:46px;border-radius:14px;border:none;background:#F0EBE3;font-family:inherit;font-size:13px;font-weight:800;color:var(--muted);cursor:pointer;transition:background .15s}
+.micro-modal-cancel:active{background:#e4ddd4}
+/* Share apps grid */
+.share-apps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:6px 16px 4px}
+.share-app-btn{display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 6px;border:1.5px solid var(--border);border-radius:14px;background:var(--card);cursor:pointer;font-family:inherit;font-size:10px;font-weight:800;color:var(--muted);transition:all .15s;-webkit-tap-highlight-color:transparent}
+.share-app-btn:active{transform:scale(.92);background:#f0ebe0}
+.sa-ico{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+/* Delete confirm */
+.delete-confirm-ov{position:fixed;inset:0;z-index:900;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0);pointer-events:none;transition:background .25s;padding:20px}
+.delete-confirm-ov.open{background:rgba(0,0,0,.56);pointer-events:all;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.delete-confirm-modal{background:var(--card);border-radius:24px;padding:28px 22px 20px;width:100%;max-width:320px;transform:scale(.88) translateY(20px);opacity:0;transition:transform .3s cubic-bezier(.32,.72,0,1),opacity .22s}
+.delete-confirm-ov.open .delete-confirm-modal{transform:scale(1) translateY(0);opacity:1}
+.dcm-icon{width:58px;height:58px;border-radius:18px;background:#FFF0F0;color:var(--red);display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 14px}
+.dcm-title{font-size:18px;font-weight:900;color:var(--text);text-align:center;margin-bottom:8px}
+.dcm-name{font-size:12px;font-weight:800;color:var(--red);text-align:center;padding:6px 14px;background:#FFF5F5;border-radius:10px;margin-bottom:12px;word-break:break-word}
+.dcm-desc{font-size:12px;color:var(--muted);text-align:center;line-height:1.65;margin-bottom:20px}
+.dcm-actions{display:flex;gap:10px}
+.dcm-cancel{flex:1;height:46px;border-radius:14px;border:1.5px solid var(--border);background:var(--bg);font-family:inherit;font-size:13px;font-weight:800;color:var(--text);cursor:pointer;transition:background .15s}
+.dcm-cancel:active{background:#ede7dc}
+.dcm-confirm{flex:1;height:46px;border-radius:14px;border:none;background:var(--red);color:#fff;font-family:inherit;font-size:13px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 4px 16px rgba(212,43,43,.32);transition:all .15s}
+.dcm-confirm:active{transform:scale(.96)}
 .g-avatar{width:34px;height:34px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid var(--border)}
 .g-avatar img{width:100%;height:100%;object-fit:cover}
 .author-name{font-size:13px;font-weight:700;color:var(--text);flex:1}
@@ -830,8 +905,8 @@ body.tab-active #mapQuickBtns{display:none}
   .profile-view,.itin-view,.poi-view,.companions-view,.illi-view{left:50%}
   .nav-bar{left:50%;right:0}
 
-  /* Detail sheet overlay: ancorato alla metà destra */
-  #detailOv{left:50%;right:0;top:0;bottom:0}
+  /* Detail modal: copre tutta la viewport (modal centrato) */
+  #detailOv{left:0;right:0;top:0;bottom:0}
 
   /* POI board: 2 colonne nel pannello 50% */
   .poi-board{grid-template-columns:repeat(2,1fr)!important}
@@ -839,7 +914,7 @@ body.tab-active #mapQuickBtns{display:none}
   /* Cover immagini: aspect-ratio controllato, mai sgranate */
   .itin-cover-img{aspect-ratio:16/9;object-fit:cover;width:100%;display:block}
   .poi-card-img{aspect-ratio:4/3!important}
-  .detail-photo{width:100%;height:auto;aspect-ratio:4/3;flex-shrink:0}
+  .pdm-photo img{width:100%;height:100%;object-fit:contain}
 
   /* AddPOI desktop split-view: form a destra, mappa interattiva a sinistra */
   body.addpoi-open #addPoiOv{left:50%;right:0;top:0;bottom:0}
@@ -2553,56 +2628,177 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 <div class="sheet-overlay" id="detailOv">
   <div class="sheet-backdrop" id="detailBg"></div>
   <div class="sheet" id="detailSheet">
-    <div class="sh-handle" id="detailHandle"></div>
-    <!-- Bottone X chiusura -->
-    <button class="sh-close" onclick="closeDetail()" title="Chiudi" style="position:absolute;top:12px;right:14px;z-index:6"><i class="ph-duotone ph-x"></i></button>
-    <!-- ── Quick action bar ── -->
-    <div class="poi-quick-actions" id="detailQuickActions">
-      <button class="pqa-btn pqa-nav" onclick="openNavigation()">
-        <div class="pqa-icon"><i class="ph-duotone ph-car"></i></div>
+    <!-- X chiudi -->
+    <button class="pdm-close" onclick="closeDetail()" title="Chiudi"><i class="ph-duotone ph-x"></i></button>
+    <!-- 1. Foto -->
+    <div class="pdm-photos" id="detailPhotos"></div>
+    <!-- 2. Azioni -->
+    <div class="pdm-actions" id="detailQuickActions">
+      <button class="pdm-act pdm-act-nav" onclick="openNavigation()">
+        <div class="pdm-act-icon"><i class="ph-duotone ph-road-horizon"></i></div>
         <span>Vai</span>
       </button>
-      <button class="pqa-btn pqa-add" onclick="addPoiToItinerary()">
-        <div class="pqa-icon"><i class="ph-duotone ph-plus-circle"></i></div>
+      <button class="pdm-act pdm-act-add" onclick="openPoiAddDisambig()">
+        <div class="pdm-act-icon"><i class="ph-duotone ph-plus-circle"></i></div>
         <span>Aggiungi</span>
       </button>
-      <button class="pqa-btn" onclick="shareDetail()">
-        <div class="pqa-icon"><i class="ph-duotone ph-share-network"></i></div>
+      <button class="pdm-act pdm-act-share" onclick="openPoiShareDisambig()">
+        <div class="pdm-act-icon"><i class="ph-duotone ph-share-network"></i></div>
         <span>Condividi</span>
       </button>
-      <button class="pqa-btn pqa-edit" id="detailEditBtn" onclick="openEditPOI()" style="display:none">
-        <div class="pqa-icon"><i class="ph-duotone ph-pencil-simple"></i></div>
+      <button class="pdm-act pdm-act-edit" id="detailEditBtn" onclick="openEditPOI()" style="display:none">
+        <div class="pdm-act-icon"><i class="ph-duotone ph-pencil-simple"></i></div>
         <span>Modifica</span>
       </button>
-      <button class="pqa-btn pqa-del" id="detailDeleteBtn" onclick="deleteCurrentPOI()" style="display:none">
-        <div class="pqa-icon"><i class="ph-duotone ph-trash"></i></div>
+      <button class="pdm-act pdm-act-del" id="detailDeleteBtn" onclick="openDeleteConfirm()" style="display:none">
+        <div class="pdm-act-icon"><i class="ph-duotone ph-trash-simple"></i></div>
         <span>Cancella</span>
       </button>
     </div>
-    <!-- ── Contenuto ── -->
-    <div style="padding:14px 20px 0">
-      <div class="detail-photos" id="detailPhotos"></div>
-      <div class="detail-tag" id="detailTag"><i class="ph-duotone ph-tag" style="font-size:11px"></i> Cultura</div>
-      <div class="detail-name" id="detailName">—</div>
-      <div class="detail-loc"><i class="ph-duotone ph-map-pin"></i><span id="detailAddress">—</span></div>
-      <div class="detail-coords"><i class="ph-duotone ph-crosshair-simple"></i><span id="detailCoordsText">—</span></div>
-      <div class="detail-share-link" id="detailShareLink">
-        <i class="ph-duotone ph-link" style="color:var(--orange)"></i>
-        <span id="detailShareLinkTxt" style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
-        <button style="border:none;background:none;cursor:pointer;color:var(--orange)" onclick="copyDetailLink()"><i class="ph-duotone ph-copy"></i></button>
+    <!-- 3. Categorie + tag colorati -->
+    <div class="pdm-cat-section">
+      <div class="pdm-section-lbl">Categorie</div>
+      <div class="pdm-tags-strip" id="detailTagsStrip">
+        <span class="pdm-tag pdm-tag-default" id="detailTag"><i class="ph-duotone ph-tag"></i> Luogo</span>
       </div>
-      <div class="detail-desc" id="detailDesc">—</div>
-      <!-- Love button grande centrato -->
-      <div class="love-row">
-        <button class="love-btn love-btn-big" id="loveBtn" onclick="toggleLove()">
-          <i class="ph-duotone ph-heart" id="loveHeart"></i>
-          <span class="love-cnt" id="loveCnt">24</span>
-        </button>
+    </div>
+    <!-- 4. Sezione bianca: itinerari + indirizzo + coordinate -->
+    <div class="pdm-white-section">
+      <div class="pdm-itin-section" id="detailItinSection" style="display:none">
+        <div class="pdm-section-lbl">In itinerari</div>
+        <div class="pdm-itin-chips" id="detailItinChips"></div>
       </div>
-      <div class="author-row" style="padding-top:8px;border-top:1px solid var(--border);margin-bottom:10px" onclick="openAuthorProfile()">
-        <div class="g-avatar"><img src="https://ui-avatars.com/api/?name=A&background=D42B2B&color=fff&size=80" alt="" id="detailAuthorAvatar"/></div>
-        <div class="author-name" id="detailAuthor">—</div>
+      <div class="pdm-meta-row">
+        <i class="ph-duotone ph-map-pin"></i>
+        <span id="detailAddress">—</span>
       </div>
+      <div class="pdm-meta-row coords">
+        <i class="ph-duotone ph-crosshair-simple"></i>
+        <span id="detailCoordsText">—</span>
+      </div>
+    </div>
+    <!-- 5. Titolo grande + link -->
+    <div class="pdm-title-section">
+      <h2 class="pdm-title" id="detailName">—</h2>
+      <div class="pdm-share-link" id="detailShareLink" onclick="copyDetailLink()">
+        <i class="ph-duotone ph-link"></i>
+        <span id="detailShareLinkTxt"></span>
+        <button onclick="event.stopPropagation();copyDetailLink()" title="Copia link"><i class="ph-duotone ph-copy"></i></button>
+      </div>
+    </div>
+    <!-- 6. Love -->
+    <div class="pdm-love-row">
+      <button class="love-btn love-btn-big" id="loveBtn" onclick="toggleLove()">
+        <i class="ph-duotone ph-heart" id="loveHeart"></i>
+        <span class="love-cnt" id="loveCnt">0</span>
+      </button>
+    </div>
+    <!-- 7. Autore -->
+    <div class="pdm-author" onclick="openAuthorProfile()">
+      <div class="pdm-author-avatar">
+        <img src="https://ui-avatars.com/api/?name=A&background=D42B2B&color=fff&size=80" alt="" id="detailAuthorAvatar"/>
+      </div>
+      <div class="pdm-author-info">
+        <span class="pdm-author-handle" id="detailAuthor">—</span>
+        <span class="pdm-author-meta" id="detailAuthorMeta"></span>
+      </div>
+      <i class="ph-duotone ph-caret-right pdm-author-arrow"></i>
+    </div>
+    <!-- descrizione nascosta (usata da JS, non mostrata nel nuovo layout) -->
+    <div id="detailDesc" style="display:none"></div>
+  </div>
+</div>
+
+<!-- DISAMBIGUATION: Aggiungi POI a… -->
+<div class="micro-modal-ov" id="addPoiDisambigOv" onclick="closeAddPoiDisambig()">
+  <div class="micro-modal" onclick="event.stopPropagation()">
+    <div class="micro-modal-handle"></div>
+    <div class="micro-modal-title"><i class="ph-duotone ph-plus-circle"></i> Aggiungi a…</div>
+    <button class="micro-modal-opt" onclick="addPoiToItinerary()">
+      <div class="mmo-icon" style="background:#DBEAFE;color:#1E3A8A"><i class="ph-duotone ph-path"></i></div>
+      <div class="mmo-text"><strong>Itinerario</strong><span>Aggiungi a un viaggio o percorso</span></div>
+      <i class="ph-duotone ph-caret-right mmo-arrow"></i>
+    </button>
+    <button class="micro-modal-opt" onclick="addPoiToCompagnia();closeAddPoiDisambig()">
+      <div class="mmo-icon" style="background:#DCFCE7;color:#14532D"><i class="ph-duotone ph-users-three"></i></div>
+      <div class="mmo-text"><strong>Compagnia</strong><span>Condividi con una compagnia di viaggio</span></div>
+      <i class="ph-duotone ph-caret-right mmo-arrow"></i>
+    </button>
+    <button class="micro-modal-opt" onclick="closeAddPoiDisambig();showToast('🗺 Rotte Storiche — prossimamente!')">
+      <div class="mmo-icon" style="background:#FFEDD5;color:#9A3412"><i class="ph-duotone ph-mountains"></i></div>
+      <div class="mmo-text"><strong>Rotta Storica</strong><span>Inserisci in un percorso storico</span></div>
+      <i class="ph-duotone ph-caret-right mmo-arrow"></i>
+    </button>
+    <button class="micro-modal-opt" onclick="closeAddPoiDisambig();showToast('🏷 Categorie — prossimamente!')">
+      <div class="mmo-icon" style="background:#EDE9FE;color:#4C1D95"><i class="ph-duotone ph-tag"></i></div>
+      <div class="mmo-text"><strong>Categoria</strong><span>Organizza per tipo o tema</span></div>
+      <i class="ph-duotone ph-caret-right mmo-arrow"></i>
+    </button>
+    <button class="micro-modal-cancel" onclick="closeAddPoiDisambig()">Annulla</button>
+  </div>
+</div>
+
+<!-- DISAMBIGUATION: Condividi POI -->
+<div class="micro-modal-ov" id="sharePoiDisambigOv" onclick="closeSharePoiDisambig()">
+  <div class="micro-modal" onclick="event.stopPropagation()">
+    <div class="micro-modal-handle"></div>
+    <div class="micro-modal-title"><i class="ph-duotone ph-share-network"></i> Condividi</div>
+    <div class="micro-modal-sec-lbl">Community POI•LOVE</div>
+    <button class="micro-modal-opt" onclick="sharePoiWith('followers')">
+      <div class="mmo-icon" style="background:#DBEAFE;color:#1E3A8A"><i class="ph-duotone ph-rss-simple"></i></div>
+      <div class="mmo-text"><strong>Follower</strong><span>Visibile a chi ti segue</span></div>
+      <i class="ph-duotone ph-caret-right mmo-arrow"></i>
+    </button>
+    <button class="micro-modal-opt" onclick="sharePoiWith('friends')">
+      <div class="mmo-icon" style="background:#DCFCE7;color:#14532D"><i class="ph-duotone ph-users"></i></div>
+      <div class="mmo-text"><strong>Amici</strong><span>Solo le persone connesse</span></div>
+      <i class="ph-duotone ph-caret-right mmo-arrow"></i>
+    </button>
+    <div class="micro-modal-sec-lbl">Fuori dalla community</div>
+    <div class="share-apps-grid">
+      <button class="share-app-btn" onclick="shareVia('whatsapp')">
+        <div class="sa-ico" style="background:#25D366;color:#fff"><i class="ph-fill ph-whatsapp-logo"></i></div>
+        WhatsApp
+      </button>
+      <button class="share-app-btn" onclick="shareVia('telegram')">
+        <div class="sa-ico" style="background:#26A5E4;color:#fff"><i class="ph-fill ph-telegram-logo"></i></div>
+        Telegram
+      </button>
+      <button class="share-app-btn" onclick="shareVia('email')">
+        <div class="sa-ico" style="background:#EA4335;color:#fff"><i class="ph-duotone ph-envelope-simple"></i></div>
+        Email
+      </button>
+      <button class="share-app-btn" onclick="shareVia('facebook')">
+        <div class="sa-ico" style="background:#1877F2;color:#fff"><i class="ph-fill ph-facebook-logo"></i></div>
+        Facebook
+      </button>
+      <button class="share-app-btn" onclick="shareVia('x')" style="font-weight:900">
+        <div class="sa-ico" style="background:#000;color:#fff;font-size:14px;font-weight:900;font-family:serif">𝕏</div>
+        X
+      </button>
+      <button class="share-app-btn" onclick="shareVia('copy')">
+        <div class="sa-ico" style="background:var(--orange);color:#fff"><i class="ph-duotone ph-link"></i></div>
+        Copia
+      </button>
+      <button class="share-app-btn" onclick="shareViaNative()">
+        <div class="sa-ico" style="background:var(--blue);color:#fff"><i class="ph-duotone ph-export"></i></div>
+        Altro…
+      </button>
+    </div>
+    <button class="micro-modal-cancel" onclick="closeSharePoiDisambig()">Annulla</button>
+  </div>
+</div>
+
+<!-- CONFERMA ELIMINAZIONE POI -->
+<div class="delete-confirm-ov" id="deleteConfirmOv" onclick="closeDeleteConfirm()">
+  <div class="delete-confirm-modal" onclick="event.stopPropagation()">
+    <div class="dcm-icon"><i class="ph-duotone ph-trash-simple"></i></div>
+    <div class="dcm-title">Elimina questo POI?</div>
+    <div class="dcm-name" id="deleteConfirmName">—</div>
+    <div class="dcm-desc">Questa azione è irreversibile. Il POI sparirà dalla mappa e da tutti gli itinerari in cui è stato salvato.</div>
+    <div class="dcm-actions">
+      <button class="dcm-cancel" onclick="closeDeleteConfirm()">Annulla</button>
+      <button class="dcm-confirm" onclick="confirmDeletePOI()"><i class="ph-duotone ph-trash-simple"></i> Elimina</button>
     </div>
   </div>
 </div>
@@ -3092,31 +3288,38 @@ function addDBMarker(p) {
 
 function openDBDetail(p) {
   currentPOI = { ...p, idx: -1 };
-  // ── Foto: griglia 3 col 33%, prime 3 con badge "+N" sull'ultima ──
   const photos = Array.isArray(p.photos) ? p.photos : (p.photos ? [p.photos] : []);
   const ph = document.getElementById('detailPhotos');
   ph.innerHTML = '';
   if (photos.length > 0) {
     renderDetailPhotos(ph, photos);
   } else {
-    const d = document.createElement('div');
-    d.className = 'detail-no-photo';
-    d.innerHTML = '<i class="ph-duotone ph-image-broken"></i>';
-    ph.appendChild(d);
+    ph.innerHTML = '<div class="pdm-no-photo"><i class="ph-duotone ph-image-broken"></i></div>';
   }
-  // ── Metadati ──
-  document.getElementById('detailTag').innerHTML = `<i class="ph-duotone ph-tag" style="font-size:11px"></i> ${p.category || 'Luogo'}`;
+  // Tag categoria colorato
+  const cat = p.category || 'Luogo';
+  const tag = document.getElementById('detailTag');
+  tag.className = `pdm-tag ${_tagClass(cat)}`;
+  tag.innerHTML = `<i class="ph-duotone ph-tag"></i> ${cat}`;
+  // Metadati
   document.getElementById('detailName').textContent = p.name;
   document.getElementById('detailAddress').textContent = p.address || '';
   document.getElementById('detailDesc').textContent = p.description || '';
-  document.getElementById('detailAuthor').textContent = p.profiles?.username || 'Anonimo';
-  document.getElementById('loveCnt').textContent = p.love_count || 0;
-  // Coordinate nel detail
   const coordEl = document.getElementById('detailCoordsText');
   if (coordEl && p.lat && p.lng) coordEl.textContent = `${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}`;
-  // Aggiorna link condivisione — con ID se disponibile (link stabile)
+  // Love
+  document.getElementById('loveCnt').textContent = p.love_count || 0;
+  document.getElementById('loveBtn').classList.remove('loved');
+  document.getElementById('loveHeart').className = 'ph-duotone ph-heart';
+  // Autore
+  const username = p.profiles?.username || 'Anonimo';
+  document.getElementById('detailAuthor').textContent = username;
+  document.getElementById('detailAuthorMeta').textContent = '';
+  document.getElementById('detailAuthorAvatar').src =
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=D42B2B&color=fff&size=80`;
+  // Link condivisione
   updateShareLink(p.lat || 0, p.lng || 0, p.id || null);
-  // Mostra "Modifica" e "Cancella" solo se il POI appartiene all'utente corrente
+  // Mostra Modifica/Cancella solo al proprietario
   const isOwner = !!(currentUser && currentUser.id === p.author_id);
   const editBtn = document.getElementById('detailEditBtn');
   if (editBtn) editBtn.style.display = isOwner ? 'flex' : 'none';
@@ -3125,36 +3328,8 @@ function openDBDetail(p) {
   openSheet('detailOv', 'detailBg', 'detailSheet');
 }
 
-/* Elimina il POI attualmente aperto nel detail sheet (solo il proprietario può farlo) */
-async function deleteCurrentPOI(){
-  if(!currentPOI || !currentUser) return;
-  if(currentPOI.author_id !== currentUser.id){ showToast('⛔ Non puoi eliminare POI altrui'); return; }
-  const nm = currentPOI.name || 'questo POI';
-  // Popup di conferma — obbligatorio per evitare eliminazioni accidentali
-  const ok = confirm(`Eliminare "${nm}"?\n\nQuesta azione è irreversibile.\nIl POI sparirà dalla mappa e dal database.`);
-  if(!ok) return;
-  // Elimina da Supabase (RLS garantisce che solo il proprietario possa farlo)
-  if(currentPOI.id && typeof sb !== 'undefined'){
-    const { error } = await sb.from('pois').delete()
-      .eq('id', currentPOI.id)
-      .eq('author_id', currentUser.id);
-    if(error){ showToast(`⚠️ Errore: ${error.message}`); return; }
-  }
-  // Rimuovi marker dalla mappa
-  if(window._dbMarkers && window._dbMarkers[currentPOI.id]){
-    window._dbMarkers[currentPOI.id].remove();
-    delete window._dbMarkers[currentPOI.id];
-  }
-  // Rimuovi dall'array globale _dbPOIs
-  if(window._dbPOIs) window._dbPOIs = window._dbPOIs.filter(x => x.id !== currentPOI.id);
-  // Chiudi sheet + feedback visivo
-  closeDetail();
-  showToast(`🗑 "${nm}" eliminato`);
-  // Aggiorna tab POI e contatore profilo
-  if(document.getElementById('poiView')?.classList.contains('active')) renderPoiTab();
-  const statEl = document.getElementById('statPoi');
-  if(statEl) statEl.textContent = Math.max(0, parseInt(statEl.textContent||0) - 1);
-}
+/* deleteCurrentPOI — mantenuta per retrocompatibilità, usa il nuovo confirm modal */
+function deleteCurrentPOI(){ openDeleteConfirm(); }
 
 /* ══════════════════════════════════════════
    UPLOAD FOTO — media.poilove.com (PHP server)
@@ -5995,39 +6170,70 @@ function openAddList(){openSheet('addListOv','addListBg','addListSheet');setTime
 /* ══════════════════════════════════════════
    DETAIL
 ══════════════════════════════════════════ */
-// Helper: griglia 3 col 33%, prime 3 + badge "+N" sull'ultima
+// Render foto nel detail modal — fino a 3, quadrate, object-fit:contain
 function renderDetailPhotos(container, photos){
   const MAX = 3;
   const visible = photos.slice(0, MAX);
+  const count = visible.length;
+  // Flex basis adattiva: 1 foto→100%, 2→50%, 3→33%
+  const basis = count === 1 ? '100%' : count === 2 ? 'calc(50% - 1.5px)' : 'calc(33.333% - 2px)';
   visible.forEach((url, i) => {
     const d = document.createElement('div');
-    d.className = 'detail-photo';
-    d.style.backgroundImage = `url('${url}')`;
+    d.className = 'pdm-photo';
+    d.style.flex = `0 0 ${basis}`;
+    // Border radius angoli superiori
+    if(count === 1) d.style.borderRadius = '26px 26px 0 0';
+    else if(i === 0) d.style.borderRadius = '26px 0 0 0';
+    else if(i === count - 1) d.style.borderRadius = '0 26px 0 0';
+    const img = document.createElement('img');
+    img.src = url;
+    img.alt = '';
+    img.loading = 'lazy';
+    d.appendChild(img);
     if (i === MAX - 1 && photos.length > MAX) {
-      d.innerHTML = `<div class="detail-photo-more">+${photos.length - MAX}</div>`;
+      const more = document.createElement('div');
+      more.className = 'pdm-photo-more';
+      more.textContent = `+${photos.length - MAX}`;
+      d.appendChild(more);
     }
     container.appendChild(d);
   });
 }
+
+// Mappa il nome categoria → classe CSS colore tag
+function _tagClass(cat){
+  const map={cibo:'cibo',food:'cibo',ristorante:'cibo',cultura:'cultura',arte:'arte',art:'arte',
+    natura:'natura',nature:'natura',nightlife:'nightlife',notte:'nightlife',storia:'storia',sport:'sport'};
+  return 'pdm-tag-'+(map[(cat||'').toLowerCase()]||'default');
+}
+
 function openDetail(idx){
-  const p=POIS[idx];currentPOI=p;
-  const ph=document.getElementById('detailPhotos');ph.innerHTML='';
+  const p=POIS[idx]; currentPOI=p;
+  const ph=document.getElementById('detailPhotos'); ph.innerHTML='';
   if(p.photos&&p.photos.length>0){
     renderDetailPhotos(ph, p.photos);
   } else {
-    const d=document.createElement('div');d.className='detail-no-photo';d.innerHTML='<i class="ph-duotone ph-image-broken"></i>';ph.appendChild(d);
+    ph.innerHTML='<div class="pdm-no-photo"><i class="ph-duotone ph-image-broken"></i></div>';
   }
-  document.getElementById('detailTag').innerHTML=`<i class="ph-duotone ph-tag" style="font-size:11px"></i> ${p.cat}`;
+  // Tag categoria
+  const tag=document.getElementById('detailTag');
+  const cat=p.cat||'Luogo';
+  tag.className=`pdm-tag ${_tagClass(cat)}`;
+  tag.innerHTML=`<i class="ph-duotone ph-tag"></i> ${cat}`;
+  // Metadati
   document.getElementById('detailName').textContent=p.name;
   document.getElementById('detailAddress').textContent=p.address||'Tiranë, Albania';
-  document.getElementById('detailCoordsText').textContent=`${p.lat.toFixed(4)}, ${p.lng.toFixed(4)}`;
-  document.getElementById('detailDesc').textContent=p.desc;
-  document.getElementById('loveCnt').textContent=p.love;
+  document.getElementById('detailCoordsText').textContent=`${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}`;
+  document.getElementById('detailDesc').textContent=p.desc||'';
+  document.getElementById('loveCnt').textContent=p.love||0;
   document.getElementById('loveBtn').classList.remove('loved');
-  document.getElementById('loveHeart').className='ph ph-heart';
+  document.getElementById('loveHeart').className='ph-duotone ph-heart';
   document.getElementById('detailAuthor').textContent=p.author||'—';
+  document.getElementById('detailAuthorMeta').textContent='';
+  document.getElementById('detailAuthorAvatar').src=
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(p.author||'?')}&background=D42B2B&color=fff&size=80`;
   updateShareLink(p.lat,p.lng);
-  // POI demo: bottoni owner sempre nascosti
+  // Nascondi edit/delete su POI demo
   const eB=document.getElementById('detailEditBtn');if(eB)eB.style.display='none';
   const dB=document.getElementById('detailDeleteBtn');if(dB)dB.style.display='none';
   openSheet('detailOv','detailBg','detailSheet');
@@ -6071,20 +6277,107 @@ function openNavigation(){
   if(!currentPOI) return;
   openNavPicker(currentPOI.lat, currentPOI.lng, currentPOI.name||'');
 }
-function shareDetail(){
-  const txt=document.getElementById('detailShareLinkTxt').textContent;
-  if(navigator.share)navigator.share({title:document.getElementById('detailName').textContent,url:txt});
-  else navigator.clipboard&&navigator.clipboard.writeText(txt).then(()=>showToast('Link copiato!'));
+function shareDetail(){ openPoiShareDisambig(); }
+
+/* ── Disambiguation: Aggiungi ── */
+function openPoiAddDisambig(){
+  if(!currentPOI) return;
+  document.getElementById('addPoiDisambigOv').classList.add('open');
 }
-// Aggiunge il POI corrente all'itinerario aprendone il form pre-compilato
+function closeAddPoiDisambig(){
+  document.getElementById('addPoiDisambigOv').classList.remove('open');
+}
+function addPoiToCompagnia(){
+  if(!currentPOI) return;
+  showToast('👥 Funzione Compagnia — prossimamente!');
+}
+
+// Aggiunge il POI all'itinerario (dal disambiguation modal)
 function addPoiToItinerary(){
   if(!currentPOI) return;
+  closeAddPoiDisambig();
   closeDetail();
   openSheet('addStopOv','addStopBg','addStopSheet');
   setTimeout(()=>{
     const el=document.getElementById('stopNameIn');
     if(el){ el.value=currentPOI.name||''; el.dispatchEvent(new Event('input')); }
   }, 320);
+}
+
+/* ── Disambiguation: Condividi ── */
+function openPoiShareDisambig(){
+  if(!currentPOI) return;
+  document.getElementById('sharePoiDisambigOv').classList.add('open');
+}
+function closeSharePoiDisambig(){
+  document.getElementById('sharePoiDisambigOv').classList.remove('open');
+}
+function sharePoiWith(type){
+  closeSharePoiDisambig();
+  if(type==='followers') showToast('📡 Condivisione follower — prossimamente!');
+  else showToast('👥 Condivisione amici — prossimamente!');
+}
+function shareVia(platform){
+  closeSharePoiDisambig();
+  const url = document.getElementById('detailShareLinkTxt').textContent || location.href;
+  const name = document.getElementById('detailName').textContent || 'POI•LOVE';
+  const text = `${name} — ${url}`;
+  const enc = encodeURIComponent;
+  const targets = {
+    whatsapp: `https://wa.me/?text=${enc(text)}`,
+    telegram: `https://t.me/share/url?url=${enc(url)}&text=${enc(name)}`,
+    facebook: `https://www.facebook.com/sharer/sharer.php?u=${enc(url)}`,
+    x:        `https://x.com/intent/tweet?text=${enc(text)}`,
+    email:    `mailto:?subject=${enc(name)}&body=${enc(text)}`,
+    copy:     null
+  };
+  if(platform === 'copy'){
+    navigator.clipboard?.writeText(url).then(()=>showToast('✅ Link copiato!'));
+    return;
+  }
+  if(targets[platform]) window.open(targets[platform], '_blank');
+}
+function shareViaNative(){
+  closeSharePoiDisambig();
+  const url = document.getElementById('detailShareLinkTxt').textContent || location.href;
+  const name = document.getElementById('detailName').textContent || 'POI•LOVE';
+  if(navigator.share){
+    navigator.share({title: name, url}).catch(()=>{});
+  } else {
+    navigator.clipboard?.writeText(url).then(()=>showToast('✅ Link copiato!'));
+  }
+}
+
+/* ── Delete confirm modal ── */
+function openDeleteConfirm(){
+  if(!currentPOI) return;
+  document.getElementById('deleteConfirmName').textContent = currentPOI.name || '—';
+  document.getElementById('deleteConfirmOv').classList.add('open');
+}
+function closeDeleteConfirm(){
+  document.getElementById('deleteConfirmOv').classList.remove('open');
+}
+async function confirmDeletePOI(){
+  if(!currentPOI || !currentUser) return;
+  if(currentPOI.author_id !== currentUser.id){ showToast('⛔ Non puoi eliminare POI altrui'); closeDeleteConfirm(); return; }
+  closeDeleteConfirm();
+  const nm = currentPOI.name || 'questo POI';
+  if(currentPOI.id && typeof sb !== 'undefined'){
+    const { error } = await sb.from('pois').delete()
+      .eq('id', currentPOI.id)
+      .eq('author_id', currentUser.id);
+    if(error){ showToast(`⚠️ Errore: ${error.message}`); return; }
+  }
+  if(window._dbMarkers?.[currentPOI.id]){
+    window._dbMarkers[currentPOI.id].remove();
+    delete window._dbMarkers[currentPOI.id];
+  }
+  if(window._dbPOIs) window._dbPOIs = window._dbPOIs.filter(x => x.id !== currentPOI.id);
+  closeDetail();
+  showToast(`🗑 "${nm}" eliminato`);
+  if(document.getElementById('poiView')?.classList.contains('active')) renderPoiTab();
+  const statEl = document.getElementById('statPoi');
+  if(statEl) statEl.textContent = Math.max(0, parseInt(statEl.textContent||0) - 1);
 }
 
 /* ══════════════════════════════════════════
@@ -6684,7 +6977,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   initSwipe('addPoiHandle','addPoiSheet','addPoiBg');
   initSwipe('addStopHandle','addStopSheet','addStopBg');
   initSwipe('addListHandle','addListSheet','addListBg');
-  initSwipe('detailHandle','detailSheet','detailBg');
+  // detailSheet è ora un modal centrato, niente swipe handle
   // Default share link
   updateShareLink(CENTER[0],CENTER[1]);
   // Visibility default state
