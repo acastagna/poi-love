@@ -32,3 +32,7 @@ yarn-error.log*
 
 # OS
 Thumbs.db
+
+# Sorgenti Photoshop: fuori dal repo (vanno in magazzino)
+*.psd
+*.PSD
