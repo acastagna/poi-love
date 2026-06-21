@@ -1450,6 +1450,10 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 </div>
 
 <div class="fab-menu" id="fabMenu">
+  <button class="fab-opt" onclick="openAddPOIHere()">
+    <div class="fab-opt-icon" style="background:#FFF7ED;color:#EA580C"><i class="ph-duotone ph-crosshair"></i></div>
+    <span>Sono qui — crea POI</span>
+  </button>
   <button class="fab-opt" onclick="openAddPOI()">
     <div class="fab-opt-icon" style="background:#FFF0F0;color:var(--red)"><i class="ph-duotone ph-map-pin"></i></div>
     <span data-t="fab_poi">Segna un luogo</span>
@@ -3312,6 +3316,7 @@ function addDBMarker(p) {
     iconSize: [46, 68], iconAnchor: [23, 68]
   });
   if(!window._dbMarkers) window._dbMarkers = {};
+  if(window._dbMarkers[p.id]) { window._dbMarkers[p.id].remove(); }
   const m = L.marker([p.lat, p.lng], { icon, bubblingMouseEvents: false }).addTo(map);
   window._dbMarkers[p.id] = m;
 }
@@ -3848,8 +3853,9 @@ async function toggleLoveDB(poiId, badgeEl) {
   const { data: existing } = await sb.from('loves')
     .select('id').eq('poi_id', poiId).eq('user_id', currentUser.id).maybeSingle();
   if (existing) {
-    await sb.from('loves').delete().eq('id', existing.id);
-    await sb.from('pois').update({ love_count: sb.rpc('decrement', { x: 1 }) }).eq('id', poiId);
+    await sb.from('loves').delete().eq('poi_id', poiId).eq('user_id', currentUser.id);
+    const {data:pdDec}=await sb.from('pois').select('love_count').eq('id',poiId).single();
+    await sb.from('pois').update({love_count:Math.max(0,(pdDec?.love_count||0)-1)}).eq('id',poiId);
     if (badgeEl) badgeEl.textContent = Math.max(0, parseInt(badgeEl.textContent) - 1);
     showToast('💔 LOVE rimosso');
   } else {
@@ -4370,7 +4376,7 @@ function handleDeepLink(){
   if(poiId && sb){
     // Carica il POI specifico dal DB e apri il detail
     sb.from('pois')
-      .select('id,name,description,lat,lng,category,love_count,photos,author_id,address,profiles(username,avatar_url)')
+      .select('id,name:title,description,lat,lng,category,love_count,photos,author_id,address,profiles(username,avatar_url)')
       .eq('id', poiId)
       .single()
       .then(({data, error})=>{
@@ -4391,8 +4397,9 @@ function handleDeepLink(){
     // Cerca il POI più vicino a quelle coordinate nel DB
     if(sb){
       sb.from('pois')
-        .select('id,name,description,lat,lng,category,love_count,photos,author_id,address,profiles(username,avatar_url)')
+        .select('id,name:title,description,lat,lng,category,love_count,photos,author_id,address,profiles(username,avatar_url)')
         .eq('visibility','community')
+        .limit(500)
         .then(({data})=>{
           if(!data||!data.length) return;
           // Trova il POI più vicino alle coordinate (distanza euclidea)
@@ -7295,6 +7302,21 @@ window.addEventListener('DOMContentLoaded',()=>{
 /* ══════════════════════════════════════════
    LONG PRESS COORDS → AGGIUNGI POI
 ══════════════════════════════════════════ */
+function openAddPOIHere(){
+  closeFab();
+  if(!currentUser){ showToast('Accedi prima per creare un POI'); document.getElementById('authOverlay').style.display='flex'; return; }
+  if(gpsPos){
+    openAddPOIAtCoords(gpsPos.lat,gpsPos.lng);
+  } else {
+    showToast('📍 Rilevamento GPS...');
+    navigator.geolocation?.getCurrentPosition(
+      pos=>{ gpsPos={lat:pos.coords.latitude,lng:pos.coords.longitude}; openAddPOIAtCoords(gpsPos.lat,gpsPos.lng); },
+      ()=>showToast('GPS non disponibile — attiva la posizione'),
+      {enableHighAccuracy:true,timeout:8000}
+    );
+  }
+}
+
 function openAddPOIAtCoords(lat,lng){
   openAddPOI();
   // Aggiorna tab GPS + UI tramite reverseGeocodeAndShow
@@ -7868,6 +7890,7 @@ function openUserRowProfile(name, meta={}){
    LOCATION SHARE (1-to-1 dal profilo)
 ══════════════════════════════════════════ */
 let locShareChannel=null;
+let locShareWatchId=null;
 function toggleLocDurPicker(){
   document.getElementById('locDurPicker').classList.toggle('open');
 }
@@ -7879,12 +7902,13 @@ function startLocShare(duration){
   const labels=durLabels[lang]||durLabels.it;
   const lbl={'1h':labels.h,'1d':labels.d,'1m':labels.m,'always':labels.always}[duration]||duration;
   const shareId=`loc-${currentUser.id.substring(0,8)}-${(currentViewedUser.id||'guest').substring(0,8)}`;
+  if(locShareWatchId!==null){ navigator.geolocation?.clearWatch(locShareWatchId); locShareWatchId=null; }
   if(locShareChannel) sb.removeChannel(locShareChannel);
   locShareChannel=sb.channel(shareId);
   locShareChannel.subscribe(status=>{
     if(status==='SUBSCRIBED'){
-      // Broadcast posizione ogni 5s
-      navigator.geolocation?.watchPosition(pos=>{
+      if(locShareWatchId!==null){ navigator.geolocation?.clearWatch(locShareWatchId); locShareWatchId=null; }
+      locShareWatchId=navigator.geolocation?.watchPosition(pos=>{
         locShareChannel.send({type:'broadcast',event:'loc',
           payload:{lat:pos.coords.latitude,lng:pos.coords.longitude,
             name:(currentUser.user_metadata?.full_name||'Tu'),
