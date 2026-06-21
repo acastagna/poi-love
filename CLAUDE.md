@@ -428,12 +428,27 @@ Quando POI•LOVE supera 100k utenti attivi:
 
 ---
 
+## Decisioni architetturali pendenti (segnalate il 21/06/2026)
+
+### demo.poilove.com → app ufficiale diretta
+`demo.poilove.com` è temporanea. Quando l'app va in produzione reale, diventa il dominio principale (`poilove.com` o un dominio dedicato). La cartella `demo/` del repo diventa la radice dell'app ufficiale. **Non costruire features pensando che "demo" sia permanente.**
+
+### Terms of Service e Privacy Policy — DA CREARE
+Richieste da X OAuth, Facebook OAuth e qualsiasi store (App Store, Play Store). Devono vivere su `poilove.com/terms` e `poilove.com/privacy`.
+- Contenuto minimo: raccolta dati (email, posizione GPS, foto), uso dei dati, GDPR, cancellazione account
+- Da creare prima di attivare Facebook OAuth e prima del lancio pubblico
+- Nel frattempo usare URL placeholder `https://poilove.com/terms` e `https://poilove.com/privacy` nelle configurazioni OAuth
+
+---
+
 ## Prossime priorità (sprint giugno 2026)
 
-1. **Rotte storiche** — visualizzazione, creazione, landing page `/route/slug`
-2. **App Expo push** — committare i 17 file, test su device fisico
-3. **Candidatura Claude for OSS** — 5000 stelle GitHub o exception clause (missione culturale)
-4. **ProductHunt launch** — solo con app mobile funzionante
+1. **Terms & Privacy** — creare `web/terms.html` e `web/privacy.html` su poilove.com (blocca Facebook OAuth e lancio)
+2. **OAuth attivi** — X (Twitter) in corso · LinkedIn · Facebook (dopo Terms)
+3. **Rotte storiche** — visualizzazione, creazione, landing page `/route/slug`
+4. **App Expo push** — committare i 17 file, test su device fisico
+5. **Candidatura Claude for OSS** — 5000 stelle GitHub o exception clause (missione culturale)
+6. **ProductHunt launch** — solo con app mobile funzionante
 
 ---
 
