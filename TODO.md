@@ -32,11 +32,11 @@
 ## 🔴 Bug da fixare (trovati dal code reviewer 21/06)
 
 - [ ] **Groq API key esposta** in sorgente HTML (riga 8493) — chiunque può leggerla e abusarla
-- [ ] **Link condivisione POI rotti** — query deep-link usa `name` invece di `name:title` (riga 4373/4394)
-- [ ] **Marker Leaflet duplicati** ad ogni login OAuth — nessuna guard in `addDBMarker` (riga 3299)
-- [ ] **GPS watcher leak** in `startLocShare` — `watchPosition` mai fermato (riga 7887)
+- [x] **Link condivisione POI rotti** — fixato 21/06 ✅
+- [x] **Marker Leaflet duplicati** — fixato 21/06 ✅
+- [x] **GPS watcher leak** in `startLocShare` — fixato 21/06 ✅
 - [ ] **Love count non atomico** — race condition con utenti concorrenti in `toggleLove` (riga 6543)
-- [ ] **`toggleLoveDB` corrotto** — usa `sb.rpc()` come valore in `.update()` (riga 3852)
+- [x] **`toggleLoveDB` corrotto** — fixato 21/06 ✅
 - [ ] **`prompt()` rotto su iOS PWA** — `signInWithPasskey` usa alert bloccante (riga 3212)
 - [ ] **Query deep-link senza `.limit()`** — scarica tutta la tabella pois (riga 4393)
 - [ ] **Avatar addEventListener leak** — listener duplicati ad ogni generazione AI (riga 5747)

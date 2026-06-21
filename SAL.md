@@ -3,17 +3,24 @@
 ## Sessione 21/06/2026
 
 ### Fatto
-- ✅ X (Twitter) OAuth attivato su Supabase (Auth → Providers → X / Twitter OAuth 2.0)
+- ✅ X (Twitter) OAuth attivato su Supabase
 - ✅ LinkedIn (OIDC) OAuth attivato su Supabase
 - ✅ Code review completo: trovati 6 BLOCKER + 8 MAJOR (vedi TODO.md sezione bug)
-- ✅ TODO.md aggiornato con lista bug prioritizzata
+- ✅ Fix: marker Leaflet duplicati ad ogni login OAuth
+- ✅ Fix: deep-link `name` → `name:title` (link condivisione POI erano rotti)
+- ✅ Fix: query deep-link aggiunto `.limit(500)`
+- ✅ Fix: `toggleLoveDB` — `sb.rpc()` usato erroneamente come valore, ora legge count reale dal DB
+- ✅ Fix: GPS watcher leak in `startLocShare` — `locShareWatchId` salvato e pulito
+- ✅ Feature: bottone "Sono qui — crea POI" nel FAB menu (GPS → form precompilato)
+- ✅ Feature: AI descrizione POI migliorata con coordinate, categorie, prompt unicità
+- ✅ Bottone AI rinominato "Suggerisci"
 - Decisione: passare direttamente a poilove.com ufficiale, eliminare demo quando pronti
 
 ### In sospeso / non completato
-- Plesk pull demo.poilove.com — NON fatto, tutti i commit sessione 21/06 non sono live
+- **Plesk pull demo.poilove.com** — NON fatto, tutti i commit 21/06 non sono live
 - LinkedIn redirect URI da aggiungere nell'app LinkedIn Developer Console
-- Fix bug da code review — rimandati alla prossima sessione
-- Groq key esposta nel sorgente — priorità alta, da fixare prima del lancio
+- Groq key esposta nel sorgente — da fixare prima del lancio (Edge Function Supabase)
+- Bug rimanenti da code review (vedi TODO.md)
 
 ---
 
