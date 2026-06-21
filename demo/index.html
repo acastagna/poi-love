@@ -4696,13 +4696,23 @@ async function aiSummarize(){
   if(btnEl){btnEl.disabled=true;btnEl.innerHTML='<i class="ph-duotone ph-circle-notch" style="animation:spin 1s linear infinite"></i>';}
 
   const langLabel=lang==='it'?'italiano':lang==='sq'?'albanese':'English';
+  const cats=Array.from(document.querySelectorAll('#addPoiSheet .chip.sel')).map(c=>c.textContent.trim()).join(', ');
   let prompt;
   if(isGenerate){
-    prompt=`Scrivi una breve descrizione originale (massimo 180 caratteri, stile POI•LOVE — caldo, vivo, senza cliché) per questo luogo:
+    prompt=`Sei un travel writer che conosce bene questo luogo. Scrivi una descrizione personale e originale (massimo 180 caratteri) per questo posto.
+
+Dati disponibili:
 Nome: "${placeName}"
 ${address?`Indirizzo: ${address}`:''}
-${coords?`Coordinate: ${coords}`:''}
-Rispondi solo con il testo della descrizione, senza virgolette, in ${langLabel}.`;
+${coords?`Coordinate: ${coords} — usa queste per capire la zona geografica e il contesto del luogo`:''}
+${cats?`Categoria: ${cats}`:''}
+
+Regole:
+- Ispirati a ciò che sai di questo luogo ma usa parole tue, non copiare da guide o siti
+- Tono caldo, personale, come se lo raccontassi a un amico
+- Niente cliché turistici ("luogo imperdibile", "posto magico", "da non perdere")
+- Non iniziare con il nome del posto
+- Rispondi SOLO con il testo della descrizione, senza virgolette, in ${langLabel}`;
   } else {
     prompt=`Sintetizza questo testo a massimo 180 caratteri mantenendo lo spirito e il tono del luogo. Rispondi solo con il testo sintetizzato, senza virgolette, in ${langLabel}:
 "${existingText}"`;
