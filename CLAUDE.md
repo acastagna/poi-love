@@ -345,6 +345,18 @@ Motore (CPU/RAM) e backup sono condivisi. Quando un prodotto scala, viene promos
 6. **Exposed schemas a mano** — disattivare "Automatically expose new tables" in Settings → Data API
 7. **Migrazioni in Git** — DDL/policy/funzioni in file SQL versionati, niente modifiche manuali non tracciate
 
+### Perché Supabase Pro era la scelta giusta (decisione 21/06/2026)
+
+Supabase Pro ($25/mese) non è solo storage immagini — copre tutto ciò che serve per far girare l'app:
+- **PostgreSQL** con backup automatici 7 giorni
+- **Auth** (Google OAuth, sessioni, JWT)
+- **RLS** (sicurezza dati per utente)
+- **Nessuna pausa automatica** (il free tier si spegne dopo 7 giorni di inattività)
+
+Senza Pro queste cose non funzionano o costano di più altrove. È la scelta giusta per la fase attuale.
+
+Il problema dell'egress sulle immagini emerge **solo oltre i 10k utenti** — con 100 GB inclusi nel Pro, la beta gira senza costi aggiuntivi.
+
 ### Storage immagini — strategia per scala
 
 | Fase | Utenti | Storage | Costo aggiuntivo |
@@ -357,6 +369,22 @@ Motore (CPU/RAM) e backup sono condivisi. Quando un prodotto scala, viene promos
 **Regola da rispettare ora:** nel DB salvare solo URL/metadati delle immagini, mai i file binari. Le foto vanno su object storage esterno (oggi Supabase Storage, domani R2).
 
 **Compressione WebP obbligatoria** prima di ogni upload — riduce il peso del 70% senza perdita visibile (qualità 82%, max 1200px lato lungo).
+
+### R2 vs server ferro a 1M+ utenti
+
+**Cloudflare R2 vince** finché non c'è un team tecnico dedicato:
+- Zero gestione, zero backup manuali, zero aggiornamenti sicurezza
+- CDN globale inclusa, egress $0
+- Scala automaticamente
+- Costo stimato a 1M utenti: ~$100-200/mese
+
+**Server ferro vince** solo se:
+- C'è un sysadmin fisso pagato
+- Il volume è nell'ordine dei petabyte (non terabyte)
+- Il costo fisso del server batte il variabile R2
+- Costo stimato server: €80-150/mese ma con ore di gestione settimanali
+
+**Regola pratica:** non valutare il server ferro prima di 1M utenti attivi. Prima fai girare l'app.
 
 ### Roadmap promozione futura
 
