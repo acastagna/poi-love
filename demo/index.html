@@ -3379,9 +3379,34 @@ function deleteCurrentPOI(){ openDeleteConfirm(); }
 ══════════════════════════════════════════ */
 const MEDIA_SERVER_URL = 'https://media.poilove.com';
 
+// Comprime un File/Blob in WebP (max 1200px, qualità 82%) via Canvas
+async function compressToWebP(file, maxWidth=1200, quality=0.82){
+  return new Promise(resolve=>{
+    const img=new Image();
+    const url=URL.createObjectURL(file);
+    img.onload=()=>{
+      const ratio=Math.min(maxWidth/img.width,1);
+      const canvas=document.createElement('canvas');
+      canvas.width=Math.round(img.width*ratio);
+      canvas.height=Math.round(img.height*ratio);
+      canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
+      URL.revokeObjectURL(url);
+      canvas.toBlob(blob=>resolve(blob||file),'image/webp',quality);
+    };
+    img.onerror=()=>{ URL.revokeObjectURL(url); resolve(file); };
+    img.src=url;
+  });
+}
+
 async function uploadPhotosToMediaServer(files, poiId){
   const urls = [];
   if(!currentUser || !files.length) return urls;
+
+  // Comprimi in WebP prima dell'upload
+  const compressed = await Promise.all(files.map(async f=>{
+    try{ return await compressToWebP(f); }catch(_){ return f; }
+  }));
+
   // Recupera il JWT dell'utente per autenticare la richiesta al media server
   const { data: { session } } = await sb.auth.getSession();
   const jwt = session?.access_token;
@@ -3389,7 +3414,7 @@ async function uploadPhotosToMediaServer(files, poiId){
 
   const fd = new FormData();
   fd.append('poi_id', poiId || `tmp-${Date.now()}`);
-  files.forEach(f => fd.append('photos[]', f));
+  compressed.forEach((f,i) => fd.append('photos[]', f, `photo_${i}.webp`));
 
   try {
     const res = await fetch(`${MEDIA_SERVER_URL}/upload.php`, {
@@ -3409,11 +3434,10 @@ async function uploadPhotosToMediaServer(files, poiId){
   }
 
   // FALLBACK: Supabase Storage (bucket poi_photos)
-  for (const file of files) {
+  for (const file of compressed) {
     try {
-      const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
-      const path = `${currentUser.id}/${Date.now()}_${Math.random().toString(36).substr(2,6)}.${ext}`;
-      const { error: upErr } = await sb.storage.from('poi_photos').upload(path, file, { cacheControl: '3600', upsert: false });
+      const path = `${currentUser.id}/${Date.now()}_${Math.random().toString(36).substr(2,6)}.webp`;
+      const { error: upErr } = await sb.storage.from('poi_photos').upload(path, file, { cacheControl: '3600', upsert: false, contentType: 'image/webp' });
       if (upErr) { console.warn('[poilove] storage skip:', upErr.message); continue; }
       const { data: urlData } = sb.storage.from('poi_photos').getPublicUrl(path);
       urls.push(urlData.publicUrl);
