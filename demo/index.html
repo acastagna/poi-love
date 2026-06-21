@@ -2945,6 +2945,7 @@ sb.auth.getSession().then(({ data: { session } }) => {
     syncProfileFromAuth();
     if(typeof loadMyLists==='function') loadMyLists();
     if(typeof loadMyTags==='function') loadMyTags();
+    loadUserLovesCount();
   } else {
     // Anche senza login carica i tag locali (non richiedono auth)
     if(typeof loadMyTags==='function') setTimeout(loadMyTags,400);
@@ -3333,10 +3334,11 @@ function openDBDetail(p) {
   document.getElementById('detailDesc').textContent = p.description || '';
   const coordEl = document.getElementById('detailCoordsText');
   if (coordEl && p.lat && p.lng) coordEl.textContent = `${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}`;
-  // Love
+  // Love — reset UI poi controlla stato reale dal DB
   document.getElementById('loveCnt').textContent = p.love_count || 0;
   document.getElementById('loveBtn').classList.remove('loved');
   document.getElementById('loveHeart').className = 'ph-duotone ph-heart';
+  if(currentUser && p.id) _checkUserLove(p.id);
   // Autore
   const username = p.profiles?.username || 'Anonimo';
   document.getElementById('detailAuthor').textContent = username;
@@ -3856,7 +3858,14 @@ function renderBadge(loves){
   // Aggiorna anche gli ambienti del livello
   renderLevelEnvs(b.label);
 }
-let currentLoves=87;
+let currentLoves=0;
+
+async function loadUserLovesCount(){
+  if(!currentUser) return;
+  const {count}=await sb.from('loves').select('*',{count:'exact',head:true}).eq('user_id',currentUser.id);
+  currentLoves=count||0;
+  renderBadge(currentLoves);
+}
 
 function generateAvatar(){
   const b=getBadge(currentLoves);
@@ -6476,11 +6485,57 @@ document.addEventListener('keydown', e => {
   // 5. Hero bg picker / token modal / vanity edit ecc.
   document.getElementById('heroBgPicker')?.classList.remove('open');
 });
-function toggleLove(){
+async function _checkUserLove(poiId){
+  if(!currentUser||!poiId) return;
+  const {data}=await sb.from('loves').select('id').eq('poi_id',poiId).eq('user_id',currentUser.id).maybeSingle();
+  const btn=document.getElementById('loveBtn');
+  const heart=document.getElementById('loveHeart');
+  if(!btn||!heart) return;
+  if(data){
+    btn.classList.add('loved');
+    heart.className='ph-fill ph-heart';
+  } else {
+    btn.classList.remove('loved');
+    heart.className='ph-duotone ph-heart';
+  }
+}
+
+async function toggleLove(){
+  if(!currentUser){
+    showToast('Accedi per dare LOVE ❤️');
+    document.getElementById('authOverlay').style.display='flex';
+    return;
+  }
+  if(!currentPOI?.id){ showToast('POI non trovato'); return; }
   const btn=document.getElementById('loveBtn'),heart=document.getElementById('loveHeart'),cnt=document.getElementById('loveCnt');
-  const loved=btn.classList.toggle('loved');
-  heart.className=loved?'ph-fill ph-heart':'ph ph-heart';
-  cnt.textContent=parseInt(cnt.textContent)+(loved?1:-1);
+  const alreadyLoved=btn.classList.contains('loved');
+  // Optimistic UI update
+  const newCount=parseInt(cnt.textContent||'0')+(alreadyLoved?-1:1);
+  btn.classList.toggle('loved',!alreadyLoved);
+  heart.className=alreadyLoved?'ph-duotone ph-heart':'ph-fill ph-heart';
+  cnt.textContent=Math.max(0,newCount);
+  if(alreadyLoved){
+    // Rimuovi love
+    const {error:delErr}=await sb.from('loves').delete().eq('poi_id',currentPOI.id).eq('user_id',currentUser.id);
+    if(delErr){ showToast('Errore rimozione LOVE'); return; }
+    await sb.from('pois').update({love_count:Math.max(0,newCount)}).eq('id',currentPOI.id);
+    currentPOI.love_count=Math.max(0,newCount);
+    showToast('💔 LOVE rimosso');
+  } else {
+    // Aggiungi love
+    const {error:insErr}=await sb.from('loves').insert({poi_id:currentPOI.id,user_id:currentUser.id});
+    if(insErr){
+      // Rollback UI se errore (es. duplicato)
+      btn.classList.remove('loved'); heart.className='ph-duotone ph-heart'; cnt.textContent=parseInt(cnt.textContent)-1;
+      return;
+    }
+    await sb.from('pois').update({love_count:newCount}).eq('id',currentPOI.id);
+    currentPOI.love_count=newCount;
+    showToast('❤️ LOVE!');
+    // Aggiorna badge personale
+    currentLoves=(currentLoves||0)+1;
+    renderBadge(currentLoves);
+  }
 }
 function openNavigation(){
   if(!currentPOI) return;
