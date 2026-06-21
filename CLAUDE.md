@@ -284,9 +284,11 @@ Il sito è live su **https://poilove.com** (non su GitHub Pages — quello è so
   - Formato: OpenAI-compatible
 
 ### Backend / Infrastruttura
-- **Supabase** — PostgreSQL + RLS + Auth + Storage
-  - Project: `ptppxwlafswfhbueakjt.supabase.co`
+- **Supabase `core-321`** — PostgreSQL + RLS + Auth (progetto ex `poi-love`, solo rinominato)
+  - Org: `321` · Piano: **Pro** · Project ref: `ptppxwlafswfhbueakjt`
+  - API URL: `https://ptppxwlafswfhbueakjt.supabase.co`
   - Publishable key: `sb_publishable_PC1xQ8XiQK9jpzwsAlFLxw_E-PKN40V`
+  - `service_role` key: MAI nel repo né nel client — salvare in `~/.supabase_poilove.env`
 - **Plesk** — hosting Apache su poilove.com (hPanel)
 - **Plesk Media Server PHP** — `media.poilove.com` (upload.php, delete.php)
 - **Google OAuth** — login via Supabase Auth
@@ -313,6 +315,55 @@ follows        -- follower_id, following_id
 **cover_type** valori: `'gradient'` (CSS gradient string) | `'image'` (URL immagine).
 
 **Visibility POI:** `'private'` | `'community'` | `'suggested_google'`
+
+---
+
+## Infrastruttura dati — Supabase `core-321`
+
+### Architettura multi-schema
+
+Il motore Postgres è **condiviso per schema** con altri prodotti 321.AL. Ogni prodotto è isolato nel proprio schema — nessuna interferenza:
+
+| Schema | Prodotto | Note |
+|--------|----------|------|
+| `public` | **POI•LOVE** | ← qui vivono tutte le tabelle POI•LOVE |
+| `smile` | Diario integratore | non toccare |
+| `dieta` | Dieta 321 | non toccare |
+| `sal` | SAL interno | non toccare |
+| `top_market` | TopMarket | non toccare |
+| `progetti` | Gestione progetti (con Erion) | non toccare |
+
+Motore (CPU/RAM) e backup sono condivisi. Quando un prodotto scala, viene promosso su istanza propria via `pg_dump` → `pg_restore`.
+
+### Regole vincolanti (non negoziabili)
+
+1. **Restare in `public`** — tabelle POI•LOVE solo in `public`, mai in altri schemi
+2. **Non toccare gli altri schemi** — zero query cross-schema
+3. **Identificatori solo con underscore** — mai trattini (`poi_love` ✅ `poi-love` ❌)
+4. **Segreti via environment** — `SUPABASE_URL` e `SUPABASE_ANON_KEY` in `.env`; `service_role` MAI nel client né nel repo
+5. **RLS obbligatorie** su ogni tabella esposta via Data API
+6. **Exposed schemas a mano** — disattivare "Automatically expose new tables" in Settings → Data API
+7. **Migrazioni in Git** — DDL/policy/funzioni in file SQL versionati, niente modifiche manuali non tracciate
+
+### Storage immagini — strategia per scala
+
+| Fase | Utenti | Storage | Costo aggiuntivo |
+|------|--------|---------|-----------------|
+| Beta | → 10k | Supabase incluso (100 GB Pro) | $0 |
+| Crescita | 10k → 100k | Migra a **Cloudflare R2** | ~$5-20/mese |
+| Scala | 100k → 1M | R2 + CDN Cloudflare | ~$50-150/mese |
+| Enterprise | 1M+ | Valuta server ferro proprio | da definire |
+
+**Regola da rispettare ora:** nel DB salvare solo URL/metadati delle immagini, mai i file binari. Le foto vanno su object storage esterno (oggi Supabase Storage, domani R2).
+
+**Compressione WebP obbligatoria** prima di ogni upload — riduce il peso del 70% senza perdita visibile (qualità 82%, max 1200px lato lungo).
+
+### Roadmap promozione futura
+
+Quando POI•LOVE supera 100k utenti attivi:
+- `pg_dump` dello schema `public` → `pg_restore` su Postgres dedicato (VPS separato, non Plesk)
+- Migrazione immagini Supabase Storage → Cloudflare R2
+- Auth: valutare GoTrue self-hosted per azzerare costo per-MAU
 
 ---
 
