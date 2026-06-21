@@ -2461,9 +2461,9 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
       </div>
       <div class="story-actions">
         <button class="voice-btn" id="voiceBtn" onclick="toggleVoice()"><i class="ph-duotone ph-microphone"></i> <span id="voiceBtnLbl">Dett.</span></button>
-        <button class="ai-btn" id="aiSumBtn" onclick="aiSummarize()"><i class="ph-duotone ph-sparkle"></i> <span id="aiSumLbl">AI</span></button>
+        <button class="ai-btn" id="aiSumBtn" onclick="aiSummarize()"><i class="ph-duotone ph-sparkle"></i> <span id="aiSumLbl">Suggerisci</span></button>
       </div>
-      <textarea class="field-in field-ta" id="storyIn" placeholder="L'anima di questo posto… (fino a 200 caratteri)" maxlength="200" oninput="updateChar();const lbl=document.getElementById('aiSumLbl');if(lbl)lbl.textContent=this.value.trim().length<20?'Genera':'Riassumi'"></textarea>
+      <textarea class="field-in field-ta" id="storyIn" placeholder="L'anima di questo posto… (fino a 200 caratteri)" maxlength="200" oninput="updateChar();const lbl=document.getElementById('aiSumLbl');if(lbl)lbl.textContent='Suggerisci'"></textarea>
 
       <!-- CATEGORIE -->
       <div class="sec-lbl">
@@ -4735,7 +4735,7 @@ Regole:
   } catch(err){
     showToast('Errore AI: '+err.message);
   } finally {
-    if(btnEl){btnEl.disabled=false;btnEl.innerHTML='<i class="ph-duotone ph-sparkle"></i> <span>'+(isGenerate?'Genera':'Riassumi')+'</span>';}
+    if(btnEl){btnEl.disabled=false;btnEl.innerHTML='<i class="ph-duotone ph-sparkle"></i> <span>Suggerisci</span>';}
   }
 }
 
