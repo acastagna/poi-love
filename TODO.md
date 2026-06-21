@@ -12,9 +12,9 @@
 ## 🟡 OAuth provider
 
 - [x] Google — attivo ✅
-- [ ] X (Twitter) — configurazione in corso (21/06)
-- [ ] LinkedIn (OIDC) — da fare
-- [ ] Facebook — da fare dopo Terms & Privacy
+- [x] X (Twitter) — attivato 21/06 ✅
+- [x] LinkedIn (OIDC) — attivato 21/06 ✅
+- [ ] Facebook — bloccato: serve Terms & Privacy pubblica su poilove.com
 - [ ] Apple Sign In — rimandato a inizio luglio (fondi in arrivo)
 
 ## 🟡 Architettura / infra
