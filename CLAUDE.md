@@ -71,6 +71,24 @@
 
 Queste regole sono **non negoziabili**. Sono nate dall'incident del 10/05/2026.
 
+### 🚨 STRUTTURA SERVER PLESK — FONDAMENTALE, NON DIMENTICARE MAI
+
+**`httpdocs/` È LA ROOT PUBBLICA DI PLESK. È il DocumentRoot di Apache. È il `public/` del server.**
+
+| Path server | Corrisponde a | URL |
+|---|---|---|
+| `/var/www/vhosts/poilove.com/httpdocs/` | root pubblica | `https://poilove.com/` |
+| `/var/www/vhosts/poilove.com/httpdocs/web/` | sottocartella | `https://poilove.com/web/` |
+| `/var/www/vhosts/poilove.com/project.poilove.com/` | root pubblica | `https://project.poilove.com/` |
+| `/var/www/vhosts/poilove.com/demo.poilove.com/demo/` | webapp demo | `https://demo.poilove.com/demo/` |
+
+**Prima di copiare QUALSIASI file sul server: verificare il DocumentRoot con:**
+```bash
+grep DocumentRoot /var/www/vhosts/system/poilove.com/conf/httpsd.conf
+```
+
+**MAI assumere che una sottocartella sia la root. Verificare sempre.**
+
 ### Deploy & infrastruttura
 1. **MAI usare `--delete` in rsync** in alcun workflow o script. Sostituire con `--ignore-existing` o `--update`. Se serve davvero pulizia, usare `--dry-run` prima e chiedere conferma scritta.
 2. **MAI riattivare un workflow disattivato** (`workflow_dispatch only`) senza:
@@ -81,8 +99,9 @@ Queste regole sono **non negoziabili**. Sono nate dall'incident del 10/05/2026.
 4. **MAI eseguire `gh secret set`, `gh workflow run`, `gh secret delete`** senza ack scritto.
 5. **MAI `git push --force` o `--force-with-lease`** senza ack scritto.
 6. **Deploy autonomo consentito — SOLO file singoli via rsync**, senza `--delete`, su path esatti e pre-approvati:
-   - `demo/index.html` → `/var/www/vhosts/poilove.com/demo.poilove.com/demo/index.html`
-   - Comando sicuro: `rsync -e "ssh -i ~/.ssh/evolab_deploy" demo/index.html root@46.4.70.47:/var/www/vhosts/poilove.com/demo.poilove.com/demo/index.html`
+   - `demo/index.html` → `/var/www/vhosts/poilove.com/httpdocs/index.html` (poilove.com — ROOT PUBBLICA)
+   - `demo/index.html` → `/var/www/vhosts/poilove.com/demo.poilove.com/demo/index.html` (demo — redirect)
+   - Comando deploy produzione: `rsync -e "ssh -i ~/.ssh/evolab_deploy" demo/index.html root@46.4.70.47:/var/www/vhosts/poilove.com/httpdocs/index.html`
    - Claude esegue questo **automaticamente a fine ogni sessione** dopo il commit.
    - MAI rsync di cartelle intere, MAI `--delete`, MAI altri path non elencati qui.
    - Per nuovi path da aggiungere: ack esplicito di Alessandro prima.
