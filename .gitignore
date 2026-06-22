@@ -17,6 +17,10 @@ android/.gradle/
 .env.*.local
 *.env
 
+# Chiavi API — solo sul server, mai nel repo
+demo/config.js
+config.js
+
 # Cache e log
 .DS_Store
 *.log

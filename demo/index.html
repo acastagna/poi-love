@@ -19,7 +19,7 @@
 <meta name="description" content="I tuoi luoghi del cuore, su una mappa comunitaria. Salvali, raccontali, condividili. Open source. Prima istanza: Tirana, Albania.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="POI•LOVE">
-<meta property="og:url" content="https://demo.poilove.com/">
+<meta property="og:url" content="https://poilove.com/">
 <meta property="og:title" content="POI•LOVE — i tuoi luoghi del cuore">
 <meta property="og:description" content="I tuoi luoghi del cuore, su una mappa comunitaria. Salvali, raccontali, condividili. Open source. Prima istanza: Tirana, Albania.">
 <meta property="og:image" content="https://poilove.com/img/opengraph.jpg">
@@ -1665,7 +1665,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
       <svg viewBox="0 0 191.35 191.35" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M95.68 174.2c-3.5-2.05-65.4-39.45-79.3-69.7C5.2 79.7 9.05 56.4 28.5 38.85 41.5 27.6 56.5 22.6 71 25.3c12.2 2.27 21.5 9.5 24.7 13.4 3.2-3.9 12.5-11.13 24.7-13.4 14.5-2.7 29.5 2.3 42.5 13.55 19.45 17.55 23.3 40.85 12.12 65.65-13.9 30.25-75.8 67.65-79.3 69.7Z"/></svg>
     </div>
   </div>
-  <img class="auth-logo" src="img/logo-completo.svg" onerror="this.src='https://demo.poilove.com/img/logo-completo.svg'" alt="POI•LOVE">
+  <img class="auth-logo" src="img/logo-completo.svg" onerror="this.src='https://poilove.com/img/logo-completo.svg'" alt="POI•LOVE">
   <h3 class="auth-tagline" data-t="auth_tagline">i luoghi del cuore</h3>
 
   <!-- 1. ID Apple — bottone primary in alto -->
@@ -2895,6 +2895,8 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 
 <div class="toast" id="toastMsg"></div>
 
+<!-- Chiavi esterne — file solo sul server, non nel repo -->
+<script src="/config.js" onerror="console.warn('config.js non trovato — ILLI·AI disabilitato')"></script>
 <script>
 /* ══════════════════════════════════════════
    SUPABASE — connessione reale
@@ -3157,10 +3159,10 @@ function syncProfileFromAuth() {
 }
 
 // ── LOGIN ──
-// URL di redirect = origine corrente (funziona sia su demo.poilove.com sia in locale)
+// URL di redirect = origine corrente (funziona sia su poilove.com sia in locale)
 const AUTH_REDIRECT = (location.origin && location.origin.startsWith('http'))
   ? location.origin + location.pathname
-  : 'https://demo.poilove.com/';
+  : 'https://poilove.com/';
 
 function _providerErrorToast(name, error){
   if(!error) return;
@@ -3641,7 +3643,7 @@ function goToPlPlace(i){
 function sharePlPlace(i){
   const p = plPlaces[i]; if(!p) return;
   const label = _plLabel(p);
-  const url = `https://demo.poilove.com/?lat=${p.lat.toFixed(6)}&lng=${p.lng.toFixed(6)}&label=${encodeURIComponent(label)}`;
+  const url = `https://poilove.com/?lat=${p.lat.toFixed(6)}&lng=${p.lng.toFixed(6)}&label=${encodeURIComponent(label)}`;
   if(navigator.share){ navigator.share({title:label, url}); }
   else { navigator.clipboard?.writeText(url).then(()=>showToast('🔗 Link copiato!')); }
 }
@@ -4961,7 +4963,7 @@ async function sharePoiByKey(key){
   const p = _poiFromKey(key);
   if(!p) return;
   const url = p.id
-    ? `https://demo.poilove.com/?poi=${p.id}`
+    ? `https://poilove.com/?poi=${p.id}`
     : `https://www.google.com/maps?q=${p.lat},${p.lng}`;
   const text = `${p.name} — ${p.address||''}`;
   if(navigator.share){
@@ -6142,7 +6144,7 @@ function createCompagnia(){
     const recipients = invites.split(/[,;\s]+/).map(s=>s.trim()).filter(s=>s.includes('@'));
     if(recipients.length){
       const senderName = currentUser?.user_metadata?.full_name || currentUser?.user_metadata?.name || 'Un amico';
-      const joinUrl = `https://demo.poilove.com/?join=${code}`;
+      const joinUrl = `https://poilove.com/?join=${code}`;
       const subject = `${senderName} ti ha invitato a unirti a "${name}" su POI•LOVE`;
       const body = `Ciao!\n\n${senderName} ti invita a unirti a "${name}" — ${typeLabel}.\n`+
         (range?`📅 ${range}\n`:'')+( desc?`\n${desc}\n`:'')+
@@ -8625,7 +8627,8 @@ document.addEventListener('click',e=>{
    Formato OpenAI-compatible. MVP front-end.
 ═══════════════════════════════════════════════════════ */
 // ILLI•AI key — XOR-encoded, decoded at runtime
-const GROQ_KEY=[96,116,108,88,52,53,125,116,87,49,114,106,118,127,99,108,81,52,96,65,95,94,86,73,80,64,99,126,101,52,65,94,70,116,96,126,116,86,83,102,62,64,84,106,108,64,55,63,75,78,117,102,100,63,106,84].map(n=>String.fromCharCode(n^7)).join('');
+// Chiave Groq caricata da /config.js (escluso da git, solo sul server)
+const GROQ_KEY = (typeof window !== 'undefined' && window._groqKey) ? window._groqKey : '';
 const GROQ_URL='https://api.groq.com/openai/v1/chat/completions';
 const GROQ_MODEL='llama-3.3-70b-versatile';
 
