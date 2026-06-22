@@ -4201,24 +4201,59 @@ function onNameInput(val){
   checkSave();
   if(val.length<2){document.getElementById('acDrop').classList.remove('open');return;}
   const lat=gpsPos?gpsPos.lat:CENTER[0],lng=gpsPos?gpsPos.lng:CENTER[1];
-  acTimer=setTimeout(()=>{
-    fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(val)}&format=json&limit=5&lat=${lat}&lon=${lng}&addressdetails=1`,{headers:{'Accept-Language':lang}})
-      .then(r=>r.json()).then(results=>{
-        showAcSuggestion(results.slice(0,5).map(r=>({
-          name:r.display_name.split(',')[0],
-          addr:r.display_name.split(',').slice(1,3).join(',').trim(),
-          lat:parseFloat(r.lat),lng:parseFloat(r.lon)
-        })));
-      }).catch(()=>{});
-  },400);
+  acTimer=setTimeout(async()=>{
+    try{
+      const r=await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(val)}&format=json&limit=6&lat=${lat}&lon=${lng}&addressdetails=1&namedetails=1`,{headers:{'Accept-Language':lang}});
+      const results=await r.json();
+      const items=results.slice(0,6).map(r=>{
+        const nd=r.namedetails||{};
+        const name=nd.name||nd['name:it']||nd['name:en']||r.display_name.split(',')[0];
+        const addr=r.address||{};
+        const via=(addr.road||addr.pedestrian||'');
+        const num=addr.house_number||'';
+        const city=addr.city||addr.town||addr.village||'';
+        const meta=[via+(num?' '+num:''),city].filter(Boolean).join(' · ');
+        return {name,meta,lat:parseFloat(r.lat),lng:parseFloat(r.lon),type:r.type,cls:r.class};
+      });
+      if(items.length){ showAcSuggestion(items,val); return; }
+      // 0 risultati → prova correzione AI
+      if(typeof GROQ_KEY!=='undefined' && val.length>3){
+        const res=await fetch(GROQ_URL,{method:'POST',
+          headers:{'Content-Type':'application/json','Authorization':`Bearer ${GROQ_KEY}`},
+          body:JSON.stringify({model:GROQ_MODEL,messages:[{role:'user',
+            content:`Correggi l'errore di battitura nel nome di questo luogo: "${val}". Rispondi SOLO con il nome corretto, niente altro.`}],
+            max_tokens:20,temperature:0})});
+        if(res.ok){
+          const j=await res.json();
+          const fix=(j?.choices?.[0]?.message?.content||'').trim().replace(/^["']|["']$/g,'');
+          if(fix && fix.toLowerCase()!==val.toLowerCase()){
+            const drop=document.getElementById('acDrop');
+            drop.innerHTML=`<div class="ac-item" onclick="document.getElementById('poiNameIn').value='${fix.replace(/'/g,"\\'")}';onNameInput('${fix.replace(/'/g,"\\'")}')">
+              <i class="ph-duotone ph-magic-wand"></i>
+              <div><div class="ac-item-name">Intendevi: <b>${fix.replace(/</g,'&lt;')}</b>?</div><div class="ac-item-addr">Tocca per cercare</div></div>
+            </div>`;
+            drop.classList.add('open');
+          }
+        }
+      }
+    }catch(e){}
+  },450);
 }
 function showAcSuggestion(items){
   const drop=document.getElementById('acDrop');
   if(!items.length){drop.classList.remove('open');return;}
+  function _icon(type,cls){
+    if(cls==='amenity'||type==='restaurant'||type==='cafe'||type==='bar'||type==='fast_food') return 'ph-fork-knife';
+    if(type==='hotel'||type==='hostel') return 'ph-bed';
+    if(cls==='shop') return 'ph-shopping-bag';
+    if(cls==='tourism') return 'ph-mountains';
+    if(cls==='highway') return 'ph-road-horizon';
+    return 'ph-map-pin';
+  }
   drop.innerHTML=items.map(item=>`
     <div class="ac-item" onclick="selectAcItem('${item.name.replace(/'/g,"\\'")}',${item.lat},${item.lng})">
-      <i class="ph-duotone ph-map-pin"></i>
-      <div><div class="ac-item-name">${item.name}</div><div class="ac-item-addr">${item.addr}</div></div>
+      <i class="ph-duotone ${_icon(item.type,item.cls)}"></i>
+      <div><div class="ac-item-name">${item.name.replace(/</g,'&lt;')}</div><div class="ac-item-addr">${(item.meta||'').replace(/</g,'&lt;')}</div></div>
     </div>`).join('');
   drop.classList.add('open');
 }
@@ -5060,17 +5095,35 @@ async function runMapSearch(q){
     .filter(o=>o.p && o.p.name && o.p.name.toLowerCase().includes(ql))
     .slice(0,3);
 
-  // 2. Nominatim OSM geocoding (max 3)
-  let places=[];
+  // 2. Nominatim — due query parallele: luoghi (amenity/shop/tourism) + indirizzi
+  let lugares=[], streets=[];
+  const nominatimLang=(typeof lang!=='undefined'?lang:'it');
   try{
-    const r=await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=3&addressdetails=1`,
-      { headers:{'Accept-Language': (typeof lang!=='undefined'?lang:'it')} });
-    if(r.ok && token===_mapSearchToken){
-      const data=await r.json();
-      places=(data||[]).slice(0,3);
+    const [rPlaces, rStreets]=await Promise.all([
+      fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=6&addressdetails=1&namedetails=1`,
+        {headers:{'Accept-Language':nominatimLang}}),
+      fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=4&addressdetails=1&featureType=street`,
+        {headers:{'Accept-Language':nominatimLang}})
+    ]);
+    if(token!==_mapSearchToken) return;
+    if(rPlaces.ok){ const d=await rPlaces.json(); const all=d||[];
+      lugares=all.filter(p=>p.type!=='road'&&p.type!=='residential'&&p.class!=='highway'&&p.class!=='boundary').slice(0,4);
+      streets=all.filter(p=>p.class==='highway'||p.type==='road'||p.type==='residential').slice(0,2);
     }
-  }catch(e){ /* offline: salta OSM */ }
+    if(rStreets.ok){ const d=await rStreets.json(); streets=[...streets,...(d||[])].slice(0,3); }
+  }catch(e){}
   if(token!==_mapSearchToken) return;
+
+  // Icona per tipo luogo
+  function _placeIcon(pl){
+    const t=pl.type||''; const c=pl.class||'';
+    if(c==='amenity'||t==='restaurant'||t==='cafe'||t==='bar'||t==='fast_food') return 'ph-fork-knife';
+    if(t==='hotel'||t==='hostel'||t==='motel') return 'ph-bed';
+    if(c==='shop'||t==='supermarket'||t==='mall') return 'ph-shopping-bag';
+    if(c==='tourism'||t==='museum'||t==='attraction') return 'ph-mountains';
+    if(c==='highway'||t==='road') return 'ph-road-horizon';
+    return 'ph-map-pin';
+  }
 
   let html='';
   if(matched.length){
@@ -5088,24 +5141,72 @@ async function runMapSearch(q){
     });
     html+='</div>';
   }
-  if(places.length){
-    html+='<div class="map-search-section"><div class="map-search-section-lbl"><i class="ph-duotone ph-globe" style="font-size:11px"></i> Luoghi</div>';
-    places.forEach(pl=>{
-      const dn=(pl.display_name||'').toString();
-      const name=dn.split(',')[0].trim();
-      const rest=dn.split(',').slice(1).join(',').trim();
-      const safeName=name.replace(/'/g,"\\'").replace(/"/g,'&quot;');
+  if(lugares.length){
+    html+='<div class="map-search-section"><div class="map-search-section-lbl"><i class="ph-duotone ph-storefront" style="font-size:11px"></i> Luoghi</div>';
+    lugares.forEach(pl=>{
+      const namedetails=pl.namedetails||{};
+      const canonName=namedetails.name||namedetails['name:it']||namedetails['name:en']||(pl.display_name||'').split(',')[0];
+      const addr=pl.address||{};
+      const via=addr.road||addr.pedestrian||addr.path||'';
+      const num=addr.house_number||'';
+      const meta=[via+(num?' '+num:''), addr.city||addr.town||addr.village||''].filter(Boolean).join(' · ');
+      const icon=_placeIcon(pl);
+      const safeName=canonName.replace(/'/g,"\\'").replace(/"/g,'&quot;');
       html+=`<div class="map-search-item" onclick="onSearchPickPlace(${pl.lat},${pl.lon},'${safeName}')">
-        <div class="map-search-item-icon osm"><i class="ph-duotone ph-compass"></i></div>
+        <div class="map-search-item-icon osm"><i class="ph-duotone ${icon}"></i></div>
         <div class="map-search-item-text">
-          <div class="map-search-item-name">${name.replace(/</g,'&lt;')}</div>
-          <div class="map-search-item-meta">${rest.replace(/</g,'&lt;')}</div>
+          <div class="map-search-item-name">${canonName.replace(/</g,'&lt;')}</div>
+          <div class="map-search-item-meta">${meta.replace(/</g,'&lt;')}</div>
         </div>
       </div>`;
     });
     html+='</div>';
   }
-  if(!html) html='<div class="map-search-empty">Nessun risultato</div>';
+  if(streets.length){
+    html+='<div class="map-search-section"><div class="map-search-section-lbl"><i class="ph-duotone ph-road-horizon" style="font-size:11px"></i> Indirizzi</div>';
+    streets.forEach(pl=>{
+      const addr=pl.address||{};
+      const via=addr.road||addr.pedestrian||(pl.display_name||'').split(',')[0];
+      const city=addr.city||addr.town||addr.village||'';
+      const safeName=via.replace(/'/g,"\\'").replace(/"/g,'&quot;');
+      html+=`<div class="map-search-item" onclick="onSearchPickPlace(${pl.lat},${pl.lon},'${safeName}')">
+        <div class="map-search-item-icon osm"><i class="ph-duotone ph-road-horizon"></i></div>
+        <div class="map-search-item-text">
+          <div class="map-search-item-name">${via.replace(/</g,'&lt;')}</div>
+          <div class="map-search-item-meta">${city.replace(/</g,'&lt;')}</div>
+        </div>
+      </div>`;
+    });
+    html+='</div>';
+  }
+
+  // Spell check: 0 risultati → chiedi a ILLI•AI la correzione
+  if(!matched.length && !lugares.length && !streets.length){
+    html='<div class="map-search-empty">Nessun risultato</div>';
+    // Suggerisci correzione via AI (solo se GROQ_KEY disponibile)
+    if(typeof GROQ_KEY!=='undefined' && q.length>3){
+      try{
+        const res=await fetch(GROQ_URL,{method:'POST',
+          headers:{'Content-Type':'application/json','Authorization':`Bearer ${GROQ_KEY}`},
+          body:JSON.stringify({model:GROQ_MODEL,messages:[{role:'user',
+            content:`Correggi l'errore di battitura in questa ricerca di luoghi: "${q}". Rispondi SOLO con la versione corretta, niente altro.`}],
+            max_tokens:20,temperature:0})});
+        if(token===_mapSearchToken && res.ok){
+          const j=await res.json();
+          const fix=(j?.choices?.[0]?.message?.content||'').trim().replace(/^["']|["']$/g,'');
+          if(fix && fix.toLowerCase()!==q.toLowerCase()){
+            html+=`<div class="map-search-item" style="opacity:.75" onclick="document.getElementById('mapSearchIn').value='${fix.replace(/'/g,"\\'")}';onMapSearch('${fix.replace(/'/g,"\\'")}')">
+              <div class="map-search-item-icon"><i class="ph-duotone ph-magic-wand"></i></div>
+              <div class="map-search-item-text">
+                <div class="map-search-item-name">Intendevi: <b>${fix.replace(/</g,'&lt;')}</b>?</div>
+                <div class="map-search-item-meta">Tocca per cercare</div>
+              </div>
+            </div>`;
+          }
+        }
+      }catch(e){}
+    }
+  }
   drop.innerHTML=html;
   drop.classList.add('show');
 }
