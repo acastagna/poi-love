@@ -80,7 +80,12 @@ Queste regole sono **non negoziabili**. Sono nate dall'incident del 10/05/2026.
 3. **MAI modificare file in `.github/workflows/`** senza ack esplicito dell'utente. La modifica del solo file workflow può triggerare deploy se il path è incluso in `paths:`.
 4. **MAI eseguire `gh secret set`, `gh workflow run`, `gh secret delete`** senza ack scritto.
 5. **MAI `git push --force` o `--force-with-lease`** senza ack scritto.
-6. **MAI eseguire comandi Plesk REST API** o `ssh` con scrittura su path di produzione (`/var/www/vhosts/poilove.com/`). Lettura/diagnostica OK, scrittura NO.
+6. **Deploy autonomo consentito — SOLO file singoli via rsync**, senza `--delete`, su path esatti e pre-approvati:
+   - `demo/index.html` → `/var/www/vhosts/poilove.com/demo.poilove.com/demo/index.html`
+   - Comando sicuro: `rsync -e "ssh -i ~/.ssh/evolab_deploy" demo/index.html root@46.4.70.47:/var/www/vhosts/poilove.com/demo.poilove.com/demo/index.html`
+   - Claude esegue questo **automaticamente a fine ogni sessione** dopo il commit.
+   - MAI rsync di cartelle intere, MAI `--delete`, MAI altri path non elencati qui.
+   - Per nuovi path da aggiungere: ack esplicito di Alessandro prima.
 
 ### Path safety in deploy YAML
 - **OGNI** workflow di deploy DEVE avere come primo step una guardia che blocca se i secret PATH sono vuoti o non iniziano con `/var/www/vhosts/poilove.com/`. Esempio:
