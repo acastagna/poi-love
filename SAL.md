@@ -16,10 +16,21 @@
 - ✅ Bottone AI rinominato "Suggerisci"
 - Decisione: passare direttamente a poilove.com ufficiale, eliminare demo quando pronti
 
-### In sospeso / non completato
-- **Plesk pull demo.poilove.com** — NON fatto, tutti i commit 21/06 non sono live
-- LinkedIn redirect URI da aggiungere nell'app LinkedIn Developer Console
-- Groq key esposta nel sorgente — da fixare prima del lancio (Edge Function Supabase)
+### Sessione 22/06/2026 — migrazione live
+
+- ✅ project.poilove.com creato su Plesk con pagina marketing
+- ✅ Webapp spostata da demo.poilove.com → poilove.com (live)
+- ✅ Groq key rimossa dal sorgente HTML — spostata in config.js server-only (gitignore)
+- ✅ Supabase: Site URL → poilove.com, Redirect URLs aggiornati via Management API
+- ✅ demo.poilove.com → redirect automatico a poilove.com
+- ✅ URL hardcoded aggiornati da demo.poilove.com a poilove.com nel codice
+- ✅ Ricerca mappa migliorata: luoghi + vie separate, icone per tipo, correzione spelling AI
+- ✅ Deploy autonomo abilitato via rsync file singolo
+
+### In sospeso
+- config.js sul server (chiave Groq) — ILLI•AI non funziona senza
+- LinkedIn redirect URI → aggiungere poilove.com nell'app LinkedIn Developer Console
+- Facebook OAuth — dopo Terms & Privacy
 - Bug rimanenti da code review (vedi TODO.md)
 
 ---

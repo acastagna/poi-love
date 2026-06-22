@@ -3,11 +3,12 @@
 
 ## 🔴 Bloccanti (fanno saltare il lancio)
 
+- [ ] **config.js sul server** — chiave Groq per ILLI•AI (`/var/www/vhosts/poilove.com/httpdocs/config.js`)
 - [ ] **Terms of Service** — creare `web/terms.html` → live su `poilove.com/terms`
 - [ ] **Privacy Policy** — creare `web/privacy.html` → live su `poilove.com/privacy`
-      *(richieste da X OAuth, Facebook OAuth, App Store, Play Store, GDPR)*
+      *(richieste da Facebook OAuth, App Store, Play Store, GDPR)*
 - [ ] **Bucket `poi_photos`** su Supabase Storage — mancante, le foto non si caricano
-- [ ] **Plesk pull** demo.poilove.com — pullare tutti i commit della sessione 21/06
+- [ ] **LinkedIn redirect URI** — aggiungere `https://poilove.com` nell'app LinkedIn Developer Console
 
 ## 🟡 OAuth provider
 
