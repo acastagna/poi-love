@@ -44,7 +44,6 @@
 
 ## 🔵 Futuro (non ora)
 
-- [ ] demo.poilove.com → app ufficiale diretta (rinominare dominio al lancio)
 - [ ] GoTrue self-hosted per Auth a scala alta
 - [ ] ProductHunt launch (solo con app mobile pronta)
 - [ ] Candidatura Claude for OSS (5000 stelle GitHub)

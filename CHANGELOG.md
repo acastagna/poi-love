@@ -38,7 +38,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) · Versioning: 
 
 ### Infrastructure
 - GitHub Pages: serves `web/` from `main` branch
-- Plesk webhook: `poilove.com/demo/` auto-synced on every push
+- Plesk webhook: `poilove.com/webapp/` auto-synced on every push
 - GitHub Actions: `pages.yml` (GitHub Pages) + `deploy-media-server.yml` (media.poilove.com)
 
 ---

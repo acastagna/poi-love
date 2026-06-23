@@ -165,12 +165,12 @@ Polish UX richiesti durante la sessione (priorità utente):
 
 ### 🎯 Asset aggiunti
 
-- `demo/img/logo-bianco.png` (1000×188 RGBA, ~11KB) — logo POI♥LOVE bianco per fascia brand inferiore
-- `demo/img/illi-ai.png` (~992KB, Midjourney v8.1) — mascot ILLI con headband, motivo tradizionale, cuore al petto
+- `webapp/img/logo-bianco.png` (1000×188 RGBA, ~11KB) — logo POI♥LOVE bianco per fascia brand inferiore
+- `webapp/img/illi-ai.png` (~992KB, Midjourney v8.1) — mascot ILLI con headband, motivo tradizionale, cuore al petto
 
 ### 📂 File modificato
 
-- `demo/index.html` (8070 righe, era ~6850): +~1200 righe net (CSS popup, modal, sub-menu, JS handler nav picker / public profile / list detail / map search / askIlliAbout)
+- `webapp/index.html` (8070 righe, era ~6850): +~1200 righe net (CSS popup, modal, sub-menu, JS handler nav picker / public profile / list detail / map search / askIlliAbout)
 - `STORICO-LAVORI.md` (questo aggiornamento)
 
 ### 🔌 Live status fine sessione
@@ -222,7 +222,7 @@ L'utente deve fare manualmente:
 
 ### ⚠️ INCIDENT — 740 file cancellati in produzione
 
-**Cosa è successo**: riattivando i workflow GitHub Actions di deploy (`deploy-web.yml`, nuovo `deploy-demo.yml`), il run `25627558418` ha eseguito `rsync -avz --delete demo/ user@host:${PLESK_DEMO_PATH}/` con il secret `PLESK_DEMO_PATH` non ancora settato (stringa vuota). GitHub ha risolto la stringa come "" → rsync ha sincronizzato `demo/` (5 file) verso **`/`** del server con `--delete`. Risultato: **740 file cancellati** su `/var/www/vhosts/poilove.com/`.
+**Cosa è successo**: riattivando i workflow GitHub Actions di deploy (`deploy-web.yml`, nuovo `deploy-demo.yml`), il run `25627558418` ha eseguito `rsync -avz --delete webapp/ user@host:${PLESK_DEMO_PATH}/` con il secret `PLESK_DEMO_PATH` non ancora settato (stringa vuota). GitHub ha risolto la stringa come "" → rsync ha sincronizzato `webapp/` (5 file) verso **`/`** del server con `--delete`. Risultato: **740 file cancellati** su `/var/www/vhosts/poilove.com/`.
 
 **Distribuzione cancellazioni**:
 - httpdocs (poilove.com root): 117 file
@@ -264,15 +264,15 @@ Salvato il lavoro di oggi in branch backup `wip/2026-05-10-task7-auth` (commit `
 | # | SHA | Messaggio | File | Live |
 |---|---|---|---|---|
 | 1 | `2185737` | docs: incident report + REGOLE HARD per Claude | CLAUDE.md (+52 -0) | n/a |
-| 2 | `ccf721b` | feat(demo+sal+web): auth restyle + 2 cuori animati + logo SVG ufficiali | demo/index.html (+1213 -167), sal/index.html (-2), web/img/, demo/img/, sal/img/ (5 SVG ognuna) | ✅ demo.poilove.com (414 KB) |
-| 3 | `d3daf48` | feat(demo): traduzioni IT/SQ/EN complete + auto-detect dispositivo | demo/index.html (+146 -116) | ✅ |
-| 4 | `1df6ff5` | feat(demo): chip lingua glassmorphism nell'auth overlay | demo/index.html (+48 -0) | ✅ |
-| 5 | `47fb29b` | chore(demo): inverti ordine chip lingua → EN · SQ · IT | demo/index.html (+6 -6) | ✅ |
+| 2 | `ccf721b` | feat(demo+sal+web): auth restyle + 2 cuori animati + logo SVG ufficiali | webapp/index.html (+1213 -167), sal/index.html (-2), web/img/, webapp/img/, sal/img/ (5 SVG ognuna) | ✅ demo.poilove.com (414 KB) |
+| 3 | `d3daf48` | feat(demo): traduzioni IT/SQ/EN complete + auto-detect dispositivo | webapp/index.html (+146 -116) | ✅ |
+| 4 | `1df6ff5` | feat(demo): chip lingua glassmorphism nell'auth overlay | webapp/index.html (+48 -0) | ✅ |
+| 5 | `47fb29b` | chore(demo): inverti ordine chip lingua → EN · SQ · IT | webapp/index.html (+6 -6) | ✅ |
 
 ### 🎨 Cosa contengono i commit
 
 **Auth overlay completamente ridisegnato** (`ccf721b`):
-- Logo SVG **ufficiale** (`logo-completo.svg` 1088×190 vettoriale puro, in `web/img/`+`demo/img/`+`sal/img/`)
+- Logo SVG **ufficiale** (`logo-completo.svg` 1088×190 vettoriale puro, in `web/img/`+`webapp/img/`+`sal/img/`)
 - Tagline `<h3>i luoghi del cuore</h3>`
 - 🍎 **ID Apple** primary nero (largo)
 - 👆 **Accedi con Biometria** primary trasparente (passkey/WebAuthn detect)
@@ -381,7 +381,7 @@ Riorganizzato POI•LOVE da **monolite `web/`** a **architettura 4 sotto-domini*
 | URL | Cartella repo | Ruolo |
 |---|---|---|
 | poilove.com | `web/` | presentazione progetto (PDF v5 + notarizzazione SHA-256) |
-| demo.poilove.com | `demo/` | ⭐ webapp ufficiale blessed (7 tab: Mappa/ILLI•AI/POI/Itinerari/Compagni/Profilo/SOS) |
+| demo.poilove.com | `webapp/` | ⭐ webapp ufficiale blessed (7 tab: Mappa/ILLI•AI/POI/Itinerari/Compagni/Profilo/SOS) |
 | sal.poilove.com | `sal/` | SAL — Stato Avanzamento Lavori (per investitori, finestra 13-17 Maggio) |
 | media.poilove.com | `plesk-media-server/` | media server PHP (foto upload + card SHA-256) |
 
@@ -434,7 +434,7 @@ feef947  feat(demo): bottom nav 6 tab + ILLI•AI mascot + Compagni
 - Conversione massiva icone a **Phosphor duotone** (232 occorrenze)
 - POI detail close fix (X button + Escape)
 - FAB z-index ottimizzato (350 — sopra nav, sotto sheet/popup)
-- ILLI•AI mascot SVG creato (`demo/illi-ai.svg`)
+- ILLI•AI mascot SVG creato (`webapp/illi-ai.svg`)
 - Trilingue IT/SQ/EN rifinito
 
 ---

@@ -28,4 +28,4 @@ Data di ripiego se si dovesse restare a luglio: **29/07/2026 (mer)** — score +
 - 27 Apr → 6 Mag · ✅ Webapp HTML + infrastruttura (4 sotto-domini)
 - 13–17 Mag · ✅ Finestra presentazioni (partner + investitori)
 - 21/06 · ✅ Code review + fix bug + OAuth X/LinkedIn attivati
-- 22/06 · ✅ Migrazione live: demo.poilove.com → poilove.com
+- 22/06 · ✅ Migrazione live: webapp ufficiale su poilove.com

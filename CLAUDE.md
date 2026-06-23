@@ -54,7 +54,7 @@
 
 ## 🚨 INCIDENT REPORT — 10/05/2026 · cancellati 740 file in produzione
 
-**Cosa è successo**: nella sessione del 10/05/2026, riattivando i workflow GitHub Actions di deploy (`deploy-web.yml`, nuovo `deploy-demo.yml`), il run #25627558418 ha eseguito `rsync -avz --delete demo/ user@host:${PLESK_DEMO_PATH}/`. Il secret `PLESK_DEMO_PATH` non era ancora settato → GitHub ha risolto la stringa come vuota → rsync ha sincronizzato `demo/` (5 file) verso **`/`** del server (root filesystem) con `--delete`. Risultato: **740 file cancellati** su `/var/www/vhosts/poilove.com/` (httpdocs 117, demo 91, sal 178, media 16, git/ bare repos 126, .ssh 5, logs 144, ecc.). I 4 sotto-domini sono andati down.
+**Cosa è successo**: nella sessione del 10/05/2026, riattivando i workflow GitHub Actions di deploy (`deploy-web.yml`, nuovo `deploy-demo.yml`), il run #25627558418 ha eseguito `rsync -avz --delete webapp/ user@host:${PLESK_DEMO_PATH}/`. Il secret `PLESK_DEMO_PATH` non era ancora settato → GitHub ha risolto la stringa come vuota → rsync ha sincronizzato `webapp/` (5 file) verso **`/`** del server (root filesystem) con `--delete`. Risultato: **740 file cancellati** su `/var/www/vhosts/poilove.com/` (httpdocs 117, demo 91, sal 178, media 16, git/ bare repos 126, .ssh 5, logs 144, ecc.). I 4 sotto-domini sono andati down.
 
 **Recovery**: l'utente ha ripristinato il backup Plesk del 09/05/2026. I siti sono tornati al contenuto del commit `04e2e71` (08/05/2026). Le feature scritte oggi sono salvate nel branch `wip/2026-05-10-task7-auth`.
 
@@ -80,7 +80,7 @@ Queste regole sono **non negoziabili**. Sono nate dall'incident del 10/05/2026.
 | `/var/www/vhosts/poilove.com/httpdocs/` | root pubblica | `https://poilove.com/` |
 | `/var/www/vhosts/poilove.com/httpdocs/web/` | sottocartella | `https://poilove.com/web/` |
 | `/var/www/vhosts/poilove.com/project.poilove.com/` | root pubblica | `https://project.poilove.com/` |
-| `/var/www/vhosts/poilove.com/demo.poilove.com/demo/` | webapp demo | `https://demo.poilove.com/demo/` |
+| `/var/www/vhosts/poilove.com/demo.poilove.com/webapp/` | webapp demo | `https://demo.poilove.com/webapp/` |
 
 **Prima di copiare QUALSIASI file sul server: verificare il DocumentRoot con:**
 ```bash
@@ -119,7 +119,7 @@ grep DocumentRoot /var/www/vhosts/system/poilove.com/conf/httpsd.conf
   ```
 
 ### Workflow di lavoro corretto
-- Modifiche al codice in `demo/`, `web/`, `sal/`, `plesk-media-server/` → push su `main` libero (non triggera deploy se workflow disattivati)
+- Modifiche al codice in `webapp/`, `web/`, `sal/`, `plesk-media-server/` → push su `main` libero (non triggera deploy se workflow disattivati)
 - Pubblicazione live → SOLO **manuale tramite Plesk → dominio → Git → "Estrai ora" + "Implementa ora"**
 - Niente più auto-deploy GitHub Actions finché non sono stati testati con dry-run + secret tutti validati
 
@@ -135,7 +135,7 @@ grep DocumentRoot /var/www/vhosts/system/poilove.com/conf/httpsd.conf
 | URL pubblico | Cartella repo | Cosa serve | SSL |
 |---|---|---|---|
 | `https://poilove.com/` | `web/` | Presentazione progetto v9 17:09 (612 KB) + PDF v5 + notarizzazione SHA-256 (hash `2e543e7a...`) | Let's Encrypt R13 (scade 6 ago 2026) |
-| `https://demo.poilove.com/` | `demo/` | Webapp ufficiale 341 KB (7 tab: Mappa · ILLI•AI · POI · Itinerari · Compagni · Profilo · SOS) | Let's Encrypt R13 |
+| `https://demo.poilove.com/` | `webapp/` | Webapp ufficiale 341 KB (7 tab: Mappa · ILLI•AI · POI · Itinerari · Compagni · Profilo · SOS) | Let's Encrypt R13 |
 | `https://sal.poilove.com/` | `sal/` | SAL v2.4 — finestra presentazioni 13-17 Maggio (root = il SAL completo, no redirect) | Let's Encrypt R13 |
 | `https://media.poilove.com/` | `plesk-media-server/` | Media server PHP (foto upload + card SHA-256) | Let's Encrypt R13 |
 
@@ -174,7 +174,7 @@ Sempre **2 click** in sequenza: Estrai (git pull) + Implementa (rsync to docroot
 - Mappa fullscreen su tab Mappa, 50/50 desktop sulle altre
 - ILLI•AI tab dedicata (#illiView) con chat Travel Advisor + guida piattaforma
 - ILLI•AI prompt sistema doppio ruolo (suggerimenti viaggio + how-to app)
-- ILLI•AI mascot SVG in `demo/illi-ai.svg`
+- ILLI•AI mascot SVG in `webapp/illi-ai.svg`
 - POI tab con 3 sub-tab: Miei · Loved · Vicini (haversine sort)
 - Compagni di Viaggio: form CREA completo (Per sempre/Viaggio/Cena · date+ora · descrizione · inviti · codice 6 char) + lista compagnie con status amici live (🟢 in viaggio · ⚪ offline · 🔴 fermo +1g)
 - Profilo: 12 sfondi gradient moderni (Tirana Sunset · Aurora del Drin · Skanderbeg Gold · ecc.) + Avatar modal 3 tab (Upload · Unsplash · AI Pollinations/Flux con prompt enhancement)
@@ -190,7 +190,7 @@ Sempre **2 click** in sequenza: Estrai (git pull) + Implementa (rsync to docroot
 **Repository GitHub**: https://github.com/acastagna/poi-love (public, MIT)
 
 **Ultimi commit chiave**:
-- `19f55a0` architettura 4 sotto-domini (cartelle web/demo/sal)
+- `19f55a0` architettura 4 sotto-domini (cartelle web/webapp/sal)
 - `feef947` bottom nav 6 tab + ILLI•AI + Compagni
 - `cec8667` mappa fullscreen + ILLI•AI tab + form Compagni
 - `69769ad` 12 sfondi + Avatar 3 tab + Pollinations
@@ -210,11 +210,11 @@ Sempre **2 click** in sequenza: Estrai (git pull) + Implementa (rsync to docroot
 |---|---|---|
 | **poilove.com** | `web/` | 📄 Presentazione del progetto (v9 17:09 · PDF v5 + notarizzazione SHA-256) |
 | **poilove.com/dev/**, `/v2/`, `/preview/` … | `web/dev/`, `web/v2/`, `web/preview/` … | versioni in sviluppo (sotto-livelli del dominio principale) |
-| **demo.poilove.com** | `demo/` | ⭐ versione **ufficiale blessed** della webapp |
+| **demo.poilove.com** | `webapp/` | ⭐ versione **ufficiale blessed** della webapp |
 | **sal.poilove.com** | `sal/` | SAL — Stato Avanzamento Lavori (per investitori/partner) |
 | **media.poilove.com** | `plesk-media-server/` | Media server PHP (foto upload) |
 
-**Workflow di promozione**: una versione WIP gira in `web/<nome>/` → quando approvata, la copiamo in `demo/` (il `cp -r web/wip/* demo/` poi `git push` poi su Plesk → `Pull updates`).
+**Workflow di promozione**: una versione WIP gira in `web/<nome>/` → quando approvata, la copiamo in `webapp/` (il `cp -r web/wip/* webapp/` poi `git push` poi su Plesk → `Pull updates`).
 
 **Deploy**: passato da GitHub Actions auto-deploy → **Plesk Git pull manuale**. I workflow `deploy-web.yml` e `pages.yml` sono in `workflow_dispatch only` (non scattano da soli al push). Setup Plesk dettagliato in `PLESK-GITHUB-DEPLOY.md`.
 
@@ -455,7 +455,7 @@ Quando POI•LOVE supera 100k utenti attivi:
 ## Decisioni architetturali pendenti (segnalate il 21/06/2026)
 
 ### demo.poilove.com → app ufficiale diretta
-`demo.poilove.com` è temporanea. Quando l'app va in produzione reale, diventa il dominio principale (`poilove.com` o un dominio dedicato). La cartella `demo/` del repo diventa la radice dell'app ufficiale. **Non costruire features pensando che "demo" sia permanente.**
+`demo.poilove.com` è temporanea. Quando l'app va in produzione reale, diventa il dominio principale (`poilove.com` o un dominio dedicato). La cartella `webapp/` del repo diventa la radice dell'app ufficiale. **Non costruire features pensando che "demo" sia permanente.**
 
 ### Terms of Service e Privacy Policy — DA CREARE
 Richieste da X OAuth, Facebook OAuth e qualsiasi store (App Store, Play Store). Devono vivere su `poilove.com/terms` e `poilove.com/privacy`.

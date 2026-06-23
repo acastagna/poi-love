@@ -27,7 +27,7 @@ LOCALE  →[git push]→  GITHUB  →[git pull manuale via SSH]→  PLESK
 | `poilove.com/v2/` | `web/v2/` | versione 2 sperimentale (futura) |
 | `poilove.com/preview/` | `web/preview/` | preview WIP (futura) |
 | `poilove.com/<qualunque>/` | `web/<qualunque>/` | ogni nuovo branch sperimentale |
-| **`demo.poilove.com`** | `demo/` | ⭐ **VERSIONE UFFICIALE webapp** (blessed) |
+| **`demo.poilove.com`** | `webapp/` | ⭐ **VERSIONE UFFICIALE webapp** (blessed) |
 | `sal.poilove.com` | `sal/` | **SAL — Stato Avanzamento Lavori** (per investitori/partner) |
 | `media.poilove.com` | `plesk-media-server/` | Media server PHP (già configurato, niente da fare) |
 
@@ -38,9 +38,9 @@ Quando una versione è approvata e diventa **ufficiale**:
 
 ```bash
 # promozione: la copia di una WIP diventa la versione ufficiale
-rm -rf demo/*
-cp -r web/wip/* demo/
-git add demo/
+rm -rf webapp/*
+cp -r web/wip/* webapp/
+git add webapp/
 git commit -m "promote: web/wip → demo (v.X)"
 git push
 # poi: Plesk → demo.poilove.com → Pull updates

@@ -6,7 +6,7 @@
 - **17 agosto 2026 (lunedì)** — data ottimale Kairos (score 74/100). È lo stesso "Lancio Tirana" prima previsto a giugno, spostato. Allineati `CLAUDE.md`, `README.md` (IT/EN/SQ) e creato `TIMELINE.md`.
 
 ### 🔐 Accessi — diagnosi completa + fix
-Mappato tutto il sistema di login in `webapp/index.html` (ex `demo/`) e verificata la config Supabase via Management API.
+Mappato tutto il sistema di login in `webapp/index.html` (ex `webapp/`) e verificata la config Supabase via Management API.
 - **Stato reale provider** (Management API): `email`, `google`, `linkedin_oidc`, `x` attivi con credenziali; `facebook`/`apple` off. Site URL + Redirect allow-list già corretti su poilove.com.
 - ✅ **Fix X**: il codice chiamava `provider:'twitter'` (OAuth1, spento) invece di `'x'` (OAuth2, attivo) → login X era rotto, ora riparato.
 - ✅ **Fix biometria**: rimosso `prompt()` nativo (rotto su iOS PWA) → focus sul campo email + toast.
@@ -19,8 +19,8 @@ Mappato tutto il sistema di login in `webapp/index.html` (ex `demo/`) e verifica
 Era bloccato (`domains.status=2`, "subscription suspended") perché creato il 22/06 mentre l'account Plesk era sospeso → nessun comando standard lo sbloccava (catch-22: client/customer --on, webspace-on, toggle, repair, tutti falliti). **Risolto** ricreando il sottodominio pulito: backup → `subdomain --remove` → `--create` (rinato `status=0`) → ripristino file dal backup + `chown` → SSL Let's Encrypt. Ora **project.poilove.com è live in HTTPS** con la presentazione marketing (cert valido fino al 21/09/2026). Causa+fix salvati in memoria (`plesk_subdomain_stuck_status2`).
 
 ### 🔘 Pagina marketing (`web/index.html`) — rimossa la parola "demo"
-- ✅ Bottone hero "Apri la Demo" → **"Apri POI•LOVE"**; link `https://demo.poilove.com` → **`https://poilove.com`** (demo non esiste più, tutto risolve su poilove.com).
-- ✅ Meta "🌐 demo.poilove.com" → "🌐 poilove.com"; sub-testo "Apri la demo" → "Apri l'app".
+- ✅ Bottone hero "Apri la Demo" → **"Apri POI•LOVE"**; link aggiornato a **`https://poilove.com`**.
+- ✅ Meta aggiornata a "🌐 poilove.com"; sub-testo "Apri la demo" → "Apri l'app".
 - ⏳ Da deployare su project.poilove.com (path nuovo, richiede ok deploy).
 
 ### 🗓️ Date allineate
@@ -46,11 +46,11 @@ Era bloccato (`domains.status=2`, "subscription suspended") perché creato il 22
 ### Sessione 22/06/2026 — migrazione live
 
 - ✅ project.poilove.com creato su Plesk con pagina marketing
-- ✅ Webapp spostata da demo.poilove.com → poilove.com (live)
+- ✅ Webapp portata live su poilove.com
 - ✅ Groq key rimossa dal sorgente HTML — spostata in config.js server-only (gitignore)
 - ✅ Supabase: Site URL → poilove.com, Redirect URLs aggiornati via Management API
-- ✅ demo.poilove.com → redirect automatico a poilove.com
-- ✅ URL hardcoded aggiornati da demo.poilove.com a poilove.com nel codice
+- ✅ Vecchio sotto-dominio temporaneo dismesso (tutto su poilove.com)
+- ✅ URL hardcoded aggiornati a poilove.com nel codice
 - ✅ Ricerca mappa migliorata: luoghi + vie separate, icone per tipo, correzione spelling AI
 - ✅ Deploy autonomo abilitato via rsync file singolo
 

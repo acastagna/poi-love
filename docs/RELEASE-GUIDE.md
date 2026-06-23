@@ -11,7 +11,7 @@
 
 2. Push su GitHub (Claude lo fa via API)
    → GitHub Actions aggiorna GitHub Pages automaticamente
-   → Webhook aggiorna poilove.com/demo/ automaticamente (post-setup)
+   → Webhook aggiorna poilove.com/webapp/ automaticamente (post-setup)
 
 3. Fine sessione → aggiorna SAL-data.json
    → Claude aggiorna POI-LOVE-SAL.html
