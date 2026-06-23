@@ -166,8 +166,8 @@ Sempre **2 click** in sequenza: Estrai (git pull) + Implementa (rsync to docroot
 - 7-9 Maggio · 🔄 Rifinitura demo + ILLI•AI mascot + Compagni form
 - **10-12 Maggio · pre-presentazione** (slide demo, dry-run, dress rehearsal)
 - **13-17 Maggio · 🎤 Finestra presentazioni** (5 giorni hand-picked, partner+investitori)
-- 18 Mag → Giugno · 🚀 Pre-lancio Tirana
-- **Giugno 2026 · Lancio Tirana fisico**
+- 18 Mag → Ago · 🚀 Pre-lancio Tirana
+- **17 agosto 2026 (lun) · 🎯 Lancio pubblico Tirana** *(spostato da giugno — data Kairos, vedi TIMELINE.md)*
 
 **Webapp demo features chiave (commit `9bdc402`):**
 - Bottom nav 7 tab (Mappa · ILLI•AI · POI · Itinerari · Compagni · Profilo · SOS)
@@ -224,7 +224,7 @@ Vedi la sezione **Struttura del repository** sotto per la mappa file aggiornata.
 
 ## Identità progetto
 
-**POI•LOVE** è una mappa comunitaria dei luoghi amati — un'alternativa umana e culturale a Google Maps. Primo lancio: **Tirana, Albania — giugno 2026**. Framework open source: **Cultural Bridge OS** (MIT).
+**POI•LOVE** è una mappa comunitaria dei luoghi amati — un'alternativa umana e culturale a Google Maps. Primo lancio: **Tirana, Albania — 17 agosto 2026**. Framework open source: **Cultural Bridge OS** (MIT).
 
 Founder e direttore creativo: **Alessandro Castagna** (it@altrostile.app) — operativo tra Tirana e Italia tramite AltroStile.NET e 321.AL.
 

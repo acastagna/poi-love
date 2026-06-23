@@ -8,15 +8,15 @@
 - [ ] **Privacy Policy** — creare `web/privacy.html` → live su `poilove.com/privacy`
       *(richieste da Facebook OAuth, App Store, Play Store, GDPR)*
 - [ ] **Bucket `poi_photos`** su Supabase Storage — mancante, le foto non si caricano
-- [ ] **LinkedIn redirect URI** — aggiungere `https://poilove.com` nell'app LinkedIn Developer Console
+- [x] **LinkedIn redirect URI** — verificato 23/06: allow-list Supabase già corretta (`poilove.com/**`) ✅
 
 ## 🟡 OAuth provider
 
 - [x] Google — attivo ✅
-- [x] X (Twitter) — attivato 21/06 ✅
-- [x] LinkedIn (OIDC) — attivato 21/06 ✅
-- [ ] Facebook — bloccato: serve Terms & Privacy pubblica su poilove.com
-- [ ] Apple Sign In — rimandato a inizio luglio (fondi in arrivo)
+- [x] X — attivato 21/06 + **fix 23/06**: il codice usava provider `twitter` (spento), ora `x` ✅
+- [x] LinkedIn (OIDC) — attivato 21/06 ✅ (redirect allow-list verificata via Management API)
+- [ ] Facebook — bottone "presto" in UI; serve Terms & Privacy + App Review Meta
+- [ ] Apple Sign In — bottone "presto" in UI; serve Service ID + $99/anno
 
 ## 🟡 Architettura / infra
 
@@ -38,7 +38,7 @@
 - [x] **GPS watcher leak** in `startLocShare` — fixato 21/06 ✅
 - [ ] **Love count non atomico** — race condition con utenti concorrenti in `toggleLove` (riga 6543)
 - [x] **`toggleLoveDB` corrotto** — fixato 21/06 ✅
-- [ ] **`prompt()` rotto su iOS PWA** — `signInWithPasskey` usa alert bloccante (riga 3212)
+- [x] **`prompt()` rotto su iOS PWA** — fixato 23/06: focus sul campo email invece del prompt nativo ✅
 - [ ] **Query deep-link senza `.limit()`** — scarica tutta la tabella pois (riga 4393)
 - [ ] **Avatar addEventListener leak** — listener duplicati ad ogni generazione AI (riga 5747)
 

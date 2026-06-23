@@ -63,7 +63,7 @@ This is not just an app — it's a **framework**. Clone the repo, point it at yo
 
 ### 🇦🇱 First Instance: Albania · Tirana
 
-**Launch: June 2026 in Tirana**
+**Launch: 17 August 2026 in Tirana**
 
 Albania is the ideal context:
 - 🏛️ High historical density (Illyrian, Greek, Roman, Ottoman, Venetian layers)
@@ -94,7 +94,7 @@ POI•LOVE è un'**app open source per mappare i luoghi che ami davvero** — no
 
 ### 🚀 Prima Istanza: Albania · Tirana
 
-**Lancio: giugno 2026 a Tirana**
+**Lancio: 17 agosto 2026 a Tirana**
 
 L'Albania è il contesto ideale:
 - 🏛️ Territorio ad alta densità storica (strati illirici, greci, romani, ottomani, veneziani)
@@ -121,7 +121,7 @@ POI•LOVE është një **aplikacion me burim të hapur për të hartografuar ve
 
 ### 🚀 Instanca e Parë: Shqipëri · Tiranë
 
-**Lëshimi: qershor 2026 në Tiranë**
+**Lëshimi: 17 gusht 2026 në Tiranë**
 
 Shqipëria është konteksti ideal:
 - 🏛️ Terren me densitet të lartë historik (shtresa ilire, greke, romake, osmane, veneciane)
@@ -136,8 +136,8 @@ Shqipëria është konteksti ideal:
 |-----------|--------|--------|
 | 🎨 Interactive web prototype | ✅ Done | [Demo](https://acastagna.github.io/poi-love/) |
 | 🗄️ Supabase database schema | ✅ Done | [schema.sql](database/schema.sql) |
-| 📱 MVP App iOS + Android | 🎯 June 2026 | — |
-| 🚀 Public launch Tirana | 🎯 June 2026 | — |
+| 📱 MVP App iOS + Android | 🎯 Aug 2026 | — |
+| 🚀 Public launch Tirana | 🎯 17 Aug 2026 | — |
 | 🎙️ POI•VOICE (AI audio guides) | 📅 2027 Q1 | — |
 | 📖 Il Libro dei Luoghi | 📅 2027 Q3 | — |
 | 💳 Payment system | 📅 2028+ | — |
