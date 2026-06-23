@@ -6,7 +6,7 @@
 - **17 agosto 2026 (lunedì)** — data ottimale Kairos (score 74/100). È lo stesso "Lancio Tirana" prima previsto a giugno, spostato. Allineati `CLAUDE.md`, `README.md` (IT/EN/SQ) e creato `TIMELINE.md`.
 
 ### 🔐 Accessi — diagnosi completa + fix
-Mappato tutto il sistema di login in `demo/index.html` e verificata la config Supabase via Management API.
+Mappato tutto il sistema di login in `webapp/index.html` (ex `demo/`) e verificata la config Supabase via Management API.
 - **Stato reale provider** (Management API): `email`, `google`, `linkedin_oidc`, `x` attivi con credenziali; `facebook`/`apple` off. Site URL + Redirect allow-list già corretti su poilove.com.
 - ✅ **Fix X**: il codice chiamava `provider:'twitter'` (OAuth1, spento) invece di `'x'` (OAuth2, attivo) → login X era rotto, ora riparato.
 - ✅ **Fix biometria**: rimosso `prompt()` nativo (rotto su iOS PWA) → focus sul campo email + toast.
