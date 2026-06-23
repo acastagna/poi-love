@@ -6,7 +6,8 @@
 
 | Data | Evento | Stato |
 |------|--------|-------|
-| **17/08/2026 (lun)** | **🎯 LANCIO PUBBLICO POI•LOVE** | 🔴 in preparazione |
+| **13–17/07/2026** | **🎤 Finestra presentazioni — Tirana** (partner + investitori) | 🔴 in preparazione |
+| **17/08/2026 (lun)** | **🎯 LANCIO PUBBLICO POI•LOVE — Tirana** | 🔴 in preparazione |
 
 **Data scelta con il framework Kairos** (score 74/100): luna nuova giorno 3, compound 17 "Stella dei Magi", Universal Day 8 complementare a Destiny 1, nessuna retrogradazione attiva.
 Data di ripiego se si dovesse restare a luglio: **29/07/2026 (mer)** — score +12.

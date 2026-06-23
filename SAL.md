@@ -15,6 +15,18 @@ Mappato tutto il sistema di login in `demo/index.html` e verificata la config Su
 - Aggiunta i18n `auth_soon` (it/sq/en). Sintassi JS verificata, fix testati in preview.
 - **Login funzionanti ora: 5** (email/magic link, Google, LinkedIn, X, biometria).
 
+### 🌐 project.poilove.com — sbloccato e live in HTTPS
+Era bloccato (`domains.status=2`, "subscription suspended") perché creato il 22/06 mentre l'account Plesk era sospeso → nessun comando standard lo sbloccava (catch-22: client/customer --on, webspace-on, toggle, repair, tutti falliti). **Risolto** ricreando il sottodominio pulito: backup → `subdomain --remove` → `--create` (rinato `status=0`) → ripristino file dal backup + `chown` → SSL Let's Encrypt. Ora **project.poilove.com è live in HTTPS** con la presentazione marketing (cert valido fino al 21/09/2026). Causa+fix salvati in memoria (`plesk_subdomain_stuck_status2`).
+
+### 🔘 Pagina marketing (`web/index.html`) — rimossa la parola "demo"
+- ✅ Bottone hero "Apri la Demo" → **"Apri POI•LOVE"**; link `https://demo.poilove.com` → **`https://poilove.com`** (demo non esiste più, tutto risolve su poilove.com).
+- ✅ Meta "🌐 demo.poilove.com" → "🌐 poilove.com"; sub-testo "Apri la demo" → "Apri l'app".
+- ⏳ Da deployare su project.poilove.com (path nuovo, richiede ok deploy).
+
+### 🗓️ Date allineate
+- **Finestra presentazioni — Tirana: 13–17 luglio 2026** (nuova milestone in `TIMELINE.md`).
+- Lancio pubblico confermato **17 agosto 2026**; corretta la tappa nella timeline marketing da "Lug 2026" → "Ago 2026".
+
 ## Sessione 21/06/2026
 
 ### Fatto

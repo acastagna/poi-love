@@ -3980,14 +3980,15 @@ const T={
 /* Helper: t('key', fallback) — usato in JS dinamico */
 function t(key, fallback){ return (T[lang]&&T[lang][key]) || (T.it&&T.it[key]) || fallback || key; }
 
-const LANGS=['en','sq','it'];
-let lang='it';
+const LANGS=['sq','it','en'];
+let lang='sq';
 // 1) Preferenza utente salvata localmente
 try{ const saved=localStorage.getItem('poilove_lang'); if(saved && LANGS.includes(saved)) lang=saved; else throw 0; }
 catch(_){
   // 2) Lingua del dispositivo (navigator.language)
   const nl=(navigator.language||navigator.userLanguage||'').substring(0,2).toLowerCase();
-  if(nl==='sq')lang='sq'; else if(nl!=='it')lang='en';
+  // it→italiano, en→inglese, tutto il resto (SQ + lingue non supportate) → albanese (prima lingua, mercato Tirana)
+  if(nl==='it')lang='it'; else if(nl==='en')lang='en'; else lang='sq';
 }
 
 const LANG_FLAGS={it:'🇮🇹',sq:'🇦🇱',en:'🇬🇧'};
