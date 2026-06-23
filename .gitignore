@@ -18,7 +18,7 @@ android/.gradle/
 *.env
 
 # Chiavi API — solo sul server, mai nel repo
-demo/config.js
+webapp/config.js
 config.js
 
 # Cache e log

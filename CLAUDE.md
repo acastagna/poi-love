@@ -99,9 +99,9 @@ grep DocumentRoot /var/www/vhosts/system/poilove.com/conf/httpsd.conf
 4. **MAI eseguire `gh secret set`, `gh workflow run`, `gh secret delete`** senza ack scritto.
 5. **MAI `git push --force` o `--force-with-lease`** senza ack scritto.
 6. **Deploy autonomo consentito — SOLO file singoli via rsync**, senza `--delete`, su path esatti e pre-approvati:
-   - `demo/index.html` → `/var/www/vhosts/poilove.com/httpdocs/index.html` (poilove.com — ROOT PUBBLICA)
-   - `demo/index.html` → `/var/www/vhosts/poilove.com/demo.poilove.com/demo/index.html` (demo — redirect)
-   - Comando deploy produzione: `rsync -e "ssh -i ~/.ssh/evolab_deploy" demo/index.html root@46.4.70.47:/var/www/vhosts/poilove.com/httpdocs/index.html`
+   - `webapp/index.html` → `/var/www/vhosts/poilove.com/httpdocs/index.html` (poilove.com — webapp, ROOT PUBBLICA)
+   - `web/index.html` → `/var/www/vhosts/poilove.com/project.poilove.com/index.html` (project.poilove.com — presentazione marketing)
+   - Comando deploy webapp: `rsync -e "ssh -i ~/.ssh/evolab_deploy" webapp/index.html root@46.4.70.47:/var/www/vhosts/poilove.com/httpdocs/index.html`
    - Claude esegue questo **automaticamente a fine ogni sessione** dopo il commit.
    - MAI rsync di cartelle intere, MAI `--delete`, MAI altri path non elencati qui.
    - Per nuovi path da aggiungere: ack esplicito di Alessandro prima.
