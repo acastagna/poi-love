@@ -2,6 +2,13 @@
 > Leggi questo file per intero prima di ogni sessione. È la fonte di verità del progetto.
 > Vedi anche `STORICO-LAVORI.md` per il registro cronologico delle sessioni.
 
+> 🚀 **REDESIGN 2026 IN CORSO** (dal 23/06): la webapp passa da prototipo-vetrina a PRODOTTO REALE.
+> Visione e specifiche prodotto in **`SPECS.md`**. Analisi qualità (8 blocker + 14 major) in **`POSTMORTEM.md`**.
+> Pilastri: sistema codice-POI trasferibile, 3 QR fisici (modello di business), gamification a punti/badge,
+> AI di qualità (Sonnet/GPT-4o, non Groq), admin desktop, rotte storiche con pagina propria, POIVOICE audio.
+> **Stile: vietati i trattini lunghi (em dash). Usare virgole o due punti.**
+> Leggi `SPECS.md` e `POSTMORTEM.md` prima di toccare la webapp.
+
 ---
 
 ## 🟢 STATO AL 26/05/2026 — AI photo generation + Ownership guard + DB migrazione cover

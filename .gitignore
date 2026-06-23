@@ -21,6 +21,10 @@ android/.gradle/
 webapp/config.js
 config.js
 
+# Documenti strategici e sensibili — MAI nel repo pubblico (business plan + analisi debolezze)
+SPECS.md
+POSTMORTEM.md
+
 # Cache e log
 .DS_Store
 *.log
