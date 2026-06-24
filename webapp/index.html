@@ -2922,6 +2922,7 @@ sb.auth.getSession().then(({ data: { session } }) => {
     if(typeof loadMyLists==='function') loadMyLists();
     if(typeof loadMyTags==='function') loadMyTags();
     loadUserLovesCount();
+    applyPendingReferral();
   } else {
     // Anche senza login carica i tag locali (non richiedono auth)
     if(typeof loadMyTags==='function') setTimeout(loadMyTags,400);
@@ -3043,6 +3044,8 @@ function onAuthStateUpdate(event) {
     // Carica dati utente persistenti
     if(typeof loadMyLists==='function') loadMyLists();
     if(typeof loadMyTags==='function') loadMyTags();
+    loadUserLovesCount();
+    applyPendingReferral();
     // "Ricordami" — salva snapshot leggero per pre-fill UX al prossimo avvio
     try {
       if(currentUser.email) localStorage.setItem('poilove_last_email', currentUser.email);
@@ -3933,6 +3936,34 @@ async function loadUserLovesCount(){
     if(!pErr && prof){ currentPoints = prof.points||0; window._userSpecialTier = prof.special_tier||null; }
   }catch(e){ console.warn('loadUserLovesCount:', e); /* badge resta sui valori precedenti */ }
   renderBadge(currentPoints);
+}
+// Referral signup: cattura ?ref=handle dall'URL all'avvio (sopravvive al redirect OAuth via localStorage),
+// poi al login chiama claim_referral (RPC server-side validata). Il +50 lo accredita il trigger DB all'invitante.
+
+// Cattura il ref SOLO se non c'e' gia' un invito in sospeso (non sovrascrivere uno valido)
+(function(){
+  try{
+    const m = location.search.match(/[?&]ref=([^&]+)/);
+    if(m && !localStorage.getItem('poi_ref_pending')){
+      localStorage.setItem('poi_ref_pending', decodeURIComponent(m[1]));
+    }
+  }catch(e){ console.warn('ref capture:', e); }
+})();
+
+let _referralApplied=false;
+async function applyPendingReferral(){
+  // _referralApplied blocca la doppia esecuzione (getSession + onAuthStateUpdate possono sparare insieme)
+  if(_referralApplied || !currentUser || typeof sb==='undefined' || !sb) return;
+  const ref = localStorage.getItem('poi_ref_pending');
+  if(!ref) return;
+  _referralApplied=true;
+  try{
+    const {data,error}=await sb.rpc('claim_referral',{p_handle:ref});
+    if(!error){
+      localStorage.removeItem('poi_ref_pending');
+      if(data===true){ showToast('🎉 Invito accettato, grazie!'); loadUserLovesCount(); }
+    } else { _referralApplied=false; }   // errore di rete: permetti un retry al prossimo login
+  }catch(e){ _referralApplied=false; console.warn('applyPendingReferral:', e); }
 }
 
 function generateAvatar(){
