@@ -3887,11 +3887,11 @@ const SPECIAL_TIERS={
     ctaKey:'tier_pro_cta', cta:'Passa a Professionista',
     perks:[
       {i:'ph-infinity',     k:'tier_pro_p1', t:'ILLI•AI senza limiti, ogni giorno'},
-      {i:'ph-trend-up',     k:'tier_pro_p2', t:'Profilo influencer: punti raddoppiati'},
+      {i:'ph-chart-line-up',k:'tier_pro_p2', t:'Profilo influencer: punti raddoppiati'},
       {i:'ph-scroll',       k:'tier_pro_p3', t:'Adotta una rotta culturale con la tua dedica'},
       {i:'ph-qr-code',      k:'tier_pro_p4', t:'Un QR business incluso per la tua attivita'},
       {i:'ph-ticket',       k:'tier_pro_p5', t:'Inviti agli eventi POI•LOVE dal vivo'},
-      {i:'ph-compass-tool', k:'tier_pro_p6', t:'La tua voce sulla roadmap del progetto'}
+      {i:'ph-compass',      k:'tier_pro_p6', t:'La tua voce sulla roadmap del progetto'}
     ]},
   sostenitore:{labelKey:'tier_sostenitore', label:'Sostenitore', icon:'ph-fill ph-hand-heart', style:'background:linear-gradient(135deg,#1e3a8a 0%,#0b1226 52%,#1d4ed8 100%);color:#dbeafe;border-color:rgba(147,197,253,.6);box-shadow:0 3px 12px rgba(29,78,216,.45),inset 0 1px 0 rgba(255,255,255,.3)',
     pitchKey:'tier_sost_pitch', pitch:'Sostieni la mappa culturale libera. In cambio, vantaggi concreti: non solo un badge.',
@@ -4122,7 +4122,7 @@ const T={
     tier_sost_p1:'ILLI•AI potenziata, 20 consigli al giorno',tier_sost_p2:'Spunta di verifica sul profilo',tier_sost_p3:'I tuoi POI in evidenza sulla mappa',tier_sost_p4:'Copertine e temi profilo esclusivi',tier_sost_p5:'Accesso anticipato alle nuove funzioni',tier_sost_p6:'Il tuo nome nel Muro dei Sostenitori',
     tier_mec_pitch:'Il livello piu alto: tutto del Professionista, piu i privilegi esclusivi.',
     tier_mec_cta:'Diventa Mecenate',
-    tier_mec_p1:'Audiolibri ovunque, navigando, senza scansionare il QR sul posto',tier_mec_p2:'Segnala e proponi nuove rotte storiche',tier_mec_p3:'Un tuo itinerario nella sezione In Evidenza',tier_mec_p4:'5 dei tuoi POI in evidenza sulla mappa',tier_mec_p5:'Amministratore di una compagnia in evidenza',tier_mec_p6:'La tua voce sulla roadmap del progetto',
+    tier_mec_p1:'Audiolibri ovunque, navigando, senza scansionare il QR sul posto',tier_mec_p2:'Segnala e proponi nuove rotte storiche',tier_mec_p3:'Un tuo itinerario nella sezione In Evidenza',tier_mec_p4:'5 dei tuoi POI in evidenza sulla mappa',tier_mec_p5:'Amministratore di una compagnia in evidenza',
     tier_cta_fallback:'Sostieni',
     tier_points_suffix:'punti',
     tier_verified:'Profilo verificato',
@@ -4202,7 +4202,7 @@ const T={
     tier_sost_p1:'ILLI•AI e fuqizuar, 20 këshilla në ditë',tier_sost_p2:'Shenjë verifikimi në profil',tier_sost_p3:'POI-të e tua në pah në hartë',tier_sost_p4:'Kopertina dhe tema profili ekskluzive',tier_sost_p5:'Qasje e parakohshme te funksionet e reja',tier_sost_p6:'Emri yt në Murin e Mbështetësve',
     tier_mec_pitch:'Niveli më i lartë: gjithçka e Profesionistit, plus privilegjet ekskluzive.',
     tier_mec_cta:'Bëhu Mecen',
-    tier_mec_p1:'Audiolibra kudo, duke lundruar, pa skanuar QR-in në vend',tier_mec_p2:'Sinjalizo dhe propozo rrugë të reja historike',tier_mec_p3:'Një itinerar yti në seksionin Në Pah',tier_mec_p4:'5 nga POI-të e tua në pah në hartë',tier_mec_p5:'Administrator i një kompanie në pah',tier_mec_p6:'Zëri yt në planin e projektit',
+    tier_mec_p1:'Audiolibra kudo, duke lundruar, pa skanuar QR-in në vend',tier_mec_p2:'Sinjalizo dhe propozo rrugë të reja historike',tier_mec_p3:'Një itinerar yti në seksionin Në Pah',tier_mec_p4:'5 nga POI-të e tua në pah në hartë',tier_mec_p5:'Administrator i një kompanie në pah',
     tier_cta_fallback:'Mbështet',
     tier_points_suffix:'pikë',
     tier_verified:'Profil i verifikuar',
@@ -4282,7 +4282,7 @@ const T={
     tier_sost_p1:'Boosted ILLI•AI, 20 tips a day',tier_sost_p2:'Verified check on your profile',tier_sost_p3:'Your POIs featured on the map',tier_sost_p4:'Exclusive profile covers and themes',tier_sost_p5:'Early access to new features',tier_sost_p6:'Your name on the Supporters Wall',
     tier_mec_pitch:'The highest tier: everything in Professional, plus exclusive privileges.',
     tier_mec_cta:'Become a Patron',
-    tier_mec_p1:'Audiobooks anywhere, while browsing, without scanning the on-site QR',tier_mec_p2:'Report and propose new historic routes',tier_mec_p3:'One of your itineraries in the Featured section',tier_mec_p4:'5 of your POIs featured on the map',tier_mec_p5:'Administrator of a featured company',tier_mec_p6:'Your voice on the project roadmap',
+    tier_mec_p1:'Audiobooks anywhere, while browsing, without scanning the on-site QR',tier_mec_p2:'Report and propose new historic routes',tier_mec_p3:'One of your itineraries in the Featured section',tier_mec_p4:'5 of your POIs featured on the map',tier_mec_p5:'Administrator of a featured company',
     tier_cta_fallback:'Support',
     tier_points_suffix:'points',
     tier_verified:'Verified profile',
@@ -6411,8 +6411,8 @@ function setBgTab(t){
 }
 // Applica lo sfondo (URL immagine) al profilo privato + pubblico, e salva
 function applyHeroBgImage(url){
-  // Sicurezza: accetta solo https o data-URL immagine, per non poter iniettare CSS via background
-  if(!/^(https:\/\/|data:image\/)/i.test(url||'')){ showToast?.(t('bg_error_invalid','Seleziona un\'immagine valida')); return; }
+  // Sicurezza: solo https o data-URL immagine, e nessun carattere che possa rompere il CSS url() (CSS injection)
+  if(!/^(https:\/\/|data:image\/)/i.test(url||'') || /['"()\s<>]/.test(url)){ showToast?.(t('bg_error_invalid','Seleziona un\'immagine valida')); return; }
   const css = `linear-gradient(rgba(0,0,0,.35),rgba(0,0,0,.55)),url('${url}') center/cover`;
   const hero = document.getElementById('profileHero');
   const lang = document.getElementById('lang-strip');
@@ -9803,7 +9803,7 @@ function closePhotoPicker(){
   photoPickerSelected=null;
 }
 
-// Cerca foto con parole chiave via Flickr Lorem (no API key, keyword-aware)
+// Cerca/genera immagini con parole chiave via Flux (Pollinations), nessuna API key
 function searchUnsplash(){
   const q=document.getElementById('photoPickerSearch')?.value?.trim();
   if(!q){showToast('Inserisci un termine di ricerca');return;}
@@ -9816,17 +9816,18 @@ function searchUnsplash(){
   const seed=Date.now()%9000+1000;
   photoPickerUnsplashUrls=Array.from({length:9},(_,i)=>`https://image.pollinations.ai/prompt/${baseQ}?width=400&height=400&nologo=true&seed=${seed+i}`);
   grid.innerHTML=photoPickerUnsplashUrls.map((url,i)=>`
-    <div class="photo-picker-thumb" id="ppt-${i}" onclick="selectUnsplashPhoto(${i},'${url}')">
+    <div class="photo-picker-thumb" id="ppt-${i}" onclick="selectUnsplashPhoto(${i})">
       <img src="${url}" alt="" loading="lazy"
         onload="this.parentNode.querySelector('.ph-spinner')?.remove()"
         onerror="this.src='https://picsum.photos/seed/${seed+i}/400/400';this.onerror=null">
       <i class="ph-duotone ph-spinner-gap ph-spinner" style="position:absolute;inset:0;margin:auto;font-size:22px;color:var(--muted);animation:spin 1s linear infinite"></i>
-      <div class="unsplash-attr">Flickr CC</div>
+      <div class="unsplash-attr">AI · Flux</div>
     </div>
   `).join('');
 }
 
-function selectUnsplashPhoto(idx, url){
+function selectUnsplashPhoto(idx){
+  const url=photoPickerUnsplashUrls[idx]; if(!url) return;
   // Deseleziona tutti
   document.querySelectorAll('.photo-picker-thumb').forEach(t=>t.classList.remove('selected'));
   document.getElementById('ppt-'+idx)?.classList.add('selected');
