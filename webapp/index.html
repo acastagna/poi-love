@@ -602,7 +602,9 @@ body.tab-active #mapQuickBtns{display:none}
 /* ── Livelli popup ── */
 #levelsOv{position:fixed;inset:0;z-index:9200;background:rgba(20,16,14,.55);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);display:none;align-items:center;justify-content:center;padding:20px}
 #levelsOv.show{display:flex}
-.levels-card{width:100%;max-width:380px;max-height:90vh;overflow-y:auto;background:var(--card);border-radius:22px;box-shadow:0 24px 60px rgba(0,0,0,.4)}
+.levels-card{width:100%;max-width:380px;max-height:90vh;overflow-y:auto;background:var(--card);border-radius:22px;box-shadow:0 24px 60px rgba(0,0,0,.4);scrollbar-width:none;-ms-overflow-style:none}
+.levels-card::-webkit-scrollbar{width:0;height:0;display:none}
+@media(min-width:560px){.levels-card{max-width:470px}}
 .levels-hero{background:linear-gradient(135deg,#E13535 0%,#BC2222 45%,#8a1a1a 100%);color:#fff;padding:22px 22px 20px;text-align:center;border-radius:22px 22px 0 0}
 .levels-avatar{width:60px;height:60px;border-radius:50%;margin:0 auto 10px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:28px;overflow:hidden;border:2px solid rgba(255,255,255,.5)}
 .levels-avatar img{width:100%;height:100%;object-fit:cover}
