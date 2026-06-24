@@ -3936,13 +3936,8 @@ function cycleLang(){applyLang(LANGS[(LANGS.indexOf(lang)+1)%LANGS.length])}
    MAP
 ══════════════════════════════════════════ */
 const CENTER=[41.3275,19.8189];
-const POIS=[
-  {lat:41.3264,lng:19.8193,cat:'Cultura',name:'Blloku',desc:"Quartiere liberato nel '91. Caffè, storia, energia vibrante.",address:'Rruga Ismail Qemali, Tiranë',love:0,photos:['https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Blloku_Tirana.jpg/400px-Blloku_Tirana.jpg'],author:'@admin'},
-  {lat:41.3275,lng:19.8212,cat:'Cultura',name:"Xhamia Et'hem Beut",desc:'Moschea ottomana del 1823. Capolavoro di tilework.',address:'Sheshi Skënderbej, Tiranë',love:0,photos:['https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Mosque_of_Ethem_Bey.jpg/400px-Mosque_of_Ethem_Bey.jpg'],author:'@admin'},
-  {lat:41.3293,lng:19.8180,cat:'Cultura',name:'Piramida di Tirana',desc:"Costruita nel 1988 come museo per Enver Hoxha. Oggi spazio culturale.",address:'Bulevardi Dëshmorët e Kombit, Tiranë',love:0,photos:['https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Pyramid_of_Tirana_2022.jpg/400px-Pyramid_of_Tirana_2022.jpg'],author:'@admin'},
-  {lat:41.3236,lng:19.8162,cat:'Cibo',name:'Pazari i Ri',desc:'Il mercato più autentico dei Balcani. Odori di spezie, vita vera.',address:'Rruga Luigj Gurakuqi, Tiranë',love:0,photos:['https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/New_Bazaar_Tirana.jpg/400px-New_Bazaar_Tirana.jpg'],author:'@admin'},
-  {lat:41.3320,lng:19.8242,cat:'Natura',name:'Liqeni Artificial',desc:'Il lago artificiale è il polmone verde di Tirana. Al tramonto è pura magia.',address:'Parku Kombëtar, Tiranë',love:0,photos:[],author:'@admin'},
-];
+// POI di seed: verranno da Supabase (luoghi reali, rivendicabili), non più hardcoded qui
+const POIS=[];
 
 let map,tileStreet,tileSat,tileLabels,routeLayer,currentPOI;
 let gpsPos=null,gpsRegistered=false,userLocMarker=null;
