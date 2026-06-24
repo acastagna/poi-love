@@ -5832,6 +5832,11 @@ function goToProfileStat(kind){
   } else if(kind==='list'){
     showTab('itin');
     if(typeof setItinSubtab==='function') setItinSubtab('lists');
+  } else if(kind==='itin'){
+    showTab('itin');
+    if(typeof setItinSubtab==='function') setItinSubtab('trips');
+  } else if(kind==='comp'){
+    showTab('companions');
   }
 }
 async function refreshProfileStats(){
