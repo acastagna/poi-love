@@ -4563,7 +4563,7 @@ function onNameInput(val){
           headers:{'Content-Type':'application/json','Authorization':`Bearer ${GROQ_KEY}`},
           body:JSON.stringify({model:GROQ_MODEL,messages:[{role:'user',
             content:`Correggi l'errore di battitura nel nome di questo luogo: "${val}". Rispondi SOLO con il nome corretto, niente altro.`}],
-            max_tokens:20,temperature:0})});
+            max_completion_tokens:20,temperature:0})});
         if(res.ok){
           const j=await res.json();
           const fix=(j?.choices?.[0]?.message?.content||'').trim().replace(/^["']|["']$/g,'');
@@ -5097,7 +5097,7 @@ Regole:
   try {
     const res=await fetch(GROQ_URL,{method:'POST',
       headers:{'Content-Type':'application/json','Authorization':`Bearer ${GROQ_KEY}`},
-      body:JSON.stringify({model:GROQ_MODEL,messages:[{role:'user',content:prompt}],temperature:0.9,max_tokens:120})});
+      body:JSON.stringify({model:GROQ_MODEL,messages:[{role:'user',content:prompt}],temperature:0.9,max_completion_tokens:120})});
     const json=await res.json();
     const generated=(json?.choices?.[0]?.message?.content||'').trim()
       .replace(/^["']|["']$/g,'').substring(0,200);
@@ -5531,7 +5531,7 @@ async function runMapSearch(q){
           headers:{'Content-Type':'application/json','Authorization':`Bearer ${GROQ_KEY}`},
           body:JSON.stringify({model:GROQ_MODEL,messages:[{role:'user',
             content:`Correggi l'errore di battitura in questa ricerca di luoghi: "${q}". Rispondi SOLO con la versione corretta, niente altro.`}],
-            max_tokens:20,temperature:0})});
+            max_completion_tokens:20,temperature:0})});
         if(token===_mapSearchToken && res.ok){
           const j=await res.json();
           const fix=(j?.choices?.[0]?.message?.content||'').trim().replace(/^["']|["']$/g,'');
@@ -9234,14 +9234,15 @@ document.addEventListener('click',e=>{
    ILLI•AI TRAVEL ADVISOR
 ══════════════════════════════════════════ */
 /* ═══════════════════════════════════════════════════════
-   ILLI•AI — Groq · llama-3.3-70b-versatile
+   ILLI•AI — OpenAI · gpt-4o-mini (ex Groq llama-3.3-70b)
    Formato OpenAI-compatible. MVP front-end.
 ═══════════════════════════════════════════════════════ */
-// ILLI•AI key — XOR-encoded, decoded at runtime
-// Chiave Groq caricata da /config.js (escluso da git, solo sul server)
+// ILLI•AI key (OpenAI) — caricata da config.js sul server, mai nel repo
+// Chiave OpenAI caricata da /config.js (escluso da git, solo sul server).
+// NB: la variabile resta GROQ_KEY per non toccare i punti di chiamata, ma ora contiene la chiave OpenAI (sk-...).
 const GROQ_KEY = (typeof window !== 'undefined' && window._groqKey) ? window._groqKey : '';
-const GROQ_URL='https://api.groq.com/openai/v1/chat/completions';
-const GROQ_MODEL='llama-3.3-70b-versatile';
+const GROQ_URL='https://api.openai.com/v1/chat/completions';
+const GROQ_MODEL='gpt-4o-mini';
 
 // Conversazione in memoria per contesto multi-turno (formato OpenAI)
 let poiaiHistory=[];
@@ -9309,7 +9310,7 @@ async function sendPoiAIMsg(){
     const res=await fetch(GROQ_URL,{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':`Bearer ${GROQ_KEY}`},
-      body:JSON.stringify({model:GROQ_MODEL,messages,temperature:0.85,max_tokens:512})
+      body:JSON.stringify({model:GROQ_MODEL,messages,temperature:0.85,max_completion_tokens:512})
     });
     const json=await res.json();
     if(!res.ok) throw new Error(json?.error?.message||`HTTP ${res.status}`);
