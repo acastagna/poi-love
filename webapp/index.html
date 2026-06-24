@@ -1710,10 +1710,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
     <span data-t="auth_terms">Accedendo accetti i Termini di servizio di POI•LOVE</span><br>
     <span data-t="auth_oss">Progetto Open Source · MIT License · © 2026 321.AL</span>
   </div>
-  <!-- DEMO BYPASS -->
-  <button class="auth-demo-btn" onclick="enterDemoMode()">
-    <i class="ph-duotone ph-eye"></i> <span data-t="auth_demo">Esplora in modalità demo</span>
-  </button>
+  <!-- modalità demo rimossa: l'app richiede login reale, niente dati finti -->
 
   <!-- Selettore lingua — chip ultramoderni glassmorphism (EN · SQ · IT) -->
   <div class="auth-lang-row" role="group" aria-label="Language selector">
@@ -1900,86 +1897,27 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
       <div class="profile-sec">
         <div class="prof-sec-lbl"><span>Connessioni</span></div>
         <div class="social-tabs">
-          <button class="social-tab active" onclick="showSocialTab('seguiti',this)">Seguiti <span style="background:#EBF2FC;color:var(--blue);border-radius:8px;padding:1px 6px;font-size:10px">3</span></button>
-          <button class="social-tab" onclick="showSocialTab('follower',this)">Follower <span style="background:#f5f0e8;color:var(--muted);border-radius:8px;padding:1px 6px;font-size:10px">12</span></button>
-          <button class="social-tab" onclick="showSocialTab('bloccati',this)">Bloccati <span style="background:#FEE2E2;color:#DC2626;border-radius:8px;padding:1px 6px;font-size:10px">1</span></button>
+          <button class="social-tab active" onclick="showSocialTab('seguiti',this)">Seguiti <span id="cnt-seguiti" style="background:#EBF2FC;color:var(--blue);border-radius:8px;padding:1px 6px;font-size:10px">0</span></button>
+          <button class="social-tab" onclick="showSocialTab('follower',this)">Follower <span id="cnt-follower" style="background:#f5f0e8;color:var(--muted);border-radius:8px;padding:1px 6px;font-size:10px">0</span></button>
+          <button class="social-tab" onclick="showSocialTab('bloccati',this)">Bloccati <span id="cnt-bloccati" style="background:#FEE2E2;color:#DC2626;border-radius:8px;padding:1px 6px;font-size:10px">0</span></button>
         </div>
+        <!-- Connessioni reali: da caricare da Supabase (tabella follows). Vuoto finché non ci sono dati veri. -->
         <div class="social-panel active" id="panel-seguiti">
-          <!-- Mirela K. — Amico · condivisione pos. attiva 1 giorno -->
-          <div class="user-row-wrap">
-            <div class="user-row" onclick="openUserRowProfile('Mirela K.',{email:'mirela@test.com',avatar_url:'https://ui-avatars.com/api/?name=Mirela+K&background=285EA7&color=fff&size=200'})" style="cursor:pointer">
-              <div class="u-avatar"><img src="https://ui-avatars.com/api/?name=Mirela+K&background=285EA7&color=fff&size=80" alt=""></div>
-              <div class="u-info">
-                <div class="u-name">Mirela K. <span class="rel-badge friend">Amico</span></div>
-                <div class="u-meta">18 POI · Tirana · <span class="pos-share-timer" data-until="1d">📍 ancora 23h</span></div>
-              </div>
-              <button class="u-action u-pos-btn" onclick="event.stopPropagation();toggleLocDurPicker('ldup-mirela')"><i class="ph-duotone ph-map-trifold"></i></button>
-            </div>
-            <div class="loc-dur-picker" id="ldup-mirela">
-              <div class="loc-dur-title">Condividi posizione per:</div>
-              <div class="loc-dur-opts">
-                <button class="loc-dur-opt" onclick="setLocShare('mirela','1h',this)">1 ora</button>
-                <button class="loc-dur-opt" onclick="setLocShare('mirela','1d',this)">1 giorno</button>
-                <button class="loc-dur-opt sel" onclick="setLocShare('mirela','1M',this)">1 mese</button>
-                <button class="loc-dur-opt" onclick="setLocShare('mirela','always',this)">Sempre</button>
-                <button class="loc-dur-opt stop-share" onclick="setLocShare('mirela','off',this)">✕ Togli</button>
-              </div>
-            </div>
-          </div>
-          <!-- Arben S. — Seguo · nessuna condivisione pos. -->
-          <div class="user-row-wrap">
-            <div class="user-row" onclick="openUserRowProfile('Arben S.',{email:'arben@test.com',avatar_url:'https://ui-avatars.com/api/?name=Arben+S&background=22C55E&color=fff&size=200'})" style="cursor:pointer">
-              <div class="u-avatar"><img src="https://ui-avatars.com/api/?name=Arben+S&background=22C55E&color=fff&size=80" alt=""></div>
-              <div class="u-info">
-                <div class="u-name">Arben S. <span class="rel-badge follow">Seguo</span></div>
-                <div class="u-meta">7 POI · Shkodër</div>
-              </div>
-              <button class="u-action u-pos-btn" onclick="event.stopPropagation();toggleLocDurPicker('ldup-arben')"><i class="ph-duotone ph-map-trifold"></i></button>
-            </div>
-            <div class="loc-dur-picker" id="ldup-arben">
-              <div class="loc-dur-title">Condividi posizione per:</div>
-              <div class="loc-dur-opts">
-                <button class="loc-dur-opt" onclick="setLocShare('arben','1h',this)">1 ora</button>
-                <button class="loc-dur-opt" onclick="setLocShare('arben','1d',this)">1 giorno</button>
-                <button class="loc-dur-opt" onclick="setLocShare('arben','1M',this)">1 mese</button>
-                <button class="loc-dur-opt" onclick="setLocShare('arben','always',this)">Sempre</button>
-                <button class="loc-dur-opt stop-share" onclick="setLocShare('arben','off',this)">✕ Togli</button>
-              </div>
-            </div>
-          </div>
-          <!-- Liri V. — Seguo -->
-          <div class="user-row-wrap">
-            <div class="user-row" onclick="openUserRowProfile('Liri V.',{email:'liri@test.com',avatar_url:'https://ui-avatars.com/api/?name=Liri+V&background=D42B2B&color=fff&size=200'})" style="cursor:pointer">
-              <div class="u-avatar"><img src="https://ui-avatars.com/api/?name=Liri+V&background=D42B2B&color=fff&size=80" alt=""></div>
-              <div class="u-info">
-                <div class="u-name">Liri V. <span class="rel-badge follow">Seguo</span></div>
-                <div class="u-meta">31 POI · Tirana</div>
-              </div>
-              <button class="u-action u-pos-btn" onclick="event.stopPropagation();toggleLocDurPicker('ldup-liri')"><i class="ph-duotone ph-map-trifold"></i></button>
-            </div>
-            <div class="loc-dur-picker" id="ldup-liri">
-              <div class="loc-dur-title">Condividi posizione per:</div>
-              <div class="loc-dur-opts">
-                <button class="loc-dur-opt" onclick="setLocShare('liri','1h',this)">1 ora</button>
-                <button class="loc-dur-opt" onclick="setLocShare('liri','1d',this)">1 giorno</button>
-                <button class="loc-dur-opt" onclick="setLocShare('liri','1M',this)">1 mese</button>
-                <button class="loc-dur-opt" onclick="setLocShare('liri','always',this)">Sempre</button>
-                <button class="loc-dur-opt stop-share" onclick="setLocShare('liri','off',this)">✕ Togli</button>
-              </div>
-            </div>
+          <div class="social-empty" style="text-align:center;padding:24px 0;color:var(--muted);font-size:13px">
+            <i class="ph-duotone ph-user-plus" style="font-size:32px;display:block;margin-bottom:8px"></i>
+            Non segui ancora nessuno.<br>Segui altri viaggiatori per vedere qui i loro percorsi.
           </div>
         </div>
         <div class="social-panel" id="panel-follower">
-          <div style="text-align:center;padding:20px 0;color:var(--muted);font-size:12px">
+          <div class="social-empty" style="text-align:center;padding:24px 0;color:var(--muted);font-size:13px">
             <i class="ph-duotone ph-users" style="font-size:32px;display:block;margin-bottom:8px"></i>
-            12 persone ti seguono.<br>Solo i tuoi seguiti vedono i tuoi POI privati.
+            Ancora nessun follower.
           </div>
         </div>
         <div class="social-panel" id="panel-bloccati">
-          <div class="user-row">
-            <div class="u-avatar"><img src="https://ui-avatars.com/api/?name=U+B&background=6B6B6B&color=fff&size=80" alt=""></div>
-            <div class="u-info"><div class="u-name">Utente bloccato</div><div class="u-meta">Non vede i tuoi contenuti</div></div>
-            <button class="u-action danger" onclick="showToast('Utente sbloccato')"><i class="ph-duotone ph-lock-open" style="font-size:12px"></i> Sblocca</button>
+          <div class="social-empty" style="text-align:center;padding:24px 0;color:var(--muted);font-size:13px">
+            <i class="ph-duotone ph-shield-check" style="font-size:32px;display:block;margin-bottom:8px"></i>
+            Nessun utente bloccato.
           </div>
         </div>
       </div>
@@ -2909,35 +2847,7 @@ const SUPABASE_ANON = 'sb_publishable_PC1xQ8XiQK9jpzwsAlFLxw_E-PKN40V';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 let currentUser = null;
 
-// ── DEMO MODE ──────────────────────────────────────────────
-function enterDemoMode() {
-  currentUser = {
-    id: 'demo-user-0000-0000-0000-000000000001',
-    email: 'demo@poilove.com',
-    user_metadata: {
-      full_name: 'Alessandro Demo',
-      name: 'Alessandro Demo',
-      avatar_url: '',
-    }
-  };
-  const overlay = document.getElementById('authOverlay');
-  if (overlay) overlay.style.display = 'none';
-  // Popola profilo con dati mock
-  const nameEl = document.getElementById('profileName');
-  const emailEl = document.getElementById('profileEmail') || document.querySelector('[data-profile-email]');
-  if (nameEl) nameEl.textContent = 'Alessandro Demo';
-  if (emailEl) emailEl.textContent = 'demo@poilove.com';
-  // Prova a chiamare syncProfileFromAuth se esiste
-  if (typeof syncProfileFromAuth === 'function') {
-    try { syncProfileFromAuth(); } catch(e) {}
-  }
-  // Avvia la mappa se non già avviata
-  if (typeof initMap === 'function') {
-    try { initMap(); } catch(e) {}
-  }
-  showToast(t('auth_demo_active'));
-}
-// ──────────────────────────────────────────────────────────
+// (modalità demo rimossa: l'app richiede login reale)
 
 // Ascolta cambi sessione (login / logout / token refresh)
 sb.auth.onAuthStateChange((event, session) => {
