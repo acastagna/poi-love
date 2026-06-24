@@ -5510,7 +5510,7 @@ function showPlaceTripChooser(){
 function aiPlaceAddToTripById(tripId){
   if(!_mapPopupCtx) return;
   if(typeof addAISuggestionAsStop==='function') addAISuggestionAsStop(tripId, _mapPopupCtx.name);
-  else showToast?.(`Aggiunto "${(_mapPopupCtx.name||'').replace(/</g,'&lt;')}"`);
+  else showToast?.(`Aggiunto "${_mapPopupCtx.name}"`);
 }
 
 // Rotte storiche UFFICIALI (curate dall'amministrazione): NON modificabili dagli utenti.
@@ -5573,7 +5573,7 @@ function showPlaceHistoricRouteChooser(){
 }
 function addPlaceToHistoricRouteById(routeId, routeName){
   if(!_mapPopupCtx) return;
-  showToast?.(`🏛 "${(_mapPopupCtx.name||'').replace(/</g,'&lt;')}" aggiunto alla rotta "${routeName}"`);
+  showToast?.(`🏛 "${_mapPopupCtx.name}" aggiunto alla rotta "${routeName}"`);
 }
 function createHistoricRouteWithAI(){
   if(!_mapPopupCtx) return;
@@ -5581,7 +5581,7 @@ function createHistoricRouteWithAI(){
   setTimeout(()=>{
     const input = document.getElementById('poiaiInput');
     if(input){
-      input.value = `Aiutami a creare una nuova rotta storica che includa "${(_mapPopupCtx.name||'').replace(/</g,'&lt;')}" (coordinate ${(+_mapPopupCtx.lat).toFixed(5)}, ${(+_mapPopupCtx.lng).toFixed(5)}). Suggeriscimi nome, periodo storico, altre tappe coerenti e una breve storia narrativa.`;
+      input.value = `Aiutami a creare una nuova rotta storica che includa "${_mapPopupCtx.name}" (coordinate ${(+_mapPopupCtx.lat).toFixed(5)}, ${(+_mapPopupCtx.lng).toFixed(5)}). Suggeriscimi nome, periodo storico, altre tappe coerenti e una breve storia narrativa.`;
       if(typeof sendPoiAIMsg==='function') sendPoiAIMsg();
     }
   }, 350);
@@ -5594,7 +5594,7 @@ function addPlaceToItinerary(){
 // Aggiungi → alla rotta storica (placeholder per ora — feature V2)
 function addPlaceToHistoricRoute(){
   if(!_mapPopupCtx) return;
-  showToast?.(`🏛 "${(_mapPopupCtx.name||'').replace(/</g,'&lt;')}" sarà aggiungibile a una rotta storica (presto)`);
+  showToast?.(`🏛 "${_mapPopupCtx.name}" sarà aggiungibile a una rotta storica (presto)`);
 }
 // Aggiungi → ILLI•AI racconta
 function askIlliAbout(){
@@ -5613,7 +5613,7 @@ function askIlliAbout(){
 // Condividi → con un amico (compagni di viaggio)
 function sharePlaceWithFriend(){
   if(!_mapPopupCtx) return;
-  showToast?.(`👥 Apri la tab Compagni e seleziona chi vuole conoscere "${(_mapPopupCtx.name||'').replace(/</g,'&lt;')}"`);
+  showToast?.(`👥 Apri la tab Compagni e seleziona chi vuole conoscere "${_mapPopupCtx.name}"`);
   showTab('companions');
   closeMapSearchMarker();
 }
