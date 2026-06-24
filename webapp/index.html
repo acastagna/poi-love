@@ -1566,7 +1566,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
       <i class="ph-duotone ph-users-three"></i>
       <span class="compagnia-badge" id="compagniaBadge">0</span>
     </div>
-    <span>Compagni di Viaggio</span>
+    <span data-t="comp_title">Compagni di Viaggio</span>
   </button>
 </div>
 
@@ -1577,8 +1577,8 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
     <div class="sh-handle"></div>
     <div class="sh-head">
       <div>
-        <div class="sh-title" id="compSheetTitle"><i class="ph-duotone ph-users-three"></i> Compagni di Viaggio</div>
-        <div class="sh-sub">Condividi la tua posizione GPS in tempo reale con gli amici</div>
+        <div class="sh-title" id="compSheetTitle"><i class="ph-duotone ph-users-three"></i> <span data-t="comp_title">Compagni di Viaggio</span></div>
+        <div class="sh-sub" data-t="comp_sheet_sub">Condividi la tua posizione GPS in tempo reale con gli amici</div>
       </div>
       <button class="sh-close" onclick="closeSheet('compagniaOv','compagniaBg','compagniaSheet')"><i class="ph-duotone ph-x"></i></button>
     </div>
@@ -1587,54 +1587,54 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
       <!-- ╭─ UNISCITI a una compagnia esistente ─╮ -->
       <details class="comp-section" style="margin-bottom:14px;background:#f5f0e8;border-radius:12px;padding:10px 14px">
         <summary style="font-size:13px;font-weight:700;color:var(--text);cursor:pointer;list-style:none;display:flex;align-items:center;gap:6px">
-          <i class="ph-duotone ph-sign-in" style="color:var(--blue)"></i> Hai già un codice? Unisciti
+          <i class="ph-duotone ph-sign-in" style="color:var(--blue)"></i> <span data-t="comp_have_code">Hai già un codice? Unisciti</span>
         </summary>
         <div style="margin-top:10px">
           <div class="compagnia-code-row">
             <input class="compagnia-code-in" id="compagniaCode" type="text" maxlength="6" placeholder="ABC123"
               onkeydown="if(event.key==='Enter')joinOrCreateCompagnia()"/>
-            <button class="compagnia-join-btn" onclick="joinOrCreateCompagnia()">Unisciti</button>
+            <button class="compagnia-join-btn" onclick="joinOrCreateCompagnia()" data-t="comp_join">Unisciti</button>
           </div>
         </div>
       </details>
 
       <!-- ╭─ CREA nuova compagnia ─╮ -->
       <div style="font-size:13px;font-weight:800;color:var(--text);margin:8px 0 10px;display:flex;align-items:center;gap:6px">
-        <i class="ph-duotone ph-plus-circle" style="color:var(--red);font-size:18px"></i> Crea un nuovo gruppo
+        <i class="ph-duotone ph-plus-circle" style="color:var(--red);font-size:18px"></i> <span data-t="comp_create_group">Crea un nuovo gruppo</span>
       </div>
 
       <!-- Nome -->
-      <label style="display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">Nome del gruppo</label>
-      <input id="compNewName" type="text" maxlength="40" placeholder="Es: Tirana Weekend, Cena del giovedì…" style="width:100%;height:42px;border:1.5px solid var(--border);border-radius:11px;padding:0 14px;font-size:14px;font-family:inherit;outline:none;background:var(--card);color:var(--text);margin-bottom:12px;box-sizing:border-box"/>
+      <label style="display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px" data-t="comp_name_lbl">Nome del gruppo</label>
+      <input id="compNewName" type="text" maxlength="40" placeholder="Es: Tirana Weekend, Cena del giovedì…" data-tp="comp_name_ph" style="width:100%;height:42px;border:1.5px solid var(--border);border-radius:11px;padding:0 14px;font-size:14px;font-family:inherit;outline:none;background:var(--card);color:var(--text);margin-bottom:12px;box-sizing:border-box"/>
 
       <!-- Tipo -->
-      <label style="display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Durata</label>
+      <label style="display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px" data-t="comp_duration">Durata</label>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px" id="compTypeRow">
         <label class="comp-type-opt" style="cursor:pointer">
           <input type="radio" name="compType" value="forever" onchange="onCompTypeChange()" style="display:none">
-          <div class="comp-type-card" data-type="forever"><i class="ph-duotone ph-heart-straight" style="color:var(--red);font-size:18px"></i><span>Per sempre</span></div>
+          <div class="comp-type-card" data-type="forever"><i class="ph-duotone ph-heart-straight" style="color:var(--red);font-size:18px"></i><span data-t="comp_forever">Per sempre</span></div>
         </label>
         <label class="comp-type-opt" style="cursor:pointer">
           <input type="radio" name="compType" value="trip" checked onchange="onCompTypeChange()" style="display:none">
-          <div class="comp-type-card active" data-type="trip"><i class="ph-duotone ph-airplane-tilt" style="color:var(--blue);font-size:18px"></i><span>Un viaggio</span></div>
+          <div class="comp-type-card active" data-type="trip"><i class="ph-duotone ph-airplane-tilt" style="color:var(--blue);font-size:18px"></i><span data-t="comp_trip">Un viaggio</span></div>
         </label>
         <label class="comp-type-opt" style="cursor:pointer">
           <input type="radio" name="compType" value="dinner" onchange="onCompTypeChange()" style="display:none">
-          <div class="comp-type-card" data-type="dinner"><i class="ph-duotone ph-fork-knife" style="color:#16A34A;font-size:18px"></i><span>Una cena</span></div>
+          <div class="comp-type-card" data-type="dinner"><i class="ph-duotone ph-fork-knife" style="color:#16A34A;font-size:18px"></i><span data-t="comp_dinner">Una cena</span></div>
         </label>
       </div>
 
       <!-- Date/Ore (solo per trip/dinner) -->
       <div id="compDateBlock" style="margin-bottom:12px">
         <label style="display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">
-          <i class="ph-duotone ph-calendar-blank" style="font-size:13px"></i> Inizio
+          <i class="ph-duotone ph-calendar-blank" style="font-size:13px"></i> <span data-t="comp_start">Inizio</span>
         </label>
         <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:6px;margin-bottom:10px">
           <input id="compStartDate" type="date" style="height:42px;border:1.5px solid var(--border);border-radius:11px;padding:0 12px;font-size:13px;font-family:inherit;background:var(--card);color:var(--text);outline:none;box-sizing:border-box">
           <input id="compStartTime" type="time" style="height:42px;border:1.5px solid var(--border);border-radius:11px;padding:0 12px;font-size:13px;font-family:inherit;background:var(--card);color:var(--text);outline:none;box-sizing:border-box">
         </div>
         <label style="display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">
-          <i class="ph-duotone ph-calendar-check" style="font-size:13px"></i> Fine
+          <i class="ph-duotone ph-calendar-check" style="font-size:13px"></i> <span data-t="comp_end">Fine</span>
         </label>
         <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:6px">
           <input id="compEndDate" type="date" style="height:42px;border:1.5px solid var(--border);border-radius:11px;padding:0 12px;font-size:13px;font-family:inherit;background:var(--card);color:var(--text);outline:none;box-sizing:border-box">
@@ -1643,25 +1643,25 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
       </div>
 
       <!-- Descrizione -->
-      <label style="display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">Descrizione (opzionale)</label>
-      <textarea id="compDesc" maxlength="200" rows="2" placeholder="Es: Cena giovedì sera per festeggiare insieme" style="width:100%;border:1.5px solid var(--border);border-radius:11px;padding:10px 14px;font-size:13px;font-family:inherit;outline:none;background:var(--card);color:var(--text);margin-bottom:12px;resize:vertical;box-sizing:border-box;line-height:1.4"></textarea>
+      <label style="display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px" data-t="comp_desc_lbl">Descrizione (opzionale)</label>
+      <textarea id="compDesc" maxlength="200" rows="2" placeholder="Es: Cena giovedì sera per festeggiare insieme" data-tp="comp_desc_ph" style="width:100%;border:1.5px solid var(--border);border-radius:11px;padding:10px 14px;font-size:13px;font-family:inherit;outline:none;background:var(--card);color:var(--text);margin-bottom:12px;resize:vertical;box-sizing:border-box;line-height:1.4"></textarea>
 
       <!-- Inviti -->
       <label style="display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">
-        <i class="ph-duotone ph-paper-plane-tilt" style="font-size:13px"></i> Invita amici (email separate da virgola)
+        <i class="ph-duotone ph-paper-plane-tilt" style="font-size:13px"></i> <span data-t="comp_invite_lbl">Invita amici (email separate da virgola)</span>
       </label>
       <input id="compInvites" type="text" placeholder="liri@example.com, marco@..." style="width:100%;height:42px;border:1.5px solid var(--border);border-radius:11px;padding:0 14px;font-size:13px;font-family:inherit;outline:none;background:var(--card);color:var(--text);margin-bottom:14px;box-sizing:border-box"/>
 
       <!-- Azione: crea + condividi -->
       <button id="compSaveBtn" onclick="createCompagnia()" style="width:100%;height:48px;border-radius:14px;background:var(--red);color:#fff;border:none;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;letter-spacing:.3px">
-        <i class="ph-duotone ph-users-three"></i> Crea gruppo e ottieni codice
+        <i class="ph-duotone ph-users-three"></i> <span data-t="comp_create_btn">Crea gruppo e ottieni codice</span>
       </button>
-      <p style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5;text-align:center">
+      <p style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5;text-align:center" data-t="comp_create_hint">
         Otterrai un codice di 6 caratteri da condividere con i tuoi compagni di viaggio. Anche WhatsApp, link diretto o QR code.
       </p>
 
       <button class="compagnia-stop vis" id="compagniaStopBtn" onclick="stopCompagnia();closeSheet('compagniaOv','compagniaBg','compagniaSheet')" style="display:none;margin-top:14px">
-        <i class="ph-duotone ph-stop-circle"></i> Lascia il gruppo
+        <i class="ph-duotone ph-stop-circle"></i> <span data-t="comp_leave">Lascia il gruppo</span>
       </button>
     </div>
   </div>
@@ -1947,7 +1947,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
         <div class="pub-toggle-icon"><i class="ph-duotone ph-eye"></i></div>
         <div class="pub-toggle-text">
           <div class="pub-toggle-title" data-t="prof_pub_toggle">Come ti vedono gli altri</div>
-          <div class="pub-toggle-sub">Anteprima del tuo profilo pubblico: POI, itinerari, follower</div>
+          <div class="pub-toggle-sub" data-t="foll_preview">Anteprima del tuo profilo pubblico: POI, itinerari, follower</div>
         </div>
         <i class="ph-duotone ph-caret-right pub-toggle-arrow"></i>
       </button>
@@ -1968,29 +1968,29 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 
       <!-- SEGUITI / BLOCCATI -->
       <div class="profile-sec">
-        <div class="prof-sec-lbl"><span>Connessioni</span></div>
+        <div class="prof-sec-lbl"><span data-t="foll_connections">Connessioni</span></div>
         <div class="social-tabs">
-          <button class="social-tab active" onclick="showSocialTab('seguiti',this)">Seguiti <span id="cnt-seguiti" style="background:#EBF2FC;color:var(--blue);border-radius:8px;padding:1px 6px;font-size:10px">0</span></button>
-          <button class="social-tab" onclick="showSocialTab('follower',this)">Follower <span id="cnt-follower" style="background:#f5f0e8;color:var(--muted);border-radius:8px;padding:1px 6px;font-size:10px">0</span></button>
-          <button class="social-tab" onclick="showSocialTab('bloccati',this)">Bloccati <span id="cnt-bloccati" style="background:#FEE2E2;color:#DC2626;border-radius:8px;padding:1px 6px;font-size:10px">0</span></button>
+          <button class="social-tab active" onclick="showSocialTab('seguiti',this)"><span data-t="foll_following">Seguiti</span> <span id="cnt-seguiti" style="background:#EBF2FC;color:var(--blue);border-radius:8px;padding:1px 6px;font-size:10px">0</span></button>
+          <button class="social-tab" onclick="showSocialTab('follower',this)"><span data-t="foll_followers">Follower</span> <span id="cnt-follower" style="background:#f5f0e8;color:var(--muted);border-radius:8px;padding:1px 6px;font-size:10px">0</span></button>
+          <button class="social-tab" onclick="showSocialTab('bloccati',this)"><span data-t="foll_blocked">Bloccati</span> <span id="cnt-bloccati" style="background:#FEE2E2;color:#DC2626;border-radius:8px;padding:1px 6px;font-size:10px">0</span></button>
         </div>
         <!-- Connessioni reali: da caricare da Supabase (tabella follows). Vuoto finché non ci sono dati veri. -->
         <div class="social-panel active" id="panel-seguiti">
           <div class="social-empty" style="text-align:center;padding:24px 0;color:var(--muted);font-size:13px">
             <i class="ph-duotone ph-user-plus" style="font-size:32px;display:block;margin-bottom:8px"></i>
-            Non segui ancora nessuno.<br>Segui altri viaggiatori per vedere qui i loro percorsi.
+            <span data-t="foll_empty_following">Non segui ancora nessuno.</span><br><span data-t="foll_empty_following_sub">Segui altri viaggiatori per vedere qui i loro percorsi.</span>
           </div>
         </div>
         <div class="social-panel" id="panel-follower">
           <div class="social-empty" style="text-align:center;padding:24px 0;color:var(--muted);font-size:13px">
             <i class="ph-duotone ph-users" style="font-size:32px;display:block;margin-bottom:8px"></i>
-            Ancora nessun follower.
+            <span data-t="foll_empty_followers">Ancora nessun follower.</span>
           </div>
         </div>
         <div class="social-panel" id="panel-bloccati">
           <div class="social-empty" style="text-align:center;padding:24px 0;color:var(--muted);font-size:13px">
             <i class="ph-duotone ph-shield-check" style="font-size:32px;display:block;margin-bottom:8px"></i>
-            Nessun utente bloccato.
+            <span data-t="foll_empty_blocked">Nessun utente bloccato.</span>
           </div>
         </div>
       </div>
@@ -2074,7 +2074,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
       </div>
       <div class="pub-actions">
         <button class="pub-action-btn follow" id="pubFollowBtn" onclick="togglePublicFollow()">
-          <i class="ph-duotone ph-user-plus"></i> <span id="pubFollowLbl">Segui</span>
+          <i class="ph-duotone ph-user-plus"></i> <span id="pubFollowLbl" data-t="foll_follow">Segui</span>
         </button>
         <button class="pub-action-btn connect" id="pubConnectBtn" onclick="togglePublicConnect()">
           <i class="ph-duotone ph-handshake"></i> <span id="pubConnectLbl">Collegati</span>
@@ -2220,13 +2220,13 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
   <div style="padding:16px 14px 8px">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
       <i class="ph-duotone ph-users-three" style="color:var(--blue);font-size:22px"></i>
-      <div style="font-size:18px;font-weight:900;color:var(--ink)">Compagni di Viaggio</div>
+      <div style="font-size:18px;font-weight:900;color:var(--ink)" data-t="comp_view_title">Compagni di Viaggio</div>
     </div>
-    <div style="font-size:12px;color:var(--muted);line-height:1.4">Le tue compagnie attive e quelle a cui hai partecipato. Tocca <strong>+</strong> per crearne una nuova.</div>
+    <div style="font-size:12px;color:var(--muted);line-height:1.4" data-t="comp_view_sub">Le tue compagnie attive e quelle a cui hai partecipato. Tocca <strong>+</strong> per crearne una nuova.</div>
   </div>
   <div id="companions-list"></div>
   <div style="padding:14px;color:var(--muted);font-size:11px;text-align:center;border-top:1px solid var(--border);margin-top:14px">
-    <i class="ph-duotone ph-eye"></i> = scadenza · <i class="ph-duotone ph-heart"></i> = per sempre · <i class="ph-duotone ph-circle"></i> in viaggio · <i class="ph-duotone ph-circle"></i> offline · <i class="ph-duotone ph-circle"></i> fermo da +1g
+    <i class="ph-duotone ph-eye"></i> <span data-t="comp_leg_expiry">= scadenza</span> · <i class="ph-duotone ph-heart"></i> <span data-t="comp_leg_forever">= per sempre</span> · <i class="ph-duotone ph-circle"></i> <span data-t="comp_leg_traveling">in viaggio</span> · <i class="ph-duotone ph-circle"></i> <span data-t="comp_leg_offline">offline</span> · <i class="ph-duotone ph-circle"></i> <span data-t="comp_leg_stopped">fermo da +1g</span>
   </div>
 </div>
 
@@ -2727,7 +2727,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
     </button>
     <button class="micro-modal-opt" onclick="addPoiToCompagnia();closeAddPoiDisambig()">
       <div class="mmo-icon" style="background:#DCFCE7;color:#14532D"><i class="ph-duotone ph-users-three"></i></div>
-      <div class="mmo-text"><strong>Compagnia</strong><span>Condividi con una compagnia di viaggio</span></div>
+      <div class="mmo-text"><strong data-t="comp_modal_title">Compagnia</strong><span data-t="comp_modal_sub">Condividi con una compagnia di viaggio</span></div>
       <i class="ph-duotone ph-caret-right mmo-arrow"></i>
     </button>
     <button class="micro-modal-opt" onclick="closeAddPoiDisambig();showToast('🗺 Rotte Storiche — prossimamente!')">
@@ -2752,7 +2752,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
     <div class="micro-modal-sec-lbl">Community POI•LOVE</div>
     <button class="micro-modal-opt" onclick="sharePoiWith('followers')">
       <div class="mmo-icon" style="background:#DBEAFE;color:#1E3A8A"><i class="ph-duotone ph-rss-simple"></i></div>
-      <div class="mmo-text"><strong>Follower</strong><span>Visibile a chi ti segue</span></div>
+      <div class="mmo-text"><strong data-t="foll_modal_title">Follower</strong><span data-t="foll_modal_sub">Visibile a chi ti segue</span></div>
       <i class="ph-duotone ph-caret-right mmo-arrow"></i>
     </button>
     <button class="micro-modal-opt" onclick="sharePoiWith('friends')">
@@ -4067,6 +4067,20 @@ const T={
     toast_login_required:'⚠️ Accedi per salvare il POI',toast_no_user:'Nessun utente selezionato',toast_bio_updated:'Bio aggiornata',toast_invite_ready:'📧 Invito pronto per',toast_invite_dest1:'destinatario',toast_invite_destN:'destinatari',toast_only_local:'⚠ Lista salvata solo localmente',toast_list_added:'+ Lista',toast_tag_added:'+ Tag',
     /* Follow */
     follow_now:'Stai seguendo',follow_no_more:'Non segui più',
+    /* Compagnie (compagni di viaggio) */
+    comp_title:'Compagni di Viaggio',comp_sheet_sub:'Condividi la tua posizione GPS in tempo reale con gli amici',comp_have_code:'Hai già un codice? Unisciti',comp_join:'Unisciti',comp_create_group:'Crea un nuovo gruppo',comp_name_lbl:'Nome del gruppo',comp_name_ph:'Es: Tirana Weekend, Cena del giovedì…',comp_duration:'Durata',comp_forever:'Per sempre',comp_trip:'Un viaggio',comp_dinner:'Una cena',comp_start:'Inizio',comp_end:'Fine',comp_desc_lbl:'Descrizione (opzionale)',comp_desc_ph:'Es: Cena giovedì sera per festeggiare insieme',comp_invite_lbl:'Invita amici (email separate da virgola)',comp_create_btn:'Crea gruppo e ottieni codice',comp_create_hint:'Otterrai un codice di 6 caratteri da condividere con i tuoi compagni di viaggio. Anche WhatsApp, link diretto o QR code.',comp_leave:'Lascia il gruppo',
+    comp_view_title:'Compagni di Viaggio',comp_view_sub:'Le tue compagnie attive e quelle a cui hai partecipato. Tocca <strong>+</strong> per crearne una nuova.',
+    comp_modal_title:'Compagnia',comp_modal_sub:'Condividi con una compagnia di viaggio',
+    comp_toast_name_req:'Nome del gruppo obbligatorio',comp_lbl_forever_emoji:'Per sempre 🥰',comp_lbl_dinner_emoji:'Una cena 🍽️',comp_lbl_trip_emoji:'Un viaggio ✈️',
+    comp_updated:'✓ "{name}" aggiornato!',comp_created:'✓ "{name}" creato! Codice: {code}',
+    comp_invite_subject:'{sender} ti ha invitato a unirti a "{name}" su POI•LOVE',comp_invite_hello:'Ciao!',comp_invite_line:'{sender} ti invita a unirti a "{name}": {type}.',comp_invite_code:'Codice gruppo',comp_invite_link:'Link diretto',comp_invite_bye:'A presto',comp_invite_ready:'📧 Invito pronto per',comp_invite_dest1:'destinatario',comp_invite_destN:'destinatari',
+    comp_empty:'Nessun gruppo ancora. Tocca <strong>+</strong> per crearne uno.',comp_status_forever:'Per sempre',comp_status_expires:'Scade',comp_status_ongoing:'In corso',comp_friend_traveling:'In viaggio',comp_friend_stopped:'Fermo',comp_friend_offline:'Offline',comp_left:'Sei uscito',comp_admin_all:'Admin condivisa con tutti',comp_admin_creator:'Creatore & Amministratore',comp_member:'membro',comp_members:'membri',comp_edit:'Modifica',comp_admin_to_all:'Admin a tutti',comp_close_title:'Chiudi e scioglie il gruppo',comp_close_disabled_title:'Disponibile solo quando rimangono in 2',
+    comp_close_hint:'Puoi chiudere il gruppo solo quando rimaste in 2, ora {n} {members}',comp_close_blocked:'⛔ Puoi chiudere il gruppo solo quando rimaste in 2',comp_close_confirm:'Chiudere "{name}"? Il gruppo verrà sciolto definitivamente. Questa azione è irreversibile.',comp_close_ok:'Chiudi',comp_retry_online:'⚠ Riprova quando sei online',comp_close_failed:'⚠ Chiusura non riuscita, riprova',comp_closed:'🗑 "{name}" chiusa',comp_admin_confirm:'Dare i permessi di amministratore a tutti i partecipanti di "{name}"? Tutti potranno modificare e chiudere il gruppo.',comp_admin_done:'👑 Tutti i partecipanti sono ora amministratori',comp_edit_not_saved:'⚠ Modifica non salvata, riprova',comp_not_found:'Compagnia non trovata',comp_none_yet:'Nessuna compagnia ancora, creane una nella tab Compagni',
+    comp_edit_title:'✏️ Modifica gruppo',comp_update_btn:'Aggiorna gruppo',comp_soon:'👥 Funzione Compagnia, prossimamente!',
+    comp_leg_expiry:'= scadenza',comp_leg_forever:'= per sempre',comp_leg_traveling:'in viaggio',comp_leg_offline:'offline',comp_leg_stopped:'fermo da +1g',
+    /* Follow (connessioni social) */
+    foll_preview:'Anteprima del tuo profilo pubblico: POI, itinerari, follower',foll_connections:'Connessioni',foll_following:'Seguiti',foll_followers:'Follower',foll_blocked:'Bloccati',foll_empty_following:'Non segui ancora nessuno.',foll_empty_following_sub:'Segui altri viaggiatori per vedere qui i loro percorsi.',foll_empty_followers:'Ancora nessun follower.',foll_empty_blocked:'Nessun utente bloccato.',foll_follow:'Segui',foll_followed:'Seguito',foll_toast_now:'✓ Segui {name}',
+    foll_modal_title:'Follower',foll_modal_sub:'Visibile a chi ti segue',
     /* Tier / Livelli */
     tier_lvl_amatore:'Amatore',tier_lvl_viaggiatore:'Viaggiatore',tier_lvl_giramondo:'Giramondo',tier_lvl_instancabile:'Instancabile',tier_lvl_leggenda:'Leggenda',
     tier_sostenitore:'Sostenitore',tier_mecenate:'Mecenate',
@@ -4115,6 +4129,20 @@ const T={
     toast_login_required:'⚠️ Hyni për të ruajtur POI-n',toast_no_user:'Asnjë përdorues i zgjedhur',toast_bio_updated:'Bio u përditësua',toast_invite_ready:'📧 Ftesa gati për',toast_invite_dest1:'marrës',toast_invite_destN:'marrës',toast_only_local:'⚠ Lista u ruajt vetëm lokalisht',toast_list_added:'+ Listë',toast_tag_added:'+ Etiketë',
     /* Follow */
     follow_now:'Po ndjek',follow_no_more:'Nuk ndjek më',
+    /* Compagnie (shokë udhëtimi) */
+    comp_title:'Shokë Udhëtimi',comp_sheet_sub:'Ndaje vendndodhjen tënde GPS në kohë reale me miqtë',comp_have_code:'Ke tashmë një kod? Bashkohu',comp_join:'Bashkohu',comp_create_group:'Krijo një grup të ri',comp_name_lbl:'Emri i grupit',comp_name_ph:'P.sh.: Tirana Weekend, Darka e enjtes…',comp_duration:'Kohëzgjatja',comp_forever:'Përgjithmonë',comp_trip:'Një udhëtim',comp_dinner:'Një darkë',comp_start:'Fillimi',comp_end:'Mbarimi',comp_desc_lbl:'Përshkrim (opsional)',comp_desc_ph:'P.sh.: Darkë të enjten në mbrëmje për të festuar bashkë',comp_invite_lbl:'Fto miqtë (email-e të ndara me presje)',comp_create_btn:'Krijo grupin dhe merr kodin',comp_create_hint:'Do të marrësh një kod me 6 karaktere për ta ndarë me shokët e udhëtimit. Edhe me WhatsApp, link të drejtpërdrejtë ose QR code.',comp_leave:'Largohu nga grupi',
+    comp_view_title:'Shokë Udhëtimi',comp_view_sub:'Shoqëritë e tua aktive dhe ato ku ke marrë pjesë. Prek <strong>+</strong> për të krijuar një të re.',
+    comp_modal_title:'Shoqëri',comp_modal_sub:'Ndaje me një shoqëri udhëtimi',
+    comp_toast_name_req:'Emri i grupit është i detyrueshëm',comp_lbl_forever_emoji:'Përgjithmonë 🥰',comp_lbl_dinner_emoji:'Një darkë 🍽️',comp_lbl_trip_emoji:'Një udhëtim ✈️',
+    comp_updated:'✓ "{name}" u përditësua!',comp_created:'✓ "{name}" u krijua! Kodi: {code}',
+    comp_invite_subject:'{sender} të ka ftuar të bashkohesh me "{name}" në POI•LOVE',comp_invite_hello:'Përshëndetje!',comp_invite_line:'{sender} të fton të bashkohesh me "{name}": {type}.',comp_invite_code:'Kodi i grupit',comp_invite_link:'Link i drejtpërdrejtë',comp_invite_bye:'Shihemi së shpejti',comp_invite_ready:'📧 Ftesa gati për',comp_invite_dest1:'marrës',comp_invite_destN:'marrës',
+    comp_empty:'Ende asnjë grup. Prek <strong>+</strong> për të krijuar një.',comp_status_forever:'Përgjithmonë',comp_status_expires:'Skadon',comp_status_ongoing:'Në vazhdim',comp_friend_traveling:'Në udhëtim',comp_friend_stopped:'Ndalur',comp_friend_offline:'Offline',comp_left:'Je larguar',comp_admin_all:'Admin i ndarë me të gjithë',comp_admin_creator:'Krijues & Administrator',comp_member:'anëtar',comp_members:'anëtarë',comp_edit:'Redakto',comp_admin_to_all:'Admin për të gjithë',comp_close_title:'Mbyll dhe shpërndaje grupin',comp_close_disabled_title:'I disponueshëm vetëm kur mbeteni në 2',
+    comp_close_hint:'Mund ta mbyllësh grupin vetëm kur mbeteni në 2, tani {n} {members}',comp_close_blocked:'⛔ Mund ta mbyllësh grupin vetëm kur mbeteni në 2',comp_close_confirm:'Të mbyllet "{name}"? Grupi do të shpërndahet përfundimisht. Ky veprim është i pakthyeshëm.',comp_close_ok:'Mbyll',comp_retry_online:'⚠ Provo përsëri kur je online',comp_close_failed:'⚠ Mbyllja dështoi, provo përsëri',comp_closed:'🗑 "{name}" u mbyll',comp_admin_confirm:'T\'u jepen të drejtat e administratorit të gjithë pjesëmarrësve të "{name}"? Të gjithë do të mund ta redaktojnë dhe ta mbyllin grupin.',comp_admin_done:'👑 Të gjithë pjesëmarrësit janë tani administratorë',comp_edit_not_saved:'⚠ Ndryshimi nuk u ruajt, provo përsëri',comp_not_found:'Shoqëria nuk u gjet',comp_none_yet:'Ende asnjë shoqëri, krijo një te skeda Shokë',
+    comp_edit_title:'✏️ Redakto grupin',comp_update_btn:'Përditëso grupin',comp_soon:'👥 Funksioni Shoqëri, së shpejti!',
+    comp_leg_expiry:'= skadenca',comp_leg_forever:'= përgjithmonë',comp_leg_traveling:'në udhëtim',comp_leg_offline:'offline',comp_leg_stopped:'ndalur prej +1 dite',
+    /* Follow (lidhje sociale) */
+    foll_preview:'Pamja paraprake e profilit tënd publik: POI, itinerare, ndjekës',foll_connections:'Lidhje',foll_following:'Që ndjek',foll_followers:'Ndjekës',foll_blocked:'Të bllokuar',foll_empty_following:'Ende nuk ndjek askënd.',foll_empty_following_sub:'Ndiq udhëtarë të tjerë për të parë këtu rrugëtimet e tyre.',foll_empty_followers:'Ende asnjë ndjekës.',foll_empty_blocked:'Asnjë përdorues i bllokuar.',foll_follow:'Ndiq',foll_followed:'Po ndjek',foll_toast_now:'✓ Po ndjek {name}',
+    foll_modal_title:'Ndjekës',foll_modal_sub:'I dukshëm për ata që të ndjekin',
     /* Tier / Livelli */
     tier_lvl_amatore:'Amator',tier_lvl_viaggiatore:'Udhëtar',tier_lvl_giramondo:'Endacak',tier_lvl_instancabile:'I palodhur',tier_lvl_leggenda:'Legjendë',
     tier_sostenitore:'Mbështetës',tier_mecenate:'Mecen',
@@ -4163,6 +4191,20 @@ const T={
     toast_login_required:'⚠️ Sign in to save the POI',toast_no_user:'No user selected',toast_bio_updated:'Bio updated',toast_invite_ready:'📧 Invitation ready for',toast_invite_dest1:'recipient',toast_invite_destN:'recipients',toast_only_local:'⚠ List saved only locally',toast_list_added:'+ List',toast_tag_added:'+ Tag',
     /* Follow */
     follow_now:'Now following',follow_no_more:'Unfollowed',
+    /* Compagnie (travel companions) */
+    comp_title:'Travel Companions',comp_sheet_sub:'Share your live GPS location with friends',comp_have_code:'Already have a code? Join',comp_join:'Join',comp_create_group:'Create a new group',comp_name_lbl:'Group name',comp_name_ph:'E.g. Tirana Weekend, Thursday dinner…',comp_duration:'Duration',comp_forever:'Forever',comp_trip:'A trip',comp_dinner:'A dinner',comp_start:'Start',comp_end:'End',comp_desc_lbl:'Description (optional)',comp_desc_ph:'E.g. Thursday evening dinner to celebrate together',comp_invite_lbl:'Invite friends (comma-separated emails)',comp_create_btn:'Create group and get code',comp_create_hint:'You will get a 6-character code to share with your travel companions. Also via WhatsApp, direct link or QR code.',comp_leave:'Leave the group',
+    comp_view_title:'Travel Companions',comp_view_sub:'Your active companies and the ones you joined. Tap <strong>+</strong> to create a new one.',
+    comp_modal_title:'Company',comp_modal_sub:'Share with a travel company',
+    comp_toast_name_req:'Group name is required',comp_lbl_forever_emoji:'Forever 🥰',comp_lbl_dinner_emoji:'A dinner 🍽️',comp_lbl_trip_emoji:'A trip ✈️',
+    comp_updated:'✓ "{name}" updated!',comp_created:'✓ "{name}" created! Code: {code}',
+    comp_invite_subject:'{sender} invited you to join "{name}" on POI•LOVE',comp_invite_hello:'Hi!',comp_invite_line:'{sender} invites you to join "{name}": {type}.',comp_invite_code:'Group code',comp_invite_link:'Direct link',comp_invite_bye:'See you soon',comp_invite_ready:'📧 Invitation ready for',comp_invite_dest1:'recipient',comp_invite_destN:'recipients',
+    comp_empty:'No groups yet. Tap <strong>+</strong> to create one.',comp_status_forever:'Forever',comp_status_expires:'Expires',comp_status_ongoing:'Ongoing',comp_friend_traveling:'Traveling',comp_friend_stopped:'Stopped',comp_friend_offline:'Offline',comp_left:'You left',comp_admin_all:'Admin shared with everyone',comp_admin_creator:'Creator & Administrator',comp_member:'member',comp_members:'members',comp_edit:'Edit',comp_admin_to_all:'Admin to all',comp_close_title:'Close and disband the group',comp_close_disabled_title:'Available only when 2 remain',
+    comp_close_hint:'You can close the group only when 2 remain, now {n} {members}',comp_close_blocked:'⛔ You can close the group only when 2 remain',comp_close_confirm:'Close "{name}"? The group will be permanently disbanded. This action is irreversible.',comp_close_ok:'Close',comp_retry_online:'⚠ Try again when you are online',comp_close_failed:'⚠ Closing failed, try again',comp_closed:'🗑 "{name}" closed',comp_admin_confirm:'Give administrator permissions to all participants of "{name}"? Everyone will be able to edit and close the group.',comp_admin_done:'👑 All participants are now administrators',comp_edit_not_saved:'⚠ Change not saved, try again',comp_not_found:'Company not found',comp_none_yet:'No company yet, create one in the Companions tab',
+    comp_edit_title:'✏️ Edit group',comp_update_btn:'Update group',comp_soon:'👥 Company feature, coming soon!',
+    comp_leg_expiry:'= expiry',comp_leg_forever:'= forever',comp_leg_traveling:'traveling',comp_leg_offline:'offline',comp_leg_stopped:'stopped for +1d',
+    /* Follow (social connections) */
+    foll_preview:'Preview of your public profile: POIs, itineraries, followers',foll_connections:'Connections',foll_following:'Following',foll_followers:'Followers',foll_blocked:'Blocked',foll_empty_following:'You are not following anyone yet.',foll_empty_following_sub:'Follow other travelers to see their routes here.',foll_empty_followers:'No followers yet.',foll_empty_blocked:'No blocked users.',foll_follow:'Follow',foll_followed:'Following',foll_toast_now:'✓ Following {name}',
+    foll_modal_title:'Followers',foll_modal_sub:'Visible to those who follow you',
     /* Tier / Levels */
     tier_lvl_amatore:'Amateur',tier_lvl_viaggiatore:'Traveler',tier_lvl_giramondo:'Globetrotter',tier_lvl_instancabile:'Tireless',tier_lvl_leggenda:'Legend',
     tier_sostenitore:'Supporter',tier_mecenate:'Patron',
@@ -5928,7 +5970,7 @@ function setListVis(v){
 function _buildCompChips(){
   const wrap = document.getElementById('listCompChips');
   const comps = (typeof _getCompagnie==='function' ? _getCompagnie() : []);
-  if(!comps.length){ wrap.innerHTML = '<div class="list-chip-empty">Nessuna compagnia ancora, creane una nella tab Compagni</div>'; return; }
+  if(!comps.length){ wrap.innerHTML = '<div class="list-chip-empty">'+t('comp_none_yet','Nessuna compagnia ancora, creane una nella tab Compagni')+'</div>'; return; }
   wrap.innerHTML = comps.map(c=>`<button type="button" class="list-chip ${c.code===_listDetailCtx.compCode?'active':''}" onclick="_pickComp('${c.code}')"><i class="ph-duotone ph-users-three"></i> ${(c.name||c.code).replace(/</g,'&lt;')}</button>`).join('');
 }
 function _pickComp(code){
@@ -6079,7 +6121,7 @@ function openPublicProfile(name, status, kind){
   }
   // Reset toggle stato bottoni
   const followBtn = document.getElementById('pubPopFollowBtn');
-  followBtn.innerHTML = '<i class="ph-duotone ph-user-plus"></i><span>Segui</span>';
+  followBtn.innerHTML = '<i class="ph-duotone ph-user-plus"></i><span>'+t('foll_follow','Segui')+'</span>';
   followBtn.classList.remove('toggle','on');
   const shareBtn = document.getElementById('pubPopShareLocBtn');
   shareBtn.classList.remove('on');
@@ -6097,12 +6139,12 @@ function pubProfileToggleFollow(){
   if(_pubProfileCtx.following){
     btn.classList.remove('primary');
     btn.classList.add('toggle','on');
-    btn.innerHTML='<i class="ph-duotone ph-check"></i><span>Seguito</span>';
-    showToast?.(`✓ Segui ${_pubProfileCtx.name}`);
+    btn.innerHTML='<i class="ph-duotone ph-check"></i><span>'+t('foll_followed','Seguito')+'</span>';
+    showToast?.(t('foll_toast_now','✓ Segui {name}').replace('{name}', _pubProfileCtx.name));
   } else {
     btn.classList.add('primary');
     btn.classList.remove('toggle','on');
-    btn.innerHTML='<i class="ph-duotone ph-user-plus"></i><span>Segui</span>';
+    btn.innerHTML='<i class="ph-duotone ph-user-plus"></i><span>'+t('foll_follow','Segui')+'</span>';
   }
 }
 function pubProfileConnect(){
@@ -6359,9 +6401,9 @@ function openEditCompagnia(code){
   if(typeInput){ typeInput.checked=true; onCompTypeChange?.(); }
   // UI edit mode
   const titleEl = document.getElementById('compSheetTitle');
-  if(titleEl) titleEl.innerHTML = emoToIcons('✏️ Modifica gruppo');
+  if(titleEl) titleEl.innerHTML = emoToIcons(t('comp_edit_title','✏️ Modifica gruppo'));
   const saveBtn = document.getElementById('compSaveBtn');
-  if(saveBtn) saveBtn.innerHTML = '<i class="ph-duotone ph-floppy-disk"></i> Aggiorna gruppo';
+  if(saveBtn) saveBtn.innerHTML = '<i class="ph-duotone ph-floppy-disk"></i> '+t('comp_update_btn','Aggiorna gruppo');
   openSheet('compagniaOv','compagniaBg','compagniaSheet');
   document.getElementById('compagniaSheet')?.scrollTo({top:0,behavior:'instant'});
 }
@@ -6369,9 +6411,9 @@ function openEditCompagnia(code){
 function _resetCompSheet(){
   _editingCompCode = null;
   const titleEl = document.getElementById('compSheetTitle');
-  if(titleEl) titleEl.innerHTML = '<i class="ph-duotone ph-users-three"></i> Compagni di Viaggio';
+  if(titleEl) titleEl.innerHTML = '<i class="ph-duotone ph-users-three"></i> <span data-t="comp_title">'+t('comp_title','Compagni di Viaggio')+'</span>';
   const saveBtn = document.getElementById('compSaveBtn');
-  if(saveBtn) saveBtn.innerHTML = '<i class="ph-duotone ph-users-three"></i> Crea gruppo e ottieni codice';
+  if(saveBtn) saveBtn.innerHTML = '<i class="ph-duotone ph-users-three"></i> <span data-t="comp_create_btn">'+t('comp_create_btn','Crea gruppo e ottieni codice')+'</span>';
   // Reset campi
   ['compNewName','compDesc','compInvites','compStartDate','compStartTime','compEndDate','compEndTime']
     .forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
@@ -6381,25 +6423,25 @@ function _resetCompSheet(){
 async function deleteCompagnia(code){
   const all = _getCompagnie();
   const c = all.find(function(x){ return x.code===code; });
-  if(!c){ showToast('Compagnia non trovata'); return; }
+  if(!c){ showToast(t('comp_not_found','Compagnia non trovata')); return; }
   const total = (c.friends||[]).length + 1;
   if(total > 2){
-    showToast('⛔ Puoi chiudere il gruppo solo quando rimaste in 2');
+    showToast(t('comp_close_blocked','⛔ Puoi chiudere il gruppo solo quando rimaste in 2'));
     return;
   }
-  const ok = await uiConfirm('Chiudere "' + c.name + '"? Il gruppo verrà sciolto definitivamente. Questa azione è irreversibile.', {okText:'Chiudi', danger:true});
+  const ok = await uiConfirm(t('comp_close_confirm','Chiudere "{name}"? Il gruppo verrà sciolto definitivamente. Questa azione è irreversibile.').replace('{name}', c.name), {okText:t('comp_close_ok','Chiudi'), danger:true});
   if(!ok) return;
   // Persistenza Supabase: se la compagnia e' su DB (ha un id) la elimino li' PRIMA della cache.
   // Senza sessione non posso eliminarla dal DB: blocco, altrimenti riapparirebbe al prossimo sync.
   if(c.id){
-    if(!currentUser?.id || !sb){ showToast('⚠ Riprova quando sei online'); return; }
+    if(!currentUser?.id || !sb){ showToast(t('comp_retry_online','⚠ Riprova quando sei online')); return; }
     try{ const { error } = await sb.from('companions').delete().eq('id', c.id).eq('owner_id', currentUser.id); if(error) throw error; }
-    catch(e){ console.warn('deleteCompagnia DB:', e); showToast('⚠ Chiusura non riuscita, riprova'); return; }
+    catch(e){ console.warn('deleteCompagnia DB:', e); showToast(t('comp_close_failed','⚠ Chiusura non riuscita, riprova')); return; }
   }
   // c.id assente = mai sincronizzata su DB: rimuovo solo dalla cache locale
   _saveCompagnie(all.filter(function(x){ return x.code!==code; }));
   renderCompanionsTab();
-  showToast('🗑 "' + c.name + '" chiusa');
+  showToast(t('comp_closed','🗑 "{name}" chiusa').replace('{name}', c.name));
 }
 
 /* Promuove tutti i partecipanti ad amministratori */
@@ -6407,18 +6449,18 @@ async function giveAdminToAll(code){
   const all = _getCompagnie();
   const idx = all.findIndex(function(x){ return x.code===code; });
   if(idx<0) return;
-  const ok = await uiConfirm('Dare i permessi di amministratore a tutti i partecipanti di "' + all[idx].name + '"? Tutti potranno modificare e chiudere il gruppo.');
+  const ok = await uiConfirm(t('comp_admin_confirm','Dare i permessi di amministratore a tutti i partecipanti di "{name}"? Tutti potranno modificare e chiudere il gruppo.').replace('{name}', all[idx].name));
   if(!ok) return;
   all[idx].allAdmin = true;
   _saveCompagnie(all);
   renderCompanionsTab();
-  showToast('👑 Tutti i partecipanti sono ora amministratori');
+  showToast(t('comp_admin_done','👑 Tutti i partecipanti sono ora amministratori'));
 }
 
 async function createCompagnia(){
   const name = (document.getElementById('compNewName')?.value || '').trim();
   if(!name){
-    showToast?.('Nome del gruppo obbligatorio');
+    showToast?.(t('comp_toast_name_req','Nome del gruppo obbligatorio'));
     return;
   }
   const type = document.querySelector('input[name="compType"]:checked')?.value || 'trip';
@@ -6429,7 +6471,7 @@ async function createCompagnia(){
   const desc      = (document.getElementById('compDesc')?.value     || '').trim();
   const invites   = (document.getElementById('compInvites')?.value  || '').trim();
 
-  const typeLabel = type==='forever' ? 'Per sempre 🥰' : type==='dinner' ? 'Una cena 🍽️' : 'Un viaggio ✈️';
+  const typeLabel = type==='forever' ? t('comp_lbl_forever_emoji','Per sempre 🥰') : type==='dinner' ? t('comp_lbl_dinner_emoji','Una cena 🍽️') : t('comp_lbl_trip_emoji','Un viaggio ✈️');
   const range = type==='forever' ? '' : (startDate? `${startDate}${startTime?' '+startTime:''} → ${endDate}${endTime?' '+endTime:''}` : '');
 
   if(_editingCompCode){
@@ -6442,11 +6484,11 @@ async function createCompagnia(){
         try{ const { error } = await sb.from('companions').update({ name, description:desc, type,
           start_date:startDate||null, start_time:startTime||null, end_date:endDate||null, end_time:endTime||null
         }).eq('id', all[idx].id).eq('owner_id', currentUser.id); if(error) throw error; }
-        catch(e){ console.warn('editCompagnia DB:', e); showToast?.('⚠ Modifica non salvata, riprova'); return; }
+        catch(e){ console.warn('editCompagnia DB:', e); showToast?.(t('comp_edit_not_saved','⚠ Modifica non salvata, riprova')); return; }
       }
       all[idx] = {...all[idx], name, type, startDate, startTime, endDate, endTime, desc};
       _saveCompagnie(all);
-      showToast?.(`✓ "${name}" aggiornato!`);
+      showToast?.(t('comp_updated','✓ "{name}" aggiornato!').replace('{name}', name));
     }
     _resetCompSheet();
     closeSheet('compagniaOv','compagniaBg','compagniaSheet');
@@ -6484,7 +6526,7 @@ async function createCompagnia(){
     }catch(e){ console.warn('createCompagnia DB:', e); }
   }
 
-  showToast?.(`✓ "${name}" creato! Codice: ${code} — ${typeLabel}${range?' · '+range:''}`);
+  showToast?.(t('comp_created','✓ "{name}" creato! Codice: {code}').replace('{name}', name).replace('{code}', code) + ` · ${typeLabel}${range?' · '+range:''}`);
   if(navigator.clipboard) navigator.clipboard.writeText(code).catch(()=>{});
 
   // Invio email
@@ -6493,12 +6535,13 @@ async function createCompagnia(){
     if(recipients.length){
       const senderName = currentUser?.user_metadata?.full_name || currentUser?.user_metadata?.name || 'Un amico';
       const joinUrl = `https://poilove.com/?join=${code}`;
-      const subject = `${senderName} ti ha invitato a unirti a "${name}" su POI•LOVE`;
-      const body = `Ciao!\n\n${senderName} ti invita a unirti a "${name}" — ${typeLabel}.\n`+
+      const subject = t('comp_invite_subject','{sender} ti ha invitato a unirti a "{name}" su POI•LOVE').replace('{sender}', senderName).replace('{name}', name);
+      const inviteLine = t('comp_invite_line','{sender} ti invita a unirti a "{name}": {type}.').replace('{sender}', senderName).replace('{name}', name).replace('{type}', typeLabel);
+      const body = `${t('comp_invite_hello','Ciao!')}\n\n${inviteLine}\n`+
         (range?`📅 ${range}\n`:'')+( desc?`\n${desc}\n`:'')+
-        `\n🔑 Codice gruppo: ${code}\n🔗 Link diretto: ${joinUrl}\n\nA presto,\n${senderName}`;
+        `\n🔑 ${t('comp_invite_code','Codice gruppo')}: ${code}\n🔗 ${t('comp_invite_link','Link diretto')}: ${joinUrl}\n\n${t('comp_invite_bye','A presto')},\n${senderName}`;
       window.location.href=`mailto:${encodeURIComponent(recipients.join(','))}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-      setTimeout(()=>showToast?.(`📧 Invito pronto per ${recipients.length} destinatar${recipients.length===1?'io':'i'}`),300);
+      setTimeout(()=>showToast?.(`${t('comp_invite_ready','📧 Invito pronto per')} ${recipients.length} ${recipients.length===1?t('comp_invite_dest1','destinatario'):t('comp_invite_destN','destinatari')}`),300);
     }
   }
 
@@ -6519,17 +6562,17 @@ function renderCompanionsTab(){
   const compagnie = [...saved];
 
   if(!compagnie.length){
-    root.innerHTML='<div class="poi-list-empty">Nessun gruppo ancora. Tocca <strong>+</strong> per crearne uno.</div>';
+    root.innerHTML='<div class="poi-list-empty">'+t('comp_empty','Nessun gruppo ancora. Tocca <strong>+</strong> per crearne uno.')+'</div>';
     return;
   }
 
   root.innerHTML = compagnie.map(c=>{
     const statusEmoji = c.forever ? '<i class="ph-duotone ph-heart"></i>' : '<i class="ph-duotone ph-eye"></i>';
-    const statusTxt   = c.forever ? 'Per sempre' : (c.expires ? 'Scade '+c.expires : 'In corso');
+    const statusTxt   = c.forever ? t('comp_status_forever','Per sempre') : (c.expires ? t('comp_status_expires','Scade')+' '+c.expires : t('comp_status_ongoing','In corso'));
     const isMine = c._mine !== false; // owner (flag da syncCompagnieFromDB); default true per compagnie locali. Quando il join via RPC sara' attivo, i membri non-owner avranno _mine=false
     const friends = (c.friends||[]).map(f=>{
       const cls = f.status==='traveling'?'fs-traveling':f.status==='stopped'?'fs-stopped':'fs-still';
-      const lbl = f.status==='traveling'?'In viaggio':f.status==='stopped'?'Fermo':'Offline';
+      const lbl = f.status==='traveling'?t('comp_friend_traveling','In viaggio'):f.status==='stopped'?t('comp_friend_stopped','Fermo'):t('comp_friend_offline','Offline');
       const initials = f.name.split(' ').map(s=>s[0]).join('').slice(0,2).toUpperCase();
       const safeName = f.name.replace(/'/g,"\\'").replace(/"/g,'&quot;');
       return `<div class="friend-row" onclick="openPublicProfile('${safeName}','${f.status}','friend')">
@@ -6541,7 +6584,7 @@ function renderCompanionsTab(){
     if(!c.joined){
       return `<div class="comp-card left">
         <div class="comp-row"><div class="comp-name">${c.name}</div><div class="comp-status">${statusEmoji}</div></div>
-        <div><span class="comp-code">${c.code}</span><span class="comp-meta">Sei uscito · ${statusTxt}</span></div>
+        <div><span class="comp-code">${c.code}</span><span class="comp-meta">${t('comp_left','Sei uscito')} · ${statusTxt}</span></div>
       </div>`;
     }
     const safeCode = (c.code||'').replace(/'/g,"\\'");
@@ -6555,22 +6598,23 @@ function renderCompanionsTab(){
     const creatorAv = creatorAvSrc
       ? `<img src="${creatorAvSrc}" class="comp-creator-av" onerror="this.outerHTML='<div class=comp-creator-av-ph>${creatorInitial}</div>'">`
       : `<div class="comp-creator-av-ph">${creatorInitial}</div>`;
-    const adminLabel = isAllAdmin ? 'Admin condivisa con tutti' : 'Creatore &amp; Amministratore';
+    const adminLabel = isAllAdmin ? t('comp_admin_all','Admin condivisa con tutti') : t('comp_admin_creator','Creatore & Amministratore');
+    const memberWord = totalMembers===1 ? t('comp_member','membro') : t('comp_members','membri');
     const creatorRow = isMine ? `<div class="comp-creator-row">
       ${creatorAv}
       <span class="comp-creator-lbl"><i class="ph-duotone ph-crown" style="color:#D97706;font-size:14px"></i> ${adminLabel}</span>
-      <span style="font-size:10px;color:var(--muted);flex-shrink:0">${totalMembers} ${totalMembers===1?'membro':'membri'}</span>
+      <span style="font-size:10px;color:var(--muted);flex-shrink:0">${totalMembers} ${memberWord}</span>
     </div>` : '';
     // Bottoni azione admin
-    const actEdit = `<button class="comp-act edit" onclick="event.stopPropagation();openEditCompagnia('${safeCode}')"><i class="ph-duotone ph-pencil-simple"></i> Modifica</button>`;
+    const actEdit = `<button class="comp-act edit" onclick="event.stopPropagation();openEditCompagnia('${safeCode}')"><i class="ph-duotone ph-pencil-simple"></i> ${t('comp_edit','Modifica')}</button>`;
     const actAdmin = (friendsArr.length > 0 && !isAllAdmin)
-      ? `<button class="comp-act adm" onclick="event.stopPropagation();giveAdminToAll('${safeCode}')"><i class="ph-duotone ph-crown"></i> Admin a tutti</button>`
+      ? `<button class="comp-act adm" onclick="event.stopPropagation();giveAdminToAll('${safeCode}')"><i class="ph-duotone ph-crown"></i> ${t('comp_admin_to_all','Admin a tutti')}</button>`
       : '';
     const actDel = canClose
-      ? `<button class="comp-act del" title="Chiudi e scioglie il gruppo" onclick="event.stopPropagation();deleteCompagnia('${safeCode}')"><i class="ph-duotone ph-trash"></i></button>`
-      : `<button class="comp-act del-off" title="Disponibile solo quando rimangono in 2" disabled><i class="ph-duotone ph-trash"></i></button>`;
+      ? `<button class="comp-act del" title="${t('comp_close_title','Chiudi e scioglie il gruppo')}" onclick="event.stopPropagation();deleteCompagnia('${safeCode}')"><i class="ph-duotone ph-trash"></i></button>`
+      : `<button class="comp-act del-off" title="${t('comp_close_disabled_title','Disponibile solo quando rimangono in 2')}" disabled><i class="ph-duotone ph-trash"></i></button>`;
     const actionsRow = isMine ? `<div class="comp-actions">${actEdit}${actAdmin}${actDel}</div>
-      ${!canClose?`<div class="comp-close-hint"><i class="ph-duotone ph-lock-simple"></i> Puoi chiudere il gruppo solo quando rimaste in 2 — ora ${totalMembers} ${totalMembers===1?'membro':'membri'}</div>`:''}` : '';
+      ${!canClose?`<div class="comp-close-hint"><i class="ph-duotone ph-lock-simple"></i> ${t('comp_close_hint','Puoi chiudere il gruppo solo quando rimaste in 2 — ora {n} {members}').replace('{n}', totalMembers).replace('{members}', memberWord)}</div>`:''}` : '';
     return `<div class="comp-card">
       ${creatorRow}
       <div class="comp-row">
@@ -6993,7 +7037,7 @@ function closeAddPoiDisambig(){
 }
 function addPoiToCompagnia(){
   if(!currentPOI) return;
-  showToast('👥 Funzione Compagnia — prossimamente!');
+  showToast(t('comp_soon','👥 Funzione Compagnia, prossimamente!'));
 }
 
 // Aggiunge il POI all'itinerario (dal disambiguation modal)
@@ -9889,13 +9933,13 @@ async function confirmPhotoPicker(){
       <div class="pub-profile-stats">
         <div class="pub-profile-stat"><div class="pub-profile-stat-v" id="pubPopStatPoi">0</div><div class="pub-profile-stat-l">POI</div></div>
         <div class="pub-profile-stat"><div class="pub-profile-stat-v" id="pubPopStatList">0</div><div class="pub-profile-stat-l">Liste</div></div>
-        <div class="pub-profile-stat"><div class="pub-profile-stat-v" id="pubPopStatFoll">0</div><div class="pub-profile-stat-l">Follower</div></div>
+        <div class="pub-profile-stat"><div class="pub-profile-stat-v" id="pubPopStatFoll">0</div><div class="pub-profile-stat-l" data-t="foll_followers">Follower</div></div>
       </div>
       <div class="pub-profile-bio" id="pubPopBio" style="display:none"></div>
       <div class="pub-profile-sec-lbl"><i class="ph-duotone ph-map-pin" style="color:var(--red);font-size:12px"></i> POI pubblici</div>
       <div id="pubPopPoiList"></div>
       <div class="pub-profile-actions">
-        <button class="pub-profile-action primary"   id="pubPopFollowBtn" onclick="pubProfileToggleFollow()"><i class="ph-duotone ph-user-plus"></i><span>Segui</span></button>
+        <button class="pub-profile-action primary"   id="pubPopFollowBtn" onclick="pubProfileToggleFollow()"><i class="ph-duotone ph-user-plus"></i><span data-t="foll_follow">Segui</span></button>
         <button class="pub-profile-action secondary" onclick="pubProfileConnect()"><i class="ph-duotone ph-link"></i><span>Connetti</span></button>
         <button class="pub-profile-action toggle"    id="pubPopShareLocBtn" onclick="pubProfileToggleShareLoc()" style="grid-column:1/-1"><i class="ph-duotone ph-map-trifold"></i><span>Condividi posizione</span></button>
       </div>
