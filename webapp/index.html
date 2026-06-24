@@ -1944,34 +1944,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
             <i class="ph-duotone ph-plus"></i> <span data-t="prof_new_list">Nuova lista</span>
           </button>
         </div>
-        <div id="listsContainer">
-          <div class="list-item">
-            <div class="list-dot" style="background:var(--red)"></div>
-            <div class="list-info"><div class="list-name">Lista libera</div><div class="list-meta">5 POI</div></div>
-            <span class="list-vis lv-pub">Pubblica</span>
-            <div class="list-actions">
-              <button class="list-act-btn list-act-share" title="Copia link" onclick="event.stopPropagation();copyListLink('lista-libera')"><i class="ph-duotone ph-share-network"></i></button>
-              <button class="list-act-btn" title="Modifica" onclick="event.stopPropagation();editList(this,'Lista libera','lv-pub')"><i class="ph-duotone ph-pencil-simple"></i></button>
-            </div>
-          </div>
-          <div class="list-item">
-            <div class="list-dot" style="background:var(--blue)"></div>
-            <div class="list-info"><div class="list-name">Tirana Top</div><div class="list-meta">4 POI</div></div>
-            <span class="list-vis lv-pub">Pubblica</span>
-            <div class="list-actions">
-              <button class="list-act-btn list-act-share" title="Copia link" onclick="event.stopPropagation();copyListLink('tirana-top')"><i class="ph-duotone ph-share-network"></i></button>
-              <button class="list-act-btn" title="Modifica" onclick="event.stopPropagation();editList(this,'Tirana Top','lv-pub')"><i class="ph-duotone ph-pencil-simple"></i></button>
-            </div>
-          </div>
-          <div class="list-item">
-            <div class="list-dot" style="background:#7C3AED"></div>
-            <div class="list-info"><div class="list-name">Segreti</div><div class="list-meta">3 POI</div></div>
-            <span class="list-vis lv-prv">Privata</span>
-            <div class="list-actions">
-              <button class="list-act-btn" title="Modifica" onclick="event.stopPropagation();editList(this,'Segreti','lv-prv')"><i class="ph-duotone ph-pencil-simple"></i></button>
-            </div>
-          </div>
-        </div>
+        <div id="listsContainer"><!-- popolato da loadMyLists() con le liste reali da Supabase --></div>
       </div>
       <!-- LE MIE ROTTE STORICHE -->
       <div class="profile-sec">
@@ -2474,9 +2447,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
       <!-- LISTE + NUOVA LISTA -->
       <div class="sec-lbl" data-t="lbl_list">Aggiungi a una lista</div>
       <div style="display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;margin-bottom:14px" id="sheetListScroll">
-        <button class="chip sel-b" onclick="toggleList(this)">Lista libera</button>
-        <button class="chip" onclick="toggleList(this)">Tirana Top</button>
-        <button class="chip" onclick="toggleList(this)">Segreti</button>
+        <!-- chip delle liste reali: popolati da loadMyLists/createList -->
         <button class="chip chip-add" onclick="openAddList()"><i class="ph-duotone ph-plus" style="font-size:11px"></i> Nuova</button>
       </div>
 
@@ -5390,16 +5361,16 @@ async function renderItinLists(){
   if(currentUser && typeof sb!=='undefined' && sb){
     try{
       const { data, error } = await sb.from('lists')
-        .select('id,name,is_public,list_pois(count)')
+        .select('id,name,visibility,list_pois(count)')
         .eq('owner_id', currentUser.id)
         .order('id', { ascending: false });
       if(!error && data) lists = data.map(l => ({
-        id: l.id, name: l.name, is_public: l.is_public,
+        id: l.id, name: l.name, isPub: l.visibility==='public',
         count: l.list_pois?.[0]?.count || 0
       }));
     }catch(e){ console.warn('renderItinLists:', e); }
   }
-  // Fallback demo: leggo dal DOM del profilo (se esistono liste hardcoded)
+  // Fallback: se Supabase non ha risposto, leggo le liste gia' rese nel DOM del profilo
   if(lists.length===0){
     const profLists = document.querySelectorAll('#listsContainer .list-item');
     profLists.forEach(li => {
@@ -5407,7 +5378,7 @@ async function renderItinLists(){
       const meta = li.querySelector('.list-meta')?.textContent || '';
       const isPub = !!li.querySelector('.lv-pub');
       const m = meta.match(/(\d+)/);
-      lists.push({ id:null, name, is_public:isPub, count: m?+m[1]:0 });
+      lists.push({ id:null, name, isPub, count: m?+m[1]:0 });
     });
   }
   if(lists.length===0){
@@ -5421,10 +5392,10 @@ async function renderItinLists(){
     card.innerHTML = `
       <div class="itin-list-card-dot" style="background:${palette[i%palette.length]}"><i class="ph-duotone ph-list-bullets"></i></div>
       <div class="itin-list-card-info">
-        <div class="itin-list-card-name">${l.name}</div>
+        <div class="itin-list-card-name">${(l.name||'').replace(/</g,'&lt;')}</div>
         <div class="itin-list-card-meta">${l.count} POI</div>
       </div>
-      <span class="itin-list-card-vis ${l.is_public?'pub':'prv'}">${l.is_public?'Pubblica':'Privata'}</span>
+      <span class="itin-list-card-vis ${l.isPub?'pub':'prv'}">${l.isPub?'Pubblica':'Privata'}</span>
     `;
     cont.appendChild(card);
   });
@@ -5485,14 +5456,14 @@ function toggleMapPopupSubmenu(which){
   const sub = document.getElementById('mapPopupSubmenuSub');
   const list = document.getElementById('mapPopupSubmenuList');
   if(which==='add'){
-    title.innerHTML = `<i class="ph-duotone ph-list-plus"></i><span>Aggiungi "${_mapPopupCtx.name}"</span>`;
+    title.innerHTML = `<i class="ph-duotone ph-list-plus"></i><span>Aggiungi "${(_mapPopupCtx.name||'').replace(/</g,'&lt;')}"</span>`;
     sub.textContent = 'Dove vuoi aggiungere questo luogo?';
     list.innerHTML = `
       <button class="map-popup-submenu-row add" onclick="showPlaceTripChooser()"><i class="ph-duotone ph-path"></i><span>All'itinerario</span><i class="ph-duotone ph-caret-right map-popup-row-arrow"></i></button>
       <button class="map-popup-submenu-row add" onclick="showPlaceHistoricRouteChooser()"><i class="ph-duotone ph-scroll"></i><span>Alla rotta storica</span><i class="ph-duotone ph-caret-right map-popup-row-arrow"></i></button>
       <button class="map-popup-submenu-row illi" onclick="closeMapPopupSubmenu();askIlliAbout()"><i class="ph-duotone ph-sparkle"></i><span>Chiedi a ILLI•AI di raccontarmela</span></button>`;
   } else if(which==='share'){
-    title.innerHTML = `<i class="ph-duotone ph-share-network"></i><span>Condividi "${_mapPopupCtx.name}"</span>`;
+    title.innerHTML = `<i class="ph-duotone ph-share-network"></i><span>Condividi "${(_mapPopupCtx.name||'').replace(/</g,'&lt;')}"</span>`;
     sub.textContent = 'Con chi vuoi condividere questo luogo?';
     list.innerHTML = `
       <button class="map-popup-submenu-row share" onclick="closeMapPopupSubmenu();sharePlaceWithFriend()"><i class="ph-duotone ph-users-three"></i><span>Con un amico</span></button>
@@ -5511,7 +5482,7 @@ function showPlaceTripChooser(){
   const title = document.getElementById('mapPopupSubmenuTitle');
   const sub = document.getElementById('mapPopupSubmenuSub');
   const list = document.getElementById('mapPopupSubmenuList');
-  title.innerHTML = `<i class="ph-duotone ph-path"></i><span>"${_mapPopupCtx.name}" a quale itinerario?</span>`;
+  title.innerHTML = `<i class="ph-duotone ph-path"></i><span>"${(_mapPopupCtx.name||'').replace(/</g,'&lt;')}" a quale itinerario?</span>`;
   sub.textContent = 'Seleziona un itinerario esistente o creane uno nuovo:';
   const trips = (typeof TRIPS!=='undefined') ? Object.values(TRIPS) : [];
   if(trips.length){
@@ -5527,7 +5498,7 @@ function showPlaceTripChooser(){
       </button>`;
   } else {
     list.innerHTML = `
-      <div style="padding:14px;text-align:center;color:var(--muted);font-size:12px">Nessun itinerario ancora. Creane uno per aggiungere "${_mapPopupCtx.name}".</div>
+      <div style="padding:14px;text-align:center;color:var(--muted);font-size:12px">Nessun itinerario ancora. Creane uno per aggiungere "${(_mapPopupCtx.name||'').replace(/</g,'&lt;')}".</div>
       <button class="map-popup-submenu-row" onclick="closeMapPopupSubmenu();openNewTrip?.()">
         <i class="ph-duotone ph-plus-circle"></i><span>Crea nuovo itinerario</span>
       </button>
@@ -5539,7 +5510,7 @@ function showPlaceTripChooser(){
 function aiPlaceAddToTripById(tripId){
   if(!_mapPopupCtx) return;
   if(typeof addAISuggestionAsStop==='function') addAISuggestionAsStop(tripId, _mapPopupCtx.name);
-  else showToast?.(`Aggiunto "${_mapPopupCtx.name}"`);
+  else showToast?.(`Aggiunto "${(_mapPopupCtx.name||'').replace(/</g,'&lt;')}"`);
 }
 
 // Rotte storiche UFFICIALI (curate dall'amministrazione): NON modificabili dagli utenti.
@@ -5583,7 +5554,7 @@ function showPlaceHistoricRouteChooser(){
   const title = document.getElementById('mapPopupSubmenuTitle');
   const sub = document.getElementById('mapPopupSubmenuSub');
   const list = document.getElementById('mapPopupSubmenuList');
-  title.innerHTML = `<i class="ph-duotone ph-scroll"></i><span>"${_mapPopupCtx.name}" a quale rotta?</span>`;
+  title.innerHTML = `<i class="ph-duotone ph-scroll"></i><span>"${(_mapPopupCtx.name||'').replace(/</g,'&lt;')}" a quale rotta?</span>`;
   sub.textContent = 'Seleziona una rotta storica o creane una nuova:';
   list.innerHTML = _HISTORIC_ROUTES.map(r=>`
     <button class="map-popup-submenu-row add" onclick="closeMapPopupSubmenu();addPlaceToHistoricRouteById('${r.id}','${r.name}')">
@@ -5602,7 +5573,7 @@ function showPlaceHistoricRouteChooser(){
 }
 function addPlaceToHistoricRouteById(routeId, routeName){
   if(!_mapPopupCtx) return;
-  showToast?.(`🏛 "${_mapPopupCtx.name}" aggiunto alla rotta "${routeName}"`);
+  showToast?.(`🏛 "${(_mapPopupCtx.name||'').replace(/</g,'&lt;')}" aggiunto alla rotta "${routeName}"`);
 }
 function createHistoricRouteWithAI(){
   if(!_mapPopupCtx) return;
@@ -5610,7 +5581,7 @@ function createHistoricRouteWithAI(){
   setTimeout(()=>{
     const input = document.getElementById('poiaiInput');
     if(input){
-      input.value = `Aiutami a creare una nuova rotta storica che includa "${_mapPopupCtx.name}" (coordinate ${(+_mapPopupCtx.lat).toFixed(5)}, ${(+_mapPopupCtx.lng).toFixed(5)}). Suggeriscimi nome, periodo storico, altre tappe coerenti e una breve storia narrativa.`;
+      input.value = `Aiutami a creare una nuova rotta storica che includa "${(_mapPopupCtx.name||'').replace(/</g,'&lt;')}" (coordinate ${(+_mapPopupCtx.lat).toFixed(5)}, ${(+_mapPopupCtx.lng).toFixed(5)}). Suggeriscimi nome, periodo storico, altre tappe coerenti e una breve storia narrativa.`;
       if(typeof sendPoiAIMsg==='function') sendPoiAIMsg();
     }
   }, 350);
@@ -5623,7 +5594,7 @@ function addPlaceToItinerary(){
 // Aggiungi → alla rotta storica (placeholder per ora — feature V2)
 function addPlaceToHistoricRoute(){
   if(!_mapPopupCtx) return;
-  showToast?.(`🏛 "${_mapPopupCtx.name}" sarà aggiungibile a una rotta storica (presto)`);
+  showToast?.(`🏛 "${(_mapPopupCtx.name||'').replace(/</g,'&lt;')}" sarà aggiungibile a una rotta storica (presto)`);
 }
 // Aggiungi → ILLI•AI racconta
 function askIlliAbout(){
@@ -5642,7 +5613,7 @@ function askIlliAbout(){
 // Condividi → con un amico (compagni di viaggio)
 function sharePlaceWithFriend(){
   if(!_mapPopupCtx) return;
-  showToast?.(`👥 Apri la tab Compagni e seleziona chi vuole conoscere "${_mapPopupCtx.name}"`);
+  showToast?.(`👥 Apri la tab Compagni e seleziona chi vuole conoscere "${(_mapPopupCtx.name||'').replace(/</g,'&lt;')}"`);
   showTab('companions');
   closeMapSearchMarker();
 }
@@ -5790,8 +5761,20 @@ async function saveListDetail(){
   document.getElementById('listDetailCard').classList.remove('editing');
   let msg = '✓ Lista aggiornata';
   if(vis==='company' && compCode){ const c=(_getCompagnie()||[]).find(x=>x.code===compCode); if(c) msg = '✓ Condivisa con '+(c.name||'la compagnia'); }
+  // Persistenza su Supabase: ora le liste hanno un id reale (dataset.listId da loadMyLists/createList)
+  const lid = el?.dataset.listId;
+  if(lid && currentUser && sb){
+    try{
+      const { error } = await sb.from('lists').update({
+        name, description: desc,
+        visibility: vis==='public' ? 'public' : 'private'
+        // TODO(24/06): companion_id/itinerary_id si collegano quando companions/trips saranno su Supabase;
+        // finche' non esistono, il 3o stato "compagnia" salva come 'private' e non persiste la compagnia scelta
+      }).eq('id', lid).eq('owner_id', currentUser.id);
+      if(error) throw error;
+    }catch(e){ console.warn('saveListDetail update:', e); }
+  }
   showToast?.(msg);
-  // Persistenza su Supabase: quando le liste avranno id reale (oggi vivono nel profilo)
 }
 async function shareListDetail(){
   if(!_listDetailCtx) return;
@@ -5807,8 +5790,14 @@ async function shareListDetail(){
 async function deleteListDetail(){
   if(!_listDetailCtx) return;
   if(!await uiConfirm(`Eliminare "${_listDetailCtx.name}"? L'azione è irreversibile.`, {okText:'Elimina', danger:true})) return;
-  if(_listDetailCtx.sourceEl){
-    _listDetailCtx.sourceEl.remove();
+  const el = _listDetailCtx.sourceEl;
+  const lid = el?.dataset.listId;
+  if(lid && currentUser && sb){
+    try{ const { error } = await sb.from('lists').delete().eq('id', lid).eq('owner_id', currentUser.id); if(error) throw error; }
+    catch(e){ console.warn('deleteListDetail:', e); showToast?.('⚠ Eliminazione non riuscita, riprova'); return; } // niente rimozione DOM se il DB fallisce
+  }
+  if(el){
+    el.remove();
     const st = document.getElementById('statList');
     if(st) st.textContent = Math.max(0, parseInt(st.textContent)-1);
   }
@@ -7339,7 +7328,7 @@ async function saveNewList(){
     const { data, error } = await sb.from('lists').insert({
       owner_id: currentUser.id,
       name: name,
-      is_public: true
+      visibility: 'public'
     }).select('id').single();
     if(error){
       console.warn('[poilove] insert lista error:',error.message);
@@ -7351,7 +7340,7 @@ async function saveNewList(){
 
   const item=document.createElement('div');item.className='list-item';
   if(listId) item.dataset.listId=listId;
-  item.innerHTML=`<div class="list-dot" style="background:${color}"></div><div class="list-info"><div class="list-name">${name}</div><div class="list-meta">0 POI</div></div><span class="list-vis lv-pub">Pubblica</span>`;
+  item.innerHTML=`<div class="list-dot" style="background:${color}"></div><div class="list-info"><div class="list-name">${(name||'').replace(/</g,'&lt;')}</div><div class="list-meta">0 POI</div></div><span class="list-vis lv-pub">Pubblica</span>`;
   container.appendChild(item);
   const statEl=document.getElementById('statList');if(statEl)statEl.textContent=parseInt(statEl.textContent)+1;
   // Add to sheet list scroll
@@ -7364,12 +7353,11 @@ async function saveNewList(){
 // Carica le liste dell'utente da Supabase e le rende nel container
 async function loadMyLists(){
   if(!currentUser?.id || !sb) return;
-  const { data, error } = await sb.from('lists').select('id,name,is_public').eq('owner_id',currentUser.id).order('created_at',{ascending:true});
+  const { data, error } = await sb.from('lists').select('id,name,visibility,description,companion_id,itinerary_id').eq('owner_id',currentUser.id).order('created_at',{ascending:true});
   if(error||!data) return;
   const container=document.getElementById('listsContainer');
   if(!container) return;
-  // Mantieni solo liste già rese (con dataset.listId) e quelle hardcoded di partenza —
-  // aggiungi solo quelle nuove non ancora presenti
+  // Aggiungo solo le liste non ancora rese nel container (evita duplicati su ricariche)
   const existingIds=new Set(Array.from(container.querySelectorAll('[data-list-id]')).map(el=>el.dataset.listId));
   const colors=['#D42B2B','#285EA7','#22C55E','#D48B2B','#7C3AED'];
   let idx=container.children.length;
@@ -7379,9 +7367,12 @@ async function loadMyLists(){
     const item=document.createElement('div');
     item.className='list-item';
     item.dataset.listId=l.id;
-    const visClass=l.is_public?'lv-pub':'lv-prv';
-    const visLbl=l.is_public?'Pubblica':'Privata';
-    item.innerHTML=`<div class="list-dot" style="background:${color}"></div><div class="list-info"><div class="list-name">${l.name}</div><div class="list-meta">0 POI</div></div><span class="list-vis ${visClass}">${visLbl}</span>`;
+    item.dataset.desc=l.description||'';
+    item.dataset.comp=l.companion_id||'';
+    item.dataset.trip=l.itinerary_id||'';
+    const visClass=l.visibility==='public'?'lv-pub':(l.companion_id?'lv-comp':'lv-prv');
+    const visLbl=l.visibility==='public'?'Pubblica':(l.companion_id?'Compagnia':'Privata');
+    item.innerHTML=`<div class="list-dot" style="background:${color}"></div><div class="list-info"><div class="list-name">${(l.name||'').replace(/</g,'&lt;')}</div><div class="list-meta">0 POI</div></div><span class="list-vis ${visClass}">${visLbl}</span>`;
     container.appendChild(item);
   });
   // Aggiorna stat
