@@ -5,7 +5,8 @@
 - **RLS blindate**: trigger `protect_gamification_columns` impedisce al client di auto-assegnarsi punti/tier; scrittura punti solo server-side (service_role). Referral creabili solo a proprio nome.
 - **Workflow code-quality attivato** (richiesto dal founder): la prima stesura aveva 2 BLOCKER di sicurezza RLS, scovati dall'agente e corretti prima di toccare il DB. Da ora ogni migrazione/codice importante passa da code-quality.
 - **Push a ogni passaggio** ripristinato come regola (errore del giorno: 41 commit accumulati senza push; ora salvati su GitHub + tag `checkpoint-2026-06-24`).
-- Prossimi passi backend: Edge Function per accredito punti server-side; aggancio frontend (badge legge `points` reali, referral scrive in `referrals`); tabelle `companions`/`trips`/`follows`/rotte-utente; email HTML invito; liste pubbliche POI.
+- **Migrazione 002 accredito punti** applicata: `award_points` (atomica, anti-abuso) + trigger su pois/loves/lists (accredito automatico e verificato dal DB quando l'azione reale avviene) + trigger referral + RPC `award_share` (validazione entità reale + tetto giornaliero). 2° giro code-quality: altri 2 BLOCKER (spam share, REVOKE incompleto) corretti prima del deploy.
+- Prossimi passi backend: aggancio frontend (badge legge `points` reali da Supabase, share chiama `award_share`, signup con `?ref` setta `referred_by`); tabelle `companions`/`trips`/`follows`/rotte-utente (persistenza); email HTML invito; liste pubbliche POI.
 
 ## Sessione 24/06/2026 (pomeriggio) — Fase 1 avviata: UI proprietaria
 
