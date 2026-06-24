@@ -6,7 +6,9 @@
 - **Workflow code-quality attivato** (richiesto dal founder): la prima stesura aveva 2 BLOCKER di sicurezza RLS, scovati dall'agente e corretti prima di toccare il DB. Da ora ogni migrazione/codice importante passa da code-quality.
 - **Push a ogni passaggio** ripristinato come regola (errore del giorno: 41 commit accumulati senza push; ora salvati su GitHub + tag `checkpoint-2026-06-24`).
 - **Migrazione 002 accredito punti** applicata: `award_points` (atomica, anti-abuso) + trigger su pois/loves/lists (accredito automatico e verificato dal DB quando l'azione reale avviene) + trigger referral + RPC `award_share` (validazione entità reale + tetto giornaliero). 2° giro code-quality: altri 2 BLOCKER (spam share, REVOKE incompleto) corretti prima del deploy.
-- Prossimi passi backend: aggancio frontend (badge legge `points` reali da Supabase, share chiama `award_share`, signup con `?ref` setta `referred_by`); tabelle `companions`/`trips`/`follows`/rotte-utente (persistenza); email HTML invito; liste pubbliche POI.
+- **Aggancio frontend gamification FATTO**: badge e popup "I livelli" leggono i `points` reali da Supabase; il love ricarica i punti (accreditati dal trigger DB); lo share chiama la RPC `award_share`. Display badge passato da "love" a "punti" (livello = punti, formattazione compatta). 4 BLOCKER frontend corretti da code-quality in 2 round.
+- Gamification ora END-TO-END per POI/love/share: azione → trigger accredita → badge mostra i punti reali.
+- Prossimi passi backend: referral signup (`?ref` → `referred_by` → +50 all'invitante); tabelle `companions`/`trips`/`follows`/rotte-utente (persistenza); email HTML invito; liste pubbliche POI; admin.
 
 ## Sessione 24/06/2026 (pomeriggio) — Fase 1 avviata: UI proprietaria
 
