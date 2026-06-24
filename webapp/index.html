@@ -2011,16 +2011,15 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
           <img src="https://ui-avatars.com/api/?name=%3F&background=285EA7&color=fff&size=200" alt="avatar"/>
         </div>
       </div>
-      <div class="profile-name" id="pubProfileName">Alessandro C.</div>
-      <div class="profile-email" id="pubProfileEmail">it@altrostile.app</div>
-      <!-- Vanity URL — cliccabile per copiare -->
+      <div class="profile-name" id="pubProfileName">—</div>
+      <!-- L'email NON va mai nel profilo pubblico (privacy): rimossa -->
       <div class="profile-vanity" id="pubVanityUrl" onclick="copyVanityUrl()">
         <i class="ph-duotone ph-link"></i>
-        <span id="pubVanityTxt">poilove.com?@alessandrocastagna</span>
+        <span id="pubVanityTxt">—</span>
       </div>
       <div class="prof-badge" id="pubProfileBadge" style="background:rgba(245,158,11,.2);color:#FDE68A;border-color:rgba(245,158,11,.3)">
         <i class="ph-duotone ph-star" style="color:#FDE68A"></i>
-        <span id="pubProfileBadgeTxt">Amatore · 87 love</span>
+        <span id="pubProfileBadgeTxt">Amatore</span>
       </div>
       <div class="pub-actions">
         <button class="pub-action-btn follow" id="pubFollowBtn" onclick="togglePublicFollow()">
@@ -2049,9 +2048,9 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
       </div>
     </div>
     <div class="profile-stats">
-      <div class="stat-item"><i class="ph-duotone ph-map-pin"></i><div class="stat-v">7</div><div class="stat-l">POI pub.</div></div>
-      <div class="stat-item"><i class="ph-duotone ph-heart" style="color:var(--red)"></i><div class="stat-v">87</div><div class="stat-l">Love tot.</div></div>
-      <div class="stat-item"><i class="ph-duotone ph-route"></i><div class="stat-v">2</div><div class="stat-l">Itinerari</div></div>
+      <div class="stat-item"><i class="ph-duotone ph-map-pin"></i><div class="stat-v" id="pubStatPoi">0</div><div class="stat-l">POI pub.</div></div>
+      <div class="stat-item"><i class="ph-duotone ph-heart" style="color:var(--red)"></i><div class="stat-v" id="pubStatLove">0</div><div class="stat-l">Love tot.</div></div>
+      <div class="stat-item"><i class="ph-duotone ph-route"></i><div class="stat-v" id="pubStatItin">0</div><div class="stat-l">Itinerari</div></div>
     </div>
     <div class="profile-body">
       <!-- Stesso verde toggle — torna al tuo profilo -->
@@ -3008,8 +3007,7 @@ function syncProfileFromAuth() {
   if (pname) pname.textContent = name;
   const pubName = document.getElementById('pubProfileName');
   if (pubName) pubName.textContent = name;
-  const pubEmail = document.getElementById('pubProfileEmail');
-  if (pubEmail) pubEmail.textContent = currentUser?.email || '';
+  // (email non mostrata nel profilo pubblico: privacy)
   // Avatar di partenza dall'auth (se non c'è uno custom in DB, useremo questo)
   const pav = document.querySelector('#profileAvatarImg img');
   const pubAv = document.querySelector('#publicProfile .profile-avatar img');
@@ -7110,13 +7108,20 @@ function syncOwnPublicPreview(){
   const myName = document.getElementById('myProfileName')?.textContent;
   const pubName = document.getElementById('pubProfileName');
   if(myName && pubName) pubName.textContent=myName;
-  // Email
-  const pubEmail = document.getElementById('pubProfileEmail');
-  if(pubEmail) pubEmail.textContent = currentUser?.email || document.getElementById('profEmailTxt')?.textContent || '';
+  // (Email rimossa dal profilo pubblico: non si mostra agli altri, è privacy)
   // Vanity URL
   const myVanity = document.getElementById('myVanityTxt')?.textContent;
   const pubVanity = document.getElementById('pubVanityTxt');
   if(myVanity && pubVanity) pubVanity.textContent=myVanity;
+  // Contatori REALI dal profilo privato (POI, Love) + itinerari veri da TRIPS
+  const _cp=(from,to)=>{ const f=document.getElementById(from), t=document.getElementById(to); if(f&&t) t.textContent=f.textContent; };
+  _cp('statPoi','pubStatPoi'); _cp('statLove','pubStatLove');
+  const pubItin=document.getElementById('pubStatItin');
+  if(pubItin) pubItin.textContent = (typeof TRIPS!=='undefined' ? Object.keys(TRIPS).length : 0);
+  // Badge livello reale, copiato dal profilo privato
+  const myBadge=document.getElementById('profBadge')?.textContent?.trim();
+  const pubBadge=document.getElementById('pubProfileBadgeTxt');
+  if(myBadge && pubBadge) pubBadge.textContent=myBadge;
   // Sfondo: copia dallo style del profileHero
   const heroBg = document.getElementById('profileHero')?.style.background;
   const pubH = document.querySelector('#publicProfile .pub-header');
@@ -7918,7 +7923,6 @@ function openUserProfile(user, isOwn=false){
   const pubAvImg=document.querySelector('#publicProfile .profile-avatar img');
   if(pubAvImg) pubAvImg.src=avatar||`https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=285EA7&color=fff&size=200`;
   setEl('pubProfileName',name);
-  setEl('pubProfileEmail',email);
   setEl('pubVanityTxt',buildVanityUrl(handle));
 
   // Nascondi/mostra azioni in base a se è il proprio profilo
