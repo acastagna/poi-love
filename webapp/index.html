@@ -462,7 +462,7 @@ body.tab-active #mapQuickBtns{display:none}
 #pubProfileOv{position:fixed;inset:0;z-index:9100;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);padding:18px}
 #pubProfileOv.show{display:flex}
 .pub-profile-card{width:100%;max-width:380px;max-height:88vh;background:var(--card);border-radius:22px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(0,0,0,.4)}
-.pub-profile-hero{background:linear-gradient(135deg,var(--red),#7B1111);padding:22px 18px 36px;position:relative;color:#fff;text-align:center}
+.pub-profile-hero{background:linear-gradient(135deg,#E13535 0%,#BC2222 42%,#7B1111 100%);padding:22px 18px 36px;position:relative;color:#fff;text-align:center}
 .pub-profile-close{position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:16px;background:rgba(255,255,255,.18);border:none;cursor:pointer;color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px}
 .pub-profile-avatar{width:74px;height:74px;border-radius:50%;background:rgba(255,255,255,.18);border:3px solid #fff;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:900;color:#fff;margin:0 auto 8px}
 .pub-profile-name{font-size:18px;font-weight:900;letter-spacing:.3px}
@@ -579,7 +579,7 @@ body.tab-active #mapQuickBtns{display:none}
 #referralOv.show{display:flex}
 .referral-close{position:absolute;top:18px;right:18px;z-index:3;width:40px;height:40px;border-radius:20px;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);border:1.5px solid rgba(255,255,255,.3);cursor:pointer;color:#fff;display:flex;align-items:center;justify-content:center;font-size:17px}
 .referral-card{width:100%;max-width:380px;max-height:90vh;overflow-y:auto;background:var(--card);border-radius:22px;box-shadow:0 24px 60px rgba(0,0,0,.4)}
-.referral-hero{background:linear-gradient(135deg,var(--red),#8a1a1a);color:#fff;padding:26px 22px 22px;text-align:center;border-radius:22px 22px 0 0}
+.referral-hero{background:linear-gradient(135deg,#E13535 0%,#BC2222 45%,#8a1a1a 100%);color:#fff;padding:26px 22px 22px;text-align:center;border-radius:22px 22px 0 0}
 .referral-hero-ico{width:54px;height:54px;border-radius:16px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 12px}
 .referral-title{font-size:20px;font-weight:900}
 .referral-sub{font-size:12.5px;opacity:.92;margin-top:5px;line-height:1.4}
@@ -600,7 +600,7 @@ body.tab-active #mapQuickBtns{display:none}
 .referral-points b{color:#B45309}
 .referral-points-sub{font-size:11px;color:var(--muted)}
 /* Anti-banding (dithering): velo di rumore impercettibile che rompe le bande di colore nei gradienti, così non sembrano un JPG compresso */
-body::after{content:'';position:fixed;inset:0;z-index:99999;pointer-events:none;opacity:.045;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+body::after{content:'';position:fixed;inset:0;z-index:99999;pointer-events:none;opacity:.06;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
 .friend-avatar{width:30px;height:30px;border-radius:50%;background:#EBF2FC;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--blue);flex-shrink:0}
 .friend-name{flex:1;font-size:13px;color:var(--ink);font-weight:600}
 .friend-status{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:800;text-transform:uppercase;padding:3px 8px;border-radius:7px;letter-spacing:.4px}
@@ -913,7 +913,7 @@ body::after{content:'';position:fixed;inset:0;z-index:99999;pointer-events:none;
 .author-name{font-size:13px;font-weight:700;color:var(--text);flex:1}
 
 /* ── PROFILE ── */
-.profile-hero{background:linear-gradient(160deg,#D42B2B 0%,#7B1111 100%);padding:60px 20px 70px;position:relative;text-align:center;min-height:320px}
+.profile-hero{background:linear-gradient(160deg,#E13535 0%,#C12424 30%,#9E1A1A 58%,#7B1111 82%,#600C0C 100%);padding:60px 20px 70px;position:relative;text-align:center;min-height:320px}
 .profile-avatar-wrap{display:inline-block;position:relative;cursor:pointer;margin-bottom:14px}
 .profile-avatar{width:104px;height:104px;border-radius:50%;overflow:hidden;border:3.5px solid rgba(255,255,255,.45);margin:0 auto;box-shadow:0 6px 22px rgba(0,0,0,.25)}
 .profile-avatar img{width:100%;height:100%;object-fit:cover}
@@ -1133,7 +1133,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 
 /* PUBLIC PROFILE */
 .public-profile-view{display:none}
-.pub-header{background:linear-gradient(160deg,#285EA7 0%,#1a3d6e 100%);padding:52px 20px 30px;text-align:center;position:relative}
+.pub-header{background:linear-gradient(160deg,#3A72BE 0%,#285EA7 36%,#1F4A82 68%,#163459 100%);padding:52px 20px 30px;text-align:center;position:relative}
 .back-btn{position:absolute;top:14px;left:14px;border:none;background:rgba(255,255,255,.2);border-radius:20px;padding:6px 12px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px}
 .back-profile-btn{position:absolute;top:14px;right:14px;border:none;background:rgba(255,255,255,.2);border-radius:20px;padding:6px 12px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px}
 /* Azioni profilo pubblico: Segui / Collegati / Condividi pos. / Blocca */
