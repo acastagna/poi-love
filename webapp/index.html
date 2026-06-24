@@ -6101,14 +6101,7 @@ function renderCompanionsTab(){
 
   // Legge compagnie salvate + aggiunge demo solo se localStorage è vuoto
   const saved = _getCompagnie();
-  const demoCompagnie = saved.length ? [] : [
-    { name:'Tirana Weekend', code:'TR2026', forever:false, expires:'2026-05-20', joined:true,
-      friends:[{name:'Liri V.',status:'traveling'},{name:'Marco S.',status:'traveling'},{name:'Anna B.',status:'still'}]},
-    { name:'Cuori in Cammino', code:'LOVE99', forever:true, expires:null, joined:true,
-      friends:[{name:'Elena R.',status:'stopped'},{name:'Davide T.',status:'still'}]},
-    { name:'Balcani 2025', code:'BLK425', forever:false, expires:'2025-09-30', joined:false, friends:[]}
-  ];
-  const compagnie = [...saved, ...demoCompagnie];
+  const compagnie = [...saved];
 
   if(!compagnie.length){
     root.innerHTML='<div class="poi-list-empty">Nessun gruppo ancora. Tocca <strong>+</strong> per crearne uno.</div>';
@@ -6359,42 +6352,7 @@ function _fillUserSlot(el, url, idx){
   el.appendChild(acts);
 }
 
-function _fillAISlot(el, seed, name, address, category, idx){
-  el.className = 'pdm-photo-slot ps-ai';
-  el.innerHTML = `<div class="pdm-ai-spinner"><i class="ph-duotone ph-sparkle"></i><span>AI</span></div>`;
-  const enc = encodeURIComponent(_photoPrompt(name, address, category));
-  const img = document.createElement('img');
-  img.alt = name;
-  img.src = `https://image.pollinations.ai/prompt/${enc}?width=400&height=400&nologo=true&seed=${seed}&model=flux`;
-  img.onload = () => {
-    el.innerHTML = '';
-    img.style.opacity = '0';
-    el.appendChild(img);
-    requestAnimationFrame(()=>{ img.style.opacity='1'; });
-    if(idx === 0){
-      const badge = document.createElement('div');
-      badge.className = 'pdm-ai-badge';
-      badge.innerHTML = '<i class="ph-duotone ph-sparkle"></i> AI';
-      el.appendChild(badge);
-    }
-    const acts = document.createElement('div');
-    acts.className = 'pdm-slot-acts';
-    acts.innerHTML =
-      `<button class="pdm-slot-act sa-redo" title="Rigenera" onclick="_regenAISlot(${idx},this.closest('.pdm-photos'))"><i class="ph-duotone ph-arrows-clockwise"></i></button>` +
-      `<button class="pdm-slot-act sa-cam" title="Mia foto" onclick="_pickPhotoForSlot(${idx},this.closest('.pdm-photos'))"><i class="ph-duotone ph-camera"></i></button>` +
-      `<button class="pdm-slot-act sa-del" title="Elimina" onclick="_deleteSlot(${idx},this.closest('.pdm-photos'))"><i class="ph-duotone ph-trash"></i></button>`;
-    el.appendChild(acts);
-  };
-  img.onerror = () => {
-    el.innerHTML = `<div class="pdm-ai-spinner" style="color:rgba(255,255,255,.2)"><i class="ph-duotone ph-image-broken"></i></div>`;
-    const acts = document.createElement('div');
-    acts.className = 'pdm-slot-acts';
-    acts.innerHTML =
-      `<button class="pdm-slot-act sa-redo" title="Riprova" onclick="_regenAISlot(${idx},this.closest('.pdm-photos'))"><i class="ph-duotone ph-arrows-clockwise"></i></button>`;
-    el.appendChild(acts);
-  };
-  el.appendChild(img);
-}
+// (generazione foto POI con AI rimossa: i POI senza foto mostrano uno slot vuoto col "+")
 
 function _fillEmptySlot(el, idx){
   el.className = 'pdm-photo-slot ps-empty';
@@ -6413,18 +6371,14 @@ function _renderAllSlots(container){
   container._slots.forEach((s,i)=>{
     const el = document.createElement('div');
     if(s.type==='user')       _fillUserSlot(el, s.url, i);
-    else if(s.type==='ai')    _fillAISlot(el, s.seed, name, address, category, i);
     else                      _fillEmptySlot(el, i);
     container.appendChild(el);
   });
   const nUser = container._slots.filter(s=>s.type==='user').length;
-  const nAI   = container._slots.filter(s=>s.type==='ai').length;
-  if(nUser > 0 || nAI > 0){
+  if(nUser > 0){
     const ctr = document.createElement('div');
     ctr.className = 'pdm-photo-counter';
-    if(nUser > 0 && nAI === 0)      ctr.innerHTML = `<i class="ph-duotone ph-camera"></i> ${nUser} foto`;
-    else if(nAI > 0 && nUser === 0) ctr.innerHTML = `<i class="ph-duotone ph-sparkle"></i> AI`;
-    else                            ctr.innerHTML = `<i class="ph-duotone ph-camera"></i> ${nUser} · <i class="ph-duotone ph-sparkle"></i> ${nAI}`;
+    ctr.innerHTML = `<i class="ph-duotone ph-camera"></i> ${nUser} foto`;
     container.appendChild(ctr);
   }
 }
@@ -6434,7 +6388,6 @@ function renderPhotoStrip(container, photos, name, address, category){
   const user = Array.isArray(photos) ? photos.slice(0,3) : [];
   container._slots = [0,1,2].map(i => {
     if(i < user.length)      return { type:'user', url: user[i] };
-    if(user.length === 0)    return { type:'ai', seed: Math.floor(Math.random()*8000+100) };
     return { type:'empty' };
   });
   _renderAllSlots(container);
@@ -6459,11 +6412,7 @@ function _pickPhotoForSlot(idx, container){
   inp.click();
 }
 
-function _regenAISlot(idx, container){
-  if(!container) return;
-  container._slots[idx] = { type:'ai', seed: Math.floor(Math.random()*8000+100) };
-  _renderAllSlots(container);
-}
+// (rigenerazione foto AI rimossa)
 
 function _deleteSlot(idx, container){
   if(!container) return;
