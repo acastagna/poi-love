@@ -1962,7 +1962,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
       </div>
       <!-- LE MIE ROTTE STORICHE -->
       <div class="profile-sec">
-        <div class="prof-sec-lbl"><span>Le mie rotte storiche</span><span style="font-size:10px;font-weight:400;color:var(--muted)">selezionate sulla mappa</span></div>
+        <div class="prof-sec-lbl"><span data-t="prof_my_routes">Le mie rotte storiche</span><span data-t="prof_routes_on_map" style="font-size:10px;font-weight:400;color:var(--muted)">selezionate sulla mappa</span></div>
         <div id="myRoutesContainer"><!-- popolato da renderMyRoutes(): ufficiali col badge "Ufficiale", utente col pennino --></div>
       </div>
 
@@ -2028,7 +2028,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
       </div>
       <!-- LOGOUT -->
       <div class="profile-sec" style="text-align:center;padding:24px 16px 40px">
-        <button onclick="uiConfirm('Uscire da POI•LOVE?',{okText:'Esci',danger:true}).then(ok=>{if(ok)signOut().then(()=>location.reload())})"
+        <button onclick="uiConfirm(t('misc_logout_confirm','Uscire da POI•LOVE?'),{okText:t('misc_logout_ok','Esci'),danger:true}).then(ok=>{if(ok)signOut().then(()=>location.reload())})"
           style="background:transparent;border:1.5px solid var(--red);color:var(--red);font-weight:600;font-size:14px;padding:12px 28px;border-radius:13px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:8px;transition:all .2s">
           <i class="ph-duotone ph-sign-out"></i> Esci
         </button>
@@ -2730,12 +2730,12 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
       <div class="mmo-text"><strong data-t="comp_modal_title">Compagnia</strong><span data-t="comp_modal_sub">Condividi con una compagnia di viaggio</span></div>
       <i class="ph-duotone ph-caret-right mmo-arrow"></i>
     </button>
-    <button class="micro-modal-opt" onclick="closeAddPoiDisambig();showToast('🗺 Rotte Storiche — prossimamente!')">
+    <button class="micro-modal-opt" onclick="closeAddPoiDisambig();showToast(t('map_routes_soon','🗺 Rotte Storiche, prossimamente!'))">
       <div class="mmo-icon" style="background:#FFEDD5;color:#9A3412"><i class="ph-duotone ph-mountains"></i></div>
       <div class="mmo-text"><strong>Rotta Storica</strong><span>Inserisci in un percorso storico</span></div>
       <i class="ph-duotone ph-caret-right mmo-arrow"></i>
     </button>
-    <button class="micro-modal-opt" onclick="closeAddPoiDisambig();showToast('🏷 Categorie — prossimamente!')">
+    <button class="micro-modal-opt" onclick="closeAddPoiDisambig();showToast(t('map_cat_soon','🏷 Categorie, prossimamente!'))">
       <div class="mmo-icon" style="background:#EDE9FE;color:#4C1D95"><i class="ph-duotone ph-tag"></i></div>
       <div class="mmo-text"><strong>Categoria</strong><span>Organizza per tipo o tema</span></div>
       <i class="ph-duotone ph-caret-right mmo-arrow"></i>
@@ -3256,7 +3256,7 @@ async function signOut() {
     window._dbPOIs = [];
   } catch(_){}
   await sb.auth.signOut();
-  showToast('👋 Disconnesso');
+  showToast(t('misc_disconnected','👋 Disconnesso'));
 }
 
 // ── LOAD POIs da Supabase ──
@@ -3438,7 +3438,7 @@ async function uploadPhotosToMediaServer(files, poiId){
 // ── SAVE POI reale ──
 async function savePOIToDB(data) {
   if (!currentUser) {
-    showToast('⚠️ Accedi per salvare il POI');
+    showToast(t('toast_login_required','⚠️ Accedi per salvare il POI'));
     document.getElementById('authOverlay').style.display = 'flex';
     return null;
   }
@@ -3658,7 +3658,7 @@ function openAddPersonalPlace(type){
   plPendingLat = null; plPendingLng = null; plPendingAddr = '';
   const cfg = PL_TYPE_CFG[type] || { label: type };
   const icon = PL_TYPE_EMOJI[type] || 'ph-map-pin';
-  document.getElementById('plSheetTitle').innerHTML = `<i class="ph-duotone ${icon}"></i> Aggiungi ${cfg.label}`;
+  document.getElementById('plSheetTitle').innerHTML = `<i class="ph-duotone ${icon}"></i> ${t('misc_add','Aggiungi')} ${cfg.label}`;
   document.getElementById('plSheetPrefix').textContent = cfg.label + ' ';
   document.getElementById('plSheetWord').value = '';
   document.getElementById('plSheetAddr').value = '';
@@ -4072,6 +4072,14 @@ const T={
     av_change_title:'Cambia avatar',av_change_sub:'Carica una tua foto, scegli da Unsplash, oppure fattela dipingere da ILLI•AI.',av_tab_upload:'Upload',av_tab_unsplash:'Unsplash',av_upload_drop_title:'Carica una foto',av_upload_drop_sub:'JPG, PNG · max 5 MB',av_use_photo:'Usa questa foto',av_painting:'ILLI•AI sta dipingendo…',av_painting_long:'(può richiedere 10-25 sec)',av_use_avatar:'Usa questo avatar',av_generate_again:'Genera un altro',av_search_ph:'Cerca: portrait, montagne, mare…',av_ai_prompt_ph:'Es: ritratto stile cinematografico, illuminazione calda, montagne sullo sfondo, espressione serena',av_describe:'Descrivi come vuoi essere ritratto/a. ILLI•AI userà Flux per dipingere.',av_avatar_updated:'✓ Avatar aggiornato',av_error_size:'Immagine > 5 MB, troppo grande',
     /* Common toasts */
     toast_login_required:'⚠️ Accedi per salvare il POI',toast_no_user:'Nessun utente selezionato',toast_bio_updated:'Bio aggiornata',toast_invite_ready:'📧 Invito pronto per',toast_invite_dest1:'destinatario',toast_invite_destN:'destinatari',toast_only_local:'⚠ Lista salvata solo localmente',toast_list_added:'+ Lista',toast_tag_added:'+ Tag',
+    /* POI · edit/delete/save toasts */
+    poi_name_required:'Inserisci un nome',poi_deleted:'POI eliminato',poi_photo_first:'📷 Carica prima una foto con GPS',poi_no_gps_photo:'Nessun GPS trovato in questa foto',poi_updated:'✅ POI aggiornato!',poi_edit_yours:'✏️ Modifica il tuo POI',poi_no_delete_others:'⛔ Non puoi eliminare POI altrui',poi_no_edit_others:'⛔ Non puoi modificare POI altrui',
+    /* Mappa · disambig + posizione + coordinate */
+    map_routes_soon:'🗺 Rotte Storiche, prossimamente!',map_cat_soon:'🏷 Categorie, prossimamente!',map_pos_set:'📍 Posizione impostata sulla mappa',map_coords_copied:'Coordinate copiate!',map_gps_unavail_other:'GPS non disponibile, usa un altro metodo',
+    /* Profilo / handle / rotte */
+    prof_handle_login:'Accedi per salvare un handle.',prof_save_handle:'Salva handle',prof_bio_prompt:'La tua bio (max 160 caratteri)',prof_qr_downloaded:'⬇️ QR scaricato per la stampa!',prof_my_routes:'Le mie rotte storiche',prof_routes_on_map:'selezionate sulla mappa',route_official:'Ufficiale',
+    /* Varie · misc */
+    misc_add:'Aggiungi',misc_saving:'Salvataggio…',misc_logout_confirm:'Uscire da POI•LOVE?',misc_logout_ok:'Esci',misc_disconnected:'👋 Disconnesso',misc_environment:'Ambiente',misc_env_selected:'Ambiente selezionato!',dev_mode_on:'🔓 Dev Mode attivato!',dev_mode_active:'Dev Mode attivo ✓, doppio tap email per disattivare',
     /* Follow */
     follow_now:'Stai seguendo',follow_no_more:'Non segui più',
     /* Compagnie (compagni di viaggio) */
@@ -4141,6 +4149,14 @@ const T={
     av_change_title:'Ndrysho avatarin',av_change_sub:'Ngarko një foto tënde, zgjidh nga Unsplash, ose lëre ILLI•AI ta vizatojë.',av_tab_upload:'Ngarko',av_tab_unsplash:'Unsplash',av_upload_drop_title:'Ngarko një foto',av_upload_drop_sub:'JPG, PNG · max 5 MB',av_use_photo:'Përdor këtë foto',av_painting:'ILLI•AI po vizaton…',av_painting_long:'(mund të zgjasë 10-25 sek)',av_use_avatar:'Përdor këtë avatar',av_generate_again:'Gjenero një tjetër',av_search_ph:'Kërko: portrait, male, det…',av_ai_prompt_ph:'P.sh.: portret kinematografik, ndriçim i ngrohtë, male në sfond, shprehje e qetë',av_describe:'Përshkruaj si do të portretizohesh. ILLI•AI do të përdorë Flux për të vizatuar.',av_avatar_updated:'✓ Avatari u përditësua',av_error_size:'Imazhi > 5 MB, shumë i madh',
     /* Common toasts */
     toast_login_required:'⚠️ Hyni për të ruajtur POI-n',toast_no_user:'Asnjë përdorues i zgjedhur',toast_bio_updated:'Bio u përditësua',toast_invite_ready:'📧 Ftesa gati për',toast_invite_dest1:'marrës',toast_invite_destN:'marrës',toast_only_local:'⚠ Lista u ruajt vetëm lokalisht',toast_list_added:'+ Listë',toast_tag_added:'+ Etiketë',
+    /* POI · edit/delete/save toasts */
+    poi_name_required:'Fut një emër',poi_deleted:'POI u fshi',poi_photo_first:'📷 Ngarko fillimisht një foto me GPS',poi_no_gps_photo:'Nuk u gjet GPS në këtë foto',poi_updated:'✅ POI u përditësua!',poi_edit_yours:'✏️ Redakto POI-n tënd',poi_no_delete_others:'⛔ Nuk mund të fshish POI të të tjerëve',poi_no_edit_others:'⛔ Nuk mund të redaktosh POI të të tjerëve',
+    /* Mappa · disambig + posizione + coordinate */
+    map_routes_soon:'🗺 Rrugët Historike, së shpejti!',map_cat_soon:'🏷 Kategoritë, së shpejti!',map_pos_set:'📍 Pozicioni u vendos në hartë',map_coords_copied:'Koordinatat u kopjuan!',map_gps_unavail_other:'GPS jo i disponueshëm, përdor një metodë tjetër',
+    /* Profilo / handle / rotte */
+    prof_handle_login:'Hyr për të ruajtur një handle.',prof_save_handle:'Ruaj handle-in',prof_bio_prompt:'Bio-ja jote (maks 160 karaktere)',prof_qr_downloaded:'⬇️ QR u shkarkua për printim!',prof_my_routes:'Rrugët e mia historike',prof_routes_on_map:'të zgjedhura në hartë',route_official:'Zyrtare',
+    /* Varie · misc */
+    misc_add:'Shto',misc_saving:'Po ruhet…',misc_logout_confirm:'Të dalësh nga POI•LOVE?',misc_logout_ok:'Dil',misc_disconnected:'👋 U shkëpute',misc_environment:'Mjedisi',misc_env_selected:'Mjedisi u zgjodh!',dev_mode_on:'🔓 Dev Mode u aktivizua!',dev_mode_active:'Dev Mode aktiv ✓, dy prekje te email-i për ta çaktivizuar',
     /* Follow */
     follow_now:'Po ndjek',follow_no_more:'Nuk ndjek më',
     /* Compagnie (shokë udhëtimi) */
@@ -4210,6 +4226,14 @@ const T={
     av_change_title:'Change avatar',av_change_sub:'Upload a photo, pick from Unsplash, or have ILLI•AI paint it for you.',av_tab_upload:'Upload',av_tab_unsplash:'Unsplash',av_upload_drop_title:'Upload a photo',av_upload_drop_sub:'JPG, PNG · max 5 MB',av_use_photo:'Use this photo',av_painting:'ILLI•AI is painting…',av_painting_long:'(may take 10-25 sec)',av_use_avatar:'Use this avatar',av_generate_again:'Generate another',av_search_ph:'Search: portrait, mountains, sea…',av_ai_prompt_ph:'E.g. cinematic portrait, warm lighting, mountains in the background, calm expression',av_describe:'Describe how you want to be portrayed. ILLI•AI will use Flux to paint.',av_avatar_updated:'✓ Avatar updated',av_error_size:'Image > 5 MB, too big',
     /* Common toasts */
     toast_login_required:'⚠️ Sign in to save the POI',toast_no_user:'No user selected',toast_bio_updated:'Bio updated',toast_invite_ready:'📧 Invitation ready for',toast_invite_dest1:'recipient',toast_invite_destN:'recipients',toast_only_local:'⚠ List saved only locally',toast_list_added:'+ List',toast_tag_added:'+ Tag',
+    /* POI · edit/delete/save toasts */
+    poi_name_required:'Enter a name',poi_deleted:'POI deleted',poi_photo_first:'📷 Upload a photo with GPS first',poi_no_gps_photo:'No GPS found in this photo',poi_updated:'✅ POI updated!',poi_edit_yours:'✏️ Edit your POI',poi_no_delete_others:"⛔ You can't delete others' POIs",poi_no_edit_others:"⛔ You can't edit others' POIs",
+    /* Mappa · disambig + position + coordinates */
+    map_routes_soon:'🗺 Historic Routes, coming soon!',map_cat_soon:'🏷 Categories, coming soon!',map_pos_set:'📍 Position set on the map',map_coords_copied:'Coordinates copied!',map_gps_unavail_other:'GPS unavailable, use another method',
+    /* Profile / handle / routes */
+    prof_handle_login:'Sign in to save a handle.',prof_save_handle:'Save handle',prof_bio_prompt:'Your bio (max 160 characters)',prof_qr_downloaded:'⬇️ QR downloaded for printing!',prof_my_routes:'My historic routes',prof_routes_on_map:'selected on the map',route_official:'Official',
+    /* Varie · misc */
+    misc_add:'Add',misc_saving:'Saving…',misc_logout_confirm:'Sign out of POI•LOVE?',misc_logout_ok:'Sign out',misc_disconnected:'👋 Signed out',misc_environment:'Environment',misc_env_selected:'Environment selected!',dev_mode_on:'🔓 Dev Mode enabled!',dev_mode_active:'Dev Mode active ✓, double tap email to disable',
     /* Follow */
     follow_now:'Now following',follow_no_more:'Unfollowed',
     /* Compagnie (travel companions) */
@@ -4935,11 +4959,11 @@ function applyExifToForm(){
   if(!exifCache){
     // Nessun EXIF trovato finora — prova a estrarlo dalla prima foto disponibile
     const file=photoFiles.find(Boolean);
-    if(!file){ showToast('📷 Carica prima una foto con GPS'); return; }
+    if(!file){ showToast(t('poi_photo_first','📷 Carica prima una foto con GPS')); return; }
     if(typeof exifr==='undefined'){ showToast('Libreria EXIF non disponibile'); return; }
     showToast('🔍 Leggo i dati EXIF…');
     exifr.gps(file).then(gps=>{
-      if(!gps||!gps.latitude){ showToast('Nessun GPS trovato in questa foto'); return; }
+      if(!gps||!gps.latitude){ showToast(t('poi_no_gps_photo','Nessun GPS trovato in questa foto')); return; }
       const lat=gps.latitude, lng=gps.longitude;
       fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`,{headers:{'Accept-Language':lang}})
         .then(r=>r.json()).then(d=>{
@@ -4995,7 +5019,7 @@ function removePhoto(e,idx){
 /* COPY COORDS */
 function copyCoords(el){
   const txt=el.textContent;
-  if(navigator.clipboard){navigator.clipboard.writeText(txt).then(()=>showToast('Coordinate copiate!'));}
+  if(navigator.clipboard){navigator.clipboard.writeText(txt).then(()=>showToast(t('map_coords_copied','Coordinate copiate!')));}
   else showToast(txt);
 }
 
@@ -5810,7 +5834,7 @@ function renderMyRoutes(){
       <div class="route-dot" style="background:${r.bg||'#EBF2FC'}"><i class="ph-duotone ${r.icon||'ph-path'}" style="color:${r.color||'var(--blue)'}"></i></div>
       <div style="flex:1;min-width:0"><div class="route-name">${(r.name||'').replace(/</g,'&lt;')}</div><div class="route-meta">${(r.meta||'').replace(/</g,'&lt;')}</div></div>
       ${r.official
-        ? `<span class="route-badge-official" title="Rotta ufficiale, curata dall'amministrazione"><i class="ph-fill ph-seal-check"></i> Ufficiale</span>`
+        ? `<span class="route-badge-official" title="Rotta ufficiale, curata dall'amministrazione"><i class="ph-fill ph-seal-check"></i> ${t('route_official','Ufficiale')}</span>`
         : `<button class="list-act-btn" title="Modifica" onclick="event.stopPropagation();editUserRoute('${r.id}')"><i class="ph-duotone ph-pencil-simple"></i></button>`}
     </div>`).join('');
 }
@@ -7015,7 +7039,7 @@ async function toggleLove(){
     document.getElementById('authOverlay').style.display='flex';
     return;
   }
-  if(!currentPOI?.id){ showToast('POI non trovato'); return; }
+  if(!currentPOI?.id){ showToast(t('poi_not_found','POI non trovato')); return; }
   const btn=document.getElementById('loveBtn'),heart=document.getElementById('loveHeart'),cnt=document.getElementById('loveCnt');
   const alreadyLoved=btn.classList.contains('loved');
   // Optimistic UI update
@@ -7131,7 +7155,7 @@ function closeDeleteConfirm(){
 }
 async function confirmDeletePOI(){
   if(!currentPOI || !currentUser) return;
-  if(currentPOI.author_id !== currentUser.id){ showToast('⛔ Non puoi eliminare POI altrui'); closeDeleteConfirm(); return; }
+  if(currentPOI.author_id !== currentUser.id){ showToast(t('poi_no_delete_others','⛔ Non puoi eliminare POI altrui')); closeDeleteConfirm(); return; }
   closeDeleteConfirm();
   const nm = currentPOI.name || 'questo POI';
   if(currentPOI.id && typeof sb !== 'undefined'){
@@ -7202,7 +7226,7 @@ function setLocTab(btn,type){
         if(locActiveTab==='gps') reverseGeocodeAndShow(gpsPos.lat,gpsPos.lng);
       },()=>{
         document.getElementById('locGpsLoading').style.display='none';
-        showToast('GPS non disponibile — usa un altro metodo');
+        showToast(t('map_gps_unavail_other','GPS non disponibile, usa un altro metodo'));
       });
     }
   } else if(type==='exif'){
@@ -7238,7 +7262,7 @@ function _mapTapLocHandler(e){
     tip.innerHTML='<i class="ph-duotone ph-map-pin" style="font-size:18px;color:var(--red)"></i><span>Posizione impostata — tocca di nuovo per cambiare</span>';
   }
   reverseGeocodeAndShow(lat,lng);
-  showToast('📍 Posizione impostata sulla mappa');
+  showToast(t('map_pos_set','📍 Posizione impostata sulla mappa'));
 }
 
 // Reverse geocode + aggiorna UI
@@ -7449,7 +7473,7 @@ function renderAvEnvGrid(){
       ${envNames.map(name=>`<button style="flex:1;height:34px;border-radius:9px;border:2px solid ${avSelEnv===name?'var(--red)':'var(--border)'};background:${avSelEnv===name?'#FFF5F5':'none'};color:${avSelEnv===name?'var(--red)':'var(--muted)'};font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s" onclick="selectAvStyle('${name}')">${name}</button>`).join('')}
     </div>
     ${AV_ENVS[avSelEnv].map((e,i)=>`
-      <div class="av-env-card" onclick="showToast('Ambiente: ${e.lbl}')">
+      <div class="av-env-card" onclick="showToast('${window.t('misc_environment','Ambiente')}: ${e.lbl}')">
         <img class="av-env-card-img" src="${e.img}" alt="${e.lbl}" loading="lazy"/>
         <div class="av-env-label">${e.lbl}</div>
       </div>`).join('')}`;
@@ -7636,7 +7660,7 @@ function loadMyTags(){
 }
 async function saveNewList(){
   const name=document.getElementById('newListName').value.trim();
-  if(!name){showToast('Inserisci un nome');return;}
+  if(!name){showToast(window.t('poi_name_required','Inserisci un nome'));return;}
   const colors=['#D42B2B','#285EA7','#22C55E','#D48B2B','#7C3AED'];
   const container=document.getElementById('listsContainer');
   const color=colors[container.children.length%colors.length];
@@ -7724,12 +7748,12 @@ async function syncCompagnieFromDB(){
 function deletePOI(id){
   const card=document.getElementById(id);if(!card)return;
   card.style.opacity='0';card.style.transform='scale(.9)';card.style.transition='all .3s';
-  setTimeout(()=>{card.remove();const s=document.getElementById('statPoi');if(s)s.textContent=Math.max(0,parseInt(s.textContent)-1);showToast('POI eliminato');},300);
+  setTimeout(()=>{card.remove();const s=document.getElementById('statPoi');if(s)s.textContent=Math.max(0,parseInt(s.textContent)-1);showToast(t('poi_deleted','POI eliminato'));},300);
 }
 function editPOI(id){
   // Trova il POI nel DB se disponibile, altrimenti apri con dati locali
   const el=document.getElementById(id);
-  if(!el){showToast('POI non trovato');return;}
+  if(!el){showToast(t('poi_not_found','POI non trovato'));return;}
   const name=el.querySelector('.poi-card-name')?.textContent||'';
   const desc=el.querySelector('.poi-card-desc')?.textContent||'';
   // Simula currentPOI per aprire l'edit
@@ -8122,7 +8146,7 @@ function selectEnv(idx){
   selectedEnvIdx=idx;
   const badge=getBadge(currentPoints);
   renderLevelEnvs(badge.label);
-  showToast('Ambiente selezionato!');
+  showToast(t('misc_env_selected','Ambiente selezionato!'));
 }
 function requestAvatarGen(){
   showToast('🎨 Ambiente selezionato — avatar generato da ILLI•AI');
@@ -8270,7 +8294,7 @@ function onVanityInput(val){
 
   clearTimeout(_vanityCheckTimer);
   _vanityCheckTimer=setTimeout(async()=>{
-    if(!sb){statusEl.className='vanity-status err';statusEl.textContent='Accedi per salvare un handle.';return;}
+    if(!sb){statusEl.className='vanity-status err';statusEl.textContent=t('prof_handle_login','Accedi per salvare un handle.');return;}
     const{data,error}=await sb.from('profiles')
       .select('id').ilike('username',clean).neq('id',currentUser?.id||'x').limit(1);
     if(error){statusEl.className='vanity-status err';statusEl.textContent='Errore verifica.';return;}
@@ -8291,12 +8315,12 @@ async function saveVanityHandle(){
   if(!handle||!_vanityValid||!currentUser||!sb) return;
   const saveBtn=document.getElementById('vanitySaveBtn');
   saveBtn.disabled=true;
-  saveBtn.textContent='Salvataggio…';
+  saveBtn.textContent=t('misc_saving','Salvataggio…');
   const{error}=await sb.from('profiles').update({username:handle}).eq('id',currentUser.id);
   if(error){
     showToast('Errore: '+error.message);
     saveBtn.disabled=false;
-    saveBtn.textContent='Salva handle';
+    saveBtn.textContent=t('prof_save_handle','Salva handle');
     return;
   }
   myVanityHandle=handle;
@@ -8330,7 +8354,7 @@ function downloadQR(){
   a.download=`poilove-qr-@${handle}.png`;
   a.target='_blank';
   a.click();
-  showToast('⬇️ QR scaricato per la stampa!');
+  showToast(t('prof_qr_downloaded','⬇️ QR scaricato per la stampa!'));
 }
 
 /* ── Toggle visibilità campo profilo (email, ecc.) ── */
@@ -8347,7 +8371,7 @@ async function editProfileBio(){
   const el=document.getElementById('myProfileBio');
   if(!el) return;
   const cur=el.textContent||'';
-  const val=await uiPrompt('La tua bio (max 160 caratteri)', cur, {okText:'Salva'});
+  const val=await uiPrompt(t('prof_bio_prompt','La tua bio (max 160 caratteri)'), cur, {okText:t('list_act_save','Salva')});
   if(val===null) return;
   const trimmed=val.trim().substring(0,160);
   el.textContent=trimmed;
@@ -8563,7 +8587,7 @@ let editingPOIId=null; // id del POI in editing
 
 function openEditPOI(){
   if(!currentPOI) return;
-  if(!currentUser || currentUser.id !== currentPOI.author_id){ showToast('⛔ Non puoi modificare POI altrui'); return; }
+  if(!currentUser || currentUser.id !== currentPOI.author_id){ showToast(t('poi_no_edit_others','⛔ Non puoi modificare POI altrui')); return; }
   // Permetti edit anche per POI demo senza id (fallback locale)
   editingPOIId = currentPOI.id || ('local-'+Date.now());
   closeDetail();
@@ -8602,7 +8626,7 @@ function openEditPOI(){
     // Cambia il testo del pulsante salva in "Aggiorna POI"
     const saveBtn=document.getElementById('saveBtn');
     if(saveBtn){ saveBtn.textContent='Aggiorna POI'; saveBtn.className='save-btn ready'; }
-    showToast('✏️ Modifica il tuo POI');
+    showToast(t('poi_edit_yours','✏️ Modifica il tuo POI'));
   },350);
 }
 
@@ -8630,7 +8654,7 @@ async function savePOIEdit(data){
   if(error){console.error('editPOI:',error);showToast(`❌ ${error.message||'Errore aggiornamento'}`);return null;}
   if(updated) updated.name=updated.title;  // alias per il resto del codice
   editingPOIId=null;
-  showToast('✅ POI aggiornato!');
+  showToast(t('poi_updated','✅ POI aggiornato!'));
   return updated;
 }
 
@@ -9606,7 +9630,7 @@ function onProfileStatsTap(){
   const now=Date.now();
   if(now-_devLastTap < 350){
     _devLastTap=0;
-    if(devMode) showToast('Dev Mode attivo ✓ — doppio tap email per disattivare');
+    if(devMode) showToast(t('dev_mode_active','Dev Mode attivo ✓, doppio tap email per disattivare'));
     else openTokenModal();
   } else {
     _devLastTap=now;
@@ -9629,7 +9653,7 @@ function verifyToken(){
     localStorage.setItem('poilove_dev','1');
     closeTokenModal();
     showDevPanel();
-    showToast('🔓 Dev Mode attivato!');
+    showToast(t('dev_mode_on','🔓 Dev Mode attivato!'));
   } else {
     showToast(lang==='it'?'Codice non valido':lang==='sq'?'Kod i pavlefshëm':'Invalid code');
     document.getElementById('tokenInput').value='';
@@ -10212,7 +10236,7 @@ async function confirmPhotoPicker(){
         oninput="onVanityInput(this.value)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
     </div>
     <div class="vanity-status" id="vanityStatus"></div>
-    <button class="vanity-save-btn" id="vanitySaveBtn" disabled onclick="saveVanityHandle()">Salva handle</button>
+    <button class="vanity-save-btn" id="vanitySaveBtn" disabled onclick="saveVanityHandle()" data-t="prof_save_handle">Salva handle</button>
     <div class="vanity-qr-sep"></div>
     <div class="vanity-qr-row">
       <div class="vanity-qr-box" id="vanityQrBox">
