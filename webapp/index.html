@@ -2905,6 +2905,7 @@ sb.auth.getSession().then(({ data: { session } }) => {
     syncProfileFromAuth();
     if(typeof loadMyLists==='function') loadMyLists();
     if(typeof syncCompagnieFromDB==='function') syncCompagnieFromDB();
+    if(typeof syncTripsFromDB==='function') syncTripsFromDB();
     if(typeof loadMyTags==='function') loadMyTags();
     loadUserLovesCount();
     applyPendingReferral();
@@ -3030,6 +3031,7 @@ function onAuthStateUpdate(event) {
     // Carica dati utente persistenti
     if(typeof loadMyLists==='function') loadMyLists();
     if(typeof syncCompagnieFromDB==='function') syncCompagnieFromDB();
+    if(typeof syncTripsFromDB==='function') syncTripsFromDB();
     if(typeof loadMyTags==='function') loadMyTags();
     loadUserLovesCount();
     applyPendingReferral();
@@ -8501,6 +8503,52 @@ function renderTripCards(){
   if(!container)return;
   container.innerHTML=Object.values(TRIPS).map(t=>renderTripCardHTML(t)).join('');
 }
+// Carica gli itinerari dell'utente da Supabase (trips + trip_stops) e popola TRIPS (cache del render).
+async function syncTripsFromDB(){
+  if(!currentUser?.id || !sb) return;
+  try{
+    const { data, error } = await sb.from('trips')
+      .select('id,name,badge,dates_label,cover_url,cal_year,cal_month,trip_stops(id,name,stop_date_label,status,lat,lng,icon,icon_bg,icon_color,note,sort_order)')
+      .eq('owner_id', currentUser.id).order('created_at',{ascending:false});
+    if(error || !data) return;
+    // Preserva i trip ancora solo locali (senza dbId), poi rimpiazza il resto coi dati DB
+    const localOnly = Object.values(TRIPS).filter(t=>!t.dbId);
+    Object.keys(TRIPS).forEach(k=>delete TRIPS[k]);
+    localOnly.forEach(t=>{ TRIPS[t.id]=t; });
+    data.forEach(t=>{
+      const stops=(t.trip_stops||[]).slice().sort((a,b)=>(a.sort_order||0)-(b.sort_order||0)).map(s=>({
+        id:s.id, dbId:s.id, name:s.name, date:s.stop_date_label||'', status:s.status||'planned',
+        suspended:s.status==='suspended', lat:s.lat, lng:s.lng,
+        icon:s.icon||'ph-duotone ph-map-pin', iconBg:s.icon_bg||'#285EA7', iconColor:s.icon_color||'#fff', note:s.note||''
+      }));
+      TRIPS[t.id]={ id:t.id, dbId:t.id, name:t.name, badge:t.badge||'', dates:t.dates_label||'',
+        cover:t.cover_url||'', companions:[], stops, calYear:t.cal_year, calMonth:t.cal_month, visibility:'prv' };
+    });
+    if(typeof renderTripCards==='function') renderTripCards();
+  }catch(e){ console.warn('syncTripsFromDB:', e); }
+}
+// Sincronizza le tappe di un trip: cache locale (push/splice non ri-persistevano) + Supabase.
+// La sync DB e' DEBOUNCED per trip (evita la race da modifiche rapide, es. drag) e usa la RPC
+// transazionale replace_trip_stops: delete+insert atomico server-side, niente finestra di perdita dati.
+const _tripStopTimers={};
+function _persistTripStops(trip){
+  if(!trip) return;
+  try{ const s=JSON.parse(localStorage.getItem('poi_trips')||'{}'); s[trip.id]=trip; localStorage.setItem('poi_trips', JSON.stringify(s)); }catch(e){}
+  if(!(trip.dbId && currentUser?.id && sb)) return;  // trip solo locale (offline): basta la cache
+  clearTimeout(_tripStopTimers[trip.dbId]);
+  _tripStopTimers[trip.dbId]=setTimeout(async ()=>{
+    try{
+      const rows=(trip.stops||[]).map((s,i)=>({
+        name: s.name, stop_date_label: s.date||null,
+        status: s.suspended ? 'suspended' : (s.status==='done' ? 'done' : 'planned'),
+        lat: s.lat??null, lng: s.lng??null, poi_id: s.poiId||s.poi_id||null,
+        icon: s.icon||null, icon_bg: s.iconBg||null, icon_color: s.iconColor||null, note: s.note||null, sort_order: i
+      }));
+      const { error }=await sb.rpc('replace_trip_stops',{ p_trip_id: trip.dbId, p_stops: rows });
+      if(error) throw error;
+    }catch(e){ console.warn('_persistTripStops:', e); }
+  }, 400);
+}
 
 function renderTripCardHTML(t){
   const compsHtml=t.companions.slice(0,3).map((n,i)=>{
@@ -8701,6 +8749,7 @@ async function deleteStop(tripId,stopId){
   if(!await uiConfirm(`Eliminare "${name}"?`, {okText:'Elimina', danger:true}))return;
   t.stops.splice(idx,1);
   refreshStops(tripId);
+  _persistTripStops(t);
   showToast(`🗑 "${name}" eliminata`);
 }
 function suspendStop(tripId,stopId){
@@ -8708,6 +8757,7 @@ function suspendStop(tripId,stopId){
   const s=t.stops.find(x=>x.id===stopId); if(!s)return;
   s.suspended=!s.suspended;
   refreshStops(tripId);
+  _persistTripStops(t);
   showToast(s.suspended?'⏸ Tappa sospesa':'▶ Tappa ripristinata');
 }
 function editStop(tripId,stopId){openStopDetail(tripId,stopId);}
@@ -8739,6 +8789,7 @@ function saveStopDetail(){
   const s=t?.stops.find(x=>x.id===_curStopId);
   if(s){
     s.note=document.getElementById('stopDetailNote').value.trim();
+    _persistTripStops(t);
     showToast(`✓ Modifiche salvate per "${s.name}"`);
   }
   closeStopDetail();
@@ -8787,6 +8838,7 @@ function dropStop(e,tripId,toIdx){
   const [moved]=t.stops.splice(dragSrcIdx,1);
   t.stops.splice(toIdx,0,moved);
   refreshStops(tripId);
+  _persistTripStops(t);
   dragSrcTrip=null; dragSrcIdx=null;
   showToast('↕ Ordine tappe aggiornato');
 }
@@ -8844,7 +8896,7 @@ function openNewTrip(){
 }
 function closeNewTripSheet(){ closeSheet('newTripOv','newTripBg','newTripSheet'); }
 
-function saveNewTrip(){
+async function saveNewTrip(){
   const name = (document.getElementById('newTripName')?.value||'').trim();
   if(!name) return;
   const dest  = (document.getElementById('newTripDest')?.value||'').trim() || 'Destinazione';
@@ -8860,7 +8912,7 @@ function saveNewTrip(){
     id, name,
     badge:  dest,
     dates:  dateStr,
-    cover:  `https://source.unsplash.com/800x400/?${encodeURIComponent(dest.split(',')[0])},travel`,
+    cover:  `https://loremflickr.com/800/400/${encodeURIComponent(dest.split(',')[0])},travel`,
     companions: [],
     stops:  [],
     shareId: id,
@@ -8876,6 +8928,19 @@ function saveNewTrip(){
     saved[id] = trip;
     localStorage.setItem('poi_trips', JSON.stringify(saved));
   }catch(e){}
+
+  // Persistenza Supabase: l'id reale (uuid) torna in trip.dbId per stop/edit/delete; l'id locale resta la chiave TRIPS
+  if(currentUser?.id && sb){
+    try{
+      const { data, error } = await sb.from('trips').insert({
+        owner_id: currentUser.id, name, badge: dest, dates_label: dateStr,
+        cover_url: trip.cover, cal_year: trip.calYear, cal_month: trip.calMonth
+      }).select('id').single();
+      if(error) throw error;
+      trip.dbId = data.id;
+      try{ const s2 = JSON.parse(localStorage.getItem('poi_trips')||'{}'); s2[id]=trip; localStorage.setItem('poi_trips', JSON.stringify(s2)); }catch(e){}
+    }catch(e){ console.warn('saveNewTrip DB:', e); }
+  }
 
   closeNewTripSheet();
   renderTripCards();
@@ -9111,6 +9176,7 @@ function addAISuggestionAsStop(tripId,placeName){
     status:'planned', icon:'ph ph-sparkle', iconBg:'#FFF5F5', iconColor:'var(--red)', suspended:false
   });
   refreshStops(tripId);
+  _persistTripStops(t);
   // Apri il dettaglio del trip se chiuso
   const detail=document.getElementById('td-'+tripId);
   if(detail&&!detail.classList.contains('open'))toggleTripDetail(tripId);
