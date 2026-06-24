@@ -12,7 +12,9 @@ Rimosso tutto il contenuto finto spacciato per reale dalla webapp (`webapp/index
 - ✅ Testi UI che citavano "Flux" → puliti
 - Itinerari (`TRIPS`) già vuoti da prima.
 
-Restano (minori, NON finti): pulsanti "prossimamente" (onesti), dead code residuo da ripulire (`stopCoords`, `_photoPrompt`, `openUserRowProfile`, stringhe i18n con "Flux").
+Restano (minori, NON finti): pulsanti "prossimamente" (onesti), dead code residuo da ripulire (`stopCoords`, `_photoPrompt`, `openUserRowProfile`).
+
+**Deploy LIVE**: webapp pulita su poilove.com, verificata al 100% (zero demo, zero POI finti, zero @test.com, zero Pollinations, zero stats random). La verifica live ha scovato e rimosso altre 4 POI card hardcoded (sezione "I miei POI" + anteprima profilo pubblico) che il postmortem aveva mancato, più stringhe i18n demo e CSS morto. Backup del precedente in `/root/bak-httpdocs-index-20260624.html`.
 
 ## Sessione 23/06/2026
 
