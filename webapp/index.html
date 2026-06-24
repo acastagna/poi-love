@@ -5637,14 +5637,14 @@ function openPublicProfile(name, status, kind){
   statusPill.innerHTML = `<i class="ph-duotone ${s.icon}"></i> ${s.label}`;
   statusPill.style.display='inline-flex';
   statusPill.style.background = s.bg;
-  // Stats placeholder (in demo)
-  document.getElementById('pubPopStatPoi').textContent  = Math.floor(Math.random()*30)+5;
-  document.getElementById('pubPopStatList').textContent = Math.floor(Math.random()*6)+1;
-  document.getElementById('pubPopStatFoll').textContent = Math.floor(Math.random()*100)+10;
-  // Bio
+  // Stats reali da caricare da Supabase (profiles + pois + follows). Per ora neutre, mai numeri finti.
+  document.getElementById('pubPopStatPoi').textContent  = '—';
+  document.getElementById('pubPopStatList').textContent = '—';
+  document.getElementById('pubPopStatFoll').textContent = '—';
+  // Bio: da caricare da Supabase. Nascosta finché non c'è il dato reale.
   const bio = document.getElementById('pubPopBio');
-  bio.textContent = 'Esploratore curioso, ama luoghi autentici e cucina locale.';
-  bio.style.display='block';
+  bio.textContent = '';
+  bio.style.display='none';
   // POI pubblici demo (3 random dai POIS)
   const list = document.getElementById('pubPopPoiList');
   const pois = (typeof POIS!=='undefined' ? POIS : []);
