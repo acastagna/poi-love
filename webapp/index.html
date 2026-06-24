@@ -599,6 +599,28 @@ body.tab-active #mapQuickBtns{display:none}
 .referral-points i{color:#F59E0B;font-size:18px;flex-shrink:0;margin-top:1px}
 .referral-points b{color:#B45309}
 .referral-points-sub{font-size:11px;color:var(--muted)}
+/* ── Livelli popup ── */
+#levelsOv{position:fixed;inset:0;z-index:9200;background:rgba(20,16,14,.55);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);display:none;align-items:center;justify-content:center;padding:20px}
+#levelsOv.show{display:flex}
+.levels-card{width:100%;max-width:380px;max-height:90vh;overflow-y:auto;background:var(--card);border-radius:22px;box-shadow:0 24px 60px rgba(0,0,0,.4)}
+.levels-hero{background:linear-gradient(135deg,#E13535 0%,#BC2222 45%,#8a1a1a 100%);color:#fff;padding:22px 22px 20px;text-align:center;border-radius:22px 22px 0 0}
+.levels-avatar{width:60px;height:60px;border-radius:50%;margin:0 auto 10px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:28px;overflow:hidden;border:2px solid rgba(255,255,255,.5)}
+.levels-avatar img{width:100%;height:100%;object-fit:cover}
+.levels-title{font-size:19px;font-weight:900}
+.levels-sub{font-size:12px;opacity:.92;margin-top:4px;line-height:1.4}
+.levels-body{padding:14px 16px 4px}
+.level-row{display:flex;align-items:center;gap:12px;padding:11px 10px;border-radius:13px;margin-bottom:6px}
+.level-row.current{background:#f3ede2;outline:1.5px solid var(--red)}
+.level-ico{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;border-width:1.5px;flex-shrink:0}
+.level-info{flex:1;min-width:0}
+.level-name{font-size:14px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:7px}
+.level-you{font-size:9px;font-weight:800;color:#fff;background:var(--red);padding:2px 7px;border-radius:6px;text-transform:uppercase;letter-spacing:.3px}
+.level-thr{font-size:11.5px;color:var(--muted);margin-top:2px}
+.level-special-sep{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;text-align:center;margin:12px 0 8px}
+.level-row.special{background:linear-gradient(135deg,rgba(30,58,138,.07),rgba(37,99,235,.05))}
+.level-row.special.current{outline-color:#1d4ed8}
+.levels-foot{display:flex;align-items:flex-start;gap:6px;font-size:11px;color:var(--muted);padding:10px 18px 18px;line-height:1.4}
+.levels-foot i{flex-shrink:0;margin-top:1px}
 /* Anti-banding (dithering): velo di rumore impercettibile che rompe le bande di colore nei gradienti, così non sembrano un JPG compresso */
 body::after{content:'';position:fixed;inset:0;z-index:99999;pointer-events:none;opacity:.06;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
 .friend-avatar{width:30px;height:30px;border-radius:50%;background:#EBF2FC;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--blue);flex-shrink:0}
@@ -1857,7 +1879,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
       </div>
       <div class="profile-name" id="myProfileName">—</div>
       <!-- Vanity URL — subito sotto il nome. Click = copia, icona matita = modifica -->
-      <div class="profile-vanity" id="myVanityUrl" onclick="copyMyVanityUrl()" style="margin:4px auto 0">
+      <div class="profile-vanity" id="myVanityUrl" onclick="shareReferral()" style="margin:4px auto 0">
         <i class="ph-duotone ph-at"></i>
         <span id="myVanityTxt">poilove.com/@tu</span>
         <span class="profile-vanity-edit" onclick="event.stopPropagation();openVanityEdit()" title="Modifica handle"><i class="ph-duotone ph-note-pencil"></i></span>
@@ -1875,7 +1897,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
           <i class="ph-duotone ph-megaphone"></i><span data-t="diffondi">Diffondi POI•LOVE</span>
         </span>
       </div>
-      <div class="prof-badge" id="profBadge" onclick="changeAvatar()"></div>
+      <div class="prof-badge" id="profBadge" onclick="openLevels()" style="cursor:pointer"></div>
       <div class="badge-label" id="badgeLabel" onclick="onProfileStatsTap()"></div>
     </div>
     <div class="profile-stats">
@@ -3865,6 +3887,38 @@ function renderBadge(loves){
   if(typeof renderLevelEnvs==='function') renderLevelEnvs(b.label);
 }
 let currentLoves=0;
+// Popup "I livelli": elenco dei 7 livelli con soglia, icona e spiegazione; evidenzia il livello attuale + avatar in cima.
+function openLevels(){
+  const av=document.getElementById('levelsAvatar');
+  const myImg=document.querySelector('#profileAvatarImg img')?.src;
+  if(av) av.innerHTML = myImg ? `<img src="${myImg}" alt="avatar">` : '<i class="ph-duotone ph-user"></i>';
+  const wrap=document.getElementById('levelsList');
+  if(wrap){
+    const loves=(typeof currentLoves!=='undefined')?currentLoves:0;
+    const cur=getBadge(loves);
+    const fmt=n=> n>=1000 ? Math.round(n/1000)+'k' : n;
+    let html=BADGES.map(b=>{
+      const isCur=!window._userSpecialTier && b.label===cur.label;
+      const soglia = b.max===Infinity ? ('da '+fmt(b.min)+' punti in su') : ('da '+fmt(b.min)+' a '+fmt(b.max)+' punti');
+      return `<div class="level-row${isCur?' current':''}">
+        <div class="level-ico" style="${b.style};border-style:solid"><i class="${b.icon}"></i></div>
+        <div class="level-info"><div class="level-name">${b.label}${isCur?' <span class="level-you">tu sei qui</span>':''}</div><div class="level-thr">${soglia}</div></div>
+      </div>`;
+    }).join('');
+    html += '<div class="level-special-sep">Livelli di sostegno, a chi sostiene il progetto</div>';
+    html += Object.keys(SPECIAL_TIERS).map(k=>{
+      const b=SPECIAL_TIERS[k];
+      const isCur=window._userSpecialTier===k;
+      return `<div class="level-row special${isCur?' current':''}">
+        <div class="level-ico" style="${b.style};border-style:solid"><i class="${b.icon}"></i></div>
+        <div class="level-info"><div class="level-name">${b.label}${isCur?' <span class="level-you">tu sei qui</span>':''}</div><div class="level-thr">AI illimitata, badge esclusivo, blu notte metallico</div></div>
+      </div>`;
+    }).join('');
+    wrap.innerHTML=html;
+  }
+  document.getElementById('levelsOv')?.classList.add('show');
+}
+function closeLevels(){ document.getElementById('levelsOv')?.classList.remove('show'); }
 
 async function loadUserLovesCount(){
   if(!currentUser) return;
@@ -9409,6 +9463,20 @@ async function confirmPhotoPicker(){
         <span>Guadagni <b id="referralPts">punti</b> per ogni amico che si iscrive<br><span class="referral-points-sub">(il valore si imposterà dal pannello admin)</span></span>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- ═══ LIVELLI POPUP — I livelli di POI•LOVE ═══ -->
+<div id="levelsOv" onclick="if(event.target===this)closeLevels()">
+  <button class="referral-close" onclick="closeLevels()" aria-label="Chiudi"><i class="ph-duotone ph-x"></i></button>
+  <div class="levels-card">
+    <div class="levels-hero">
+      <div class="levels-avatar" id="levelsAvatar"><i class="ph-duotone ph-user"></i></div>
+      <div class="levels-title">I livelli di POI•LOVE</div>
+      <div class="levels-sub">Più sei attivo, più sali. Ogni azione e ogni condivisione ti fanno crescere.</div>
+    </div>
+    <div class="levels-body" id="levelsList"></div>
+    <div class="levels-foot"><i class="ph-duotone ph-info"></i> Punti per azione e vantaggi di ogni livello si imposteranno dal pannello admin.</div>
   </div>
 </div>
 
