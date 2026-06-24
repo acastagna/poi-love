@@ -19,7 +19,7 @@
 ## Media priorità
 
 - [ ] **i18n — stringhe variante minori**: varianti POI "non trovato" con emoji, ambiente avatar ILLI•AI, tooltip "rotta ufficiale" (ancora in IT)
-- [ ] **Bucket `poi_photos`** su Supabase Storage — mancante, le foto non si caricano
+- [x] **Foto POI: funzionanti** (verificato con test reale 24/06): il bucket `poi_photos` esiste con permessi corretti (insert authenticated, read public); upload + lettura pubblica testati OK. La nota precedente "bucket mancante" era ERRATA. Il server primario `media.poilove.com` è rotto (403, DNS lato Plesk non risolve supabase.co) ma il piano B Supabase lo copre automaticamente. Opzionale, non bloccante: riparare media.poilove.com per la compressione WebP server-side (richiede accesso SSH al server).
 - [ ] **Love count atomico** — race condition con utenti concorrenti in `toggleLove` (riga 6543)
 - [ ] **Query deep-link senza `.limit()`** — scarica tutta la tabella pois (riga 4393)
 - [ ] **Avatar addEventListener leak** — listener duplicati ad ogni generazione AI (riga 5747)
