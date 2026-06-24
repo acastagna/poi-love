@@ -4,8 +4,8 @@
 ## 🚧 Fase 1 — UI proprietaria + modificabilità (in corso, dal 24/06)
 - [x] Sistema modali proprietarie `uiPrompt`/`uiConfirm` (grafica POI•LOVE, fade+slide, focus auto, Enter/Esc, variante danger rossa) ✅ 24/06
 - [x] Sostituiti TUTTI i 13 dialoghi nativi (`prompt`/`confirm`) con le modali nostre, verificato live a 0 ✅ 24/06
-- [x] Rinomina lista: ora modale custom (era il `prompt()` grigio dello screenshot) ✅ 24/06
-- [ ] Editing lista COMPLETO: oltre al nome, visibilità (pubblica/privata), colore, POI dentro, in UI nostra
+- [x] Editing lista INLINE nel popup: nome editabile + descrizione + visibilità a 3 stati (privata/pubblica/compagnia) + Salva, niente più sub-popup di rinomina ✅ 24/06
+- [ ] Collegare "Compagnia" alla scelta del gruppo specifico + persistenza Supabase delle liste (oggi vivono nel profilo, senza id reale)
 - [ ] Rotte UTENTE completamente modificabili; rotte UFFICIALI (admin) bloccate, con segno "ufficiale"
 - Regola ferrea: MAI interfacce native del dispositivo, tutto in grafica POI•LOVE (vedi `SPECS.md`)
 
