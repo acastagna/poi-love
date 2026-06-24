@@ -1,5 +1,14 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
+## Sessione 24/06/2026 (notte) — BACKEND avviato + workflow code-quality
+- **Migrazione 001 gamification** applicata a Supabase e versionata in `supabase/migrations/`: tabelle `gamification_config` (punti per azione e soglie livelli, regolabili da admin), `point_events` (log azioni, anti-abuso), `referrals` (inviti). Colonne nuove su `profiles`: `points`, `special_tier`, `referred_by`.
+- **RLS blindate**: trigger `protect_gamification_columns` impedisce al client di auto-assegnarsi punti/tier; scrittura punti solo server-side (service_role). Referral creabili solo a proprio nome.
+- **Workflow code-quality attivato** (richiesto dal founder): la prima stesura aveva 2 BLOCKER di sicurezza RLS, scovati dall'agente e corretti prima di toccare il DB. Da ora ogni migrazione/codice importante passa da code-quality.
+- **Push a ogni passaggio** ripristinato come regola (errore del giorno: 41 commit accumulati senza push; ora salvati su GitHub + tag `checkpoint-2026-06-24`).
+- Prossimi passi backend: Edge Function per accredito punti server-side; aggancio frontend (badge legge `points` reali, referral scrive in `referrals`); tabelle `companions`/`trips`/`follows`/rotte-utente; email HTML invito; liste pubbliche POI.
+
+## Sessione 24/06/2026 (pomeriggio) — Fase 1 avviata: UI proprietaria
+
 ## Sessione 24/06/2026 (pomeriggio) — Fase 1 avviata: UI proprietaria
 Tutto deployato live su poilove.com, verificato in preview a ogni passo.
 - **Modali proprietarie** `uiPrompt`/`uiConfirm` (grafica POI•LOVE, fade, focus, Enter/Esc, variante danger rossa): sostituiti TUTTI i 13 dialoghi nativi del browser (`prompt`/`confirm`). Zero interfacce native.
