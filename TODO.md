@@ -1,23 +1,24 @@
 # TODO — POI•LOVE
 > Aggiornato: 24/06/2026
 
-## Alta priorità — Persistenza Supabase (prossimo blocco)
-
-- [ ] **Frontend itinerari**: aggancio TRIPS/trip_stops (localStorage) → tabelle `trips` + `trip_stops` Supabase — pezzo complesso, prossimo
-- [ ] **Follow / connessioni**: tabella `follows` su Supabase + aggancio frontend
-- [ ] **Rotte utente**: migrare `poi_user_routes` (localStorage) → tabella `user_routes` su Supabase + aggancio frontend
-- [ ] **Presence live compagnie**: layer realtime Supabase per stato online membri
-
 ## Alta priorità — Bloccanti lancio
 
 - [ ] **config.js sul server** — chiave Groq per ILLI•AI (`/var/www/vhosts/poilove.com/httpdocs/config.js`)
 - [ ] **Terms of Service** — creare `web/terms.html` → live su `poilove.com/terms`
 - [ ] **Privacy Policy** — creare `web/privacy.html` → live su `poilove.com/privacy`
       *(richieste da Facebook OAuth, App Store, Play Store, GDPR)*
+- [ ] **Follow SELECT pubblica** — rischio scraping grafo sociale: rivedere RLS `follows` prima del 17/08
+
+## Alta priorità — Prossimi moduli
+
+- [ ] **Presence live compagnie**: layer realtime Supabase per stato online membri
+- [ ] **Frontend rotte utente V2**: flusso creazione via AI (tabella `user_routes` pronta, UI da costruire)
+- [ ] **Meccanismi tier paganti**: implementare uno a uno i perks promessi a Sostenitore e Mecenate (AI rate-limit per tier, punti x2 Mecenate, verifica profilo, POI in evidenza, adotta rotta, QR business)
+- [ ] **project.poilove.com aggiornato**: aggiornare la presentazione marketing con le novità (gamification, i18n, compagnie, itinerari)
 
 ## Media priorità
 
-- [ ] **Meccanismi tier paganti**: implementare uno a uno i perks promessi a Sostenitore e Mecenate (AI potenziata, verifica profilo, POI in evidenza, punti x2, adotta rotta, QR business)
+- [ ] **i18n — stringhe variante minori**: varianti POI "non trovato" con emoji, ambiente avatar ILLI•AI, tooltip "rotta ufficiale" (ancora in IT)
 - [ ] **Bucket `poi_photos`** su Supabase Storage — mancante, le foto non si caricano
 - [ ] **Love count atomico** — race condition con utenti concorrenti in `toggleLove` (riga 6543)
 - [ ] **Query deep-link senza `.limit()`** — scarica tutta la tabella pois (riga 4393)
@@ -49,6 +50,16 @@
 
 ## Completati (ultimi 30 giorni)
 
+- [x] Fix z-index popup: stacking dinamico via MutationObserver, ultimo overlay sempre sopra; `_uiModal` su contatore separato — 24/06
+- [x] Fix handle: funzione unica `_sanitizeHandle`, bug reset handle in `savePOIToDB` corretto — 24/06
+- [x] i18n ~220 chiavi nuove IT/SQ/EN: Tier+Referral (48), Compagnie+Follow (87), Itinerari+Liste (58), POI+Mappa+Profilo+Varie (32) — 24/06
+- [x] Frontend itinerari agganciato a Supabase: `saveNewTrip`, `syncTripsFromDB`, `_persistTripStops` — 24/06
+- [x] Migrazione 007: `trip_stops.note` — 24/06
+- [x] Migrazione 008: RPC transazionale `replace_trip_stops` (BLOCKER race condition drag risolto) — 24/06
+- [x] Fix: sostituito `source.unsplash.com` (deprecato) con `loremflickr` — 24/06
+- [x] Follow persistente (migrazione 009): tabella `follows` creata, `togglePublicFollow` ora funziona — 24/06
+- [x] Rotte utente (migrazione 010): tabella `user_routes` creata, owner-based — 24/06
+- [x] CLAUDE.md aggiornato con tutte le tabelle reali + RPC — 24/06
 - [x] Backend compagnie migrazione 005: `companions` + `companion_members`, RLS SECURITY DEFINER, RPC `join_companion` — 24/06
 - [x] Frontend compagnie FASE A: create/edit/delete su Supabase, `syncCompagnieFromDB` al login — 24/06
 - [x] Frontend compagnie FASE B: inviti email + join via `?join=CODE` — 24/06

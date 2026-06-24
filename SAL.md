@@ -1,5 +1,33 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
+## Sessione 24/06/2026 (parte 5) — Fix popup/handle + i18n completo
+
+- **Fix z-index popup**: stacking dinamico via MutationObserver; l'ultimo overlay/sheet aperto va sempre sopra. Confirm proprietari (`_uiModal`) su contatore separato, sempre in cima. Risolve il caso "popup sotto popup".
+- **Fix handle**: funzione unica `_sanitizeHandle` (spazi rimossi, niente simboli, accenti via, solo a-z0-9_-). Corretto bug: l'upsert profilo in `savePOIToDB` resettava l'handle a ogni salvataggio POI — ora insert solo se utente nuovo.
+- **i18n COMPLETO delle aree principali** (~220 chiavi nuove IT/SQ/EN): Tier+Referral (48 chiavi), Compagnie+Follow (87), Itinerari+Liste (58), POI+Mappa+Profilo+Varie (32). Le stringhe erano hardcoded in italiano (`showToast`, popup, label). Restano poche varianti minori documentate (varianti POI "non trovato" con emoji, ambiente avatar ILLI•AI, tooltip "rotta ufficiale").
+- Commit chiave: `bceec24` (popup+handle), `4732d7e` (i18n tier/ref), `22cb88e` (i18n compagnie/follow), `3c41109` (i18n itinerari/liste), `7b96981` (i18n POI/mappa/profilo).
+
+---
+
+## Sessione 24/06/2026 (parte 4) — Frontend itinerari + Follow + user_routes backend
+
+- **Frontend itinerari agganciato a Supabase**: `saveNewTrip` fa insert su `trips`, `syncTripsFromDB` al login, `_persistTripStops` sincronizza add/delete/suspend/reorder/nota. Migrazione 007 (`trip_stops.note`) + 008 (RPC transazionale `replace_trip_stops`: BLOCKER bloccante risolto, delete+insert non atomico rischiava perdita dati, ora RPC + debounce per la race da drag). Itinerari ora persistenti end-to-end.
+- **Fix loremflickr**: sostituito `source.unsplash.com` (deprecato) con `loremflickr` ovunque.
+- **Follow persistente (migrazione 009)**: tabella `follows` creata (mancava, il toggle falliva in silenzio). Frontend `togglePublicFollow` era già pronto: ora il follow persiste. Nota pre-lancio: SELECT pubblica = rischio scraping grafo sociale, da rivedere prima del 17/08.
+- **Rotte utente (migrazione 010)**: tabella `user_routes` creata, owner-based. Frontend rotte V2 ancora incompleto (creazione via AI non salva, aggiunta POI placeholder): nessun aggancio frontend fatto in questa sessione.
+- **CLAUDE.md aggiornato**: tutte le tabelle reali documentate (companions, trips, follows, user_routes, ecc.) + RPC.
+- Commit chiave: `d65a274` (frontend itinerari), `6ddb6f0` (follow), `ebd4869` (user_routes).
+
+### Stato persistenza per modulo
+
+| Modulo | Stato |
+|---|---|
+| Liste | Completa |
+| Compagnie | Completa (manca presence live realtime) |
+| Itinerari | Completa |
+| Follow | Completa |
+| Rotte utente | Backend pronto, frontend V2 da costruire |
+
 ## Sessione 24/06/2026 (parte 3) — Persistenza COMPAGNIE + ITINERARI backend + Valore tier paganti
 
 - **Migrazione 005 applicata**: tabelle `companions` + `companion_members`, RLS con funzione SECURITY DEFINER `is_companion_member` (elimina ricorsione), RPC `join_companion`, FK `lists.companion_id`.
