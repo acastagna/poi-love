@@ -7409,7 +7409,7 @@ function showToast(msg){
 function _uiModal({title='', message='', input=false, defaultValue='', okText='Ok', cancelText='Annulla', danger=false}){
   return new Promise(resolve=>{
     const ov=document.createElement('div');
-    ov.style.cssText='position:fixed;inset:0;z-index:9000;background:rgba(20,16,14,.5);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;transition:opacity .18s ease';
+    ov.style.cssText='position:fixed;inset:0;z-index:99990;background:rgba(20,16,14,.5);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;transition:opacity .18s ease';
     const box=document.createElement('div');
     box.style.cssText='background:var(--card);color:var(--text);border-radius:18px;max-width:340px;width:100%;padding:22px;box-shadow:0 24px 60px rgba(0,0,0,.32);transform:translateY(10px) scale(.98);transition:transform .2s cubic-bezier(.2,.8,.2,1)';
     const accent=danger?'var(--red)':'var(--blue)';
