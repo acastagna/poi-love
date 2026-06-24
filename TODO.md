@@ -2,10 +2,11 @@
 > Aggiornato: 24/06/2026
 
 ## 🚧 Fase 1 — UI proprietaria + modificabilità (in corso, dal 24/06)
-- [ ] Rinomina lista: sostituire il `prompt()` nativo con modale custom POI•LOVE
-- [ ] Editing lista completo: nome, POI dentro, visibilità (pubblica/privata), colore, in UI nostra
+- [x] Sistema modali proprietarie `uiPrompt`/`uiConfirm` (grafica POI•LOVE, fade+slide, focus auto, Enter/Esc, variante danger rossa) ✅ 24/06
+- [x] Sostituiti TUTTI i 13 dialoghi nativi (`prompt`/`confirm`) con le modali nostre, verificato live a 0 ✅ 24/06
+- [x] Rinomina lista: ora modale custom (era il `prompt()` grigio dello screenshot) ✅ 24/06
+- [ ] Editing lista COMPLETO: oltre al nome, visibilità (pubblica/privata), colore, POI dentro, in UI nostra
 - [ ] Rotte UTENTE completamente modificabili; rotte UFFICIALI (admin) bloccate, con segno "ufficiale"
-- [ ] Sostituire TUTTI i restanti `prompt()` / `alert()` / `confirm()` nativi con UI proprietaria (bio profilo, copia link, ecc.)
 - Regola ferrea: MAI interfacce native del dispositivo, tutto in grafica POI•LOVE (vedi `SPECS.md`)
 
 ## 🔴 Bloccanti (fanno saltare il lancio)
