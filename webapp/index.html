@@ -1867,9 +1867,8 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
         <span class="prof-info-chip" id="profEmailChip" data-visible="1" onclick="toggleProfileField('email')">
           <i class="ph-duotone ph-envelope"></i><span id="profEmailTxt">—</span>
         </span>
-        <span class="prof-info-chip level-chip" id="profLevelChip">
-          <i class="ph-duotone ph-star"></i><span id="profLevelTxt">Lv.1 Explorer</span>
-        </span>
+        <!-- Level-chip "Lv.N" rimosso: il livello è già nel badge sotto (Amatore/Viaggiatore... · X love) -->
+        <span id="profLevelChip" style="display:none"><span id="profLevelTxt"></span></span>
         <span class="prof-info-chip referral-chip" onclick="shareReferral()">
           <i class="ph-duotone ph-megaphone"></i><span data-t="diffondi">Diffondi POI•LOVE</span>
         </span>
@@ -3836,24 +3835,32 @@ async function toggleLoveDB(poiId, badgeEl) {
 /* ══════════════════════════════════════════
    BADGE SYSTEM
 ══════════════════════════════════════════ */
+// 5 livelli normali (per punti) + 2 special di sostegno. Soglie e nomi REGOLABILI dal backend admin.
 const BADGES=[
-  {min:0,    max:1000,  label:'Amatore',     icon:'ph-fill ph-star',          hat:'',style:'background:rgba(245,158,11,.2);color:#FDE68A;border-color:rgba(245,158,11,.3)'},
-  {min:1001, max:10000, label:'Viaggiatore',  icon:'ph-fill ph-airplane-tilt', hat:'',style:'background:rgba(5,150,105,.2);color:#6EE7B7;border-color:rgba(5,150,105,.3)'},
-  {min:10001,max:70000, label:'Avventuriero', icon:'ph-fill ph-mountains',      hat:'',style:'background:rgba(234,88,12,.2);color:#FED7AA;border-color:rgba(234,88,12,.3)'},
-  {min:70001,max:Infinity,label:'Galattico',  icon:'ph-fill ph-planet',         hat:'',style:'background:rgba(124,58,237,.2);color:#DDD6FE;border-color:rgba(124,58,237,.3)'},
+  {min:0,     max:1000,    label:'Amatore',     icon:'ph-fill ph-star',                  style:'background:rgba(245,158,11,.2);color:#FDE68A;border-color:rgba(245,158,11,.35)'},
+  {min:1001,  max:10000,   label:'Viaggiatore', icon:'ph-fill ph-airplane-tilt',         style:'background:rgba(5,150,105,.2);color:#6EE7B7;border-color:rgba(5,150,105,.35)'},
+  {min:10001, max:50000,   label:'Giramondo',   icon:'ph-fill ph-globe-hemisphere-west', style:'background:rgba(8,145,178,.2);color:#A5F3FC;border-color:rgba(8,145,178,.35)'},
+  {min:50001, max:150000,  label:'Instancabile',icon:'ph-fill ph-fire',                  style:'background:rgba(234,88,12,.2);color:#FED7AA;border-color:rgba(234,88,12,.35)'},
+  {min:150001,max:Infinity,label:'Leggenda',    icon:'ph-fill ph-crown',                 style:'background:rgba(124,58,237,.2);color:#DDD6FE;border-color:rgba(124,58,237,.35)'},
 ];
+// SPECIAL di sostegno: assegnati dal backend a chi sostiene il progetto (NON per punti).
+// Blu notte metallico elegante. Danno AI illimitata (max 20 consultazioni/giorno) e badge esclusivo.
+const SPECIAL_TIERS={
+  sostenitore:{label:'Sostenitore', icon:'ph-fill ph-hand-heart', style:'background:linear-gradient(135deg,#1e3a8a 0%,#0b1226 52%,#1d4ed8 100%);color:#dbeafe;border-color:rgba(147,197,253,.6);box-shadow:0 3px 12px rgba(29,78,216,.45),inset 0 1px 0 rgba(255,255,255,.3)'},
+  mecenate:   {label:'Mecenate',    icon:'ph-fill ph-medal',      style:'background:linear-gradient(135deg,#2563eb 0%,#070d1c 50%,#3b82f6 100%);color:#eff6ff;border-color:rgba(191,219,254,.7);box-shadow:0 3px 16px rgba(37,99,235,.55),inset 0 1px 0 rgba(255,255,255,.4)'}
+};
 function getBadge(n){return BADGES.find(b=>n>=b.min&&n<=b.max)||BADGES[0]}
 function renderBadge(loves){
-  const b=getBadge(loves);
+  // Se l'utente sostiene il progetto (flag dal backend), il badge SPECIAL ha priorità sul livello a punti.
+  const tier=(typeof window!=='undefined' && window._userSpecialTier) || null;
+  const b=(tier && SPECIAL_TIERS[tier]) ? SPECIAL_TIERS[tier] : getBadge(loves);
   const el=document.getElementById('profBadge');
   if(!el)return;
-  el.setAttribute('style',b.style+';display:inline-flex;align-items:center;gap:6px;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:700;border:1.5px solid rgba(255,255,255,.25)');
-  // Use textContent-safe approach: build without innerHTML for live icon
-  el.innerHTML=`<span style="font-size:14px">${b.hat}</span><span>${b.label} · ${loves} love</span>`;
+  el.setAttribute('style',b.style+';display:inline-flex;align-items:center;gap:6px;border-radius:20px;padding:5px 13px;font-size:12px;font-weight:800;border:1.5px solid');
+  el.innerHTML=`<i class="${b.icon}"></i><span>${b.label} · ${loves} love</span>`;
   const lbl=document.getElementById('badgeLabel');
   if(lbl)lbl.textContent=b.label;
-  // Aggiorna anche gli ambienti del livello
-  renderLevelEnvs(b.label);
+  if(typeof renderLevelEnvs==='function') renderLevelEnvs(b.label);
 }
 let currentLoves=0;
 
