@@ -1414,6 +1414,8 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 .route-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px}
 .route-name{font-size:13px;font-weight:700;color:var(--text)}
 .route-meta{font-size:10px;color:var(--muted);margin-top:1px}
+.route-badge-official{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:800;color:var(--blue);background:#EBF2FC;padding:5px 10px;border-radius:8px;white-space:nowrap;flex-shrink:0}
+.route-badge-official i{font-size:13px}
 </style>
 </head>
 <body>
@@ -1910,16 +1912,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
       <!-- LE MIE ROTTE STORICHE -->
       <div class="profile-sec">
         <div class="prof-sec-lbl"><span>Le mie rotte storiche</span><span style="font-size:10px;font-weight:400;color:var(--muted)">selezionate sulla mappa</span></div>
-        <div id="myRoutesContainer">
-          <div class="route-item">
-            <div class="route-dot" style="background:#EBF2FC"><i class="ph-duotone ph-person-simple-walk" style="color:var(--blue)"></i></div>
-            <div><div class="route-name">Via Egnatia</div><div class="route-meta">Albania · Macedonia · Grecia</div></div>
-          </div>
-          <div class="route-item">
-            <div class="route-dot" style="background:#FFF5F5"><i class="ph-duotone ph-person-simple-run" style="color:var(--red)"></i></div>
-            <div><div class="route-name">Terre Illiriche</div><div class="route-meta">Popoli antichi dei Balcani</div></div>
-          </div>
-        </div>
+        <div id="myRoutesContainer"><!-- popolato da renderMyRoutes(): ufficiali col badge "Ufficiale", utente col pennino --></div>
       </div>
 
       <!-- SEGUITI / BLOCCATI -->
@@ -4738,7 +4731,7 @@ function showTab(tab){
   if(msw) msw.classList.toggle('show', onMap);
   if(!onMap){ clearMapSearch?.(); }
   if(tab==='map'&&map)setTimeout(()=>map.invalidateSize(),50);
-  if(tab==='profile'){togglePublicProfile(false); refreshProfileStats();}
+  if(tab==='profile'){togglePublicProfile(false); refreshProfileStats(); renderMyRoutes();}
   if(tab==='poi') renderPoiTab();
   if(tab==='companions') renderCompanionsTab();
 }
@@ -5408,11 +5401,42 @@ function aiPlaceAddToTripById(tripId){
   else showToast?.(`Aggiunto "${_mapPopupCtx.name}"`);
 }
 
-// Rotte storiche: per ora hardcoded (Via Egnatia, Terre Illiriche)
+// Rotte storiche UFFICIALI (curate dall'amministrazione): NON modificabili dagli utenti.
 const _HISTORIC_ROUTES = [
-  {id:'r-egnatia', name:'Via Egnatia',     meta:'Albania · Macedonia · Grecia'},
-  {id:'r-illire',  name:'Terre Illiriche', meta:'Popoli antichi dei Balcani'}
+  {id:'r-egnatia', name:'Via Egnatia',     meta:'Albania · Macedonia · Grecia', official:true, icon:'ph-person-simple-walk', color:'#285EA7', bg:'#EBF2FC'},
+  {id:'r-illire',  name:'Terre Illiriche', meta:'Popoli antichi dei Balcani',   official:true, icon:'ph-person-simple-run',  color:'#D42B2B', bg:'#FFF5F5'}
 ];
+// Rotte create dagli UTENTI (modificabili dal proprietario), per ora salvate in locale.
+function _getUserRoutes(){ try{ return JSON.parse(localStorage.getItem('poi_user_routes')||'[]').map(r=>({...r, official:false})); }catch(e){ return []; } }
+function _saveUserRoutes(arr){ try{ localStorage.setItem('poi_user_routes', JSON.stringify(arr)); }catch(e){} }
+// "Le mie rotte storiche" nel profilo: ufficiali col badge (bloccate), utente col pennino (modificabili)
+function renderMyRoutes(){
+  const c = document.getElementById('myRoutesContainer');
+  if(!c) return;
+  const all = [..._HISTORIC_ROUTES, ..._getUserRoutes()];
+  c.innerHTML = all.map(r=>`
+    <div class="route-item" data-route="${r.id}">
+      <div class="route-dot" style="background:${r.bg||'#EBF2FC'}"><i class="ph-duotone ${r.icon||'ph-path'}" style="color:${r.color||'var(--blue)'}"></i></div>
+      <div style="flex:1;min-width:0"><div class="route-name">${(r.name||'').replace(/</g,'&lt;')}</div><div class="route-meta">${(r.meta||'').replace(/</g,'&lt;')}</div></div>
+      ${r.official
+        ? `<span class="route-badge-official" title="Rotta ufficiale, curata dall'amministrazione"><i class="ph-fill ph-seal-check"></i> Ufficiale</span>`
+        : `<button class="list-act-btn" title="Modifica" onclick="event.stopPropagation();editUserRoute('${r.id}')"><i class="ph-duotone ph-pencil-simple"></i></button>`}
+    </div>`).join('');
+}
+// Modifica rotta UTENTE (le ufficiali non arrivano qui): rinomina o elimina, in grafica nostra
+async function editUserRoute(id){
+  const routes = _getUserRoutes();
+  const r = routes.find(x=>x.id===id);
+  if(!r) return;
+  const nuovo = await uiPrompt('Rinomina rotta', r.name, {okText:'Salva'});
+  if(nuovo===null) return;
+  const trimmed = nuovo.trim();
+  if(!trimmed) return;
+  const clean = routes.map(x=>({id:x.id, name:(x.id===id?trimmed:x.name), meta:x.meta, icon:x.icon, color:x.color, bg:x.bg}));
+  _saveUserRoutes(clean);
+  renderMyRoutes();
+  showToast?.('✓ Rotta aggiornata');
+}
 function showPlaceHistoricRouteChooser(){
   if(!_mapPopupCtx) return;
   const title = document.getElementById('mapPopupSubmenuTitle');
