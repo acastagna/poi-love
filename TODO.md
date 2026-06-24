@@ -7,7 +7,6 @@
 - [ ] **Terms of Service** — creare `web/terms.html` → live su `poilove.com/terms`
 - [ ] **Privacy Policy** — creare `web/privacy.html` → live su `poilove.com/privacy`
       *(richieste da Facebook OAuth, App Store, Play Store, GDPR)*
-- [ ] **Follow SELECT pubblica** — rischio scraping grafo sociale: rivedere RLS `follows` prima del 17/08
 
 ## Alta priorità — Prossimi moduli
 
@@ -51,6 +50,8 @@
 
 ## Completati (ultimi 30 giorni)
 
+- [x] **Falla follow (RLS) chiusa** (migrazione 011): `follows_select` ristretta a chi è coinvolto (follower o seguito), basta scraping del grafo sociale; applicata e verificata su Supabase (25/06)
+- [x] **Tre modi su nome e descrizione POI** (Suggerisci AI / Detta / Scrivo io), con dettatura generica iOS-friendly e suggerimento nome via AI; i18n IT/SQ/EN (25/06)
 - [x] **Microfono dettatura nella chat ILLI•AI**: speech-to-text che scrive nell'area di testo, a destra dell'invio (iOS-friendly); il vecchio mic in alto era un toggle voce, ora è un altoparlante; i18n IT/SQ/EN (25/06)
 - [x] **Bottone verde "Svuota cache" in SOS**: svuota Cache Storage + service worker + sessionStorage e ricarica fresco (cache-bust), senza sloggare (25/06)
 - [x] **Debiti chiusi**: diagnostica DB al boot dietro flag debug (non espone più lo schema in console), `setBgTab` parametro rinominato (25/06)
