@@ -599,6 +599,8 @@ body.tab-active #mapQuickBtns{display:none}
 .referral-points i{color:#F59E0B;font-size:18px;flex-shrink:0;margin-top:1px}
 .referral-points b{color:#B45309}
 .referral-points-sub{font-size:11px;color:var(--muted)}
+/* Anti-banding (dithering): velo di rumore impercettibile che rompe le bande di colore nei gradienti, così non sembrano un JPG compresso */
+body::after{content:'';position:fixed;inset:0;z-index:99999;pointer-events:none;opacity:.045;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
 .friend-avatar{width:30px;height:30px;border-radius:50%;background:#EBF2FC;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--blue);flex-shrink:0}
 .friend-name{flex:1;font-size:13px;color:var(--ink);font-weight:600}
 .friend-status{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:800;text-transform:uppercase;padding:3px 8px;border-radius:7px;letter-spacing:.4px}
