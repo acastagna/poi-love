@@ -5095,18 +5095,20 @@ function setVoiceBtnState(rec){
 // Focus su un campo (modo "Scrivo io"): apre la tastiera per scrivere a mano
 function focusField(id){ const el=document.getElementById(id); if(el){ el.focus(); try{ el.setSelectionRange(el.value.length,el.value.length); }catch(_){} } }
 // Dettatura generica in un campo: riusa Web Speech (iOS-friendly), rispetta maxlength, aggiorna i contatori
-let _fldRec=null,_fldRecOn=false;
+let _fldRec=null,_fldRecOn=false,_fldRecBtn=null;
+// Spegne SEMPRE lo stato UI della dettatura campo (sul bottone che ha avviato la sessione), non condizionato a _fldRec
+function stopFieldDictationUI(){ _fldRecOn=false; if(_fldRecBtn) _fldRecBtn.classList.remove('recording'); }
 function toggleFieldDictation(targetId,btnId){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   const btn=document.getElementById(btnId), target=document.getElementById(targetId);
   if(!SR){ showToast(t('mic_unsupported','Dettatura vocale non supportata su questo browser, scrivi pure a mano')); return; }
   if(!target) return;
-  if(_fldRecOn){ try{ _fldRec&&_fldRec.stop(); }catch(e){} if(!_fldRec){ _fldRecOn=false; if(btn)btn.classList.remove('recording'); } return; }
-  const base=target.value||'';
+  if(_fldRecOn){ try{ _fldRec&&_fldRec.stop(); }catch(e){} stopFieldDictationUI(); return; }
+  const base=target.value||'';   // testo iniziale; con continuous=false il transcript completo della sessione sostituisce l'aggiunta (non si duplica)
   const r=new SR();
   r.lang=lang==='sq'?'sq-AL':lang==='en'?'en-US':'it-IT';
   r.continuous=false; r.interimResults=true; r.maxAlternatives=1;
-  r.onstart=()=>{ _fldRecOn=true; if(btn)btn.classList.add('recording'); };
+  r.onstart=()=>{ _fldRecOn=true; if(_fldRecBtn)_fldRecBtn.classList.add('recording'); };
   r.onresult=e=>{
     let interim='',fin='';
     for(let i=e.resultIndex;i<e.results.length;i++){ const res=e.results[i]; if(res.isFinal) fin+=res[0].transcript; else interim+=res[0].transcript; }
@@ -5121,18 +5123,19 @@ function toggleFieldDictation(targetId,btnId){
     if(ev.error==='not-allowed'||ev.error==='service-not-allowed') showToast(t('mic_denied','Microfono bloccato: abilita il permesso nelle impostazioni'));
     else if(ev.error==='no-speech') showToast(t('mic_nospeech','Non ho sentito nulla, riprova'));
     else if(ev.error!=='aborted') showToast(t('mic_error','Errore dettatura, riprova'));
-    _fldRecOn=false; if(btn)btn.classList.remove('recording');
+    stopFieldDictationUI();
   };
-  r.onend=()=>{ _fldRecOn=false; if(btn)btn.classList.remove('recording'); _fldRec=null; };
-  _fldRec=r;
-  try{ r.start(); }catch(e){ _fldRecOn=false; if(btn)btn.classList.remove('recording'); _fldRec=null; }
+  r.onend=()=>{ stopFieldDictationUI(); _fldRec=null; };
+  _fldRec=r; _fldRecBtn=btn;
+  try{ r.start(); }catch(e){ stopFieldDictationUI(); _fldRec=null; }
 }
 // "Suggerisci" il NOME via AI (serve credito, come per ILLI): usa indirizzo/coordinate/categoria
 async function suggestPoiName(){
   const nameIn=document.getElementById('poiNameIn');
-  const address=document.getElementById('locStreet')?.textContent||'';
-  const coords=document.getElementById('locCoords')?.textContent||'';
-  const cats=Array.from(document.querySelectorAll('#addPoiSheet .chip.sel')).map(c=>c.textContent.trim()).join(', ');
+  const _clean=s=>String(s||'').replace(/["'\n\r`]/g,' ').trim();  // niente virgolette/newline nel prompt (anti prompt-injection)
+  const address=_clean(document.getElementById('locStreet')?.textContent);
+  const coords=_clean(document.getElementById('locCoords')?.textContent);
+  const cats=_clean(Array.from(document.querySelectorAll('#addPoiSheet .chip.sel')).map(c=>c.textContent.trim()).join(', '));
   if(!address && !coords && !cats){ showToast(t('name_need_loc','Indica prima dove si trova, poi te lo suggerisco')); return; }
   const btn=document.getElementById('nameAiBtn'); let old='';
   if(btn){ old=btn.innerHTML; btn.disabled=true; btn.innerHTML='<i class="ph-duotone ph-circle-notch" style="animation:spin 1s linear infinite"></i>'; }
@@ -5204,12 +5207,12 @@ Regole:
       updateChar();
       showToast(isGenerate?'✨ Descrizione generata da ILLI•AI!':'✨ Testo sintetizzato da ILLI•AI!');
     } else {
-      showToast('ILLI•AI non ha risposto.');
+      showToast(t('ai_gen_failed','Generazione non riuscita, riprova tra poco.'));
     }
   } catch(err){
-    showToast('Errore AI: '+err.message);
+    showToast(t('ai_gen_failed','Generazione non riuscita, riprova tra poco.'));
   } finally {
-    if(btnEl){btnEl.disabled=false;btnEl.innerHTML='<i class="ph-duotone ph-sparkle"></i> <span>Suggerisci</span>';}
+    if(btnEl){btnEl.disabled=false;btnEl.innerHTML='<i class="ph-duotone ph-sparkle"></i> <span id="aiSumLbl">'+t('field_suggest','Suggerisci')+'</span>';}
   }
 }
 
@@ -6949,6 +6952,7 @@ function closeAddPOI(){
   if(_locTapMarker && map){ map.removeLayer(_locTapMarker); _locTapMarker=null; }
   document.getElementById('acDrop').classList.remove('open');
   if(isRecording&&recognition){recognition.stop();isRecording=false;setVoiceBtnState(false);}
+  if(_fldRecOn&&_fldRec){ try{_fldRec.stop();}catch(e){} stopFieldDictationUI(); }
   // Reset modalità editing
   if(typeof editingPOIId!=='undefined'&&editingPOIId){
     editingPOIId=null;
