@@ -12,6 +12,11 @@ ErrorDocument 404 /403.html
 
 <IfModule mod_rewrite.c>
     RewriteEngine On
+    # Passa l'header Authorization al PHP: con PHP 8.3 via proxy_fcgi Apache non lo inoltra
+    # di default, quindi upload.php non vedeva il Bearer token. auth.php lo legge poi da
+    # REDIRECT_HTTP_AUTHORIZATION. Senza questa riga ogni upload autenticato falliva con "token mancante".
+    RewriteCond %{HTTP:Authorization} .+
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
     # Risposta 204 alle preflight OPTIONS
     RewriteCond %{REQUEST_METHOD} =OPTIONS
     RewriteRule ^ - [R=204,L]
