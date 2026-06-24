@@ -4,8 +4,8 @@
 ## 🚧 Fase 1 — UI proprietaria + modificabilità (in corso, dal 24/06)
 - [x] Sistema modali proprietarie `uiPrompt`/`uiConfirm` (grafica POI•LOVE, fade+slide, focus auto, Enter/Esc, variante danger rossa) ✅ 24/06
 - [x] Sostituiti TUTTI i 13 dialoghi nativi (`prompt`/`confirm`) con le modali nostre, verificato live a 0 ✅ 24/06
-- [x] Editing lista INLINE nel popup: nome editabile + descrizione + visibilità a 3 stati (privata/pubblica/compagnia) + Salva, niente più sub-popup di rinomina ✅ 24/06
-- [ ] Collegare "Compagnia" alla scelta del gruppo specifico + persistenza Supabase delle liste (oggi vivono nel profilo, senza id reale)
+- [x] Popup lista a 2 modi: VISTA (sola lettura) + MODIFICA col pennino. In modifica: nome + descrizione + visibilità 3 stati + selettori chip "quale compagnia" e "quale itinerario" (la lista può entrare in un itinerario). Tutto in grafica nostra, niente `<select>` nativi ✅ 24/06
+- [ ] Persistenza Supabase delle liste (oggi vivono nel profilo, senza id reale): allora compagnia/itinerario scelti vengono salvati per davvero + caricamento POI reali nella lista
 - [ ] Rotte UTENTE completamente modificabili; rotte UFFICIALI (admin) bloccate, con segno "ufficiale"
 - Regola ferrea: MAI interfacce native del dispositivo, tutto in grafica POI•LOVE (vedi `SPECS.md`)
 
