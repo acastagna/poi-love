@@ -1425,7 +1425,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 <div class="topbar">
   <div class="tb-right" id="tbRight">
     <button class="tb-btn icon-only" onclick="centerMap()" title="Centra mappa"><i class="ph-duotone ph-crosshair-simple"></i></button>
-    <button class="tb-btn icon-only" id="langBtn" onclick="cycleLang()" title="Cambia lingua">🇮🇹</button>
+    <button class="tb-btn icon-only" id="langBtn" onclick="cycleLang()" title="Cambia lingua">IT</button>
   </div>
 </div>
 
@@ -1506,7 +1506,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
     <div class="sh-handle"></div>
     <div class="sh-head">
       <div>
-        <div class="sh-title" id="compSheetTitle">🧭 Compagni di Viaggio</div>
+        <div class="sh-title" id="compSheetTitle"><i class="ph-duotone ph-users-three"></i> Compagni di Viaggio</div>
         <div class="sh-sub">Condividi la tua posizione GPS in tempo reale con gli amici</div>
       </div>
       <button class="sh-close" onclick="closeSheet('compagniaOv','compagniaBg','compagniaSheet')"><i class="ph-duotone ph-x"></i></button>
@@ -1603,7 +1603,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
     <div class="sh-handle"></div>
     <div class="sh-head">
       <div>
-        <div class="sh-title">✈️ Nuovo Viaggio</div>
+        <div class="sh-title"><i class="ph-duotone ph-airplane-takeoff"></i> Nuovo Viaggio</div>
         <div class="sh-sub">Crea l'itinerario — poi aggiungi tappe e condividilo</div>
       </div>
       <button class="sh-close" onclick="closeNewTripSheet()"><i class="ph-duotone ph-x"></i></button>
@@ -1744,13 +1744,13 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
   <!-- Selettore lingua — chip ultramoderni glassmorphism (EN · SQ · IT) -->
   <div class="auth-lang-row" role="group" aria-label="Language selector">
     <button class="auth-lang-chip" data-lang="en" onclick="applyLang('en')" aria-label="English">
-      <span class="flag">🇬🇧</span> EN
+      <i class="ph-duotone ph-globe flag"></i> EN
     </button>
     <button class="auth-lang-chip" data-lang="sq" onclick="applyLang('sq')" aria-label="Shqip">
-      <span class="flag">🇦🇱</span> SQ
+      <i class="ph-duotone ph-globe flag"></i> SQ
     </button>
     <button class="auth-lang-chip" data-lang="it" onclick="applyLang('it')" aria-label="Italiano">
-      <span class="flag">🇮🇹</span> IT
+      <i class="ph-duotone ph-globe flag"></i> IT
     </button>
   </div>
 </div>
@@ -1809,7 +1809,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
         <button class="hero-bg-opt" onclick="setHeroBg('linear-gradient(135deg,#3E1F0F 0%,#A0522D 100%)')"><div class="hero-bg-swatch" style="background:linear-gradient(135deg,#3E1F0F,#A0522D)"></div> Espresso</button>
         <button class="hero-bg-opt" onclick="setHeroBgImg()"><div class="hero-bg-swatch" style="background:var(--bg);border:1px dashed #999"></div> Casuale paesaggio</button>
         <div style="height:1px;background:var(--border);margin:6px 4px"></div>
-        <button class="hero-bg-opt" onclick="openBgPopup()"><div class="hero-bg-swatch" style="background:linear-gradient(135deg,#D42B2B,#7C3AED)"></div> 🪄 Genera con ILLI•AI</button>
+        <button class="hero-bg-opt" onclick="openBgPopup()"><div class="hero-bg-swatch" style="background:linear-gradient(135deg,#D42B2B,#7C3AED)"></div> <i class="ph-duotone ph-magic-wand"></i> Genera con ILLI•AI</button>
         <button class="hero-bg-opt" onclick="document.getElementById('heroBgUploadFile').click()"><div class="hero-bg-swatch" style="background:#f5f0e8;display:flex;align-items:center;justify-content:center"><i class="ph-duotone ph-upload-simple" style="font-size:11px;color:var(--muted)"></i></div> Carica foto…</button>
         <input type="file" id="heroBgUploadFile" accept="image/*" style="display:none" onchange="uploadHeroBgFile(event)">
       </div>
@@ -2183,7 +2183,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
   </div>
   <div id="companions-list"></div>
   <div style="padding:14px;color:var(--muted);font-size:11px;text-align:center;border-top:1px solid var(--border);margin-top:14px">
-    👀 = scadenza · 🥰 = per sempre · 🟢 in viaggio · ⚪ offline · 🔴 fermo da +1g
+    <i class="ph-duotone ph-eye"></i> = scadenza · <i class="ph-duotone ph-heart"></i> = per sempre · <i class="ph-duotone ph-circle"></i> in viaggio · <i class="ph-duotone ph-circle"></i> offline · <i class="ph-duotone ph-circle"></i> fermo da +1g
   </div>
 </div>
 
@@ -2247,7 +2247,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
       <button class="poiai-voice-btn" id="poiaiVoiceBtn" onclick="togglePoiAIVoice()" title="Rispondi a voce"><i class="ph-duotone ph-microphone"></i></button>
     </div>
     <div class="poiai-msgs" id="poiaiMsgs">
-      <div class="poiai-msg ai">Ciao! Sono <strong>ILLI•AI</strong>, la mascot di POI•LOVE — il tuo cuore-amico per scoprire luoghi e capire l'app. Posso suggerirti tappe, ristoranti, esperienze culturali, oppure aiutarti a usare POI•LOVE (POI, itinerari, compagni di viaggio). Da dove iniziamo? 💞</div>
+      <div class="poiai-msg ai">Ciao! Sono <strong>ILLI•AI</strong>, la mascot di POI•LOVE — il tuo cuore-amico per scoprire luoghi e capire l'app. Posso suggerirti tappe, ristoranti, esperienze culturali, oppure aiutarti a usare POI•LOVE (POI, itinerari, compagni di viaggio). Da dove iniziamo? <i class="ph-duotone ph-heart"></i></div>
     </div>
     <div class="poiai-input-bar">
       <input class="poiai-input" id="poiaiInput" type="text"
@@ -3590,15 +3590,15 @@ async function removePlPlace(i){
 
 // Emoji titolo per ciascun tipo
 const PL_TYPE_EMOJI = {
-  casa:'🏠', lavoro:'💼', famiglia:'👨‍👩‍👧', salute:'🏥', sport:'🏋️', preferito:'⭐'
+  casa:'ph-house', lavoro:'ph-briefcase', famiglia:'ph-users-three', salute:'ph-first-aid', sport:'ph-barbell', preferito:'ph-star'
 };
 
 function openAddPersonalPlace(type){
   plCurrentType = type;
   plPendingLat = null; plPendingLng = null; plPendingAddr = '';
   const cfg = PL_TYPE_CFG[type] || { label: type };
-  const emoji = PL_TYPE_EMOJI[type] || '📍';
-  document.getElementById('plSheetTitle').textContent = `${emoji} Aggiungi ${cfg.label}`;
+  const icon = PL_TYPE_EMOJI[type] || 'ph-map-pin';
+  document.getElementById('plSheetTitle').innerHTML = `<i class="ph-duotone ${icon}"></i> Aggiungi ${cfg.label}`;
   document.getElementById('plSheetPrefix').textContent = cfg.label + ' ';
   document.getElementById('plSheetWord').value = '';
   document.getElementById('plSheetAddr').value = '';
@@ -3629,7 +3629,7 @@ function updatePlPreview(){
 function _confirmPlPos(addr){
   plPendingAddr = addr;
   const conf = document.getElementById('plPosConfirm');
-  conf.textContent = '✓ '+addr.split(',').slice(0,2).join(', ');
+  conf.innerHTML = emoToIcons('✓ '+addr.split(',').slice(0,2).join(', '));
   conf.style.display = 'block';
   const btn = document.getElementById('plSaveBtn');
   btn.disabled = false; btn.style.opacity = '1';
@@ -3754,8 +3754,8 @@ function updateCompagniaBtn(active){
   const btn=document.getElementById('compagniaFabBtn');
   if(!btn) return;
   btn.style.background = active ? 'var(--blue)' : '';
-  btn.querySelector('span').textContent = active
-    ? (lang==='sq'?'Shoqëri':lang==='en'?'Party':'Compagnia') + ' ✓'
+  btn.querySelector('span').innerHTML = active
+    ? emoToIcons((lang==='sq'?'Shoqëri':lang==='en'?'Party':'Compagnia') + ' ✓')
     : (lang==='sq'?'Shoqëri':lang==='en'?'Party':'Compagnia');
 }
 
@@ -3805,10 +3805,10 @@ async function toggleLoveDB(poiId, badgeEl) {
    BADGE SYSTEM
 ══════════════════════════════════════════ */
 const BADGES=[
-  {min:0,    max:1000,  label:'Amatore',     icon:'ph-fill ph-star',          hat:'🎩',style:'background:rgba(245,158,11,.2);color:#FDE68A;border-color:rgba(245,158,11,.3)'},
-  {min:1001, max:10000, label:'Viaggiatore',  icon:'ph-fill ph-airplane-tilt', hat:'🪖',style:'background:rgba(5,150,105,.2);color:#6EE7B7;border-color:rgba(5,150,105,.3)'},
-  {min:10001,max:70000, label:'Avventuriero', icon:'ph-fill ph-mountains',      hat:'⛑',style:'background:rgba(234,88,12,.2);color:#FED7AA;border-color:rgba(234,88,12,.3)'},
-  {min:70001,max:Infinity,label:'Galattico',  icon:'ph-fill ph-planet',         hat:'👾',style:'background:rgba(124,58,237,.2);color:#DDD6FE;border-color:rgba(124,58,237,.3)'},
+  {min:0,    max:1000,  label:'Amatore',     icon:'ph-fill ph-star',          hat:'',style:'background:rgba(245,158,11,.2);color:#FDE68A;border-color:rgba(245,158,11,.3)'},
+  {min:1001, max:10000, label:'Viaggiatore',  icon:'ph-fill ph-airplane-tilt', hat:'',style:'background:rgba(5,150,105,.2);color:#6EE7B7;border-color:rgba(5,150,105,.3)'},
+  {min:10001,max:70000, label:'Avventuriero', icon:'ph-fill ph-mountains',      hat:'',style:'background:rgba(234,88,12,.2);color:#FED7AA;border-color:rgba(234,88,12,.3)'},
+  {min:70001,max:Infinity,label:'Galattico',  icon:'ph-fill ph-planet',         hat:'',style:'background:rgba(124,58,237,.2);color:#DDD6FE;border-color:rgba(124,58,237,.3)'},
 ];
 function getBadge(n){return BADGES.find(b=>n>=b.min&&n<=b.max)||BADGES[0]}
 function renderBadge(loves){
@@ -3902,7 +3902,7 @@ catch(_){
   if(nl==='it')lang='it'; else if(nl==='en')lang='en'; else lang='sq';
 }
 
-const LANG_FLAGS={it:'🇮🇹',sq:'🇦🇱',en:'🇬🇧'};
+const LANG_FLAGS={it:'IT',sq:'SQ',en:'EN'};
 function applyLang(l){
   lang=l;
   try{ localStorage.setItem('poilove_lang', l); }catch(_){}
@@ -3916,7 +3916,7 @@ function applyLang(l){
   document.documentElement.lang=l;
   // 1) Testo dei nodi: data-t="key"
   document.querySelectorAll('[data-t]').forEach(el=>{
-    const k=el.dataset.t;if(tx[k]!==undefined)el.textContent=tx[k];
+    const k=el.dataset.t;if(tx[k]!==undefined)el.innerHTML=emoToIcons(tx[k]);
   });
   // 2) Title/tooltip: data-tt="key"
   document.querySelectorAll('[data-tt]').forEach(el=>{
@@ -4013,7 +4013,7 @@ function initMap(){
       if(!userLocMarker){
         userLocMarker=L.circleMarker([gpsPos.lat,gpsPos.lng],{
           radius:10,color:'#fff',fillColor:'#3B82F6',fillOpacity:1,weight:3
-        }).bindTooltip('📍 Tu sei qui',{permanent:false}).addTo(map);
+        }).bindTooltip('<i class="ph-duotone ph-map-pin"></i> Tu sei qui',{permanent:false}).addTo(map);
       } else {
         userLocMarker.setLatLng([gpsPos.lat,gpsPos.lng]);
       }
@@ -4071,7 +4071,7 @@ function centerMap(){
       if(!userLocMarker){
         userLocMarker=L.circleMarker([gpsPos.lat,gpsPos.lng],{
           radius:10,color:'#fff',fillColor:'#3B82F6',fillOpacity:1,weight:3
-        }).bindTooltip('📍 Tu sei qui',{permanent:false}).addTo(map);
+        }).bindTooltip('<i class="ph-duotone ph-map-pin"></i> Tu sei qui',{permanent:false}).addTo(map);
       } else { userLocMarker.setLatLng([gpsPos.lat,gpsPos.lng]); }
     },()=>map.setView(CENTER,15),{enableHighAccuracy:true,timeout:8000});
   } else { map.setView(CENTER,15); }
@@ -4086,7 +4086,7 @@ function registerGPS(){
   const googleBtn=document.getElementById('googleSuggestBtn');
   if(gpsPos){
     gpsRegistered=true;
-    info.textContent=`✓ ${gpsPos.lat.toFixed(4)}, ${gpsPos.lng.toFixed(4)}`;
+    info.innerHTML=emoToIcons(`✓ ${gpsPos.lat.toFixed(4)}, ${gpsPos.lng.toFixed(4)}`);
     bar.style.background='#DCFCE7';bar.style.borderColor='#22C55E';
     bar.querySelector('button').style.display='none';
     googleBtn.classList.add('active');
@@ -4095,7 +4095,7 @@ function registerGPS(){
     navigator.geolocation.getCurrentPosition(pos=>{
       gpsPos={lat:pos.coords.latitude,lng:pos.coords.longitude};
       gpsRegistered=true;
-      info.textContent=`✓ ${gpsPos.lat.toFixed(4)}, ${gpsPos.lng.toFixed(4)}`;
+      info.innerHTML=emoToIcons(`✓ ${gpsPos.lat.toFixed(4)}, ${gpsPos.lng.toFixed(4)}`);
       bar.style.background='#DCFCE7';bar.style.borderColor='#22C55E';
       bar.querySelector('button').style.display='none';
       googleBtn.classList.add('active');
@@ -4286,7 +4286,7 @@ function checkTripLandingPage(){
             <i class="${isDone?'ph-fill ph-check':iconClass}"></i>
           </div>
           <div class="tlp-stop-info">
-            <div class="tlp-stop-name">${s.name}${isDone?'<span class="tlp-stop-done-badge">✓ fatto</span>':''}</div>
+            <div class="tlp-stop-name">${s.name}${isDone?'<span class="tlp-stop-done-badge"><i class="ph-duotone ph-check"></i> fatto</span>':''}</div>
             <div class="tlp-stop-date">${s.date||''}</div>
           </div>
         </div>`;
@@ -4536,7 +4536,7 @@ function handlePhoto(input,idx){
           const hint=document.getElementById('locHint');
           const hintName=document.getElementById('locHintName');
           if(hint&&hintName){
-            hintName.textContent=`📍 ${name}`;
+            hintName.innerHTML=emoToIcons(`📍 ${name}`);
             hint.classList.add('show');
             const nameIn=document.getElementById('poiNameIn');
             if(nameIn&&!nameIn.value.trim()){nameIn.value=name;checkSave();}
@@ -5980,7 +5980,7 @@ function openEditCompagnia(code){
   if(typeInput){ typeInput.checked=true; onCompTypeChange?.(); }
   // UI edit mode
   const titleEl = document.getElementById('compSheetTitle');
-  if(titleEl) titleEl.textContent = '✏️ Modifica gruppo';
+  if(titleEl) titleEl.innerHTML = emoToIcons('✏️ Modifica gruppo');
   const saveBtn = document.getElementById('compSaveBtn');
   if(saveBtn) saveBtn.innerHTML = '<i class="ph-duotone ph-floppy-disk"></i> Aggiorna gruppo';
   openSheet('compagniaOv','compagniaBg','compagniaSheet');
@@ -5990,7 +5990,7 @@ function openEditCompagnia(code){
 function _resetCompSheet(){
   _editingCompCode = null;
   const titleEl = document.getElementById('compSheetTitle');
-  if(titleEl) titleEl.textContent = '🧭 Compagni di Viaggio';
+  if(titleEl) titleEl.innerHTML = '<i class="ph-duotone ph-users-three"></i> Compagni di Viaggio';
   const saveBtn = document.getElementById('compSaveBtn');
   if(saveBtn) saveBtn.innerHTML = '<i class="ph-duotone ph-users-three"></i> Crea gruppo e ottieni codice';
   // Reset campi
@@ -6113,7 +6113,7 @@ function renderCompanionsTab(){
   }
 
   root.innerHTML = compagnie.map(c=>{
-    const statusEmoji = c.forever ? '🥰' : '👀';
+    const statusEmoji = c.forever ? '<i class="ph-duotone ph-heart"></i>' : '<i class="ph-duotone ph-eye"></i>';
     const statusTxt   = c.forever ? 'Per sempre' : (c.expires ? 'Scade '+c.expires : 'In corso');
     const isMine = saved.some(x=>x.code===c.code); // solo le compagnie create da me sono modificabili
     const friends = (c.friends||[]).map(f=>{
@@ -6159,7 +6159,7 @@ function renderCompanionsTab(){
       ? `<button class="comp-act del" title="Chiudi e scioglie il gruppo" onclick="event.stopPropagation();deleteCompagnia('${safeCode}')"><i class="ph-duotone ph-trash"></i></button>`
       : `<button class="comp-act del-off" title="Disponibile solo quando rimangono in 2" disabled><i class="ph-duotone ph-trash"></i></button>`;
     const actionsRow = isMine ? `<div class="comp-actions">${actEdit}${actAdmin}${actDel}</div>
-      ${!canClose?`<div class="comp-close-hint">🔒 Puoi chiudere il gruppo solo quando rimaste in 2 — ora ${totalMembers} ${totalMembers===1?'membro':'membri'}</div>`:''}` : '';
+      ${!canClose?`<div class="comp-close-hint"><i class="ph-duotone ph-lock-simple"></i> Puoi chiudere il gruppo solo quando rimaste in 2 — ora ${totalMembers} ${totalMembers===1?'membro':'membri'}</div>`:''}` : '';
     return `<div class="comp-card">
       ${creatorRow}
       <div class="comp-row">
@@ -7227,9 +7227,33 @@ function editPOI(id){
    TOAST
 ══════════════════════════════════════════ */
 let toastTimer;
+// Mappa emoji → icone Phosphor: i messaggi (toast) mostrano icone, mai emoji
+const _emoToPh = {
+  '✓':'ph-check','✅':'ph-check-circle','☑':'ph-check-square','✔':'ph-check',
+  '⚠':'ph-warning','⛔':'ph-prohibit','❌':'ph-x-circle','❎':'ph-x-circle','🚫':'ph-prohibit',
+  '🔗':'ph-link','📧':'ph-envelope','✉':'ph-envelope','📨':'ph-envelope','📩':'ph-envelope',
+  '🗑':'ph-trash','👀':'ph-eye','🔍':'ph-magnifying-glass','🔎':'ph-magnifying-glass',
+  '🎨':'ph-palette','🖼':'ph-image','📤':'ph-export','📥':'ph-download-simple','📎':'ph-paperclip',
+  '🧭':'ph-compass','👋':'ph-hand-waving','👥':'ph-users-three','👤':'ph-user','👑':'ph-crown',
+  '🔒':'ph-lock-simple','🔓':'ph-lock-simple-open','🌐':'ph-globe','📍':'ph-map-pin','🎯':'ph-target',
+  '❤':'ph-heart','🥰':'ph-heart','💞':'ph-heart','💗':'ph-heart','♥':'ph-heart','💕':'ph-heart',
+  '📋':'ph-clipboard-text','📁':'ph-folder','📂':'ph-folder-open','✈':'ph-airplane',
+  '🚀':'ph-rocket-launch','💾':'ph-floppy-disk','⭐':'ph-star','🌟':'ph-star','🔥':'ph-fire',
+  '⏸':'ph-pause','▶':'ph-play','🟢':'ph-circle','⚪':'ph-circle','🔴':'ph-circle','🟡':'ph-circle',
+  '📷':'ph-camera','📸':'ph-camera','🪄':'ph-magic-wand','💡':'ph-lightbulb','📊':'ph-chart-bar',
+  '🏠':'ph-house','💼':'ph-briefcase','🏛':'ph-bank','⛰':'ph-mountains','🌊':'ph-wave-sine',
+  '🏙':'ph-buildings','🐾':'ph-paw-print','🌄':'ph-sun-horizon','✏':'ph-pencil-simple','📝':'ph-note-pencil',
+  '🔔':'ph-bell','⏳':'ph-hourglass','⌛':'ph-hourglass','✨':'ph-sparkle','🤖':'ph-robot','🎉':'ph-confetti'
+};
+const _emoRe = /[\u{1F000}-\u{1FAFF}\u{2190}-\u{21FF}\u{2300}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE00}-\u{FE0F}\u{1F1E6}-\u{1F1FF}\u{2600}-\u{26FF}\u{200D}]/gu;
+// Converte una stringa: emoji note → icona Phosphor, emoji ignote → rimosse. HTML-safe.
+function emoToIcons(str){
+  const safe = String(str).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  return safe.replace(_emoRe, m => _emoToPh[m] ? `<i class="ph-duotone ${_emoToPh[m]}"></i>` : '').replace(/\s{2,}/g,' ').trim();
+}
 function showToast(msg){
   const el=document.getElementById('toastMsg');
-  el.textContent=msg;el.classList.add('show');
+  el.innerHTML=emoToIcons(msg);el.classList.add('show');
   clearTimeout(toastTimer);
   toastTimer=setTimeout(()=>el.classList.remove('show'),2400);
 }
@@ -7467,13 +7491,13 @@ function openSaveModal(name,lat,lng,sec){
   document.getElementById('saveModalIcon').innerHTML=fast
     ?'<i class="ph-duotone ph-trophy" style="font-size:52px;color:#D97706"></i>'
     :'<i class="ph-duotone ph-chalkboard-teacher" style="font-size:52px;color:#92400E"></i>';
-  document.getElementById('saveModalTitle').textContent=fast
+  document.getElementById('saveModalTitle').innerHTML=emoToIcons(fast
     ?(lang==='it'?`Bravo, sei un razzo! ⚡ ${sec}s`
       :lang==='sq'?`Bravo, je një raketë! ⚡ ${sec}s`
       :`You're a rocket! ⚡ ${sec}s`)
     :(lang==='it'?`Grazie dell'impegno! 💛 ${sec}s`
       :lang==='sq'?`Faleminderit për angazhimin! 💛 ${sec}s`
-      :`Thank you for the care! 💛 ${sec}s`);
+      :`Thank you for the care! 💛 ${sec}s`));
   document.getElementById('saveModalSub').textContent=fast
     ?(lang==='it'?'Hai mappato questo luogo con amore e velocità!'
       :lang==='sq'?'E ke hartografuar me dashuri dhe shpejtësi!'
@@ -7679,7 +7703,7 @@ function onVanityInput(val){
       statusEl.textContent=`@${clean} è già preso.`;
     } else {
       statusEl.className='vanity-status ok';
-      statusEl.textContent=`✓ @${clean} è disponibile!`;
+      statusEl.innerHTML=emoToIcons(`✓ @${clean} è disponibile!`);
       _vanityValid=true;
       saveBtn.disabled=false;
     }
@@ -7812,7 +7836,7 @@ function updatePosShareTimer(userId, dur){
   if(!timerEl) return;
   if(dur==='off'){timerEl.style.display='none';return;}
   const labels={'1h':'59m','1d':'23h','1M':'30gg','always':'∞'};
-  timerEl.textContent=`📍 ancora ${labels[dur]||''}`;
+  timerEl.innerHTML=emoToIcons(`📍 ancora ${labels[dur]||''}`);
   timerEl.style.display='';
 }
 
@@ -8172,7 +8196,7 @@ function renderTripStopsHTML(t){
         <div class="stop-info" onclick="openStopDetail('${t.id}','${s.id}')">
           <div class="stop-name">${s.name}</div>
           <div class="stop-date">${s.date}</div>
-          <span class="stop-status ${susp?'suspended':s.status}">${susp?'⏸ Sospesa':s.status==='done'?'✓ Completata':'→ Pianificata'}</span>
+          <span class="stop-status ${susp?'suspended':s.status}">${susp?'<i class="ph-duotone ph-pause"></i> Sospesa':s.status==='done'?'<i class="ph-duotone ph-check"></i> Completata':'→ Pianificata'}</span>
         </div>
         <div class="stop-actions">
           <button class="stop-act-btn act-pause${susp?' paused':''}" onclick="suspendStop('${t.id}','${s.id}')"><i class="ph ${susp?'ph-play':'ph-pause'}" style="font-size:13px"></i> ${susp?'Riprendi':'Sospendi'}</button>
@@ -8347,7 +8371,7 @@ function openStopDetail(tripId,stopId){
   document.getElementById('stopDetailDate').textContent=s.date;
   const susp=s.suspended||s.status==='suspended';
   const statusEl=document.getElementById('stopDetailStatus');
-  statusEl.textContent=susp?'⏸ Sospesa':s.status==='done'?'✓ Completata':'→ Pianificata';
+  statusEl.innerHTML=susp?'<i class="ph-duotone ph-pause"></i> Sospesa':s.status==='done'?'<i class="ph-duotone ph-check"></i> Completata':'→ Pianificata';
   statusEl.style.background=susp?'#f5f0e8':s.status==='done'?'#DCFCE7':'#EBF2FC';
   statusEl.style.color=susp?'var(--muted)':s.status==='done'?'#16A34A':'var(--blue)';
   document.getElementById('stopDetailNote').value=s.note||'';
@@ -8990,7 +9014,7 @@ function openPhotoPicker(slot){
   photoPickerUnsplashUrls=[];
   document.getElementById('photoPickerConfirm').classList.remove('show');
   document.getElementById('photoPickerGrid').innerHTML=
-    '<div class="photo-picker-loading">Inserisci una parola chiave e cerca 🔍</div>';
+    '<div class="photo-picker-loading">Inserisci una parola chiave e cerca <i class="ph-duotone ph-magnifying-glass"></i></div>';
   // Pre-popola query col nome del POI se disponibile
   const poiName=document.getElementById('poiNameIn')?.value?.trim()||'';
   const search=document.getElementById('photoPickerSearch');
@@ -9074,7 +9098,7 @@ function handlePickerUpload(input){
     const grid=document.getElementById('photoPickerGrid');
     const prev=`<div class="photo-picker-thumb selected" id="ppt-upload" style="grid-column:1/-1;aspect-ratio:16/7;border-color:var(--green)">
       <img src="${e.target.result}" alt="" style="width:100%;height:100%;object-fit:cover">
-      <div class="unsplash-attr" style="color:#fff;background:rgba(34,197,94,.7);border-radius:4px;padding:1px 4px">📁 Tua foto</div>
+      <div class="unsplash-attr" style="color:#fff;background:rgba(34,197,94,.7);border-radius:4px;padding:1px 4px"><i class="ph-duotone ph-folder"></i> Tua foto</div>
     </div>`;
     document.querySelectorAll('.photo-picker-thumb').forEach(t=>t.classList.remove('selected'));
     grid.insertAdjacentHTML('afterbegin',prev);
@@ -9313,7 +9337,7 @@ async function confirmPhotoPicker(){
       <button class="photo-picker-go" onclick="searchUnsplash()">Cerca</button>
     </div>
     <div class="photo-picker-grid" id="photoPickerGrid">
-      <div class="photo-picker-loading">Inserisci una parola chiave e cerca 🔍</div>
+      <div class="photo-picker-loading">Inserisci una parola chiave e cerca <i class="ph-duotone ph-magnifying-glass"></i></div>
     </div>
     <button class="photo-picker-upload-btn" onclick="triggerPickerUpload()">
       <i class="ph-duotone ph-upload-simple" style="font-size:16px"></i>
@@ -9363,12 +9387,12 @@ async function confirmPhotoPicker(){
         <button onclick="searchUnsplashAvatar()" style="height:40px;padding:0 16px;border-radius:11px;background:var(--blue);color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit"><i class="ph-duotone ph-magnifying-glass"></i></button>
       </div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
-        <button class="av-chip" onclick="document.getElementById('avUnsplashQ').value='portrait';searchUnsplashAvatar()">👤 Portrait</button>
-        <button class="av-chip" onclick="document.getElementById('avUnsplashQ').value='mountains';searchUnsplashAvatar()">⛰️ Monti</button>
-        <button class="av-chip" onclick="document.getElementById('avUnsplashQ').value='sea';searchUnsplashAvatar()">🌊 Mare</button>
-        <button class="av-chip" onclick="document.getElementById('avUnsplashQ').value='city';searchUnsplashAvatar()">🏙️ Città</button>
-        <button class="av-chip" onclick="document.getElementById('avUnsplashQ').value='animal';searchUnsplashAvatar()">🐾 Animali</button>
-        <button class="av-chip" onclick="document.getElementById('avUnsplashQ').value='abstract';searchUnsplashAvatar()">🎨 Astratto</button>
+        <button class="av-chip" onclick="document.getElementById('avUnsplashQ').value='portrait';searchUnsplashAvatar()"><i class="ph-duotone ph-user"></i> Portrait</button>
+        <button class="av-chip" onclick="document.getElementById('avUnsplashQ').value='mountains';searchUnsplashAvatar()"><i class="ph-duotone ph-mountains"></i> Monti</button>
+        <button class="av-chip" onclick="document.getElementById('avUnsplashQ').value='sea';searchUnsplashAvatar()"><i class="ph-duotone ph-wave-sine"></i> Mare</button>
+        <button class="av-chip" onclick="document.getElementById('avUnsplashQ').value='city';searchUnsplashAvatar()"><i class="ph-duotone ph-buildings"></i> Città</button>
+        <button class="av-chip" onclick="document.getElementById('avUnsplashQ').value='animal';searchUnsplashAvatar()"><i class="ph-duotone ph-paw-print"></i> Animali</button>
+        <button class="av-chip" onclick="document.getElementById('avUnsplashQ').value='abstract';searchUnsplashAvatar()"><i class="ph-duotone ph-palette"></i> Astratto</button>
       </div>
       <div id="avUnsplashGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px"></div>
     </div>
@@ -9429,12 +9453,12 @@ async function confirmPhotoPicker(){
         <button onclick="searchUnsplashBg()" style="height:40px;padding:0 16px;border-radius:11px;background:var(--blue);color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit"><i class="ph-duotone ph-magnifying-glass"></i></button>
       </div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
-        <button class="av-chip" onclick="document.getElementById('bgUnsplashQ').value='tirana albania';searchUnsplashBg()">🇦🇱 Tirana</button>
-        <button class="av-chip" onclick="document.getElementById('bgUnsplashQ').value='balkans landscape';searchUnsplashBg()">⛰️ Balcani</button>
-        <button class="av-chip" onclick="document.getElementById('bgUnsplashQ').value='adriatic sea';searchUnsplashBg()">🌊 Adriatico</button>
-        <button class="av-chip" onclick="document.getElementById('bgUnsplashQ').value='sunset mountains';searchUnsplashBg()">🌄 Tramonto</button>
-        <button class="av-chip" onclick="document.getElementById('bgUnsplashQ').value='vintage architecture';searchUnsplashBg()">🏛 Vintage</button>
-        <button class="av-chip" onclick="document.getElementById('bgUnsplashQ').value='abstract art';searchUnsplashBg()">🎨 Astratto</button>
+        <button class="av-chip" onclick="document.getElementById('bgUnsplashQ').value='tirana albania';searchUnsplashBg()"><i class="ph-duotone ph-map-pin"></i> Tirana</button>
+        <button class="av-chip" onclick="document.getElementById('bgUnsplashQ').value='balkans landscape';searchUnsplashBg()"><i class="ph-duotone ph-mountains"></i> Balcani</button>
+        <button class="av-chip" onclick="document.getElementById('bgUnsplashQ').value='adriatic sea';searchUnsplashBg()"><i class="ph-duotone ph-wave-sine"></i> Adriatico</button>
+        <button class="av-chip" onclick="document.getElementById('bgUnsplashQ').value='sunset mountains';searchUnsplashBg()"><i class="ph-duotone ph-sun-horizon"></i> Tramonto</button>
+        <button class="av-chip" onclick="document.getElementById('bgUnsplashQ').value='vintage architecture';searchUnsplashBg()"><i class="ph-duotone ph-bank"></i> Vintage</button>
+        <button class="av-chip" onclick="document.getElementById('bgUnsplashQ').value='abstract art';searchUnsplashBg()"><i class="ph-duotone ph-palette"></i> Astratto</button>
       </div>
       <div id="bgUnsplashGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px"></div>
     </div>
