@@ -1,5 +1,19 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
+## Sessione 24/06/2026 — Fase 0: pulizia del finto COMPLETATA
+Rimosso tutto il contenuto finto spacciato per reale dalla webapp (`webapp/index.html`), 8 checkpoint committati, JS valido a ogni passo, verifica preview superata (carica pulita, zero errori console, bottone demo sparito):
+- ✅ Modalità demo (bottone + `enterDemoMode`) rimossa, l'app richiede login reale
+- ✅ 3 utenti finti (@test.com) → stati vuoti onesti, pronti per Supabase `follows`
+- ✅ Compagnie di viaggio finte → solo quelle reali
+- ✅ Immagini AI (Pollinations/Flux): foto POI rimosse del tutto (slot vuoto col "+"); avatar e sfondo scollegati da Pollinations, l'opzione AI resta come "in arrivo con motore di qualità"
+- ✅ Array `POIS` hardcoded (5 POI Tirana) svuotato → i POI reali vengono da Supabase
+- ✅ Statistiche `Math.random()` + bio fissa nel profilo pubblico → neutre, da caricare da Supabase
+- ✅ Avatar di default col nome del founder → neutro
+- ✅ Testi UI che citavano "Flux" → puliti
+- Itinerari (`TRIPS`) già vuoti da prima.
+
+Restano (minori, NON finti): pulsanti "prossimamente" (onesti), dead code residuo da ripulire (`stopCoords`, `_photoPrompt`, `openUserRowProfile`, stringhe i18n con "Flux").
+
 ## Sessione 23/06/2026
 
 ### 🚀 SVOLTA: da prototipo a PRODOTTO REALE + Visione (sera 23/06)
