@@ -18,6 +18,9 @@
 
 ## Media priorità
 
+- [ ] **Tier paganti: meccanismi backend**: i perks ora promessi nelle card vanno resi reali uno a uno (rate-limit ILLI per tier, punti x2, POI/itinerario in evidenza, audiolibri navigando, admin compagnia in evidenza). Vale per i 3 tier (Professionista/Sostenitore/Mecenate)
+- [ ] **Log di debug al boot**: `runConnectionDiagnostics()` (a ogni avvio) stampa lo schema DB in console e fa 5 query + 1 fetch ogni volta: metterla dietro un flag debug (emerso da code-quality 25/06)
+- [ ] **`setBgTab(t)`**: il parametro `t` oscura la funzione i18n `t()`, rinominare per evitare trappole future (code-quality 25/06)
 - [ ] **i18n — stringhe variante minori**: varianti POI "non trovato" con emoji, ambiente avatar ILLI•AI, tooltip "rotta ufficiale" (ancora in IT)
 - [x] **Foto POI: funzionanti** (verificato con test reale 24/06): il bucket `poi_photos` esiste con permessi corretti (insert authenticated, read public); upload + lettura pubblica testati OK. La nota precedente "bucket mancante" era ERRATA. Il server primario `media.poilove.com` è rotto (403, DNS lato Plesk non risolve supabase.co) ma il piano B Supabase lo copre automaticamente. Opzionale, non bloccante: riparare media.poilove.com per la compressione WebP server-side (richiede accesso SSH al server).
 - [ ] **Love count atomico** — race condition con utenti concorrenti in `toggleLove` (riga 6543)
@@ -50,6 +53,13 @@
 
 ## Completati (ultimi 30 giorni)
 
+- [x] **Generazione AI avatar/sfondi riattivata** via Flux (Pollinations): gratis, separata da OpenAI, verificata dal vivo (25/06)
+- [x] **GPS mirino**: avvisa con la causa reale (permesso/timeout/non disponibile) invece di saltare a Tirana in silenzio; + cache posizione (25/06)
+- [x] **Paesaggi + photo picker**: loremflickr (rotto sotto carico) sostituito con Flux; attribution falsa "Flickr CC" corretta (25/06)
+- [x] **Icona livelli**: colore scuro per livello (prima chiaro su chiaro, invisibile) (25/06)
+- [x] **Long-press anti-copia**: niente selezione/copia globale, input e textarea esclusi (25/06)
+- [x] **Cache HTML risolta**: header no-cache via .htaccess (mod_expires era inattivo sul server); backup .htaccess salvato (25/06)
+- [x] **Tier ristrutturati**: nuovo Professionista (perks forti ex-Mecenate), Mecenate potenziato (audiolibri navigando, segnala rotte, itinerario/5 POI/compagnia in evidenza); i18n IT/SQ/EN completo (25/06)
 - [x] Fix z-index popup: stacking dinamico via MutationObserver, ultimo overlay sempre sopra; `_uiModal` su contatore separato — 24/06
 - [x] Fix handle: funzione unica `_sanitizeHandle`, bug reset handle in `savePOIToDB` corretto — 24/06
 - [x] i18n ~220 chiavi nuove IT/SQ/EN: Tier+Referral (48), Compagnie+Follow (87), Itinerari+Liste (58), POI+Mappa+Profilo+Varie (32) — 24/06
