@@ -2908,6 +2908,7 @@ sb.auth.getSession().then(({ data: { session } }) => {
     if(typeof loadMyTags==='function') loadMyTags();
     loadUserLovesCount();
     applyPendingReferral();
+    applyPendingJoin();
   } else {
     // Anche senza login carica i tag locali (non richiedono auth)
     if(typeof loadMyTags==='function') setTimeout(loadMyTags,400);
@@ -3032,6 +3033,7 @@ function onAuthStateUpdate(event) {
     if(typeof loadMyTags==='function') loadMyTags();
     loadUserLovesCount();
     applyPendingReferral();
+    applyPendingJoin();
     // "Ricordami" — salva snapshot leggero per pre-fill UX al prossimo avvio
     try {
       if(currentUser.email) localStorage.setItem('poilove_last_email', currentUser.email);
@@ -3986,6 +3988,32 @@ async function applyPendingReferral(){
       if(data===true){ showToast('🎉 Invito accettato, grazie!'); loadUserLovesCount(); }
     } else { _referralApplied=false; }   // errore di rete: permetti un retry al prossimo login
   }catch(e){ _referralApplied=false; console.warn('applyPendingReferral:', e); }
+}
+
+// Join compagnia: cattura ?join=CODE all'avvio (sopravvive al redirect OAuth via localStorage),
+// poi al login chiama join_companion (RPC server-side: valida il codice e crea la membership 'joined').
+(function(){
+  try{
+    const m = location.search.match(/[?&]join=([^&]+)/);
+    if(m && !localStorage.getItem('poi_join_pending')){
+      localStorage.setItem('poi_join_pending', decodeURIComponent(m[1]));
+    }
+  }catch(e){ console.warn('join capture:', e); }
+})();
+let _joinApplied=false;
+async function applyPendingJoin(){
+  if(_joinApplied || !currentUser || typeof sb==='undefined' || !sb) return;
+  const code = localStorage.getItem('poi_join_pending');
+  if(!code) return;
+  _joinApplied=true;
+  try{
+    const {data,error}=await sb.rpc('join_companion',{p_code:code});
+    if(!error){
+      localStorage.removeItem('poi_join_pending');
+      if(data){ showToast('🎉 Sei nella compagnia!'); if(typeof syncCompagnieFromDB==='function') syncCompagnieFromDB(); }
+      else showToast('⚠ Codice compagnia non valido o scaduto');
+    } else { _joinApplied=false; }   // errore di rete: retry al prossimo login
+  }catch(e){ _joinApplied=false; console.warn('applyPendingJoin:', e); }
 }
 
 function generateAvatar(){
@@ -5816,14 +5844,16 @@ async function saveListDetail(){
   const lid = el?.dataset.listId;
   if(lid && currentUser && sb){
     try{
+      // ora companions esiste: il 3o stato "compagnia" persiste companion_id (mappo compCode -> id dalla cache)
+      const comp = (vis==='company' && compCode) ? (_getCompagnie()||[]).find(x=>x.code===compCode) : null;
       const { error } = await sb.from('lists').update({
         name, description: desc,
-        visibility: vis==='public' ? 'public' : 'private'
-        // TODO(24/06): companion_id/itinerary_id si collegano quando companions/trips saranno su Supabase;
-        // finche' non esistono, il 3o stato "compagnia" salva come 'private' e non persiste la compagnia scelta
+        visibility: vis==='public' ? 'public' : 'private',
+        companion_id: comp?.id || null
+        // itinerary_id si collega quando i trips saranno su Supabase
       }).eq('id', lid).eq('owner_id', currentUser.id);
       if(error) throw error;
-    }catch(e){ console.warn('saveListDetail update:', e); }
+    }catch(e){ console.warn('saveListDetail update:', e); showToast?.('⚠ Modifica non salvata, riprova'); return; }
   }
   showToast?.(msg);
 }
@@ -6314,6 +6344,9 @@ async function createCompagnia(){
       if(error) throw error;
       newComp.id = data.id;
       _saveCompagnie(_getCompagnie().map(x=> x.code===code ? {...x, id:data.id} : x));
+      // Inviti email -> companion_members (status 'invited'); diventano 'joined' quando l'invitato usa il codice (RPC join_companion)
+      const emails = (invites||'').split(/[,;\s]+/).map(s=>s.trim()).filter(s=>s.includes('@'));
+      if(emails.length) await sb.from('companion_members').insert(emails.map(em=>({companion_id:data.id, email:em, status:'invited'})));
     }catch(e){ console.warn('createCompagnia DB:', e); }
   }
 
