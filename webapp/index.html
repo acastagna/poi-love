@@ -2891,6 +2891,7 @@ sb.auth.getSession().then(({ data: { session } }) => {
   if (currentUser) {
     syncProfileFromAuth();
     if(typeof loadMyLists==='function') loadMyLists();
+    if(typeof syncCompagnieFromDB==='function') syncCompagnieFromDB();
     if(typeof loadMyTags==='function') loadMyTags();
     loadUserLovesCount();
     applyPendingReferral();
@@ -3014,6 +3015,7 @@ function onAuthStateUpdate(event) {
     loadPOIsFromDB();
     // Carica dati utente persistenti
     if(typeof loadMyLists==='function') loadMyLists();
+    if(typeof syncCompagnieFromDB==='function') syncCompagnieFromDB();
     if(typeof loadMyTags==='function') loadMyTags();
     loadUserLovesCount();
     applyPendingReferral();
@@ -6174,6 +6176,14 @@ async function deleteCompagnia(code){
   }
   const ok = await uiConfirm('Chiudere "' + c.name + '"? Il gruppo verrà sciolto definitivamente. Questa azione è irreversibile.', {okText:'Chiudi', danger:true});
   if(!ok) return;
+  // Persistenza Supabase: se la compagnia e' su DB (ha un id) la elimino li' PRIMA della cache.
+  // Senza sessione non posso eliminarla dal DB: blocco, altrimenti riapparirebbe al prossimo sync.
+  if(c.id){
+    if(!currentUser?.id || !sb){ showToast('⚠ Riprova quando sei online'); return; }
+    try{ const { error } = await sb.from('companions').delete().eq('id', c.id).eq('owner_id', currentUser.id); if(error) throw error; }
+    catch(e){ console.warn('deleteCompagnia DB:', e); showToast('⚠ Chiusura non riuscita, riprova'); return; }
+  }
+  // c.id assente = mai sincronizzata su DB: rimuovo solo dalla cache locale
   _saveCompagnie(all.filter(function(x){ return x.code!==code; }));
   renderCompanionsTab();
   showToast('🗑 "' + c.name + '" chiusa');
@@ -6192,7 +6202,7 @@ async function giveAdminToAll(code){
   showToast('👑 Tutti i partecipanti sono ora amministratori');
 }
 
-function createCompagnia(){
+async function createCompagnia(){
   const name = (document.getElementById('compNewName')?.value || '').trim();
   if(!name){
     showToast?.('Nome del gruppo obbligatorio');
@@ -6214,6 +6224,13 @@ function createCompagnia(){
     const all = _getCompagnie();
     const idx = all.findIndex(x=>x.code===_editingCompCode);
     if(idx>=0){
+      // Persistenza Supabase PRIMA della cache (RLS: solo l'owner): se fallisce non disallineo la cache
+      if(all[idx].id && currentUser?.id && sb){
+        try{ const { error } = await sb.from('companions').update({ name, description:desc, type,
+          start_date:startDate||null, start_time:startTime||null, end_date:endDate||null, end_time:endTime||null
+        }).eq('id', all[idx].id).eq('owner_id', currentUser.id); if(error) throw error; }
+        catch(e){ console.warn('editCompagnia DB:', e); showToast?.('⚠ Modifica non salvata, riprova'); return; }
+      }
       all[idx] = {...all[idx], name, type, startDate, startTime, endDate, endTime, desc};
       _saveCompagnie(all);
       showToast?.(`✓ "${name}" aggiornato!`);
@@ -6236,6 +6253,20 @@ function createCompagnia(){
   const all = _getCompagnie();
   all.unshift(newComp);
   _saveCompagnie(all);
+
+  // Persistenza Supabase: crea la compagnia. L'id reale torna in cache per edit/delete/condivisione.
+  if(currentUser?.id && sb){
+    try{
+      const { data, error } = await sb.from('companions').insert({
+        owner_id: currentUser.id, code, name, description: desc, type,
+        start_date: startDate||null, start_time: startTime||null,
+        end_date: endDate||null, end_time: endTime||null
+      }).select('id').single();
+      if(error) throw error;
+      newComp.id = data.id;
+      _saveCompagnie(_getCompagnie().map(x=> x.code===code ? {...x, id:data.id} : x));
+    }catch(e){ console.warn('createCompagnia DB:', e); }
+  }
 
   showToast?.(`✓ "${name}" creato! Codice: ${code} — ${typeLabel}${range?' · '+range:''}`);
   if(navigator.clipboard) navigator.clipboard.writeText(code).catch(()=>{});
@@ -6267,7 +6298,7 @@ function renderCompanionsTab(){
   const root = document.getElementById('companions-list');
   if(!root) return;
 
-  // Legge compagnie salvate + aggiunge demo solo se localStorage è vuoto
+  // Legge le compagnie dalla cache locale (sincronizzata da Supabase via syncCompagnieFromDB)
   const saved = _getCompagnie();
   const compagnie = [...saved];
 
@@ -6279,7 +6310,7 @@ function renderCompanionsTab(){
   root.innerHTML = compagnie.map(c=>{
     const statusEmoji = c.forever ? '<i class="ph-duotone ph-heart"></i>' : '<i class="ph-duotone ph-eye"></i>';
     const statusTxt   = c.forever ? 'Per sempre' : (c.expires ? 'Scade '+c.expires : 'In corso');
-    const isMine = saved.some(x=>x.code===c.code); // solo le compagnie create da me sono modificabili
+    const isMine = c._mine !== false; // owner (flag da syncCompagnieFromDB); default true per compagnie locali. Quando il join via RPC sara' attivo, i membri non-owner avranno _mine=false
     const friends = (c.friends||[]).map(f=>{
       const cls = f.status==='traveling'?'fs-traveling':f.status==='stopped'?'fs-stopped':'fs-still';
       const lbl = f.status==='traveling'?'In viaggio':f.status==='stopped'?'Fermo':'Offline';
@@ -7378,6 +7409,29 @@ async function loadMyLists(){
   // Aggiorna stat
   const statEl=document.getElementById('statList');
   if(statEl) statEl.textContent=container.querySelectorAll('.list-item').length;
+}
+// Carica le compagnie dell'utente da Supabase (owner o membro via RLS) e aggiorna la cache locale.
+// Membri/presence sono un layer successivo: qui porto le compagnie base, persistenti cross-device.
+async function syncCompagnieFromDB(){
+  if(!currentUser?.id || !sb) return;
+  try{
+    const { data, error } = await sb.from('companions')
+      .select('id,code,name,description,type,start_date,start_time,end_date,end_time,owner_id')
+      .order('created_at',{ascending:false});
+    if(error || !data) return;
+    const mapped = data.map(c=>({
+      id:c.id, code:c.code, name:c.name, desc:c.description||'', type:c.type,
+      startDate:c.start_date||'', startTime:c.start_time||'', endDate:c.end_date||'', endTime:c.end_time||'',
+      forever: c.type==='forever', expires: c.end_date||null, joined:true, friends:[],
+      _mine: c.owner_id===currentUser.id,
+      creatorName: c.owner_id===currentUser.id ? 'Tu' : '',
+      creatorAvatar: c.owner_id===currentUser.id ? (currentUser?.user_metadata?.avatar_url||currentUser?.user_metadata?.picture||null) : null
+    }));
+    // Merge, non overwrite: preservo le compagnie ancora solo locali (senza id, create offline)
+    const localOnly = _getCompagnie().filter(c=>!c.id);
+    _saveCompagnie([...localOnly, ...mapped]);
+    if(typeof renderCompanionsTab==='function') renderCompanionsTab();
+  }catch(e){ console.warn('syncCompagnieFromDB:', e); }
 }
 function deletePOI(id){
   const card=document.getElementById(id);if(!card)return;
