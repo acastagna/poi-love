@@ -1953,7 +1953,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
       </div>
       <!-- LOGOUT -->
       <div class="profile-sec" style="text-align:center;padding:24px 16px 40px">
-        <button onclick="if(confirm('Uscire da POI•LOVE?')) signOut().then(()=>location.reload())"
+        <button onclick="uiConfirm('Uscire da POI•LOVE?',{okText:'Esci',danger:true}).then(ok=>{if(ok)signOut().then(()=>location.reload())})"
           style="background:transparent;border:1.5px solid var(--red);color:var(--red);font-weight:600;font-size:14px;padding:12px 28px;border-radius:13px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:8px;transition:all .2s">
           <i class="ph-duotone ph-sign-out"></i> Esci
         </button>
@@ -3540,8 +3540,8 @@ function sharePlPlace(i){
   else { navigator.clipboard?.writeText(url).then(()=>showToast('🔗 Link copiato!')); }
 }
 
-function removePlPlace(i){
-  if(!confirm('Rimuovere questo luogo?')) return;
+async function removePlPlace(i){
+  if(!await uiConfirm('Rimuovere questo luogo?',{okText:'Rimuovi',danger:true})) return;
   plPlaces.splice(i,1);
   localStorage.setItem('pl_places', JSON.stringify(plPlaces));
   renderPlaces();
@@ -4864,7 +4864,7 @@ async function sharePoiByKey(key){
     await navigator.clipboard.writeText(`${text}\n${url}`);
     showToast?.(t('toast_link_copied'));
   } else {
-    prompt('Link:', url);
+    await uiPrompt('Copia il link', url, {okText:'Fatto'});
   }
 }
 
@@ -4923,7 +4923,7 @@ function editPoiByKey(key){
 async function deletePoiByKey(key){
   const p = _poiFromKey(key);
   if(!p) return;
-  if(!confirm(`${t('delete_confirm')} "${p.name}"?\n${t('delete_confirm_warn')}`)) return;
+  if(!await uiConfirm(`${t('delete_confirm')} "${p.name}"? ${t('delete_confirm_warn')}`,{okText:'Elimina',danger:true})) return;
   if(p.id && currentUser?.id && sb){
     const { error } = await sb.from('pois').delete().eq('id', p.id).eq('author_id', currentUser.id);
     if(error){
@@ -5910,7 +5910,7 @@ function _resetCompSheet(){
 }
 
 /* Chiude e scioglie una compagnia — solo se ≤ 2 membri totali */
-function deleteCompagnia(code){
+async function deleteCompagnia(code){
   const all = _getCompagnie();
   const c = all.find(function(x){ return x.code===code; });
   if(!c){ showToast('Compagnia non trovata'); return; }
@@ -5919,11 +5919,7 @@ function deleteCompagnia(code){
     showToast('⛔ Puoi chiudere il gruppo solo quando rimaste in 2');
     return;
   }
-  const ok = confirm(
-    'Chiudere "' + c.name + '"?\n\n' +
-    'Il gruppo verrà sciolto definitivamente.\n' +
-    'Questa azione è irreversibile.'
-  );
+  const ok = await uiConfirm('Chiudere "' + c.name + '"? Il gruppo verrà sciolto definitivamente. Questa azione è irreversibile.', {okText:'Chiudi', danger:true});
   if(!ok) return;
   _saveCompagnie(all.filter(function(x){ return x.code!==code; }));
   renderCompanionsTab();
@@ -5931,14 +5927,11 @@ function deleteCompagnia(code){
 }
 
 /* Promuove tutti i partecipanti ad amministratori */
-function giveAdminToAll(code){
+async function giveAdminToAll(code){
   const all = _getCompagnie();
   const idx = all.findIndex(function(x){ return x.code===code; });
   if(idx<0) return;
-  const ok = confirm(
-    'Dare i permessi di amministratore a tutti i partecipanti di "' + all[idx].name + '"?\n\n' +
-    'Tutti potranno modificare e chiudere il gruppo.'
-  );
+  const ok = await uiConfirm('Dare i permessi di amministratore a tutti i partecipanti di "' + all[idx].name + '"? Tutti potranno modificare e chiudere il gruppo.');
   if(!ok) return;
   all[idx].allAdmin = true;
   _saveCompagnie(all);
@@ -6218,10 +6211,10 @@ function closeAddPOI(){
 // Chiusura smart scheda "aggiungi POI":
 // — nome vuoto → chiude subito
 // — nome compilato → chiede conferma prima di annullare
-function smartCloseAddPOI(){
+async function smartCloseAddPOI(){
   const nameVal=(document.getElementById('poiNameIn')?.value||'').trim();
   if(!nameVal){closeAddPOI();return;}
-  const ok=confirm('Vuoi annullare la creazione di questo POI?\nIl nome che hai inserito andrà perso.');
+  const ok=await uiConfirm('Vuoi annullare la creazione di questo POI? Il nome che hai inserito andrà perso.', {okText:'Annulla creazione', cancelText:'Continua', danger:true});
   if(ok) closeAddPOI();
 }
 function openAddStop(){closeFab();openSheet('addStopOv','addStopBg','addStopSheet')}
@@ -7661,11 +7654,11 @@ function toggleProfileField(field){
 }
 
 /* ── Edit bio profilo ── */
-function editProfileBio(){
+async function editProfileBio(){
   const el=document.getElementById('myProfileBio');
   if(!el) return;
   const cur=el.textContent||'';
-  const val=prompt('Bio (max 160 caratteri):', cur);
+  const val=await uiPrompt('La tua bio (max 160 caratteri)', cur, {okText:'Salva'});
   if(val===null) return;
   const trimmed=val.trim().substring(0,160);
   el.textContent=trimmed;
@@ -7741,8 +7734,8 @@ function copyListLink(slug){
 }
 
 /* ── Edit lista (nome + visibilità) ── */
-function editList(btn, currentName, currentVis){
-  const newName=prompt('Nome lista:', currentName);
+async function editList(btn, currentName, currentVis){
+  const newName=await uiPrompt('Rinomina lista', currentName, {okText:'Salva'});
   if(!newName||!newName.trim()) return;
   const item=btn.closest('.list-item');
   const nameEl=item?.querySelector('.list-name');
@@ -8239,12 +8232,12 @@ function initItinMap(tripId){
 }
 
 /* ── STOP ACTIONS ── */
-function deleteStop(tripId,stopId){
+async function deleteStop(tripId,stopId){
   const t=TRIPS[tripId]; if(!t)return;
   const idx=t.stops.findIndex(s=>s.id===stopId);
   if(idx<0)return;
   const name=t.stops[idx].name;
-  if(!confirm(`Eliminare "${name}"?`))return;
+  if(!await uiConfirm(`Eliminare "${name}"?`, {okText:'Elimina', danger:true}))return;
   t.stops.splice(idx,1);
   refreshStops(tripId);
   showToast(`🗑 "${name}" eliminata`);
@@ -8821,11 +8814,11 @@ function renderDevProfiles(){
   `).join('');
 }
 
-function addDevProfile(){
-  const name=prompt(lang==='it'?'Nome del profilo test:':lang==='sq'?'Emri i profilit të testit:':'Test profile name:');
+async function addDevProfile(){
+  const name=await uiPrompt(lang==='it'?'Nome del profilo test':lang==='sq'?'Emri i profilit të testit':'Test profile name');
   if(!name||!name.trim()) return;
   const emailDef=`${name.trim().toLowerCase().replace(/\s+/g,'.')}@test.poilove.com`;
-  const email=prompt(lang==='it'?'Email (facoltativa):':lang==='sq'?'Email (opsionale):':'Email (optional):',emailDef)||emailDef;
+  const email=(await uiPrompt(lang==='it'?'Email (facoltativa)':lang==='sq'?'Email (opsionale)':'Email (optional)',emailDef))||emailDef;
   const palette=['285EA7','D42B2B','22C55E','7C3AED','F97316','0F172A','BE185D','0E7490'];
   const color=palette[devProfiles.length%palette.length];
   devProfiles.push({id:`dev_${Date.now()}`,name:name.trim(),email,color});
