@@ -336,8 +336,10 @@ profiles       -- id (=auth.users.id), username, avatar_url, bio, updated_at,
                --   cover_url text, cover_type text DEFAULT 'gradient'  ← aggiunte 26/05
 pois           -- id, author_id→profiles.id, name, description, lat, lng,
                --   category, photos[], love_count, visibility, created_at
-lists          -- id, owner_id→profiles.id, name, is_public
-list_pois      -- list_id, poi_id
+lists          -- id, owner_id→profiles.id, name, description,
+               --   visibility (enum: 'private' | 'public'),  ← NON esiste 'is_public' (errore doc corretto 24/06)
+               --   companion_id, itinerary_id (uuid, aggiunte 24/06), share_token, cover_poi_id
+list_pois      -- list_id, poi_id, note, sort_order
 loves          -- user_id, poi_id (UNIQUE)
 follows        -- follower_id, following_id
 ```

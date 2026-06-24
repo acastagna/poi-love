@@ -1,5 +1,17 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
+## Sessione 24/06/2026 (sera) — Persistenza LISTE su Supabase
+
+- **Bug colonna `is_public` vs `visibility`**: il codice usava `is_public` ma lo schema `lists` ha `visibility` (enum `private`/`public`). Le liste non persistevano davvero. Corretto in `createList`, `loadMyLists`, `renderItinLists`.
+- **`saveListDetail` e `deleteListDetail`**: agganciati a Supabase (update/delete con guardia `owner_id`). La delete non rimuove dal DOM se il DB fallisce: nessun disallineamento UI-DB.
+- **Sicurezza XSS**: escape applicato nei nomi lista e in `_mapPopupCtx.name` negli innerHTML; ripristinato dove l'escape era inappropriato (showToast, input.value).
+- **Liste hardcoded rimosse**: eliminate le 3 liste-esempio finte ("Lista libera", "Tirana Top", "Segreti").
+- **Migrazione 004 applicata**: colonne `lists.companion_id` e `lists.itinerary_id` aggiunte.
+- Processo: 2 round `/code-quality`, 4 BLOCKER intercettati e corretti prima del deploy.
+- **CLAUDE.md aggiornato**: documentazione schema `lists` corretta (`visibility`, non `is_public`).
+- Commit: `6b0ecaa` (mig 004), `deaa0e0` (persistenza liste), `4ee3dd9` (fix xss). Deployato su `httpdocs/index.html`, pushato su `origin/main`.
+- **Ancora in localStorage (prossimo blocco)**: compagnie (`companions`), itinerari (`trips`), follow (`follows`), rotte utente (`user_routes`). Il campo `companion_id` su `lists` si popolerà solo quando esisterà la tabella `companions` (guardia già nel codice).
+
 ## Sessione 24/06/2026 (notte) — BACKEND avviato + workflow code-quality
 - **Migrazione 001 gamification** applicata a Supabase e versionata in `supabase/migrations/`: tabelle `gamification_config` (punti per azione e soglie livelli, regolabili da admin), `point_events` (log azioni, anti-abuso), `referrals` (inviti). Colonne nuove su `profiles`: `points`, `special_tier`, `referred_by`.
 - **RLS blindate**: trigger `protect_gamification_columns` impedisce al client di auto-assegnarsi punti/tier; scrittura punti solo server-side (service_role). Referral creabili solo a proprio nome.
