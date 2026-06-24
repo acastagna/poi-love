@@ -1547,7 +1547,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 
       <!-- Descrizione -->
       <label style="display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">Descrizione (opzionale)</label>
-      <textarea id="compDesc" maxlength="200" rows="2" placeholder="Es: Cena al Pazari il giovedì sera per festeggiare l'arrivo di Liri" style="width:100%;border:1.5px solid var(--border);border-radius:11px;padding:10px 14px;font-size:13px;font-family:inherit;outline:none;background:var(--card);color:var(--text);margin-bottom:12px;resize:vertical;box-sizing:border-box;line-height:1.4"></textarea>
+      <textarea id="compDesc" maxlength="200" rows="2" placeholder="Es: Cena giovedì sera per festeggiare insieme" style="width:100%;border:1.5px solid var(--border);border-radius:11px;padding:10px 14px;font-size:13px;font-family:inherit;outline:none;background:var(--card);color:var(--text);margin-bottom:12px;resize:vertical;box-sizing:border-box;line-height:1.4"></textarea>
 
       <!-- Inviti -->
       <label style="display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">
@@ -1940,38 +1940,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
           <button class="prof-sec-add" onclick="openAddPOI()"><i class="ph-duotone ph-plus"></i> <span data-t="prof_add_poi">Aggiungi</span></button>
         </div>
         <div class="poi-board" id="poiBoard">
-          <div class="poi-card" id="pcard-1">
-            <div class="poi-card-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/New_Bazaar_Tirana.jpg/320px-New_Bazaar_Tirana.jpg')">
-              <div class="poi-card-vis"><i class="ph-duotone ph-globe"></i> Pubblico</div>
-            </div>
-            <div class="poi-card-body">
-              <div class="poi-card-name">Pazari i Ri</div>
-              <div class="poi-card-desc">Il mercato più bello dei Balcani.</div>
-              <div class="poi-card-footer">
-                <div class="poi-card-love"><i class="ph-duotone ph-heart"></i> 56</div>
-                <div class="poi-card-actions">
-                  <button class="poi-card-btn" onclick="editPOI('pcard-1')"><i class="ph-duotone ph-pencil-simple"></i></button>
-                  <button class="poi-card-btn pcb-del" onclick="deletePOI('pcard-1')"><i class="ph-duotone ph-trash"></i></button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="poi-card" id="pcard-2">
-            <div class="poi-card-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Blloku_Tirana.jpg/320px-Blloku_Tirana.jpg')">
-              <div class="poi-card-vis"><i class="ph-duotone ph-lock-simple"></i> Privato</div>
-            </div>
-            <div class="poi-card-body">
-              <div class="poi-card-name">Blloku</div>
-              <div class="poi-card-desc">Quartiere liberato nel '91.</div>
-              <div class="poi-card-footer">
-                <div class="poi-card-love"><i class="ph-duotone ph-heart"></i> 41</div>
-                <div class="poi-card-actions">
-                  <button class="poi-card-btn" onclick="editPOI('pcard-2')"><i class="ph-duotone ph-pencil-simple"></i></button>
-                  <button class="poi-card-btn pcb-del" onclick="deletePOI('pcard-2')"><i class="ph-duotone ph-trash"></i></button>
-                </div>
-              </div>
-            </div>
-          </div>
+          <!-- I POI reali dell'utente vengono caricati qui da Supabase (eq author_id) -->
         </div>
       </div>
       <!-- DEV MODE PANEL — visibile solo con token 321PaLa -->
@@ -2075,14 +2044,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
       <div class="profile-sec">
         <div class="prof-sec-lbl">POI pubblici</div>
         <div class="poi-board">
-          <div class="poi-card">
-            <div class="poi-card-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Blloku_Tirana.jpg/320px-Blloku_Tirana.jpg')"></div>
-            <div class="poi-card-body"><div class="poi-card-name">Blloku</div><div class="poi-card-footer"><div class="poi-card-love"><i class="ph-duotone ph-heart"></i> 41</div></div></div>
-          </div>
-          <div class="poi-card">
-            <div class="poi-card-img" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/New_Bazaar_Tirana.jpg/320px-New_Bazaar_Tirana.jpg')"></div>
-            <div class="poi-card-body"><div class="poi-card-name">Pazari i Ri</div><div class="poi-card-footer"><div class="poi-card-love"><i class="ph-duotone ph-heart"></i> 56</div></div></div>
-          </div>
+          <!-- POI pubblici reali dell'utente, caricati da Supabase -->
         </div>
       </div>
     </div>
