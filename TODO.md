@@ -1,5 +1,12 @@
 # TODO — POI•LOVE
-> Aggiornato: 21/06/2026
+> Aggiornato: 24/06/2026
+
+## 🚧 Fase 1 — UI proprietaria + modificabilità (in corso, dal 24/06)
+- [ ] Rinomina lista: sostituire il `prompt()` nativo con modale custom POI•LOVE
+- [ ] Editing lista completo: nome, POI dentro, visibilità (pubblica/privata), colore, in UI nostra
+- [ ] Rotte UTENTE completamente modificabili; rotte UFFICIALI (admin) bloccate, con segno "ufficiale"
+- [ ] Sostituire TUTTI i restanti `prompt()` / `alert()` / `confirm()` nativi con UI proprietaria (bio profilo, copia link, ecc.)
+- Regola ferrea: MAI interfacce native del dispositivo, tutto in grafica POI•LOVE (vedi `SPECS.md`)
 
 ## 🔴 Bloccanti (fanno saltare il lancio)
 

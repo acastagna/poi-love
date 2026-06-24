@@ -5525,9 +5525,9 @@ function toggleListVis(){
   }
   showToast?.(_listDetailCtx.isPublic?'🌐 Lista resa pubblica':'🔒 Lista resa privata');
 }
-function renameListDetail(){
+async function renameListDetail(){
   if(!_listDetailCtx) return;
-  const nuovo = prompt('Nuovo nome lista:', _listDetailCtx.name);
+  const nuovo = await uiPrompt('Rinomina lista', _listDetailCtx.name);
   if(nuovo===null) return;
   const trimmed = nuovo.trim();
   if(!trimmed) return;
@@ -5550,9 +5550,9 @@ async function shareListDetail(){
     showToast?.('🔗 Link lista copiato');
   }catch(e){}
 }
-function deleteListDetail(){
+async function deleteListDetail(){
   if(!_listDetailCtx) return;
-  if(!confirm(`Eliminare "${_listDetailCtx.name}"? L'azione è irreversibile.`)) return;
+  if(!await uiConfirm(`Eliminare "${_listDetailCtx.name}"? L'azione è irreversibile.`, {okText:'Elimina', danger:true})) return;
   if(_listDetailCtx.sourceEl){
     _listDetailCtx.sourceEl.remove();
     const st = document.getElementById('statList');
@@ -7151,6 +7151,46 @@ function showToast(msg){
   clearTimeout(toastTimer);
   toastTimer=setTimeout(()=>el.classList.remove('show'),2400);
 }
+
+/* ══════════════════════════════════════════
+   MODALI PROPRIETARIE — sostituiscono prompt()/confirm()/alert() nativi.
+   Regola: MAI interfacce native del dispositivo, tutto in grafica POI•LOVE.
+   uiConfirm(msg) -> Promise<bool> · uiPrompt(title,def) -> Promise<string|null>
+══════════════════════════════════════════ */
+function _uiModal({title='', message='', input=false, defaultValue='', okText='Ok', cancelText='Annulla', danger=false}){
+  return new Promise(resolve=>{
+    const ov=document.createElement('div');
+    ov.style.cssText='position:fixed;inset:0;z-index:9000;background:rgba(20,16,14,.5);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;transition:opacity .18s ease';
+    const box=document.createElement('div');
+    box.style.cssText='background:var(--card);color:var(--text);border-radius:18px;max-width:340px;width:100%;padding:22px;box-shadow:0 24px 60px rgba(0,0,0,.32);transform:translateY(10px) scale(.98);transition:transform .2s cubic-bezier(.2,.8,.2,1)';
+    const accent=danger?'var(--red)':'var(--blue)';
+    let h='';
+    if(title)   h+=`<div style="font-size:16px;font-weight:800;margin-bottom:${(message||input)?'10px':'18px'}">${title}</div>`;
+    if(message) h+=`<div style="font-size:14px;line-height:1.5;color:var(--muted);margin-bottom:18px">${message}</div>`;
+    if(input)   h+=`<input id="_uimInput" type="text" autocomplete="off" style="width:100%;box-sizing:border-box;background:var(--bg);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;font-size:15px;font-family:inherit;color:var(--text);outline:none;margin-bottom:18px">`;
+    h+=`<div style="display:flex;gap:10px;justify-content:flex-end">
+      <button id="_uimCancel" style="background:transparent;border:1.5px solid var(--border);color:var(--text);font-weight:600;font-size:14px;padding:9px 18px;border-radius:11px;cursor:pointer;font-family:inherit">${cancelText}</button>
+      <button id="_uimOk" style="background:${accent};border:none;color:#fff;font-weight:700;font-size:14px;padding:9px 20px;border-radius:11px;cursor:pointer;font-family:inherit">${okText}</button></div>`;
+    box.innerHTML=h;
+    ov.appendChild(box);
+    document.body.appendChild(ov);
+    requestAnimationFrame(()=>{ ov.style.opacity='1'; box.style.transform='translateY(0) scale(1)'; });
+    const inp=box.querySelector('#_uimInput');
+    if(inp){ inp.value=defaultValue; setTimeout(()=>{ inp.focus(); inp.select(); },40); }
+    let done=false;
+    const close=(val)=>{ if(done)return; done=true; document.removeEventListener('keydown',onKey); ov.style.opacity='0'; box.style.transform='translateY(10px) scale(.98)'; setTimeout(()=>ov.remove(),180); resolve(val); };
+    function onKey(e){
+      if(e.key==='Escape') close(input?null:false);
+      else if(e.key==='Enter') close(input?(inp?inp.value.trim():''):true);
+    }
+    box.querySelector('#_uimCancel').onclick=()=>close(input?null:false);
+    box.querySelector('#_uimOk').onclick=()=>close(input?(inp?inp.value.trim():''):true);
+    ov.addEventListener('click',e=>{ if(e.target===ov) close(input?null:false); });
+    document.addEventListener('keydown',onKey);
+  });
+}
+function uiConfirm(message, opts={}){ return _uiModal({message, okText:opts.okText||'Conferma', cancelText:opts.cancelText||'Annulla', danger:opts.danger}); }
+function uiPrompt(title, defaultValue='', opts={}){ return _uiModal({title, input:true, defaultValue, okText:opts.okText||'Ok', cancelText:opts.cancelText||'Annulla'}); }
 
 /* ══════════════════════════════════════════
    INIT
