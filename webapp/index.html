@@ -2295,7 +2295,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
         <div class="poiai-sub" data-t="itin_ai_sub">Suggerisce, pianifica, aggiunge tappe</div>
       </div>
       <div class="poiai-badge">AI</div>
-      <button class="poiai-voice-btn" id="poiaiVoiceBtn" onclick="togglePoiAIVoice()" title="ILLI legge le risposte ad alta voce"><i class="ph-duotone ph-speaker-high"></i></button>
+      <button class="poiai-voice-btn" id="poiaiVoiceBtn" onclick="togglePoiAIVoice()" title="ILLI legge le risposte ad alta voce"><i class="ph-duotone ph-speaker-slash"></i></button>
     </div>
     <div class="poiai-msgs" id="poiaiMsgs">
       <div class="poiai-msg ai">Ciao! Sono <strong>ILLI•AI</strong>, la mascot di POI•LOVE — il tuo cuore-amico per scoprire luoghi e capire l'app. Posso suggerirti tappe, ristoranti, esperienze culturali, oppure aiutarti a usare POI•LOVE (POI, itinerari, compagni di viaggio). Da dove iniziamo? <i class="ph-duotone ph-heart"></i></div>
@@ -8169,7 +8169,7 @@ async function hardRefreshApp(){
     if('caches' in window){ const ks=await caches.keys(); await Promise.all(ks.map(k=>caches.delete(k))); }
     if('serviceWorker' in navigator){ const rs=await navigator.serviceWorker.getRegistrations(); await Promise.all(rs.map(r=>r.unregister())); }
     try{ sessionStorage.clear(); }catch(e){}
-  }catch(e){ console.warn('[poilove] hardRefresh',e); }
+  }catch(e){ /* best-effort: se una pulizia fallisce, continuo comunque al reload */ }
   const u=new URL(window.location.href);
   u.searchParams.set('_cb',Date.now().toString());
   window.location.replace(u.toString());
@@ -9483,7 +9483,7 @@ function toggleChatDictation(){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   const btn=document.getElementById('poiaiMicBtn');
   if(!SR){ showToast(t('mic_unsupported','Dettatura vocale non supportata su questo browser, scrivi pure a mano')); return; }
-  if(_chatListening){ try{ _chatRecog&&_chatRecog.stop(); }catch(e){} return; }
+  if(_chatListening){ try{ _chatRecog&&_chatRecog.stop(); }catch(e){} if(!_chatRecog){ _chatListening=false; if(btn)btn.classList.remove('is-listening'); } return; }
   const input=document.getElementById('poiaiInput');
   _chatBaseText=input.value||'';
   const r=new SR();
