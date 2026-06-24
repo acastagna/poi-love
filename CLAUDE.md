@@ -341,7 +341,15 @@ lists          -- id, owner_id→profiles.id, name, description,
                --   companion_id, itinerary_id (uuid, aggiunte 24/06), share_token, cover_poi_id
 list_pois      -- list_id, poi_id, note, sort_order
 loves          -- user_id, poi_id (UNIQUE)
-follows        -- follower_id, following_id
+follows        -- id, follower_id→profiles, following_id→profiles, created_at,
+               --   unique(follower_id,following_id), check no_self_follow  (creata 24/06, mig 009)
+-- ── Tabelle aggiunte il 24/06/2026 (migrazioni 001-009 in supabase/migrations/) ──
+-- gamification: profiles.points/special_tier/referred_by + gamification_config, point_events, referrals (mig 001-003)
+companions        -- id, owner_id→profiles, code(unique 4-12), name, type(forever/trip/dinner), date, companion_id su lists (mig 005)
+companion_members -- id, companion_id→companions, user_id→profiles, email, status(invited/joined)  (mig 005)
+trips             -- id, owner_id→profiles, name, badge, dates_label, cal_year/month  (mig 006)
+trip_stops        -- id, trip_id→trips, name, status(planned/done/suspended), lat, lng, poi_id, note, sort_order (mig 006-007)
+-- RPC server-side: award_share, claim_referral, join_companion, is_companion_member, replace_trip_stops
 ```
 
 **⚠️ Nota critica:** `pois.author_id` è FK → `profiles.id` (NON `user_id`).
