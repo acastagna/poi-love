@@ -529,7 +529,8 @@ body.tab-active #mapQuickBtns{display:none}
 #listDetailOv.show{display:flex}
 .list-detail-card{width:100%;max-width:380px;max-height:88vh;background:var(--card);border-radius:22px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(0,0,0,.4)}
 .list-detail-hero{padding:22px 18px 18px;position:relative;color:#fff}
-.list-detail-close{position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:16px;background:rgba(255,255,255,.22);border:none;cursor:pointer;color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px}
+.list-detail-close{position:absolute;top:18px;right:18px;z-index:3;width:40px;height:40px;border-radius:20px;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);border:1.5px solid rgba(255,255,255,.3);cursor:pointer;color:#fff;display:flex;align-items:center;justify-content:center;font-size:17px;transition:all .15s}
+.list-detail-close:hover{background:rgba(0,0,0,.7);transform:scale(1.05)}
 .list-detail-name-row{display:flex;align-items:center;gap:10px}
 .list-detail-dot{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;background:rgba(255,255,255,.22);flex-shrink:0}
 .list-detail-name{font-size:18px;font-weight:900;flex:1;min-width:0;word-break:break-word}
@@ -542,6 +543,7 @@ body.tab-active #mapQuickBtns{display:none}
 .list-detail-poi-name{flex:1;font-size:12px;font-weight:700;color:var(--text);cursor:pointer}
 .list-detail-poi-remove{width:24px;height:24px;border-radius:12px;background:rgba(220,38,38,.1);color:#DC2626;border:none;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center}
 .list-detail-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.list-detail-actions.two{grid-template-columns:repeat(2,1fr)}
 .list-detail-action{height:42px;border-radius:11px;border:1.5px solid var(--border);background:#f8f4ec;font-family:inherit;font-size:10px;font-weight:800;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--text);transition:all .12s}
 .list-detail-action i{font-size:14px}
 .list-detail-action:active{transform:scale(.96)}
@@ -9176,9 +9178,9 @@ async function confirmPhotoPicker(){
 
 <!-- ═══ LIST DETAIL POPUP — apre una lista per modificare/vedere POI ═══ -->
 <div id="listDetailOv" onclick="if(event.target===this)closeListDetail()">
+  <button class="list-detail-close" onclick="closeListDetail()" aria-label="Chiudi"><i class="ph-duotone ph-x"></i></button>
   <div class="list-detail-card" id="listDetailCard">
     <div class="list-detail-hero" id="listDetailHero">
-      <button class="list-detail-close" onclick="closeListDetail()"><i class="ph-duotone ph-x"></i></button>
       <div class="list-detail-name-row">
         <div class="list-detail-dot" id="listDetailDot"><i class="ph-duotone ph-list-bullets"></i></div>
         <div style="flex:1;min-width:0">
@@ -9218,8 +9220,7 @@ async function confirmPhotoPicker(){
       </div>
       <div class="pub-profile-sec-lbl"><i class="ph-duotone ph-map-pin" style="color:var(--red);font-size:12px"></i> POI nella lista</div>
       <div id="listDetailPoiList"></div>
-      <div class="list-detail-actions view-only">
-        <button class="list-detail-action primary" onclick="enterListEdit()"><i class="ph-duotone ph-pencil-simple"></i><span>Modifica</span></button>
+      <div class="list-detail-actions view-only two">
         <button class="list-detail-action" onclick="shareListDetail()"><i class="ph-duotone ph-share-network"></i><span>Condividi</span></button>
         <button class="list-detail-action danger" onclick="deleteListDetail()"><i class="ph-duotone ph-trash"></i><span>Elimina</span></button>
       </div>
