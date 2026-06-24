@@ -574,6 +574,31 @@ body.tab-active #mapQuickBtns{display:none}
 .list-chip.active{border-color:var(--red);background:var(--red);color:#fff}
 .list-chip:active{transform:scale(.95)}
 .list-chip-empty{font-size:12px;color:var(--muted);font-style:italic;padding:4px 0}
+/* ── Referral popup "Diffondi POI•LOVE" ── */
+#referralOv{position:fixed;inset:0;z-index:9200;background:rgba(20,16,14,.55);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);display:none;align-items:center;justify-content:center;padding:20px}
+#referralOv.show{display:flex}
+.referral-close{position:absolute;top:18px;right:18px;z-index:3;width:40px;height:40px;border-radius:20px;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);border:1.5px solid rgba(255,255,255,.3);cursor:pointer;color:#fff;display:flex;align-items:center;justify-content:center;font-size:17px}
+.referral-card{width:100%;max-width:380px;max-height:90vh;overflow-y:auto;background:var(--card);border-radius:22px;box-shadow:0 24px 60px rgba(0,0,0,.4)}
+.referral-hero{background:linear-gradient(135deg,var(--red),#8a1a1a);color:#fff;padding:26px 22px 22px;text-align:center;border-radius:22px 22px 0 0}
+.referral-hero-ico{width:54px;height:54px;border-radius:16px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 12px}
+.referral-title{font-size:20px;font-weight:900}
+.referral-sub{font-size:12.5px;opacity:.92;margin-top:5px;line-height:1.4}
+.referral-body{padding:20px 22px 24px}
+.referral-code-lbl{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;text-align:center}
+.referral-code{font-size:30px;font-weight:900;color:var(--red);text-align:center;margin:8px 0 2px;cursor:pointer;word-break:break-all;letter-spacing:.5px}
+.referral-code-hint{font-size:11px;color:var(--muted);text-align:center;display:flex;align-items:center;justify-content:center;gap:4px;margin-bottom:18px}
+.referral-email-row{display:flex;gap:8px;margin-bottom:18px}
+.referral-email-in{flex:1;min-width:0;box-sizing:border-box;background:#f8f4ec;border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;font-size:14px;font-family:inherit;color:var(--text);outline:none}
+.referral-email-in:focus{border-color:var(--red)}
+.referral-email-btn{flex-shrink:0;display:inline-flex;align-items:center;gap:5px;background:var(--red);color:#fff;border:none;border-radius:11px;padding:0 16px;font-family:inherit;font-size:13px;font-weight:800;cursor:pointer}
+.referral-social-lbl{font-size:11px;color:var(--muted);text-align:center;margin-bottom:10px}
+.referral-social-row{display:flex;justify-content:center;gap:10px;margin-bottom:20px}
+.referral-social{width:48px;height:48px;border-radius:14px;border:1.5px solid var(--border);background:#f8f4ec;color:var(--c);font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.referral-social:hover{background:var(--c);color:#fff;border-color:var(--c);transform:translateY(-2px)}
+.referral-points{display:flex;align-items:flex-start;gap:8px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);border-radius:12px;padding:12px 14px;font-size:13px;color:var(--text);line-height:1.45}
+.referral-points i{color:#F59E0B;font-size:18px;flex-shrink:0;margin-top:1px}
+.referral-points b{color:#B45309}
+.referral-points-sub{font-size:11px;color:var(--muted)}
 .friend-avatar{width:30px;height:30px;border-radius:50%;background:#EBF2FC;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--blue);flex-shrink:0}
 .friend-name{flex:1;font-size:13px;color:var(--ink);font-weight:600}
 .friend-status{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:800;text-transform:uppercase;padding:3px 8px;border-radius:7px;letter-spacing:.4px}
@@ -7696,12 +7721,39 @@ function copyMyProfileLink(){
   const url=`https://poilove.com/@${handle}`;
   navigator.clipboard?.writeText(url).then(()=>showToast('🔗 Link profilo copiato!'));
 }
-// Referral: diffondi POI•LOVE. Il link porta ?ref=handle; col backend accrediterà i punti gamification a iscrizione confermata.
+// ══ REFERRAL — "Diffondi POI•LOVE": popup proprietario con codice invito, email, social ══
+// Il link porta ?ref=handle; col backend i punti verranno accreditati a iscrizione confermata.
+function _referralHandle(){ return getVanityHandle(currentUser)||'tu'; }
+function _referralUrl(){ return 'https://poilove.com/?ref='+encodeURIComponent(_referralHandle()); }
 function shareReferral(){
-  const handle=getVanityHandle(currentUser)||'';
-  const url=`https://poilove.com/?ref=${encodeURIComponent(handle)}`;
-  const msg=`Scopri POI•LOVE, la mappa dei luoghi del cuore. Unisciti a me: ${url}`;
-  navigator.clipboard?.writeText(msg).then(()=>showToast('📣 Invito copiato, diffondi POI•LOVE!')).catch(()=>showToast('📣 Diffondi POI•LOVE!'));
+  const code=document.getElementById('referralCode');
+  if(code) code.textContent='@'+_referralHandle();
+  document.getElementById('referralOv')?.classList.add('show');
+}
+function closeReferral(){ document.getElementById('referralOv')?.classList.remove('show'); }
+function copyReferralCode(){
+  navigator.clipboard?.writeText('@'+_referralHandle()).then(()=>showToast('✓ Codice invito copiato!'));
+}
+function sendReferralEmail(){
+  const inp=document.getElementById('referralEmail'); const to=(inp?.value||'').trim();
+  if(!to || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(to)){ showToast('Inserisci una email valida'); inp?.focus(); return; }
+  // Per ora apre il client email (testo). Col backend partirà una mail HTML curata col template dedicato.
+  const subj=encodeURIComponent('Ti aspetto su POI•LOVE');
+  const body=encodeURIComponent('Ciao!\n\nHo scoperto POI•LOVE, la mappa dei luoghi del cuore: posti veri, amati dalle persone, non scelti da un algoritmo.\n\nUnisciti a me qui:\n'+_referralUrl()+'\n\nA presto su POI•LOVE!');
+  window.location.href='mailto:'+encodeURIComponent(to)+'?subject='+subj+'&body='+body;
+  showToast('Apertura email per '+to);
+}
+function shareReferralVia(platform){
+  const url=encodeURIComponent(_referralUrl());
+  const text=encodeURIComponent('Scopri POI•LOVE, la mappa dei luoghi del cuore. Unisciti a me!');
+  const links={
+    whatsapp:'https://wa.me/?text='+text+'%20'+url,
+    telegram:'https://t.me/share/url?url='+url+'&text='+text,
+    facebook:'https://www.facebook.com/sharer/sharer.php?u='+url,
+    linkedin:'https://www.linkedin.com/sharing/share-offsite/?url='+url,
+    x:'https://twitter.com/intent/tweet?text='+text+'&url='+url
+  };
+  if(links[platform]) window.open(links[platform],'_blank','noopener');
 }
 
 /* ── Modale edit vanity ── */
@@ -9308,6 +9360,39 @@ async function confirmPhotoPicker(){
         <button class="list-detail-action primary" onclick="saveListDetail()"><i class="ph-duotone ph-check"></i><span>Salva</span></button>
         <button class="list-detail-action" onclick="exitListEdit()"><i class="ph-duotone ph-arrow-u-up-left"></i><span>Annulla</span></button>
         <button class="list-detail-action danger" onclick="deleteListDetail()"><i class="ph-duotone ph-trash"></i><span>Elimina</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ REFERRAL POPUP — Diffondi POI•LOVE ═══ -->
+<div id="referralOv" onclick="if(event.target===this)closeReferral()">
+  <button class="referral-close" onclick="closeReferral()" aria-label="Chiudi"><i class="ph-duotone ph-x"></i></button>
+  <div class="referral-card">
+    <div class="referral-hero">
+      <div class="referral-hero-ico"><i class="ph-duotone ph-megaphone"></i></div>
+      <div class="referral-title">Diffondi POI•LOVE</div>
+      <div class="referral-sub">Invita gli amici. Quando si iscrivono, guadagni punti e fai carriera.</div>
+    </div>
+    <div class="referral-body">
+      <div class="referral-code-lbl">Il tuo codice invito</div>
+      <div class="referral-code" id="referralCode" onclick="copyReferralCode()">@tu</div>
+      <div class="referral-code-hint"><i class="ph-duotone ph-copy"></i> Tocca per copiare</div>
+      <div class="referral-email-row">
+        <input id="referralEmail" type="email" placeholder="email dell'amico" class="referral-email-in" autocomplete="off">
+        <button class="referral-email-btn" onclick="sendReferralEmail()"><i class="ph-duotone ph-paper-plane-tilt"></i> Invita</button>
+      </div>
+      <div class="referral-social-lbl">oppure condividi su</div>
+      <div class="referral-social-row">
+        <button class="referral-social" style="--c:#25D366" onclick="shareReferralVia('whatsapp')" title="WhatsApp"><i class="ph-duotone ph-whatsapp-logo"></i></button>
+        <button class="referral-social" style="--c:#0088CC" onclick="shareReferralVia('telegram')" title="Telegram"><i class="ph-duotone ph-telegram-logo"></i></button>
+        <button class="referral-social" style="--c:#1877F2" onclick="shareReferralVia('facebook')" title="Facebook"><i class="ph-duotone ph-facebook-logo"></i></button>
+        <button class="referral-social" style="--c:#0A66C2" onclick="shareReferralVia('linkedin')" title="LinkedIn"><i class="ph-duotone ph-linkedin-logo"></i></button>
+        <button class="referral-social" style="--c:#111" onclick="shareReferralVia('x')" title="X"><i class="ph-duotone ph-x-logo"></i></button>
+      </div>
+      <div class="referral-points">
+        <i class="ph-fill ph-star"></i>
+        <span>Guadagni <b id="referralPts">punti</b> per ogni amico che si iscrive<br><span class="referral-points-sub">(il valore si imposterà dal pannello admin)</span></span>
       </div>
     </div>
   </div>
