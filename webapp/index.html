@@ -2929,7 +2929,8 @@ sb.auth.getSession().then(({ data: { session } }) => {
     if(typeof loadMyTags==='function') setTimeout(loadMyTags,400);
   }
   // Avvia diagnostica connessione/schema (non bloccante)
-  setTimeout(()=>{ try{ runConnectionDiagnostics(); }catch(_){} }, 800);
+  // Diagnostica DB solo in debug (esponeva schema in console + 5 query a ogni boot): attiva con window.__poilove_debug=true o ?debug nell'URL
+  if(window.__poilove_debug || /[?&]debug(\b|=)/.test(location.search)){ setTimeout(()=>{ try{ runConnectionDiagnostics(); }catch(_){} }, 800); }
 }).catch((err) => {
   // Fail-safe: se l'init auth fallisce (Supabase down, JWT corrotto…),
   // mostra comunque il login invece di lasciare l'app bloccata.
@@ -6411,11 +6412,11 @@ function openBgPopup(){
 function closeBgPopup(){
   document.getElementById('bgPopupOv').classList.remove('open');
 }
-function setBgTab(t){
-  document.querySelectorAll('[data-bgtab]').forEach(b => b.classList.toggle('active', b.dataset.bgtab===t));
-  document.getElementById('bgPaneUpload').style.display   = t==='upload'   ? '' : 'none';
-  document.getElementById('bgPaneUnsplash').style.display = t==='unsplash' ? '' : 'none';
-  document.getElementById('bgPaneAI').style.display       = t==='ai'       ? '' : 'none';
+function setBgTab(tab){
+  document.querySelectorAll('[data-bgtab]').forEach(b => b.classList.toggle('active', b.dataset.bgtab===tab));
+  document.getElementById('bgPaneUpload').style.display   = tab==='upload'   ? '' : 'none';
+  document.getElementById('bgPaneUnsplash').style.display = tab==='unsplash' ? '' : 'none';
+  document.getElementById('bgPaneAI').style.display       = tab==='ai'       ? '' : 'none';
 }
 // Applica lo sfondo (URL immagine) al profilo privato + pubblico, e salva
 function applyHeroBgImage(url){
