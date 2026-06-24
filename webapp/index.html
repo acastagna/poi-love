@@ -3866,36 +3866,38 @@ async function toggleLoveDB(poiId, badgeEl) {
 ══════════════════════════════════════════ */
 // 5 livelli normali (per punti) + 2 special di sostegno. Soglie e nomi REGOLABILI dal backend admin.
 const BADGES=[
-  {min:0,     max:1000,    label:'Amatore',     icon:'ph-fill ph-star',                  style:'background:rgba(245,158,11,.2);color:#FDE68A;border-color:rgba(245,158,11,.35)'},
-  {min:1001,  max:10000,   label:'Viaggiatore', icon:'ph-fill ph-airplane-tilt',         style:'background:rgba(5,150,105,.2);color:#6EE7B7;border-color:rgba(5,150,105,.35)'},
-  {min:10001, max:50000,   label:'Giramondo',   icon:'ph-fill ph-globe-hemisphere-west', style:'background:rgba(8,145,178,.2);color:#A5F3FC;border-color:rgba(8,145,178,.35)'},
-  {min:50001, max:150000,  label:'Instancabile',icon:'ph-fill ph-fire',                  style:'background:rgba(234,88,12,.2);color:#FED7AA;border-color:rgba(234,88,12,.35)'},
-  {min:150001,max:Infinity,label:'Leggenda',    icon:'ph-fill ph-crown',                 style:'background:rgba(124,58,237,.2);color:#DDD6FE;border-color:rgba(124,58,237,.35)'},
+  {min:0,     max:1000,    key:'tier_lvl_amatore',     label:'Amatore',     icon:'ph-fill ph-star',                  style:'background:rgba(245,158,11,.2);color:#FDE68A;border-color:rgba(245,158,11,.35)'},
+  {min:1001,  max:10000,   key:'tier_lvl_viaggiatore', label:'Viaggiatore', icon:'ph-fill ph-airplane-tilt',         style:'background:rgba(5,150,105,.2);color:#6EE7B7;border-color:rgba(5,150,105,.35)'},
+  {min:10001, max:50000,   key:'tier_lvl_giramondo',   label:'Giramondo',   icon:'ph-fill ph-globe-hemisphere-west', style:'background:rgba(8,145,178,.2);color:#A5F3FC;border-color:rgba(8,145,178,.35)'},
+  {min:50001, max:150000,  key:'tier_lvl_instancabile',label:'Instancabile',icon:'ph-fill ph-fire',                  style:'background:rgba(234,88,12,.2);color:#FED7AA;border-color:rgba(234,88,12,.35)'},
+  {min:150001,max:Infinity,key:'tier_lvl_leggenda',    label:'Leggenda',    icon:'ph-fill ph-crown',                 style:'background:rgba(124,58,237,.2);color:#DDD6FE;border-color:rgba(124,58,237,.35)'},
 ];
+// Etichetta tradotta di un badge a runtime (BADGES è definito prima di T/t: niente t() in fase di init)
+function badgeLabel(b){ return b && b.key ? t(b.key) : (b&&b.label)||''; }
 // SPECIAL di sostegno: assegnati dal backend a chi sostiene il progetto (NON per punti).
 // Blu notte metallico elegante. Danno AI illimitata (max 20 consultazioni/giorno) e badge esclusivo.
 const SPECIAL_TIERS={
-  sostenitore:{label:'Sostenitore', icon:'ph-fill ph-hand-heart', style:'background:linear-gradient(135deg,#1e3a8a 0%,#0b1226 52%,#1d4ed8 100%);color:#dbeafe;border-color:rgba(147,197,253,.6);box-shadow:0 3px 12px rgba(29,78,216,.45),inset 0 1px 0 rgba(255,255,255,.3)',
-    pitch:'Sostieni la mappa culturale libera. In cambio, vantaggi concreti: non solo un badge.',
-    cta:'Sostieni il progetto',
+  sostenitore:{labelKey:'tier_sostenitore', label:'Sostenitore', icon:'ph-fill ph-hand-heart', style:'background:linear-gradient(135deg,#1e3a8a 0%,#0b1226 52%,#1d4ed8 100%);color:#dbeafe;border-color:rgba(147,197,253,.6);box-shadow:0 3px 12px rgba(29,78,216,.45),inset 0 1px 0 rgba(255,255,255,.3)',
+    pitchKey:'tier_sost_pitch', pitch:'Sostieni la mappa culturale libera. In cambio, vantaggi concreti: non solo un badge.',
+    ctaKey:'tier_sost_cta', cta:'Sostieni il progetto',
     perks:[
-      {i:'ph-sparkle',      t:'ILLI•AI potenziata, 20 consigli al giorno'},
-      {i:'ph-seal-check',   t:'Spunta di verifica sul profilo'},
-      {i:'ph-map-pin-line', t:'I tuoi POI in evidenza sulla mappa'},
-      {i:'ph-palette',      t:'Copertine e temi profilo esclusivi'},
-      {i:'ph-rocket-launch',t:'Accesso anticipato alle nuove funzioni'},
-      {i:'ph-cards-three',  t:'Il tuo nome nel Muro dei Sostenitori'}
+      {i:'ph-sparkle',      k:'tier_sost_p1', t:'ILLI•AI potenziata, 20 consigli al giorno'},
+      {i:'ph-seal-check',   k:'tier_sost_p2', t:'Spunta di verifica sul profilo'},
+      {i:'ph-map-pin-line', k:'tier_sost_p3', t:'I tuoi POI in evidenza sulla mappa'},
+      {i:'ph-palette',      k:'tier_sost_p4', t:'Copertine e temi profilo esclusivi'},
+      {i:'ph-rocket-launch',k:'tier_sost_p5', t:'Accesso anticipato alle nuove funzioni'},
+      {i:'ph-cards-three',  k:'tier_sost_p6', t:'Il tuo nome nel Muro dei Sostenitori'}
     ]},
-  mecenate:   {label:'Mecenate',    icon:'ph-fill ph-medal',      style:'background:linear-gradient(135deg,#2563eb 0%,#070d1c 50%,#3b82f6 100%);color:#eff6ff;border-color:rgba(191,219,254,.7);box-shadow:0 3px 16px rgba(37,99,235,.55),inset 0 1px 0 rgba(255,255,255,.4)',
-    pitch:'Da grande mecenate: la cultura porta il tuo nome. Tutto del Sostenitore, e molto di piu.',
-    cta:'Diventa Mecenate',
+  mecenate:   {labelKey:'tier_mecenate', label:'Mecenate',    icon:'ph-fill ph-medal',      style:'background:linear-gradient(135deg,#2563eb 0%,#070d1c 50%,#3b82f6 100%);color:#eff6ff;border-color:rgba(191,219,254,.7);box-shadow:0 3px 16px rgba(37,99,235,.55),inset 0 1px 0 rgba(255,255,255,.4)',
+    pitchKey:'tier_mec_pitch', pitch:'Da grande mecenate: la cultura porta il tuo nome. Tutto del Sostenitore, e molto di piu.',
+    ctaKey:'tier_mec_cta', cta:'Diventa Mecenate',
     perks:[
-      {i:'ph-infinity',     t:'ILLI•AI senza limiti, ogni giorno'},
-      {i:'ph-trend-up',     t:'Profilo influencer: punti raddoppiati'},
-      {i:'ph-scroll',       t:'Adotta una rotta culturale con la tua dedica'},
-      {i:'ph-qr-code',      t:'Un QR business incluso per la tua attivita'},
-      {i:'ph-ticket',       t:'Inviti agli eventi POI•LOVE dal vivo'},
-      {i:'ph-compass-tool', t:'La tua voce sulla roadmap del progetto'}
+      {i:'ph-infinity',     k:'tier_mec_p1', t:'ILLI•AI senza limiti, ogni giorno'},
+      {i:'ph-trend-up',     k:'tier_mec_p2', t:'Profilo influencer: punti raddoppiati'},
+      {i:'ph-scroll',       k:'tier_mec_p3', t:'Adotta una rotta culturale con la tua dedica'},
+      {i:'ph-qr-code',      k:'tier_mec_p4', t:'Un QR business incluso per la tua attivita'},
+      {i:'ph-ticket',       k:'tier_mec_p5', t:'Inviti agli eventi POI•LOVE dal vivo'},
+      {i:'ph-compass-tool', k:'tier_mec_p6', t:'La tua voce sulla roadmap del progetto'}
     ]}
 };
 function getBadge(n){return BADGES.find(b=>n>=b.min&&n<=b.max)||BADGES[0]}
@@ -3906,15 +3908,15 @@ function renderBadge(points){
   const el=document.getElementById('profBadge');
   if(!el)return;
   el.setAttribute('style',b.style+';display:inline-flex;align-items:center;gap:6px;border-radius:20px;padding:5px 13px;font-size:12px;font-weight:800;border:1.5px solid');
-  el.innerHTML=`<i class="${b.icon}"></i><span>${b.label} · ${_fmtPts(points)} punti</span>`;
+  el.innerHTML=`<i class="${b.icon}"></i><span>${(b.labelKey?t(b.labelKey):badgeLabel(b))} · ${_fmtPts(points)} ${t('tier_points_suffix')}</span>`;
   const lbl=document.getElementById('badgeLabel');
-  if(lbl)lbl.textContent=b.label;
+  if(lbl)lbl.textContent=(b.labelKey?t(b.labelKey):badgeLabel(b));
   if(typeof renderLevelEnvs==='function') renderLevelEnvs(b.label);
   // Perk tier reale: spunta di verifica accanto al nome del mio profilo (solo Sostenitore/Mecenate)
   const nameEl=document.getElementById('myProfileName');
   if(nameEl){
     let chk=nameEl.querySelector('.verified-check');
-    if(tier && !chk){ chk=document.createElement('i'); chk.className='ph-fill ph-seal-check verified-check'; chk.title='Profilo verificato'; nameEl.appendChild(chk); }
+    if(tier && !chk){ chk=document.createElement('i'); chk.className='ph-fill ph-seal-check verified-check'; chk.title=t('tier_verified'); nameEl.appendChild(chk); }
     else if(!tier && chk){ chk.remove(); }
   }
 }
@@ -3929,28 +3931,31 @@ function openLevels(){
     const pts=(typeof currentPoints!=='undefined')?currentPoints:0;
     const cur=getBadge(pts);
     const fmt=n=> n>=1000 ? Math.round(n/1000)+'k' : n;
+    const youHere=`<span class="level-you">${t('tier_you_here')}</span>`;
     let html=BADGES.map(b=>{
       const isCur=!window._userSpecialTier && b.label===cur.label;
-      const soglia = b.max===Infinity ? ('da '+fmt(b.min)+' punti in su') : ('da '+fmt(b.min)+' a '+fmt(b.max)+' punti');
+      const soglia = b.max===Infinity
+        ? t('tier_from_points').replace('{x}', fmt(b.min))
+        : t('tier_range_points').replace('{x}', fmt(b.min)).replace('{y}', fmt(b.max));
       return `<div class="level-row${isCur?' current':''}">
         <div class="level-ico" style="${b.style};border-style:solid"><i class="${b.icon}"></i></div>
-        <div class="level-info"><div class="level-name">${b.label}${isCur?' <span class="level-you">tu sei qui</span>':''}</div><div class="level-thr">${soglia}</div></div>
+        <div class="level-info"><div class="level-name">${badgeLabel(b)}${isCur?' '+youHere:''}</div><div class="level-thr">${soglia}</div></div>
       </div>`;
     }).join('');
-    html += '<div class="level-special-sep">Livelli di sostegno, a chi sostiene il progetto</div>';
+    html += `<div class="level-special-sep">${t('tier_support_sep')}</div>`;
     html += Object.keys(SPECIAL_TIERS).map(k=>{
       const b=SPECIAL_TIERS[k];
       const isCur=window._userSpecialTier===k;
-      const perks=(b.perks||[]).map(p=>`<div class="tier-perk"><i class="ph-duotone ${p.i}"></i><span>${p.t}</span></div>`).join('');
+      const perks=(b.perks||[]).map(p=>`<div class="tier-perk"><i class="ph-duotone ${p.i}"></i><span>${p.k?t(p.k):p.t}</span></div>`).join('');
       return `<div class="tier-card${isCur?' current':''}" style="${b.style}">
         <div class="tier-head">
           <div class="tier-badge"><i class="${b.icon}"></i></div>
-          <div class="tier-ttl"><div class="tier-name">${b.label}${isCur?' <span class="level-you">tu sei qui</span>':''}</div><div class="tier-pitch">${b.pitch||''}</div></div>
+          <div class="tier-ttl"><div class="tier-name">${b.labelKey?t(b.labelKey):(b.label||'')}${isCur?' '+youHere:''}</div><div class="tier-pitch">${b.pitchKey?t(b.pitchKey):(b.pitch||'')}</div></div>
         </div>
         <div class="tier-perks">${perks}</div>
         ${isCur
-          ? '<div class="tier-active"><i class="ph-fill ph-check-circle"></i> Grazie per il tuo sostegno</div>'
-          : `<button class="tier-cta" onclick="becomeSupporter('${k}')"><i class="ph-fill ph-hand-heart"></i> ${b.cta||'Sostieni'}</button>`}
+          ? `<div class="tier-active"><i class="ph-fill ph-check-circle"></i> ${t('tier_thanks')}</div>`
+          : `<button class="tier-cta" onclick="becomeSupporter('${k}')"><i class="ph-fill ph-hand-heart"></i> ${b.ctaKey?t(b.ctaKey):(b.cta||t('tier_cta_fallback'))}</button>`}
       </div>`;
     }).join('');
     wrap.innerHTML=html;
@@ -3961,11 +3966,12 @@ function closeLevels(){ document.getElementById('levelsOv')?.classList.remove('s
 // CTA dei tier di sostegno: niente acquisto in-app (policy store + missione culturale).
 // Il sostegno passa da un contatto diretto; sara' il backend ad assegnare special_tier.
 function becomeSupporter(tier){
-  const t = SPECIAL_TIERS[tier]; if(!t) return;
-  const subject = `Voglio diventare ${t.label} di POI•LOVE`;
-  const body = `Ciao team POI•LOVE,\n\nvoglio sostenere il progetto come ${t.label}.\nFatemi sapere come procedere.\n\nGrazie!`;
+  const tierObj = SPECIAL_TIERS[tier]; if(!tierObj) return;
+  const tierLabel = tierObj.labelKey ? t(tierObj.labelKey) : (tierObj.label||'');
+  const subject = t('tier_mail_subject').replace('{label}', tierLabel);
+  const body = t('tier_mail_body').replace('{label}', tierLabel);
   try{ window.location.href = `mailto:it@altrostile.app?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`; }catch(e){}
-  showToast?.(`💙 Grazie! Ti mettiamo in contatto per diventare ${t.label}`);
+  showToast?.(t('tier_toast_contact').replace('{label}', tierLabel));
 }
 
 let currentPoints=0;
@@ -4060,7 +4066,40 @@ const T={
     /* Common toasts */
     toast_login_required:'⚠️ Accedi per salvare il POI',toast_no_user:'Nessun utente selezionato',toast_bio_updated:'Bio aggiornata',toast_invite_ready:'📧 Invito pronto per',toast_invite_dest1:'destinatario',toast_invite_destN:'destinatari',toast_only_local:'⚠ Lista salvata solo localmente',toast_list_added:'+ Lista',toast_tag_added:'+ Tag',
     /* Follow */
-    follow_now:'Stai seguendo',follow_no_more:'Non segui più',},
+    follow_now:'Stai seguendo',follow_no_more:'Non segui più',
+    /* Tier / Livelli */
+    tier_lvl_amatore:'Amatore',tier_lvl_viaggiatore:'Viaggiatore',tier_lvl_giramondo:'Giramondo',tier_lvl_instancabile:'Instancabile',tier_lvl_leggenda:'Leggenda',
+    tier_sostenitore:'Sostenitore',tier_mecenate:'Mecenate',
+    tier_sost_pitch:'Sostieni la mappa culturale libera. In cambio, vantaggi concreti: non solo un badge.',
+    tier_sost_cta:'Sostieni il progetto',
+    tier_sost_p1:'ILLI•AI potenziata, 20 consigli al giorno',tier_sost_p2:'Spunta di verifica sul profilo',tier_sost_p3:'I tuoi POI in evidenza sulla mappa',tier_sost_p4:'Copertine e temi profilo esclusivi',tier_sost_p5:'Accesso anticipato alle nuove funzioni',tier_sost_p6:'Il tuo nome nel Muro dei Sostenitori',
+    tier_mec_pitch:'Da grande mecenate: la cultura porta il tuo nome. Tutto del Sostenitore, e molto di piu.',
+    tier_mec_cta:'Diventa Mecenate',
+    tier_mec_p1:'ILLI•AI senza limiti, ogni giorno',tier_mec_p2:'Profilo influencer: punti raddoppiati',tier_mec_p3:'Adotta una rotta culturale con la tua dedica',tier_mec_p4:'Un QR business incluso per la tua attivita',tier_mec_p5:'Inviti agli eventi POI•LOVE dal vivo',tier_mec_p6:'La tua voce sulla roadmap del progetto',
+    tier_cta_fallback:'Sostieni',
+    tier_points_suffix:'punti',
+    tier_verified:'Profilo verificato',
+    tier_you_here:'tu sei qui',
+    tier_from_points:'da {x} punti in su',tier_range_points:'da {x} a {y} punti',
+    tier_support_sep:'Livelli di sostegno, a chi sostiene il progetto',
+    tier_thanks:'Grazie per il tuo sostegno',
+    tier_mail_subject:'Voglio diventare {label} di POI•LOVE',
+    tier_mail_body:'Ciao team POI•LOVE,\n\nvoglio sostenere il progetto come {label}.\nFatemi sapere come procedere.\n\nGrazie!',
+    tier_toast_contact:'💙 Grazie! Ti mettiamo in contatto per diventare {label}',
+    tier_levels_title:'I livelli di POI•LOVE',
+    tier_levels_sub:'Più sei attivo, più sali. Ogni azione e ogni condivisione ti fanno crescere.',
+    tier_levels_foot:'Punti per azione e vantaggi di ogni livello si imposteranno dal pannello admin.',
+    /* Referral */
+    ref_sub:'Invita gli amici. Quando si iscrivono, guadagni punti e fai carriera.',
+    ref_code_lbl:'Il tuo codice invito',
+    ref_code_hint:'Tocca per copiare',
+    ref_email_ph:"email dell'amico",
+    ref_invite_btn:'Invita',
+    ref_or_share:'oppure condividi su',
+    ref_earn_pre:'Guadagni',ref_earn_post:'per ogni amico che si iscrive',
+    ref_pts_placeholder:'punti',
+    ref_admin_note:'(il valore si imposterà dal pannello admin)',
+    ref_close:'Chiudi',},
   sq:{nav_map:'Harta',nav_itin:'Itinerare',nav_profile:'Profili',mt_street:'Rrugore',mt_sat:'Satelitor',mt_routes:'Rrugët Historike',fab_poi:'Shëno një vend',fab_itin:'Stacion Itinerarit',add_title:'Ruaj këtë vend',add_sub:'Shto një vend që e do',add_challenge:'Arrin brenda 60 sekondave?',loc_hint_use:'Përdor si emër',congrats:'',lbl_name:'Emri i vendit',req:'E DETYRUESHME',lbl_where:'Ku ndodhet',loc_gps:'GPS Live',loc_exif:'EXIF Foto',loc_addr:'Adresë',loc_map:'Prek hartën',lbl_photos:'Foto',ph_main:'Kryesore',ph_2:'Foto 2',ph_3:'Foto 3',ph_hint:'Nuk jeni aty? Mund të shtoni foto më vonë.',lbl_story:'Trego',lbl_cat:'Kategori',lbl_list:'Shto në listë',lbl_route:'Rrugë Historike',route_none:'Asnjë rrugë historike',lbl_vis:'Dukshmëria',vis_pub_btn:'Publik',vis_prv_btn:'Privat',vis_share_btn:'Nda',save_disabled:'Fut emrin për të vazhduar',save_ready:'Shëno në hartë',google_suggest:'Sugjeroni te Google Maps',stop_title:'Stacion Itinerarit',stop_sub:'Pa foto. Planifiko tani, trego kur je aty.',stop_lbl_name:'Emri i stacionit',stop_lbl_cat:'Kategori',stop_lbl_vis:'Dukshmëria Itinerarit',itin_pub:'Publik',itin_prv:'Privat',stop_lbl_date:'Data e planifikuar',stop_save:'Shto stacionin',stat_poi:'POI',stat_love:'Love',stat_list:'Lista',stat_itin:'Itinerare',stat_comp:'Shoqëri',diffondi:'Përhap POI•LOVE',prof_lists:'Listat e mia',prof_new_list:'Listë e re',prof_tags:'Etiketat e mia',prof_new_tag:'Shto',prof_my_poi:'POI-të e mia',prof_add_poi:'Shto',prof_pub_toggle:'Si më shohin të tjerët',itin_h:'Itinerare Udhëtimi',itin_desc:'Planifikoni stacionet para nisjes. Gjeni shokë udhëtimi.',itin_open:'Hap Itineraret',itin_note:'Hartë, mini-kalendar, GPS live.',back:'Kthehu',cr_top:'Krijim i POI•LOVE nga 321.AL',cr_bot:'Projekt Open Source · Ide dhe Drejtim Krijues: Alessandro Castagna© · Liçensë MIT',
     /* Auth overlay */
     auth_tagline:'vendet e zemrës',auth_apple:'Apple ID',auth_passkey:'Hyr me biometri',auth_passkey_as:'Hyr si',auth_passkey_need_email:'✉️ Vendos email-in tënd më poshtë dhe shtyp "Dërgo linkun"',auth_or_magic:'ose me link magjik via email',auth_email_ph:'email-juaj@email.com',auth_email_send:'Dërgo linkun',auth_terms:'Duke hyrë pranoni Kushtet e shërbimit të POI•LOVE',auth_oss:'Projekt Open Source · Liçensë MIT · © 2026 321.AL',auth_continue_google:'Vazhdo me Google',auth_continue_apple:'Vazhdo me Apple',auth_continue_li:'Vazhdo me LinkedIn',auth_continue_fb:'Vazhdo me Facebook',auth_continue_x:'Vazhdo me X',auth_email_invalid:'Vendos një email të vlefshëm',auth_link_sent:'📧 Linku u dërgua! Kontrollo postën.',auth_welcome_back:'Mirëserdhe',auth_provider_off:'nuk është aktivuar ende (Supabase → Auth → Providers)',auth_soon:'së shpejti',auth_guest:'Hyr e shiko',guest_active:'👀 Po eksploron si vizitor, hyr për të krijuar vendet e tua',
@@ -4075,7 +4114,40 @@ const T={
     /* Common toasts */
     toast_login_required:'⚠️ Hyni për të ruajtur POI-n',toast_no_user:'Asnjë përdorues i zgjedhur',toast_bio_updated:'Bio u përditësua',toast_invite_ready:'📧 Ftesa gati për',toast_invite_dest1:'marrës',toast_invite_destN:'marrës',toast_only_local:'⚠ Lista u ruajt vetëm lokalisht',toast_list_added:'+ Listë',toast_tag_added:'+ Etiketë',
     /* Follow */
-    follow_now:'Po ndjek',follow_no_more:'Nuk ndjek më',},
+    follow_now:'Po ndjek',follow_no_more:'Nuk ndjek më',
+    /* Tier / Livelli */
+    tier_lvl_amatore:'Amator',tier_lvl_viaggiatore:'Udhëtar',tier_lvl_giramondo:'Endacak',tier_lvl_instancabile:'I palodhur',tier_lvl_leggenda:'Legjendë',
+    tier_sostenitore:'Mbështetës',tier_mecenate:'Mecen',
+    tier_sost_pitch:'Mbështet hartën kulturore të lirë. Në këmbim, përfitime konkrete: jo thjesht një stemë.',
+    tier_sost_cta:'Mbështet projektin',
+    tier_sost_p1:'ILLI•AI e fuqizuar, 20 këshilla në ditë',tier_sost_p2:'Shenjë verifikimi në profil',tier_sost_p3:'POI-të e tua në pah në hartë',tier_sost_p4:'Kopertina dhe tema profili ekskluzive',tier_sost_p5:'Qasje e parakohshme te funksionet e reja',tier_sost_p6:'Emri yt në Murin e Mbështetësve',
+    tier_mec_pitch:'Si mecen i madh: kultura mban emrin tënd. Gjithçka e Mbështetësit, dhe shumë më tepër.',
+    tier_mec_cta:'Bëhu Mecen',
+    tier_mec_p1:'ILLI•AI pa kufij, çdo ditë',tier_mec_p2:'Profil influencer: pikë të dyfishuara',tier_mec_p3:'Birëso një rrugë kulturore me dedikimin tënd',tier_mec_p4:'Një QR biznesi i përfshirë për aktivitetin tënd',tier_mec_p5:'Ftesa në eventet POI•LOVE drejtpërdrejt',tier_mec_p6:'Zëri yt në planin e projektit',
+    tier_cta_fallback:'Mbështet',
+    tier_points_suffix:'pikë',
+    tier_verified:'Profil i verifikuar',
+    tier_you_here:'ti je këtu',
+    tier_from_points:'nga {x} pikë e lart',tier_range_points:'nga {x} deri në {y} pikë',
+    tier_support_sep:'Nivele mbështetjeje, për ata që mbështesin projektin',
+    tier_thanks:'Faleminderit për mbështetjen tënde',
+    tier_mail_subject:'Dua të bëhem {label} i POI•LOVE',
+    tier_mail_body:'Përshëndetje ekipi POI•LOVE,\n\ndua të mbështes projektin si {label}.\nMë tregoni si të vazhdoj.\n\nFaleminderit!',
+    tier_toast_contact:'💙 Faleminderit! Të lidhim për t\'u bërë {label}',
+    tier_levels_title:'Nivelet e POI•LOVE',
+    tier_levels_sub:'Sa më aktiv të jesh, aq më lart ngjitesh. Çdo veprim dhe çdo ndarje të bëjnë të rritesh.',
+    tier_levels_foot:'Pikët për veprim dhe përfitimet e çdo niveli do të caktohen nga paneli admin.',
+    /* Referral */
+    ref_sub:'Fto miqtë. Kur regjistrohen, fiton pikë dhe ngjitesh në nivel.',
+    ref_code_lbl:'Kodi yt i ftesës',
+    ref_code_hint:'Prek për të kopjuar',
+    ref_email_ph:'email-i i mikut',
+    ref_invite_btn:'Fto',
+    ref_or_share:'ose ndaje në',
+    ref_earn_pre:'Fiton',ref_earn_post:'për çdo mik që regjistrohet',
+    ref_pts_placeholder:'pikë',
+    ref_admin_note:'(vlera do të caktohet nga paneli admin)',
+    ref_close:'Mbyll',},
   en:{nav_map:'Map',nav_itin:'Itineraries',nav_profile:'Profile',mt_street:'Street',mt_sat:'Satellite',mt_routes:'Historic Routes',fab_poi:'Mark a place',fab_itin:'Itinerary Stop',add_title:'Save this place',add_sub:'Add a place you love',add_challenge:'Can you do it in 60 seconds?',loc_hint_use:'Use as name',congrats:'',lbl_name:'Place name',req:'REQUIRED',lbl_where:'Where is it',loc_gps:'GPS Live',loc_exif:'Photo EXIF',loc_addr:'Address',loc_map:'Tap map',lbl_photos:'Photos',ph_main:'Main',ph_2:'Photo 2',ph_3:'Photo 3',ph_hint:"Not there yet? You can add photos later.",lbl_story:'Tell your story',lbl_cat:'Categories',lbl_list:'Add to a list',lbl_route:'Historic Route',route_none:'No historic route',lbl_vis:'Visibility',vis_pub_btn:'Public',vis_prv_btn:'Private',vis_share_btn:'Share',save_disabled:'Enter the name to continue',save_ready:'Mark on map',google_suggest:'Suggest to Google Maps',stop_title:'Itinerary Stop',stop_sub:"No photos. Plan now, tell the story when you're there.",stop_lbl_name:'Stop name',stop_lbl_cat:'Category',stop_lbl_vis:'Itinerary Visibility',itin_pub:'Public',itin_prv:'Private',stop_lbl_date:'Planned date',stop_save:'Add stop',stat_poi:'POI',stat_love:'Love',stat_list:'Lists',stat_itin:'Itineraries',stat_comp:'Companions',diffondi:'Spread POI•LOVE',prof_lists:'My lists',prof_new_list:'New list',prof_tags:'My tags',prof_new_tag:'Add',prof_my_poi:'My POIs',prof_add_poi:'Add',prof_pub_toggle:'How others see me',itin_h:'Travel Itineraries',itin_desc:'Plan your stops before you leave. Find travel companions.',itin_open:'Open Itineraries',itin_note:'Map, mini-calendar, live GPS and companions.',back:'Back',cr_top:'POI•LOVE created by 321.AL',cr_bot:'Open Source Project · Creative Direction: Alessandro Castagna© · MIT License',
     /* Auth overlay */
     auth_tagline:'places of the heart',auth_apple:'Apple ID',auth_passkey:'Sign in with Biometrics',auth_passkey_as:'Sign in as',auth_passkey_need_email:'✉️ Enter your email below and tap "Send link"',auth_or_magic:'or with magic link via email',auth_email_ph:'your@email.com',auth_email_send:'Send link',auth_terms:'By signing in you accept POI•LOVE Terms of Service',auth_oss:'Open Source Project · MIT License · © 2026 321.AL',auth_continue_google:'Continue with Google',auth_continue_apple:'Continue with Apple',auth_continue_li:'Continue with LinkedIn',auth_continue_fb:'Continue with Facebook',auth_continue_x:'Continue with X',auth_email_invalid:'Enter a valid email',auth_link_sent:'📧 Link sent! Check your mail.',auth_welcome_back:'Welcome back',auth_provider_off:'not yet enabled (Supabase → Auth → Providers)',auth_soon:'soon',auth_guest:'Look around',guest_active:'👀 You are exploring as a guest, sign in to create your places',
@@ -4090,7 +4162,40 @@ const T={
     /* Common toasts */
     toast_login_required:'⚠️ Sign in to save the POI',toast_no_user:'No user selected',toast_bio_updated:'Bio updated',toast_invite_ready:'📧 Invitation ready for',toast_invite_dest1:'recipient',toast_invite_destN:'recipients',toast_only_local:'⚠ List saved only locally',toast_list_added:'+ List',toast_tag_added:'+ Tag',
     /* Follow */
-    follow_now:'Now following',follow_no_more:'Unfollowed',}
+    follow_now:'Now following',follow_no_more:'Unfollowed',
+    /* Tier / Levels */
+    tier_lvl_amatore:'Amateur',tier_lvl_viaggiatore:'Traveler',tier_lvl_giramondo:'Globetrotter',tier_lvl_instancabile:'Tireless',tier_lvl_leggenda:'Legend',
+    tier_sostenitore:'Supporter',tier_mecenate:'Patron',
+    tier_sost_pitch:'Support the free cultural map. In return, real perks: not just a badge.',
+    tier_sost_cta:'Support the project',
+    tier_sost_p1:'Boosted ILLI•AI, 20 tips a day',tier_sost_p2:'Verified check on your profile',tier_sost_p3:'Your POIs featured on the map',tier_sost_p4:'Exclusive profile covers and themes',tier_sost_p5:'Early access to new features',tier_sost_p6:'Your name on the Supporters Wall',
+    tier_mec_pitch:'As a great patron: culture carries your name. Everything in Supporter, and much more.',
+    tier_mec_cta:'Become a Patron',
+    tier_mec_p1:'Unlimited ILLI•AI, every day',tier_mec_p2:'Influencer profile: double points',tier_mec_p3:'Adopt a cultural route with your dedication',tier_mec_p4:'A business QR included for your activity',tier_mec_p5:'Invitations to live POI•LOVE events',tier_mec_p6:'Your voice on the project roadmap',
+    tier_cta_fallback:'Support',
+    tier_points_suffix:'points',
+    tier_verified:'Verified profile',
+    tier_you_here:'you are here',
+    tier_from_points:'from {x} points up',tier_range_points:'from {x} to {y} points',
+    tier_support_sep:'Support levels, for those who back the project',
+    tier_thanks:'Thank you for your support',
+    tier_mail_subject:'I want to become a {label} of POI•LOVE',
+    tier_mail_body:'Hi POI•LOVE team,\n\nI want to support the project as a {label}.\nLet me know how to proceed.\n\nThanks!',
+    tier_toast_contact:'💙 Thanks! We will get in touch to make you a {label}',
+    tier_levels_title:'POI•LOVE levels',
+    tier_levels_sub:'The more active you are, the higher you climb. Every action and every share helps you grow.',
+    tier_levels_foot:'Points per action and perks for each level will be set from the admin panel.',
+    /* Referral */
+    ref_sub:'Invite your friends. When they sign up, you earn points and level up.',
+    ref_code_lbl:'Your invite code',
+    ref_code_hint:'Tap to copy',
+    ref_email_ph:"friend's email",
+    ref_invite_btn:'Invite',
+    ref_or_share:'or share on',
+    ref_earn_pre:'You earn',ref_earn_post:'for every friend who signs up',
+    ref_pts_placeholder:'points',
+    ref_admin_note:'(the value will be set from the admin panel)',
+    ref_close:'Close',}
 };
 
 /* Helper: t('key', fallback) — usato in JS dinamico */
@@ -4135,6 +4240,14 @@ function applyLang(l){
   document.querySelectorAll('[data-lang]').forEach(el=>{
     el.classList.toggle('active', el.dataset.lang===l);
   });
+  // 5) Nodi badge/livello generati da JS (non hanno data-t): li ri-renderizzo nella nuova lingua
+  try{
+    if(typeof renderBadge==='function' && document.getElementById('profBadge')){
+      renderBadge(typeof currentPoints!=='undefined'?currentPoints:0);
+    }
+    const refPts=document.getElementById('referralPts');
+    if(refPts && tx && tx.ref_pts_placeholder!==undefined) refPts.textContent=tx.ref_pts_placeholder;
+  }catch(_){}
 }
 function cycleLang(){applyLang(LANGS[(LANGS.indexOf(lang)+1)%LANGS.length])}
 
@@ -7249,7 +7362,7 @@ let avSelEnv='Comics';
 function changeAvatar(){
   const badge=getBadge(currentPoints);
   const el=document.getElementById('avLevelText');
-  if(el)el.textContent=`${badge.label} · ${_fmtPts(currentPoints)} punti`;
+  if(el)el.textContent=`${badgeLabel(badge)} · ${_fmtPts(currentPoints)} ${t('tier_points_suffix')}`;
   renderAvEnvGrid();
   document.getElementById('avPopupOv').classList.add('open');
 }
@@ -7385,7 +7498,7 @@ function syncOwnPublicPreview(){
   if(myName && pubName){
     pubName.textContent=myName;
     // Perk tier: replica la spunta di verifica anche nella preview pubblica (come mi vedono gli altri)
-    if(window._userSpecialTier){ const c=document.createElement('i'); c.className='ph-fill ph-seal-check verified-check'; c.title='Profilo verificato'; pubName.appendChild(c); }
+    if(window._userSpecialTier){ const c=document.createElement('i'); c.className='ph-fill ph-seal-check verified-check'; c.title=t('tier_verified'); pubName.appendChild(c); }
   }
   // (Email rimossa dal profilo pubblico: non si mostra agli altri, è privacy)
   // Vanity URL
@@ -8001,6 +8114,9 @@ function _referralUrl(){ return 'https://poilove.com/?ref='+encodeURIComponent(_
 function shareReferral(){
   const code=document.getElementById('referralCode');
   if(code) code.textContent='@'+_referralHandle();
+  // Placeholder "punti" localizzato (verrà sovrascritto dal valore reale del backend)
+  const ptsEl=document.getElementById('referralPts');
+  if(ptsEl) ptsEl.textContent=t('ref_pts_placeholder');
   document.getElementById('referralOv')?.classList.add('show');
 }
 function closeReferral(){ document.getElementById('referralOv')?.classList.remove('show'); }
@@ -9714,22 +9830,22 @@ async function confirmPhotoPicker(){
 
 <!-- ═══ REFERRAL POPUP — Diffondi POI•LOVE ═══ -->
 <div id="referralOv" onclick="if(event.target===this)closeReferral()">
-  <button class="referral-close" onclick="closeReferral()" aria-label="Chiudi"><i class="ph-duotone ph-x"></i></button>
+  <button class="referral-close" onclick="closeReferral()" data-tt="ref_close" aria-label="Chiudi"><i class="ph-duotone ph-x"></i></button>
   <div class="referral-card">
     <div class="referral-hero">
       <div class="referral-hero-ico"><i class="ph-duotone ph-megaphone"></i></div>
-      <div class="referral-title">Diffondi POI•LOVE</div>
-      <div class="referral-sub">Invita gli amici. Quando si iscrivono, guadagni punti e fai carriera.</div>
+      <div class="referral-title" data-t="diffondi">Diffondi POI•LOVE</div>
+      <div class="referral-sub" data-t="ref_sub">Invita gli amici. Quando si iscrivono, guadagni punti e fai carriera.</div>
     </div>
     <div class="referral-body">
-      <div class="referral-code-lbl">Il tuo codice invito</div>
+      <div class="referral-code-lbl" data-t="ref_code_lbl">Il tuo codice invito</div>
       <div class="referral-code" id="referralCode" onclick="copyReferralCode()">@tu</div>
-      <div class="referral-code-hint"><i class="ph-duotone ph-copy"></i> Tocca per copiare</div>
+      <div class="referral-code-hint"><i class="ph-duotone ph-copy"></i> <span data-t="ref_code_hint">Tocca per copiare</span></div>
       <div class="referral-email-row">
-        <input id="referralEmail" type="email" placeholder="email dell'amico" class="referral-email-in" autocomplete="off">
-        <button class="referral-email-btn" onclick="sendReferralEmail()"><i class="ph-duotone ph-paper-plane-tilt"></i> Invita</button>
+        <input id="referralEmail" type="email" placeholder="email dell'amico" data-tp="ref_email_ph" class="referral-email-in" autocomplete="off">
+        <button class="referral-email-btn" onclick="sendReferralEmail()"><i class="ph-duotone ph-paper-plane-tilt"></i> <span data-t="ref_invite_btn">Invita</span></button>
       </div>
-      <div class="referral-social-lbl">oppure condividi su</div>
+      <div class="referral-social-lbl" data-t="ref_or_share">oppure condividi su</div>
       <div class="referral-social-row">
         <button class="referral-social" style="--c:#25D366" onclick="shareReferralVia('whatsapp')" title="WhatsApp"><i class="ph-duotone ph-whatsapp-logo"></i></button>
         <button class="referral-social" style="--c:#0088CC" onclick="shareReferralVia('telegram')" title="Telegram"><i class="ph-duotone ph-telegram-logo"></i></button>
@@ -9739,7 +9855,7 @@ async function confirmPhotoPicker(){
       </div>
       <div class="referral-points">
         <i class="ph-fill ph-star"></i>
-        <span>Guadagni <b id="referralPts">punti</b> per ogni amico che si iscrive<br><span class="referral-points-sub">(il valore si imposterà dal pannello admin)</span></span>
+        <span><span data-t="ref_earn_pre">Guadagni</span> <b id="referralPts">punti</b> <span data-t="ref_earn_post">per ogni amico che si iscrive</span><br><span class="referral-points-sub" data-t="ref_admin_note">(il valore si imposterà dal pannello admin)</span></span>
       </div>
     </div>
   </div>
@@ -9747,15 +9863,15 @@ async function confirmPhotoPicker(){
 
 <!-- ═══ LIVELLI POPUP — I livelli di POI•LOVE ═══ -->
 <div id="levelsOv" onclick="if(event.target===this)closeLevels()">
-  <button class="referral-close" onclick="closeLevels()" aria-label="Chiudi"><i class="ph-duotone ph-x"></i></button>
+  <button class="referral-close" onclick="closeLevels()" data-tt="ref_close" aria-label="Chiudi"><i class="ph-duotone ph-x"></i></button>
   <div class="levels-card">
     <div class="levels-hero">
       <div class="levels-avatar" id="levelsAvatar"><i class="ph-duotone ph-user"></i></div>
-      <div class="levels-title">I livelli di POI•LOVE</div>
-      <div class="levels-sub">Più sei attivo, più sali. Ogni azione e ogni condivisione ti fanno crescere.</div>
+      <div class="levels-title" data-t="tier_levels_title">I livelli di POI•LOVE</div>
+      <div class="levels-sub" data-t="tier_levels_sub">Più sei attivo, più sali. Ogni azione e ogni condivisione ti fanno crescere.</div>
     </div>
     <div class="levels-body" id="levelsList"></div>
-    <div class="levels-foot"><i class="ph-duotone ph-info"></i> Punti per azione e vantaggi di ogni livello si imposteranno dal pannello admin.</div>
+    <div class="levels-foot"><i class="ph-duotone ph-info"></i> <span data-t="tier_levels_foot">Punti per azione e vantaggi di ogni livello si imposteranno dal pannello admin.</span></div>
   </div>
 </div>
 
