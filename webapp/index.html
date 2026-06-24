@@ -3874,14 +3874,14 @@ const SPECIAL_TIERS={
   mecenate:   {label:'Mecenate',    icon:'ph-fill ph-medal',      style:'background:linear-gradient(135deg,#2563eb 0%,#070d1c 50%,#3b82f6 100%);color:#eff6ff;border-color:rgba(191,219,254,.7);box-shadow:0 3px 16px rgba(37,99,235,.55),inset 0 1px 0 rgba(255,255,255,.4)'}
 };
 function getBadge(n){return BADGES.find(b=>n>=b.min&&n<=b.max)||BADGES[0]}
-function renderBadge(loves){
+function renderBadge(points){
   // Se l'utente sostiene il progetto (flag dal backend), il badge SPECIAL ha priorità sul livello a punti.
   const tier=(typeof window!=='undefined' && window._userSpecialTier) || null;
-  const b=(tier && SPECIAL_TIERS[tier]) ? SPECIAL_TIERS[tier] : getBadge(loves);
+  const b=(tier && SPECIAL_TIERS[tier]) ? SPECIAL_TIERS[tier] : getBadge(points);
   const el=document.getElementById('profBadge');
   if(!el)return;
   el.setAttribute('style',b.style+';display:inline-flex;align-items:center;gap:6px;border-radius:20px;padding:5px 13px;font-size:12px;font-weight:800;border:1.5px solid');
-  el.innerHTML=`<i class="${b.icon}"></i><span>${b.label} · ${loves} love</span>`;
+  el.innerHTML=`<i class="${b.icon}"></i><span>${b.label} · ${_fmtPts(points)} punti</span>`;
   const lbl=document.getElementById('badgeLabel');
   if(lbl)lbl.textContent=b.label;
   if(typeof renderLevelEnvs==='function') renderLevelEnvs(b.label);
@@ -3894,8 +3894,8 @@ function openLevels(){
   if(av) av.innerHTML = myImg ? `<img src="${myImg}" alt="avatar">` : '<i class="ph-duotone ph-user"></i>';
   const wrap=document.getElementById('levelsList');
   if(wrap){
-    const loves=(typeof currentLoves!=='undefined')?currentLoves:0;
-    const cur=getBadge(loves);
+    const pts=(typeof currentPoints!=='undefined')?currentPoints:0;
+    const cur=getBadge(pts);
     const fmt=n=> n>=1000 ? Math.round(n/1000)+'k' : n;
     let html=BADGES.map(b=>{
       const isCur=!window._userSpecialTier && b.label===cur.label;
@@ -3920,15 +3920,23 @@ function openLevels(){
 }
 function closeLevels(){ document.getElementById('levelsOv')?.classList.remove('show'); }
 
+let currentPoints=0;
+// Formattazione compatta dei punti (coerente col popup livelli): 1250 -> "1k"
+function _fmtPts(n){ return n>=1000 ? Math.round(n/1000)+'k' : n; }
 async function loadUserLovesCount(){
-  if(!currentUser) return;
-  const {count}=await sb.from('loves').select('*',{count:'exact',head:true}).eq('user_id',currentUser.id);
-  currentLoves=count||0;
-  renderBadge(currentLoves);
+  if(!currentUser || typeof sb==='undefined' || !sb) return;
+  // Love count (contatore "amore") + punti gamification e tier special dal profilo (livello = punti)
+  try{
+    const lovesRes=await sb.from('loves').select('*',{count:'exact',head:true}).eq('user_id',currentUser.id);
+    if(!lovesRes.error) currentLoves=lovesRes.count||0;
+    const {data:prof,error:pErr}=await sb.from('profiles').select('points,special_tier').eq('id',currentUser.id).maybeSingle();
+    if(!pErr && prof){ currentPoints = prof.points||0; window._userSpecialTier = prof.special_tier||null; }
+  }catch(e){ console.warn('loadUserLovesCount:', e); /* badge resta sui valori precedenti */ }
+  renderBadge(currentPoints);
 }
 
 function generateAvatar(){
-  const b=getBadge(currentLoves);
+  const b=getBadge(currentPoints);
   openAvPopup();
 }
 
@@ -6698,9 +6706,8 @@ async function toggleLove(){
     await sb.from('pois').update({love_count:newCount}).eq('id',currentPOI.id);
     currentPOI.love_count=newCount;
     showToast('❤️ LOVE!');
-    // Aggiorna badge personale
-    currentLoves=(currentLoves||0)+1;
-    renderBadge(currentLoves);
+    // I punti li ha gia' accreditati il trigger DB (love_given): ricarico love + punti reali per il badge
+    loadUserLovesCount();
   }
 }
 function openNavigation(){
@@ -7086,9 +7093,9 @@ const AV_ENVS={
 };
 let avSelEnv='Comics';
 function changeAvatar(){
-  const badge=getBadge(currentLoves);
+  const badge=getBadge(currentPoints);
   const el=document.getElementById('avLevelText');
-  if(el)el.textContent=`${badge.label} · ${currentLoves} love`;
+  if(el)el.textContent=`${badge.label} · ${_fmtPts(currentPoints)} punti`;
   renderAvEnvGrid();
   document.getElementById('avPopupOv').classList.add('open');
 }
@@ -7459,7 +7466,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   // Lang
   applyLang(lang);
   // Badge
-  renderBadge(currentLoves);
+  renderBadge(currentPoints);
   // Voice
   initVoice();
   // Close buttons — explicit event listeners (fix mobile Safari)
@@ -7738,7 +7745,7 @@ function renderLevelEnvs(levelName){
 }
 function selectEnv(idx){
   selectedEnvIdx=idx;
-  const badge=getBadge(currentLoves);
+  const badge=getBadge(currentPoints);
   renderLevelEnvs(badge.label);
   showToast('Ambiente selezionato!');
 }
@@ -7802,14 +7809,15 @@ function closeReferral(){ document.getElementById('referralOv')?.classList.remov
 function copyReferralCode(){
   navigator.clipboard?.writeText('@'+_referralHandle()).then(()=>showToast('✓ Codice invito copiato!'));
 }
-function sendReferralEmail(){
+async function sendReferralEmail(){
   const inp=document.getElementById('referralEmail'); const to=(inp?.value||'').trim();
   if(!to || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(to)){ showToast('Inserisci una email valida'); inp?.focus(); return; }
   // Per ora apre il client email (testo). Col backend partirà una mail HTML curata col template dedicato.
   const subj=encodeURIComponent('Ti aspetto su POI•LOVE');
   const body=encodeURIComponent('Ciao!\n\nHo scoperto POI•LOVE, la mappa dei luoghi del cuore: posti veri, amati dalle persone, non scelti da un algoritmo.\n\nUnisciti a me qui:\n'+_referralUrl()+'\n\nA presto su POI•LOVE!');
-  window.location.href='mailto:'+encodeURIComponent(to)+'?subject='+subj+'&body='+body;
+  await _awardShare('profile');   // accredito il punto PRIMA di lasciare la pagina col mailto
   showToast('Apertura email per '+to);
+  window.location.href='mailto:'+encodeURIComponent(to)+'?subject='+subj+'&body='+body;
 }
 function shareReferralVia(platform){
   const url=encodeURIComponent(_referralUrl());
@@ -7821,7 +7829,16 @@ function shareReferralVia(platform){
     linkedin:'https://www.linkedin.com/sharing/share-offsite/?url='+url,
     x:'https://twitter.com/intent/tweet?text='+text+'&url='+url
   };
-  if(links[platform]) window.open(links[platform],'_blank','noopener');
+  if(links[platform]){ window.open(links[platform],'_blank','noopener'); _awardShare('profile'); }
+}
+// Accredita il punto "share" lato server (RPC con validazione entita' + tetto giornaliero). Aggiorna il badge.
+async function _awardShare(entity){
+  if(!currentUser || typeof sb==='undefined' || !sb) return;
+  try{
+    const {data,error}=await sb.rpc('award_share',{p_entity:entity});
+    if(error) throw error;
+    if(typeof data==='number'){ currentPoints=data; renderBadge(currentPoints); }
+  }catch(e){ console.warn('award_share:', e); }
 }
 
 /* ── Modale edit vanity ── */
