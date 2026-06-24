@@ -6102,7 +6102,7 @@ function searchUnsplashAvatar(){
   const seeds = [];
   for(let i=0;i<6;i++) seeds.push(Date.now() + i*1000 + Math.floor(Math.random()*9999));
   const html = seeds.map(s => {
-    const url = `https://source.unsplash.com/400x400/?${encodeURIComponent(q)}&sig=${s}`;
+    const url = `https://loremflickr.com/400/400/${encodeURIComponent(q)}?lock=${s}`;
     return `<img src="${url}" loading="lazy" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;cursor:pointer;border:2px solid transparent;transition:border-color .15s" onclick="setProfileAvatar(this.src)" onmouseover="this.style.borderColor='var(--red)'" onmouseout="this.style.borderColor='transparent'">`;
   }).join('');
   grid.innerHTML = html;
@@ -6180,7 +6180,7 @@ function searchUnsplashBg(){
   const seeds = [];
   for(let i=0;i<6;i++) seeds.push(Date.now() + i*1000 + Math.floor(Math.random()*9999));
   const html = seeds.map(s => {
-    const url = `https://source.unsplash.com/800x450/?${encodeURIComponent(q)}&sig=${s}`;
+    const url = `https://loremflickr.com/800/450/${encodeURIComponent(q)}?lock=${s}`;
     return `<img src="${url}" loading="lazy" style="width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:10px;cursor:pointer;border:2px solid transparent;transition:border-color .15s" onclick="applyHeroBgImage(this.src)" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='transparent'">`;
   }).join('');
   grid.innerHTML = html;
