@@ -954,6 +954,7 @@ body::after{content:'';position:fixed;inset:0;z-index:99999;pointer-events:none;
 .profile-avatar img{width:100%;height:100%;object-fit:cover}
 .avatar-edit{position:absolute;bottom:0;right:0;width:24px;height:24px;border-radius:50%;background:var(--red);border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff}
 .profile-name{font-size:22px;font-weight:900;color:#fff;margin-bottom:6px;letter-spacing:-.3px}
+.verified-check{color:#60a5fa;font-size:.7em;margin-left:5px;vertical-align:middle;filter:drop-shadow(0 1px 2px rgba(37,99,235,.5))}
 .profile-email{font-size:11px;color:rgba(255,255,255,.65);margin-bottom:10px}
 .prof-badge{display:inline-flex;align-items:center;gap:6px;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:700;border:1.5px solid rgba(255,255,255,.25);cursor:pointer;margin-top:14px;background:rgba(0,0,0,0.22)}
 .badge-label{display:none}/* nascosto: duplicava info di .prof-badge */
@@ -3898,6 +3899,13 @@ function renderBadge(points){
   const lbl=document.getElementById('badgeLabel');
   if(lbl)lbl.textContent=b.label;
   if(typeof renderLevelEnvs==='function') renderLevelEnvs(b.label);
+  // Perk tier reale: spunta di verifica accanto al nome del mio profilo (solo Sostenitore/Mecenate)
+  const nameEl=document.getElementById('myProfileName');
+  if(nameEl){
+    let chk=nameEl.querySelector('.verified-check');
+    if(tier && !chk){ chk=document.createElement('i'); chk.className='ph-fill ph-seal-check verified-check'; chk.title='Profilo verificato'; nameEl.appendChild(chk); }
+    else if(!tier && chk){ chk.remove(); }
+  }
 }
 let currentLoves=0;
 // Popup "I livelli": elenco dei 7 livelli con soglia, icona e spiegazione; evidenzia il livello attuale + avatar in cima.
@@ -7363,7 +7371,11 @@ function syncOwnPublicPreview(){
   // Nome
   const myName = document.getElementById('myProfileName')?.textContent;
   const pubName = document.getElementById('pubProfileName');
-  if(myName && pubName) pubName.textContent=myName;
+  if(myName && pubName){
+    pubName.textContent=myName;
+    // Perk tier: replica la spunta di verifica anche nella preview pubblica (come mi vedono gli altri)
+    if(window._userSpecialTier){ const c=document.createElement('i'); c.className='ph-fill ph-seal-check verified-check'; c.title='Profilo verificato'; pubName.appendChild(c); }
+  }
   // (Email rimossa dal profilo pubblico: non si mostra agli altri, è privacy)
   // Vanity URL
   const myVanity = document.getElementById('myVanityTxt')?.textContent;
