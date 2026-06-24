@@ -557,7 +557,9 @@ body.tab-active #mapQuickBtns{display:none}
 .list-vis-seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
 .list-vis-seg button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;height:54px;border-radius:11px;border:1.5px solid var(--border);background:#f8f4ec;font-family:inherit;font-size:10px;font-weight:800;color:var(--muted);cursor:pointer;transition:all .12s}
 .list-vis-seg button i{font-size:17px}
-.list-vis-seg button.active{border-color:var(--red);background:#FEF2F2;color:var(--red)}
+.list-vis-seg button[data-vis="private"].active{border-color:#DC2626;background:#FEE2E2;color:#DC2626}
+.list-vis-seg button[data-vis="company"].active{border-color:#15803D;background:#DCFCE7;color:#15803D}
+.list-vis-seg button[data-vis="public"].active{border-color:#1D4ED8;background:#DBEAFE;color:#1D4ED8}
 .list-vis-seg button:active{transform:scale(.96)}
 .list-detail-card .edit-only{display:none}
 .list-detail-card.editing .view-only{display:none}
@@ -910,7 +912,8 @@ body.tab-active #mapQuickBtns{display:none}
 .list-name{font-size:14px;font-weight:700;color:var(--text)}
 .list-meta{font-size:11px;color:var(--muted);margin-top:2px}
 .list-vis{font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px}
-.lv-pub{background:#DCFCE7;color:#15803D}
+.lv-pub{background:#DBEAFE;color:#1D4ED8}
+.lv-comp{background:#DCFCE7;color:#15803D}
 /* Liste actions */
 .list-actions{display:flex;gap:4px;flex-shrink:0}
 .list-act-btn{width:28px;height:28px;border-radius:8px;border:none;background:#f5f0e8;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--muted);transition:all .15s}
