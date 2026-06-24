@@ -3882,6 +3882,17 @@ function badgeLabel(b){ return b && b.key ? t(b.key) : (b&&b.label)||''; }
 // SPECIAL di sostegno: assegnati dal backend a chi sostiene il progetto (NON per punti).
 // Blu notte metallico elegante. Danno AI illimitata (max 20 consultazioni/giorno) e badge esclusivo.
 const SPECIAL_TIERS={
+  professionista:{labelKey:'tier_professionista', label:'Professionista', icon:'ph-fill ph-briefcase', style:'background:linear-gradient(135deg,#334155 0%,#0b1220 52%,#475569 100%);color:#e2e8f0;border-color:rgba(148,163,184,.6);box-shadow:0 3px 12px rgba(71,85,105,.45),inset 0 1px 0 rgba(255,255,255,.25)',
+    pitchKey:'tier_pro_pitch', pitch:'Per chi vive POI•LOVE da professionista: gli strumenti al massimo.',
+    ctaKey:'tier_pro_cta', cta:'Passa a Professionista',
+    perks:[
+      {i:'ph-infinity',     k:'tier_pro_p1', t:'ILLI•AI senza limiti, ogni giorno'},
+      {i:'ph-trend-up',     k:'tier_pro_p2', t:'Profilo influencer: punti raddoppiati'},
+      {i:'ph-scroll',       k:'tier_pro_p3', t:'Adotta una rotta culturale con la tua dedica'},
+      {i:'ph-qr-code',      k:'tier_pro_p4', t:'Un QR business incluso per la tua attivita'},
+      {i:'ph-ticket',       k:'tier_pro_p5', t:'Inviti agli eventi POI•LOVE dal vivo'},
+      {i:'ph-compass-tool', k:'tier_pro_p6', t:'La tua voce sulla roadmap del progetto'}
+    ]},
   sostenitore:{labelKey:'tier_sostenitore', label:'Sostenitore', icon:'ph-fill ph-hand-heart', style:'background:linear-gradient(135deg,#1e3a8a 0%,#0b1226 52%,#1d4ed8 100%);color:#dbeafe;border-color:rgba(147,197,253,.6);box-shadow:0 3px 12px rgba(29,78,216,.45),inset 0 1px 0 rgba(255,255,255,.3)',
     pitchKey:'tier_sost_pitch', pitch:'Sostieni la mappa culturale libera. In cambio, vantaggi concreti: non solo un badge.',
     ctaKey:'tier_sost_cta', cta:'Sostieni il progetto',
@@ -3893,16 +3904,15 @@ const SPECIAL_TIERS={
       {i:'ph-rocket-launch',k:'tier_sost_p5', t:'Accesso anticipato alle nuove funzioni'},
       {i:'ph-cards-three',  k:'tier_sost_p6', t:'Il tuo nome nel Muro dei Sostenitori'}
     ]},
-  mecenate:   {labelKey:'tier_mecenate', label:'Mecenate',    icon:'ph-fill ph-medal',      style:'background:linear-gradient(135deg,#2563eb 0%,#070d1c 50%,#3b82f6 100%);color:#eff6ff;border-color:rgba(191,219,254,.7);box-shadow:0 3px 16px rgba(37,99,235,.55),inset 0 1px 0 rgba(255,255,255,.4)',
-    pitchKey:'tier_mec_pitch', pitch:'Da grande mecenate: la cultura porta il tuo nome. Tutto del Sostenitore, e molto di piu.',
+  mecenate:   {labelKey:'tier_mecenate', label:'Mecenate', icon:'ph-fill ph-crown', style:'background:linear-gradient(135deg,#6d28d9 0%,#0f0a1e 50%,#7c3aed 100%);color:#ede9fe;border-color:rgba(196,181,253,.7);box-shadow:0 3px 16px rgba(124,58,237,.55),inset 0 1px 0 rgba(255,255,255,.4)',
+    pitchKey:'tier_mec_pitch', pitch:'Il livello piu alto: tutto del Professionista, piu i privilegi esclusivi.',
     ctaKey:'tier_mec_cta', cta:'Diventa Mecenate',
     perks:[
-      {i:'ph-infinity',     k:'tier_mec_p1', t:'ILLI•AI senza limiti, ogni giorno'},
-      {i:'ph-trend-up',     k:'tier_mec_p2', t:'Profilo influencer: punti raddoppiati'},
-      {i:'ph-scroll',       k:'tier_mec_p3', t:'Adotta una rotta culturale con la tua dedica'},
-      {i:'ph-qr-code',      k:'tier_mec_p4', t:'Un QR business incluso per la tua attivita'},
-      {i:'ph-ticket',       k:'tier_mec_p5', t:'Inviti agli eventi POI•LOVE dal vivo'},
-      {i:'ph-compass-tool', k:'tier_mec_p6', t:'La tua voce sulla roadmap del progetto'}
+      {i:'ph-headphones',   k:'tier_mec_p1', t:'Audiolibri ovunque, navigando, senza scansionare il QR sul posto'},
+      {i:'ph-path',         k:'tier_mec_p2', t:'Segnala e proponi nuove rotte storiche'},
+      {i:'ph-push-pin',     k:'tier_mec_p3', t:'Un tuo itinerario nella sezione In Evidenza'},
+      {i:'ph-map-pin-line', k:'tier_mec_p4', t:'5 dei tuoi POI in evidenza sulla mappa'},
+      {i:'ph-users-three',  k:'tier_mec_p5', t:'Amministratore di una compagnia in evidenza'}
     ]}
 };
 function getBadge(n){return BADGES.find(b=>n>=b.min&&n<=b.max)||BADGES[0]}
@@ -4103,13 +4113,16 @@ const T={
     foll_modal_title:'Follower',foll_modal_sub:'Visibile a chi ti segue',
     /* Tier / Livelli */
     tier_lvl_amatore:'Amatore',tier_lvl_viaggiatore:'Viaggiatore',tier_lvl_giramondo:'Giramondo',tier_lvl_instancabile:'Instancabile',tier_lvl_leggenda:'Leggenda',
-    tier_sostenitore:'Sostenitore',tier_mecenate:'Mecenate',
+    tier_professionista:'Professionista',tier_sostenitore:'Sostenitore',tier_mecenate:'Mecenate',
+    tier_pro_pitch:'Per chi vive POI•LOVE da professionista: gli strumenti al massimo.',
+    tier_pro_cta:'Passa a Professionista',
+    tier_pro_p1:'ILLI•AI senza limiti, ogni giorno',tier_pro_p2:'Profilo influencer: punti raddoppiati',tier_pro_p3:'Adotta una rotta culturale con la tua dedica',tier_pro_p4:'Un QR business incluso per la tua attivita',tier_pro_p5:'Inviti agli eventi POI•LOVE dal vivo',tier_pro_p6:'La tua voce sulla roadmap del progetto',
     tier_sost_pitch:'Sostieni la mappa culturale libera. In cambio, vantaggi concreti: non solo un badge.',
     tier_sost_cta:'Sostieni il progetto',
     tier_sost_p1:'ILLI•AI potenziata, 20 consigli al giorno',tier_sost_p2:'Spunta di verifica sul profilo',tier_sost_p3:'I tuoi POI in evidenza sulla mappa',tier_sost_p4:'Copertine e temi profilo esclusivi',tier_sost_p5:'Accesso anticipato alle nuove funzioni',tier_sost_p6:'Il tuo nome nel Muro dei Sostenitori',
-    tier_mec_pitch:'Da grande mecenate: la cultura porta il tuo nome. Tutto del Sostenitore, e molto di piu.',
+    tier_mec_pitch:'Il livello piu alto: tutto del Professionista, piu i privilegi esclusivi.',
     tier_mec_cta:'Diventa Mecenate',
-    tier_mec_p1:'ILLI•AI senza limiti, ogni giorno',tier_mec_p2:'Profilo influencer: punti raddoppiati',tier_mec_p3:'Adotta una rotta culturale con la tua dedica',tier_mec_p4:'Un QR business incluso per la tua attivita',tier_mec_p5:'Inviti agli eventi POI•LOVE dal vivo',tier_mec_p6:'La tua voce sulla roadmap del progetto',
+    tier_mec_p1:'Audiolibri ovunque, navigando, senza scansionare il QR sul posto',tier_mec_p2:'Segnala e proponi nuove rotte storiche',tier_mec_p3:'Un tuo itinerario nella sezione In Evidenza',tier_mec_p4:'5 dei tuoi POI in evidenza sulla mappa',tier_mec_p5:'Amministratore di una compagnia in evidenza',tier_mec_p6:'La tua voce sulla roadmap del progetto',
     tier_cta_fallback:'Sostieni',
     tier_points_suffix:'punti',
     tier_verified:'Profilo verificato',
@@ -4180,13 +4193,16 @@ const T={
     foll_modal_title:'Ndjekës',foll_modal_sub:'I dukshëm për ata që të ndjekin',
     /* Tier / Livelli */
     tier_lvl_amatore:'Amator',tier_lvl_viaggiatore:'Udhëtar',tier_lvl_giramondo:'Endacak',tier_lvl_instancabile:'I palodhur',tier_lvl_leggenda:'Legjendë',
-    tier_sostenitore:'Mbështetës',tier_mecenate:'Mecen',
+    tier_professionista:'Profesionist',tier_sostenitore:'Mbështetës',tier_mecenate:'Mecen',
+    tier_pro_pitch:'Për ata që e jetojnë POI•LOVE si profesionistë: mjetet në maksimum.',
+    tier_pro_cta:'Kalo te Profesionisti',
+    tier_pro_p1:'ILLI•AI pa kufij, çdo ditë',tier_pro_p2:'Profil influencer: pikë të dyfishuara',tier_pro_p3:'Birëso një rrugë kulturore me dedikimin tënd',tier_pro_p4:'Një QR biznesi i përfshirë për aktivitetin tënd',tier_pro_p5:'Ftesa në eventet POI•LOVE drejtpërdrejt',tier_pro_p6:'Zëri yt në planin e projektit',
     tier_sost_pitch:'Mbështet hartën kulturore të lirë. Në këmbim, përfitime konkrete: jo thjesht një stemë.',
     tier_sost_cta:'Mbështet projektin',
     tier_sost_p1:'ILLI•AI e fuqizuar, 20 këshilla në ditë',tier_sost_p2:'Shenjë verifikimi në profil',tier_sost_p3:'POI-të e tua në pah në hartë',tier_sost_p4:'Kopertina dhe tema profili ekskluzive',tier_sost_p5:'Qasje e parakohshme te funksionet e reja',tier_sost_p6:'Emri yt në Murin e Mbështetësve',
-    tier_mec_pitch:'Si mecen i madh: kultura mban emrin tënd. Gjithçka e Mbështetësit, dhe shumë më tepër.',
+    tier_mec_pitch:'Niveli më i lartë: gjithçka e Profesionistit, plus privilegjet ekskluzive.',
     tier_mec_cta:'Bëhu Mecen',
-    tier_mec_p1:'ILLI•AI pa kufij, çdo ditë',tier_mec_p2:'Profil influencer: pikë të dyfishuara',tier_mec_p3:'Birëso një rrugë kulturore me dedikimin tënd',tier_mec_p4:'Një QR biznesi i përfshirë për aktivitetin tënd',tier_mec_p5:'Ftesa në eventet POI•LOVE drejtpërdrejt',tier_mec_p6:'Zëri yt në planin e projektit',
+    tier_mec_p1:'Audiolibra kudo, duke lundruar, pa skanuar QR-in në vend',tier_mec_p2:'Sinjalizo dhe propozo rrugë të reja historike',tier_mec_p3:'Një itinerar yti në seksionin Në Pah',tier_mec_p4:'5 nga POI-të e tua në pah në hartë',tier_mec_p5:'Administrator i një kompanie në pah',tier_mec_p6:'Zëri yt në planin e projektit',
     tier_cta_fallback:'Mbështet',
     tier_points_suffix:'pikë',
     tier_verified:'Profil i verifikuar',
@@ -4257,13 +4273,16 @@ const T={
     foll_modal_title:'Followers',foll_modal_sub:'Visible to those who follow you',
     /* Tier / Levels */
     tier_lvl_amatore:'Amateur',tier_lvl_viaggiatore:'Traveler',tier_lvl_giramondo:'Globetrotter',tier_lvl_instancabile:'Tireless',tier_lvl_leggenda:'Legend',
-    tier_sostenitore:'Supporter',tier_mecenate:'Patron',
+    tier_professionista:'Professional',tier_sostenitore:'Supporter',tier_mecenate:'Patron',
+    tier_pro_pitch:'For those who live POI•LOVE professionally: tools at their fullest.',
+    tier_pro_cta:'Go Professional',
+    tier_pro_p1:'Unlimited ILLI•AI, every day',tier_pro_p2:'Influencer profile: double points',tier_pro_p3:'Adopt a cultural route with your dedication',tier_pro_p4:'A business QR included for your activity',tier_pro_p5:'Invitations to live POI•LOVE events',tier_pro_p6:'Your voice on the project roadmap',
     tier_sost_pitch:'Support the free cultural map. In return, real perks: not just a badge.',
     tier_sost_cta:'Support the project',
     tier_sost_p1:'Boosted ILLI•AI, 20 tips a day',tier_sost_p2:'Verified check on your profile',tier_sost_p3:'Your POIs featured on the map',tier_sost_p4:'Exclusive profile covers and themes',tier_sost_p5:'Early access to new features',tier_sost_p6:'Your name on the Supporters Wall',
-    tier_mec_pitch:'As a great patron: culture carries your name. Everything in Supporter, and much more.',
+    tier_mec_pitch:'The highest tier: everything in Professional, plus exclusive privileges.',
     tier_mec_cta:'Become a Patron',
-    tier_mec_p1:'Unlimited ILLI•AI, every day',tier_mec_p2:'Influencer profile: double points',tier_mec_p3:'Adopt a cultural route with your dedication',tier_mec_p4:'A business QR included for your activity',tier_mec_p5:'Invitations to live POI•LOVE events',tier_mec_p6:'Your voice on the project roadmap',
+    tier_mec_p1:'Audiobooks anywhere, while browsing, without scanning the on-site QR',tier_mec_p2:'Report and propose new historic routes',tier_mec_p3:'One of your itineraries in the Featured section',tier_mec_p4:'5 of your POIs featured on the map',tier_mec_p5:'Administrator of a featured company',tier_mec_p6:'Your voice on the project roadmap',
     tier_cta_fallback:'Support',
     tier_points_suffix:'points',
     tier_verified:'Verified profile',
