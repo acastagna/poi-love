@@ -6,7 +6,9 @@
 - [x] Sostituiti TUTTI i 13 dialoghi nativi (`prompt`/`confirm`) con le modali nostre, verificato live a 0 ✅ 24/06
 - [x] Popup lista a 2 modi: VISTA (sola lettura) + MODIFICA col pennino. In modifica: nome + descrizione + visibilità 3 stati + selettori chip "quale compagnia" e "quale itinerario" (la lista può entrare in un itinerario). Tutto in grafica nostra, niente `<select>` nativi ✅ 24/06
 - [ ] Persistenza Supabase delle liste (oggi vivono nel profilo, senza id reale): allora compagnia/itinerario scelti vengono salvati per davvero + caricamento POI reali nella lista
-- [ ] Rotte UTENTE completamente modificabili; rotte UFFICIALI (admin) bloccate, con segno "ufficiale"
+- [x] Rotte: UFFICIALI (Via Egnatia, Terre Illiriche) con badge "Ufficiale" (seal-check) e bloccate; rotte UTENTE col pennino → rinomina via modale proprietaria. Render dinamico da `_HISTORIC_ROUTES` + `poi_user_routes` ✅ 24/06
+- [x] Tutte le icone Phosphor, zero emoji (motore `emoToIcons`, bandiere→globo, ~34 icone convertite) ✅ 24/06
+- [ ] Persistenza Supabase di liste e rotte utente (oggi vivono in locale/profilo, senza id reale): allora compagnia/itinerario/rinomine si salvano per davvero + caricamento POI reali
 - Regola ferrea: MAI interfacce native del dispositivo, tutto in grafica POI•LOVE (vedi `SPECS.md`)
 
 ## 🔴 Bloccanti (fanno saltare il lancio)
