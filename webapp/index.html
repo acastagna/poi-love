@@ -617,6 +617,19 @@ body.tab-active #mapQuickBtns{display:none}
 .level-you{font-size:9px;font-weight:800;color:#fff;background:var(--red);padding:2px 7px;border-radius:6px;text-transform:uppercase;letter-spacing:.3px}
 .level-thr{font-size:11.5px;color:var(--muted);margin-top:2px}
 .level-special-sep{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;text-align:center;margin:12px 0 8px}
+.tier-card{border:1.5px solid;border-radius:18px;padding:14px;margin-bottom:12px;position:relative;overflow:hidden}
+.tier-card.current{outline:2px solid rgba(255,255,255,.55);outline-offset:1px}
+.tier-head{display:flex;align-items:flex-start;gap:11px;margin-bottom:12px}
+.tier-badge{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;background:rgba(255,255,255,.14);flex-shrink:0;box-shadow:inset 0 1px 0 rgba(255,255,255,.25)}
+.tier-name{font-size:15px;font-weight:800;display:flex;align-items:center;gap:7px}
+.tier-pitch{font-size:11.5px;opacity:.85;margin-top:3px;line-height:1.4}
+.tier-perks{display:flex;flex-direction:column;gap:8px;margin-bottom:13px}
+.tier-perk{display:flex;align-items:center;gap:9px;font-size:12.5px;font-weight:600}
+.tier-perk i{font-size:17px;opacity:.92;flex-shrink:0}
+.tier-cta{width:100%;border:none;border-radius:11px;padding:11px;font-size:13px;font-weight:800;cursor:pointer;background:rgba(255,255,255,.96);color:#0b1226;display:flex;align-items:center;justify-content:center;gap:7px;transition:transform .15s,box-shadow .15s}
+.tier-cta:hover{transform:translateY(-1px);box-shadow:0 5px 16px rgba(0,0,0,.32)}
+.tier-cta:active{transform:translateY(0)}
+.tier-active{text-align:center;font-size:12px;font-weight:700;padding:9px;background:rgba(255,255,255,.16);border-radius:11px;display:flex;align-items:center;justify-content:center;gap:6px}
 .level-row.special{background:linear-gradient(135deg,rgba(30,58,138,.07),rgba(37,99,235,.05))}
 .level-row.special.current{outline-color:#1d4ed8}
 .levels-foot{display:flex;align-items:flex-start;gap:6px;font-size:11px;color:var(--muted);padding:10px 18px 18px;line-height:1.4}
@@ -3846,8 +3859,28 @@ const BADGES=[
 // SPECIAL di sostegno: assegnati dal backend a chi sostiene il progetto (NON per punti).
 // Blu notte metallico elegante. Danno AI illimitata (max 20 consultazioni/giorno) e badge esclusivo.
 const SPECIAL_TIERS={
-  sostenitore:{label:'Sostenitore', icon:'ph-fill ph-hand-heart', style:'background:linear-gradient(135deg,#1e3a8a 0%,#0b1226 52%,#1d4ed8 100%);color:#dbeafe;border-color:rgba(147,197,253,.6);box-shadow:0 3px 12px rgba(29,78,216,.45),inset 0 1px 0 rgba(255,255,255,.3)'},
-  mecenate:   {label:'Mecenate',    icon:'ph-fill ph-medal',      style:'background:linear-gradient(135deg,#2563eb 0%,#070d1c 50%,#3b82f6 100%);color:#eff6ff;border-color:rgba(191,219,254,.7);box-shadow:0 3px 16px rgba(37,99,235,.55),inset 0 1px 0 rgba(255,255,255,.4)'}
+  sostenitore:{label:'Sostenitore', icon:'ph-fill ph-hand-heart', style:'background:linear-gradient(135deg,#1e3a8a 0%,#0b1226 52%,#1d4ed8 100%);color:#dbeafe;border-color:rgba(147,197,253,.6);box-shadow:0 3px 12px rgba(29,78,216,.45),inset 0 1px 0 rgba(255,255,255,.3)',
+    pitch:'Sostieni la mappa culturale libera. In cambio, vantaggi concreti: non solo un badge.',
+    cta:'Sostieni il progetto',
+    perks:[
+      {i:'ph-sparkle',      t:'ILLI•AI potenziata, 20 consigli al giorno'},
+      {i:'ph-seal-check',   t:'Spunta di verifica sul profilo'},
+      {i:'ph-map-pin-line', t:'I tuoi POI in evidenza sulla mappa'},
+      {i:'ph-palette',      t:'Copertine e temi profilo esclusivi'},
+      {i:'ph-rocket-launch',t:'Accesso anticipato alle nuove funzioni'},
+      {i:'ph-cards-three',  t:'Il tuo nome nel Muro dei Sostenitori'}
+    ]},
+  mecenate:   {label:'Mecenate',    icon:'ph-fill ph-medal',      style:'background:linear-gradient(135deg,#2563eb 0%,#070d1c 50%,#3b82f6 100%);color:#eff6ff;border-color:rgba(191,219,254,.7);box-shadow:0 3px 16px rgba(37,99,235,.55),inset 0 1px 0 rgba(255,255,255,.4)',
+    pitch:'Da grande mecenate: la cultura porta il tuo nome. Tutto del Sostenitore, e molto di piu.',
+    cta:'Diventa Mecenate',
+    perks:[
+      {i:'ph-infinity',     t:'ILLI•AI senza limiti, ogni giorno'},
+      {i:'ph-trend-up',     t:'Profilo influencer: punti raddoppiati'},
+      {i:'ph-scroll',       t:'Adotta una rotta culturale con la tua dedica'},
+      {i:'ph-qr-code',      t:'Un QR business incluso per la tua attivita'},
+      {i:'ph-ticket',       t:'Inviti agli eventi POI•LOVE dal vivo'},
+      {i:'ph-compass-tool', t:'La tua voce sulla roadmap del progetto'}
+    ]}
 };
 function getBadge(n){return BADGES.find(b=>n>=b.min&&n<=b.max)||BADGES[0]}
 function renderBadge(points){
@@ -3885,9 +3918,16 @@ function openLevels(){
     html += Object.keys(SPECIAL_TIERS).map(k=>{
       const b=SPECIAL_TIERS[k];
       const isCur=window._userSpecialTier===k;
-      return `<div class="level-row special${isCur?' current':''}">
-        <div class="level-ico" style="${b.style};border-style:solid"><i class="${b.icon}"></i></div>
-        <div class="level-info"><div class="level-name">${b.label}${isCur?' <span class="level-you">tu sei qui</span>':''}</div><div class="level-thr">AI illimitata, badge esclusivo, blu notte metallico</div></div>
+      const perks=(b.perks||[]).map(p=>`<div class="tier-perk"><i class="ph-duotone ${p.i}"></i><span>${p.t}</span></div>`).join('');
+      return `<div class="tier-card${isCur?' current':''}" style="${b.style}">
+        <div class="tier-head">
+          <div class="tier-badge"><i class="${b.icon}"></i></div>
+          <div class="tier-ttl"><div class="tier-name">${b.label}${isCur?' <span class="level-you">tu sei qui</span>':''}</div><div class="tier-pitch">${b.pitch||''}</div></div>
+        </div>
+        <div class="tier-perks">${perks}</div>
+        ${isCur
+          ? '<div class="tier-active"><i class="ph-fill ph-check-circle"></i> Grazie per il tuo sostegno</div>'
+          : `<button class="tier-cta" onclick="becomeSupporter('${k}')"><i class="ph-fill ph-hand-heart"></i> ${b.cta||'Sostieni'}</button>`}
       </div>`;
     }).join('');
     wrap.innerHTML=html;
@@ -3895,6 +3935,15 @@ function openLevels(){
   document.getElementById('levelsOv')?.classList.add('show');
 }
 function closeLevels(){ document.getElementById('levelsOv')?.classList.remove('show'); }
+// CTA dei tier di sostegno: niente acquisto in-app (policy store + missione culturale).
+// Il sostegno passa da un contatto diretto; sara' il backend ad assegnare special_tier.
+function becomeSupporter(tier){
+  const t = SPECIAL_TIERS[tier]; if(!t) return;
+  const subject = `Voglio diventare ${t.label} di POI•LOVE`;
+  const body = `Ciao team POI•LOVE,\n\nvoglio sostenere il progetto come ${t.label}.\nFatemi sapere come procedere.\n\nGrazie!`;
+  try{ window.location.href = `mailto:it@altrostile.app?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`; }catch(e){}
+  showToast?.(`💙 Grazie! Ti mettiamo in contatto per diventare ${t.label}`);
+}
 
 let currentPoints=0;
 // Formattazione compatta dei punti (coerente col popup livelli): 1250 -> "1k"
