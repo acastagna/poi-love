@@ -557,6 +557,19 @@ body.tab-active #mapQuickBtns{display:none}
 .list-vis-seg button i{font-size:17px}
 .list-vis-seg button.active{border-color:var(--red);background:#FEF2F2;color:var(--red)}
 .list-vis-seg button:active{transform:scale(.96)}
+.list-detail-card .edit-only{display:none}
+.list-detail-card.editing .view-only{display:none}
+.list-detail-card.editing .edit-only{display:block}
+.list-detail-card.editing .list-detail-actions.edit-only{display:grid}
+.list-detail-edit-btn{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.22);border:none;cursor:pointer;color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.list-detail-edit-btn:hover{background:rgba(255,255,255,.38)}
+.list-detail-desc-view{font-size:13.5px;line-height:1.5;color:var(--muted);margin-bottom:14px}
+.list-chip-row{display:flex;flex-wrap:wrap;gap:7px}
+.list-chip{display:inline-flex;align-items:center;gap:5px;padding:8px 13px;border-radius:20px;border:1.5px solid var(--border);background:#f8f4ec;font-family:inherit;font-size:12px;font-weight:700;color:var(--text);cursor:pointer;transition:all .12s}
+.list-chip i{font-size:14px}
+.list-chip.active{border-color:var(--red);background:var(--red);color:#fff}
+.list-chip:active{transform:scale(.95)}
+.list-chip-empty{font-size:12px;color:var(--muted);font-style:italic;padding:4px 0}
 .friend-avatar{width:30px;height:30px;border-radius:50%;background:#EBF2FC;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--blue);flex-shrink:0}
 .friend-name{flex:1;font-size:13px;color:var(--ink);font-weight:600}
 .friend-status{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:800;text-transform:uppercase;padding:3px 8px;border-radius:7px;letter-spacing:.4px}
@@ -5504,66 +5517,114 @@ function openAuthorProfile(){
 /* ══════════════════════════════════════════
    LIST DETAIL — popup centrato: apre la lista per vedere/modificare
 ══════════════════════════════════════════ */
-let _listDetailCtx = null; // { name, vis:'private'|'public'|'company', desc, color, sourceEl }
+let _listDetailCtx = null; // { name, vis, desc, compCode, tripId, color, sourceEl }
 function _visFromClass(c){ return c==='lv-prv' ? 'private' : c==='lv-comp' ? 'company' : 'public'; }
-function openListDetail(name, visClass, color, sourceEl){
-  _listDetailCtx = { name, vis: _visFromClass(visClass), desc: sourceEl?.dataset?.desc || '', color: color||'#D42B2B', sourceEl: sourceEl||null };
+function _visLabel(v){ return v==='private'?'Privata':v==='company'?'Compagnia':'Pubblica'; }
+function _visClass(v){ return v==='private'?'lv-prv':v==='company'?'lv-comp':'lv-pub'; }
+// Apre il popup lista. startInEdit=true → entra subito in modifica (dal pennino); altrimenti sola lettura.
+function openListDetail(name, visClass, color, sourceEl, startInEdit){
+  const ds = sourceEl?.dataset || {};
+  _listDetailCtx = { name, vis: _visFromClass(visClass), desc: ds.desc||'', compCode: ds.comp||'', tripId: ds.trip||'', color: color||'#D42B2B', sourceEl: sourceEl||null };
   const hero = document.getElementById('listDetailHero');
   hero.style.background = `linear-gradient(135deg, ${_listDetailCtx.color}, #1a1a1a)`;
-  document.getElementById('listDetailNameInput').value = name;
-  document.getElementById('listDetailDesc').value = _listDetailCtx.desc;
   document.getElementById('listDetailDot').style.background = 'rgba(255,255,255,.25)';
-  setListVis(_listDetailCtx.vis);
-  // POI reali della lista: caricati da Supabase quando le liste avranno id; ora lista onesta vuota
-  const poi = Array.isArray(_listDetailCtx.sourceEl?._pois) ? _listDetailCtx.sourceEl._pois : [];
+  // Popola la VISTA (sola lettura)
+  document.getElementById('listDetailName').textContent = name;
+  document.getElementById('listDetailVisBadge').textContent = _visLabel(_listDetailCtx.vis);
+  const dv = document.getElementById('listDetailDescView');
+  dv.textContent = _listDetailCtx.desc; dv.style.display = _listDetailCtx.desc ? 'block' : 'none';
+  // POI reali della lista (da Supabase quando le liste avranno id); ora lista onesta vuota
+  const poi = Array.isArray(sourceEl?._pois) ? sourceEl._pois : [];
   document.getElementById('listDetailCount').textContent = poi.length+' POI';
-  const list = document.getElementById('listDetailPoiList');
-  if(poi.length){
-    list.innerHTML = poi.map(p=>`<div class="list-detail-poi-row">
-        <div class="list-detail-poi-icon"><i class="ph-duotone ph-map-pin"></i></div>
-        <div class="list-detail-poi-name">${(p.name||'').replace(/</g,'&lt;')}</div>
-        <button class="list-detail-poi-remove" title="Rimuovi dalla lista"><i class="ph-duotone ph-x"></i></button>
-      </div>`).join('');
-  } else {
-    list.innerHTML = '<div class="pub-profile-empty">Lista ancora vuota, tocca un POI sulla mappa per aggiungerlo</div>';
-  }
+  document.getElementById('listDetailPoiList').innerHTML = poi.length
+    ? poi.map(p=>`<div class="list-detail-poi-row"><div class="list-detail-poi-icon"><i class="ph-duotone ph-map-pin"></i></div><div class="list-detail-poi-name">${(p.name||'').replace(/</g,'&lt;')}</div><button class="list-detail-poi-remove" title="Rimuovi dalla lista"><i class="ph-duotone ph-x"></i></button></div>`).join('')
+    : '<div class="pub-profile-empty">Lista ancora vuota, tocca un POI sulla mappa per aggiungerlo</div>';
+  // Modalità: vista o modifica
+  document.getElementById('listDetailCard').classList.toggle('editing', !!startInEdit);
+  if(startInEdit) _fillListEditFields();
   document.getElementById('listDetailOv').classList.add('show');
-  setTimeout(()=>{ try{ document.getElementById('listDetailNameInput').focus(); }catch(_){} }, 250);
+  if(startInEdit) setTimeout(()=>{ try{ document.getElementById('listDetailNameInput').focus(); }catch(_){} }, 250);
 }
 function closeListDetail(){
   document.getElementById('listDetailOv').classList.remove('show');
+  document.getElementById('listDetailCard').classList.remove('editing');
   _listDetailCtx = null;
+}
+// Passa alla modifica (dal pennino o dal bottone Modifica)
+function enterListEdit(){
+  if(!_listDetailCtx) return;
+  document.getElementById('listDetailCard').classList.add('editing');
+  _fillListEditFields();
+  setTimeout(()=>{ try{ document.getElementById('listDetailNameInput').focus(); }catch(_){} }, 200);
+}
+// Annulla la modifica e torna alla vista (senza salvare)
+function exitListEdit(){ document.getElementById('listDetailCard').classList.remove('editing'); }
+function _fillListEditFields(){
+  if(!_listDetailCtx) return;
+  document.getElementById('listDetailNameInput').value = _listDetailCtx.name;
+  document.getElementById('listDetailDesc').value = _listDetailCtx.desc;
+  setListVis(_listDetailCtx.vis);
+  _buildCompChips();
+  _buildTripChips();
 }
 function setListVis(v){
   if(!_listDetailCtx) return;
   _listDetailCtx.vis = v;
-  document.querySelectorAll('#listDetailVisSeg button').forEach(b=>{
-    b.classList.toggle('active', b.dataset.vis===v);
-  });
+  document.querySelectorAll('#listDetailVisSeg button').forEach(b=>b.classList.toggle('active', b.dataset.vis===v));
+  document.getElementById('listCompPick').style.display = (v==='company') ? 'block' : 'none';
+}
+// Selettore "quale compagnia" (chip, niente select nativo)
+function _buildCompChips(){
+  const wrap = document.getElementById('listCompChips');
+  const comps = (typeof _getCompagnie==='function' ? _getCompagnie() : []);
+  if(!comps.length){ wrap.innerHTML = '<div class="list-chip-empty">Nessuna compagnia ancora, creane una nella tab Compagni</div>'; return; }
+  wrap.innerHTML = comps.map(c=>`<button type="button" class="list-chip ${c.code===_listDetailCtx.compCode?'active':''}" onclick="_pickComp('${c.code}')"><i class="ph-duotone ph-users-three"></i> ${(c.name||c.code).replace(/</g,'&lt;')}</button>`).join('');
+}
+function _pickComp(code){
+  if(!_listDetailCtx) return;
+  _listDetailCtx.compCode = (_listDetailCtx.compCode===code ? '' : code);
+  _buildCompChips();
+}
+// Selettore "quale itinerario" (la lista può far parte di un itinerario)
+function _buildTripChips(){
+  const wrap = document.getElementById('listTripChips');
+  const trips = (typeof TRIPS!=='undefined' ? Object.entries(TRIPS) : []);
+  let html = `<button type="button" class="list-chip ${!_listDetailCtx.tripId?'active':''}" onclick="_pickTrip('')">Nessuno</button>`;
+  html += trips.map(([id,t])=>`<button type="button" class="list-chip ${id===_listDetailCtx.tripId?'active':''}" onclick="_pickTrip('${id}')"><i class="ph-duotone ph-path"></i> ${(((t&&t.name)||id)+'').replace(/</g,'&lt;')}</button>`).join('');
+  if(!trips.length) html += '<div class="list-chip-empty">Nessun itinerario ancora, creane uno nella tab Itinerari</div>';
+  wrap.innerHTML = html;
+}
+function _pickTrip(id){
+  if(!_listDetailCtx) return;
+  _listDetailCtx.tripId = id;
+  _buildTripChips();
 }
 async function saveListDetail(){
   if(!_listDetailCtx) return;
   const nameEl = document.getElementById('listDetailNameInput');
   const name = nameEl.value.trim();
   if(!name){ showToast?.('Dai un nome alla lista'); nameEl.focus(); return; }
-  const desc = document.getElementById('listDetailDesc').value.trim();
-  const vis = _listDetailCtx.vis;
-  _listDetailCtx.name = name; _listDetailCtx.desc = desc;
+  if(_listDetailCtx.vis==='company' && !_listDetailCtx.compCode){ showToast?.('Scegli con quale compagnia condividere'); return; }
+  _listDetailCtx.name = name;
+  _listDetailCtx.desc = document.getElementById('listDetailDesc').value.trim();
+  const { vis, desc, compCode, tripId } = _listDetailCtx;
   // Sync nella card del profilo (sourceEl)
   const el = _listDetailCtx.sourceEl;
   if(el){
     const n = el.querySelector('.list-name'); if(n) n.textContent = name;
-    el.dataset.desc = desc;
+    el.dataset.desc = desc; el.dataset.comp = compCode; el.dataset.trip = tripId;
     const visEl = el.querySelector('.list-vis');
-    if(visEl){
-      const cls = vis==='private'?'lv-prv':vis==='company'?'lv-comp':'lv-pub';
-      const lbl = vis==='private'?'Privata':vis==='company'?'Compagnia':'Pubblica';
-      visEl.className = 'list-vis '+cls; visEl.textContent = lbl;
-    }
+    if(visEl){ visEl.className = 'list-vis '+_visClass(vis); visEl.textContent = _visLabel(vis); }
   }
-  // Persistenza su Supabase: arriverà quando le liste avranno id reale (oggi vivono nel profilo)
-  showToast?.('✓ Lista aggiornata');
-  closeListDetail();
+  // Aggiorna la VISTA e torna in sola lettura
+  document.getElementById('listDetailName').textContent = name;
+  document.getElementById('listDetailVisBadge').textContent = _visLabel(vis);
+  const dv = document.getElementById('listDetailDescView'); dv.textContent = desc; dv.style.display = desc ? 'block' : 'none';
+  document.getElementById('listDetailCard').classList.remove('editing');
+  let msg = '✓ Lista aggiornata';
+  if(vis==='company' && compCode){ const c=(_getCompagnie()||[]).find(x=>x.code===compCode); if(c) msg = '✓ Condivisa con '+(c.name||'la compagnia'); }
+  showToast?.(msg);
+  // Persistenza su Supabase: quando le liste avranno id reale (oggi vivono nel profilo)
 }
 async function shareListDetail(){
   if(!_listDetailCtx) return;
@@ -7759,14 +7820,11 @@ function copyListLink(slug){
   navigator.clipboard?.writeText(url).then(()=>showToast('🔗 Link lista copiato!'));
 }
 
-/* ── Edit lista (nome + visibilità) ── */
-async function editList(btn, currentName, currentVis){
-  const newName=await uiPrompt('Rinomina lista', currentName, {okText:'Salva'});
-  if(!newName||!newName.trim()) return;
-  const item=btn.closest('.list-item');
-  const nameEl=item?.querySelector('.list-name');
-  if(nameEl) nameEl.textContent=newName.trim();
-  showToast('✓ Lista aggiornata');
+/* ── Pennino "modifica" nelle card lista del profilo: apre il popup direttamente in modifica ── */
+function editList(btn, currentName, currentVis){
+  const item = btn.closest('.list-item');
+  const color = item?.querySelector('.list-dot')?.style.background || '#D42B2B';
+  openListDetail(currentName, currentVis, color, item, true);
 }
 
 // Parsing vanity URL all'avvio — es. ?@nomeutente
@@ -9118,35 +9176,56 @@ async function confirmPhotoPicker(){
 
 <!-- ═══ LIST DETAIL POPUP — apre una lista per modificare/vedere POI ═══ -->
 <div id="listDetailOv" onclick="if(event.target===this)closeListDetail()">
-  <div class="list-detail-card">
+  <div class="list-detail-card" id="listDetailCard">
     <div class="list-detail-hero" id="listDetailHero">
       <button class="list-detail-close" onclick="closeListDetail()"><i class="ph-duotone ph-x"></i></button>
       <div class="list-detail-name-row">
         <div class="list-detail-dot" id="listDetailDot"><i class="ph-duotone ph-list-bullets"></i></div>
         <div style="flex:1;min-width:0">
-          <input id="listDetailNameInput" class="list-detail-name-in" placeholder="Nome della lista" maxlength="60" autocomplete="off">
-          <div class="list-detail-meta"><span id="listDetailCount">0 POI</span></div>
+          <div class="list-detail-name view-only" id="listDetailName">—</div>
+          <input id="listDetailNameInput" class="list-detail-name-in edit-only" placeholder="Nome della lista" maxlength="60" autocomplete="off">
+          <div class="list-detail-meta">
+            <span id="listDetailCount">0 POI</span>
+            <span class="list-detail-vis view-only" id="listDetailVisBadge">Pubblica</span>
+          </div>
         </div>
+        <button class="list-detail-edit-btn view-only" onclick="enterListEdit()" title="Modifica"><i class="ph-duotone ph-pencil-simple"></i></button>
       </div>
     </div>
     <div class="list-detail-body">
-      <div class="list-edit-field">
-        <label class="list-edit-lbl"><i class="ph-duotone ph-text-aa"></i> Descrizione</label>
-        <textarea id="listDetailDesc" class="list-detail-desc-in" placeholder="A cosa serve questa lista? (facoltativo)" rows="2" maxlength="200"></textarea>
-      </div>
-      <div class="list-edit-field">
-        <label class="list-edit-lbl"><i class="ph-duotone ph-eye"></i> Visibilità</label>
-        <div class="list-vis-seg" id="listDetailVisSeg">
-          <button type="button" data-vis="private" onclick="setListVis('private')"><i class="ph-duotone ph-lock-simple"></i><span>Privata</span></button>
-          <button type="button" data-vis="public" onclick="setListVis('public')"><i class="ph-duotone ph-globe"></i><span>Pubblica</span></button>
-          <button type="button" data-vis="company" onclick="setListVis('company')"><i class="ph-duotone ph-users-three"></i><span>Compagnia</span></button>
+      <div class="list-detail-desc-view view-only" id="listDetailDescView"></div>
+      <div class="edit-only">
+        <div class="list-edit-field">
+          <label class="list-edit-lbl"><i class="ph-duotone ph-text-aa"></i> Descrizione</label>
+          <textarea id="listDetailDesc" class="list-detail-desc-in" placeholder="A cosa serve questa lista? (facoltativo)" rows="2" maxlength="200"></textarea>
+        </div>
+        <div class="list-edit-field">
+          <label class="list-edit-lbl"><i class="ph-duotone ph-eye"></i> Visibilità</label>
+          <div class="list-vis-seg" id="listDetailVisSeg">
+            <button type="button" data-vis="private" onclick="setListVis('private')"><i class="ph-duotone ph-lock-simple"></i><span>Privata</span></button>
+            <button type="button" data-vis="public" onclick="setListVis('public')"><i class="ph-duotone ph-globe"></i><span>Pubblica</span></button>
+            <button type="button" data-vis="company" onclick="setListVis('company')"><i class="ph-duotone ph-users-three"></i><span>Compagnia</span></button>
+          </div>
+        </div>
+        <div class="list-edit-field" id="listCompPick" style="display:none">
+          <label class="list-edit-lbl"><i class="ph-duotone ph-users-three"></i> Quale compagnia</label>
+          <div class="list-chip-row" id="listCompChips"></div>
+        </div>
+        <div class="list-edit-field">
+          <label class="list-edit-lbl"><i class="ph-duotone ph-path"></i> Itinerario (facoltativo)</label>
+          <div class="list-chip-row" id="listTripChips"></div>
         </div>
       </div>
       <div class="pub-profile-sec-lbl"><i class="ph-duotone ph-map-pin" style="color:var(--red);font-size:12px"></i> POI nella lista</div>
       <div id="listDetailPoiList"></div>
-      <div class="list-detail-actions">
-        <button class="list-detail-action primary" onclick="saveListDetail()"><i class="ph-duotone ph-check"></i><span>Salva</span></button>
+      <div class="list-detail-actions view-only">
+        <button class="list-detail-action primary" onclick="enterListEdit()"><i class="ph-duotone ph-pencil-simple"></i><span>Modifica</span></button>
         <button class="list-detail-action" onclick="shareListDetail()"><i class="ph-duotone ph-share-network"></i><span>Condividi</span></button>
+        <button class="list-detail-action danger" onclick="deleteListDetail()"><i class="ph-duotone ph-trash"></i><span>Elimina</span></button>
+      </div>
+      <div class="list-detail-actions edit-only">
+        <button class="list-detail-action primary" onclick="saveListDetail()"><i class="ph-duotone ph-check"></i><span>Salva</span></button>
+        <button class="list-detail-action" onclick="exitListEdit()"><i class="ph-duotone ph-arrow-u-up-left"></i><span>Annulla</span></button>
         <button class="list-detail-action danger" onclick="deleteListDetail()"><i class="ph-duotone ph-trash"></i><span>Elimina</span></button>
       </div>
     </div>
