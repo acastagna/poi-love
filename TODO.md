@@ -19,8 +19,6 @@
 ## Media priorità
 
 - [ ] **Tier paganti: meccanismi backend**: i perks ora promessi nelle card vanno resi reali uno a uno (rate-limit ILLI per tier, punti x2, POI/itinerario in evidenza, audiolibri navigando, admin compagnia in evidenza). Vale per i 3 tier (Professionista/Sostenitore/Mecenate)
-- [ ] **Log di debug al boot**: `runConnectionDiagnostics()` (a ogni avvio) stampa lo schema DB in console e fa 5 query + 1 fetch ogni volta: metterla dietro un flag debug (emerso da code-quality 25/06)
-- [ ] **`setBgTab(t)`**: il parametro `t` oscura la funzione i18n `t()`, rinominare per evitare trappole future (code-quality 25/06)
 - [ ] **i18n — stringhe variante minori**: varianti POI "non trovato" con emoji, ambiente avatar ILLI•AI, tooltip "rotta ufficiale" (ancora in IT)
 - [x] **Foto POI: funzionanti** (verificato con test reale 24/06): il bucket `poi_photos` esiste con permessi corretti (insert authenticated, read public); upload + lettura pubblica testati OK. La nota precedente "bucket mancante" era ERRATA. Il server primario `media.poilove.com` è rotto (403, DNS lato Plesk non risolve supabase.co) ma il piano B Supabase lo copre automaticamente. Opzionale, non bloccante: riparare media.poilove.com per la compressione WebP server-side (richiede accesso SSH al server).
 - [ ] **Love count atomico** — race condition con utenti concorrenti in `toggleLove` (riga 6543)
@@ -53,6 +51,9 @@
 
 ## Completati (ultimi 30 giorni)
 
+- [x] **Microfono dettatura nella chat ILLI•AI**: speech-to-text che scrive nell'area di testo, a destra dell'invio (iOS-friendly); il vecchio mic in alto era un toggle voce, ora è un altoparlante; i18n IT/SQ/EN (25/06)
+- [x] **Bottone verde "Svuota cache" in SOS**: svuota Cache Storage + service worker + sessionStorage e ricarica fresco (cache-bust), senza sloggare (25/06)
+- [x] **Debiti chiusi**: diagnostica DB al boot dietro flag debug (non espone più lo schema in console), `setBgTab` parametro rinominato (25/06)
 - [x] **Generazione AI avatar/sfondi riattivata** via Flux (Pollinations): gratis, separata da OpenAI, verificata dal vivo (25/06)
 - [x] **GPS mirino**: avvisa con la causa reale (permesso/timeout/non disponibile) invece di saltare a Tirana in silenzio; + cache posizione (25/06)
 - [x] **Paesaggi + photo picker**: loremflickr (rotto sotto carico) sostituito con Flux; attribution falsa "Flickr CC" corretta (25/06)
