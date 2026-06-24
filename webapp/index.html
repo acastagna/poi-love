@@ -101,6 +101,9 @@
 [class*="zone-"] .zone-accent{ color:var(--zone) }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;font-family:'Inter',sans-serif;touch-action:manipulation}
 html,body{height:100%;overflow:hidden;background:var(--bg)}
+/* Long-press non deve mai selezionare o copiare elementi/testi (web-app native-like). Input, textarea e campi editabili restano selezionabili. */
+body{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+input,textarea,[contenteditable="true"]{-webkit-touch-callout:default;-webkit-user-select:text;user-select:text}
 i.ph,i.ph-fill{line-height:1;pointer-events:none}
 button{touch-action:manipulation}
 
@@ -3868,11 +3871,11 @@ async function toggleLoveDB(poiId, badgeEl) {
 ══════════════════════════════════════════ */
 // 5 livelli normali (per punti) + 2 special di sostegno. Soglie e nomi REGOLABILI dal backend admin.
 const BADGES=[
-  {min:0,     max:1000,    key:'tier_lvl_amatore',     label:'Amatore',     icon:'ph-fill ph-star',                  style:'background:rgba(245,158,11,.2);color:#FDE68A;border-color:rgba(245,158,11,.35)'},
-  {min:1001,  max:10000,   key:'tier_lvl_viaggiatore', label:'Viaggiatore', icon:'ph-fill ph-airplane-tilt',         style:'background:rgba(5,150,105,.2);color:#6EE7B7;border-color:rgba(5,150,105,.35)'},
-  {min:10001, max:50000,   key:'tier_lvl_giramondo',   label:'Giramondo',   icon:'ph-fill ph-globe-hemisphere-west', style:'background:rgba(8,145,178,.2);color:#A5F3FC;border-color:rgba(8,145,178,.35)'},
-  {min:50001, max:150000,  key:'tier_lvl_instancabile',label:'Instancabile',icon:'ph-fill ph-fire',                  style:'background:rgba(234,88,12,.2);color:#FED7AA;border-color:rgba(234,88,12,.35)'},
-  {min:150001,max:Infinity,key:'tier_lvl_leggenda',    label:'Leggenda',    icon:'ph-fill ph-crown',                 style:'background:rgba(124,58,237,.2);color:#DDD6FE;border-color:rgba(124,58,237,.35)'},
+  {min:0,     max:1000,    key:'tier_lvl_amatore',     label:'Amatore',     icon:'ph-fill ph-star',                  dark:'#B45309', style:'background:rgba(245,158,11,.2);color:#FDE68A;border-color:rgba(245,158,11,.35)'},
+  {min:1001,  max:10000,   key:'tier_lvl_viaggiatore', label:'Viaggiatore', icon:'ph-fill ph-airplane-tilt',         dark:'#047857', style:'background:rgba(5,150,105,.2);color:#6EE7B7;border-color:rgba(5,150,105,.35)'},
+  {min:10001, max:50000,   key:'tier_lvl_giramondo',   label:'Giramondo',   icon:'ph-fill ph-globe-hemisphere-west', dark:'#0E7490', style:'background:rgba(8,145,178,.2);color:#A5F3FC;border-color:rgba(8,145,178,.35)'},
+  {min:50001, max:150000,  key:'tier_lvl_instancabile',label:'Instancabile',icon:'ph-fill ph-fire',                  dark:'#C2410C', style:'background:rgba(234,88,12,.2);color:#FED7AA;border-color:rgba(234,88,12,.35)'},
+  {min:150001,max:Infinity,key:'tier_lvl_leggenda',    label:'Leggenda',    icon:'ph-fill ph-crown',                 dark:'#6D28D9', style:'background:rgba(124,58,237,.2);color:#DDD6FE;border-color:rgba(124,58,237,.35)'},
 ];
 // Etichetta tradotta di un badge a runtime (BADGES è definito prima di T/t: niente t() in fase di init)
 function badgeLabel(b){ return b && b.key ? t(b.key) : (b&&b.label)||''; }
@@ -3940,7 +3943,7 @@ function openLevels(){
         ? t('tier_from_points').replace('{x}', fmt(b.min))
         : t('tier_range_points').replace('{x}', fmt(b.min)).replace('{y}', fmt(b.max));
       return `<div class="level-row${isCur?' current':''}">
-        <div class="level-ico" style="${b.style};border-style:solid"><i class="${b.icon}"></i></div>
+        <div class="level-ico" style="${b.style};color:${b.dark};border-style:solid"><i class="${b.icon}"></i></div>
         <div class="level-info"><div class="level-name">${badgeLabel(b)}${isCur?' '+youHere:''}</div><div class="level-thr">${soglia}</div></div>
       </div>`;
     }).join('');
@@ -6332,7 +6335,7 @@ function searchUnsplashAvatar(){
   const seeds = [];
   for(let i=0;i<6;i++) seeds.push(Date.now() + i*1000 + Math.floor(Math.random()*9999));
   const html = seeds.map(s => {
-    const url = `https://loremflickr.com/400/400/${encodeURIComponent(q)}?lock=${s}`;
+    const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(q)}?width=400&height=400&nologo=true&seed=${s}`;
     return `<img src="${url}" loading="lazy" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;cursor:pointer;border:2px solid transparent;transition:border-color .15s" onclick="setProfileAvatar(this.src)" onmouseover="this.style.borderColor='var(--red)'" onmouseout="this.style.borderColor='transparent'">`;
   }).join('');
   grid.innerHTML = html;
@@ -6439,7 +6442,7 @@ function searchUnsplashBg(){
   const seeds = [];
   for(let i=0;i<6;i++) seeds.push(Date.now() + i*1000 + Math.floor(Math.random()*9999));
   const html = seeds.map(s => {
-    const url = `https://loremflickr.com/800/450/${encodeURIComponent(q)}?lock=${s}`;
+    const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(q)}?width=800&height=450&nologo=true&seed=${s}`;
     return `<img src="${url}" loading="lazy" style="width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:10px;cursor:pointer;border:2px solid transparent;transition:border-color .15s" onclick="applyHeroBgImage(this.src)" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='transparent'">`;
   }).join('');
   grid.innerHTML = html;
@@ -9222,7 +9225,7 @@ async function saveNewTrip(){
     id, name,
     badge:  dest,
     dates:  dateStr,
-    cover:  `https://loremflickr.com/800/400/${encodeURIComponent(dest.split(',')[0])},travel`,
+    cover:  `https://image.pollinations.ai/prompt/${encodeURIComponent(dest.split(',')[0]+' travel landscape')}?width=800&height=400&nologo=true`,
     companions: [],
     stops:  [],
     shareId: id,
@@ -9789,10 +9792,10 @@ function searchUnsplash(){
   grid.innerHTML='<div class="photo-picker-loading"><i class="ph-duotone ph-spinner-gap" style="animation:spin 1s linear infinite;display:block;font-size:28px;margin-bottom:8px"></i>Cerco foto…</div>';
   photoPickerSelected=null;
   document.getElementById('photoPickerConfirm').classList.remove('show');
-  // loremflickr.com: keyword-based, gratuito, senza API key, CORS-safe per img tag
-  const baseQ=encodeURIComponent(q.replace(/\s+/g,','));
+  // Flux (Pollinations): keyword-based, gratuito, senza API key, CORS-safe per img tag (loremflickr era inaffidabile sotto carico)
+  const baseQ=encodeURIComponent(q.replace(/\s+/g,' '));
   const seed=Date.now()%9000+1000;
-  photoPickerUnsplashUrls=Array.from({length:9},(_,i)=>`https://loremflickr.com/400/400/${baseQ}?random=${seed+i}`);
+  photoPickerUnsplashUrls=Array.from({length:9},(_,i)=>`https://image.pollinations.ai/prompt/${baseQ}?width=400&height=400&nologo=true&seed=${seed+i}`);
   grid.innerHTML=photoPickerUnsplashUrls.map((url,i)=>`
     <div class="photo-picker-thumb" id="ppt-${i}" onclick="selectUnsplashPhoto(${i},'${url}')">
       <img src="${url}" alt="" loading="lazy"
