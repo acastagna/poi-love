@@ -5817,25 +5817,9 @@ function searchUnsplashAvatar(){
   grid.innerHTML = html;
 }
 function generateAIAvatar(){
-  const raw = (document.getElementById('avAiPrompt').value || '').trim();
-  if(!raw){ if(typeof showToast==='function') showToast('Scrivi una descrizione'); return; }
-  // Prompt enhancement per qualità: aggiunge keywords da fotografia
-  const enhanced = `portrait avatar, ${raw}, professional headshot, soft natural lighting, high detail, vibrant colors, sharp focus, depth of field, centered composition`;
-  const seed = Math.floor(Math.random()*99999);
-  const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(enhanced)}?width=512&height=512&nologo=true&model=flux&seed=${seed}`;
+  // Generazione avatar con AI temporaneamente disattivata: in arrivo con un motore di qualità (non più Pollinations scadente).
   const result = document.getElementById('avAiResult');
-  result.innerHTML = `<div style="padding:30px 20px;text-align:center;color:var(--muted)"><i class="ph-duotone ph-circle-notch" style="font-size:24px;animation:spin 1s linear infinite;color:var(--red)"></i><div style="margin-top:10px;font-size:13px">ILLI•AI sta dipingendo… <small style="opacity:.6">(può richiedere 10-25 sec)</small></div></div>`;
-  const img = new Image();
-  img.onload = () => {
-    result.innerHTML = `
-      <img src="${url}" style="width:200px;height:200px;border-radius:50%;object-fit:cover;display:block;margin:0 auto 12px;border:3px solid var(--red);box-shadow:0 8px 24px rgba(212,43,43,.25)">
-      <button class="av-gen-btn" id="avAiUseBtn"><i class="ph-duotone ph-check"></i> Usa questo avatar</button>
-      <button class="av-gen-btn" id="avAiAgainBtn" style="background:transparent;color:var(--text);border:1.5px solid var(--border);margin-top:8px"><i class="ph-duotone ph-arrows-clockwise"></i> Genera un altro</button>`;
-    document.getElementById('avAiUseBtn').addEventListener('click', ()=> setProfileAvatar(url));
-    document.getElementById('avAiAgainBtn').addEventListener('click', generateAIAvatar);
-  };
-  img.onerror = () => { result.innerHTML = '<div style="padding:30px;text-align:center;color:var(--red);font-size:13px">Errore di rete. Riprova fra qualche secondo.</div>'; };
-  img.src = url;
+  if(result) result.innerHTML = `<div style="padding:28px 20px;text-align:center;color:var(--muted);font-size:13px"><i class="ph-duotone ph-sparkle" style="font-size:26px;display:block;margin-bottom:10px;color:var(--red)"></i>Avatar con AI <strong>in arrivo</strong>, con un motore di qualità.<br><small style="opacity:.7">Per ora: carica una tua foto o scegli da Unsplash.</small></div>`;
 }
 
 /* ══════════════════════════════════════════
@@ -5911,26 +5895,9 @@ function searchUnsplashBg(){
   grid.innerHTML = html;
 }
 function generateAIBg(){
-  const raw = (document.getElementById('bgAiPrompt').value || '').trim();
-  if(!raw){ showToast?.('Scrivi una descrizione'); return; }
-  // Prompt enhancement per paesaggio panoramico
-  const enhanced = `panoramic landscape, ${raw}, cinematic wide shot, soft natural lighting, high detail, vibrant colors, no people, no text, professional photography`;
-  const seed = Math.floor(Math.random()*99999);
-  // 1280x512 — formato profilo (stretto e largo) ideale per hero
-  const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(enhanced)}?width=1280&height=512&nologo=true&model=flux&seed=${seed}`;
+  // Generazione sfondo con AI temporaneamente disattivata: in arrivo con un motore di qualità (non più Pollinations).
   const result = document.getElementById('bgAiResult');
-  result.innerHTML = `<div style="padding:30px 20px;text-align:center;color:var(--muted)"><i class="ph-duotone ph-circle-notch" style="font-size:24px;animation:spin 1s linear infinite;color:var(--blue)"></i><div style="margin-top:10px;font-size:13px">ILLI•AI sta dipingendo lo sfondo… <small style="opacity:.6">(può richiedere 15-30 sec)</small></div></div>`;
-  const img = new Image();
-  img.onload = () => {
-    result.innerHTML = `
-      <img src="${url}" style="width:100%;max-width:420px;aspect-ratio:16/7;object-fit:cover;border-radius:12px;display:block;margin:0 auto 12px;border:2px solid var(--blue);box-shadow:0 8px 24px rgba(40,94,167,.25)">
-      <button class="av-gen-btn" id="bgAiUseBtn"><i class="ph-duotone ph-check"></i> Usa questo sfondo</button>
-      <button class="av-gen-btn" id="bgAiAgainBtn" style="background:transparent;color:var(--text);border:1.5px solid var(--border);margin-top:8px"><i class="ph-duotone ph-arrows-clockwise"></i> Genera un altro</button>`;
-    document.getElementById('bgAiUseBtn').addEventListener('click', ()=> applyHeroBgImage(url));
-    document.getElementById('bgAiAgainBtn').addEventListener('click', generateAIBg);
-  };
-  img.onerror = () => { result.innerHTML = '<div style="padding:30px;text-align:center;color:var(--red);font-size:13px">Errore di rete. Riprova fra qualche secondo.</div>'; };
-  img.src = url;
+  if(result) result.innerHTML = `<div style="padding:28px 20px;text-align:center;color:var(--muted);font-size:13px"><i class="ph-duotone ph-sparkle" style="font-size:26px;display:block;margin-bottom:10px;color:var(--blue)"></i>Sfondo con AI <strong>in arrivo</strong>, con un motore di qualità.<br><small style="opacity:.7">Per ora: carica una foto o scegli un paesaggio.</small></div>`;
 }
 
 /* ══════════════════════════════════════════
