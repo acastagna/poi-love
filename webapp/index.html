@@ -3442,13 +3442,24 @@ async function savePOIToDB(data) {
     document.getElementById('authOverlay').style.display = 'flex';
     return null;
   }
-  // Assicura che il profilo esista prima di inserire (FK: pois.author_id → profiles.id)
-  await sb.from('profiles').upsert({
-    id: currentUser.id,
-    username: currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || currentUser.email?.split('@')[0] || 'Utente',
-    avatar_url: currentUser.user_metadata?.avatar_url || '',
-    updated_at: new Date().toISOString()
-  }, { onConflict: 'id' });
+  // Assicura che il profilo esista (FK: pois.author_id → profiles.id) SENZA sovrascrivere l'handle
+  // gia' scelto: username si imposta solo alla CREAZIONE (pulito, senza spazi), poi resta dell'utente.
+  {
+    const { data: _exist } = await sb.from('profiles').select('id').eq('id', currentUser.id).maybeSingle();
+    if(!_exist){
+      await sb.from('profiles').insert({
+        id: currentUser.id,
+        username: _sanitizeHandle(currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || currentUser.email?.split('@')[0] || 'utente') || 'explorer',
+        avatar_url: currentUser.user_metadata?.avatar_url || '',
+        updated_at: new Date().toISOString()
+      });
+    } else {
+      await sb.from('profiles').update({
+        avatar_url: currentUser.user_metadata?.avatar_url || '',
+        updated_at: new Date().toISOString()
+      }).eq('id', currentUser.id);
+    }
+  }
 
   // Upload foto: PRIMA prova media.poilove.com (architettura voluta — converte in WebP),
   // FALLBACK Supabase Storage se il media server è down o non raggiungibile.
@@ -7585,10 +7596,21 @@ function showToast(msg){
    Regola: MAI interfacce native del dispositivo, tutto in grafica POI•LOVE.
    uiConfirm(msg) -> Promise<bool> · uiPrompt(title,def) -> Promise<string|null>
 ══════════════════════════════════════════ */
+// Stacking robusto: l'ULTIMO overlay/sheet aperto va sempre sopra i precedenti (niente piu' popup
+// che appaiono SOTTO quello gia' aperto quando hanno z-index uguali). Le conferme (_uiModal) usano
+// un contatore separato, garantito sopra qualunque overlay.
+window._zTop = window._zTop || 9400; window._zModalTop = window._zModalTop || 100000;
+(function(){
+  const lift = el => { if(el&&el.style&&(el.classList.contains('show')||el.classList.contains('open')||el.classList.contains('vis'))) el.style.zIndex=String(++window._zTop); };
+  const isOv = id => /(?:Ov|Modal|Sheet|Bg|Overlay)$/.test(id||'');
+  const obs = new MutationObserver(ms=>{ for(const m of ms){ const el=m.target; if(el.nodeType===1 && isOv(el.id)) lift(el); } });
+  (function start(){ if(!document.body){ setTimeout(start,50); return; } obs.observe(document.body,{attributes:true,attributeFilter:['class'],subtree:true}); })();
+})();
 function _uiModal({title='', message='', input=false, defaultValue='', okText='Ok', cancelText='Annulla', danger=false}){
   return new Promise(resolve=>{
     const ov=document.createElement('div');
-    ov.style.cssText='position:fixed;inset:0;z-index:99990;background:rgba(20,16,14,.5);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;transition:opacity .18s ease';
+    ov.style.cssText='position:fixed;inset:0;background:rgba(20,16,14,.5);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;transition:opacity .18s ease';
+    ov.style.zIndex=String(++window._zModalTop);
     const box=document.createElement('div');
     box.style.cssText='background:var(--card);color:var(--text);border-radius:18px;max-width:340px;width:100%;padding:22px;box-shadow:0 24px 60px rgba(0,0,0,.32);transform:translateY(10px) scale(.98);transition:transform .2s cubic-bezier(.2,.8,.2,1)';
     const accent=danger?'var(--red)':'var(--blue)';
@@ -7935,13 +7957,17 @@ function requestAvatarGen(){
 // Handle salvato localmente dopo il login (dal DB profiles.username)
 let myVanityHandle = null;
 
+// Handle "pulito": spazi RIMOSSI (attaccati, niente simboli per colmarli), accenti via, solo a-z0-9_-
+function _sanitizeHandle(s){
+  return String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')
+    .replace(/\s+/g,'').replace(/[^a-z0-9_-]/g,'').substring(0,20);
+}
 function getVanityHandle(user){
-  // Priorità: handle scelto dall'utente → fallback da metadati Google
+  // Priorità: handle scelto dall'utente → fallback dal nome (spazi rimossi, nessun simbolo strano)
   if(myVanityHandle) return myVanityHandle;
   if(!user) return 'tu';
   const meta=user.user_metadata||{};
-  const name=(meta.full_name||meta.name||user.email?.split('@')[0]||'utente')
-    .toLowerCase().replace(/\s+/g,'.').replace(/[^a-z0-9._-]/g,'').substring(0,20);
+  const name=_sanitizeHandle(meta.full_name||meta.name||user.email?.split('@')[0]||'utente');
   return name||'explorer';
 }
 function buildVanityUrl(handle){
@@ -8077,8 +8103,8 @@ function onVanityInput(val){
 }
 
 async function saveVanityHandle(){
-  const handle=document.getElementById('vanityIn').value.trim().toLowerCase();
-  if(!_vanityValid||!currentUser||!sb) return;
+  const handle=_sanitizeHandle(document.getElementById('vanityIn').value);
+  if(!handle||!_vanityValid||!currentUser||!sb) return;
   const saveBtn=document.getElementById('vanitySaveBtn');
   saveBtn.disabled=true;
   saveBtn.textContent='Salvataggio…';
