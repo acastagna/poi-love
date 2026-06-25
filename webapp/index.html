@@ -707,20 +707,21 @@ body::after{content:'';position:fixed;inset:0;z-index:99999;pointer-events:none;
 /* LENTE strumento (long-press / Sono qui) */
 .lens-ov{position:fixed;inset:0;z-index:1250;display:none;pointer-events:none}
 .lens-ov.show{display:block}
-.lens-wrap{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);width:250px}
+.lens-wrap{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);width:330px}
 .lens-campana{display:block;position:absolute;left:0;top:0;pointer-events:none;z-index:0}
-.lens-mag{position:absolute;left:81px;top:4px;width:88px;height:88px;border-radius:50%;overflow:hidden;pointer-events:none;background:#EDE9DF;z-index:1}
-.lens-mag .leaflet-container{width:88px;height:88px;background:#EDE9DF}
+.lens-mag{position:absolute;left:85px;top:7px;width:160px;height:160px;border-radius:50%;overflow:hidden;pointer-events:none;background:#EDE9DF;z-index:1;clip-path:circle(50%);-webkit-clip-path:circle(50%)}
+.lens-mag .leaflet-container{width:160px;height:160px;background:#EDE9DF}
+.lens-mag .leaflet-tile{filter:contrast(1.14) saturate(1.35);-webkit-filter:contrast(1.14) saturate(1.35)}
 .lens-mirino{display:block;position:relative;pointer-events:none;z-index:2}
-.lens-box{margin-top:-2px;background:var(--card);border:0.5px solid var(--border);border-radius:14px;padding:11px 13px;pointer-events:auto;box-shadow:0 10px 34px rgba(0,0,0,.2)}
-.lens-ttl{font-size:16px;font-weight:800;color:var(--text);display:flex;justify-content:space-between;align-items:center;gap:8px}
+.lens-box{margin-top:0;background:var(--card);border:0.5px solid var(--border);border-radius:18px;padding:14px 16px;pointer-events:auto;box-shadow:0 12px 40px rgba(0,0,0,.22)}
+.lens-ttl{font-size:18px;font-weight:800;color:var(--text);display:flex;justify-content:space-between;align-items:center;gap:8px}
 .lens-ttl span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.lens-x{font-size:18px;color:var(--muted);cursor:pointer;flex-shrink:0}
-.lens-addr{font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.4}
-.lens-coords{font-size:11px;color:var(--muted);opacity:.75;margin-top:1px;font-family:monospace}
-.lens-cmds{display:flex;gap:5px;margin-top:11px}
-.lens-cmd{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 0;border-radius:9px;border:none;background:#f5f0e8;color:var(--muted);font-size:10px;font-weight:700;cursor:pointer;font-family:inherit}
-.lens-cmd i{font-size:18px}
+.lens-x{font-size:21px;color:var(--muted);cursor:pointer;flex-shrink:0}
+.lens-addr{font-size:13px;color:var(--muted);margin-top:4px;line-height:1.4}
+.lens-coords{font-size:12px;color:var(--muted);opacity:.75;margin-top:2px;font-family:monospace}
+.lens-cmds{display:flex;gap:6px;margin-top:14px}
+.lens-cmd{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px;padding:9px 0;border-radius:11px;border:none;background:#f5f0e8;color:var(--muted);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit}
+.lens-cmd i{font-size:22px}
 .lens-cmd:active{transform:scale(.94)}
 .lens-cmd.poi{background:#FFF0F0;color:var(--red)}
 .lens-cmd.nav{background:#EBF2FC;color:var(--blue)}
@@ -1608,16 +1609,16 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 <!-- LENTE strumento: appare su "Sono qui" e long-press, lente fissa al centro, mappa scorre sotto -->
 <div class="lens-ov" id="lensOv">
   <div class="lens-wrap">
-    <svg class="lens-campana" viewBox="0 0 250 103" width="250" aria-hidden="true">
-      <path d="M98 82 C84 97 42 101 0 101 L250 101 C208 101 166 97 152 82 A44 44 0 0 0 98 82 Z" fill="#8E8B82"/>
+    <svg class="lens-campana" viewBox="0 0 330 198" width="330" aria-hidden="true">
+      <path d="M115 150 C97 168 58 194 0 196 L330 196 C272 194 233 168 215 150 A80 80 0 0 0 115 150 Z" fill="#8E8B82"/>
     </svg>
     <div class="lens-mag" id="lensMag"></div>
-    <svg class="lens-mirino" viewBox="0 0 250 103" width="250" aria-hidden="true">
-      <circle cx="125" cy="48" r="44" fill="none" stroke="#8E8B82" stroke-width="8"/>
-      <line x1="125" y1="9" x2="125" y2="39" stroke="#8E8B82" stroke-width="4" stroke-linecap="round"/>
-      <line x1="125" y1="57" x2="125" y2="87" stroke="#8E8B82" stroke-width="4" stroke-linecap="round"/>
-      <line x1="86" y1="48" x2="116" y2="48" stroke="#8E8B82" stroke-width="4" stroke-linecap="round"/>
-      <line x1="134" y1="48" x2="164" y2="48" stroke="#8E8B82" stroke-width="4" stroke-linecap="round"/>
+    <svg class="lens-mirino" viewBox="0 0 330 198" width="330" aria-hidden="true">
+      <circle cx="165" cy="87" r="80" fill="none" stroke="#8E8B82" stroke-width="14"/>
+      <line x1="165" y1="17" x2="165" y2="71" stroke="#8E8B82" stroke-width="6" stroke-linecap="round"/>
+      <line x1="165" y1="103" x2="165" y2="157" stroke="#8E8B82" stroke-width="6" stroke-linecap="round"/>
+      <line x1="95" y1="87" x2="149" y2="87" stroke="#8E8B82" stroke-width="6" stroke-linecap="round"/>
+      <line x1="235" y1="87" x2="181" y2="87" stroke="#8E8B82" stroke-width="6" stroke-linecap="round"/>
     </svg>
     <div class="lens-box">
       <div class="lens-ttl"><span id="lensTitle">…</span><i class="ph-duotone ph-x lens-x" onclick="closeLens()"></i></div>
@@ -4556,46 +4557,91 @@ function initMap(){
    (Magnifier che ingrandisce + trascina-lente = step 2.)
 ══════════════════════════════════════════ */
 let _lensLL=null, _lensActive=false, _lensRevT=null;
+
+/* Helper geometria: corrispondenza crosshair -> punto reale.
+   Misura in PIXEL il centro del cerchio #lensMag sullo schermo, cosi il punto
+   ingrandito coincide col crosshair anche se .lens-wrap e a top:42% (non al
+   centro mappa). Niente magic number. Ritorna null se il rect non e pronto. */
+function _lensCrosshairContainerPoint(){
+  if(!map) return null;
+  const magEl=document.getElementById('lensMag');
+  const cont=map.getContainer();
+  if(!magEl||!cont) return null;
+  const m=magEl.getBoundingClientRect();
+  const c=cont.getBoundingClientRect();
+  if(m.width===0||m.height===0) return null;
+  return L.point((m.left+m.width/2)-c.left, (m.top+m.height/2)-c.top);
+}
+function _lensLatLngUnderCrosshair(){
+  const p=_lensCrosshairContainerPoint();
+  if(!p) return null;
+  try{ return map.containerPointToLatLng(p); }catch(e){ return null; }
+}
+/* Centra la mappa cosi che (lat,lng) cada ESATTAMENTE sotto il crosshair. */
+function _lensRecenterUnderCrosshair(lat,lng,zoom){
+  if(!map) return;
+  const cp=_lensCrosshairContainerPoint();
+  if(!cp){ map.setView([lat,lng], zoom, {animate:false}); return; }
+  const cont=map.getContainer();
+  const off=L.point(cont.clientWidth/2, cont.clientHeight/2).subtract(cp);
+  const newCenter=map.unproject(map.project([lat,lng], zoom).add(off), zoom);
+  map.setView(newCenter, zoom, {animate:false});
+}
 function openLens(lat,lng){
   if(!map) return;
   if(typeof closeFab==='function') closeFab();
   if(typeof showTab==='function') showTab('map');
   _lensActive=true; _lensLL={lat,lng};
   document.getElementById('lensOv').classList.add('show');
-  map.setView([lat,lng], Math.max(map.getZoom(),17), {animate:true});
-  if(!map._lensBound){ map.on('moveend', _lensOnMove); map._lensBound=true; }
   document.getElementById('lensTitle').textContent='…';
   document.getElementById('lensAddr').textContent='';
   document.getElementById('lensCoords').textContent=lat.toFixed(5)+', '+lng.toFixed(5);
-  _lensReverse(lat,lng);
   _lensInitMag();
-  // il primo render puo trovare il container appena ridimensionato (showTab) e caricare un solo tile:
-  // ripeto invalidateSize+setView a piu intervalli (idempotente) finche i tile coprono tutto il cerchio
-  const _magReady=()=>{ if(lensMagMap){ lensMagMap.invalidateSize(); _lensMagSync(lat,lng); } };
-  requestAnimationFrame(()=>requestAnimationFrame(_magReady));
-  setTimeout(_magReady, 200);
-  setTimeout(_magReady, 550);
+  const zoom=Math.max(map.getZoom(),17);
+  void document.getElementById('lensMag').offsetWidth; // reflow: il rect di #lensMag passa da 0x0 a reale
+  const _place=()=>{
+    if(!_lensActive) return;
+    _lensRecenterUnderCrosshair(lat,lng,zoom);
+    if(lensMagMap){ lensMagMap.invalidateSize(); }
+    _lensMagSync(lat,lng);
+  };
+  // doppio rAF + due timeout: copre il resize da showTab e il primo render iOS (idempotente)
+  requestAnimationFrame(()=>requestAnimationFrame(_place));
+  setTimeout(_place, 200);
+  setTimeout(_place, 550);
+  if(!map._lensBound){ map.on('moveend', _lensOnMove); map._lensBound=true; }
+  _lensReverse(lat,lng);
 }
 function closeLens(){ _lensActive=false; document.getElementById('lensOv').classList.remove('show'); if(map&&map._lensBound){ map.off('moveend',_lensOnMove); map._lensBound=false; } }
 // Magnifier: seconda mini-mappa dentro il cerchio, stesse tile, zoom +2 del centro
 let lensMagMap=null;
 function _lensInitMag(){
   if(lensMagMap || typeof L==='undefined') return;
+  const el=document.getElementById('lensMag');
+  if(!el || !el.offsetWidth){ if(_lensActive) requestAnimationFrame(_lensInitMag); return; } // aspetta dimensioni reali
   try{
-    lensMagMap=L.map('lensMag',{zoomControl:false,attributionControl:false,dragging:false,scrollWheelZoom:false,doubleClickZoom:false,touchZoom:false,keyboard:false,boxZoom:false,tap:false,inertia:false,fadeAnimation:false,zoomAnimation:false});
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{maxZoom:20}).addTo(lensMagMap);
+    lensMagMap=L.map(el,{zoomControl:false,attributionControl:false,dragging:false,scrollWheelZoom:false,doubleClickZoom:false,touchZoom:false,keyboard:false,boxZoom:false,tap:false,inertia:false,fadeAnimation:false,zoomAnimation:false});
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{maxZoom:20,crossOrigin:true,updateWhenIdle:false,keepBuffer:4}).addTo(lensMagMap);
   }catch(e){ lensMagMap=null; }
 }
+/* Il magnifier mostra il punto sotto il crosshair (non map.getCenter), a zoom
+   mappa +3 (clamp 20). invalidateSize prima del setView: su iOS il primo setView
+   su container appena dimensionato non carica tutte le tile. */
 function _lensMagSync(lat,lng){
   if(!lensMagMap||!map) return;
-  lensMagMap.setView([lat,lng], Math.min((map.getZoom()||15)+2,20), {animate:false});
+  const ll=_lensLatLngUnderCrosshair() || L.latLng(lat,lng);
+  lensMagMap.invalidateSize(false);
+  lensMagMap.setView(ll, Math.min((map.getZoom()||15)+1,20), {animate:false});
 }
+/* L'utente trascina la MAPPA, lente ferma: il punto sotto il crosshair cambia,
+   ricalcolo box + magnifier da li. Fonte unica: corrispondenza garantita. */
 function _lensOnMove(){
   if(!_lensActive) return;
-  const c=map.getCenter(); _lensLL={lat:c.lat,lng:c.lng};
-  document.getElementById('lensCoords').textContent=c.lat.toFixed(5)+', '+c.lng.toFixed(5);
-  _lensMagSync(c.lat,c.lng);
-  clearTimeout(_lensRevT); _lensRevT=setTimeout(()=>_lensReverse(c.lat,c.lng), 380);
+  const ll=_lensLatLngUnderCrosshair() || map.getCenter();
+  _lensLL={lat:ll.lat,lng:ll.lng};
+  document.getElementById('lensCoords').textContent=ll.lat.toFixed(5)+', '+ll.lng.toFixed(5);
+  _lensMagSync(ll.lat,ll.lng);
+  clearTimeout(_lensRevT); _lensRevT=setTimeout(()=>_lensReverse(ll.lat,ll.lng), 380);
 }
 async function _lensReverse(lat,lng){
   try{
