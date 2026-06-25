@@ -4451,7 +4451,16 @@ const CENTER=[41.3275,19.8189];
 const POIS=[];
 
 let map,tileStreet,tileSat,tileLabels,routeLayer,currentPOI;
-let gpsPos=null,gpsRegistered=false,userLocMarker=null;
+let gpsPos=null,gpsRegistered=false,userLocMarker=null,_gpsCity='';
+// Reverse-geocoda la posizione GPS in NOME CITTA, cosi ILLI sa davvero dove sei: le coordinate da sole non bastano, il modello rispondeva Tirana
+async function _refreshGpsCity(){
+  if(!gpsPos) return;
+  try{
+    const r=await fetch('https://nominatim.openstreetmap.org/reverse?format=json&zoom=12&lat='+gpsPos.lat+'&lon='+gpsPos.lng,{headers:{'Accept-Language':(typeof lang!=='undefined'?lang:'it')}});
+    const d=await r.json(); const a=d.address||{};
+    _gpsCity=[a.city||a.town||a.village||a.hamlet||a.municipality||a.suburb, a.county||a.state, a.country].filter(Boolean).join(', ');
+  }catch(e){}
+}
 
 function initMap(){
   map=L.map('map',{zoomControl:false,attributionControl:true,doubleClickZoom:false}).setView(CENTER,15);
@@ -4521,6 +4530,7 @@ function initMap(){
   if(navigator.geolocation){
     navigator.geolocation.getCurrentPosition(pos=>{
       gpsPos={lat:pos.coords.latitude,lng:pos.coords.longitude};
+      _refreshGpsCity();
       // Centra la mappa sulla posizione reale
       if(map) map.setView([gpsPos.lat,gpsPos.lng],15);
       // Marker "Tu sei qui" (pallino blu)
@@ -7088,6 +7098,7 @@ function renderCompanionsTab(){
    FAB
 ══════════════════════════════════════════ */
 function toggleFab(){
+  if(typeof _lensActive!=='undefined' && _lensActive && typeof closeLens==='function') closeLens();   // aprire il menu del + chiude la lente (cosi la lista non finisce sotto la lente)
   document.getElementById('fab').classList.toggle('open');
   document.getElementById('fabMenu').classList.toggle('open');
 }
@@ -9670,7 +9681,7 @@ function _buildPoiAISystemPrompt(){
   const tripNames=Object.values(TRIPS).map(t=>t.name).join(', ')||'nessuno';
   const activePoiName=currentPOI?.name||null;
   const langLabel=lang==='it'?'italiano':lang==='sq'?'albanese':'English';
-  const locationCtx=gpsPos?`L'utente è circa a ${gpsPos.lat.toFixed(3)},${gpsPos.lng.toFixed(3)}.`:'';
+  const locationCtx=_gpsCity?`L'utente si trova ADESSO a ${_gpsCity}. Quando suggerisci posti reali (ristoranti, pizzerie, esperienze), proponi SOLO luoghi vicini a qui, nella sua citta o zona. MAI Tirana o altre citta se non e li che si trova.`:(gpsPos?`L'utente e circa a ${gpsPos.lat.toFixed(3)},${gpsPos.lng.toFixed(3)}: deduci la zona dalle coordinate, NON assumere Tirana.`:'');
 
   return `Sei ILLI•AI, la mascot ufficiale e Travel Advisor di POI•LOVE — mappa comunitaria dei luoghi amati nei Balcani e nel mondo. Ti chiamano "ILLI" per affetto: sei il piccolo cuore-amico che accompagna chi ama un luogo.
 
@@ -9722,6 +9733,7 @@ async function sendPoiAIMsg(){
   poiaiHistory.push({role:'user',content:text});
 
   try {
+    if(gpsPos && !_gpsCity) await _refreshGpsCity();   // assicura che ILLI sappia la citta anche se il GPS e arrivato tardi
     const messages=[
       {role:'system',content:_buildPoiAISystemPrompt()},
       ...poiaiHistory.slice(-12) // max 12 turni
