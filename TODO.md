@@ -10,6 +10,13 @@
 
 ## Alta priorità — Prossimi moduli
 
+### Blocco "Lente-strumento + UX input" (richiesto 25/06 notte, design fissato — vedi memoria `lente_mappa_strumento`)
+- [ ] **A. Lente-strumento sulla mappa (long-press ~300ms)**: magnifier che ingrandisce davvero, 2 trascinamenti (mappa ferma/lente mobile e viceversa), titolo+indirizzo+coordinate+descrizione live, comandi (POI, Naviga, Aggiungi a itin/rotta, Chiedi AI, Condividi amico/compagnia/social). È il prossimo blocco grosso, da fare nel codice reale Leaflet
+- [ ] **B. Bottoni dentro i campi**: Suggerisci AI / Detta / Scrivo io DENTRO il campo compilabile (icone nel campo), non a fianco
+- [ ] **C. Fix dettatura**: il microfono resta attaccato, niente conversazione naturale → stop pulito
+- [ ] **D. Voci TTS iperrealistiche** via servizio esterno (Google Cloud TTS o simile): scelto dal founder, serve chiave + billing, deroga alla regola no-TTS-esterno
+- [ ] **E. Tastiera assistita**: basi pronte a scorrimento (Piazza, Via, Contrada, Largo, Vicolo...) + riga numeri sempre visibile stile Waze
+
 - [ ] **Presence live compagnie**: layer realtime Supabase per stato online membri
 - [ ] **Frontend rotte utente V2**: flusso creazione via AI (tabella `user_routes` pronta, UI da costruire)
 - [ ] **Meccanismi tier paganti**: implementare uno a uno i perks promessi a Sostenitore e Mecenate (AI rate-limit per tier, punti x2 Mecenate, verifica profilo, POI in evidenza, adotta rotta, QR business)
