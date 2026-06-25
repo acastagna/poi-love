@@ -9767,10 +9767,12 @@ async function searchRealPlaces(query, lat, lng, radiusM){
   return {places:out, overpassDown};
 }
 async function _fetchRealPlaces(text){
-  if(!gpsPos) return {cat:null, places:[], overpassDown:false};
+  // posizione: GPS se c'e, altrimenti il centro della mappa (cosi cerca anche su desktop senza GPS, dove l'utente sta guardando)
+  const origin = gpsPos || ((typeof map!=='undefined'&&map&&map.getCenter)?map.getCenter():null);
+  if(!origin) return {cat:null, places:[], overpassDown:false};
   const cat=_detectPlaceQuery(text);
   if(!cat) return {cat:null, places:[], overpassDown:false};
-  const {lat,lng}=gpsPos;
+  const lat=origin.lat, lng=origin.lng;
   let merged=[], overpassDown=false;
   for(const rKm of [3,8,15]){
     const osmRes=await searchRealPlaces(cat, lat, lng, rKm*1000);
@@ -9926,9 +9928,10 @@ async function sendPoiAIMsg(){
     let groundingMsg=null;
     _lastGroundedPlaces=[];
     const _gCat=_detectPlaceQuery(text);
-    if(_gCat && gpsPos){
+    const _origin = gpsPos || ((typeof map!=='undefined'&&map&&map.getCenter)?map.getCenter():null);
+    if(_gCat && _origin){
       const _le=document.getElementById(loadId);
-      if(_le) _le.innerHTML=`<i class="ph-duotone ph-magnifying-glass" style="margin-right:6px"></i>Cerco ${_gCat.label} reali vicino a te…`;
+      if(_le) _le.innerHTML=`<i class="ph-duotone ph-magnifying-glass" style="margin-right:6px"></i>Sto guardando cosa c'è qui intorno…`;
       let _g={cat:_gCat, places:[], overpassDown:false};
       try{ _g=await Promise.race([_fetchRealPlaces(text), new Promise(r=>setTimeout(()=>r({cat:_gCat,places:[],overpassDown:true}),8000))]); }catch(e){}
       _lastGroundedPlaces=_g.places;
