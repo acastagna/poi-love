@@ -9740,19 +9740,26 @@ async function searchRealPlaces(query, lat, lng, radiusM){
   const q=`[out:json][timeout:12];(
     node${filt}${ex}(around:${radius},${lat},${lng});
     way${filt}${ex}(around:${radius},${lat},${lng});
-  );out center 30;`;
+  );out center meta 30;`;
   const els=await _overpassFetch(q);
   const overpassDown=(els===null);
   const out=[]; const seen=new Set();
   for(const el of (els||[])){
-    const nm=el.tags && (el.tags['name:it']||el.tags.name);
+    const tg=el.tags||{};
+    const nm=tg['name:it']||tg.name;
     if(!nm) continue;
+    // scarta i posti che OSM gia marca come chiusi/dismessi
+    if(Object.keys(tg).some(k=>/^(disused|abandoned|was|removed|demolished):/i.test(k)) || tg.disused==='yes'||tg.abandoned==='yes'||tg.opening_hours==='closed'||tg.opening_hours==='off') continue;
     const plat=el.lat ?? (el.center&&el.center.lat);
     const plng=el.lon ?? (el.center&&el.center.lon);
     if(plat==null||plng==null) continue;
     const k=nm.toLowerCase().trim();
     if(seen.has(k)) continue; seen.add(k);
-    out.push({name:nm, lat:plat, lng:plng, distM:Math.round(haversineKm(lat,lng,plat,plng)*1000), kind:cat.label, src:'OSM'});
+    out.push({name:nm, lat:plat, lng:plng, distM:Math.round(haversineKm(lat,lng,plat,plng)*1000), kind:cat.label, src:'OSM',
+      cuisine:tg.cuisine||null,
+      veg:(tg['diet:vegetarian']==='only'||tg['diet:vegan']==='only')?'solo':((tg['diet:vegetarian']==='yes'||tg['diet:vegan']==='yes')?true:null),
+      hours:tg.opening_hours||null, website:tg.website||tg['contact:website']||null, phone:tg.phone||tg['contact:phone']||null,
+      wheelchair:tg.wheelchair==='yes'||null, outdoor:tg.outdoor_seating==='yes'||null, openNow:_openNow(tg.opening_hours)});
   }
   out.sort((a,b)=>a.distM-b.distM);
   return {places:out, overpassDown};
@@ -9772,12 +9779,43 @@ async function _fetchRealPlaces(text){
       const k=p.name.toLowerCase().trim();
       if(seen.has(k)) continue; seen.add(k); merged.push(p);
     }
-    merged.sort((a,b)=>a.distM-b.distM);
+    merged.sort((a,b)=>_qualityScore(b)-_qualityScore(a));   // qualita reale, non solo distanza
     if(merged.length>=4) break;
   }
   return {cat, places:merged.slice(0,12), overpassDown};
 }
 function _fmtDist(m){ return m<1000 ? `a ${m} m` : `a ${(m/1000).toFixed(1).replace('.',',')} km`; }
+// "aperto adesso" da opening_hours OSM (casi comuni). Ritorna true/false/null (null = non so, ILLI non afferma).
+function _openNow(oh){
+  if(!oh||typeof oh!=='string') return null;
+  if(/24\/7/.test(oh)) return true;
+  try{
+    const days=['Su','Mo','Tu','We','Th','Fr','Sa'];
+    const now=new Date(); const today=days[now.getDay()]; const hm=now.getHours()*60+now.getMinutes();
+    let res=null;
+    for(const rule of oh.split(';')){
+      const m=rule.match(/([A-Za-z,\-]+)\s+(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/);
+      if(!m) continue;
+      const spec=m[1]; let active=false;
+      if(spec.includes('-')){ const [a,b]=spec.split('-'); const ia=days.indexOf(a), ib=days.indexOf(b);
+        if(ia>=0&&ib>=0){ for(let i=0;i<7;i++){ const idx=(ia+i)%7; if(days[idx]===today)active=true; if(idx===ib)break; } } }
+      else { active=spec.split(',').includes(today); }
+      if(active){ const s=+m[2]*60+ +m[3], e=+m[4]*60+ +m[5]; if(hm>=s&&hm<=e) return true; if(res===null) res=false; }
+    }
+    return res;
+  }catch(e){ return null; }
+}
+// Punteggio qualita SOLO da dati reali: priorita POI•LOVE community, aperto, vitalita (sito/telefono/orari), cucina/veg, accessibilita, meno distanza.
+function _qualityScore(p){
+  let s=0;
+  if(p.src==='POI•LOVE') s+=100;
+  if(p.openNow===true) s+=30;
+  if(p.website) s+=12; if(p.phone) s+=8; if(p.hours) s+=8;
+  if(p.cuisine) s+=6; if(p.veg) s+=6;
+  if(p.wheelchair) s+=3; if(p.outdoor) s+=3;
+  s -= Math.min((p.distM||0)/200, 25);
+  return s;
+}
 function _buildGroundingBlock(cat, places, overpassDown){
   const city=_gpsCity||'questa zona';
   if(!places.length){
@@ -9789,7 +9827,16 @@ Dillo onestamente in 1-2 frasi calde (es. "Qui intorno non trovo ${cat.label} ma
 Invita l'utente ad allargare la zona, a crearlo lui col tasto + (Crea POI), oppure proponi un altro tipo di posto da cercare.
 NON includere il blocco ===PLACES===.`;
   }
-  const lista=places.map(p=>`- ${p.name} (${_fmtDist(p.distM)}${p.src==='POI•LOVE'?', già su POI•LOVE':''})`).join('\n');
+  const lista=places.map(p=>{
+    const det=[_fmtDist(p.distM)];
+    if(p.src==='POI•LOVE') det.push('verificato su POI•LOVE');
+    if(p.cuisine) det.push('cucina: '+String(p.cuisine).replace(/_/g,' ').replace(/;/g,', '));
+    if(p.veg) det.push(p.veg==='solo'?'solo vegetariano/vegano':'opzioni vegetariane');
+    if(p.openNow===true) det.push('aperto adesso'); else if(p.openNow===false) det.push('ora risulta chiuso');
+    if(p.hours) det.push('orari: '+p.hours);
+    if(p.website) det.push('ha sito web'); if(p.outdoor) det.push("tavoli all'aperto"); if(p.wheelchair) det.push('accessibile');
+    return `- ${p.name} — ${det.join(' · ')}`;
+  }).join('\n');
   return `GROUNDING OBBLIGATORIO — anti-invenzione (regola assoluta, sovrascrive TUTTO il resto):
 L'utente cerca "${cat.label}" vicino a ${city}.
 Ho già interrogato OpenStreetMap e il database POI•LOVE. Questi sono gli UNICI posti reali esistenti vicino all'utente:
@@ -9803,6 +9850,8 @@ REGOLE FERREE:
 - NON proporre posti di altre citta o lontani: usa solo questa lista.
 - Nel blocco ===PLACES=== metti SOLO nomi presi da questa lista, identici carattere per carattere.
 - Se un posto della lista non c'entra con la richiesta, semplicemente non citarlo.
+- VALUTA e classifica: presenta i 2-3 MIGLIORI dal migliore in giu, e per ciascuno UNA frase sul PERCHE basata SOLO sui dettagli reali sopra (cucina, opzioni vegetariane, aperto adesso, verificato su POI•LOVE, accessibilita, sito). Per il cibo pesa cucina/vegetariano/aperto; per la cultura il tipo e gli orari; per la natura accessibilita e ingresso.
+- Se un dettaglio non e nella lista (es. parcheggio, recensioni, prezzo), DILLO con onesta ("non ho info sul parcheggio") invece di inventarlo.
 - ATTENZIONE freschezza: questi nomi vengono da OpenStreetMap e possono essere DATATI (il posto potrebbe aver chiuso). NON garantire MAI che siano aperti: chiudi invitando a verificare orari e apertura. Da' fiducia e priorita ai posti marcati "gia su POI•LOVE" (verificati dalla community).`;
 }
 let _lastGroundedPlaces=[];
