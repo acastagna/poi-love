@@ -709,7 +709,7 @@ body::after{content:'';position:fixed;inset:0;z-index:99999;pointer-events:none;
 .lens-ov.show{display:block}
 .lens-wrap{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);width:330px}
 .lens-campana{display:block;position:absolute;left:0;top:0;pointer-events:none;z-index:0}
-.lens-mag{position:absolute;left:85px;top:7px;width:160px;height:160px;border-radius:50%;overflow:hidden;pointer-events:none;background:#EDE9DF;z-index:1;clip-path:circle(50%);-webkit-clip-path:circle(50%)}
+.lens-mag{position:absolute;left:85px;top:7px;width:160px;height:160px;border-radius:50%;overflow:hidden;pointer-events:auto;touch-action:none;cursor:grab;background:#EDE9DF;z-index:1;clip-path:circle(50%);-webkit-clip-path:circle(50%)}
 .lens-mag .leaflet-container{width:160px;height:160px;background:#EDE9DF}
 .lens-mag .leaflet-tile{filter:contrast(1.14) saturate(1.35);-webkit-filter:contrast(1.14) saturate(1.35)}
 .lens-mirino{display:block;position:relative;pointer-events:none;z-index:2}
@@ -4609,10 +4609,10 @@ function openLens(lat,lng){
   requestAnimationFrame(()=>requestAnimationFrame(_place));
   setTimeout(_place, 200);
   setTimeout(_place, 550);
-  if(!map._lensBound){ map.on('moveend', _lensOnMove); map._lensBound=true; }
+  if(!map._lensBound){ map.on('move', _lensOnMove); map.on('moveend', _lensOnMoveEnd); map._lensBound=true; }
   _lensReverse(lat,lng);
 }
-function closeLens(){ _lensActive=false; document.getElementById('lensOv').classList.remove('show'); if(map&&map._lensBound){ map.off('moveend',_lensOnMove); map._lensBound=false; } }
+function closeLens(){ _lensActive=false; document.getElementById('lensOv').classList.remove('show'); _lensResetPos(); if(map&&map._lensBound){ map.off('move',_lensOnMove); map.off('moveend',_lensOnMoveEnd); map._lensBound=false; } }
 // Magnifier: seconda mini-mappa dentro il cerchio, stesse tile, zoom +2 del centro
 let lensMagMap=null;
 function _lensInitMag(){
@@ -4630,19 +4630,66 @@ function _lensInitMag(){
 function _lensMagSync(lat,lng){
   if(!lensMagMap||!map) return;
   const ll=_lensLatLngUnderCrosshair() || L.latLng(lat,lng);
-  lensMagMap.invalidateSize(false);
   lensMagMap.setView(ll, Math.min((map.getZoom()||15)+1,20), {animate:false});
 }
-/* L'utente trascina la MAPPA, lente ferma: il punto sotto il crosshair cambia,
-   ricalcolo box + magnifier da li. Fonte unica: corrispondenza garantita. */
-function _lensOnMove(){
-  if(!_lensActive) return;
+/* Aggiornamento LIVE (throttle 1/frame): magnifier + coordinate seguono il punto
+   sotto il crosshair in tempo reale, sia che si muova la mappa sia la lente.
+   Il nome (reverse geocode) NON qui: a fine movimento, per non sommergere Nominatim. */
+let _lensRaf=0;
+function _lensLiveUpdate(){ if(!_lensActive||_lensRaf) return; _lensRaf=requestAnimationFrame(_lensLiveDo); }
+function _lensLiveDo(){
+  _lensRaf=0; if(!_lensActive) return;
   const ll=_lensLatLngUnderCrosshair() || map.getCenter();
   _lensLL={lat:ll.lat,lng:ll.lng};
   document.getElementById('lensCoords').textContent=ll.lat.toFixed(5)+', '+ll.lng.toFixed(5);
   _lensMagSync(ll.lat,ll.lng);
-  clearTimeout(_lensRevT); _lensRevT=setTimeout(()=>_lensReverse(ll.lat,ll.lng), 380);
 }
+function _lensReverseSoon(){
+  if(!_lensActive||!_lensLL) return;
+  clearTimeout(_lensRevT); _lensRevT=setTimeout(()=>_lensReverse(_lensLL.lat,_lensLL.lng), 260);
+}
+// MODALITA A: trascini la MAPPA, lente ferma. 'move' = live, 'moveend' = nome
+function _lensOnMove(){ _lensLiveUpdate(); }
+function _lensOnMoveEnd(){ _lensLiveDo(); _lensReverseSoon(); }
+
+// MODALITA B: trascini la LENTE, mappa ferma. Sposto .lens-wrap sullo schermo:
+// getBoundingClientRect di #lensMag riflette la nuova posizione, quindi il punto
+// sotto il crosshair (e magnifier + coordinate) segue in tempo reale.
+let _lensWrapDX=0, _lensWrapDY=0, _lensDrag=null;
+function _lensApplyPos(){
+  const w=document.querySelector('.lens-wrap');
+  if(!w) return;
+  const sx=(_lensWrapDX>=0?'+ ':'- ')+Math.abs(_lensWrapDX)+'px';
+  const sy=(_lensWrapDY>=0?'+ ':'- ')+Math.abs(_lensWrapDY)+'px';
+  w.style.transform='translate(calc(-50% '+sx+'), calc(-50% '+sy+'))';
+}
+function _lensResetPos(){ _lensWrapDX=0; _lensWrapDY=0; _lensApplyPos(); }
+function _lensDragStart(e){
+  if(!_lensActive) return;
+  const p=e.touches?e.touches[0]:e;
+  _lensDrag={x:p.clientX,y:p.clientY,bx:_lensWrapDX,by:_lensWrapDY};
+  if(e.cancelable) e.preventDefault();
+}
+function _lensDragMove(e){
+  if(!_lensDrag||!_lensActive) return;
+  const p=e.touches?e.touches[0]:e;
+  _lensWrapDX=_lensDrag.bx+(p.clientX-_lensDrag.x);
+  _lensWrapDY=_lensDrag.by+(p.clientY-_lensDrag.y);
+  _lensApplyPos();
+  _lensLiveDo();
+  if(e.cancelable) e.preventDefault();
+}
+function _lensDragEnd(){ if(!_lensDrag) return; _lensDrag=null; _lensReverseSoon(); }
+(function _lensBindDrag(){
+  const mag=document.getElementById('lensMag');
+  if(!mag) return;
+  mag.addEventListener('touchstart',_lensDragStart,{passive:false});
+  mag.addEventListener('mousedown',_lensDragStart);
+  document.addEventListener('touchmove',_lensDragMove,{passive:false});
+  document.addEventListener('mousemove',_lensDragMove);
+  document.addEventListener('touchend',_lensDragEnd);
+  document.addEventListener('mouseup',_lensDragEnd);
+})();
 async function _lensReverse(lat,lng){
   try{
     const r=await fetch('https://nominatim.openstreetmap.org/reverse?format=json&zoom=18&addressdetails=1&namedetails=1&lat='+lat+'&lon='+lng,{headers:{'Accept-Language':lang}});
