@@ -704,6 +704,25 @@ body::after{content:'';position:fixed;inset:0;z-index:99999;pointer-events:none;
 .in-field-tools button:active{transform:scale(.86)}
 .in-field-tools button.ai{color:#fff;background:var(--blue)}
 .in-field-tools button.recording{color:#fff;background:var(--red);animation:pulse 1s infinite}
+/* LENTE strumento (long-press / Sono qui) */
+.lens-ov{position:fixed;inset:0;z-index:1250;display:none;pointer-events:none}
+.lens-ov.show{display:block}
+.lens-wrap{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);width:250px}
+.lens-svg{display:block;pointer-events:none}
+.lens-box{margin-top:-2px;background:var(--card);border:0.5px solid var(--border);border-radius:14px;padding:11px 13px;pointer-events:auto;box-shadow:0 10px 34px rgba(0,0,0,.2)}
+.lens-ttl{font-size:16px;font-weight:800;color:var(--text);display:flex;justify-content:space-between;align-items:center;gap:8px}
+.lens-ttl span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lens-x{font-size:18px;color:var(--muted);cursor:pointer;flex-shrink:0}
+.lens-addr{font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.4}
+.lens-coords{font-size:11px;color:var(--muted);opacity:.75;margin-top:1px;font-family:monospace}
+.lens-cmds{display:flex;gap:5px;margin-top:11px}
+.lens-cmd{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 0;border-radius:9px;border:none;background:#f5f0e8;color:var(--muted);font-size:10px;font-weight:700;cursor:pointer;font-family:inherit}
+.lens-cmd i{font-size:18px}
+.lens-cmd:active{transform:scale(.94)}
+.lens-cmd.poi{background:#FFF0F0;color:var(--red)}
+.lens-cmd.nav{background:#EBF2FC;color:var(--blue)}
+.lens-cmd.add{background:#F0FDF4;color:#16A34A}
+.lens-cmd.ai{background:#FAEEDA;color:#B45309}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
 
 /* LOCATION TABS */
@@ -1581,6 +1600,32 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
     </div>
     <span data-t="comp_title">Compagni di Viaggio</span>
   </button>
+</div>
+
+<!-- LENTE strumento: appare su "Sono qui" e long-press, lente fissa al centro, mappa scorre sotto -->
+<div class="lens-ov" id="lensOv">
+  <div class="lens-wrap">
+    <svg class="lens-svg" viewBox="0 0 250 103" width="250" aria-hidden="true">
+      <path d="M98 82 C84 97 42 101 0 101 L250 101 C208 101 166 97 152 82 A44 44 0 0 0 98 82 Z" fill="#8E8B82" opacity="0.94"/>
+      <circle cx="125" cy="48" r="44" fill="none" stroke="#8E8B82" stroke-width="8"/>
+      <line x1="125" y1="9" x2="125" y2="39" stroke="#8E8B82" stroke-width="4" stroke-linecap="round"/>
+      <line x1="125" y1="57" x2="125" y2="87" stroke="#8E8B82" stroke-width="4" stroke-linecap="round"/>
+      <line x1="86" y1="48" x2="116" y2="48" stroke="#8E8B82" stroke-width="4" stroke-linecap="round"/>
+      <line x1="134" y1="48" x2="164" y2="48" stroke="#8E8B82" stroke-width="4" stroke-linecap="round"/>
+    </svg>
+    <div class="lens-box">
+      <div class="lens-ttl"><span id="lensTitle">…</span><i class="ph-duotone ph-x lens-x" onclick="closeLens()"></i></div>
+      <div class="lens-addr" id="lensAddr"></div>
+      <div class="lens-coords" id="lensCoords"></div>
+      <div class="lens-cmds">
+        <button class="lens-cmd poi" onclick="lensCreatePOI()"><i class="ph-duotone ph-map-pin-plus"></i>POI</button>
+        <button class="lens-cmd nav" onclick="lensNavigate()"><i class="ph-duotone ph-navigation-arrow"></i>Naviga</button>
+        <button class="lens-cmd add" onclick="lensAdd()"><i class="ph-duotone ph-list-plus"></i>Aggiungi</button>
+        <button class="lens-cmd ai" onclick="lensAskAI()"><i class="ph-duotone ph-sparkle"></i>Chiedi AI</button>
+        <button class="lens-cmd" onclick="lensShare()"><i class="ph-duotone ph-share-network"></i>Condividi</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- COMPAGNIA SHEET -->
@@ -4478,14 +4523,14 @@ function initMap(){
 
   setTimeout(()=>map.invalidateSize(),200);
 
-  // ── LONG PRESS sulla mappa (3 secondi) → apri Aggiungi POI con coordinate ──
+  // ── LONG PRESS sulla mappa (>300ms) → apri la LENTE strumento sul punto ──
   let lpTimer=null,lpPos=null,lpStarted=false;
   function startLP(latlng){
     if(!latlng)return;
     lpPos=latlng; lpStarted=true;
     lpTimer=setTimeout(()=>{
-      if(lpPos&&lpStarted){ openAddPOIAtCoords(lpPos.lat,lpPos.lng); }
-    },750);
+      if(lpPos&&lpStarted){ openLens(lpPos.lat,lpPos.lng); }
+    },350);
   }
   function cancelLP(){ clearTimeout(lpTimer); lpTimer=null; lpPos=null; lpStarted=false; }
   map.on('mousedown', e=>startLP(e.latlng));
@@ -4497,6 +4542,49 @@ function initMap(){
   // Previeni il menu contestuale nativo (destra desktop + long-press mobile)
   map.getContainer().addEventListener('contextmenu', e=>e.preventDefault());
 }
+
+/* ══════════════════════════════════════════
+   LENTE strumento — appare su "Sono qui" e long-press.
+   Strato base: lente fissa al centro, la mappa scorre sotto (drag passa attraverso),
+   il box mostra nome/indirizzo/coordinate dal reverse geocoding e si aggiorna su moveend.
+   (Magnifier che ingrandisce + trascina-lente = step 2.)
+══════════════════════════════════════════ */
+let _lensLL=null, _lensActive=false, _lensRevT=null;
+function openLens(lat,lng){
+  if(!map) return;
+  if(typeof closeFab==='function') closeFab();
+  _lensActive=true; _lensLL={lat,lng};
+  document.getElementById('lensOv').classList.add('show');
+  map.setView([lat,lng], Math.max(map.getZoom(),17), {animate:true});
+  if(!map._lensBound){ map.on('moveend', _lensOnMove); map._lensBound=true; }
+  document.getElementById('lensTitle').textContent='…';
+  document.getElementById('lensAddr').textContent='';
+  document.getElementById('lensCoords').textContent=lat.toFixed(5)+', '+lng.toFixed(5);
+  _lensReverse(lat,lng);
+}
+function closeLens(){ _lensActive=false; document.getElementById('lensOv').classList.remove('show'); }
+function _lensOnMove(){
+  if(!_lensActive) return;
+  const c=map.getCenter(); _lensLL={lat:c.lat,lng:c.lng};
+  document.getElementById('lensCoords').textContent=c.lat.toFixed(5)+', '+c.lng.toFixed(5);
+  clearTimeout(_lensRevT); _lensRevT=setTimeout(()=>_lensReverse(c.lat,c.lng), 380);
+}
+async function _lensReverse(lat,lng){
+  try{
+    const r=await fetch('https://nominatim.openstreetmap.org/reverse?format=json&zoom=18&addressdetails=1&namedetails=1&lat='+lat+'&lon='+lng,{headers:{'Accept-Language':lang}});
+    const d=await r.json();
+    if(!_lensActive) return;
+    const a=d.address||{}, nd=d.namedetails||{};
+    const title=nd.name||a.amenity||a.shop||a.tourism||a.leisure||a.building||a.road||a.neighbourhood||a.suburb||a.hamlet||a.village||a.town||a.city||((d.display_name||'').split(',')[0])||t('lens_point','Questo punto');
+    document.getElementById('lensTitle').textContent=title;
+    document.getElementById('lensAddr').textContent=(d.display_name||'').split(',').slice(0,4).join(',').trim();
+  }catch(e){ document.getElementById('lensTitle').textContent=t('lens_point','Questo punto'); }
+}
+function lensCreatePOI(){ if(!_lensLL) return; const ll=_lensLL; closeLens(); openAddPOIAtCoords(ll.lat,ll.lng); }
+function lensNavigate(){ if(!_lensLL) return; const nm=document.getElementById('lensTitle').textContent||''; if(typeof openNavPicker==='function') openNavPicker(_lensLL.lat,_lensLL.lng,nm); }
+function lensAdd(){ showToast(t('soon','Presto disponibile')); }
+function lensAskAI(){ const nm=document.getElementById('lensTitle').textContent||''; closeLens(); if(typeof openIlliAI==='function') openIlliAI(); const inp=document.getElementById('poiaiInput'); if(inp){ inp.value='Raccontami qualcosa su '+nm; } }
+function lensShare(){ if(!_lensLL) return; const nm=document.getElementById('lensTitle').textContent||'Questo punto'; const url='https://poilove.com/?at='+_lensLL.lat+','+_lensLL.lng; if(navigator.share){ navigator.share({title:nm,url}).catch(()=>{}); } else { navigator.clipboard?.writeText(url).then(()=>showToast(t('toast_link_copied','🔗 Link copiato'))); } }
 
 function setMapType(type,btn){
   document.querySelectorAll('.mt-btn').forEach(b=>b.classList.remove('active','route-active'));
@@ -8056,15 +8144,14 @@ window.addEventListener('DOMContentLoaded',()=>{
 ══════════════════════════════════════════ */
 function openAddPOIHere(){
   closeFab();
-  if(!currentUser){ showToast('Accedi prima per creare un POI'); document.getElementById('authOverlay').style.display='flex'; return; }
   if(gpsPos){
-    openAddPOIAtCoords(gpsPos.lat,gpsPos.lng);
+    openLens(gpsPos.lat,gpsPos.lng);
   } else {
     showToast('📍 Rilevamento GPS...');
     navigator.geolocation?.getCurrentPosition(
-      pos=>{ gpsPos={lat:pos.coords.latitude,lng:pos.coords.longitude}; openAddPOIAtCoords(gpsPos.lat,gpsPos.lng); },
-      ()=>showToast('GPS non disponibile — attiva la posizione'),
-      {enableHighAccuracy:true,timeout:8000}
+      pos=>{ gpsPos={lat:pos.coords.latitude,lng:pos.coords.longitude}; openLens(gpsPos.lat,gpsPos.lng); },
+      ()=>showToast(t('gps_unavailable','Posizione non disponibile in questo momento.')),
+      {enableHighAccuracy:true,timeout:10000,maximumAge:60000}
     );
   }
 }
