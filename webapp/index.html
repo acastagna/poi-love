@@ -707,11 +707,11 @@ body::after{content:'';position:fixed;inset:0;z-index:99999;pointer-events:none;
 /* LENTE strumento (long-press / Sono qui) */
 .lens-ov{position:fixed;inset:0;z-index:1250;display:none;pointer-events:none}
 .lens-ov.show{display:block}
-.lens-wrap{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);width:330px}
+.lens-wrap{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);width:360px}
 .lens-campana{display:block;position:absolute;left:0;top:0;pointer-events:none;z-index:0}
-.lens-mag{position:absolute;left:85px;top:7px;width:160px;height:160px;border-radius:50%;overflow:hidden;pointer-events:auto;touch-action:none;cursor:grab;background:#c2ab8c;z-index:1;clip-path:circle(50%);-webkit-clip-path:circle(50%)}
-.lens-mag .leaflet-container{width:160px;height:160px;background:#c2ab8c}
-.lens-mag .leaflet-tile{filter:sepia(.72) saturate(1.28) brightness(.9) contrast(1.06);-webkit-filter:sepia(.72) saturate(1.28) brightness(.9) contrast(1.06)}
+.lens-mag{position:absolute;left:20px;top:16px;width:320px;height:320px;border-radius:50%;overflow:hidden;pointer-events:auto;touch-action:none;cursor:grab;background:#9a9a9a;z-index:1;clip-path:circle(50%);-webkit-clip-path:circle(50%)}
+.lens-mag .leaflet-container{width:320px;height:320px;background:#9a9a9a}
+.lens-mag .leaflet-tile{filter:grayscale(1) contrast(1.34) brightness(1.04);-webkit-filter:grayscale(1) contrast(1.34) brightness(1.04)}
 .lens-mirino{display:block;position:relative;pointer-events:none;z-index:2}
 .lens-box{margin-top:0;background:var(--card);border:0.5px solid var(--border);border-radius:18px;padding:14px 16px;pointer-events:auto;box-shadow:0 12px 40px rgba(0,0,0,.22)}
 .lens-ttl{font-size:18px;font-weight:800;color:var(--text);display:flex;justify-content:space-between;align-items:center;gap:8px}
@@ -727,6 +727,11 @@ body::after{content:'';position:fixed;inset:0;z-index:99999;pointer-events:none;
 .lens-cmd.nav{background:#EBF2FC;color:var(--blue)}
 .lens-cmd.add{background:#F0FDF4;color:#16A34A}
 .lens-cmd.ai{background:#FAEEDA;color:#B45309}
+.lens-led{position:relative;margin-top:13px;width:100%;display:flex;align-items:center;justify-content:center;gap:11px;padding:15px 20px;border:none;border-radius:32px;cursor:pointer;font-family:inherit;font-weight:800;font-size:17px;letter-spacing:.3px;color:#fff;pointer-events:auto;text-shadow:0 1px 2px rgba(0,0,0,.4);background:radial-gradient(circle at 50% 26%,#ff6363,#D42B2B 55%,#9e1414);animation:ledpulse 1.05s ease-in-out infinite}
+.lens-led:active{transform:scale(.97)}
+.lens-led .led-dot{width:15px;height:15px;border-radius:50%;background:radial-gradient(circle at 38% 30%,#fff,#ffb0b0 38%,#ff2d2d 78%);box-shadow:0 0 8px 2px rgba(255,70,70,.9),inset 0 -1px 2px rgba(120,0,0,.5);flex-shrink:0;animation:leddot 1.05s ease-in-out infinite}
+@keyframes ledpulse{0%,100%{box-shadow:inset 0 2px 7px rgba(255,255,255,.5),inset 0 -4px 7px rgba(0,0,0,.32),0 4px 12px rgba(212,43,43,.4),0 0 6px 1px rgba(212,43,43,.45)}50%{box-shadow:inset 0 2px 8px rgba(255,255,255,.72),inset 0 -4px 7px rgba(0,0,0,.28),0 7px 20px rgba(212,43,43,.7),0 0 26px 7px rgba(255,72,72,.95)}}
+@keyframes leddot{0%,100%{opacity:.6;box-shadow:0 0 5px 1px rgba(255,70,70,.7)}50%{opacity:1;box-shadow:0 0 13px 4px rgba(255,90,90,1)}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
 
 /* LOCATION TABS */
@@ -1609,16 +1614,16 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 <!-- LENTE strumento: appare su "Sono qui" e long-press, lente fissa al centro, mappa scorre sotto -->
 <div class="lens-ov" id="lensOv">
   <div class="lens-wrap">
-    <svg class="lens-campana" viewBox="0 0 330 198" width="330" aria-hidden="true">
-      <path d="M115 150 C97 168 58 194 0 196 L330 196 C272 194 233 168 215 150 A80 80 0 0 0 115 150 Z" fill="#8E8B82"/>
+    <svg class="lens-campana" viewBox="0 0 360 372" width="360" aria-hidden="true">
+      <path d="M80 302 C50 340 25 366 0 368 L360 368 C335 366 310 340 280 302 A160 160 0 0 0 80 302 Z" fill="#8E8B82"/>
     </svg>
     <div class="lens-mag" id="lensMag"></div>
-    <svg class="lens-mirino" viewBox="0 0 330 198" width="330" aria-hidden="true">
-      <circle cx="165" cy="87" r="80" fill="none" stroke="#8E8B82" stroke-width="14"/>
-      <line x1="165" y1="17" x2="165" y2="71" stroke="#8E8B82" stroke-width="6" stroke-linecap="round"/>
-      <line x1="165" y1="103" x2="165" y2="157" stroke="#8E8B82" stroke-width="6" stroke-linecap="round"/>
-      <line x1="95" y1="87" x2="149" y2="87" stroke="#8E8B82" stroke-width="6" stroke-linecap="round"/>
-      <line x1="235" y1="87" x2="181" y2="87" stroke="#8E8B82" stroke-width="6" stroke-linecap="round"/>
+    <svg class="lens-mirino" viewBox="0 0 360 372" width="360" aria-hidden="true">
+      <circle cx="180" cy="176" r="160" fill="none" stroke="#8E8B82" stroke-width="26"/>
+      <line x1="180" y1="46" x2="180" y2="142" stroke="#8E8B82" stroke-width="11" stroke-linecap="round"/>
+      <line x1="180" y1="210" x2="180" y2="306" stroke="#8E8B82" stroke-width="11" stroke-linecap="round"/>
+      <line x1="50" y1="176" x2="146" y2="176" stroke="#8E8B82" stroke-width="11" stroke-linecap="round"/>
+      <line x1="310" y1="176" x2="214" y2="176" stroke="#8E8B82" stroke-width="11" stroke-linecap="round"/>
     </svg>
     <div class="lens-box">
       <div class="lens-ttl"><span id="lensTitle">…</span><i class="ph-duotone ph-x lens-x" onclick="closeLens()"></i></div>
@@ -1632,6 +1637,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
         <button class="lens-cmd" onclick="lensShare()"><i class="ph-duotone ph-share-network"></i><span data-t="lens_share">Condividi</span></button>
       </div>
     </div>
+    <button class="lens-led" onclick="lensCreatePOI()"><span class="led-dot"></span><span data-t="lens_save_poi">Salva il POI</span></button>
   </div>
 </div>
 
