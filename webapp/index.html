@@ -4565,7 +4565,10 @@ function openLens(lat,lng){
   document.getElementById('lensCoords').textContent=lat.toFixed(5)+', '+lng.toFixed(5);
   _lensReverse(lat,lng);
   _lensInitMag();
-  setTimeout(()=>{ if(lensMagMap){ lensMagMap.invalidateSize(); _lensMagSync(lat,lng); } }, 80);
+  // doppio rAF: garantisce che il div (appena passato a visibile) abbia completato il layout prima di invalidateSize, cosi i tile caricano anche su device lenti
+  const _magReady=()=>{ if(lensMagMap){ lensMagMap.invalidateSize(); _lensMagSync(lat,lng); } };
+  requestAnimationFrame(()=>requestAnimationFrame(_magReady));
+  setTimeout(_magReady, 300);
 }
 function closeLens(){ _lensActive=false; document.getElementById('lensOv').classList.remove('show'); if(map&&map._lensBound){ map.off('moveend',_lensOnMove); map._lensBound=false; } }
 // Magnifier: seconda mini-mappa dentro il cerchio, stesse tile, zoom +2 del centro
