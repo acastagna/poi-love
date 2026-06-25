@@ -708,9 +708,10 @@ body::after{content:'';position:fixed;inset:0;z-index:99999;pointer-events:none;
 .lens-ov{position:fixed;inset:0;z-index:1250;display:none;pointer-events:none}
 .lens-ov.show{display:block}
 .lens-wrap{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);width:250px}
-.lens-svg{display:block;pointer-events:none;position:relative;z-index:1}
-.lens-mag{position:absolute;left:81px;top:4px;width:88px;height:88px;border-radius:50%;overflow:hidden;pointer-events:none;background:#EDE9DF;z-index:0}
+.lens-campana{display:block;position:absolute;left:0;top:0;pointer-events:none;z-index:0}
+.lens-mag{position:absolute;left:81px;top:4px;width:88px;height:88px;border-radius:50%;overflow:hidden;pointer-events:none;background:#EDE9DF;z-index:1}
 .lens-mag .leaflet-container{width:88px;height:88px;background:#EDE9DF}
+.lens-mirino{display:block;position:relative;pointer-events:none;z-index:2}
 .lens-box{margin-top:-2px;background:var(--card);border:0.5px solid var(--border);border-radius:14px;padding:11px 13px;pointer-events:auto;box-shadow:0 10px 34px rgba(0,0,0,.2)}
 .lens-ttl{font-size:16px;font-weight:800;color:var(--text);display:flex;justify-content:space-between;align-items:center;gap:8px}
 .lens-ttl span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -1607,9 +1608,11 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 <!-- LENTE strumento: appare su "Sono qui" e long-press, lente fissa al centro, mappa scorre sotto -->
 <div class="lens-ov" id="lensOv">
   <div class="lens-wrap">
+    <svg class="lens-campana" viewBox="0 0 250 103" width="250" aria-hidden="true">
+      <path d="M98 82 C84 97 42 101 0 101 L250 101 C208 101 166 97 152 82 A44 44 0 0 0 98 82 Z" fill="#8E8B82"/>
+    </svg>
     <div class="lens-mag" id="lensMag"></div>
-    <svg class="lens-svg" viewBox="0 0 250 103" width="250" aria-hidden="true">
-      <path d="M98 82 C84 97 42 101 0 101 L250 101 C208 101 166 97 152 82 A44 44 0 0 0 98 82 Z" fill="#8E8B82" opacity="0.94"/>
+    <svg class="lens-mirino" viewBox="0 0 250 103" width="250" aria-hidden="true">
       <circle cx="125" cy="48" r="44" fill="none" stroke="#8E8B82" stroke-width="8"/>
       <line x1="125" y1="9" x2="125" y2="39" stroke="#8E8B82" stroke-width="4" stroke-linecap="round"/>
       <line x1="125" y1="57" x2="125" y2="87" stroke="#8E8B82" stroke-width="4" stroke-linecap="round"/>
@@ -4556,6 +4559,7 @@ let _lensLL=null, _lensActive=false, _lensRevT=null;
 function openLens(lat,lng){
   if(!map) return;
   if(typeof closeFab==='function') closeFab();
+  if(typeof showTab==='function') showTab('map');
   _lensActive=true; _lensLL={lat,lng};
   document.getElementById('lensOv').classList.add('show');
   map.setView([lat,lng], Math.max(map.getZoom(),17), {animate:true});
@@ -4565,10 +4569,12 @@ function openLens(lat,lng){
   document.getElementById('lensCoords').textContent=lat.toFixed(5)+', '+lng.toFixed(5);
   _lensReverse(lat,lng);
   _lensInitMag();
-  // doppio rAF: garantisce che il div (appena passato a visibile) abbia completato il layout prima di invalidateSize, cosi i tile caricano anche su device lenti
+  // il primo render puo trovare il container appena ridimensionato (showTab) e caricare un solo tile:
+  // ripeto invalidateSize+setView a piu intervalli (idempotente) finche i tile coprono tutto il cerchio
   const _magReady=()=>{ if(lensMagMap){ lensMagMap.invalidateSize(); _lensMagSync(lat,lng); } };
   requestAnimationFrame(()=>requestAnimationFrame(_magReady));
-  setTimeout(_magReady, 300);
+  setTimeout(_magReady, 200);
+  setTimeout(_magReady, 550);
 }
 function closeLens(){ _lensActive=false; document.getElementById('lensOv').classList.remove('show'); if(map&&map._lensBound){ map.off('moveend',_lensOnMove); map._lensBound=false; } }
 // Magnifier: seconda mini-mappa dentro il cerchio, stesse tile, zoom +2 del centro
@@ -4576,7 +4582,7 @@ let lensMagMap=null;
 function _lensInitMag(){
   if(lensMagMap || typeof L==='undefined') return;
   try{
-    lensMagMap=L.map('lensMag',{zoomControl:false,attributionControl:false,dragging:false,scrollWheelZoom:false,doubleClickZoom:false,touchZoom:false,keyboard:false,boxZoom:false,tap:false,inertia:false});
+    lensMagMap=L.map('lensMag',{zoomControl:false,attributionControl:false,dragging:false,scrollWheelZoom:false,doubleClickZoom:false,touchZoom:false,keyboard:false,boxZoom:false,tap:false,inertia:false,fadeAnimation:false,zoomAnimation:false});
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{maxZoom:20}).addTo(lensMagMap);
   }catch(e){ lensMagMap=null; }
 }
