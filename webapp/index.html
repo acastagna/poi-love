@@ -4639,6 +4639,7 @@ function openLens(lat,lng,contPt){
   if(typeof closeMapSearchMarker==='function') closeMapSearchMarker();
   try{ map.closePopup(); }catch(e){}
   if(typeof showTab==='function') showTab('map');
+  { const _f=document.getElementById('fab'); if(_f) _f.style.display='none'; }   // DOPO showTab (che lo rimetterebbe): il + non resta cliccabile sopra la lente
   _lensActive=true; _lensLL={lat,lng}; _lensOpenTs=Date.now();
   _lensPointMode=!!contPt; _lensUserDragged=false;
   const gen=++_lensGeneration;   // invalida i _place di una eventuale lente precedente
@@ -4667,7 +4668,7 @@ function openLens(lat,lng,contPt){
   if(!map._lensBound){ map.on('move', _lensOnMove); map.on('moveend', _lensOnMoveEnd); map._lensBound=true; }
   _lensReverse(lat,lng);
 }
-function closeLens(){ _lensActive=false; _lensPointMode=false; _lensSuppressClick=false; clearTimeout(_lensRevT); document.getElementById('lensOv').classList.remove('show'); _lensResetPos(); if(map&&map._lensBound){ map.off('move',_lensOnMove); map.off('moveend',_lensOnMoveEnd); map._lensBound=false; } }
+function closeLens(){ _lensActive=false; _lensPointMode=false; _lensSuppressClick=false; clearTimeout(_lensRevT); document.getElementById('lensOv').classList.remove('show'); _lensResetPos(); if(map&&map._lensBound){ map.off('move',_lensOnMove); map.off('moveend',_lensOnMoveEnd); map._lensBound=false; } if((window._activeTab||'map')==='map'){ const _f=document.getElementById('fab'); if(_f) _f.style.display='flex'; } }
 // Magnifier: seconda mini-mappa dentro il cerchio, stesse tile, zoom +2 del centro
 let lensMagMap=null;
 function _lensInitMag(){
@@ -9682,7 +9683,7 @@ const _OSM_CATS=[
   {re:/\b(pizzeri[ae]|pizza|pizzeri)\b/i,                          label:'pizzeria',     osm:'amenity=restaurant', extra:'["cuisine"~"pizza"]'},
   {re:/\b(ristorant[ei]|trattori[ae]|osteri[ae]|mangiare|cena|pranzo|restaurant|restorant)\b/i, label:'ristorante', osm:'amenity=restaurant'},
   {re:/\b(sushi|giappones[ei]|japanese)\b/i,                       label:'sushi',        osm:'amenity=restaurant', extra:'["cuisine"~"sushi|japanese"]'},
-  {re:/\b(bar|caff[eè]|caffetteri[ae]|aperitiv[oi]|colazione|coffee|kafe)\b/i, label:'bar o caffè', osm:'amenity~"cafe|bar"'},
+  {re:/\b(bar|caff[eèé]|caffetteri[ae]|aperitiv[oi]|colazione|coffee|kafe)/i, label:'bar o caffè', osm:'amenity~"cafe|bar"'},
   {re:/\b(pub|birreri[ae]|birra|beer)\b/i,                         label:'pub',          osm:'amenity~"pub|bar"'},
   {re:/\b(hotel|alberg[hoi]|dormire|alloggi[oa]|b&b|bnb|pernott|accommodation)\b/i, label:'hotel o alloggio', osm:'tourism~"hotel|guest_house|hostel|apartment"'},
   {re:/\b(gelateri[ae]|gelat[oi]|ice cream|akullore)\b/i,          label:'gelateria',    osm:'amenity=ice_cream'},
@@ -9697,6 +9698,7 @@ const _OSM_CATS=[
 ];
 function _detectPlaceQuery(text){
   if(!text) return null;
+  if(/\b(era|fu|com'era|cosa ne pensi|ti piace|secondo te|ricordi|anni fa|tempo fa|ha chiuso|aveva chiuso)\b/i.test(text)) return null;   // domande su passato/opinione: non far partire la ricerca
   const wantsSearch=/\b(consigl|suggeris|trov|cerc|dove|vicin|dintorn|qui intorno|nei paraggi|paraggi|zona|migliore|miglior|posto|locale|mangiare|dormire)\b/i.test(text);
   const looksLikeAsk=/\b(un[ao]?|qualche|due|tre|dei|delle|degli|che)\b/i.test(text) || text.trim().split(/\s+/).length<=5;
   for(const c of _OSM_CATS){
@@ -9718,7 +9720,7 @@ async function _overpassFetch(query){
   const ENDPOINTS=['https://overpass-api.de/api/interpreter','https://overpass.kumi.systems/api/interpreter'];
   for(const url of ENDPOINTS){
     const ctrl=new AbortController();
-    const t=setTimeout(()=>ctrl.abort(),12000);
+    const t=setTimeout(()=>ctrl.abort(),9000);
     try{
       const r=await fetch(url,{method:'POST',headers:{'Content-Type':'text/plain'},body:query,signal:ctrl.signal});
       clearTimeout(t);
@@ -9734,7 +9736,7 @@ async function searchRealPlaces(query, lat, lng, radiusM){
   if(!cat || typeof lat!=='number' || typeof lng!=='number') return {places:[], overpassDown:false};
   const radius=Math.min(Math.max((radiusM|0)||3000,1000),15000);
   const filt=cat.osm.includes('~')
-    ? `["${cat.osm.split('~')[0]}"~"${cat.osm.split('~')[1]}"]`
+    ? `["${cat.osm.split('~')[0].replace(/"/g,'')}"~"${cat.osm.split('~')[1].replace(/"/g,'')}"]`
     : `["${cat.osm.split('=')[0]}"="${cat.osm.split('=')[1]}"]`;
   const ex=cat.extra||'';
   const q=`[out:json][timeout:12];(
@@ -9780,6 +9782,7 @@ async function _fetchRealPlaces(text){
       if(seen.has(k)) continue; seen.add(k); merged.push(p);
     }
     merged.sort((a,b)=>_qualityScore(b)-_qualityScore(a));   // qualita reale, non solo distanza
+    if(overpassDown) break;   // OSM giu: inutile ritentare altri raggi, uso i POI locali
     if(merged.length>=4) break;
   }
   return {cat, places:merged.slice(0,12), overpassDown};
@@ -9800,7 +9803,7 @@ function _openNow(oh){
       if(spec.includes('-')){ const [a,b]=spec.split('-'); const ia=days.indexOf(a), ib=days.indexOf(b);
         if(ia>=0&&ib>=0){ for(let i=0;i<7;i++){ const idx=(ia+i)%7; if(days[idx]===today)active=true; if(idx===ib)break; } } }
       else { active=spec.split(',').includes(today); }
-      if(active){ const s=+m[2]*60+ +m[3], e=+m[4]*60+ +m[5]; if(hm>=s&&hm<=e) return true; if(res===null) res=false; }
+      if(active){ const s=+m[2]*60+ +m[3], e=+m[4]*60+ +m[5]; const op=(e<s)?(hm>=s||hm<=e):(hm>=s&&hm<=e); if(op) return true; if(res===null) res=false; }
     }
     return res;
   }catch(e){ return null; }
@@ -9850,8 +9853,13 @@ REGOLE FERREE:
 - NON proporre posti di altre citta o lontani: usa solo questa lista.
 - Nel blocco ===PLACES=== metti SOLO nomi presi da questa lista, identici carattere per carattere.
 - Se un posto della lista non c'entra con la richiesta, semplicemente non citarlo.
-- VALUTA e classifica: presenta i 2-3 MIGLIORI dal migliore in giu, e per ciascuno UNA frase sul PERCHE basata SOLO sui dettagli reali sopra (cucina, opzioni vegetariane, aperto adesso, verificato su POI•LOVE, accessibilita, sito). Per il cibo pesa cucina/vegetariano/aperto; per la cultura il tipo e gli orari; per la natura accessibilita e ingresso.
-- Se un dettaglio non e nella lista (es. parcheggio, recensioni, prezzo), DILLO con onesta ("non ho info sul parcheggio") invece di inventarlo.
+- VALUTA e presenta ALMENO 3 posti (se ci sono), dal migliore in giu, OGNUNO con questa SCHEDA a colpo d'occhio (campi su righe compatte, SALTA i campi che non hai):
+  R1: **Nome** · tipologia (Pizzeria/Ristorante/Bar/Trattoria...)
+  R2: ⭐ media voti (SOLO se presente nei dati) · 💶 prezzo (€ economico / €€ medio / €€€ caro, SOLO se nei dati) · 📍 distanza · 🕐 stato (aperto ora / ora chiuso, solo se noto)
+  R3: 🍽 cucina/specialita · 🥗 se vegetariano · 🍹 se fa aperitivo/bar · 🅿️ se parcheggio noto
+  R4: → una frase sul PERCHE, basata SOLO sui dati reali sopra.
+  Criteri per macro-tipo: cibo = cucina/veg/aperto/prezzo; cultura = tipo/orari; natura = accessibilita/ingresso.
+- Se un dato manca (media voti, prezzo, piatti forti, parcheggio), OMETTI la voce o scrivi "n/d": non inventarlo MAI.
 - ATTENZIONE freschezza: questi nomi vengono da OpenStreetMap e possono essere DATATI (il posto potrebbe aver chiuso). NON garantire MAI che siano aperti: chiudi invitando a verificare orari e apertura. Da' fiducia e priorita ai posti marcati "gia su POI•LOVE" (verificati dalla community).`;
 }
 let _lastGroundedPlaces=[];
@@ -9922,7 +9930,7 @@ async function sendPoiAIMsg(){
       const _le=document.getElementById(loadId);
       if(_le) _le.innerHTML=`<i class="ph-duotone ph-magnifying-glass" style="margin-right:6px"></i>Cerco ${_gCat.label} reali vicino a te…`;
       let _g={cat:_gCat, places:[], overpassDown:false};
-      try{ _g=await _fetchRealPlaces(text); }catch(e){}
+      try{ _g=await Promise.race([_fetchRealPlaces(text), new Promise(r=>setTimeout(()=>r({cat:_gCat,places:[],overpassDown:true}),8000))]); }catch(e){}
       _lastGroundedPlaces=_g.places;
       groundingMsg={role:'system', content:_buildGroundingBlock(_g.cat, _g.places, _g.overpassDown)};
     }
