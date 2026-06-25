@@ -3676,6 +3676,49 @@ const PL_TYPE_CFG = {
   preferito: { icon:'ph-star',         color:'#EF4444', label:'Preferito',max:1 },
 };
 
+// ── Cassaforte: manda un POI (dalla lista POI) in un luogo personale privato ──
+function poiToSafe(key){
+  const p=(window._poiTabIndex||{})[key];
+  if(!p){ showToast('POI non trovato'); return; }
+  window._safePendingPoi={ name:p.name, lat:p.lat, lng:p.lng, address:p.address||p.cat||p.category||'' };
+  let ov=document.getElementById('safeOverlay');
+  if(!ov){
+    ov=document.createElement('div'); ov.id='safeOverlay';
+    ov.style.cssText='position:fixed;inset:0;z-index:4000;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center';
+    ov.onclick=e=>{ if(e.target===ov) closeSafe(); };
+    document.body.appendChild(ov);
+  }
+  const btns=Object.entries(PL_TYPE_CFG).map(([type,cfg])=>{
+    const full=plPlaces.filter(x=>x.type===type).length>=cfg.max;
+    return `<button onclick="savePoiToSafe('${type}')" ${full?'disabled':''} style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 8px;border:1px solid var(--border);border-radius:14px;background:#fff;cursor:${full?'not-allowed':'pointer'};opacity:${full?'.4':'1'}">
+      <i class="ph-duotone ${cfg.icon}" style="font-size:26px;color:${cfg.color}"></i>
+      <span style="font-size:12px;font-weight:700;color:var(--ink)">${cfg.label}</span>
+      ${full?'<span style="font-size:9px;color:var(--muted)">pieno</span>':''}
+    </button>`;
+  }).join('');
+  ov.innerHTML=`<div style="background:#fff;width:100%;max-width:480px;border-radius:20px 20px 0 0;padding:18px 16px 26px">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+      <i class="ph-duotone ph-vault" style="font-size:22px;color:var(--red)"></i>
+      <strong style="font-size:15px;color:var(--ink)">Salva in un luogo personale</strong>
+      <button onclick="closeSafe()" style="margin-left:auto;border:none;background:transparent;font-size:24px;line-height:1;color:var(--muted);cursor:pointer">&times;</button>
+    </div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:14px">"${(p.name||'').replace(/</g,'&lt;')}" va nella tua cassaforte privata, visibile solo a te.</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">${btns}</div>
+  </div>`;
+  ov.style.display='flex';
+}
+function closeSafe(){ const ov=document.getElementById('safeOverlay'); if(ov) ov.style.display='none'; }
+function savePoiToSafe(type){
+  const p=window._safePendingPoi; if(!p){ closeSafe(); return; }
+  const cfg=PL_TYPE_CFG[type]||{label:type,max:PL_MAX};
+  if(plPlaces.filter(x=>x.type===type).length>=cfg.max){ showToast(`${cfg.label}: pieno (max ${cfg.max})`); return; }
+  plPlaces.push({ type, word:p.name, lat:p.lat, lng:p.lng, address:(p.address||'').split(',').slice(0,2).join(', ') });
+  localStorage.setItem('pl_places', JSON.stringify(plPlaces));
+  if(typeof renderPlaces==='function') renderPlaces();
+  closeSafe();
+  showToast(`✨ "${p.name}" → ${cfg.label}`);
+}
+
 function renderPlaces(){
   const chips = document.getElementById('plChips');
   if(!chips) return;
@@ -5610,6 +5653,7 @@ async function renderPoiTab(){
           <div class="pi-sub">${p.cat||p.category||''} · ${p.address||''}</div>
         </div>
         <div class="pi-actions">
+          <button class="pi-act-btn" title="Salva in un luogo personale" onclick="event.stopPropagation();poiToSafe('${key}')"><i class="ph-duotone ph-vault"></i></button>
           <button class="pi-act-btn" data-tt="act_open_map" title="${t('act_open_map')}" onclick="event.stopPropagation();centerMapOnPoi(${p.lat},${p.lng})"><i class="ph-duotone ph-crosshair"></i></button>
           <button class="pi-act-btn" data-tt="act_navigate" title="${t('act_navigate')}" onclick="event.stopPropagation();navigateToPoi(${p.lat},${p.lng},'${(p.name||'').replace(/'/g,'')}')"><i class="ph-duotone ph-navigation-arrow"></i></button>
         </div>
@@ -5625,6 +5669,7 @@ async function renderPoiTab(){
         <div class="pi-sub"><i class="ph-duotone ${visIcon}" style="font-size:10px"></i> ${visLblT} · <i class="ph-duotone ph-heart" style="color:var(--red);font-size:11px;vertical-align:-1px"></i> ${p.love||p.love_count||0}</div>
       </div>
       <div class="pi-actions">
+        <button class="pi-act-btn" title="Salva in un luogo personale" onclick="poiToSafe('${key}')"><i class="ph-duotone ph-vault"></i></button>
         <button class="pi-act-btn" data-tt="act_navigate" title="${t('act_navigate')}" onclick="navigateToPoi(${p.lat},${p.lng},'${(p.name||'').replace(/'/g,'')}')"><i class="ph-duotone ph-navigation-arrow"></i></button>
         <button class="pi-act-btn" data-tt="act_open_map" title="${t('act_open_map')}" onclick="centerMapOnPoi(${p.lat},${p.lng})"><i class="ph-duotone ph-map-pin"></i></button>
         <button class="pi-act-btn" data-tt="act_share" title="${t('act_share')}" onclick="sharePoiByKey('${key}')"><i class="ph-duotone ph-share-network"></i></button>
