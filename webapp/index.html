@@ -9677,6 +9677,135 @@ const GROQ_MODEL='gpt-4o-mini';
 // Conversazione in memoria per contesto multi-turno (formato OpenAI)
 let poiaiHistory=[];
 
+// ILLI GROUNDING anti-allucinazione: recupera POI REALI vicino a (lat,lng) da OpenStreetMap (Overpass) + DB POI•LOVE e li inietta come whitelist chiusa. Nessuna dipendenza, nessuna key.
+const _OSM_CATS=[
+  {re:/\b(pizzeri[ae]|pizza|pizzeri)\b/i,                          label:'pizzeria',     osm:'amenity=restaurant', extra:'["cuisine"~"pizza"]'},
+  {re:/\b(ristorant[ei]|trattori[ae]|osteri[ae]|mangiare|cena|pranzo|restaurant|restorant)\b/i, label:'ristorante', osm:'amenity=restaurant'},
+  {re:/\b(sushi|giappones[ei]|japanese)\b/i,                       label:'sushi',        osm:'amenity=restaurant', extra:'["cuisine"~"sushi|japanese"]'},
+  {re:/\b(bar|caff[eè]|caffetteri[ae]|aperitiv[oi]|colazione|coffee|kafe)\b/i, label:'bar o caffè', osm:'amenity~"cafe|bar"'},
+  {re:/\b(pub|birreri[ae]|birra|beer)\b/i,                         label:'pub',          osm:'amenity~"pub|bar"'},
+  {re:/\b(hotel|alberg[hoi]|dormire|alloggi[oa]|b&b|bnb|pernott|accommodation)\b/i, label:'hotel o alloggio', osm:'tourism~"hotel|guest_house|hostel|apartment"'},
+  {re:/\b(gelateri[ae]|gelat[oi]|ice cream|akullore)\b/i,          label:'gelateria',    osm:'amenity=ice_cream'},
+  {re:/\b(pasticceri[ae]|dolc[ie]|pastry)\b/i,                     label:'pasticceria',  osm:'shop~"pastry|confectionery"'},
+  {re:/\b(panetteri[ae]|panificio|forno|pane|bakery|furr)\b/i,     label:'panetteria',   osm:'shop=bakery'},
+  {re:/\b(farmaci[ae]|pharmacy|farmaci)\b/i,                       label:'farmacia',     osm:'amenity=pharmacy'},
+  {re:/\b(supermercat[oi]|supermarket|spesa|aliment|market)\b/i,   label:'supermercato', osm:'shop~"supermarket|convenience"'},
+  {re:/\b(distributor[ei]|benzina|carburante|fuel)\b/i,            label:'distributore', osm:'amenity=fuel'},
+  {re:/\b(musei?|museo|galleri[ae]|muze)\b/i,                      label:'museo',        osm:'tourism=museum'},
+  {re:/\b(parc[hoi]|parco|giardin[oi]|park)\b/i,                   label:'parco',        osm:'leisure=park'},
+  {re:/\b(attrazion[ei]|monument[oi]|da vedere|da visitare|landmark)\b/i, label:'attrazione', osm:'tourism~"attraction|viewpoint"'},
+];
+function _detectPlaceQuery(text){
+  if(!text) return null;
+  const wantsSearch=/\b(consigl|suggeris|trov|cerc|dove|vicin|dintorn|qui intorno|nei paraggi|paraggi|zona|migliore|miglior|posto|locale|mangiare|dormire)\b/i.test(text);
+  const looksLikeAsk=/\b(un[ao]?|qualche|due|tre|dei|delle|degli|che)\b/i.test(text) || text.trim().split(/\s+/).length<=5;
+  for(const c of _OSM_CATS){
+    if(c.re.test(text) && (wantsSearch || looksLikeAsk)) return c;
+  }
+  return null;
+}
+function _localPoiPlaces(lat,lng,radiusKm){
+  const all=[...(window._dbPOIs||[]), ...(typeof POIS!=='undefined'?POIS:[])];
+  const seen=new Set();
+  return all
+    .filter(p=>p && p.name && typeof p.lat==='number' && typeof p.lng==='number')
+    .map(p=>({name:p.name, lat:p.lat, lng:p.lng, distM:Math.round(haversineKm(lat,lng,p.lat,p.lng)*1000), kind:p.category||'POI', src:'POI•LOVE'}))
+    .filter(p=>p.distM<=radiusKm*1000)
+    .filter(p=>{const k=p.name.toLowerCase().trim(); if(seen.has(k))return false; seen.add(k); return true;})
+    .sort((a,b)=>a.distM-b.distM);
+}
+async function _overpassFetch(query){
+  const ENDPOINTS=['https://overpass-api.de/api/interpreter','https://overpass.kumi.systems/api/interpreter'];
+  for(const url of ENDPOINTS){
+    const ctrl=new AbortController();
+    const t=setTimeout(()=>ctrl.abort(),12000);
+    try{
+      const r=await fetch(url,{method:'POST',headers:{'Content-Type':'text/plain'},body:query,signal:ctrl.signal});
+      clearTimeout(t);
+      if(!r.ok) continue;
+      const d=await r.json();
+      return d.elements||[];
+    }catch(e){ clearTimeout(t); }
+  }
+  return null;
+}
+async function searchRealPlaces(query, lat, lng, radiusM){
+  const cat=(query && typeof query==='object') ? query : _detectPlaceQuery(query);
+  if(!cat || typeof lat!=='number' || typeof lng!=='number') return {places:[], overpassDown:false};
+  const radius=Math.min(Math.max((radiusM|0)||3000,1000),15000);
+  const filt=cat.osm.includes('~')
+    ? `["${cat.osm.split('~')[0]}"~"${cat.osm.split('~')[1]}"]`
+    : `["${cat.osm.split('=')[0]}"="${cat.osm.split('=')[1]}"]`;
+  const ex=cat.extra||'';
+  const q=`[out:json][timeout:12];(
+    node${filt}${ex}(around:${radius},${lat},${lng});
+    way${filt}${ex}(around:${radius},${lat},${lng});
+  );out center 30;`;
+  const els=await _overpassFetch(q);
+  const overpassDown=(els===null);
+  const out=[]; const seen=new Set();
+  for(const el of (els||[])){
+    const nm=el.tags && (el.tags['name:it']||el.tags.name);
+    if(!nm) continue;
+    const plat=el.lat ?? (el.center&&el.center.lat);
+    const plng=el.lon ?? (el.center&&el.center.lon);
+    if(plat==null||plng==null) continue;
+    const k=nm.toLowerCase().trim();
+    if(seen.has(k)) continue; seen.add(k);
+    out.push({name:nm, lat:plat, lng:plng, distM:Math.round(haversineKm(lat,lng,plat,plng)*1000), kind:cat.label, src:'OSM'});
+  }
+  out.sort((a,b)=>a.distM-b.distM);
+  return {places:out, overpassDown};
+}
+async function _fetchRealPlaces(text){
+  if(!gpsPos) return {cat:null, places:[], overpassDown:false};
+  const cat=_detectPlaceQuery(text);
+  if(!cat) return {cat:null, places:[], overpassDown:false};
+  const {lat,lng}=gpsPos;
+  let merged=[], overpassDown=false;
+  for(const rKm of [3,8,15]){
+    const osmRes=await searchRealPlaces(cat, lat, lng, rKm*1000);
+    overpassDown = osmRes.overpassDown;
+    const local=_localPoiPlaces(lat,lng,rKm);
+    const seen=new Set(); merged=[];
+    for(const p of [...local, ...osmRes.places]){
+      const k=p.name.toLowerCase().trim();
+      if(seen.has(k)) continue; seen.add(k); merged.push(p);
+    }
+    merged.sort((a,b)=>a.distM-b.distM);
+    if(merged.length>=4) break;
+  }
+  return {cat, places:merged.slice(0,12), overpassDown};
+}
+function _fmtDist(m){ return m<1000 ? `a ${m} m` : `a ${(m/1000).toFixed(1).replace('.',',')} km`; }
+function _buildGroundingBlock(cat, places, overpassDown){
+  const city=_gpsCity||'questa zona';
+  if(!places.length){
+    const motivo = overpassDown ? `la fonte dati (OpenStreetMap) non risponde in questo momento` : `nel raggio non ci sono ${cat.label} mappati`;
+    return `GROUNDING OBBLIGATORIO — nessun posto reale trovato (regola assoluta, sovrascrive tutto):
+Ho cercato "${cat.label}" vicino a ${city}: ${motivo}.
+NON inventare NESSUN nome di locale, NESSUN indirizzo, NESSUNA distanza.
+Dillo onestamente in 1-2 frasi calde (es. "Qui intorno non trovo ${cat.label} mappati, ma...").
+Invita l'utente ad allargare la zona, a crearlo lui col tasto + (Crea POI), oppure proponi un altro tipo di posto da cercare.
+NON includere il blocco ===PLACES===.`;
+  }
+  const lista=places.map(p=>`- ${p.name} (${_fmtDist(p.distM)}${p.src==='POI•LOVE'?', già su POI•LOVE':''})`).join('\n');
+  return `GROUNDING OBBLIGATORIO — anti-invenzione (regola assoluta, sovrascrive TUTTO il resto):
+L'utente cerca "${cat.label}" vicino a ${city}.
+Ho già interrogato OpenStreetMap e il database POI•LOVE. Questi sono gli UNICI posti reali esistenti vicino all'utente:
+
+${lista}
+
+REGOLE FERREE:
+- Suggerisci SOLO posti presenti in questa lista, col loro NOME ESATTO come scritto sopra.
+- Riporta la distanza indicata tra parentesi. NON inventare distanze diverse.
+- NON aggiungere, NON inventare, NON "ricordare" altri nomi: se un posto non e in lista, NON esiste.
+- NON proporre posti di altre citta o lontani: usa solo questa lista.
+- Nel blocco ===PLACES=== metti SOLO nomi presi da questa lista, identici carattere per carattere.
+- Se un posto della lista non c'entra con la richiesta, semplicemente non citarlo.`;
+}
+let _lastGroundedPlaces=[];
+
 function _buildPoiAISystemPrompt(){
   const tripNames=Object.values(TRIPS).map(t=>t.name).join(', ')||'nessuno';
   const activePoiName=currentPOI?.name||null;
@@ -9734,14 +9863,29 @@ async function sendPoiAIMsg(){
 
   try {
     if(gpsPos && !_gpsCity) await _refreshGpsCity();   // assicura che ILLI sappia la citta anche se il GPS e arrivato tardi
+
+    // GROUNDING anti-allucinazione: se l'utente cerca un posto, recupero i REALI (OSM + POI•LOVE) e li inietto come whitelist chiusa
+    let groundingMsg=null;
+    _lastGroundedPlaces=[];
+    const _gCat=_detectPlaceQuery(text);
+    if(_gCat && gpsPos){
+      const _le=document.getElementById(loadId);
+      if(_le) _le.innerHTML=`<i class="ph-duotone ph-magnifying-glass" style="margin-right:6px"></i>Cerco ${_gCat.label} reali vicino a te…`;
+      let _g={cat:_gCat, places:[], overpassDown:false};
+      try{ _g=await _fetchRealPlaces(text); }catch(e){}
+      _lastGroundedPlaces=_g.places;
+      groundingMsg={role:'system', content:_buildGroundingBlock(_g.cat, _g.places, _g.overpassDown)};
+    }
+
     const messages=[
       {role:'system',content:_buildPoiAISystemPrompt()},
+      ...(groundingMsg?[groundingMsg]:[]),     // grounding subito dopo la personalita, vicino alla risposta
       ...poiaiHistory.slice(-12) // max 12 turni
     ];
     const res=await fetch(GROQ_URL,{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':`Bearer ${GROQ_KEY}`},
-      body:JSON.stringify({model:GROQ_MODEL,messages,temperature:0.85,max_completion_tokens:512})
+      body:JSON.stringify({model:GROQ_MODEL,messages,temperature:groundingMsg?0.4:0.85,max_completion_tokens:512})
     });
     const json=await res.json();
     if(!res.ok) throw new Error(json?.error?.message||`HTTP ${res.status}`);
