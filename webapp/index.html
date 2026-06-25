@@ -728,7 +728,7 @@ body::after{content:'';position:fixed;inset:0;z-index:99999;pointer-events:none;
 .lens-cmd.add{background:#F0FDF4;color:#16A34A}
 .lens-cmd.ai{background:#FAEEDA;color:#B45309}
 /* pulsante "Salva il POI": piccolo cilindro rosso incastonato tra la lente e il box, niente luce lampeggiante */
-.lens-led{display:flex;width:fit-content;max-width:90%;margin:-32px auto 10px;align-items:center;justify-content:center;gap:6px;padding:8px 16px;border:none;border-radius:16px;cursor:pointer;font-family:inherit;font-weight:800;font-size:13.5px;color:#fff;pointer-events:auto;white-space:nowrap;text-shadow:0 1px 1px rgba(0,0,0,.35);background:linear-gradient(180deg,#ff8585 0%,#e23b3b 50%,#a81d1d 100%);box-shadow:0 3px 9px rgba(150,25,25,.42),inset 0 1.5px 1px rgba(255,255,255,.6),inset 0 -2px 3px rgba(110,0,0,.4)}
+.lens-led{display:flex;position:relative;z-index:6;width:fit-content;max-width:90%;margin:-32px auto 10px;align-items:center;justify-content:center;gap:6px;padding:8px 16px;border:none;border-radius:16px;cursor:pointer;font-family:inherit;font-weight:800;font-size:13.5px;color:#fff;pointer-events:auto;white-space:nowrap;text-shadow:0 1px 1px rgba(0,0,0,.35);background:linear-gradient(180deg,#ff8585 0%,#e23b3b 50%,#a81d1d 100%);box-shadow:0 3px 9px rgba(150,25,25,.42),inset 0 1.5px 1px rgba(255,255,255,.6),inset 0 -2px 3px rgba(110,0,0,.4)}
 .lens-led i{font-size:16px}
 .lens-led:active{transform:scale(.96)}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
