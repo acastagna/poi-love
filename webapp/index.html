@@ -5078,27 +5078,7 @@ function copyCoords(el){
 /* ══════════════════════════════════════════
    VOICE (Web Speech API)
 ══════════════════════════════════════════ */
-let recognition=null,isRecording=false;
-function initVoice(){
-  const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SpeechRecognition)return;
-  recognition=new SpeechRecognition();
-  recognition.continuous=false;recognition.interimResults=true;
-  recognition.lang=lang==='sq'?'sq-AL':lang==='en'?'en-US':'it-IT';
-  recognition.onresult=e=>{
-    const transcript=Array.from(e.results).map(r=>r[0].transcript).join('');
-    const ta=document.getElementById('storyIn');
-    ta.value=transcript.substring(0,200);updateChar();
-  };
-  recognition.onend=()=>{isRecording=false;setVoiceBtnState(false)};
-  recognition.onerror=()=>{isRecording=false;setVoiceBtnState(false)};
-}
-function setVoiceBtnState(rec){
-  const btn=document.getElementById('voiceBtn');
-  const lbl=document.getElementById('voiceBtnLbl');
-  if(rec){btn.classList.add('recording');lbl.textContent=lang==='it'?'Stop':lang==='sq'?'Ndaloj':'Stop';}
-  else{btn.classList.remove('recording');lbl.textContent=lang==='it'?'Detta':lang==='sq'?'Dikto':'Dictate';}
-}
+// Vecchio motore voce descrizione (initVoice/toggleVoice/setVoiceBtnState/recognition) rimosso: la dettatura ora usa toggleFieldDictation (generico, robusto, stop pulito).
 // Focus su un campo (modo "Scrivo io"): apre la tastiera per scrivere a mano
 function focusField(id){ const el=document.getElementById(id); if(el){ el.focus(); try{ el.setSelectionRange(el.value.length,el.value.length); }catch(_){} } }
 // Dettatura generica in un campo: riusa Web Speech (iOS-friendly), rispetta maxlength, aggiorna i contatori
@@ -5157,11 +5137,7 @@ async function suggestPoiName(){
   }catch(e){ showToast(t('ai_gen_failed','Generazione non riuscita, riprova tra poco.')); }
   finally{ if(btn){ btn.disabled=false; btn.innerHTML=old; } }
 }
-function toggleVoice(){
-  if(!recognition){showToast(lang==='it'?'Voce non supportata su questo browser':lang==='sq'?'Zëri nuk mbështetet':'Voice not supported');return;}
-  if(isRecording){recognition.stop();isRecording=false;setVoiceBtnState(false);}
-  else{recognition.lang=lang==='sq'?'sq-AL':lang==='en'?'en-US':'it-IT';recognition.start();isRecording=true;setVoiceBtnState(true);}
-}
+// toggleVoice (legacy) rimosso: la dettatura descrizione usa toggleFieldDictation('storyIn','voiceBtn').
 
 /* ══════════════════════════════════════════
    AI SUMMARIZE (smart truncation, free)
@@ -6958,7 +6934,6 @@ function closeAddPOI(){
   }
   if(_locTapMarker && map){ map.removeLayer(_locTapMarker); _locTapMarker=null; }
   document.getElementById('acDrop').classList.remove('open');
-  if(isRecording&&recognition){recognition.stop();isRecording=false;setVoiceBtnState(false);}
   if(_fldRecOn&&_fldRec){ try{_fldRec.stop();}catch(e){} stopFieldDictationUI(); }
   // Reset modalità editing
   if(typeof editingPOIId!=='undefined'&&editingPOIId){
@@ -8033,8 +8008,6 @@ window.addEventListener('DOMContentLoaded',()=>{
   applyLang(lang);
   // Badge
   renderBadge(currentPoints);
-  // Voice
-  initVoice();
   // Close buttons — explicit event listeners (fix mobile Safari)
   document.getElementById('closeAddPoiBtn').addEventListener('click', smartCloseAddPOI);
   document.getElementById('closeAddPoiBtn').addEventListener('touchend', e=>{e.preventDefault();smartCloseAddPOI()});
