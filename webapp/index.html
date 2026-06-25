@@ -709,9 +709,9 @@ body::after{content:'';position:fixed;inset:0;z-index:99999;pointer-events:none;
 .lens-ov.show{display:block}
 .lens-wrap{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);width:330px}
 .lens-campana{display:block;position:absolute;left:0;top:0;pointer-events:none;z-index:0}
-.lens-mag{position:absolute;left:85px;top:7px;width:160px;height:160px;border-radius:50%;overflow:hidden;pointer-events:auto;touch-action:none;cursor:grab;background:#EDE9DF;z-index:1;clip-path:circle(50%);-webkit-clip-path:circle(50%)}
-.lens-mag .leaflet-container{width:160px;height:160px;background:#EDE9DF}
-.lens-mag .leaflet-tile{filter:contrast(1.14) saturate(1.35);-webkit-filter:contrast(1.14) saturate(1.35)}
+.lens-mag{position:absolute;left:85px;top:7px;width:160px;height:160px;border-radius:50%;overflow:hidden;pointer-events:auto;touch-action:none;cursor:grab;background:#0b0b0b;z-index:1;clip-path:circle(50%);-webkit-clip-path:circle(50%)}
+.lens-mag .leaflet-container{width:160px;height:160px;background:#0b0b0b}
+.lens-mag .leaflet-tile{filter:brightness(1.7) contrast(1.18);-webkit-filter:brightness(1.7) contrast(1.18)}
 .lens-mirino{display:block;position:relative;pointer-events:none;z-index:2}
 .lens-box{margin-top:0;background:var(--card);border:0.5px solid var(--border);border-radius:18px;padding:14px 16px;pointer-events:auto;box-shadow:0 12px 40px rgba(0,0,0,.22)}
 .lens-ttl{font-size:18px;font-weight:800;color:var(--text);display:flex;justify-content:space-between;align-items:center;gap:8px}
@@ -4621,7 +4621,7 @@ function _lensInitMag(){
   if(!el || !el.offsetWidth){ if(_lensActive) requestAnimationFrame(_lensInitMag); return; } // aspetta dimensioni reali
   try{
     lensMagMap=L.map(el,{zoomControl:false,attributionControl:false,dragging:false,scrollWheelZoom:false,doubleClickZoom:false,touchZoom:false,keyboard:false,boxZoom:false,tap:false,inertia:false,fadeAnimation:false,zoomAnimation:false});
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{maxZoom:20,crossOrigin:true,updateWhenIdle:false,keepBuffer:4}).addTo(lensMagMap);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:20,crossOrigin:true,updateWhenIdle:false,keepBuffer:6}).addTo(lensMagMap);
   }catch(e){ lensMagMap=null; }
 }
 /* Il magnifier mostra il punto sotto il crosshair (non map.getCenter), a zoom
@@ -4659,8 +4659,9 @@ let _lensWrapDX=0, _lensWrapDY=0, _lensDrag=null;
 function _lensApplyPos(){
   const w=document.querySelector('.lens-wrap');
   if(!w) return;
-  const sx=(_lensWrapDX>=0?'+ ':'- ')+Math.abs(_lensWrapDX)+'px';
-  const sy=(_lensWrapDY>=0?'+ ':'- ')+Math.abs(_lensWrapDY)+'px';
+  const dx=Math.round(_lensWrapDX), dy=Math.round(_lensWrapDY);
+  const sx=(dx>=0?'+ ':'- ')+Math.abs(dx)+'px';
+  const sy=(dy>=0?'+ ':'- ')+Math.abs(dy)+'px';
   w.style.transform='translate(calc(-50% '+sx+'), calc(-50% '+sy+'))';
 }
 function _lensResetPos(){ _lensWrapDX=0; _lensWrapDY=0; _lensApplyPos(); }
