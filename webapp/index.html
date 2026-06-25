@@ -5479,8 +5479,9 @@ function showTab(tab){
   document.body.classList.toggle('tab-active', !onMap);
   const fab=document.getElementById('fab');
   const fabMenu=document.getElementById('fabMenu');
-  // FAB sempre visibile su qualsiasi tab (fix: prima si nascondeva fuori da Mappa)
-  fab.style.display='flex';
+  window._activeTab=tab;
+  // il "+" sta in primo piano SOLO sulla mappa: fuori (POI, Itinerari, Compagni, ILLI, Profilo, SOS) si nasconde
+  fab.style.display=onMap?'flex':'none';
   fabMenu.classList.remove('open');
   fab.classList.remove('open');
   fabMenu.style.opacity='';
@@ -7100,6 +7101,7 @@ function closeFab(){
 ══════════════════════════════════════════ */
 function openSheet(ovId,bgId,sheetId){
   if(typeof _lensActive!=='undefined' && _lensActive && typeof closeLens==='function') closeLens();
+  const _f=document.getElementById('fab'); if(_f) _f.style.display='none';   // niente "+" sopra uno sheet aperto
   const bg=document.getElementById(bgId);
   bg.classList.add('vis');
   document.getElementById(sheetId).classList.add('open');
@@ -7113,6 +7115,7 @@ function openSheet(ovId,bgId,sheetId){
 function closeSheet(ovId,bgId,sheetId){
   document.getElementById(bgId).classList.remove('vis');
   document.getElementById(sheetId).classList.remove('open');
+  if((window._activeTab||'map')==='map'){ const _f=document.getElementById('fab'); if(_f) _f.style.display='flex'; }   // tornato sulla mappa: il "+" riappare
 }
 function initSwipe(handleId,sheetId,bgId){
   const handle=document.getElementById(handleId);
