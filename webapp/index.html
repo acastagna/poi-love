@@ -5526,6 +5526,7 @@ function showTab(tab){
   const poiV=document.getElementById('poiView');           if(poiV)        poiV.classList.toggle('active',tab==='poi');
   const compV=document.getElementById('companionsView');   if(compV) compV.classList.toggle('active',tab==='companions');
   const illiV=document.getElementById('illiView');         if(illiV)      illiV.classList.toggle('active',tab==='illi');
+  if(tab==='illi' && typeof _restorePoiaiChat==='function') _restorePoiaiChat();
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   const nm=document.getElementById('nav-'+tab);if(nm)nm.classList.add('active');
   const onMap=tab==='map';
@@ -9721,7 +9722,28 @@ const GROQ_URL='https://api.openai.com/v1/chat/completions';
 const GROQ_MODEL='gpt-4o-mini';
 
 // Conversazione in memoria per contesto multi-turno (formato OpenAI)
-let poiaiHistory=[];
+let poiaiHistory=JSON.parse(localStorage.getItem('poiai_history')||'[]');
+let _poiaiRestored=false;
+function _persistPoiaiHistory(){ try{ localStorage.setItem('poiai_history', JSON.stringify(poiaiHistory.slice(-40))); }catch(e){} }
+// Pulisce il testo grezzo del modello: via blocco PLACES, titoli/asterischi markdown, a capo -> <br>
+function _cleanAiText(raw){
+  return String(raw||'').replace(/===PLACES===[\s\S]*?===END===/,'').trim()
+    .replace(/</g,'&lt;')
+    .replace(/^\s*#{1,6}\s+/gm,'')
+    .replace(/\*\*([^*]+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/(^|[^*])\*([^*\n]+?)\*(?!\*)/g,'$1$2')
+    .replace(/\n/g,'<br>');
+}
+// Ripristina i messaggi salvati nella chat ILLI dopo un reload (storicita della conversazione), una sola volta
+function _restorePoiaiChat(){
+  if(_poiaiRestored) return; _poiaiRestored=true;
+  const msgs=document.getElementById('poiaiMsgs'); if(!msgs||!poiaiHistory.length) return;
+  const html=poiaiHistory.map(m=> m.role==='user'
+    ? `<div class="poiai-msg user">${String(m.content||'').replace(/</g,'&lt;')}</div>`
+    : `<div class="poiai-msg ai">${_cleanAiText(m.content)}</div>`).join('');
+  msgs.insertAdjacentHTML('beforeend', html);
+  msgs.scrollTop=msgs.scrollHeight;
+}
 
 // ILLI GROUNDING anti-allucinazione: recupera POI REALI vicino a (lat,lng) da OpenStreetMap (Overpass) + DB POI•LOVE e li inietta come whitelist chiusa. Nessuna dipendenza, nessuna key.
 const _OSM_CATS=[
@@ -9866,6 +9888,11 @@ function _qualityScore(p){
   s -= Math.min((p.distM||0)/200, 25);
   return s;
 }
+// Traduce i tag cuisine OSM (inglese) in italiano leggibile, cosi ILLI non scrive mezzo inglese
+function _trCuisine(c){
+  const M={italian:'italiana',pizza:'pizza',regional:'regionale',steak_house:'carne alla griglia',japanese:'giapponese',sushi:'sushi',chinese:'cinese',kebab:'kebab',burger:'hamburger',seafood:'pesce',fish:'pesce',vegetarian:'vegetariana',vegan:'vegana',ice_cream:'gelato',coffee_shop:'caffetteria',sandwich:'panini',mexican:'messicana',indian:'indiana',french:'francese',greek:'greca',mediterranean:'mediterranea',asian:'asiatica',bbq:'griglia',grill:'griglia',international:'internazionale',local:'cucina locale',pasta:'pasta',fast_food:'fast food',breakfast:'colazione',bakery:'forno',dessert:'dolci',thai:'thailandese',turkish:'turca',spanish:'spagnola',german:'tedesca',american:'americana',cake:'dolci',coffee:'caffe',wine:'vino',beer:'birra',friture:'fritto',balkan:'balcanica',albanian:'albanese'};
+  return String(c).split(/[;,]/).map(x=>{ const k=x.trim().toLowerCase().replace(/\s+/g,'_'); return M[k]||x.trim().replace(/_/g,' '); }).filter(Boolean).join(', ');
+}
 function _buildGroundingBlock(cat, places, overpassDown){
   const city=_gpsCity||'questa zona';
   if(!places.length){
@@ -9880,7 +9907,7 @@ NON includere il blocco ===PLACES===.`;
   const lista=places.map(p=>{
     const det=[_fmtDist(p.distM)];
     if(p.src==='POI•LOVE') det.push('verificato su POI•LOVE');
-    if(p.cuisine) det.push('cucina: '+String(p.cuisine).replace(/_/g,' ').replace(/;/g,', '));
+    if(p.cuisine) det.push('cucina: '+_trCuisine(p.cuisine));
     if(p.veg) det.push(p.veg==='solo'?'solo vegetariano/vegano':'opzioni vegetariane');
     if(p.openNow===true) det.push('aperto adesso'); else if(p.openNow===false) det.push('ora risulta chiuso');
     if(p.hours) det.push('orari: '+p.hours);
@@ -9894,20 +9921,13 @@ Ho già interrogato OpenStreetMap e il database POI•LOVE. Questi sono gli UNIC
 ${lista}
 
 REGOLE FERREE:
-- Suggerisci SOLO posti presenti in questa lista, col loro NOME ESATTO come scritto sopra.
-- Riporta la distanza indicata tra parentesi. NON inventare distanze diverse.
-- NON aggiungere, NON inventare, NON "ricordare" altri nomi: se un posto non e in lista, NON esiste.
-- NON proporre posti di altre citta o lontani: usa solo questa lista.
-- Nel blocco ===PLACES=== metti SOLO nomi presi da questa lista, identici carattere per carattere.
-- Se un posto della lista non c'entra con la richiesta, semplicemente non citarlo.
-- VALUTA e presenta ALMENO 3 posti (se ci sono), dal migliore in giu, OGNUNO con questa SCHEDA a colpo d'occhio (campi su righe compatte, SALTA i campi che non hai):
-  R1: **Nome** · tipologia (Pizzeria/Ristorante/Bar/Trattoria...)
-  R2: ⭐ media voti (SOLO se presente nei dati) · 💶 prezzo (€ economico / €€ medio / €€€ caro, SOLO se nei dati) · 📍 distanza · 🕐 stato (aperto ora / ora chiuso, solo se noto)
-  R3: 🍽 cucina/specialita · 🥗 se vegetariano · 🍹 se fa aperitivo/bar · 🅿️ se parcheggio noto
-  R4: → una frase sul PERCHE, basata SOLO sui dati reali sopra.
-  Criteri per macro-tipo: cibo = cucina/veg/aperto/prezzo; cultura = tipo/orari; natura = accessibilita/ingresso.
-- Se un dato manca (media voti, prezzo, piatti forti, parcheggio), OMETTI la voce o scrivi "n/d": non inventarlo MAI.
-- ATTENZIONE freschezza: questi nomi vengono da OpenStreetMap e possono essere DATATI (il posto potrebbe aver chiuso). NON garantire MAI che siano aperti: chiudi invitando a verificare orari e apertura. Da' fiducia e priorita ai posti marcati "gia su POI•LOVE" (verificati dalla community).`;
+- Suggerisci SOLO posti presenti in questa lista, col loro NOME ESATTO. Se un posto non e in lista NON esiste: non inventarlo, non "ricordarlo", non proporre altre citta o posti lontani.
+- L'app mostra GIA, sotto la tua risposta, una scheda-pulsante per ogni posto (nome, tipo, distanza e i tasti Crea POI / Vai / Aggiungi / Condividi). Quindi NON ripetere quelle schede.
+- VIETATO: scrivere "R1/R2/R3", elencare campi uno per riga, usare emoji, usare asterischi o cancelletti (niente **grassetto**, niente #titoli), scrivere "n/d".
+- Scrivi SOLO 2-4 frasi di prosa naturale e calda: introduci, poi di' QUALE conviene e PERCHE usando i dati reali qui sopra (piu vicino, aperto adesso, gia su POI•LOVE). Esempio: "Vicino a te le piu comode sono la Rotonda e The Legend: la Rotonda e la piu vicina ed e aperta adesso."
+- Se un dato non ce l'hai (voti, prezzo), NON nominarlo per niente.
+- Scrivi TUTTO nella lingua dell'utente: nessuna parola in inglese, traduci anche i tipi di cucina.
+- Freschezza: questi nomi vengono da OpenStreetMap e possono essere datati. Chiudi con un breve invito a verificare orari e apertura. Da' priorita ai posti gia su POI•LOVE.`;
 }
 let _lastGroundedPlaces=[];
 
@@ -9937,14 +9957,7 @@ ${locationCtx}
 - Itinerari dell'utente: ${tripNames}.
 ${activePoiName?`- POI aperto adesso: "${activePoiName}".`:''}
 
-REGOLA CRITICA — luoghi concreti: quando suggerisci POI/ristoranti/esperienze, inserisci SEMPRE in fondo questa sezione (formato esatto, nessuna variazione):
-===PLACES===
-["Nome Luogo 1","Nome Luogo 2","Nome Luogo 3"]
-===END===
-
-Se non ci sono luoghi da suggerire (es. risposta a "come faccio a…"), ometti completamente la sezione PLACES.
-
-STILE: breve (max 4 frasi), concreto. Niente elenchi puntati nella risposta visibile. Rispondi sempre in ${langLabel}.`.trim();
+STILE: prosa breve e calda (max 4 frasi), concreta. MAI emoji, MAI asterischi o cancelletti markdown (niente **grassetto**, niente #titoli), MAI sigle tipo "R1/R2", MAI parole in inglese. Quando suggerisci posti reali, l'app mostra gia da sola le schede cliccabili sotto la tua risposta: tu di' solo, a parole, quale conviene e perche. Rispondi sempre in ${langLabel}.`.trim();
 }
 
 async function sendPoiAIMsg(){
@@ -9964,7 +9977,7 @@ async function sendPoiAIMsg(){
   msgs.scrollTop=msgs.scrollHeight;
 
   // Storia formato OpenAI
-  poiaiHistory.push({role:'user',content:text});
+  poiaiHistory.push({role:'user',content:text}); _persistPoiaiHistory();
 
   try {
     if(gpsPos && !_gpsCity) await _refreshGpsCity();   // assicura che ILLI sappia la citta anche se il GPS e arrivato tardi
@@ -9997,14 +10010,18 @@ async function sendPoiAIMsg(){
     if(!res.ok) throw new Error(json?.error?.message||`HTTP ${res.status}`);
 
     const rawText=json?.choices?.[0]?.message?.content||'Nessuna risposta.';
-    poiaiHistory.push({role:'assistant',content:rawText});
+    poiaiHistory.push({role:'assistant',content:rawText}); _persistPoiaiHistory();
 
     // Estrai PLACES
     let places=[];
     const pm=rawText.match(/===PLACES===\s*([\s\S]*?)\s*===END===/);
     if(pm){try{places=JSON.parse(pm[1]);}catch(e){}}
     const cleanText=rawText.replace(/===PLACES===[\s\S]*?===END===/,'').trim()
-      .replace(/</g,'&lt;').replace(/\n/g,'<br>');
+      .replace(/</g,'&lt;')
+      .replace(/^\s*#{1,6}\s+/gm,'')                       // via i titoli markdown (### ecc.)
+      .replace(/\*\*([^*]+?)\*\*/g,'<strong>$1</strong>')  // **grassetto** -> grassetto vero, niente asterischi a vista
+      .replace(/(^|[^*])\*([^*\n]+?)\*(?!\*)/g,'$1$2')     // *corsivo* -> testo semplice
+      .replace(/\n/g,'<br>');
 
     const tripSel=Object.values(TRIPS).map((t,i)=>`<button class="poiai-trip-chip${i===0?' sel':''}" onclick="document.querySelectorAll('.poiai-trip-chip').forEach(b=>b.classList.remove('sel'));this.classList.add('sel');window._paiTrip='${t.id}'">${t.name.split(' ').slice(0,3).join(' ')}</button>`).join('');
     // Card azione per ogni posto REALE groundato: nome + tipo + distanza + i 4 comandi del box POI, con coordinate vere
