@@ -708,7 +708,9 @@ body::after{content:'';position:fixed;inset:0;z-index:99999;pointer-events:none;
 .lens-ov{position:fixed;inset:0;z-index:1250;display:none;pointer-events:none}
 .lens-ov.show{display:block}
 .lens-wrap{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);width:250px}
-.lens-svg{display:block;pointer-events:none}
+.lens-svg{display:block;pointer-events:none;position:relative;z-index:1}
+.lens-mag{position:absolute;left:81px;top:4px;width:88px;height:88px;border-radius:50%;overflow:hidden;pointer-events:none;background:#EDE9DF;z-index:0}
+.lens-mag .leaflet-container{width:88px;height:88px;background:#EDE9DF}
 .lens-box{margin-top:-2px;background:var(--card);border:0.5px solid var(--border);border-radius:14px;padding:11px 13px;pointer-events:auto;box-shadow:0 10px 34px rgba(0,0,0,.2)}
 .lens-ttl{font-size:16px;font-weight:800;color:var(--text);display:flex;justify-content:space-between;align-items:center;gap:8px}
 .lens-ttl span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -1605,6 +1607,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 <!-- LENTE strumento: appare su "Sono qui" e long-press, lente fissa al centro, mappa scorre sotto -->
 <div class="lens-ov" id="lensOv">
   <div class="lens-wrap">
+    <div class="lens-mag" id="lensMag"></div>
     <svg class="lens-svg" viewBox="0 0 250 103" width="250" aria-hidden="true">
       <path d="M98 82 C84 97 42 101 0 101 L250 101 C208 101 166 97 152 82 A44 44 0 0 0 98 82 Z" fill="#8E8B82" opacity="0.94"/>
       <circle cx="125" cy="48" r="44" fill="none" stroke="#8E8B82" stroke-width="8"/>
@@ -4561,12 +4564,28 @@ function openLens(lat,lng){
   document.getElementById('lensAddr').textContent='';
   document.getElementById('lensCoords').textContent=lat.toFixed(5)+', '+lng.toFixed(5);
   _lensReverse(lat,lng);
+  _lensInitMag();
+  setTimeout(()=>{ if(lensMagMap){ lensMagMap.invalidateSize(); _lensMagSync(lat,lng); } }, 80);
 }
 function closeLens(){ _lensActive=false; document.getElementById('lensOv').classList.remove('show'); if(map&&map._lensBound){ map.off('moveend',_lensOnMove); map._lensBound=false; } }
+// Magnifier: seconda mini-mappa dentro il cerchio, stesse tile, zoom +2 del centro
+let lensMagMap=null;
+function _lensInitMag(){
+  if(lensMagMap || typeof L==='undefined') return;
+  try{
+    lensMagMap=L.map('lensMag',{zoomControl:false,attributionControl:false,dragging:false,scrollWheelZoom:false,doubleClickZoom:false,touchZoom:false,keyboard:false,boxZoom:false,tap:false,inertia:false});
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{maxZoom:20}).addTo(lensMagMap);
+  }catch(e){ lensMagMap=null; }
+}
+function _lensMagSync(lat,lng){
+  if(!lensMagMap||!map) return;
+  lensMagMap.setView([lat,lng], Math.min((map.getZoom()||15)+2,20), {animate:false});
+}
 function _lensOnMove(){
   if(!_lensActive) return;
   const c=map.getCenter(); _lensLL={lat:c.lat,lng:c.lng};
   document.getElementById('lensCoords').textContent=c.lat.toFixed(5)+', '+c.lng.toFixed(5);
+  _lensMagSync(c.lat,c.lng);
   clearTimeout(_lensRevT); _lensRevT=setTimeout(()=>_lensReverse(c.lat,c.lng), 380);
 }
 async function _lensReverse(lat,lng){
