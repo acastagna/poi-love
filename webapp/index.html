@@ -264,9 +264,9 @@ button{touch-action:manipulation}
 
 /* ── FAB ── */
 /* FAB z-index: sopra nav (300), SOTTO sheet (400) e popup. Sempre cliccabile su mappa/tab ma non interferisce con form di creazione */
-.fab{position:fixed;bottom:150px;left:50%;transform:translateX(-50%);z-index:350;width:60px;height:60px;border-radius:30px;background:var(--red);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 22px rgba(212,43,43,.45);font-size:28px;color:#fff;transition:transform .25s,background .25s}
+.fab{position:fixed;bottom:150px;left:50%;transform:translateX(-50%);z-index:1300;width:60px;height:60px;border-radius:30px;background:var(--red);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 22px rgba(212,43,43,.45);font-size:28px;color:#fff;transition:transform .25s,background .25s}
 .fab.open{transform:translateX(-50%) rotate(45deg)}
-.fab-menu{position:fixed;bottom:220px;left:50%;transform:translateX(-50%) translateY(10px);z-index:349;display:flex;flex-direction:column;gap:9px;align-items:center;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
+.fab-menu{position:fixed;bottom:220px;left:50%;transform:translateX(-50%) translateY(10px);z-index:1299;display:flex;flex-direction:column;gap:9px;align-items:center;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
 .fab-menu.open{opacity:1;pointer-events:all;transform:translateX(-50%) translateY(0)}
 .fab-opt{background:var(--card);border:none;border-radius:22px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px;box-shadow:0 4px 18px rgba(0,0,0,.14);white-space:nowrap;transition:transform .15s}
 .fab-opt:active{transform:scale(.96)}
@@ -4487,6 +4487,8 @@ function initMap(){
     // bubblingMouseEvents:false — senza questo guard il tab-active check sotto
     // chiamerebbe showTab('map') sovrascrivendo l'apertura del popup del marker.
     if(Date.now() - (window._lastPoiMarkerClick||0) < 600) return;
+    // Lente aperta: un tap secco sulla mappa (non un trascinamento) la chiude
+    if(_lensActive && Date.now()-_lensOpenTs>400){ closeLens(); return; }
     // Desktop split-view: click sulla mappa → chiude il pannello di destra
     if(document.body.classList.contains('tab-active')){
       showTab('map');
@@ -4562,7 +4564,7 @@ function initMap(){
    il box mostra nome/indirizzo/coordinate dal reverse geocoding e si aggiorna su moveend.
    (Magnifier che ingrandisce + trascina-lente = step 2.)
 ══════════════════════════════════════════ */
-let _lensLL=null, _lensActive=false, _lensRevT=null;
+let _lensLL=null, _lensActive=false, _lensRevT=null, _lensOpenTs=0;
 
 /* Helper geometria: corrispondenza crosshair -> punto reale.
    Misura in PIXEL il centro del cerchio #lensMag sullo schermo, cosi il punto
@@ -4596,8 +4598,11 @@ function _lensRecenterUnderCrosshair(lat,lng,zoom){
 function openLens(lat,lng){
   if(!map) return;
   if(typeof closeFab==='function') closeFab();
+  // mai due popup: aprendo la lente chiudi il popup mappa e ogni popup Leaflet
+  if(typeof closeMapSearchMarker==='function') closeMapSearchMarker();
+  try{ map.closePopup(); }catch(e){}
   if(typeof showTab==='function') showTab('map');
-  _lensActive=true; _lensLL={lat,lng};
+  _lensActive=true; _lensLL={lat,lng}; _lensOpenTs=Date.now();
   document.getElementById('lensOv').classList.add('show');
   document.getElementById('lensTitle').textContent='…';
   document.getElementById('lensAddr').textContent='';
@@ -4709,7 +4714,7 @@ async function _lensReverse(lat,lng){
   }catch(e){ document.getElementById('lensTitle').textContent=t('lens_point','Questo punto'); }
 }
 function lensCreatePOI(){ if(!_lensLL) return; if(!currentUser){ showToast(t('toast_login_required','⚠️ Accedi per creare il POI')); const a=document.getElementById('authOverlay'); if(a)a.style.display='flex'; return; } const ll=_lensLL; closeLens(); openAddPOIAtCoords(ll.lat,ll.lng); }
-function lensNavigate(){ if(!_lensLL) return; const nm=document.getElementById('lensTitle').textContent||''; if(typeof openNavPicker==='function') openNavPicker(_lensLL.lat,_lensLL.lng,nm); }
+function lensNavigate(){ if(!_lensLL) return; const nm=document.getElementById('lensTitle').textContent||''; const ll=_lensLL; closeLens(); if(typeof openNavPicker==='function') openNavPicker(ll.lat,ll.lng,nm); }
 function lensAdd(){ showToast(t('soon','Presto disponibile')); }
 function lensAskAI(){ const nm=document.getElementById('lensTitle').textContent||''; closeLens(); if(typeof openIlliAI==='function') openIlliAI(); const inp=document.getElementById('poiaiInput'); if(inp){ inp.value=t('lens_ask_prefix','Raccontami qualcosa su ')+nm; } }
 function lensShare(){ if(!_lensLL) return; const nm=document.getElementById('lensTitle').textContent||'Questo punto'; const url='https://poilove.com/?at='+_lensLL.lat+','+_lensLL.lng; if(navigator.share){ navigator.share({title:nm,url}).catch(()=>{}); } else { navigator.clipboard?.writeText(url).then(()=>showToast(t('toast_link_copied','🔗 Link copiato'))); } }
@@ -5419,6 +5424,7 @@ Regole:
    TABS
 ══════════════════════════════════════════ */
 function showTab(tab){
+  if(typeof _lensActive!=='undefined' && _lensActive && typeof closeLens==='function') closeLens();
   document.getElementById('profileView').classList.toggle('active',tab==='profile');
   document.getElementById('itinView').classList.toggle('active',tab==='itin');
   const poiV=document.getElementById('poiView');           if(poiV)        poiV.classList.toggle('active',tab==='poi');
@@ -5872,6 +5878,7 @@ function onSearchPickPOI(idx){
   if(typeof openDetail==='function') openDetail(idx);
 }
 function onSearchPickPlace(lat,lng,name){
+  if(typeof closeLens==='function') closeLens();
   clearMapSearchDropOnly();
   if(!map||typeof L==='undefined') return;
   lat=+lat; lng=+lng;
@@ -7050,6 +7057,7 @@ function closeFab(){
    SHEETS — generic open/close + swipe
 ══════════════════════════════════════════ */
 function openSheet(ovId,bgId,sheetId){
+  if(typeof _lensActive!=='undefined' && _lensActive && typeof closeLens==='function') closeLens();
   const bg=document.getElementById(bgId);
   bg.classList.add('vis');
   document.getElementById(sheetId).classList.add('open');
