@@ -4487,6 +4487,8 @@ function initMap(){
     // bubblingMouseEvents:false — senza questo guard il tab-active check sotto
     // chiamerebbe showTab('map') sovrascrivendo l'apertura del popup del marker.
     if(Date.now() - (window._lastPoiMarkerClick||0) < 600) return;
+    // il click sintetizzato al rilascio del long-press non chiude la lente appena aperta
+    if(_lensSuppressClick){ _lensSuppressClick=false; return; }
     // Lente aperta: un tap secco sulla mappa (non un trascinamento) la chiude
     if(_lensActive && Date.now()-_lensOpenTs>400){ closeLens(); return; }
     // Desktop split-view: click sulla mappa → chiude il pannello di destra
@@ -4540,16 +4542,16 @@ function initMap(){
 
   // ── LONG PRESS sulla mappa (>300ms) → apri la LENTE strumento sul punto ──
   let lpTimer=null,lpPos=null,lpStarted=false;
-  function startLP(latlng){
+  function startLP(latlng,contPt){
     if(!latlng)return;
     lpPos=latlng; lpStarted=true;
     lpTimer=setTimeout(()=>{
-      if(lpPos&&lpStarted){ openLens(lpPos.lat,lpPos.lng); }
-    },350);
+      if(lpPos&&lpStarted){ openLens(lpPos.lat,lpPos.lng,contPt); }
+    },300);
   }
-  function cancelLP(){ clearTimeout(lpTimer); lpTimer=null; lpPos=null; lpStarted=false; }
-  map.on('mousedown', e=>startLP(e.latlng));
-  map.on('touchstart', e=>{ if(e.originalEvent.touches.length===1) startLP(e.latlng); },{passive:true});
+  function cancelLP(){ clearTimeout(lpTimer); lpTimer=null; lpPos=null; lpStarted=false; if(_lensSuppressClick){ clearTimeout(_lensSuppressT); _lensSuppressT=setTimeout(()=>{_lensSuppressClick=false;},500); } }
+  map.on('mousedown', e=>startLP(e.latlng,e.containerPoint));
+  map.on('touchstart', e=>{ if(e.originalEvent.touches.length===1) startLP(e.latlng,e.containerPoint); },{passive:true});
   // mouseup (rilascio) e mousemove (spostamento) cancellano. NON contextmenu:
   // su mobile il browser triggera contextmenu durante il long-press, cancellandolo.
   map.on('mouseup mousemove', cancelLP);
@@ -4564,7 +4566,7 @@ function initMap(){
    il box mostra nome/indirizzo/coordinate dal reverse geocoding e si aggiorna su moveend.
    (Magnifier che ingrandisce + trascina-lente = step 2.)
 ══════════════════════════════════════════ */
-let _lensLL=null, _lensActive=false, _lensRevT=null, _lensOpenTs=0;
+let _lensLL=null, _lensActive=false, _lensRevT=null, _lensOpenTs=0, _lensSuppressClick=false, _lensSuppressT=0;
 
 /* Helper geometria: corrispondenza crosshair -> punto reale.
    Misura in PIXEL il centro del cerchio #lensMag sullo schermo, cosi il punto
@@ -4595,7 +4597,19 @@ function _lensRecenterUnderCrosshair(lat,lng,zoom){
   const newCenter=map.unproject(map.project([lat,lng], zoom).add(off), zoom);
   map.setView(newCenter, zoom, {animate:false});
 }
-function openLens(lat,lng){
+// Posiziona la lente col crosshair ESATTAMENTE sul punto schermo toccato (long-press), mappa ferma
+function _lensPlaceAtScreen(contPt){
+  if(!map) return;
+  _lensWrapDX=0; _lensWrapDY=0; _lensApplyPos();
+  void document.getElementById('lensMag').offsetWidth;
+  const cr=map.getContainer().getBoundingClientRect();
+  const touchX=cr.left+contPt.x, touchY=cr.top+contPt.y;
+  const mr=document.getElementById('lensMag').getBoundingClientRect();
+  _lensWrapDX=touchX-(mr.left+mr.width/2);
+  _lensWrapDY=touchY-(mr.top+mr.height/2);
+  _lensApplyPos();
+}
+function openLens(lat,lng,contPt){
   if(!map) return;
   if(typeof closeFab==='function') closeFab();
   // mai due popup: aprendo la lente chiudi il popup mappa e ogni popup Leaflet
@@ -4603,6 +4617,7 @@ function openLens(lat,lng){
   try{ map.closePopup(); }catch(e){}
   if(typeof showTab==='function') showTab('map');
   _lensActive=true; _lensLL={lat,lng}; _lensOpenTs=Date.now();
+  if(contPt){ _lensSuppressClick=true; }
   document.getElementById('lensOv').classList.add('show');
   document.getElementById('lensTitle').textContent='…';
   document.getElementById('lensAddr').textContent='';
@@ -4612,7 +4627,8 @@ function openLens(lat,lng){
   void document.getElementById('lensMag').offsetWidth; // reflow: il rect di #lensMag passa da 0x0 a reale
   const _place=()=>{
     if(!_lensActive) return;
-    _lensRecenterUnderCrosshair(lat,lng,zoom);
+    if(contPt){ _lensPlaceAtScreen(contPt); }   // long-press: crosshair sul punto toccato, mappa ferma
+    else { _lensRecenterUnderCrosshair(lat,lng,zoom); }
     if(lensMagMap){ lensMagMap.invalidateSize(); }
     _lensMagSync(lat,lng);
   };
