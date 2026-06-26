@@ -9765,7 +9765,13 @@ function _restorePoiaiChat(){
 // generico, altrimenti "voglio mangiare sushi" verrebbe rilevato come "ristorante" (parola "mangiare").
 const _OSM_CATS=[
   {re:/\b(pizzeri[ae]|pizza|pizzeri)\b/i,                          label:'pizzeria',     osm:'amenity=restaurant', extra:'["cuisine"~"pizza"]'},
-  {re:/\b(sushi|giappones[ei]|japanese|ramen|poke)\b/i,            label:'sushi',        osm:'amenity=restaurant', extra:'["cuisine"~"sushi|japanese|ramen"]'},
+  {re:/\b(sushi|giappones[ei]|japanese|ramen|poke)\b/i,            label:'sushi',        osm:'amenity=restaurant', extra:'["cuisine"~"sushi|japanese|ramen"]', wide:true},
+  {re:/\b(messican[oi]|mexican|taco|burrito|tex.?mex|nachos)\b/i,  label:'messicano',    osm:'amenity=restaurant', extra:'["cuisine"~"mexican|tex-mex"]', wide:true},
+  {re:/\b(cines[ei]|chinese|wok)\b/i,                              label:'cinese',       osm:'amenity=restaurant', extra:'["cuisine"~"chinese"]', wide:true},
+  {re:/\b(indian[oi]|indian|tandoori|curry)\b/i,                   label:'indiano',      osm:'amenity=restaurant', extra:'["cuisine"~"indian"]', wide:true},
+  {re:/\b(thai|thailandes[ei])\b/i,                                label:'thai',         osm:'amenity=restaurant', extra:'["cuisine"~"thai"]', wide:true},
+  {re:/\b(kebab|kebap|doner|turc[oa])\b/i,                         label:'kebab',        osm:'amenity~"restaurant|fast_food"', extra:'["cuisine"~"kebab|turkish"]', wide:true},
+  {re:/\b(hamburger|burger|fast.?food)\b/i,                        label:'hamburger',    osm:'amenity~"fast_food|restaurant"', extra:'["cuisine"~"burger"]', wide:true},
   {re:/\b(gelateri[ae]|gelat[oi]|ice cream|akullore)\b/i,          label:'gelateria',    osm:'amenity=ice_cream'},
   {re:/\b(pasticceri[ae]|pastry)\b/i,                              label:'pasticceria',  osm:'shop~"pastry|confectionery"'},
   {re:/\b(panetteri[ae]|panificio|forno|pane|bakery|furr)\b/i,     label:'panetteria',   osm:'shop=bakery'},
@@ -9820,7 +9826,7 @@ async function _overpassFetch(query){
 async function searchRealPlaces(query, lat, lng, radiusM){
   const cat=(query && typeof query==='object') ? query : _detectPlaceQuery(query);
   if(!cat || typeof lat!=='number' || typeof lng!=='number') return {places:[], overpassDown:false};
-  const radius=Math.min(Math.max((radiusM|0)||3000,1000),15000);
+  const radius=Math.min(Math.max((radiusM|0)||3000,1000),40000);
   const filt=cat.osm.includes('~')
     ? `["${cat.osm.split('~')[0].replace(/"/g,'')}"~"${cat.osm.split('~')[1].replace(/"/g,'')}"]`
     : `["${cat.osm.split('=')[0]}"="${cat.osm.split('=')[1]}"]`;
@@ -9865,20 +9871,36 @@ function _googleMismatch(d, cat){
 }
 // Icona Phosphor per tipo di posto (header card ILLI)
 const _ICON_BY_KIND={pizzeria:'ph-pizza',sushi:'ph-fish','bar o caffè':'ph-coffee',pub:'ph-beer-stein',gelateria:'ph-ice-cream',pasticceria:'ph-cake',panetteria:'ph-bread',ristorante:'ph-fork-knife','hotel o alloggio':'ph-bed',farmacia:'ph-first-aid',supermercato:'ph-shopping-cart',distributore:'ph-gas-pump',museo:'ph-bank',parco:'ph-tree',attrazione:'ph-camera'};
-// Una frase "perché", derivata dai dati reali del posto (no invenzioni): il colpo d'occhio del box
-function _placeReason(p){
-  if(p && p.src==='POI•LOVE') return 'Già amato dalla community POI•LOVE';
-  const rev=(p&&p.reviews)||0;
-  if(p && typeof p.rating==='number'){
-    const r=String(p.rating).replace('.',',');
-    if(p.rating>=4.6 && rev>=150) return `Tra i migliori in zona, ${rev} recensioni`;
-    if(p.rating>=4.4 && rev>=80)  return `Molto apprezzato, voto ${r} su ${rev} recensioni`;
-    if(p.rating>=4.0)             return `Buone recensioni, voto ${r}${rev?` su ${rev}`:''}`;
-  }
-  if(p && p.openNow===true) return 'Aperto adesso, comodo da raggiungere';
-  if(p && p.distM!=null && p.distM<400) return 'A pochi passi da te';
-  if(p && p.cuisine) return 'Cucina: '+_trCuisine(p.cuisine);
-  return 'Un posto da provare qui vicino';
+// Icona dal tipo REALE del posto (Google primaryType / cucina OSM / nome), non dalla categoria cercata
+function _iconForPlace(p){
+  const t=(((p&&p.gType)||'')+' '+((p&&p.cuisine)||'')+' '+((p&&p.name)||'')).toLowerCase();
+  if(/mexican|messican|taco|burrito/.test(t)) return 'ph-pepper';
+  if(/pizza/.test(t)) return 'ph-pizza';
+  if(/sushi|japanese|giappon|ramen|poke/.test(t)) return 'ph-fish';
+  if(/chinese|cines|wok|noodle|asian|thai|vietnam/.test(t)) return 'ph-bowl-food';
+  if(/burger|hamburg|fast_food/.test(t)) return 'ph-hamburger';
+  if(/ice_cream|gelat/.test(t)) return 'ph-ice-cream';
+  if(/coffee|cafe|caff|\bbar\b/.test(t)) return 'ph-coffee';
+  if(/pub|beer|birr|brewery/.test(t)) return 'ph-beer-stein';
+  if(/bakery|panett|forno|bread|kebab|doner/.test(t)) return 'ph-bread';
+  if(/pastry|pasticc|cake|dessert|dolc/.test(t)) return 'ph-cake';
+  if(/hotel|lodging|alberg|guest|hostel/.test(t)) return 'ph-bed';
+  if(/pharmacy|farmac/.test(t)) return 'ph-first-aid';
+  if(/museum|muse/.test(t)) return 'ph-bank';
+  if(/park|parco|garden/.test(t)) return 'ph-tree';
+  if(/restaurant|ristorant|trattori|osteri/.test(t)) return 'ph-fork-knife';
+  return _ICON_BY_KIND[p&&p.kind]||'ph-map-pin';
+}
+// Descrizione breve del posto (NON ripete il voto, gia mostrato sopra): preferisce la descrizione
+// vera di Google, altrimenti la costruisce da tipo + cucina + caratteristiche reali.
+function _placeDesc(p){
+  if(p && p.desc) return p.desc;   // descrizione vera di Google, quando c'e
+  const bits=[];   // il tipo e gia nel sottotitolo: qui solo info aggiuntive utili, mai il voto
+  if(p && p.cuisine){ const c=_trCuisine(p.cuisine); if(c && c.toLowerCase()!=='pizza' && !/pizz/i.test(p.typeLabel||'')) bits.push('cucina '+c); }
+  if(p && p.veg) bits.push(p.veg==='solo'?'solo vegetariano o vegano':'con opzioni vegetariane');
+  if(p && p.outdoor) bits.push("tavoli all'aperto");
+  if(p && p.src==='POI•LOVE') bits.push('segnalato dalla community POI•LOVE');
+  return bits.join(' · ');   // vuoto se non c'e altro oltre al tipo: la riga descrizione viene omessa
 }
 // Fascia prezzo Google -> simbolo €
 function _priceLabel(pl){
@@ -9896,7 +9918,7 @@ async function _enrichPlace(p, cat){
     const d=await r.json();
     if(d && d.found){
       if(_googleMismatch(d, cat)){ p.mismatch=true; return p; }   // match sbagliato (via, o gioielleria al posto della pizzeria): scarta
-      p.rating=d.rating; p.reviews=d.reviews; p.priceLevel=d.priceLevel; p.businessStatus=d.businessStatus; p.gType=d.primaryType;
+      p.rating=d.rating; p.reviews=d.reviews; p.priceLevel=d.priceLevel; p.businessStatus=d.businessStatus; p.gType=d.primaryType; p.typeLabel=d.typeLabel; p.desc=d.desc;
       if(d.openNow!=null) p.openNow=d.openNow;   // Google piu affidabile dell'orario OSM
     }
   }catch(e){ /* degrado silenzioso ai dati OSM */ }
@@ -9910,7 +9932,8 @@ async function _fetchRealPlaces(text){
   if(!cat) return {cat:null, places:[], overpassDown:false};
   const lat=origin.lat, lng=origin.lng;
   let merged=[], overpassDown=false;
-  for(const rKm of [3,8,15]){
+  const _radii = cat.wide ? [10,25,35] : [3,8,15];   // cucine etniche/rare: raggio largo (a Zugliano i messicani sono a 8-20 km, Schio/Vicenza/Rosa)
+  for(const rKm of _radii){
     const osmRes=await searchRealPlaces(cat, lat, lng, rKm*1000);
     overpassDown = osmRes.overpassDown;
     const local=_localPoiPlaces(lat,lng,rKm,cat);
@@ -10107,7 +10130,7 @@ async function sendPoiAIMsg(){
     const placeCards=_gp.map((p,i)=>{
       const nm=(p.name||'').replace(/</g,'&lt;');
       const dist=p.distM!=null?(p.distM<1000?p.distM+' m':(p.distM/1000).toFixed(1).replace('.',',')+' km'):'';
-      const ico=_ICON_BY_KIND[p.kind]||'ph-map-pin';
+      const ico=_iconForPlace(p);
       const rb=[];
       if(typeof p.rating==='number') rb.push(`<span class="star"><i class="ph-fill ph-star" style="font-size:12px"></i></span> ${String(p.rating).replace('.',',')}${p.reviews?` <span class="rev">${p.reviews} recensioni</span>`:''}`);
       const price=_priceLabel(p.priceLevel); if(price) rb.push(`<span class="price">${price}</span>`);
@@ -10115,17 +10138,17 @@ async function sendPoiAIMsg(){
       if(p.openNow===true) rb.push('<span class="open">Aperto ora</span>'); else if(p.openNow===false) rb.push('<span class="closed">Ora chiuso</span>');
       const ratingRow = rb.length ? `<div class="ai-place-rating">${rb.join('<span class="sep">·</span>')}</div>` : '';
       const badge=p.src==='POI•LOVE'?'<span class="ai-place-pill">POI•LOVE</span>':'';
-      const why=_placeReason(p).replace(/</g,'&lt;');
+      const why=_placeDesc(p).replace(/</g,'&lt;');
       return `<div class="ai-place-card">
         <div class="ai-place-top">
           <div class="ai-place-ico"><i class="ph-duotone ${ico}"></i></div>
           <div class="ai-place-head">
             <div class="ai-place-name">${nm}${badge}</div>
-            ${p.kind?`<div class="ai-place-sub">${p.kind}</div>`:''}
+            ${(p.typeLabel||p.kind)?`<div class="ai-place-sub">${(p.typeLabel||p.kind)}</div>`:''}
             ${ratingRow}
           </div>
         </div>
-        <div class="ai-place-why"><i class="ph-duotone ph-sparkle"></i><span>${why}</span></div>
+        ${why?`<div class="ai-place-why"><i class="ph-duotone ph-sparkle"></i><span>${why}</span></div>`:''}
         <div class="ai-place-actions">
           <button class="ai-place-action-btn poi"   onclick="aiPlaceCreatePOI(${i})"  title="Crea POI qui"><i class="ph-duotone ph-plus-circle"></i><span>POI</span></button>
           <button class="ai-place-action-btn nav"   onclick="aiPlaceNavigate(${i})"   title="Viaggia verso"><i class="ph-duotone ph-navigation-arrow"></i><span>Vai</span></button>

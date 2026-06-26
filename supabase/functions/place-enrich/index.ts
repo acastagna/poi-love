@@ -53,7 +53,7 @@ Deno.serve(async (req: Request) => {
         "Content-Type": "application/json",
         "X-Goog-Api-Key": KEY,
         "X-Goog-FieldMask":
-          "places.displayName,places.rating,places.userRatingCount,places.priceLevel,places.businessStatus,places.currentOpeningHours.openNow,places.location,places.formattedAddress,places.primaryType",
+          "places.displayName,places.rating,places.userRatingCount,places.priceLevel,places.businessStatus,places.currentOpeningHours.openNow,places.location,places.formattedAddress,places.primaryType,places.primaryTypeDisplayName,places.editorialSummary",
       },
       body: JSON.stringify(body),
     });
@@ -78,6 +78,8 @@ Deno.serve(async (req: Request) => {
       glng: p.location?.longitude ?? null,
       address: p.formattedAddress ?? null,
       primaryType: p.primaryType ?? null, // es. pizza_restaurant, restaurant, bar...
+      typeLabel: p.primaryTypeDisplayName?.text ?? null, // tipo in chiaro (es. "Ristorante messicano")
+      desc: p.editorialSummary?.text ?? null, // descrizione breve di Google, se presente
     }, 200);
   } catch (e) {
     return json({ error: "exception", detail: String(e) }, 200);
