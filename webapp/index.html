@@ -9755,7 +9755,7 @@ function _restorePoiaiChat(){
   const msgs=document.getElementById('poiaiMsgs'); if(!msgs||!poiaiHistory.length) return;
   const html=poiaiHistory.map(m=> m.role==='user'
     ? `<div class="poiai-msg user">${String(m.content||'').replace(/</g,'&lt;')}</div>`
-    : `<div class="poiai-msg ai">${_cleanAiText(m.content)}</div>`).join('');
+    : `<div class="poiai-msg ai">${_cleanAiText(m.content)}${(m.places&&m.places.length)?_renderPlaceCards(m.places):''}</div>`).join('');
   msgs.insertAdjacentHTML('beforeend', html);
   msgs.scrollTop=msgs.scrollHeight;
 }
@@ -10031,6 +10031,44 @@ REGOLE FERREE:
 - Freschezza: questi nomi vengono da OpenStreetMap e possono essere datati. Chiudi con un breve invito a verificare orari e apertura. Da' priorita ai posti gia su POI•LOVE.`;
 }
 let _lastGroundedPlaces=[];
+// Registro GLOBALE dei posti mostrati nelle card (ricerche live + card ripristinate dalla storia).
+// Le azioni dei box usano l'indice qui dentro: resta valido anche dopo un reload, perche al restore
+// i posti salvati vengono ri-inseriti in ordine. Cosi "memoria" = testo + risultati.
+let _gPlaces=[];
+function _renderPlaceCards(places){
+  return (places||[]).map(function(p){
+    _gPlaces.push(p);
+    const gi=_gPlaces.length-1;
+    const nm=(p.name||'').replace(/</g,'&lt;');
+    const dist=p.distM!=null?(p.distM<1000?p.distM+' m':(p.distM/1000).toFixed(1).replace('.',',')+' km'):'';
+    const ico=_iconForPlace(p);
+    const rb=[];
+    if(typeof p.rating==='number') rb.push(`<span class="star"><i class="ph-fill ph-star" style="font-size:12px"></i></span> ${String(p.rating).replace('.',',')}${p.reviews?` <span class="rev">${p.reviews} recensioni</span>`:''}`);
+    const price=_priceLabel(p.priceLevel); if(price) rb.push(`<span class="price">${price}</span>`);
+    if(dist) rb.push(`<span class="rev">${dist}</span>`);
+    if(p.openNow===true) rb.push('<span class="open">Aperto ora</span>'); else if(p.openNow===false) rb.push('<span class="closed">Ora chiuso</span>');
+    const ratingRow = rb.length ? `<div class="ai-place-rating">${rb.join('<span class="sep">·</span>')}</div>` : '';
+    const badge=p.src==='POI•LOVE'?'<span class="ai-place-pill">POI•LOVE</span>':'';
+    const why=_placeDesc(p).replace(/</g,'&lt;');
+    return `<div class="ai-place-card">
+      <div class="ai-place-top">
+        <div class="ai-place-ico"><i class="ph-duotone ${ico}"></i></div>
+        <div class="ai-place-head">
+          <div class="ai-place-name">${nm}${badge}</div>
+          ${(p.typeLabel||p.kind)?`<div class="ai-place-sub">${(p.typeLabel||p.kind)}</div>`:''}
+          ${ratingRow}
+        </div>
+      </div>
+      ${why?`<div class="ai-place-why"><i class="ph-duotone ph-sparkle"></i><span>${why}</span></div>`:''}
+      <div class="ai-place-actions">
+        <button class="ai-place-action-btn poi"   onclick="aiPlaceCreatePOI(${gi})"  title="Crea POI qui"><i class="ph-duotone ph-plus-circle"></i><span>POI</span></button>
+        <button class="ai-place-action-btn nav"   onclick="aiPlaceNavigate(${gi})"   title="Viaggia verso"><i class="ph-duotone ph-navigation-arrow"></i><span>Vai</span></button>
+        <button class="ai-place-action-btn add"   onclick="aiPlaceAddToTrip(${gi})"  title="Aggiungi a itinerario"><i class="ph-duotone ph-list-plus"></i><span>Aggiungi</span></button>
+        <button class="ai-place-action-btn share" onclick="aiPlaceShare(${gi})"     title="Condividi"><i class="ph-duotone ph-share-network"></i><span>Condividi</span></button>
+      </div>
+    </div>`;
+  }).join('');
+}
 
 function _buildPoiAISystemPrompt(){
   const tripNames=Object.values(TRIPS).map(t=>t.name).join(', ')||'nessuno';
@@ -10111,7 +10149,7 @@ async function sendPoiAIMsg(){
     if(!res.ok) throw new Error(json?.error?.message||`HTTP ${res.status}`);
 
     const rawText=json?.choices?.[0]?.message?.content||'Nessuna risposta.';
-    poiaiHistory.push({role:'assistant',content:rawText}); _persistPoiaiHistory();
+    poiaiHistory.push({role:'assistant',content:rawText,places:(_lastGroundedPlaces||[]).slice()}); _persistPoiaiHistory();
 
     // Estrai PLACES
     let places=[];
@@ -10125,38 +10163,8 @@ async function sendPoiAIMsg(){
       .replace(/\n/g,'<br>');
 
     const tripSel=Object.values(TRIPS).map((t,i)=>`<button class="poiai-trip-chip${i===0?' sel':''}" onclick="document.querySelectorAll('.poiai-trip-chip').forEach(b=>b.classList.remove('sel'));this.classList.add('sel');window._paiTrip='${t.id}'">${t.name.split(' ').slice(0,3).join(' ')}</button>`).join('');
-    // Card azione per ogni posto REALE groundato: nome + tipo + distanza + i 4 comandi del box POI, con coordinate vere
-    const _gp=_lastGroundedPlaces||[];
-    const placeCards=_gp.map((p,i)=>{
-      const nm=(p.name||'').replace(/</g,'&lt;');
-      const dist=p.distM!=null?(p.distM<1000?p.distM+' m':(p.distM/1000).toFixed(1).replace('.',',')+' km'):'';
-      const ico=_iconForPlace(p);
-      const rb=[];
-      if(typeof p.rating==='number') rb.push(`<span class="star"><i class="ph-fill ph-star" style="font-size:12px"></i></span> ${String(p.rating).replace('.',',')}${p.reviews?` <span class="rev">${p.reviews} recensioni</span>`:''}`);
-      const price=_priceLabel(p.priceLevel); if(price) rb.push(`<span class="price">${price}</span>`);
-      if(dist) rb.push(`<span class="rev">${dist}</span>`);
-      if(p.openNow===true) rb.push('<span class="open">Aperto ora</span>'); else if(p.openNow===false) rb.push('<span class="closed">Ora chiuso</span>');
-      const ratingRow = rb.length ? `<div class="ai-place-rating">${rb.join('<span class="sep">·</span>')}</div>` : '';
-      const badge=p.src==='POI•LOVE'?'<span class="ai-place-pill">POI•LOVE</span>':'';
-      const why=_placeDesc(p).replace(/</g,'&lt;');
-      return `<div class="ai-place-card">
-        <div class="ai-place-top">
-          <div class="ai-place-ico"><i class="ph-duotone ${ico}"></i></div>
-          <div class="ai-place-head">
-            <div class="ai-place-name">${nm}${badge}</div>
-            ${(p.typeLabel||p.kind)?`<div class="ai-place-sub">${(p.typeLabel||p.kind)}</div>`:''}
-            ${ratingRow}
-          </div>
-        </div>
-        ${why?`<div class="ai-place-why"><i class="ph-duotone ph-sparkle"></i><span>${why}</span></div>`:''}
-        <div class="ai-place-actions">
-          <button class="ai-place-action-btn poi"   onclick="aiPlaceCreatePOI(${i})"  title="Crea POI qui"><i class="ph-duotone ph-plus-circle"></i><span>POI</span></button>
-          <button class="ai-place-action-btn nav"   onclick="aiPlaceNavigate(${i})"   title="Viaggia verso"><i class="ph-duotone ph-navigation-arrow"></i><span>Vai</span></button>
-          <button class="ai-place-action-btn add"   onclick="aiPlaceAddToTrip(${i})"  title="Aggiungi a itinerario"><i class="ph-duotone ph-list-plus"></i><span>Aggiungi</span></button>
-          <button class="ai-place-action-btn share" onclick="aiPlaceShare(${i})"     title="Condividi"><i class="ph-duotone ph-share-network"></i><span>Condividi</span></button>
-        </div>
-      </div>`;
-    }).join('');
+    // Card azione per ogni posto REALE groundato (stessa funzione del ripristino storia: vedi _renderPlaceCards)
+    const placeCards=_renderPlaceCards(_lastGroundedPlaces);
 
     const loadEl=document.getElementById(loadId);
     if(loadEl) loadEl.outerHTML=`
@@ -10236,7 +10244,7 @@ function speakText(text){
 // Crea POI da suggerimento AI: apre la sheet "Aggiungi POI" e pre-compila il nome
 // Risolve il riferimento di un posto: indice nei groundati (card ILLI) | nome stringa (map popup) | oggetto
 function _aiResolvePlace(ref){
-  if(typeof ref==='number') return (_lastGroundedPlaces||[])[ref]||null;
+  if(typeof ref==='number') return (_gPlaces||[])[ref]||null;
   if(typeof ref==='string') return {name:ref, lat:null, lng:null};
   if(ref && typeof ref==='object') return ref;
   return null;
