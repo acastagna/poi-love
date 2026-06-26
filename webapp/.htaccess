@@ -16,6 +16,10 @@ RewriteRule ^(poi-love-app|database|docs|plesk-deploy|plesk-media-server)/ - [F,
   Require all denied
 </FilesMatch>
 
+# ── Pagine legali con URL pulito ───────────────────────
+RewriteRule ^privacy/?$ /privacy.html [L]
+RewriteRule ^terms/?$ /terms.html [L]
+
 # ── 1. Redirect /demo → / ──────────────────────────────
 RewriteRule ^demo/?$ / [R=301,L]
 RewriteRule ^demo/(.*)$ /$1 [R=301,L]
