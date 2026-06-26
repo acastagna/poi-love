@@ -2271,22 +2271,22 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
     <div class="pl-section-title"><i class="ph-duotone ph-house-line"></i> Luoghi Personali</div>
     <div class="pl-chips" id="plChips"><!-- renderizzato via JS --></div>
     <div class="pl-add-row" id="plAddRow">
-      <button class="pl-add-btn" id="plAddCasaBtn" onclick="openAddPersonalPlace('casa')">
+      <button class="pl-add-btn" id="plAddCasaBtn" onclick="openPlCategory('casa')">
         <i class="ph-duotone ph-house"></i> Casa
       </button>
-      <button class="pl-add-btn" id="plAddLavoroBtn" onclick="openAddPersonalPlace('lavoro')">
+      <button class="pl-add-btn" id="plAddLavoroBtn" onclick="openPlCategory('lavoro')">
         <i class="ph-duotone ph-briefcase"></i> Lavoro
       </button>
-      <button class="pl-add-btn" id="plAddFamigliaBtn" onclick="openAddPersonalPlace('famiglia')">
+      <button class="pl-add-btn" id="plAddFamigliaBtn" onclick="openPlCategory('famiglia')">
         <i class="ph-duotone ph-users-three"></i> Famiglia
       </button>
-      <button class="pl-add-btn" id="plAddSaluteBtn" onclick="openAddPersonalPlace('salute')">
+      <button class="pl-add-btn" id="plAddSaluteBtn" onclick="openPlCategory('salute')">
         <i class="ph-duotone ph-first-aid"></i> Salute
       </button>
-      <button class="pl-add-btn" id="plAddSportBtn" onclick="openAddPersonalPlace('sport')">
+      <button class="pl-add-btn" id="plAddSportBtn" onclick="openPlCategory('sport')">
         <i class="ph-duotone ph-barbell"></i> Sport
       </button>
-      <button class="pl-add-btn" id="plAddPreferitoBtn" onclick="openAddPersonalPlace('preferito')">
+      <button class="pl-add-btn" id="plAddPreferitoBtn" onclick="openPlCategory('preferito')">
         <i class="ph-duotone ph-star"></i> Preferito
       </button>
     </div>
@@ -3693,6 +3693,65 @@ const PL_TYPE_CFG = {
 };
 
 // ── Cassaforte: manda un POI (dalla lista POI) in un luogo personale privato ──
+// ── Luoghi personali come SCORCIATOIE (SPECS): tocco la categoria -> vado / scelgo / assegno un mio POI ──
+function _plOverlayHTML(title, sub, inner){
+  return `<div style="background:#fff;width:100%;max-width:480px;border-radius:20px 20px 0 0;padding:18px 16px 24px;max-height:78vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+      <strong style="font-size:15px;color:var(--ink)">${title}</strong>
+      <button onclick="closeSafe()" style="margin-left:auto;border:none;background:transparent;font-size:24px;line-height:1;color:var(--muted);cursor:pointer">&times;</button>
+    </div>
+    ${sub?`<div style="font-size:12px;color:var(--muted);margin-bottom:14px">${sub}</div>`:''}
+    ${inner}
+  </div>`;
+}
+function _plOpenOverlay(html){
+  let ov=document.getElementById('safeOverlay');
+  if(!ov){ ov=document.createElement('div'); ov.id='safeOverlay'; ov.style.cssText='position:fixed;inset:0;z-index:4000;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center'; ov.onclick=e=>{ if(e.target===ov) closeSafe(); }; document.body.appendChild(ov); }
+  ov.innerHTML=html; ov.style.display='flex';
+}
+function openPlCategory(type){
+  const idxs = plPlaces.map((p,i)=>({p,i})).filter(x=>x.p.type===type);
+  if(idxs.length===1){ goToPlPlace(idxs[0].i); return; }   // un solo luogo: ci vado dritto
+  if(idxs.length>1){ _plPick(type, idxs); return; }        // piu luoghi: scelgo
+  _plAssign(type);                                          // vuoto: cerco tra i miei POI
+}
+function _plPick(type, idxs){
+  const cfg = PL_TYPE_CFG[type] || {label:type,icon:'ph-map-pin',color:'var(--red)'};
+  const rows = idxs.map(({p,i})=>`<button onclick="closeSafe();goToPlPlace(${i})" style="display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:1px solid var(--border);border-radius:12px;background:#fff;padding:11px 12px;margin-bottom:7px;cursor:pointer">
+      <i class="ph-duotone ${cfg.icon} pl-chip-icon" style="font-size:20px;color:${cfg.color}"></i>
+      <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700;color:var(--ink)">${(p.word||cfg.label).replace(/</g,'&lt;')}</div><div style="font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${(p.address||'Posizione salvata').replace(/</g,'&lt;')}</div></div>
+      <i class="ph-duotone ph-arrow-right" style="color:var(--muted)"></i>
+    </button>`).join('');
+  const inner = rows + `<button onclick="closeSafe();_plAssign('${type}')" style="width:100%;border:1.5px dashed var(--border);border-radius:12px;background:transparent;padding:10px;margin-top:6px;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;font-family:inherit"><i class="ph-duotone ph-plus" style="vertical-align:-2px"></i> Aggiungi un altro</button>`;
+  _plOpenOverlay(_plOverlayHTML(cfg.label, 'Hai piu luoghi qui: scegli dove andare.', inner));
+}
+function _plAssign(type){
+  const cfg = PL_TYPE_CFG[type] || {label:type};
+  const pois = Object.entries(window._poiTabIndex||{}).map(([key,p])=>({key,p})).filter(x=>x.p&&x.p.name);
+  let body;
+  if(!pois.length){
+    body = `<div style="font-size:13px;color:var(--muted);text-align:center;padding:8px 0 14px">Non hai ancora POI da assegnare. Creane uno col tasto + e poi torna qui.</div>`;
+  } else {
+    const rows = pois.map(({key,p})=>`<button onclick="_plAssignPick('${type}','${key}')" style="display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:1px solid var(--border);border-radius:12px;background:#fff;padding:10px 12px;margin-bottom:7px;cursor:pointer">
+        <i class="ph-duotone ph-map-pin" style="font-size:18px;color:var(--red);flex-shrink:0"></i>
+        <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${(p.name||'').replace(/</g,'&lt;')}</div><div style="font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${(p.address||p.cat||p.category||'').replace(/</g,'&lt;')}</div></div>
+      </button>`).join('');
+    body = `<input id="plAssignSearch" placeholder="Cerca tra i tuoi POI per nome o indirizzo..." oninput="_plAssignFilter(this.value)" style="width:100%;border:1.5px solid var(--border);border-radius:12px;padding:9px 13px;font-size:13px;font-family:inherit;outline:none;margin-bottom:12px;box-sizing:border-box">
+      <div id="plAssignList">${rows}</div>`;
+  }
+  const inner = body + `<button onclick="closeSafe();openAddPersonalPlace('${type}')" style="width:100%;border:1.5px dashed var(--border);border-radius:12px;background:transparent;padding:10px;margin-top:6px;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;font-family:inherit"><i class="ph-duotone ph-crosshair" style="vertical-align:-2px"></i> Oppure aggiungi col GPS o un indirizzo</button>`;
+  _plOpenOverlay(_plOverlayHTML('Scegli il tuo '+cfg.label, 'Assegna un tuo POI a "'+cfg.label+'": diventa la scorciatoia che apri da qui.', inner));
+}
+function _plAssignFilter(q){
+  q=(q||'').toLowerCase().trim();
+  const list=document.getElementById('plAssignList'); if(!list) return;
+  Array.from(list.children).forEach(btn=>{ btn.style.display = btn.textContent.toLowerCase().indexOf(q)>-1 ? '' : 'none'; });
+}
+function _plAssignPick(type, key){
+  const p=(window._poiTabIndex||{})[key]; if(!p){ closeSafe(); return; }
+  window._safePendingPoi={ name:p.name, lat:p.lat, lng:p.lng, address:p.address||p.cat||p.category||'' };
+  savePoiToSafe(type);   // assegna a pl_places + renderPlaces + chiude + toast
+}
 function poiToSafe(key){
   const p=(window._poiTabIndex||{})[key];
   if(!p){ showToast('POI non trovato'); return; }
