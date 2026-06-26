@@ -407,7 +407,8 @@ body.tab-active #mapQuickBtns{display:none}
 /* ── LUOGHI PERSONALI ── */
 .pl-section{padding:12px 14px 0;background:var(--card);border-bottom:2px solid var(--border)}
 .pl-section-title{font-size:10px;font-weight:900;letter-spacing:.9px;color:var(--muted);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:5px}
-.pl-chips{display:flex;flex-direction:column;gap:7px}
+.pl-chips{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:560px){.pl-chips{grid-template-columns:1fr}}
 .pl-chip{display:flex;align-items:center;gap:10px;border-radius:13px;padding:9px 12px;cursor:pointer;transition:box-shadow .15s;border-left:4px solid transparent;border-top:1px solid var(--border);border-right:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--bg)}
 .pl-chip.pl-casa{border-left-color:#F59E0B}
 .pl-chip.pl-lavoro{border-left-color:var(--blue)}
