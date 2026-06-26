@@ -6,6 +6,16 @@
 Options -Indexes
 RewriteEngine On
 
+# ── 0. SICUREZZA: blocca file e cartelle interne del repo dalla docroot pubblica ──
+#    La cartella pubblica contiene tutto il repo; questi non devono essere serviti.
+RewriteRule ^(poi-love-app|database|docs|plesk-deploy|plesk-media-server)/ - [F,L]
+<FilesMatch "\.(md|ts|tsx|jsx|log|lock|sh|yml|yaml|sql|env|example|bak)$">
+  Require all denied
+</FilesMatch>
+<FilesMatch "(^|/)(deploy\.php|nota\.txt)$">
+  Require all denied
+</FilesMatch>
+
 # ── 1. Redirect /demo → / ──────────────────────────────
 RewriteRule ^demo/?$ / [R=301,L]
 RewriteRule ^demo/(.*)$ /$1 [R=301,L]
@@ -40,4 +50,15 @@ RewriteRule ^p/(.*)$ / [R=302,L]
   ExpiresByType text/css "access plus 1 week"
   ExpiresByType image/svg+xml "access plus 1 month"
   ExpiresByType application/manifest+json "access plus 1 day"
+</IfModule>
+
+# ── No-cache su HTML (SPA) ─────────────────────────────
+#    mod_expires sopra non e attivo su questo Apache (header non emessi),
+#    quindi forzo via mod_headers: il browser deve sempre rivalidare index.html,
+#    altrimenti i deploy non si vedono finche non si svuota la cache a mano.
+<IfModule mod_headers.c>
+  <FilesMatch "\.html$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+  </FilesMatch>
 </IfModule>
