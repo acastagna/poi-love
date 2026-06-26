@@ -1,0 +1,81 @@
+/**
+ * © Alessandro Castagna — 321.al / EVOLAB
+ * Tutti i diritti riservati. Uso non autorizzato vietato.
+ * info@321.al · https://321.al
+ */
+// Edge Function: place-enrich
+// Arricchisce un posto (nome + coordinate) con voto medio, numero recensioni, fascia
+// prezzo e stato apertura da Google Places API (New). La chiave Google e un SEGRETO
+// server-side (GOOGLE_PLACES_KEY), MAI nel client ne nel repo. Degrada in silenzio se
+// la chiave manca o Google non risponde: chi chiama deve gestire { found:false } / errori.
+
+import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+
+const CORS: Record<string, string> = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+function json(obj: unknown, status = 200): Response {
+  return new Response(JSON.stringify(obj), {
+    status,
+    headers: { ...CORS, "Content-Type": "application/json" },
+  });
+}
+
+Deno.serve(async (req: Request) => {
+  if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
+  if (req.method !== "POST") return json({ error: "method_not_allowed" }, 405);
+
+  try {
+    const KEY = Deno.env.get("GOOGLE_PLACES_KEY");
+    if (!KEY) return json({ error: "no_key" }, 200); // degrado: il client usa i dati OSM
+
+    const { name, lat, lng, radius } = await req.json();
+    if (!name || lat == null || lng == null) return json({ error: "bad_request" }, 400);
+
+    const body = {
+      textQuery: String(name),
+      maxResultCount: 1,
+      languageCode: "it",
+      locationBias: {
+        circle: {
+          center: { latitude: Number(lat), longitude: Number(lng) },
+          radius: Number(radius) || 400,
+        },
+      },
+    };
+
+    const res = await fetch("https://places.googleapis.com/v1/places:searchText", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": KEY,
+        "X-Goog-FieldMask":
+          "places.displayName,places.rating,places.userRatingCount,places.priceLevel,places.businessStatus,places.currentOpeningHours.openNow",
+      },
+      body: JSON.stringify(body),
+    });
+
+    const data = await res.json();
+    if (!res.ok) {
+      return json({ error: "google_error", detail: data?.error?.message || res.status }, 200);
+    }
+
+    const p = data?.places?.[0];
+    if (!p) return json({ found: false }, 200);
+
+    return json({
+      found: true,
+      name: p.displayName?.text || name,
+      rating: p.rating ?? null,            // es. 4.6
+      reviews: p.userRatingCount ?? null,  // es. 980
+      priceLevel: p.priceLevel ?? null,    // PRICE_LEVEL_INEXPENSIVE | MODERATE | EXPENSIVE | VERY_EXPENSIVE
+      businessStatus: p.businessStatus ?? null, // OPERATIONAL | CLOSED_TEMPORARILY | CLOSED_PERMANENTLY
+      openNow: p.currentOpeningHours?.openNow ?? null,
+    }, 200);
+  } catch (e) {
+    return json({ error: "exception", detail: String(e) }, 200);
+  }
+});

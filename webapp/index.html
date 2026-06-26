@@ -9833,6 +9833,27 @@ async function searchRealPlaces(query, lat, lng, radiusM){
   out.sort((a,b)=>a.distM-b.distM);
   return {places:out, overpassDown};
 }
+// Fascia prezzo Google -> simbolo €
+function _priceLabel(pl){
+  return ({PRICE_LEVEL_INEXPENSIVE:'€',PRICE_LEVEL_MODERATE:'€€',PRICE_LEVEL_EXPENSIVE:'€€€',PRICE_LEVEL_VERY_EXPENSIVE:'€€€€'})[pl]||'';
+}
+// Arricchisce un posto con voto/recensioni/prezzo/stato da Google (Edge Function place-enrich, chiave server-side).
+// Degrada in silenzio: se manca la chiave o Google non risponde, il posto resta coi soli dati OSM.
+async function _enrichPlace(p){
+  try{
+    const r=await fetch(SUPABASE_URL+'/functions/v1/place-enrich',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+SUPABASE_ANON},
+      body:JSON.stringify({name:p.name, lat:p.lat, lng:p.lng, radius:600})
+    });
+    const d=await r.json();
+    if(d && d.found){
+      p.rating=d.rating; p.reviews=d.reviews; p.priceLevel=d.priceLevel; p.businessStatus=d.businessStatus;
+      if(d.openNow!=null) p.openNow=d.openNow;   // Google piu affidabile dell'orario OSM
+    }
+  }catch(e){ /* degrado silenzioso ai dati OSM */ }
+  return p;
+}
 async function _fetchRealPlaces(text){
   // posizione: GPS se c'e, altrimenti il centro della mappa (cosi cerca anche su desktop senza GPS, dove l'utente sta guardando)
   const origin = gpsPos || ((typeof map!=='undefined'&&map&&map.getCenter)?map.getCenter():null);
@@ -9854,7 +9875,12 @@ async function _fetchRealPlaces(text){
     if(overpassDown) break;   // OSM giu: inutile ritentare altri raggi, uso i POI locali
     if(merged.length>=4) break;
   }
-  return {cat, places:merged.slice(0,12), overpassDown};
+  // Arricchimento Google (voto, recensioni, prezzo, stato) sui migliori candidati; poi via i chiusi definitivi e riordino
+  let top=merged.slice(0,8);
+  await Promise.all(top.map(p=>_enrichPlace(p)));
+  top=top.filter(p=>p.businessStatus!=='CLOSED_PERMANENTLY');   // niente piu posti chiusi da anni (caso Leon d'oro)
+  top.sort((a,b)=>_qualityScore(b)-_qualityScore(a));
+  return {cat, places:top, overpassDown};
 }
 function _fmtDist(m){ return m<1000 ? `a ${m} m` : `a ${(m/1000).toFixed(1).replace('.',',')} km`; }
 // "aperto adesso" da opening_hours OSM (casi comuni). Ritorna true/false/null (null = non so, ILLI non afferma).
@@ -9885,6 +9911,8 @@ function _qualityScore(p){
   if(p.website) s+=12; if(p.phone) s+=8; if(p.hours) s+=8;
   if(p.cuisine) s+=6; if(p.veg) s+=6;
   if(p.wheelchair) s+=3; if(p.outdoor) s+=3;
+  if(typeof p.rating==='number'){ s += p.rating*10; if(p.reviews) s += Math.min(p.reviews/100, 20); }  // voto Google reale
+  if(p.businessStatus==='CLOSED_PERMANENTLY') s -= 1000;
   s -= Math.min((p.distM||0)/200, 25);
   return s;
 }
@@ -9908,6 +9936,8 @@ NON includere il blocco ===PLACES===.`;
     const det=[_fmtDist(p.distM)];
     if(p.src==='POI•LOVE') det.push('verificato su POI•LOVE');
     if(p.cuisine) det.push('cucina: '+_trCuisine(p.cuisine));
+    if(typeof p.rating==='number') det.push(`voto Google ${String(p.rating).replace('.',',')}/5${p.reviews?` su ${p.reviews} recensioni`:''}`);
+    const _pr=_priceLabel(p.priceLevel); if(_pr) det.push('prezzo '+_pr);
     if(p.veg) det.push(p.veg==='solo'?'solo vegetariano/vegano':'opzioni vegetariane');
     if(p.openNow===true) det.push('aperto adesso'); else if(p.openNow===false) det.push('ora risulta chiuso');
     if(p.hours) det.push('orari: '+p.hours);
@@ -9925,7 +9955,7 @@ REGOLE FERREE:
 - L'app mostra GIA, sotto la tua risposta, una scheda-pulsante per ogni posto (nome, tipo, distanza e i tasti Crea POI / Vai / Aggiungi / Condividi). Quindi NON ripetere quelle schede.
 - VIETATO: scrivere "R1/R2/R3", elencare campi uno per riga, usare emoji, usare asterischi o cancelletti (niente **grassetto**, niente #titoli), scrivere "n/d".
 - Scrivi SOLO 2-4 frasi di prosa naturale e calda: introduci, poi di' QUALE conviene e PERCHE usando i dati reali qui sopra (piu vicino, aperto adesso, gia su POI•LOVE). Esempio: "Vicino a te le piu comode sono la Rotonda e The Legend: la Rotonda e la piu vicina ed e aperta adesso."
-- Se un dato non ce l'hai (voti, prezzo), NON nominarlo per niente.
+- Se un dato non ce l'hai (voti, prezzo), NON nominarlo per niente. Se invece il voto Google c'e, CITALO nella motivazione (es. "4,3 su 1399 recensioni"): e il segnale piu forte per l'utente.
 - Scrivi TUTTO nella lingua dell'utente: nessuna parola in inglese, traduci anche i tipi di cucina.
 - Freschezza: questi nomi vengono da OpenStreetMap e possono essere datati. Chiudi con un breve invito a verificare orari e apertura. Da' priorita ai posti gia su POI•LOVE.`;
 }
@@ -10029,7 +10059,9 @@ async function sendPoiAIMsg(){
     const placeCards=_gp.map((p,i)=>{
       const nm=(p.name||'').replace(/</g,'&lt;');
       const dist=p.distM!=null?(p.distM<1000?p.distM+' m':(p.distM/1000).toFixed(1).replace('.',',')+' km'):'';
-      const meta=[p.kind,dist].filter(Boolean).join(' · ');
+      const stars=typeof p.rating==='number'?`<i class="ph-fill ph-star" style="color:#F5A623;font-size:10px;vertical-align:-1px"></i> ${String(p.rating).replace('.',',')}${p.reviews?` (${p.reviews})`:''}`:'';
+      const price=_priceLabel(p.priceLevel);
+      const meta=[p.kind,stars,price,dist].filter(Boolean).join(' · ');
       const badge=p.src==='POI•LOVE'?'<span style="margin-left:6px;font-size:9px;font-weight:700;color:var(--red);background:#FFF0F0;padding:1px 6px;border-radius:8px;vertical-align:middle">POI•LOVE</span>':'';
       return `<div class="ai-place-card">
         <div class="ai-place-card-name"><i class="ph-duotone ph-map-pin"></i><span>${nm}</span>${badge}</div>
