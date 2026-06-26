@@ -1429,13 +1429,28 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 .poiai-trip-chip{padding:4px 10px;border-radius:8px;border:1.5px solid var(--border);background:#f5f0e8;font-size:10px;font-weight:700;color:var(--muted);cursor:pointer;transition:all .15s}
 .poiai-trip-chip.sel{background:#EBF2FC;border-color:var(--blue);color:var(--blue)}
 /* ── AI Place Card: nome + 4 azioni (Crea POI · Naviga · Aggiungi · Condividi) ── */
-.ai-place-card{background:#fff;border:1px solid #E5DACA;border-radius:10px;padding:9px 11px;margin-top:8px;display:flex;flex-direction:column;gap:7px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
-.ai-place-card-name{font-size:12px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:6px;line-height:1.3}
-.ai-place-card-name i{font-size:14px;color:var(--red);flex-shrink:0}
-.ai-place-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
-.ai-place-action-btn{height:30px;border-radius:7px;border:1px solid var(--border);background:#f8f4ec;font-family:inherit;font-size:9px;font-weight:700;color:var(--muted);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:0;transition:all .12s;letter-spacing:.2px}
+.ai-place-card{background:#fff;border:1px solid #ECE3D4;border-radius:14px;padding:13px 14px 12px;margin-top:10px;display:flex;flex-direction:column;gap:9px;box-shadow:0 2px 10px rgba(40,30,10,.05)}
+.ai-place-top{display:flex;align-items:flex-start;gap:10px}
+.ai-place-ico{width:38px;height:38px;border-radius:11px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#FFF1F1;color:var(--red)}
+.ai-place-ico i{font-size:20px}
+.ai-place-head{flex:1;min-width:0}
+.ai-place-name{font-size:14px;font-weight:800;color:var(--text);line-height:1.25;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.ai-place-sub{font-size:11px;color:var(--muted);margin-top:2px;text-transform:capitalize}
+.ai-place-rating{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:12px;font-weight:700;color:var(--text);margin-top:5px}
+.ai-place-rating .star{color:#F5A623;display:inline-flex;align-items:center}
+.ai-place-rating .rev{color:var(--muted);font-weight:600}
+.ai-place-rating .sep{color:#D8CDBB}
+.ai-place-rating .price{color:#16A34A;font-weight:800;letter-spacing:.5px}
+.ai-place-rating .open{color:#16A34A;font-weight:700}
+.ai-place-rating .closed{color:var(--red);font-weight:700}
+.ai-place-why{font-size:11.5px;color:#7A6E58;background:#FBF7EF;border-radius:9px;padding:6px 9px;line-height:1.35;display:flex;align-items:flex-start;gap:6px}
+.ai-place-why i{color:var(--red);font-size:13px;flex-shrink:0;margin-top:1px}
+.ai-place-pill{font-size:9px;font-weight:800;letter-spacing:.3px;padding:2px 7px;border-radius:20px;color:#fff;background:var(--red)}
+.ai-place-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:1px}
+.ai-place-action-btn{height:34px;border-radius:9px;border:1px solid var(--border);background:#f8f4ec;font-family:inherit;font-size:9px;font-weight:800;color:var(--muted);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0;transition:all .12s;letter-spacing:.2px}
+.ai-place-action-btn:hover{transform:translateY(-1px);box-shadow:0 2px 6px rgba(0,0,0,.08)}
 .ai-place-action-btn:active{transform:scale(.95)}
-.ai-place-action-btn i{font-size:13px}
+.ai-place-action-btn i{font-size:14px}
 .ai-place-action-btn.poi{color:var(--red);border-color:#FBD0D0;background:#FFF5F5}
 .ai-place-action-btn.nav{color:var(--blue);border-color:#CBDDF5;background:#EBF2FC}
 .ai-place-action-btn.add{color:#16A34A;border-color:#A7E5B4;background:#DCFCE7}
@@ -9746,16 +9761,18 @@ function _restorePoiaiChat(){
 }
 
 // ILLI GROUNDING anti-allucinazione: recupera POI REALI vicino a (lat,lng) da OpenStreetMap (Overpass) + DB POI•LOVE e li inietta come whitelist chiusa. Nessuna dipendenza, nessuna key.
+// ORDINE IMPORTANTE: le categorie SPECIFICHE (sushi, pizza, gelato...) vanno PRIMA di "ristorante"
+// generico, altrimenti "voglio mangiare sushi" verrebbe rilevato come "ristorante" (parola "mangiare").
 const _OSM_CATS=[
   {re:/\b(pizzeri[ae]|pizza|pizzeri)\b/i,                          label:'pizzeria',     osm:'amenity=restaurant', extra:'["cuisine"~"pizza"]'},
+  {re:/\b(sushi|giappones[ei]|japanese|ramen|poke)\b/i,            label:'sushi',        osm:'amenity=restaurant', extra:'["cuisine"~"sushi|japanese|ramen"]'},
+  {re:/\b(gelateri[ae]|gelat[oi]|ice cream|akullore)\b/i,          label:'gelateria',    osm:'amenity=ice_cream'},
+  {re:/\b(pasticceri[ae]|pastry)\b/i,                              label:'pasticceria',  osm:'shop~"pastry|confectionery"'},
+  {re:/\b(panetteri[ae]|panificio|forno|pane|bakery|furr)\b/i,     label:'panetteria',   osm:'shop=bakery'},
   {re:/\b(ristorant[ei]|trattori[ae]|osteri[ae]|mangiare|cena|pranzo|restaurant|restorant)\b/i, label:'ristorante', osm:'amenity=restaurant'},
-  {re:/\b(sushi|giappones[ei]|japanese)\b/i,                       label:'sushi',        osm:'amenity=restaurant', extra:'["cuisine"~"sushi|japanese"]'},
   {re:/\b(bar|caff[eèé]|caffetteri[ae]|aperitiv[oi]|colazione|coffee|kafe)/i, label:'bar o caffè', osm:'amenity~"cafe|bar"'},
   {re:/\b(pub|birreri[ae]|birra|beer)\b/i,                         label:'pub',          osm:'amenity~"pub|bar"'},
   {re:/\b(hotel|alberg[hoi]|dormire|alloggi[oa]|b&b|bnb|pernott|accommodation)\b/i, label:'hotel o alloggio', osm:'tourism~"hotel|guest_house|hostel|apartment"'},
-  {re:/\b(gelateri[ae]|gelat[oi]|ice cream|akullore)\b/i,          label:'gelateria',    osm:'amenity=ice_cream'},
-  {re:/\b(pasticceri[ae]|dolc[ie]|pastry)\b/i,                     label:'pasticceria',  osm:'shop~"pastry|confectionery"'},
-  {re:/\b(panetteri[ae]|panificio|forno|pane|bakery|furr)\b/i,     label:'panetteria',   osm:'shop=bakery'},
   {re:/\b(farmaci[ae]|pharmacy|farmaci)\b/i,                       label:'farmacia',     osm:'amenity=pharmacy'},
   {re:/\b(supermercat[oi]|supermarket|spesa|aliment|market)\b/i,   label:'supermercato', osm:'shop~"supermarket|convenience"'},
   {re:/\b(distributor[ei]|benzina|carburante|fuel)\b/i,            label:'distributore', osm:'amenity=fuel'},
@@ -9845,6 +9862,23 @@ function _googleMismatch(d, cat){
   const isFood = cat && _FOOD_CATS.includes((cat.label||'').toLowerCase());
   if(isFood && typeof d.primaryType==='string' && !_FOOD_TYPE_RE.test(d.primaryType)) return true;   // es. gioielleria per una pizzeria (caso Leon d'oro -> Bussola D'oro)
   return false;
+}
+// Icona Phosphor per tipo di posto (header card ILLI)
+const _ICON_BY_KIND={pizzeria:'ph-pizza',sushi:'ph-fish','bar o caffè':'ph-coffee',pub:'ph-beer-stein',gelateria:'ph-ice-cream',pasticceria:'ph-cake',panetteria:'ph-bread',ristorante:'ph-fork-knife','hotel o alloggio':'ph-bed',farmacia:'ph-first-aid',supermercato:'ph-shopping-cart',distributore:'ph-gas-pump',museo:'ph-bank',parco:'ph-tree',attrazione:'ph-camera'};
+// Una frase "perché", derivata dai dati reali del posto (no invenzioni): il colpo d'occhio del box
+function _placeReason(p){
+  if(p && p.src==='POI•LOVE') return 'Già amato dalla community POI•LOVE';
+  const rev=(p&&p.reviews)||0;
+  if(p && typeof p.rating==='number'){
+    const r=String(p.rating).replace('.',',');
+    if(p.rating>=4.6 && rev>=150) return `Tra i migliori in zona, ${rev} recensioni`;
+    if(p.rating>=4.4 && rev>=80)  return `Molto apprezzato, voto ${r} su ${rev} recensioni`;
+    if(p.rating>=4.0)             return `Buone recensioni, voto ${r}${rev?` su ${rev}`:''}`;
+  }
+  if(p && p.openNow===true) return 'Aperto adesso, comodo da raggiungere';
+  if(p && p.distM!=null && p.distM<400) return 'A pochi passi da te';
+  if(p && p.cuisine) return 'Cucina: '+_trCuisine(p.cuisine);
+  return 'Un posto da provare qui vicino';
 }
 // Fascia prezzo Google -> simbolo €
 function _priceLabel(pl){
@@ -10073,13 +10107,25 @@ async function sendPoiAIMsg(){
     const placeCards=_gp.map((p,i)=>{
       const nm=(p.name||'').replace(/</g,'&lt;');
       const dist=p.distM!=null?(p.distM<1000?p.distM+' m':(p.distM/1000).toFixed(1).replace('.',',')+' km'):'';
-      const stars=typeof p.rating==='number'?`<i class="ph-fill ph-star" style="color:#F5A623;font-size:10px;vertical-align:-1px"></i> ${String(p.rating).replace('.',',')}${p.reviews?` (${p.reviews})`:''}`:'';
-      const price=_priceLabel(p.priceLevel);
-      const meta=[p.kind,stars,price,dist].filter(Boolean).join(' · ');
-      const badge=p.src==='POI•LOVE'?'<span style="margin-left:6px;font-size:9px;font-weight:700;color:var(--red);background:#FFF0F0;padding:1px 6px;border-radius:8px;vertical-align:middle">POI•LOVE</span>':'';
+      const ico=_ICON_BY_KIND[p.kind]||'ph-map-pin';
+      const rb=[];
+      if(typeof p.rating==='number') rb.push(`<span class="star"><i class="ph-fill ph-star" style="font-size:12px"></i></span> ${String(p.rating).replace('.',',')}${p.reviews?` <span class="rev">${p.reviews} recensioni</span>`:''}`);
+      const price=_priceLabel(p.priceLevel); if(price) rb.push(`<span class="price">${price}</span>`);
+      if(dist) rb.push(`<span class="rev">${dist}</span>`);
+      if(p.openNow===true) rb.push('<span class="open">Aperto ora</span>'); else if(p.openNow===false) rb.push('<span class="closed">Ora chiuso</span>');
+      const ratingRow = rb.length ? `<div class="ai-place-rating">${rb.join('<span class="sep">·</span>')}</div>` : '';
+      const badge=p.src==='POI•LOVE'?'<span class="ai-place-pill">POI•LOVE</span>':'';
+      const why=_placeReason(p).replace(/</g,'&lt;');
       return `<div class="ai-place-card">
-        <div class="ai-place-card-name"><i class="ph-duotone ph-map-pin"></i><span>${nm}</span>${badge}</div>
-        ${meta?`<div style="font-size:10px;color:var(--muted);margin:1px 0 6px 22px">${meta}</div>`:''}
+        <div class="ai-place-top">
+          <div class="ai-place-ico"><i class="ph-duotone ${ico}"></i></div>
+          <div class="ai-place-head">
+            <div class="ai-place-name">${nm}${badge}</div>
+            ${p.kind?`<div class="ai-place-sub">${p.kind}</div>`:''}
+            ${ratingRow}
+          </div>
+        </div>
+        <div class="ai-place-why"><i class="ph-duotone ph-sparkle"></i><span>${why}</span></div>
         <div class="ai-place-actions">
           <button class="ai-place-action-btn poi"   onclick="aiPlaceCreatePOI(${i})"  title="Crea POI qui"><i class="ph-duotone ph-plus-circle"></i><span>POI</span></button>
           <button class="ai-place-action-btn nav"   onclick="aiPlaceNavigate(${i})"   title="Viaggia verso"><i class="ph-duotone ph-navigation-arrow"></i><span>Vai</span></button>
