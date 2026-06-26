@@ -9718,7 +9718,7 @@ document.addEventListener('click',e=>{
 // Chiave OpenAI caricata da /config.js (escluso da git, solo sul server).
 // NB: la variabile resta GROQ_KEY per non toccare i punti di chiamata, ma ora contiene la chiave OpenAI (sk-...).
 const GROQ_KEY = (typeof window !== 'undefined' && window._groqKey) ? window._groqKey : '';
-const GROQ_URL='https://api.openai.com/v1/chat/completions';
+const GROQ_URL='https://ptppxwlafswfhbueakjt.supabase.co/functions/v1/illi-chat';
 const GROQ_MODEL='gpt-4o-mini';
 
 // Conversazione in memoria per contesto multi-turno (formato OpenAI)
