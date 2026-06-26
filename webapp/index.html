@@ -2300,6 +2300,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
     <button class="poi-subtab active" data-subtab="mine"  onclick="setPoiSubtab('mine')"><i class="ph-duotone ph-map-pin"></i> I miei POI</button>
     <button class="poi-subtab"        data-subtab="loved" onclick="setPoiSubtab('loved')"><i class="ph-duotone ph-heart"></i> Loved</button>
     <button class="poi-subtab"        data-subtab="near"  onclick="setPoiSubtab('near')"><i class="ph-duotone ph-compass"></i> Vicini</button>
+    <button class="poi-subtab"        data-subtab="lists" onclick="setPoiSubtab('lists')"><i class="ph-duotone ph-list-bullets"></i> Liste</button>
   </div>
   <div class="poi-search-wrap"><i class="ph-duotone ph-magnifying-glass ps-ico"></i><input class="poi-search" id="poiSearchInput" type="text" placeholder="Cerca per nome o indirizzo…" oninput="_poiSearch(this.value)"></div>
   <div id="poi-list-area"></div>
@@ -5647,7 +5648,50 @@ function showTab(tab){
    TAB POI — render dinamico (Miei / Loved / Vicini)
 ══════════════════════════════════════════ */
 let poiSubtab = 'mine'; // mine | loved | near
-function setPoiSubtab(t){ poiSubtab=t; const s=document.getElementById('poiSearchInput'); if(s) s.value=''; renderPoiTab(); }
+function setPoiSubtab(t){
+  poiSubtab=t;
+  const s=document.getElementById('poiSearchInput'); if(s){ s.value=''; s.placeholder = (t==='lists') ? 'Cerca tra le tue liste…' : 'Cerca per nome o indirizzo…'; }
+  document.querySelectorAll('.poi-subtab').forEach(b=>b.classList.toggle('active', b.dataset.subtab===t));
+  if(t==='lists') renderPoiLists(); else renderPoiTab();
+}
+// Sub-tab Liste dentro POI: riusa il sistema liste esistente (openListDetail / openAddList / shareListDetail)
+async function renderPoiLists(){
+  const area=document.getElementById('poi-list-area'); if(!area) return;
+  if(!currentUser?.id || typeof sb==='undefined' || !sb){
+    area.innerHTML='<div class="poi-list-empty">Accedi per creare e gestire le tue liste di luoghi.</div>';
+    return;
+  }
+  area.innerHTML='<div class="poi-list-empty" style="padding:20px 0"><i class="ph-duotone ph-spinner" style="font-size:22px;animation:spin 1s linear infinite"></i></div>';
+  let lists=[];
+  try{
+    const { data, error } = await sb.from('lists')
+      .select('id,name,visibility,description,companion_id,itinerary_id,list_pois(count)')
+      .eq('owner_id',currentUser.id).order('created_at',{ascending:true});
+    if(!error && data) lists=data;
+  }catch(e){ console.warn('renderPoiLists:', e); }
+  const colors=['#D42B2B','#285EA7','#22C55E','#D48B2B','#7C3AED'];
+  const newBtn=`<button class="pl-add-btn" style="width:calc(100% - 28px);margin:8px 14px 4px;height:44px;border-style:solid;border-color:var(--red);color:var(--red)" onclick="openAddList()"><i class="ph-duotone ph-plus"></i> Nuova lista</button>`;
+  if(!lists.length){
+    area.innerHTML=newBtn+'<div class="poi-list-empty">Ancora nessuna lista. Creane una per raccogliere e organizzare i tuoi luoghi: puoi tenerla privata, renderla pubblica o condividerla.</div>';
+    return;
+  }
+  const rows=lists.map((l,i)=>{
+    const color=colors[i%colors.length];
+    const count=(l.list_pois&&l.list_pois[0]&&l.list_pois[0].count)||0;
+    const visClass=l.visibility==='public'?'lv-pub':(l.companion_id?'lv-comp':'lv-prv');
+    const visLbl=l.visibility==='public'?'Pubblica':(l.companion_id?'Compagnia':'Privata');
+    const esc=s=>(s||'').replace(/"/g,'&quot;');
+    return `<div class="poi-list-row" data-list-id="${l.id}" data-name="${esc(l.name)}" data-desc="${esc(l.description)}" data-comp="${l.companion_id||''}" data-trip="${l.itinerary_id||''}" data-vis="${visClass}" data-color="${color}" onclick="_openListFromRow(this)" style="cursor:pointer">
+      <div class="pi-emoji"><i class="ph-duotone ph-list-bullets" style="color:${color}"></i></div>
+      <div class="pi-info"><div class="pi-name">${(l.name||'').replace(/</g,'&lt;')}</div><div class="pi-sub">${count} POI</div></div>
+      <span class="list-vis ${visClass}" style="flex-shrink:0">${visLbl}</span>
+    </div>`;
+  }).join('');
+  area.innerHTML=newBtn+rows;
+}
+function _openListFromRow(el){
+  openListDetail(el.dataset.name, el.dataset.vis, el.dataset.color, el);
+}
 // Ricerca interna nella lista POI (SPECS: obbligatoria, Loved diventa enorme): filtra le righe per nome/indirizzo
 function _poiSearch(q){
   q=(q||'').toLowerCase().trim();
@@ -8263,6 +8307,7 @@ async function saveNewList(){
   closeSheet('addListOv','addListBg','addListSheet');
   showToast(`+ Lista "${name}"`);
   document.getElementById('newListName').value='';
+  if(typeof renderPoiLists==='function' && typeof poiSubtab!=='undefined' && poiSubtab==='lists') renderPoiLists();   // refresh sub-tab Liste dentro POI
 }
 // Carica le liste dell'utente da Supabase e le rende nel container
 async function loadMyLists(){
