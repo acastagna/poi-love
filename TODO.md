@@ -1,5 +1,10 @@
 # TODO — POI•LOVE
-> Aggiornato: 26/06/2026 · prossima ripresa: **28/06/2026**
+> Aggiornato: 26/06/2026 · **prossima ripresa: sabato 27/06/2026 ore 18:00**
+
+## 🔴 ESTREMA URGENZA — ripresa sabato 27/06 ore 18:00
+
+1. [ ] **PANNELLO ADMIN del sito (`admin.poilove.com`)** — NON ESISTE, da costruire da zero. Verificato 26/06: il sottodominio non risponde, nessun ruolo admin nel DB, nessuna moderazione/limiti. Serve per gestire il sito: ruolo admin + login; **moderazione** (ban/sospensione iscritti, rimozione POI segnalati); **limiti AI** per utente/tier (oggi ILLI è aperto a tutti, solo budget cap globale OpenAI); gestione **gamification** (punti/soglie da `gamification_config`); rotte ufficiali; **analytics** (utenti, POI creati, mappa di calore). **Primo assoluto.**
+2. [ ] **Presentazione aggiornata** (`project.poilove.com`) con un **eccellente set di screenshot** delle novità: ILLI coi voti Google e le card ricche, luoghi personali a scorciatoia, sub-tab Liste, lente mappa, Privacy/Terms. Subito dopo l'admin.
 
 ## Alta priorità — Bloccanti lancio
 
@@ -10,7 +15,7 @@
 
 ## Alta priorità — Prossimi moduli
 
-### 🔜 Ripresa 28/06 — verso la presentazione 1/07 (da SPECS)
+### 🔜 Poi, verso la presentazione 1/07 (da SPECS)
 - [ ] **POI dentro le liste**: il dettaglio lista (`openListDetail`) non carica ancora i `list_pois`. Far vedere e gestire i POI dentro ogni lista (aggiungi/rimuovi/riordino). Primo passo dopo il nuovo sub-tab Liste
 - [ ] **Schermata POI (SPECS, la più importante)**: "suggerisci nome" che pesca i locali reali vicini; togliere le immagini AI dal POI; categorie personalizzabili e opzionali; timer 60s (coppa verde / frase gentile arancione)
 - [ ] **Menu "+"** come elenco di azioni (Sono qui crea POI / Segna un luogo / Tappa / Compagnia), non il mirino diretto

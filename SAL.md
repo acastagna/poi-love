@@ -1,6 +1,7 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
-> **Prossima ripresa: domenica 28/06/2026.** Checkpoint giornata: `checkpoint-2026-06-26-illi-legal-luoghi`.
+> **Prossima ripresa: sabato 27/06/2026 ore 18:00.** Checkpoint giornata: `checkpoint-2026-06-26-illi-legal-luoghi`.
+> **Priorità assoluta della ripresa: costruire il PANNELLO ADMIN (admin.poilove.com), oggi inesistente** (moderazione, blocco iscritti, limiti AI, gamification, analytics), poi presentazione aggiornata con screenshot. Vedi TODO.
 
 ## Sessione 26/06/2026 — ILLI con voti Google, sicurezza chiavi, Privacy/Terms, liste e luoghi personali
 
