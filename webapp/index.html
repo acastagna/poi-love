@@ -3808,9 +3808,9 @@ function renderPlaces(){
         <div class="pl-chip-addr">${p.address||'Posizione salvata'}</div>
       </div>
       <div class="pl-chip-acts" onclick="event.stopPropagation()">
-        <button class="pl-chip-btn" title="Vai sulla mappa" onclick="goToPlPlace(${i})"><i class="ph-duotone ph-map-trifold"></i></button>
+        <button class="pl-chip-btn" title="Vai verso (apri il navigatore)" onclick="_plNavTo(${i})"><i class="ph-duotone ph-navigation-arrow"></i></button>
         <button class="pl-chip-btn" title="Condividi" onclick="sharePlPlace(${i})"><i class="ph-duotone ph-share-network"></i></button>
-        <button class="pl-chip-btn" title="Rimuovi" onclick="removePlPlace(${i})"><i class="ph-duotone ph-trash"></i></button>
+        <button class="pl-chip-btn" title="Togli da qui (il POI resta sulla mappa, non viene cancellato)" onclick="removePlPlace(${i})"><i class="ph-duotone ph-minus-circle"></i></button>
       </div>
     </div>`;
   });
@@ -3832,6 +3832,12 @@ function goToPlPlace(i){
   showTab('map');
   if(map) map.setView([p.lat,p.lng],17);
   showToast(`📍 ${_plLabel(p)}`);
+}
+// Vai verso: apre il navigatore (Apple/Google/Waze) verso il luogo personale
+function _plNavTo(i){
+  const p = plPlaces[i]; if(!p) return;
+  if(typeof openNavPicker==='function') openNavPicker(p.lat, p.lng, _plLabel(p));
+  else if(typeof navigateToPoi==='function') navigateToPoi(p.lat, p.lng, _plLabel(p));
 }
 
 function sharePlPlace(i){
