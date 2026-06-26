@@ -9773,11 +9773,13 @@ function _detectPlaceQuery(text){
   }
   return null;
 }
-function _localPoiPlaces(lat,lng,radiusKm){
+function _localPoiPlaces(lat,lng,radiusKm,cat){
   const all=[...(window._dbPOIs||[]), ...(typeof POIS!=='undefined'?POIS:[])];
   const seen=new Set();
+  const re = cat && cat.re ? cat.re : null;
   return all
     .filter(p=>p && p.name && typeof p.lat==='number' && typeof p.lng==='number')
+    .filter(p=>!re || re.test(p.name) || re.test(p.category||'') || re.test(p.description||''))  // pertinenza: niente "casa mia" tra le pizzerie
     .map(p=>({name:p.name, lat:p.lat, lng:p.lng, distM:Math.round(haversineKm(lat,lng,p.lat,p.lng)*1000), kind:p.category||'POI', src:'POI•LOVE'}))
     .filter(p=>p.distM<=radiusKm*1000)
     .filter(p=>{const k=p.name.toLowerCase().trim(); if(seen.has(k))return false; seen.add(k); return true;})
@@ -9833,13 +9835,24 @@ async function searchRealPlaces(query, lat, lng, radiusM){
   out.sort((a,b)=>a.distM-b.distM);
   return {places:out, overpassDown};
 }
+// Categorie "cibo/locale": per queste il match Google deve essere un'attivita food, non una gioielleria o una via
+const _FOOD_CATS=['pizzeria','ristorante','trattoria','sushi','bar','pub','gelateria','pasticceria','panetteria','street food','enoteca','cantina'];
+const _FOOD_TYPE_RE=/restaurant|food|cafe|coffee|bar|pub|bakery|meal|ice_cream|pizza|wine|brewery|deli|diner|steak|sushi/i;
+// true se il match Google NON e davvero il posto cercato (e una via, o un'attivita di tipo incoerente)
+function _googleMismatch(d, cat){
+  if(!d || !d.found) return false;   // Google non ha trovato nulla: il posto resta coi suoi dati OSM
+  if(d.primaryType==null && d.rating==null && d.reviews==null && d.businessStatus==null) return true;   // e una via/indirizzo, non un'attivita (caso Via Ca' Nova)
+  const isFood = cat && _FOOD_CATS.includes((cat.label||'').toLowerCase());
+  if(isFood && typeof d.primaryType==='string' && !_FOOD_TYPE_RE.test(d.primaryType)) return true;   // es. gioielleria per una pizzeria (caso Leon d'oro -> Bussola D'oro)
+  return false;
+}
 // Fascia prezzo Google -> simbolo €
 function _priceLabel(pl){
   return ({PRICE_LEVEL_INEXPENSIVE:'€',PRICE_LEVEL_MODERATE:'€€',PRICE_LEVEL_EXPENSIVE:'€€€',PRICE_LEVEL_VERY_EXPENSIVE:'€€€€'})[pl]||'';
 }
 // Arricchisce un posto con voto/recensioni/prezzo/stato da Google (Edge Function place-enrich, chiave server-side).
 // Degrada in silenzio: se manca la chiave o Google non risponde, il posto resta coi soli dati OSM.
-async function _enrichPlace(p){
+async function _enrichPlace(p, cat){
   try{
     const r=await fetch(SUPABASE_URL+'/functions/v1/place-enrich',{
       method:'POST',
@@ -9848,7 +9861,8 @@ async function _enrichPlace(p){
     });
     const d=await r.json();
     if(d && d.found){
-      p.rating=d.rating; p.reviews=d.reviews; p.priceLevel=d.priceLevel; p.businessStatus=d.businessStatus;
+      if(_googleMismatch(d, cat)){ p.mismatch=true; return p; }   // match sbagliato (via, o gioielleria al posto della pizzeria): scarta
+      p.rating=d.rating; p.reviews=d.reviews; p.priceLevel=d.priceLevel; p.businessStatus=d.businessStatus; p.gType=d.primaryType;
       if(d.openNow!=null) p.openNow=d.openNow;   // Google piu affidabile dell'orario OSM
     }
   }catch(e){ /* degrado silenzioso ai dati OSM */ }
@@ -9865,7 +9879,7 @@ async function _fetchRealPlaces(text){
   for(const rKm of [3,8,15]){
     const osmRes=await searchRealPlaces(cat, lat, lng, rKm*1000);
     overpassDown = osmRes.overpassDown;
-    const local=_localPoiPlaces(lat,lng,rKm);
+    const local=_localPoiPlaces(lat,lng,rKm,cat);
     const seen=new Set(); merged=[];
     for(const p of [...local, ...osmRes.places]){
       const k=p.name.toLowerCase().trim();
@@ -9877,8 +9891,8 @@ async function _fetchRealPlaces(text){
   }
   // Arricchimento Google (voto, recensioni, prezzo, stato) sui migliori candidati; poi via i chiusi definitivi e riordino
   let top=merged.slice(0,8);
-  await Promise.all(top.map(p=>_enrichPlace(p)));
-  top=top.filter(p=>p.businessStatus!=='CLOSED_PERMANENTLY');   // niente piu posti chiusi da anni (caso Leon d'oro)
+  await Promise.all(top.map(p=>_enrichPlace(p, cat)));
+  top=top.filter(p=>!p.mismatch && p.businessStatus!=='CLOSED_PERMANENTLY');   // via i match sbagliati (gioielleria/via) e i chiusi definitivi
   top.sort((a,b)=>_qualityScore(b)-_qualityScore(a));
   return {cat, places:top, overpassDown};
 }
