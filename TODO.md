@@ -3,17 +3,17 @@
 
 ## Alta priorità — Bloccanti lancio
 
-- [ ] **config.js sul server** — chiave Groq per ILLI•AI (`/var/www/vhosts/poilove.com/httpdocs/config.js`)
-- [ ] **Terms of Service** — creare `web/terms.html` → live su `poilove.com/terms`
-- [ ] **Privacy Policy** — creare `web/privacy.html` → live su `poilove.com/privacy`
-      *(richieste da Facebook OAuth, App Store, Play Store, GDPR)*
+- [x] **config.js sul server** — presente (verificato 26/06). ILLI ora passa per la Edge Function proxy `illi-chat`: chiave OpenAI come segreto server-side, non piu esposta nel client
+- [x] **Terms of Service** — live su `poilove.com/terms` (26/06)
+- [x] **Privacy Policy** — live su `poilove.com/privacy` (26/06)
+      *(bozze conformi legge AL 124/2024 + GDPR, generate col caso Agi-Kons come checklist; RESTA da far validare da un consulente legale prima del lancio pubblico)*
 
 ## Alta priorità — Prossimi moduli
 
 ### Blocco "Lente-strumento + UX input" (richiesto 25/06 notte, design fissato — vedi memoria `lente_mappa_strumento`)
-- [ ] **A. Lente-strumento sulla mappa (long-press ~300ms)**: magnifier che ingrandisce davvero, 2 trascinamenti (mappa ferma/lente mobile e viceversa), titolo+indirizzo+coordinate+descrizione live, comandi (POI, Naviga, Aggiungi a itin/rotta, Chiedi AI, Condividi amico/compagnia/social). È il prossimo blocco grosso, da fare nel codice reale Leaflet
-- [ ] **B. Bottoni dentro i campi**: Suggerisci AI / Detta / Scrivo io DENTRO il campo compilabile (icone nel campo), non a fianco
-- [ ] **C. Fix dettatura**: il microfono resta attaccato, niente conversazione naturale → stop pulito
+- [x] **A. Lente-strumento sulla mappa (long-press 300ms)** — COMPLETA (25/06, live `3c3121e`): magnifier reale bianco/nero ad alto contrasto, cerchio 320px, apertura esatta sul punto toccato (mouse+touch, mappa ferma), 2 trascinamenti live, titolo+indirizzo+coordinate live, 4 comandi + LED "Salva il POI" lampeggiante, mutua esclusione popup (mai due aperti), tap-fuori chiude, clamp ai bordi, FAB sempre sopra, i18n IT/SQ/EN. Code-review superato (2 BLOCKER + 5 MAJOR risolti)
+- [x] **B. Bottoni dentro i campi** — COMPLETA (25/06): Suggerisci AI / Detta / Scrivo io dentro nome e descrizione POI
+- [x] **C. Fix dettatura** — COMPLETA (25/06): dettatura iOS-friendly con stop pulito
 - [ ] **D. Voci TTS iperrealistiche** via servizio esterno (Google Cloud TTS o simile): scelto dal founder, serve chiave + billing, deroga alla regola no-TTS-esterno
 - [ ] **E. Tastiera assistita**: basi pronte a scorrimento (Piazza, Via, Contrada, Largo, Vicolo...) + riga numeri sempre visibile stile Waze
 
