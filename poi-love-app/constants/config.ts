@@ -8,7 +8,7 @@ const extra = Constants.expoConfig?.extra ?? {};
 export const Config = {
   supabaseUrl:     process.env.EXPO_PUBLIC_SUPABASE_URL  ?? extra.supabaseUrl  ?? '',
   supabaseAnonKey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? extra.supabaseAnonKey ?? '',
-  googleMapsKey:   process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY ?? 'AIzaSyA8NN65J6s2Yf-FRfpbgVMZFMn1n8Q_zEM',
+  googleMapsKey:   process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY ?? '',
   mediaServerUrl:  process.env.EXPO_PUBLIC_MEDIA_SERVER_URL ?? 'https://media.poilove.com',
 
   // Limiti business

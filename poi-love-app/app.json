@@ -22,7 +22,7 @@
         "NSCameraUsageDescription": "Scatta una foto per il tuo POI."
       },
       "config": {
-        "googleMapsApiKey": "AIzaSyA8NN65J6s2Yf-FRfpbgVMZFMn1n8Q_zEM"
+        "googleMapsApiKey": "REPLACE_WITH_YOUR_GOOGLE_MAPS_KEY"
       }
     },
     "android": {
@@ -39,7 +39,7 @@
       ],
       "config": {
         "googleMaps": {
-          "apiKey": "AIzaSyA8NN65J6s2Yf-FRfpbgVMZFMn1n8Q_zEM"
+          "apiKey": "REPLACE_WITH_YOUR_GOOGLE_MAPS_KEY"
         }
       }
     },

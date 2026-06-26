@@ -325,7 +325,7 @@ Il sito è live su **https://poilove.com** (non su GitHub Pages — quello è so
 - **Google OAuth** — login via Supabase Auth
   - OAuth Client ID: `750440485410-sjknbfn1jnlu2s33tirdjd3d55e474tn.apps.googleusercontent.com`
 - **Google Maps API** (solo app mobile Expo, non nella web app)
-  - Maps API Key: `AIzaSyA8NN65J6s2Yf-FRfpbgVMZFMn1n8Q_zEM`
+  - Maps API Key: in Google Cloud Console + Expo secret `EXPO_PUBLIC_GOOGLE_MAPS_API_KEY` (mai nel repo)
 
 ---
 
