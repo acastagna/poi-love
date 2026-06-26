@@ -404,6 +404,10 @@ body.tab-active #mapQuickBtns{display:none}
 .poi-subtab{flex:1;height:36px;border:none;background:transparent;border-radius:9px;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;font-family:inherit}
 .poi-subtab.active{background:var(--red);color:#fff}
 .poi-list-empty{text-align:center;padding:40px 20px;color:var(--muted);font-size:13px}
+.poi-search-wrap{position:relative;padding:10px 14px 4px;background:var(--card)}
+.poi-search{width:100%;border:1.5px solid var(--border);border-radius:12px;padding:9px 13px 9px 38px;font-size:13px;font-family:inherit;outline:none;color:var(--ink);background:var(--bg);box-sizing:border-box}
+.poi-search:focus{border-color:var(--blue)}
+.poi-search-wrap .ps-ico{position:absolute;left:27px;top:20px;color:var(--muted);font-size:16px;pointer-events:none}
 /* ── LUOGHI PERSONALI ── */
 .pl-section{padding:12px 14px 0;background:var(--card);border-bottom:2px solid var(--border)}
 .pl-section-title{font-size:10px;font-weight:900;letter-spacing:.9px;color:var(--muted);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:5px}
@@ -2297,6 +2301,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
     <button class="poi-subtab"        data-subtab="loved" onclick="setPoiSubtab('loved')"><i class="ph-duotone ph-heart"></i> Loved</button>
     <button class="poi-subtab"        data-subtab="near"  onclick="setPoiSubtab('near')"><i class="ph-duotone ph-compass"></i> Vicini</button>
   </div>
+  <div class="poi-search-wrap"><i class="ph-duotone ph-magnifying-glass ps-ico"></i><input class="poi-search" id="poiSearchInput" type="text" placeholder="Cerca per nome o indirizzo…" oninput="_poiSearch(this.value)"></div>
   <div id="poi-list-area"></div>
 </div>
 
@@ -5642,7 +5647,23 @@ function showTab(tab){
    TAB POI — render dinamico (Miei / Loved / Vicini)
 ══════════════════════════════════════════ */
 let poiSubtab = 'mine'; // mine | loved | near
-function setPoiSubtab(t){ poiSubtab=t; renderPoiTab(); }
+function setPoiSubtab(t){ poiSubtab=t; const s=document.getElementById('poiSearchInput'); if(s) s.value=''; renderPoiTab(); }
+// Ricerca interna nella lista POI (SPECS: obbligatoria, Loved diventa enorme): filtra le righe per nome/indirizzo
+function _poiSearch(q){
+  q=(q||'').toLowerCase().trim();
+  const area=document.getElementById('poi-list-area'); if(!area) return;
+  let visible=0;
+  area.querySelectorAll('.poi-list-row').forEach(row=>{
+    const match = !q || row.textContent.toLowerCase().indexOf(q)>-1;
+    row.style.display = match ? '' : 'none';
+    if(match) visible++;
+  });
+  let none=document.getElementById('poiSearchNone');
+  if(q && visible===0){
+    if(!none){ none=document.createElement('div'); none.id='poiSearchNone'; none.className='poi-list-empty'; none.style.padding='24px 0'; area.appendChild(none); }
+    none.textContent='Nessun risultato per "'+q+'"'; none.style.display='';
+  } else if(none){ none.style.display='none'; }
+}
 async function renderPoiTab(){
   const list = document.getElementById('poi-list-area');
   if(!list) return;
