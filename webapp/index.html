@@ -9876,7 +9876,8 @@ function _iconForPlace(p){
   const t=(((p&&p.gType)||'')+' '+((p&&p.cuisine)||'')+' '+((p&&p.name)||'')).toLowerCase();
   if(/mexican|messican|taco|burrito/.test(t)) return 'ph-pepper';
   if(/pizza/.test(t)) return 'ph-pizza';
-  if(/sushi|japanese|giappon|ramen|poke/.test(t)) return 'ph-fish';
+  if(/sushi|japanese|giappon|ramen|poke|nigiri|sashimi/.test(t)) return 'nigiri';
+  if(/seafood|\bfish\b|pesce|frutti di mare|oyster|crud[oi]/.test(t)) return 'ph-fish';
   if(/chinese|cines|wok|noodle|asian|thai|vietnam/.test(t)) return 'ph-bowl-food';
   if(/burger|hamburg|fast_food/.test(t)) return 'ph-hamburger';
   if(/ice_cream|gelat/.test(t)) return 'ph-ice-cream';
@@ -9891,16 +9892,28 @@ function _iconForPlace(p){
   if(/restaurant|ristorant|trattori|osteri/.test(t)) return 'ph-fork-knife';
   return _ICON_BY_KIND[p&&p.kind]||'ph-map-pin';
 }
+// Nigiri disegnato per il sushi (Phosphor non ha un'icona sushi; il pesce e per il ristorante di pesce)
+const _NIGIRI_SVG='<svg viewBox="0 0 256 256" width="22" height="22" style="display:block"><rect x="36" y="150" width="184" height="58" rx="29" fill="currentColor" opacity="0.28"/><path d="M44 158 Q128 104 212 158 Q214 138 198 129 Q128 96 58 129 Q42 138 44 158 Z" fill="currentColor"/><g stroke="#fff" stroke-width="7" stroke-linecap="round" opacity="0.55"><line x1="96" y1="130" x2="103" y2="146"/><line x1="128" y1="124" x2="135" y2="142"/><line x1="160" y1="130" x2="167" y2="146"/></g></svg>';
+function _placeIcoHTML(p){
+  const ico=_iconForPlace(p);
+  if(ico==='nigiri') return _NIGIRI_SVG;
+  return '<i class="ph-duotone '+ico+'"></i>';
+}
 // Descrizione breve del posto (NON ripete il voto, gia mostrato sopra): preferisce la descrizione
 // vera di Google, altrimenti la costruisce da tipo + cucina + caratteristiche reali.
 function _placeDesc(p){
-  if(p && p.desc) return p.desc;   // descrizione vera di Google, quando c'e
-  const bits=[];   // il tipo e gia nel sottotitolo: qui solo info aggiuntive utili, mai il voto
-  if(p && p.cuisine){ const c=_trCuisine(p.cuisine); if(c && c.toLowerCase()!=='pizza' && !/pizz/i.test(p.typeLabel||'')) bits.push('cucina '+c); }
-  if(p && p.veg) bits.push(p.veg==='solo'?'solo vegetariano o vegano':'con opzioni vegetariane');
-  if(p && p.outdoor) bits.push("tavoli all'aperto");
-  if(p && p.src==='POI•LOVE') bits.push('segnalato dalla community POI•LOVE');
-  return bits.join(' · ');   // vuoto se non c'e altro oltre al tipo: la riga descrizione viene omessa
+  if(!p) return '';
+  const parts=[];
+  if(p.desc) parts.push(p.desc);   // descrizione vera di Google: la base del testo
+  const ex=[];   // caratteristiche aggiuntive (mai il voto, gia mostrato sopra)
+  if(p.cuisine){ const c=_trCuisine(p.cuisine); if(c && c.toLowerCase()!=='pizza' && !/pizz/i.test(p.typeLabel||'') && (!p.desc || p.desc.toLowerCase().indexOf((c.split(',')[0]||'').toLowerCase())<0)) ex.push('cucina '+c); }
+  if(p.veg) ex.push(p.veg==='solo'?'solo vegetariano o vegano':'opzioni vegetariane');
+  if(p.outdoor) ex.push("tavoli all'aperto");
+  if(!p.desc && p.priceLevel){ const pl=({PRICE_LEVEL_INEXPENSIVE:'prezzi contenuti',PRICE_LEVEL_MODERATE:'fascia di prezzo media',PRICE_LEVEL_EXPENSIVE:'fascia alta',PRICE_LEVEL_VERY_EXPENSIVE:'locale esclusivo'})[p.priceLevel]; if(pl) ex.push(pl); }
+  if(p.openNow===true && !p.desc) ex.push('aperto adesso');
+  if(p.src==='POI•LOVE') ex.push('segnalato dalla community POI•LOVE');
+  if(ex.length) parts.push(ex.join(', '));
+  return parts.join(' · ');   // vuoto solo se davvero non c'e nulla: la riga viene omessa
 }
 // Fascia prezzo Google -> simbolo €
 function _priceLabel(pl){
@@ -10041,7 +10054,7 @@ function _renderPlaceCards(places){
     const gi=_gPlaces.length-1;
     const nm=(p.name||'').replace(/</g,'&lt;');
     const dist=p.distM!=null?(p.distM<1000?p.distM+' m':(p.distM/1000).toFixed(1).replace('.',',')+' km'):'';
-    const ico=_iconForPlace(p);
+    const icoHTML=_placeIcoHTML(p);
     const rb=[];
     if(typeof p.rating==='number') rb.push(`<span class="star"><i class="ph-fill ph-star" style="font-size:12px"></i></span> ${String(p.rating).replace('.',',')}${p.reviews?` <span class="rev">${p.reviews} recensioni</span>`:''}`);
     const price=_priceLabel(p.priceLevel); if(price) rb.push(`<span class="price">${price}</span>`);
@@ -10052,7 +10065,7 @@ function _renderPlaceCards(places){
     const why=_placeDesc(p).replace(/</g,'&lt;');
     return `<div class="ai-place-card">
       <div class="ai-place-top">
-        <div class="ai-place-ico"><i class="ph-duotone ${ico}"></i></div>
+        <div class="ai-place-ico">${icoHTML}</div>
         <div class="ai-place-head">
           <div class="ai-place-name">${nm}${badge}</div>
           ${(p.typeLabel||p.kind)?`<div class="ai-place-sub">${(p.typeLabel||p.kind)}</div>`:''}
