@@ -1,5 +1,5 @@
 # TODO — POI•LOVE
-> Aggiornato: 24/06/2026
+> Aggiornato: 26/06/2026 · prossima ripresa: **28/06/2026**
 
 ## Alta priorità — Bloccanti lancio
 
@@ -9,6 +9,15 @@
       *(bozze conformi legge AL 124/2024 + GDPR, generate col caso Agi-Kons come checklist; RESTA da far validare da un consulente legale prima del lancio pubblico)*
 
 ## Alta priorità — Prossimi moduli
+
+### 🔜 Ripresa 28/06 — verso la presentazione 1/07 (da SPECS)
+- [ ] **POI dentro le liste**: il dettaglio lista (`openListDetail`) non carica ancora i `list_pois`. Far vedere e gestire i POI dentro ogni lista (aggiungi/rimuovi/riordino). Primo passo dopo il nuovo sub-tab Liste
+- [ ] **Schermata POI (SPECS, la più importante)**: "suggerisci nome" che pesca i locali reali vicini; togliere le immagini AI dal POI; categorie personalizzabili e opzionali; timer 60s (coppa verde / frase gentile arancione)
+- [ ] **Menu "+"** come elenco di azioni (Sono qui crea POI / Segna un luogo / Tappa / Compagnia), non il mirino diretto
+- [ ] **Filtri tag e categoria nel profilo**: tocco un tag o una categoria, vedo solo i POI con quello
+- [ ] **Condivisione proprietaria**: un foglio POI•LOVE unico e curato, mai `navigator.share` (violazione SPECS, oggi usato in ~8 punti)
+- [ ] **Validazione legale Privacy/Terms** con un consulente prima del lancio (le bozze sono live)
+- [ ] **Google Places: cache** (tabella Supabase 7-30 giorni) per tenere bassi i costi a scala
 
 ### Blocco "Lente-strumento + UX input" (richiesto 25/06 notte, design fissato — vedi memoria `lente_mappa_strumento`)
 - [x] **A. Lente-strumento sulla mappa (long-press 300ms)** — COMPLETA (25/06, live `3c3121e`): magnifier reale bianco/nero ad alto contrasto, cerchio 320px, apertura esatta sul punto toccato (mouse+touch, mappa ferma), 2 trascinamenti live, titolo+indirizzo+coordinate live, 4 comandi + LED "Salva il POI" lampeggiante, mutua esclusione popup (mai due aperti), tap-fuori chiude, clamp ai bordi, FAB sempre sopra, i18n IT/SQ/EN. Code-review superato (2 BLOCKER + 5 MAJOR risolti)

@@ -1,5 +1,36 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
+> **Prossima ripresa: domenica 28/06/2026.** Checkpoint giornata: `checkpoint-2026-06-26-illi-legal-luoghi`.
+
+## Sessione 26/06/2026 — ILLI con voti Google, sicurezza chiavi, Privacy/Terms, liste e luoghi personali
+
+Giornata molto densa, ~19 commit, tutto deployato e pushato.
+
+**ILLI•AI (qualità della ricerca, il cuore della demo)**
+- **Voti Google reali**: Edge Function `place-enrich` (proxy a Google Places API New, chiave segreta server-side) porta voto medio, numero recensioni, fascia prezzo, stato apertura, descrizione (`editorialSummary`) e tipo in chiaro. Ordina per qualità reale. Live `3e580db`.
+- **Match sbagliati filtrati** (`85c4a8a`): `_googleMismatch` scarta i match in cui Google restituisce una via (tutti i campi null, es. "Via Ca' Nova") o un'attività di tipo incoerente (gioielleria al posto della pizzeria, caso "Leon d'oro"). `_localPoiPlaces` filtra i POI•LOVE per pertinenza.
+- **Filtro categoria + cucine etniche** (`8862ba8`, `4d63c91`): "voglio mangiare sushi" non cade più su "ristorante"; messicano/cinese/indiano/thai/kebab/hamburger con raggio largo (fino a 35 km); ILLI dice onestamente "il più vicino è a 8 km" invece di rifilare ristoranti a caso.
+- **Box ridisegnato**: icona per tipo reale (nigiri sushi, peperoncino messicano, pizza, forchetta), voto+prezzo+distanza+stato, descrizione vera senza ripetere il voto. Output a prosa pulita (niente R1/R2, emoji, markdown, inglese misto).
+- **Memoria chat persistente** (`fa806ef`): la storia conserva testo **e** risultati (le card dei posti) dopo il reload, con le azioni che puntano al posto giusto.
+- **Proxy ILLI** (`c9f7fa9`): le chiamate al modello passano per la Edge Function `illi-chat`, chiave OpenAI come segreto server-side (prima pubblica in `config.js`).
+
+**Sicurezza (era messa male)**
+- Chiave Google Maps rimossa dai file e **revocata** lato Google (era nel repo pubblico). `8b62ae1`.
+- `.htaccess` che blocca i file interni del repo (CLAUDE.md, sorgenti, deploy.php) dalla docroot pubblica di poilove.com. `35c8ccd`.
+
+**Legale**
+- Privacy Policy e Terms of Service **live** su `poilove.com/privacy` e `/terms` (`d9ffb36`): bozze conformi legge AL 124/2024 + GDPR, generate col caso Agi-Kons come checklist anti-violazioni. RESTANO da far validare da un consulente legale prima del lancio.
+
+**POI e liste**
+- Cassaforte: dalla lista POI un pulsante manda un POI in un luogo personale.
+- Luoghi personali come **scorciatoie** (SPECS, `ff790d6`): tocco categoria → ci vai / scegli / cerchi tra i tuoi POI per assegnarne uno. Card a doppia colonna. Prima icona = "Vai verso" (navigatore); "rimuovi" chiarito (toglie solo la scorciatoia, non il POI).
+- **Ricerca interna** nella lista POI (Miei/Loved/Vicini) per nome e indirizzo (`c48859f`).
+- **Quarto sub-tab "Liste"** dentro POI (`e827cf1`): riusa il sistema liste esistente (crea, visibilità privata/pubblica/compagnia, condividi, elimina), con conteggio POI e ricerca.
+
+**Limite noto da chiudere (primo punto della ripresa)**: aprendo una lista, il dettaglio non mostra ancora i POI dentro (non carica i `list_pois`).
+
+---
+
 ## Sessione 24/06/2026 (parte 5) — Fix popup/handle + i18n completo
 
 - **Fix z-index popup**: stacking dinamico via MutationObserver; l'ultimo overlay/sheet aperto va sempre sopra. Confirm proprietari (`_uiModal`) su contatore separato, sempre in cima. Risolve il caso "popup sotto popup".
