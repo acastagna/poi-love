@@ -90,6 +90,52 @@ body{
   border-radius:20px;padding:5px 12px;font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;transition:all .2s}
 .langs button.on{background:var(--gold);color:#16110d;border-color:var(--gold)}
 .foot{position:fixed;bottom:14px;left:0;right:0;text-align:center;font-size:10px;color:rgba(244,236,224,.35)}
+
+/* ── Secondo fattore (MFA): pannello dedicato, stessa estetica della card ── */
+#mfa{display:none}
+#mfa.on{display:block;animation:rise .5s cubic-bezier(.2,.8,.2,1) both}
+.mfa-head{text-align:center;margin:6px 0 16px}
+.mfa-head .lock{width:48px;height:48px;border-radius:50%;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;
+  font-size:22px;background:linear-gradient(135deg,rgba(232,176,75,.25),rgba(212,43,43,.18));border:1px solid rgba(232,176,75,.4)}
+.mfa-head h2{font-size:18px;font-weight:800;line-height:1.25}
+.mfa-head p{font-size:12.5px;color:rgba(244,236,224,.66);margin-top:6px;line-height:1.5}
+/* QR del primo setup */
+.mfa-qr{display:none;margin:4px auto 14px;width:184px;height:184px;border-radius:16px;overflow:hidden;
+  background:#fff;border:1px solid var(--line);padding:8px}
+.mfa-qr.on{display:block}
+.mfa-qr svg,.mfa-qr img{width:100%;height:100%;display:block}
+.mfa-secret{display:none;margin:0 0 14px;text-align:center}
+.mfa-secret.on{display:block}
+.mfa-secret .lab{font-size:10.5px;color:rgba(244,236,224,.5);letter-spacing:.4px;margin-bottom:4px}
+.mfa-secret code{display:inline-block;font-size:13px;font-weight:700;letter-spacing:1.5px;color:var(--gold);
+  background:rgba(244,236,224,.06);border:1px solid var(--line);border-radius:10px;padding:7px 12px;word-break:break-all;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;cursor:pointer}
+/* campo codice a 6 cifre */
+.mfa-code{width:100%;text-align:center;letter-spacing:10px;font-size:22px;font-weight:800;
+  border:1px solid var(--line);background:rgba(244,236,224,.06);color:var(--paper);
+  border-radius:13px;padding:13px 14px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;outline:none;transition:border-color .2s}
+.mfa-code::placeholder{letter-spacing:6px;color:rgba(244,236,224,.3)}
+.mfa-code:focus{border-color:var(--gold)}
+.mfa-verify{width:100%;margin-top:12px;border:none;cursor:pointer;font-family:inherit;border-radius:14px;padding:14px;
+  color:#16110d;font-size:15px;font-weight:800;background:linear-gradient(135deg,var(--gold),#caa13e);
+  box-shadow:0 10px 26px rgba(232,176,75,.3);transition:transform .12s,filter .2s}
+.mfa-verify:hover{transform:translateY(-1px);filter:brightness(1.05)}
+.mfa-verify:active{transform:scale(.98)}
+.mfa-verify:disabled{opacity:.55;cursor:not-allowed;transform:none}
+/* passkey biometrica (WebAuthn) */
+.mfa-passkey{width:100%;margin-top:10px;border:1px solid var(--line);background:rgba(244,236,224,.08);color:var(--paper);
+  border-radius:14px;padding:13px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:9px;transition:background .2s}
+.mfa-passkey:hover{background:rgba(244,236,224,.16)}
+.mfa-passkey:disabled{opacity:.55;cursor:not-allowed}
+.mfa-exit{width:100%;margin-top:10px;border:1px solid var(--line);background:transparent;color:rgba(244,236,224,.6);
+  border-radius:13px;padding:11px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;transition:all .2s}
+.mfa-exit:hover{background:rgba(212,43,43,.16);color:#fff;border-color:rgba(212,43,43,.45)}
+.mfa-or{display:flex;align-items:center;gap:10px;color:rgba(244,236,224,.4);font-size:10px;letter-spacing:1px;
+  margin:14px 0;text-transform:uppercase}
+.mfa-or::before,.mfa-or::after{content:"";flex:1;height:1px;background:var(--line)}
+.mfa-msg{font-size:12px;text-align:center;margin-top:12px;min-height:16px;color:#ffb4b4}
+.mfa-msg.ok{color:#9be6a8}
 </style>
 </head>
 <body>
@@ -98,6 +144,9 @@ body{
 <div class="wrap">
   <div class="card">
     <div class="brand">POI<span class="h">•</span>LOVE<span class="tag">Admin</span></div>
+
+   <!-- ── Vista login (Google / biometria / email) ── -->
+   <div id="loginView">
     <div class="lead">
       <h1 data-t="title">Accesso riservato</h1>
       <p data-t="subtitle">Solo chi conosce il cammino prosegue.</p>
@@ -120,6 +169,40 @@ body{
     <div class="field"><input id="pwd" type="password" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')pwdLogin()"></div>
     <button class="enter" onclick="pwdLogin()" data-t="enter">Entra</button>
     <div class="msg" id="msg"></div>
+   </div><!-- /#loginView -->
+
+   <!-- ── Vista secondo fattore (MFA forte): TOTP + passkey biometrica WebAuthn ── -->
+   <div id="mfa">
+     <div class="mfa-head">
+       <div class="lock">&#128274;</div>
+       <h2 id="mfaTitle" data-t="mfa_verify_title">Verifica in due passaggi</h2>
+       <p id="mfaHint" data-t="mfa_verify_hint">Inserisci il codice a 6 cifre dalla tua app authenticator.</p>
+     </div>
+
+     <!-- QR + secret: visibili solo al primo setup -->
+     <div class="mfa-qr" id="mfaQr"></div>
+     <div class="mfa-secret" id="mfaSecretBox">
+       <div class="lab" data-t="mfa_secret_label">Codice manuale (se non puoi scansionare)</div>
+       <code id="mfaSecret" onclick="copySecret()"></code>
+     </div>
+
+     <input id="mfaCode" class="mfa-code" inputmode="numeric" autocomplete="one-time-code"
+            maxlength="6" placeholder="••••••" oninput="onlyDigits(this)"
+            onkeydown="if(event.key==='Enter')mfaSubmit()">
+     <button class="mfa-verify" id="mfaVerifyBtn" onclick="mfaSubmit()" data-t="mfa_confirm">Conferma</button>
+
+     <!-- Passkey biometrica (WebAuthn) come fattore aggiuntivo: visibile solo se la libreria la espone -->
+     <div id="mfaPasskeyWrap" style="display:none">
+       <div class="mfa-or"><span data-t="mfa_or">oppure</span></div>
+       <button class="mfa-passkey" id="mfaPasskeyBtn" onclick="mfaPasskey()">
+         <span style="font-size:16px">&#128273;</span>
+         <span id="mfaPasskeyLabel" data-t="mfa_add_passkey">Aggiungi passkey biometrica</span>
+       </button>
+     </div>
+
+     <button class="mfa-exit" onclick="mfaExit()" data-t="mfa_exit">Esci</button>
+     <div class="mfa-msg" id="mfaMsg"></div>
+   </div><!-- /#mfa -->
 
     <div class="langs">
       <button data-l="it" class="on" onclick="setLang('it')">IT</button>
@@ -137,9 +220,36 @@ const SUPABASE_ANON='sb_publishable_PC1xQ8XiQK9jpzwsAlFLxw_E-PKN40V';
 const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON) : null;
 
 const T={
-  it:{title:'Accesso riservato', subtitle:'Solo chi conosce il cammino prosegue.', bio:'Accedi con la biometria', bio_hint:'Tocco, volto o passkey del dispositivo', or:'oppure', google:'Continua con Google', enter:'Entra', no_admin:'Questo profilo non ha accesso amministrativo.', bad:'Email o password non validi.', checking:'Verifico…', no_bio:'Biometria non disponibile su questo dispositivo, usa email e password.', welcome:'Benvenuto. Apro il pannello…'},
-  sq:{title:'Hyrje e rezervuar', subtitle:'Vetëm kush e njeh rrugën vazhdon.', bio:'Hyr me biometri', bio_hint:'Prekje, fytyrë ose passkey i pajisjes', or:'ose', google:'Vazhdo me Google', enter:'Hyr', no_admin:'Ky profil nuk ka qasje administrative.', bad:'Email ose fjalëkalim i pavlefshëm.', checking:'Po verifikoj…', no_bio:'Biometria nuk disponohet, përdor email dhe fjalëkalim.', welcome:'Mirësevini. Po hap panelin…'},
-  en:{title:'Restricted access', subtitle:'Only those who know the path go on.', bio:'Sign in with biometrics', bio_hint:'Device touch, face or passkey', or:'or', google:'Continue with Google', enter:'Enter', no_admin:'This profile has no admin access.', bad:'Invalid email or password.', checking:'Checking…', no_bio:'Biometrics unavailable, use email and password.', welcome:'Welcome. Opening the panel…'}
+  it:{title:'Accesso riservato', subtitle:'Solo chi conosce il cammino prosegue.', bio:'Accedi con la biometria', bio_hint:'Tocco, volto o passkey del dispositivo', or:'oppure', google:'Continua con Google', enter:'Entra', no_admin:'Questo profilo non ha accesso amministrativo.', bad:'Email o password non validi.', checking:'Verifico…', no_bio:'Biometria non disponibile su questo dispositivo, usa email e password.', welcome:'Benvenuto. Apro il pannello…',
+    mfa_verify_title:'Verifica in due passaggi', mfa_verify_hint:'Inserisci il codice a 6 cifre dalla tua app authenticator.',
+    mfa_setup_title:'Proteggi il tuo accesso', mfa_setup_hint:'Scansiona il QR con Google Authenticator o Authy, poi inserisci il codice a 6 cifre per attivare il secondo fattore.',
+    mfa_secret_label:'Codice manuale (se non puoi scansionare)', mfa_confirm:'Conferma', mfa_or:'oppure',
+    mfa_add_passkey:'Aggiungi passkey biometrica', mfa_use_passkey:'Sblocca con Face ID o impronta', mfa_exit:'Esci',
+    mfa_enter_code:'Inserisci il codice a 6 cifre.', mfa_bad_code:'Codice non valido o scaduto. Riprova.',
+    mfa_setup_done:'Secondo fattore attivato. Apro il pannello…', mfa_verified:'Verificato. Apro il pannello…',
+    mfa_net_err:'Errore di rete. Riprova.', mfa_enroll_err:'Configurazione non riuscita. Riprova.',
+    mfa_passkey_err:'Passkey non riuscita. Riprova o usa il codice.', mfa_secret_copied:'Codice copiato.',
+    mfa_passkey_added:'Passkey biometrica aggiunta.'},
+  sq:{title:'Hyrje e rezervuar', subtitle:'Vetëm kush e njeh rrugën vazhdon.', bio:'Hyr me biometri', bio_hint:'Prekje, fytyrë ose passkey i pajisjes', or:'ose', google:'Vazhdo me Google', enter:'Hyr', no_admin:'Ky profil nuk ka qasje administrative.', bad:'Email ose fjalëkalim i pavlefshëm.', checking:'Po verifikoj…', no_bio:'Biometria nuk disponohet, përdor email dhe fjalëkalim.', welcome:'Mirësevini. Po hap panelin…',
+    mfa_verify_title:'Verifikim në dy hapa', mfa_verify_hint:'Fut kodin 6-shifror nga aplikacioni yt authenticator.',
+    mfa_setup_title:'Mbro hyrjen tënde', mfa_setup_hint:'Skano QR-në me Google Authenticator ose Authy, pastaj fut kodin 6-shifror për të aktivizuar faktorin e dytë.',
+    mfa_secret_label:'Kodi manual (nëse nuk mund të skanosh)', mfa_confirm:'Konfirmo', mfa_or:'ose',
+    mfa_add_passkey:'Shto passkey biometrik', mfa_use_passkey:'Shkyç me Face ID ose gjurmë gishti', mfa_exit:'Dil',
+    mfa_enter_code:'Fut kodin 6-shifror.', mfa_bad_code:'Kod i pavlefshëm ose i skaduar. Riprovo.',
+    mfa_setup_done:'Faktori i dytë u aktivizua. Po hap panelin…', mfa_verified:'U verifikua. Po hap panelin…',
+    mfa_net_err:'Gabim rrjeti. Riprovo.', mfa_enroll_err:'Konfigurimi dështoi. Riprovo.',
+    mfa_passkey_err:'Passkey dështoi. Riprovo ose përdor kodin.', mfa_secret_copied:'Kodi u kopjua.',
+    mfa_passkey_added:'Passkey biometrik u shtua.'},
+  en:{title:'Restricted access', subtitle:'Only those who know the path go on.', bio:'Sign in with biometrics', bio_hint:'Device touch, face or passkey', or:'or', google:'Continue with Google', enter:'Enter', no_admin:'This profile has no admin access.', bad:'Invalid email or password.', checking:'Checking…', no_bio:'Biometrics unavailable, use email and password.', welcome:'Welcome. Opening the panel…',
+    mfa_verify_title:'Two step verification', mfa_verify_hint:'Enter the 6 digit code from your authenticator app.',
+    mfa_setup_title:'Protect your access', mfa_setup_hint:'Scan the QR with Google Authenticator or Authy, then enter the 6 digit code to enable the second factor.',
+    mfa_secret_label:'Manual code (if you cannot scan)', mfa_confirm:'Confirm', mfa_or:'or',
+    mfa_add_passkey:'Add biometric passkey', mfa_use_passkey:'Unlock with Face ID or fingerprint', mfa_exit:'Sign out',
+    mfa_enter_code:'Enter the 6 digit code.', mfa_bad_code:'Invalid or expired code. Try again.',
+    mfa_setup_done:'Second factor enabled. Opening the panel…', mfa_verified:'Verified. Opening the panel…',
+    mfa_net_err:'Network error. Try again.', mfa_enroll_err:'Setup failed. Try again.',
+    mfa_passkey_err:'Passkey failed. Try again or use the code.', mfa_secret_copied:'Code copied.',
+    mfa_passkey_added:'Biometric passkey added.'}
 };
 let lang = (localStorage.getItem('admin_lang')) || (navigator.language||'it').slice(0,2);
 if(!T[lang]) lang='it';
@@ -148,6 +258,8 @@ function setLang(l){
   document.documentElement.lang=l;
   document.querySelectorAll('[data-t]').forEach(el=>{ const k=el.dataset.t; if(T[l][k]) el.textContent=T[l][k]; });
   document.querySelectorAll('.langs button').forEach(b=>b.classList.toggle('on', b.dataset.l===l));
+  // se la vista MFA è attiva, riallinea titolo/hint dinamici (dipendono dalla modalità)
+  if(typeof MFA!=='undefined' && MFA.mode){ refreshMfaTexts(); }
 }
 function msg(text, ok){ const m=document.getElementById('msg'); m.textContent=text||''; m.className='msg'+(ok?' ok':''); }
 
@@ -165,8 +277,212 @@ async function gateAdmin(){
 async function afterAuth(){
   msg(T[lang].checking);
   const ok = await gateAdmin();
-  if(ok){ msg(T[lang].welcome, true); setTimeout(()=>{ location.href='/panel.html'; }, 600); }
-  else { msg(T[lang].no_admin); }
+  if(!ok){ msg(T[lang].no_admin); return; }
+  // Admin confermato. Prima di entrare nel pannello: secondo fattore (MFA forte).
+  await startMfaGate();
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SECONDO FATTORE (MFA) — sistema NATIVO Supabase (sb.auth.mfa.*)
+   Flusso deciso da getAuthenticatorAssuranceLevel():
+     aal2                       → già verificato col 2° fattore → pannello
+     aal1 + nextLevel aal2      → ha già un fattore → CHALLENGE (chiede codice)
+     aal1 + nextLevel aal1      → nessun fattore   → ENROLL (primo setup col QR)
+   WebAuthn (passkey biometrica) supportato solo se la libreria lo espone.
+   Nessun lockout: errori tecnici → messaggio + possibilità di riprovare,
+   e un bottone "Esci" sempre disponibile.
+   ═══════════════════════════════════════════════════════════════ */
+let MFA = { factorId:null, challengeId:null, mode:null }; // mode: 'challenge' | 'enroll'
+
+// La libreria espone l'MFA WebAuthn? (factorType 'webauthn' + helper webauthn.register)
+function webauthnSupported(){
+  try{
+    return !!(sb && sb.auth && sb.auth.mfa && sb.auth.mfa.webauthn
+      && typeof sb.auth.mfa.webauthn.register === 'function'
+      && window.PublicKeyCredential);
+  }catch(e){ return false; }
+}
+
+function onlyDigits(input){ input.value = input.value.replace(/\D/g,'').slice(0,6); }
+function mfaMsg(text, ok){ const m=document.getElementById('mfaMsg'); if(m){ m.textContent=text||''; m.className='mfa-msg'+(ok?' ok':''); } }
+function showMfaView(){
+  document.getElementById('loginView').style.display='none';
+  document.getElementById('mfa').classList.add('on');
+  setTimeout(()=>{ const c=document.getElementById('mfaCode'); if(c) c.focus(); }, 60);
+}
+// Aggiorna titolo/sottotitolo MFA secondo la modalità e la lingua corrente
+function refreshMfaTexts(){
+  const titleK = MFA.mode==='enroll' ? 'mfa_setup_title' : 'mfa_verify_title';
+  const hintK  = MFA.mode==='enroll' ? 'mfa_setup_hint'  : 'mfa_verify_hint';
+  const tt=document.getElementById('mfaTitle'), hh=document.getElementById('mfaHint');
+  if(tt) tt.textContent = T[lang][titleK];
+  if(hh) hh.textContent = T[lang][hintK];
+  const pl=document.getElementById('mfaPasskeyLabel');
+  if(pl) pl.textContent = MFA.mode==='enroll' ? T[lang].mfa_add_passkey : T[lang].mfa_use_passkey;
+}
+
+async function startMfaGate(){
+  try{
+    const { data, error } = await sb.auth.mfa.getAuthenticatorAssuranceLevel();
+    if(error) throw error;
+    const cur = data && data.currentLevel;
+    const nxt = data && data.nextLevel;
+
+    if(cur === 'aal2'){
+      // Già verificato col secondo fattore in questa sessione.
+      msg(T[lang].welcome, true);
+      setTimeout(()=>{ location.href='/panel.html'; }, 500);
+      return;
+    }
+    if(cur === 'aal1' && nxt === 'aal2'){
+      // L'utente HA già un fattore: chiediamo il codice (challenge).
+      await mfaChallengeExisting();
+      return;
+    }
+    // Nessun fattore (aal1/aal1): primo setup col QR.
+    await mfaEnrollFirst();
+  }catch(e){
+    // Errore tecnico nel leggere il livello: non chiudiamo fuori l'utente.
+    msg(T[lang].mfa_net_err || 'Errore di rete.');
+  }
+}
+
+// CHALLENGE: l'admin ha già un fattore registrato (TOTP e/o WebAuthn).
+async function mfaChallengeExisting(){
+  try{
+    const { data, error } = await sb.auth.mfa.listFactors();
+    if(error) throw error;
+    const totp = (data && data.totp && data.totp[0]) || null;
+    // Preferiamo il TOTP come prompt principale; la passkey resta opzionale.
+    if(totp){
+      MFA.factorId = totp.id; MFA.mode = 'challenge';
+      document.getElementById('mfaQr').classList.remove('on');
+      document.getElementById('mfaSecretBox').classList.remove('on');
+      // mostra il bottone passkey solo se c'è un fattore webauthn verificato e la lib lo espone
+      const hasWebauthn = data && data.all && data.all.some(f=>f.factor_type==='webauthn' && f.status==='verified');
+      togglePasskeyButton(hasWebauthn && webauthnSupported());
+      refreshMfaTexts();
+      showMfaView();
+    } else if(webauthnSupported() && data && data.all && data.all.some(f=>f.factor_type==='webauthn')){
+      // Solo passkey registrata: vai diretto all'autenticazione biometrica.
+      MFA.mode = 'challenge';
+      togglePasskeyButton(true);
+      document.getElementById('mfaCode').style.display='none';
+      document.getElementById('mfaVerifyBtn').style.display='none';
+      refreshMfaTexts(); showMfaView();
+    } else {
+      // Stato incoerente: ricadi sull'enroll per ripristinare un fattore.
+      await mfaEnrollFirst();
+    }
+  }catch(e){ msg(T[lang].mfa_net_err); }
+}
+
+// ENROLL: primo setup. Mostra QR + secret, l'admin scansiona e conferma col codice.
+async function mfaEnrollFirst(){
+  try{
+    // Evita doppioni: se un TOTP non verificato è rimasto da un tentativo precedente, riusalo/rimuovilo.
+    const { data: listData } = await sb.auth.mfa.listFactors();
+    const all = (listData && listData.all) || [];
+    for(const f of all){
+      if(f.factor_type==='totp' && f.status==='unverified'){
+        try{ await sb.auth.mfa.unenroll({ factorId: f.id }); }catch(_){}
+      }
+    }
+    const { data, error } = await sb.auth.mfa.enroll({ factorType:'totp', friendlyName:'Admin' });
+    if(error) throw error;
+    MFA.factorId = data.id; MFA.mode = 'enroll';
+
+    // QR: data.totp.qr_code è un dataURL SVG. Lo iniettiamo in modo sicuro.
+    const qrBox = document.getElementById('mfaQr');
+    qrBox.textContent='';
+    const img = document.createElement('img');
+    img.alt = 'QR'; img.src = data.totp.qr_code;
+    qrBox.appendChild(img); qrBox.classList.add('on');
+
+    // Secret in chiaro come fallback (textContent: niente innerHTML grezzo).
+    document.getElementById('mfaSecret').textContent = data.totp.secret || '';
+    document.getElementById('mfaSecretBox').classList.add('on');
+
+    // Passkey biometrica come fattore aggiuntivo (se la libreria la espone).
+    togglePasskeyButton(webauthnSupported());
+    refreshMfaTexts();
+    showMfaView();
+  }catch(e){
+    msg(T[lang].mfa_enroll_err);
+  }
+}
+
+function togglePasskeyButton(show){
+  const w=document.getElementById('mfaPasskeyWrap');
+  if(w) w.style.display = show ? 'block' : 'none';
+}
+
+// Conferma codice TOTP (vale sia per enroll sia per challenge).
+async function mfaSubmit(){
+  const codeEl=document.getElementById('mfaCode');
+  const code=(codeEl.value||'').replace(/\D/g,'');
+  if(code.length!==6){ mfaMsg(T[lang].mfa_enter_code); return; }
+  if(!MFA.factorId){ mfaMsg(T[lang].mfa_bad_code); return; }
+  const btn=document.getElementById('mfaVerifyBtn'); btn.disabled=true;
+  mfaMsg(T[lang].checking);
+  try{
+    const ch = await sb.auth.mfa.challenge({ factorId: MFA.factorId });
+    if(ch.error) throw ch.error;
+    const challengeId = ch.data.id;
+    const ver = await sb.auth.mfa.verify({ factorId: MFA.factorId, challengeId, code });
+    if(ver.error){
+      // Codice errato/scaduto: NON chiudiamo fuori, lasciamo riprovare.
+      mfaMsg(T[lang].mfa_bad_code); btn.disabled=false; codeEl.select(); return;
+    }
+    mfaMsg(MFA.mode==='enroll' ? T[lang].mfa_setup_done : T[lang].mfa_verified, true);
+    setTimeout(()=>{ location.href='/panel.html'; }, 600);
+  }catch(e){
+    mfaMsg(T[lang].mfa_net_err); btn.disabled=false;
+  }
+}
+
+// Passkey biometrica WebAuthn (Face ID / impronta / Windows Hello).
+// In enroll: registra un nuovo fattore. In challenge: autentica con la passkey esistente.
+async function mfaPasskey(){
+  if(!webauthnSupported()){ mfaMsg(T[lang].mfa_passkey_err); return; }
+  const btn=document.getElementById('mfaPasskeyBtn'); btn.disabled=true;
+  mfaMsg(T[lang].checking);
+  try{
+    if(MFA.mode==='enroll'){
+      // register(): enroll + cerimonia browser + verify in un colpo solo.
+      const { error } = await sb.auth.mfa.webauthn.register({ friendlyName:'Admin biometric' });
+      if(error) throw error;
+      // Dopo la registrazione la sessione sale ad aal2: entra.
+      mfaMsg(T[lang].mfa_passkey_added, true);
+      setTimeout(()=>{ location.href='/panel.html'; }, 700);
+    } else {
+      // authenticate(): challenge + cerimonia browser + verify della passkey esistente.
+      const { error } = await sb.auth.mfa.webauthn.authenticate({});
+      if(error) throw error;
+      mfaMsg(T[lang].mfa_verified, true);
+      setTimeout(()=>{ location.href='/panel.html'; }, 600);
+    }
+  }catch(e){
+    // L'utente può aver annullato il Face ID, oppure errore tecnico: riprova o usa il codice.
+    mfaMsg(T[lang].mfa_passkey_err); btn.disabled=false;
+  }
+}
+
+function copySecret(){
+  const s=document.getElementById('mfaSecret').textContent||'';
+  if(!s) return;
+  try{ navigator.clipboard.writeText(s); mfaMsg(T[lang].mfa_secret_copied, true); }catch(e){}
+}
+
+// "Esci" dalla vista MFA: chiude la sessione e torna al login pulito (niente lockout).
+async function mfaExit(){
+  try{ await sb.auth.signOut(); }catch(e){}
+  MFA = { factorId:null, challengeId:null, mode:null };
+  document.getElementById('mfa').classList.remove('on');
+  document.getElementById('loginView').style.display='';
+  document.getElementById('mfaCode').style.display='';
+  document.getElementById('mfaVerifyBtn').style.display='';
+  msg('');
 }
 async function pwdLogin(){
   if(!sb){ msg('Supabase non caricato'); return; }
@@ -200,8 +516,10 @@ async function bioLogin(){
   }catch(e){ msg(T[lang].no_bio); document.getElementById('email').focus(); }
 }
 setLang(lang);
-// Se gia loggato e admin, salta il login
-if(sb){ gateAdmin().then(ok=>{ if(ok) location.href='/panel.html'; }); }
+// Se gia loggato e admin: NON si salta dritti al pannello.
+// Si passa comunque dal gate MFA (che manda al pannello solo se la sessione è già aal2,
+// altrimenti mostra challenge o primo setup del secondo fattore).
+if(sb){ gateAdmin().then(ok=>{ if(ok) startMfaGate(); }); }
 </script>
 </body>
 </html>

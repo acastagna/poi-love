@@ -45,7 +45,7 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Hel
 
 # Informativa sulla privacy di POI•LOVE
 
-*Ultimo aggiornamento: 26/06/2026*
+*Ultimo aggiornamento: 27/06/2026*
 
 POI•LOVE è la mappa comunitaria dei luoghi amati: uno spazio dove le persone segnano, raccontano e condividono i posti a cui tengono. Per farlo funzionare trattiamo alcuni tuoi dati personali. Questa informativa ti spiega, in modo onesto e leggibile, quali dati raccogliamo, perché, su quale base giuridica, con chi li condividiamo, per quanto li conserviamo e quali diritti hai.
 
@@ -117,7 +117,19 @@ Alcuni di questi contenuti possono includere dati di **altre persone** (ad esemp
 
 *Perché:* per far funzionare il sistema a punti, riconoscere i tuoi contributi e prevenire abusi e frodi. Registriamo solo le azioni che generano punti, non ogni singolo clic.
 
-### 2.8 Cosa NON salviamo
+### 2.8 Segnalazioni e moderazione
+- Quando **segnali** un contenuto o un profilo, registriamo la **segnalazione** (cosa hai segnalato, il motivo, la data) e chi l'ha inviata.
+- Quando interveniamo a fini di moderazione, registriamo le **azioni di moderazione** (ad esempio sospensione, blocco, rimozione di un contenuto) e il loro motivo.
+
+*Perché:* per mantenere la piattaforma sicura, gestire le segnalazioni, proteggere gli utenti e adempiere agli obblighi di legge. Conserviamo questi dati anche come prova in caso di abusi o contestazioni.
+
+### 2.9 Abbonamenti a pagamento
+- Se attivi un **abbonamento** a uno dei tier a pagamento (**Professionista, Sostenitore, Mecenate**), trattiamo i dati necessari a gestirlo: tier scelto, stato dell'abbonamento, data di attivazione e di rinnovo o cessazione, e i vantaggi collegati.
+- I **dati di pagamento** veri e propri (ad esempio i dati della carta) sono trattati direttamente dal fornitore di pagamento che useremo al momento dell'attivazione, secondo la sua informativa: noi non conserviamo i numeri di carta.
+
+*Perché:* per attivare e gestire l'abbonamento, riconoscerti i vantaggi del tier, emettere eventuali documenti contabili e adempiere agli obblighi fiscali e di legge.
+
+### 2.10 Cosa NON salviamo
 - La **cronologia delle ricerche** di indirizzi non viene conservata nel nostro database: resta nella sessione.
 - La **dettatura vocale**, se la usi, viene convertita in testo dal tuo dispositivo o browser: **non registriamo né conserviamo l'audio**.
 
@@ -136,7 +148,12 @@ Ogni trattamento ha una base giuridica precisa (art. 13 legge 124/2024, art. 6 G
 | Contenuti (POI, liste, itinerari, follow, compagnie) | **Esecuzione del contratto** |
 | Email di invito a compagnie | **Consenso** tuo all'invio e tua dichiarazione di avere il consenso del destinatario |
 | Punti, eventi, referral | **Legittimo interesse** a far funzionare la gamification e a prevenire frodi |
+| Messaggi all'assistente AI (ILLI e copilota amministrativo) | **Esecuzione del contratto** per fornirti la funzione che hai richiesto, e nostro **legittimo interesse** a far funzionare e migliorare l'assistente |
+| Segnalazioni e azioni di moderazione | **Legittimo interesse** alla sicurezza della piattaforma e degli utenti, e **obbligo legale** quando dobbiamo conservarle o agire |
+| Dati di gestione dell'abbonamento a pagamento | **Esecuzione del contratto** di abbonamento e **obbligo legale** per gli adempimenti contabili e fiscali |
 | Statistiche aggregate di utilizzo | **Legittimo interesse**, in forma anonima o pseudonimizzata |
+
+In sintesi, le basi giuridiche su cui ci appoggiamo sono il **consenso** (per geolocalizzazione, foto e inviti), l'**esecuzione del contratto** (per account, contenuti, assistente AI e abbonamenti), il **legittimo interesse** (per sicurezza, prevenzione di abusi e frodi, gamification e statistiche aggregate) e l'**obbligo legale** (per moderazione, contabilità e fisco quando previsto dalla legge).
 
 Quando la base è il **consenso** o il **legittimo interesse**, hai sempre il diritto di revocare il consenso o di opporti (vedi sezione 8).
 
@@ -180,28 +197,32 @@ Lavoriamo perché le impostazioni più prudenti siano quelle predefinite (ad ese
 
 ## 5. Con chi condividiamo i dati (servizi terzi e destinatari)
 
-Per far funzionare POI•LOVE ci appoggiamo ad alcuni fornitori, che trattano i dati per nostro conto o come destinatari. Ecco chi sono, cosa ricevono e dove si trovano i loro server.
+Per far funzionare POI•LOVE ci appoggiamo ad alcuni fornitori esterni, che trattano i dati come nostri responsabili (sub-responsabili) o come destinatari autonomi. La legge n. 124/2024 e il GDPR ci impongono di essere trasparenti su chi sono, su cosa ricevono e su dove vengono trattati i dati. Ecco l'elenco completo.
 
 | Fornitore | Cosa riceve | A cosa serve | Dove |
 |-----------|-------------|--------------|------|
-| **Supabase** | Database, autenticazione e archiviazione: profili, POI, foto, contenuti, punti | Infrastruttura dell'app (account, dati, storage) | Server nell'**Unione Europea** |
-| **Google** (login OAuth e Google Places) | Login: email, nome, avatar. Places: nomi dei luoghi cercati e coordinate | Accesso con Google; informazioni e valutazioni sui luoghi | **Stati Uniti** |
+| **Supabase** | Backend, autenticazione e archiviazione: profili, POI, foto, contenuti, punti, abbonamenti, segnalazioni | Infrastruttura dell'app (account, database, storage) | Hosting nell'**Unione Europea**, con possibili componenti negli **Stati Uniti** |
+| **Google (login OAuth)** | Email, nome, avatar del tuo account Google | Accesso con Google | **Stati Uniti** |
+| **Google (Google Places API)** | Il testo della ricerca di un luogo e le coordinate della zona | Ottenere informazioni reali sui posti: nome, valutazioni, tipo di luogo | **Stati Uniti** (e altri server Google fuori dall'UE), con garanzie adeguate |
 | **X (Twitter)** e **LinkedIn** (login OAuth) | Email, nome/handle, avatar | Accesso con il tuo account | **Stati Uniti** |
-| **OpenAI** (modello gpt-4o-mini, tramite nostro proxy) | Le domande che poni all'assistente **ILLI**, che possono includere la città o la zona di cui parli | Risposte dell'assistente di viaggio | **Stati Uniti** |
+| **OpenAI** | I **messaggi** che invii all'assistente AI **ILLI** e al **copilota amministrativo**, che possono includere la città o la zona di cui parli | Elaborare le risposte dell'assistente AI | **Stati Uniti**, con garanzie adeguate |
+| **Anthropic** | I **messaggi** che invii all'assistente AI **ILLI** e al **copilota amministrativo**, che possono includere la città o la zona di cui parli | Elaborare le risposte dell'assistente AI | **Stati Uniti**, con garanzie adeguate |
 | **OpenStreetMap / Nominatim / Overpass** | Coordinate e testo dell'indirizzo cercato | Ricerca luoghi e conversione tra indirizzi e coordinate | Server in **Europa** |
+
+A seconda della funzione e della configurazione, i messaggi inviati all'assistente AI possono essere elaborati da **OpenAI** oppure da **Anthropic**. In entrambi i casi i server sono negli **Stati Uniti** e il trattamento avviene secondo l'informativa del fornitore. **Non inserire dati sensibili o riservati** (ad esempio dati su salute, dati di altre persone, password o documenti) nelle chat con l'assistente AI.
 
 Non vendiamo i tuoi dati e non li cediamo a terzi per finalità pubblicitarie.
 
 Con i fornitori che trattano dati per nostro conto stipuliamo, dove previsto, accordi sul trattamento dei dati (DPA), e teniamo aggiornato un registro dei trattamenti e dei destinatari, come richiesto dalla legge.
 
 ### 5.1 Trasferimenti fuori dall'Albania e dall'Unione Europea
-Alcuni fornitori (in particolare **OpenAI** e **Google**) hanno server negli **Stati Uniti**. Inviare i tuoi dati lì costituisce un trasferimento verso un Paese terzo, che gli Stati Uniti, in generale, non sono considerati adeguati né dall'Albania né dall'UE.
+Alcuni fornitori (in particolare **OpenAI**, **Anthropic** e **Google**) hanno server negli **Stati Uniti**, e anche **Supabase** può avere componenti negli Stati Uniti. Inviare i tuoi dati lì costituisce un trasferimento verso un Paese terzo, che gli Stati Uniti, in generale, non sono considerati adeguati né dall'Albania né dall'UE.
 
 Per rendere lecito questo trasferimento ci basiamo, a seconda dei casi, su:
 - **garanzie contrattuali adeguate** (ad esempio clausole tipo di protezione dei dati) offerte da questi fornitori, e, dove richiesto dalla normativa albanese, sull'**autorizzazione preventiva dell'Autorità (Commissario)**;
 - in mancanza di tali garanzie, il tuo **consenso esplicito e informato sui rischi** del trasferimento, ad esempio quando scegli di usare l'assistente ILLI o la ricerca di luoghi che richiedono questi servizi.
 
-Trasferire dati negli Stati Uniti comporta che autorità di quel Paese possano, in certi casi, accedervi con tutele diverse da quelle europee e albanesi. Cerchiamo di **minimizzare** i dati inviati: ad esempio all'assistente arrivano le tue domande e la zona di cui parli, non il tuo nome o il tuo account. Se non vuoi che certi dati lascino l'area UE/Albania, puoi evitare di usare le funzioni che si appoggiano a questi fornitori (assistente ILLI, ricerca tramite Google Places).
+Trasferire dati negli Stati Uniti comporta che autorità di quel Paese possano, in certi casi, accedervi con tutele diverse da quelle europee e albanesi. Cerchiamo di **minimizzare** i dati inviati: ad esempio all'assistente AI (OpenAI o Anthropic) arrivano i tuoi messaggi e la zona di cui parli, non il tuo nome o il tuo account; e a Google Places arrivano il testo della ricerca e la zona, non la tua identità. Se non vuoi che certi dati lascino l'area UE/Albania, puoi evitare di usare le funzioni che si appoggiano a questi fornitori (assistente ILLI, copilota amministrativo, ricerca tramite Google Places). E in ogni caso, come ricordato sopra, non inserire dati sensibili nelle chat con l'assistente AI.
 
 ---
 
@@ -214,6 +235,9 @@ Trasferire dati negli Stati Uniti comporta che autorità di quel Paese possano, 
 | Posizione GPS | Conservata solo se la salvi dentro un contenuto (un POI, una tappa). Non teniamo uno storico continuo dei tuoi spostamenti |
 | Eventi di gamification e referral | Per il tempo necessario al funzionamento del sistema a punti e alla prevenzione delle frodi, con cancellazioni periodiche dei dati più vecchi |
 | Email di invito a compagnie | Per il tempo necessario a gestire l'invito |
+| Messaggi all'assistente AI | Il tempo necessario a fornirti la risposta e a far funzionare l'assistente. La conservazione lato fornitore (OpenAI, Anthropic) segue le rispettive informative |
+| Segnalazioni e azioni di moderazione | Per il tempo necessario alla sicurezza della piattaforma e, dove richiesto, per adempiere a obblighi di legge o difendere un diritto |
+| Dati di gestione dell'abbonamento | Per la durata dell'abbonamento e, per i documenti contabili e fiscali, per il periodo previsto dalla legge |
 | Dati di autenticazione | Finché esiste l'account |
 
 Quando un dato non è più necessario per le finalità per cui è stato raccolto, lo cancelliamo o lo rendiamo anonimo. Alcuni dati possono essere conservati più a lungo se serve per adempiere a obblighi di legge o per difendere un diritto in sede legale.

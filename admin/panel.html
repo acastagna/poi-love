@@ -698,6 +698,23 @@ async function gate(){
     location.href='/index.html';
     return;
   }
+  // ── Secondo fattore (MFA forte) OBBLIGATORIO ──
+  // Non basta is_admin + sessione: la sessione deve essere salita ad aal2
+  // (codice authenticator o passkey biometrica verificati). Così non si entra
+  // nel pannello col solo Google. Se non è aal2, si torna al login per completare l'MFA.
+  // NON facciamo signOut qui: la sessione resta valida così index.html può fare
+  // direttamente la challenge senza ri-loggare.
+  try{
+    const { data: aal } = await sb.auth.mfa.getAuthenticatorAssuranceLevel();
+    if(!aal || aal.currentLevel !== 'aal2'){
+      location.href='/index.html';
+      return;
+    }
+  }catch(e){
+    // In caso di errore tecnico nel leggere il livello, per sicurezza si esce al login.
+    location.href='/index.html';
+    return;
+  }
   ME = data;
   // popola intestazione utente
   document.getElementById('meName').textContent = ME.username || 'admin';
