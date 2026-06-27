@@ -184,10 +184,14 @@ security definer
 set search_path = public
 as $$
 declare
-  jwt_role text := coalesce((current_setting('request.jwt.claims', true)::json)->>'role', '');
+  claims   text := current_setting('request.jwt.claims', true);
+  jwt_role text := coalesce((claims::json)->>'role', '');
   admin_op text := coalesce(current_setting('app.admin_op', true), '');
 begin
-  if jwt_role <> 'service_role' then
+  -- Blocca solo le richieste via API client (PostgREST: anon/authenticated). Le connessioni dirette
+  -- al DB (console SQL, psql, API Management) non portano claims JWT: sono fidate (richiedono gia le
+  -- credenziali del database) e possono promuovere ad admin. Il browser resta bloccato.
+  if claims is not null and jwt_role <> 'service_role' then
     new.points := old.points;
     new.special_tier := old.special_tier;
     if old.referred_by is not null then
