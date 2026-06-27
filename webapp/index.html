@@ -2055,23 +2055,13 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
         <div class="pub-toggle-icon"><i class="ph-duotone ph-eye"></i></div>
         <div class="pub-toggle-text">
           <div class="pub-toggle-title" data-t="prof_pub_toggle">Come ti vedono gli altri</div>
-          <div class="pub-toggle-sub" data-t="foll_preview">Anteprima del tuo profilo pubblico: POI, itinerari, follower</div>
         </div>
         <i class="ph-duotone ph-caret-right pub-toggle-arrow"></i>
       </button>
-      <div class="profile-sec">
-        <div class="prof-sec-lbl">
-          <span data-t="prof_lists">Le mie liste</span>
-          <button class="prof-sec-add" onclick="openAddList()">
-            <i class="ph-duotone ph-plus"></i> <span data-t="prof_new_list">Nuova lista</span>
-          </button>
-        </div>
-        <div id="listsContainer"><!-- popolato da loadMyLists() con le liste reali da Supabase --></div>
-      </div>
-      <!-- LE MIE ROTTE STORICHE -->
-      <div class="profile-sec">
-        <div class="prof-sec-lbl"><span data-t="prof_my_routes">Le mie rotte storiche</span><span data-t="prof_routes_on_map" style="font-size:10px;font-weight:400;color:var(--muted)">selezionate sulla mappa</span></div>
-        <div id="myRoutesContainer"><!-- popolato da renderMyRoutes(): ufficiali col badge "Ufficiale", utente col pennino --></div>
+      <!-- Le mie liste (nei POI come sub-tab) e Le mie rotte storiche rimosse dal profilo su richiesta (28/06) -->
+      <div class="profile-sec" style="display:none">
+        <div id="listsContainer"></div>
+        <div id="myRoutesContainer"></div>
       </div>
 
       <!-- SEGUITI / BLOCCATI -->
@@ -2103,18 +2093,8 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
         </div>
       </div>
 
-      <div class="profile-sec">
-        <div class="prof-sec-lbl"><span data-t="prof_tags">I miei tag</span>
-          <button class="add-tag-btn" onclick="showTagInput()"><i class="ph-duotone ph-plus"></i> <span data-t="prof_new_tag">Aggiungi</span></button>
-        </div>
-        <div class="tags-cloud" id="tagsContainer">
-          <span class="tag-chip">storia</span>
-          <span class="tag-chip">gastronomia</span>
-          <span class="tag-chip">fotografia</span>
-          <span class="tag-chip">balcani</span>
-          <span class="tag-chip">benessere</span>
-        </div>
-      </div>
+      <!-- I miei tag rimossi dal profilo su richiesta (28/06) -->
+      <div class="profile-sec" style="display:none"><div id="tagsContainer"></div></div>
       <div class="profile-sec">
         <div class="prof-sec-lbl">
           <span data-t="prof_my_poi">I miei POI</span>
