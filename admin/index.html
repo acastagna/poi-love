@@ -1,0 +1,188 @@
+<!--
+  © Alessandro Castagna — 321.al / EVOLAB
+  Tutti i diritti riservati. Uso non autorizzato vietato.
+  info@321.al · https://321.al
+-->
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>POI•LOVE · Accesso riservato</title>
+<style>
+:root{
+  --red:#D42B2B; --gold:#E8B04B; --ink:#16110d; --paper:#f4ece0;
+  --glass:rgba(22,16,12,.42); --line:rgba(244,236,224,.18);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  color:var(--paper); background:#0c0907; overflow:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+/* ── Scena: il cammino (evocato, non letterale) ── */
+.scene{position:fixed;inset:0;overflow:hidden}
+.scene .photo{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(120% 90% at 50% 8%, rgba(232,176,75,.30), transparent 55%),
+    linear-gradient(180deg, rgba(12,9,7,.15) 0%, rgba(12,9,7,.55) 55%, rgba(12,9,7,.92) 100%),
+    url('https://image.pollinations.ai/prompt/lone%20winding%20earth%20trail%20at%20golden%20sunrise%20leading%20to%20a%20distant%20horizon%2C%20rolling%20hills%2C%20warm%20cinematic%20light%2C%20sense%20of%20long%20journey%20and%20quest%2C%20dramatic%20soft%20sky%2C%20no%20people%2C%20no%20signs%2C%20no%20text%2C%20atmospheric%20photographic?width=1600&height=1100&nologo=true&seed=74') center/cover no-repeat;
+  transform:scale(1.06); filter:saturate(1.04);
+  animation:driftIn 1.6s ease-out both, slowPan 38s ease-in-out 1.6s infinite alternate;
+}
+@keyframes driftIn{from{opacity:0;transform:scale(1.12)}to{opacity:1;transform:scale(1.06)}}
+@keyframes slowPan{from{transform:scale(1.06) translateY(0)}to{transform:scale(1.1) translateY(-2%)}}
+.scene .grain{position:absolute;inset:0;opacity:.05;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+/* ── Card di accesso ── */
+.wrap{position:relative;height:100%;display:flex;align-items:center;justify-content:center;padding:24px}
+.card{
+  width:100%;max-width:380px;
+  background:var(--glass);backdrop-filter:blur(22px) saturate(1.2);-webkit-backdrop-filter:blur(22px) saturate(1.2);
+  border:1px solid var(--line);border-radius:26px;
+  padding:30px 26px 24px;box-shadow:0 30px 80px rgba(0,0,0,.55);
+  animation:rise .7s cubic-bezier(.2,.8,.2,1) .25s both;
+}
+@keyframes rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+.brand{display:flex;align-items:center;justify-content:center;gap:9px;font-weight:900;letter-spacing:.5px;font-size:20px}
+.brand .h{color:var(--red)}
+.brand .tag{font-size:9px;font-weight:800;letter-spacing:2px;color:var(--gold);border:1px solid var(--gold);
+  border-radius:20px;padding:3px 9px;margin-left:4px;text-transform:uppercase}
+.lead{text-align:center;margin:14px 0 4px}
+.lead h1{font-size:21px;font-weight:800;line-height:1.2}
+.lead p{font-size:12.5px;color:rgba(244,236,224,.66);margin-top:5px;font-style:italic}
+
+.bio{margin:22px 0 6px;width:100%;border:none;cursor:pointer;font-family:inherit;
+  border-radius:16px;padding:15px;color:#fff;font-size:15px;font-weight:800;letter-spacing:.3px;
+  background:linear-gradient(135deg,var(--red),#9a1d1d);box-shadow:0 10px 26px rgba(212,43,43,.4);
+  display:flex;align-items:center;justify-content:center;gap:10px;transition:transform .12s, box-shadow .2s;position:relative;overflow:hidden}
+.bio:hover{transform:translateY(-1px);box-shadow:0 14px 32px rgba(212,43,43,.5)}
+.bio:active{transform:scale(.98)}
+.bio .ring{width:26px;height:26px;border-radius:50%;border:2px solid rgba(255,255,255,.85);
+  display:flex;align-items:center;justify-content:center;animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,.45)}50%{box-shadow:0 0 0 8px rgba(255,255,255,0)}}
+.bio .fp{font-size:15px;line-height:1}
+.bio-hint{font-size:10.5px;color:rgba(244,236,224,.5);text-align:center;margin-bottom:14px}
+
+.sep{display:flex;align-items:center;gap:10px;color:rgba(244,236,224,.4);font-size:10px;letter-spacing:1px;margin:8px 0 14px;text-transform:uppercase}
+.sep::before,.sep::after{content:"";flex:1;height:1px;background:var(--line)}
+
+.field{width:100%;margin-bottom:11px}
+.field input{width:100%;border:1px solid var(--line);background:rgba(244,236,224,.06);color:var(--paper);
+  border-radius:13px;padding:12px 14px;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s}
+.field input::placeholder{color:rgba(244,236,224,.4)}
+.field input:focus{border-color:var(--gold)}
+.enter{width:100%;border:1px solid var(--line);background:rgba(244,236,224,.1);color:var(--paper);
+  border-radius:13px;padding:12px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;transition:background .2s}
+.enter:hover{background:rgba(244,236,224,.18)}
+.msg{font-size:12px;text-align:center;margin-top:12px;min-height:16px;color:#ffb4b4}
+.msg.ok{color:#9be6a8}
+
+.langs{display:flex;justify-content:center;gap:6px;margin-top:18px}
+.langs button{border:1px solid var(--line);background:transparent;color:rgba(244,236,224,.6);
+  border-radius:20px;padding:5px 12px;font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;transition:all .2s}
+.langs button.on{background:var(--gold);color:#16110d;border-color:var(--gold)}
+.foot{position:fixed;bottom:14px;left:0;right:0;text-align:center;font-size:10px;color:rgba(244,236,224,.35)}
+</style>
+</head>
+<body>
+<div class="scene"><div class="photo"></div><div class="grain"></div></div>
+
+<div class="wrap">
+  <div class="card">
+    <div class="brand">POI<span class="h">•</span>LOVE<span class="tag">Admin</span></div>
+    <div class="lead">
+      <h1 data-t="title">Accesso riservato</h1>
+      <p data-t="subtitle">Solo chi conosce il cammino prosegue.</p>
+    </div>
+
+    <button class="bio" id="bioBtn" onclick="bioLogin()">
+      <span class="ring"><span class="fp">&#128274;</span></span>
+      <span data-t="bio">Accedi con la biometria</span>
+    </button>
+    <div class="bio-hint" id="bioHint" data-t="bio_hint">Tocco, volto o passkey del dispositivo</div>
+
+    <div class="sep"><span data-t="or">oppure</span></div>
+
+    <div class="field"><input id="email" type="email" placeholder="Email" autocomplete="username"></div>
+    <div class="field"><input id="pwd" type="password" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')pwdLogin()"></div>
+    <button class="enter" onclick="pwdLogin()" data-t="enter">Entra</button>
+    <div class="msg" id="msg"></div>
+
+    <div class="langs">
+      <button data-l="it" class="on" onclick="setLang('it')">IT</button>
+      <button data-l="sq" onclick="setLang('sq')">SQ</button>
+      <button data-l="en" onclick="setLang('en')">EN</button>
+    </div>
+  </div>
+</div>
+<div class="foot">POI•LOVE · 321.AL / EVOLAB · accesso amministrativo</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL='https://ptppxwlafswfhbueakjt.supabase.co';
+const SUPABASE_ANON='sb_publishable_PC1xQ8XiQK9jpzwsAlFLxw_E-PKN40V';
+const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON) : null;
+
+const T={
+  it:{title:'Accesso riservato', subtitle:'Solo chi conosce il cammino prosegue.', bio:'Accedi con la biometria', bio_hint:'Tocco, volto o passkey del dispositivo', or:'oppure', enter:'Entra', no_admin:'Questo profilo non ha accesso amministrativo.', bad:'Email o password non validi.', checking:'Verifico…', no_bio:'Biometria non disponibile su questo dispositivo, usa email e password.', welcome:'Benvenuto. Apro il pannello…'},
+  sq:{title:'Hyrje e rezervuar', subtitle:'Vetëm kush e njeh rrugën vazhdon.', bio:'Hyr me biometri', bio_hint:'Prekje, fytyrë ose passkey i pajisjes', or:'ose', enter:'Hyr', no_admin:'Ky profil nuk ka qasje administrative.', bad:'Email ose fjalëkalim i pavlefshëm.', checking:'Po verifikoj…', no_bio:'Biometria nuk disponohet, përdor email dhe fjalëkalim.', welcome:'Mirësevini. Po hap panelin…'},
+  en:{title:'Restricted access', subtitle:'Only those who know the path go on.', bio:'Sign in with biometrics', bio_hint:'Device touch, face or passkey', or:'or', enter:'Enter', no_admin:'This profile has no admin access.', bad:'Invalid email or password.', checking:'Checking…', no_bio:'Biometrics unavailable, use email and password.', welcome:'Welcome. Opening the panel…'}
+};
+let lang = (localStorage.getItem('admin_lang')) || (navigator.language||'it').slice(0,2);
+if(!T[lang]) lang='it';
+function setLang(l){
+  lang=l; localStorage.setItem('admin_lang', l);
+  document.documentElement.lang=l;
+  document.querySelectorAll('[data-t]').forEach(el=>{ const k=el.dataset.t; if(T[l][k]) el.textContent=T[l][k]; });
+  document.querySelectorAll('.langs button').forEach(b=>b.classList.toggle('on', b.dataset.l===l));
+}
+function msg(text, ok){ const m=document.getElementById('msg'); m.textContent=text||''; m.className='msg'+(ok?' ok':''); }
+
+// Dopo il login: il profilo deve essere admin (is_admin) — verifica server-side via RLS
+async function gateAdmin(){
+  const { data:{ user } } = await sb.auth.getUser();
+  if(!user) return false;
+  const { data, error } = await sb.from('profiles').select('is_admin,moderation_status').eq('id', user.id).single();
+  if(error || !data || !data.is_admin || data.moderation_status!=='active'){
+    await sb.auth.signOut();
+    return false;
+  }
+  return true;
+}
+async function afterAuth(){
+  msg(T[lang].checking);
+  const ok = await gateAdmin();
+  if(ok){ msg(T[lang].welcome, true); setTimeout(()=>{ location.href='/panel.html'; }, 600); }
+  else { msg(T[lang].no_admin); }
+}
+async function pwdLogin(){
+  if(!sb){ msg('Supabase non caricato'); return; }
+  const email=document.getElementById('email').value.trim();
+  const pwd=document.getElementById('pwd').value;
+  if(!email||!pwd){ msg(T[lang].bad); return; }
+  msg(T[lang].checking);
+  const { error } = await sb.auth.signInWithPassword({ email, password: pwd });
+  if(error){ msg(T[lang].bad); return; }
+  afterAuth();
+}
+// Biometria: passkey del dispositivo (WebAuthn). Se la piattaforma non la espone, ripiega su email.
+async function bioLogin(){
+  try{
+    if(!window.PublicKeyCredential || !(await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable())){
+      msg(T[lang].no_bio); document.getElementById('email').focus(); return;
+    }
+    // Flusso passkey completo (challenge server-side) collegato nel prossimo step; per ora la UI e pronta
+    msg(T[lang].no_bio); document.getElementById('email').focus();
+  }catch(e){ msg(T[lang].no_bio); document.getElementById('email').focus(); }
+}
+setLang(lang);
+// Se gia loggato e admin, salta il login
+if(sb){ gateAdmin().then(ok=>{ if(ok) location.href='/panel.html'; }); }
+</script>
+</body>
+</html>
