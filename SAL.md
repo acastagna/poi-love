@@ -1,7 +1,61 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
-> **Prossima ripresa: sabato 27/06/2026 ore 18:00.** Checkpoint giornata: `checkpoint-2026-06-26-illi-legal-luoghi`.
-> **Priorità assoluta della ripresa: costruire il PANNELLO ADMIN (admin.poilove.com), oggi inesistente** (moderazione, blocco iscritti, limiti AI, gamification, analytics), poi presentazione aggiornata con screenshot. Vedi TODO.
+> **Prossima ripresa: da definire.** Checkpoint sessione: `ae70c35` (HEAD su origin/main, 28/06/2026 notte).
+> **Priorità prossima sessione (vedi TODO riscritto): landing profilo personale, condivisione POI col teaser, sistema email + AcumbaMail nell'admin, presentazione 1/07, validazione legale, Admin FASE 2.**
+
+## Sessione 28/06/2026 (sera e notte) — ILLI, Itinerari, profilo, fix vari + TODO riscritto
+
+Sessione lunghissima, tutto deployato e verificato dal vivo. Commit fino a `ae70c35`.
+
+- **Itinerari: Liste → Rotte Storiche**. Sub-tab Liste rimosso (le liste sono gia nei POI), al suo posto Rotte Storiche con intro tematica + badge "presto disponibili", 3 lingue SQ/IT/EN.
+- **Fix AI suggerimenti POI**: il "suggerisci nome" ora legge i locali reali da OSM (`_realNamesNear`) invece di inventare dal nome della via (caso "Contra della Ceramica" → "Pizzeria Scaligera"); la descrizione AI non allucina piu. Verificato dal vivo.
+- **ILLI cerca davvero**: il grounding eredita la categoria dai messaggi precedenti (`_lastPlaceCatFromHistory`), i follow-up ("E domani?") continuano a cercare posti reali; il prompt vieta lo scarica-barile e le risposte vaghe. Verificato che il contesto si eredita.
+- **Profilo snellito**: fascia "Come mi vedono" piu sottile; rimosse Le mie liste, Le mie rotte storiche, I miei tag; restano Connessioni e I miei POI. Handle apre solo la modifica handle (non piu "Diffondi"); handle sempre slug pulito (minuscolo, niente %20), il nome resta come scritto; la statistica "Liste" porta ai POI/Liste.
+- **Mega-ricerca nel tab POI**: ogni riga ha `data-search` con nome+categoria+indirizzo+citta+descrizione+tag; `_poiSearch` cerca li dentro. Verificato dal vivo.
+- **Termini/Privacy nel footer**: pulsanti bianchi ai lati del logo nel footer nero della mappa, e a pie di pagina nella schermata di accesso.
+- **TODO.md riscritto** ordinato e prioritizzato.
+
+**Design fissato (NON ancora implementato), in memoria `poi-share-and-integrations`:**
+- Condivisione POI = teaser misterioso (zona + immagine AI + CTA; niente titolo/foto/indirizzo reali fino alla registrazione).
+- Landing profilo personale (sfondo + avatar + "Entra in POI•LOVE"), generata per ogni profilo.
+- Sistema email admin + AcumbaMail (template + webhook), primo mattone del middleware.
+- SOS sanitario = progetto a se (delicato, da non improvvisare).
+
+## Sessione 27/06/2026 — Pannello admin, MFA forte, legali aggiornati, fix AI suggerimenti POI
+
+Giornata molto densa. Tutto deployato e verificato dal vivo. Commit chiave fino a `4ddb78b` su origin/main.
+
+**Pannello admin (`admin.poilove.com`) costruito da zero e messo online**
+
+- Sottodominio `admin.poilove.com` creato su Plesk: vhost, SSL Let's Encrypt, `.htaccess` no-cache. DocumentRoot `/var/www/vhosts/poilove.com/admin.poilove.com/`.
+- Login (`admin/index.html`): estetica "cammino" (immagine evocativa, card glass), trilingua IT/SQ/EN, accesso con Google OAuth (nessuna password). URL `admin.poilove.com` autorizzato negli allowed-redirect Supabase.
+- Database: migration `012_admin.sql` applicata. Introduce: ruolo `is_admin` sui profili, stato moderazione utenti, tabelle `reports` e `admin_audit_log`, limiti AI per tier in `gamification_config`, RLS solo-admin via funzione `is_admin()` SECURITY DEFINER, trigger anti-tamper esteso, RPC `admin_set_user_status`, funzione `is_active()` con policy RESTRICTIVE che rende il ban davvero efficace sul lato data API. Alessandro (it@altrostile.app) promosso admin.
+- Proxy AI sicuro `admin-ai` (Edge Function) deployato: gate `is_admin` + `aal2`, tetto di spesa giornaliero, supporto Claude e gpt-4o, `service_role` mai esposta al client.
+- Pannello `admin/panel.html` a 7 sezioni: dashboard KPI, moderazione, utenti, limiti AI, copilota Claude, crea POI/percorsi, audit log. XSS neutralizzato, gate `aal2` su tutte le chiamate privilegiate.
+
+**MFA forte attiva e verificata dal vivo**
+
+- Migration `013` applicata: `is_admin()` ora richiede `aal2` (secondo fattore), enforcement lato server.
+- TOTP authenticator: enroll via QR nel pannello, confermato dall'utente con codice reale, verificato dal vivo.
+- Biometrico WebAuthn: predisposto nel client (codice pronto), ma il dashboard Supabase ha restituito 422 all'abilitazione. Resta da abilitare quando Supabase espone correttamente l'API (azione manuale nel dashboard).
+
+**Legali aggiornati e online**
+
+- `poilove.com/privacy` e `poilove.com/terms` aggiornati al 27/06: aggiunti sub-responsabili del trattamento (Google Places, OpenAI, Anthropic, Supabase), sezioni moderazione, abbonamenti, trasferimenti internazionali, conformi legge AL 124/2024 e GDPR. Resta il disclaimer "bozza da validare da un legale" prima del lancio pubblico.
+
+**Fix bug AI suggerimenti POI (deployato su poilove.com)**
+
+- Il "suggerisci nome" non inventa più dal nome della via: ora cerca i nomi reali dei locali vicini su OpenStreetMap via `_realNamesNear` (caso "Contrà della Ceramica" che suggeriva un nome finto per una pizzeria).
+- Il prompt della descrizione AI vieta esplicitamente di inventare fatti e di farsi influenzare dall'indirizzo. Verificato dal vivo: suggerisce "Pizzeria Scaligera".
+
+**Cosa resta (prossime sessioni)**
+
+- Admin FASE 2 (vedi TODO): icone Phosphor duotone ovunque nel pannello, tema chiaro/scuro, rotte storiche, badge elementi ufficiali, tier Professionista Plus nuovo, area knowledge base AI, pannello multi-provider AI, POI ufficiale con badge, categorie più richieste.
+- Biometrico WebAuthn: da abilitare nel dashboard Supabase quando l'API lo supporta.
+- Presentazione `project.poilove.com` da aggiornare con screenshot delle novità per la demo del 1/07.
+- Validazione legale di Privacy e Terms con un consulente prima del lancio del 17/08.
+
+---
 
 ## Sessione 26/06/2026 — ILLI con voti Google, sicurezza chiavi, Privacy/Terms, liste e luoghi personali
 

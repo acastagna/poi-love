@@ -1,110 +1,120 @@
 # TODO — POI•LOVE
-> Aggiornato: 26/06/2026 · **prossima ripresa: sabato 27/06/2026 ore 18:00**
+> Aggiornato: **28/06/2026 (notte)** · Stato: admin LIVE con MFA, legali online, ILLI sistemato. Prossima tappa prodotto: **presentazione 1/07**, lancio pubblico **17/08**.
+> 🔒 Regola di ferro su TUTTO il nuovo: tre lingue perfette, ordine **SQ → IT → EN**, apertura automatica sulla lingua del device. Niente trattini lunghi. Chiavi/segreti solo server-side.
 
-## 🔴 ESTREMA URGENZA — ripresa sabato 27/06 ore 18:00
+---
 
-1. [ ] **PANNELLO ADMIN del sito (`admin.poilove.com`)** — NON ESISTE, da costruire da zero. Verificato 26/06: il sottodominio non risponde, nessun ruolo admin nel DB, nessuna moderazione/limiti. Serve per gestire il sito: ruolo admin + login; **moderazione** (ban/sospensione iscritti, rimozione POI segnalati); **limiti AI** per utente/tier (oggi ILLI è aperto a tutti, solo budget cap globale OpenAI); gestione **gamification** (punti/soglie da `gamification_config`); rotte ufficiali; **analytics** (utenti, POI creati, mappa di calore). **Primo assoluto.**
-2. [ ] **Presentazione aggiornata** (`project.poilove.com`) con un **eccellente set di screenshot** delle novità: ILLI coi voti Google e le card ricche, luoghi personali a scorciatoia, sub-tab Liste, lente mappa, Privacy/Terms. Subito dopo l'admin.
+## 🔥 PROSSIMI GRANDI PEZZI (in ordine)
 
-## Alta priorità — Bloccanti lancio
+> Roba grossa che tocca DB, generazione pagine o integrazioni esterne: si fa lucidi, un mattone alla volta, con verifica live.
 
-- [x] **config.js sul server** — presente (verificato 26/06). ILLI ora passa per la Edge Function proxy `illi-chat`: chiave OpenAI come segreto server-side, non piu esposta nel client
-- [x] **Terms of Service** — live su `poilove.com/terms` (26/06)
-- [x] **Privacy Policy** — live su `poilove.com/privacy` (26/06)
-      *(bozze conformi legge AL 124/2024 + GDPR, generate col caso Agi-Kons come checklist; RESTA da far validare da un consulente legale prima del lancio pubblico)*
+1. [ ] **Mega-ricerca POI nel profilo** — barra sopra "I miei POI" che cerca su **nome + descrizione + indirizzo + tag + categoria** (non solo testo visibile). Stessa logica estesa agli altri punti dove si cercano POI (tab POI, ecc.). Solo frontend. *(in lavorazione autonoma 28/06 notte)*
 
-## Alta priorità — Prossimi moduli
+2. [ ] **Condivisione POI col gate (teaser misterioso)** — DESIGN COMPLETO, vedi memoria `poi-share-and-integrations`. Per il SINGOLO POI l'anteprima NON mostra titolo, foto reale né indirizzo: solo la **zona** ("Qualcuno ti aspetta al Blloku di Tirana") + un'**immagine AI** evocativa + CTA "registrati per scoprire tutto". Dopo la registrazione si rivela tutto. Diverso dalla landing itinerario. Richiede: migration (stato `shared` + `share_token` su pois + RPC anteprima SECURITY DEFINER), landing nella SPA, 3 lingue. *(migration da applicare con OK)*
 
-### 🔜 Poi, verso la presentazione 1/07 (da SPECS)
-- [ ] **POI dentro le liste**: il dettaglio lista (`openListDetail`) non carica ancora i `list_pois`. Far vedere e gestire i POI dentro ogni lista (aggiungi/rimuovi/riordino). Primo passo dopo il nuovo sub-tab Liste
-- [ ] **Schermata POI (SPECS, la più importante)**: "suggerisci nome" che pesca i locali reali vicini; togliere le immagini AI dal POI; categorie personalizzabili e opzionali; timer 60s (coppa verde / frase gentile arancione)
-- [ ] **Menu "+"** come elenco di azioni (Sono qui crea POI / Segna un luogo / Tappa / Compagnia), non il mirino diretto
-- [ ] **Filtri tag e categoria nel profilo**: tocco un tag o una categoria, vedo solo i POI con quello
-- [ ] **Condivisione proprietaria**: un foglio POI•LOVE unico e curato, mai `navigator.share` (violazione SPECS, oggi usato in ~8 punti)
-- [ ] **Validazione legale Privacy/Terms** con un consulente prima del lancio (le bozze sono live)
-- [ ] **Google Places: cache** (tabella Supabase 7-30 giorni) per tenere bassi i costi a scala
+3. [ ] **Landing profilo personale (invito)** — pagina generata per OGNI profilo, da inviare alle persone: **sfondo** del profilo + **avatar** nel cerchio al centro + "Entra in POI•LOVE" col logo. Si aggancia all'handle e al referral. Solo frontend (genera dai dati del profilo). *(in lavorazione autonoma 28/06 notte)*
 
-### Blocco "Lente-strumento + UX input" (richiesto 25/06 notte, design fissato — vedi memoria `lente_mappa_strumento`)
-- [x] **A. Lente-strumento sulla mappa (long-press 300ms)** — COMPLETA (25/06, live `3c3121e`): magnifier reale bianco/nero ad alto contrasto, cerchio 320px, apertura esatta sul punto toccato (mouse+touch, mappa ferma), 2 trascinamenti live, titolo+indirizzo+coordinate live, 4 comandi + LED "Salva il POI" lampeggiante, mutua esclusione popup (mai due aperti), tap-fuori chiude, clamp ai bordi, FAB sempre sopra, i18n IT/SQ/EN. Code-review superato (2 BLOCKER + 5 MAJOR risolti)
-- [x] **B. Bottoni dentro i campi** — COMPLETA (25/06): Suggerisci AI / Detta / Scrivo io dentro nome e descrizione POI
-- [x] **C. Fix dettatura** — COMPLETA (25/06): dettatura iOS-friendly con stop pulito
-- [ ] **D. Voci TTS iperrealistiche** via servizio esterno (Google Cloud TTS o simile): scelto dal founder, serve chiave + billing, deroga alla regola no-TTS-esterno
-- [ ] **E. Tastiera assistita**: basi pronte a scorrimento (Piazza, Via, Contrada, Largo, Vicolo...) + riga numeri sempre visibile stile Waze
+4. [ ] **Sistema email nell'admin + AcumbaMail** (primo mattone del middleware) — generatore di **template** per le mail (inviti, link di condivisione) + connessione via **webhook** ai servizi di mail automation, estendibile, primo provider **AcumbaMail**. Chiavi provider solo server-side. *(serve chiave AcumbaMail da Alessandro)*
 
-- [ ] **Presence live compagnie**: layer realtime Supabase per stato online membri
-- [ ] **Frontend rotte utente V2**: flusso creazione via AI (tabella `user_routes` pronta, UI da costruire)
-- [ ] **Meccanismi tier paganti**: implementare uno a uno i perks promessi a Sostenitore e Mecenate (AI rate-limit per tier, punti x2 Mecenate, verifica profilo, POI in evidenza, adotta rotta, QR business)
-- [ ] **project.poilove.com aggiornato**: aggiornare la presentazione marketing con le novità (gamification, i18n, compagnie, itinerari)
+5. [ ] **Presentazione aggiornata** su `project.poilove.com` con un eccellente set di screenshot delle novità (admin con MFA, ILLI coi voti Google, lente mappa, Itinerari/Rotte, profilo, Privacy/Terms). Verso il 1/07.
 
-## Media priorità
+---
 
-- [ ] **Tier paganti: meccanismi backend**: i perks ora promessi nelle card vanno resi reali uno a uno (rate-limit ILLI per tier, punti x2, POI/itinerario in evidenza, audiolibri navigando, admin compagnia in evidenza). Vale per i 3 tier (Professionista/Sostenitore/Mecenate)
-- [ ] **i18n — stringhe variante minori**: varianti POI "non trovato" con emoji, ambiente avatar ILLI•AI, tooltip "rotta ufficiale" (ancora in IT)
-- [x] **Foto POI: funzionanti** (verificato con test reale 24/06): il bucket `poi_photos` esiste con permessi corretti (insert authenticated, read public); upload + lettura pubblica testati OK. La nota precedente "bucket mancante" era ERRATA. Il server primario `media.poilove.com` è rotto (403, DNS lato Plesk non risolve supabase.co) ma il piano B Supabase lo copre automaticamente. Opzionale, non bloccante: riparare media.poilove.com per la compressione WebP server-side (richiede accesso SSH al server).
-- [ ] **Love count atomico** — race condition con utenti concorrenti in `toggleLove` (riga 6543)
-- [ ] **Query deep-link senza `.limit()`** — scarica tutta la tabella pois (riga 4393)
-- [ ] **Avatar addEventListener leak** — listener duplicati ad ogni generazione AI (riga 5747)
-- [ ] **Dead code**: ripulire `stopCoords`, `_photoPrompt`, `openUserRowProfile`
+## 🟠 Admin FASE 2 (richieste 27-28/06 — vedi memoria `admin-phase2-requirements`)
 
-## OAuth provider
+> Un mattone alla volta, DB/RLS dove serve. Chiavi AI solo nei secret/proxy.
 
-- [x] Google — attivo
-- [x] X — attivato 21/06 + fix 23/06: il codice usava provider `twitter` (spento), ora `x`
-- [x] LinkedIn (OIDC) — attivato 21/06 (redirect allow-list verificata via Management API)
-- [ ] Facebook — bottone "presto" in UI; serve Terms & Privacy + App Review Meta
-- [ ] Apple Sign In — bottone "presto" in UI; serve Service ID + $99/anno
+- [ ] **Icone Phosphor duotone ovunque** nel pannello, MAI emoji/icone di sistema. Bonificare i toast/sezioni di `panel.html`.
+- [ ] **Tema chiaro/scuro** selezionabile nel pannello.
+- [ ] **Sezione Rotte Storiche**: gestione delle rotte ufficiali dal pannello.
+- [ ] **Scheda icone/badge elementi ufficiali**: rotte, POI, liste + "in evidenza" (= **Professionista Pro**) e "suggerite" (= **Professionista Plus**, NUOVO tier da creare nello schema).
+- [ ] **Visibilità POI "ufficiale" + badge** nel form POI admin (oltre a privato/community/suggerito). Schema: `official` tra le visibility o flag `is_official`.
+- [ ] **Categoria custom da "Altri"**: scegliendo "Altri" si crea una categoria al volo, l'admin la mette a sistema.
+- [ ] **Zona "categorie più richieste"**: classifica delle categorie richieste (incluse le custom); rinomina + ufficializzazione. Collega il piano tassonomia POI.
+- [ ] **Area di conoscenza a supporto AI** (knowledge base): voci per luoghi che l'AI non capisce, scritte a mano o da AI, iniettate nel grounding di ILLI.
+- [ ] **Pannello multi-provider AI**: API configurabili da admin per immagini (avatar/sfondi) e testo/suggerimenti, chiavi server-side, assegnazione provider per funzione.
+- [ ] **Biometrico WebAuthn**: accendere il provider MFA WebAuthn dal dashboard Supabase (l'API ha dato 422); il client e gia pronto.
 
-## Architettura / infra
+---
 
-- [ ] Compressione WebP upload — pushata 21/06, manca Plesk pull
-- [ ] Cloudflare R2 per immagini — quando si supera 10k utenti
-- [ ] Service role key Supabase in `~/.supabase_poilove.env` — per autonomia Claude su DB
+## 🔵 Verso la presentazione 1/07 (da SPECS)
 
-## Feature backlog
+- [ ] **POI dentro le liste**: `openListDetail` non carica ancora i `list_pois` (aggiungi/rimuovi/riordino).
+- [ ] **Schermata POI (SPECS)**: togliere le immagini AI dal POI; categorie personalizzabili e opzionali; timer 60s (coppa verde / frase gentile arancione). *(il "suggerisci nome" reale e gia fatto 27/06)*
+- [ ] **Menu "+"** come elenco di azioni (crea POI / segna luogo / tappa / compagnia), non il mirino diretto.
+- [ ] **Filtri tag e categoria nel profilo**: tocco un tag/categoria, vedo solo i POI con quello.
+- [ ] **Condivisione proprietaria**: foglio POI•LOVE unico e curato, mai `navigator.share` (oggi in ~8 punti).
+- [ ] **Validazione legale Privacy/Terms** con un consulente prima del lancio (le bozze sono live, marcate "da validare").
+- [ ] **Google Places: cache** (tabella Supabase 7-30 giorni) per tenere bassi i costi a scala.
 
-- [ ] Rotte storiche — visualizzazione, creazione, landing `/route/slug`
-- [ ] App Expo (React Native) — push 17 file TypeScript, test su device fisico
-- [ ] Migrazioni SQL versionate in Git (schema attuale non tracciato)
-- [ ] GoTrue self-hosted per Auth a scala alta
-- [ ] ProductHunt launch (solo con app mobile pronta)
-- [ ] Candidatura Claude for OSS (5000 stelle GitHub)
+### Blocco "Lente + UX input" (memoria `lente_mappa_strumento`)
+- [x] A. Lente-strumento sulla mappa (long-press) — COMPLETA 25/06
+- [x] B. Bottoni dentro i campi (Suggerisci/Detta/Scrivo io) — COMPLETA 25/06
+- [x] C. Fix dettatura iOS — COMPLETA 25/06
+- [ ] D. Voci TTS iperrealistiche via servizio esterno (serve chiave + billing, deroga alla regola no-TTS-esterno)
+- [ ] E. Tastiera assistita (basi a scorrimento Piazza/Via/Contrada… + riga numeri stile Waze)
 
-## Completati (ultimi 30 giorni)
+### Altri moduli
+- [ ] **Presence live compagnie**: layer realtime Supabase per stato online membri.
+- [ ] **Frontend rotte utente V2**: flusso creazione via AI (tabella `user_routes` pronta, UI da costruire).
+- [ ] **Meccanismi tier paganti**: implementare uno a uno i perks (AI rate-limit per tier, punti x2 Mecenate, verifica profilo, POI in evidenza, adotta rotta, QR business).
 
-- [x] **Falla follow (RLS) chiusa** (migrazione 011): `follows_select` ristretta a chi è coinvolto (follower o seguito), basta scraping del grafo sociale; applicata e verificata su Supabase (25/06)
-- [x] **Tre modi su nome e descrizione POI** (Suggerisci AI / Detta / Scrivo io), con dettatura generica iOS-friendly e suggerimento nome via AI; i18n IT/SQ/EN (25/06)
-- [x] **Microfono dettatura nella chat ILLI•AI**: speech-to-text che scrive nell'area di testo, a destra dell'invio (iOS-friendly); il vecchio mic in alto era un toggle voce, ora è un altoparlante; i18n IT/SQ/EN (25/06)
-- [x] **Bottone verde "Svuota cache" in SOS**: svuota Cache Storage + service worker + sessionStorage e ricarica fresco (cache-bust), senza sloggare (25/06)
-- [x] **Debiti chiusi**: diagnostica DB al boot dietro flag debug (non espone più lo schema in console), `setBgTab` parametro rinominato (25/06)
-- [x] **Generazione AI avatar/sfondi riattivata** via Flux (Pollinations): gratis, separata da OpenAI, verificata dal vivo (25/06)
-- [x] **GPS mirino**: avvisa con la causa reale (permesso/timeout/non disponibile) invece di saltare a Tirana in silenzio; + cache posizione (25/06)
-- [x] **Paesaggi + photo picker**: loremflickr (rotto sotto carico) sostituito con Flux; attribution falsa "Flickr CC" corretta (25/06)
-- [x] **Icona livelli**: colore scuro per livello (prima chiaro su chiaro, invisibile) (25/06)
-- [x] **Long-press anti-copia**: niente selezione/copia globale, input e textarea esclusi (25/06)
-- [x] **Cache HTML risolta**: header no-cache via .htaccess (mod_expires era inattivo sul server); backup .htaccess salvato (25/06)
-- [x] **Tier ristrutturati**: nuovo Professionista (perks forti ex-Mecenate), Mecenate potenziato (audiolibri navigando, segnala rotte, itinerario/5 POI/compagnia in evidenza); i18n IT/SQ/EN completo (25/06)
-- [x] Fix z-index popup: stacking dinamico via MutationObserver, ultimo overlay sempre sopra; `_uiModal` su contatore separato — 24/06
-- [x] Fix handle: funzione unica `_sanitizeHandle`, bug reset handle in `savePOIToDB` corretto — 24/06
-- [x] i18n ~220 chiavi nuove IT/SQ/EN: Tier+Referral (48), Compagnie+Follow (87), Itinerari+Liste (58), POI+Mappa+Profilo+Varie (32) — 24/06
-- [x] Frontend itinerari agganciato a Supabase: `saveNewTrip`, `syncTripsFromDB`, `_persistTripStops` — 24/06
-- [x] Migrazione 007: `trip_stops.note` — 24/06
-- [x] Migrazione 008: RPC transazionale `replace_trip_stops` (BLOCKER race condition drag risolto) — 24/06
-- [x] Fix: sostituito `source.unsplash.com` (deprecato) con `loremflickr` — 24/06
-- [x] Follow persistente (migrazione 009): tabella `follows` creata, `togglePublicFollow` ora funziona — 24/06
-- [x] Rotte utente (migrazione 010): tabella `user_routes` creata, owner-based — 24/06
-- [x] CLAUDE.md aggiornato con tutte le tabelle reali + RPC — 24/06
-- [x] Backend compagnie migrazione 005: `companions` + `companion_members`, RLS SECURITY DEFINER, RPC `join_companion` — 24/06
-- [x] Frontend compagnie FASE A: create/edit/delete su Supabase, `syncCompagnieFromDB` al login — 24/06
-- [x] Frontend compagnie FASE B: inviti email + join via `?join=CODE` — 24/06
-- [x] 3° stato lista "compagnia": `lists.companion_id` persiste — 24/06
-- [x] Valore reale tier paganti: perks concreti Sostenitore/Mecenate in card popup livelli — 24/06
-- [x] Backend itinerari migrazione 006: `trips` + `trip_stops`, RLS, FK, trigger `set_updated_at` — 24/06
-- [x] Bug `is_public` vs `visibility` su tabella `lists` — corretto in `createList`/`loadMyLists`/`renderItinLists` — 24/06
-- [x] `saveListDetail` e `deleteListDetail` agganciati a Supabase con guardia `owner_id` — 24/06
-- [x] Fix XSS: escape in nomi lista e `_mapPopupCtx.name` negli innerHTML — 24/06
-- [x] Liste hardcoded rimosse ("Lista libera", "Tirana Top", "Segreti") — 24/06
-- [x] Migrazione 004: `lists.companion_id` e `lists.itinerary_id` — 24/06
-- [x] CLAUDE.md aggiornato: schema `lists` corretto (`visibility`, non `is_public`) — 24/06
-- [x] Gamification backend end-to-end (migrazioni 001-003, RLS blindate, trigger, RPC) — 24/06
-- [x] Persistenza liste Supabase completa — 24/06
-- [x] LinkedIn redirect URI — verificato 23/06: allow-list Supabase gia' corretta (`poilove.com/**`)
+---
+
+## 🟢 FATTO nella maratona 27-28/06
+
+- [x] **PANNELLO ADMIN** (`admin.poilove.com`) costruito da zero: sottodominio + SSL + no-cache, login Google (estetica "cammino", multilingua), pannello `panel.html` a 7 sezioni (dashboard, moderazione, utenti, limiti AI, copilota Claude, crea POI/percorsi, audit log).
+- [x] **DB admin** (migration 012, applicata): ruolo `is_admin`, moderazione utenti, `reports`, `admin_audit_log`, limiti AI per tier, RLS solo-admin via `is_admin()` SECURITY DEFINER, `is_active()` (ban effettivo via policy RESTRICTIVE), RPC `admin_set_user_status`, trigger anti-tamper esteso. Alessandro promosso admin.
+- [x] **Proxy AI admin** (`admin-ai`): gate is_admin + aal2, tetto di spesa giornaliero, Claude/gpt-4o, service_role mai esposta.
+- [x] **MFA forte** (migration 013): authenticator TOTP (enroll + challenge, verificato dal vivo) + enforcement aal2 server-side su `is_admin()` e sul proxy AI. Biometrico WebAuthn nel client (da abilitare lato Supabase).
+- [x] **Termini e Privacy aggiornati e online** (`poilove.com/terms`, `/privacy`): sub-responsabili Google/OpenAI/Anthropic/Supabase, moderazione, abbonamenti, trasferimenti. Restano "bozza da validare".
+- [x] **Fix AI suggerimenti POI**: "suggerisci nome" legge i locali reali da OSM (`_realNamesNear`), non inventa piu dalla via ("Contra della Ceramica" → "Pizzeria Scaligera"); descrizione AI non allucina piu.
+- [x] **ILLI cerca davvero**: il grounding eredita il contesto sui follow-up ("E domani?" continua a cercare); prompt che vieta scarica-barile ("cerca tu nella tab POI") e risposte vaghe.
+- [x] **Itinerari: Liste → Rotte Storiche** (Liste gia nei POI), intro tematica + badge "presto" in 3 lingue.
+- [x] **Profilo snellito**: fascia "Come mi vedono" piu sottile; tolte Le mie liste/Rotte storiche/I miei tag; restano Connessioni + I miei POI; handle apre solo la modifica handle (non piu "Diffondi"); handle sempre slug pulito (minuscolo, niente %20); stat "Liste" porta ai POI/Liste.
+- [x] **Termini/Privacy nel footer**: pulsanti bianchi ai lati del logo nel footer nero della mappa + a pie di pagina nella schermata di accesso.
+
+---
+
+## 🧹 Debiti tecnici / minori
+
+- [ ] **Love count atomico** — race condition in `toggleLove` (riga ~6543), serve RPC atomica.
+- [ ] **Query deep-link senza `.limit()`** — scarica tutta la tabella pois.
+- [ ] **Avatar addEventListener leak** — listener duplicati a ogni generazione AI.
+- [ ] **Dead code**: `stopCoords`, `_photoPrompt`, `openUserRowProfile`; container nascosti (liste/rotte/tag) nel profilo da rimuovere del tutto quando sicuri.
+- [ ] **i18n minori**: varianti POI "non trovato", ambiente avatar ILLI, tooltip "rotta ufficiale" ancora in IT.
+- [ ] Valutare cache PWA meno aggressiva (così le modifiche si vedono senza svuotare a mano).
+
+## 🔌 OAuth
+- [x] Google · [x] X (fix provider `x`) · [x] LinkedIn OIDC
+- [ ] Facebook (serve App Review Meta) · [ ] Apple Sign In (serve Service ID + $99/anno)
+
+## 🏗 Infra
+- [ ] Compressione WebP upload (manca Plesk pull) · riparare `media.poilove.com` (DNS Plesk rotto, piano B Supabase copre)
+- [ ] Cloudflare R2 immagini oltre 10k utenti · GoTrue self-hosted a scala alta
+- [ ] App Expo (React Native): push 17 file TS, test su device
+
+## 🚀 Lancio
+- [ ] ProductHunt (con app mobile pronta) · Candidatura Claude for OSS (5000 stelle)
+
+---
+
+## ✅ Completati (storico, ultimi 30 giorni)
+
+- [x] Falla follow (RLS) chiusa (mig 011): `follows_select` ristretta ai coinvolti — 25/06
+- [x] Tre modi su nome/descrizione POI (Suggerisci AI / Detta / Scrivo io), i18n IT/SQ/EN — 25/06
+- [x] Microfono dettatura nella chat ILLI (speech-to-text), i18n — 25/06
+- [x] Bottone "Svuota cache" in SOS (cache + SW + sessionStorage, senza sloggare) — 25/06
+- [x] Generazione AI avatar/sfondi via Flux (Pollinations), verificata — 25/06
+- [x] GPS mirino con causa reale dell'errore + cache posizione — 25/06
+- [x] Tier ristrutturati (Professionista forte, Mecenate potenziato), i18n completo — 25/06
+- [x] Fix z-index popup (stacking dinamico MutationObserver) — 24/06
+- [x] i18n ~220 chiavi nuove IT/SQ/EN — 24/06
+- [x] Frontend itinerari su Supabase (`saveNewTrip`, `syncTripsFromDB`, `_persistTripStops`) — 24/06
+- [x] Mig 007 `trip_stops.note` · Mig 008 RPC `replace_trip_stops` (race drag risolta) — 24/06
+- [x] Follow persistente (mig 009) · Rotte utente (mig 010) — 24/06
+- [x] Backend compagnie (mig 005) + frontend FASE A/B (inviti email, join `?join=CODE`) — 24/06
+- [x] Backend itinerari (mig 006) · Bug `is_public` vs `visibility` su `lists` corretto — 24/06
+- [x] Fix XSS escape nomi lista + map popup · Liste hardcoded rimosse — 24/06
+- [x] Gamification backend end-to-end (mig 001-003, RLS, trigger, RPC) — 24/06
+- [x] Foto POI funzionanti (bucket `poi_photos` verificato) — 24/06
