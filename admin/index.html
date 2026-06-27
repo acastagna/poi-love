@@ -67,6 +67,9 @@ body{
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,.45)}50%{box-shadow:0 0 0 8px rgba(255,255,255,0)}}
 .bio .fp{font-size:15px;line-height:1}
 .bio-hint{font-size:10.5px;color:rgba(244,236,224,.5);text-align:center;margin-bottom:14px}
+.gbtn{width:100%;margin-bottom:12px;border:none;cursor:pointer;font-family:inherit;border-radius:16px;padding:14px;background:#fff;color:#1f1f1f;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 8px 22px rgba(0,0,0,.28);transition:transform .12s}
+.gbtn:hover{transform:translateY(-1px)}
+.gbtn:active{transform:scale(.98)}
 
 .sep{display:flex;align-items:center;gap:10px;color:rgba(244,236,224,.4);font-size:10px;letter-spacing:1px;margin:8px 0 14px;text-transform:uppercase}
 .sep::before,.sep::after{content:"";flex:1;height:1px;background:var(--line)}
@@ -100,6 +103,11 @@ body{
       <p data-t="subtitle">Solo chi conosce il cammino prosegue.</p>
     </div>
 
+    <button class="gbtn" id="gBtn" onclick="googleLogin()">
+      <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      <span data-t="google">Continua con Google</span>
+    </button>
+
     <button class="bio" id="bioBtn" onclick="bioLogin()">
       <span class="ring"><span class="fp">&#128274;</span></span>
       <span data-t="bio">Accedi con la biometria</span>
@@ -129,9 +137,9 @@ const SUPABASE_ANON='sb_publishable_PC1xQ8XiQK9jpzwsAlFLxw_E-PKN40V';
 const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON) : null;
 
 const T={
-  it:{title:'Accesso riservato', subtitle:'Solo chi conosce il cammino prosegue.', bio:'Accedi con la biometria', bio_hint:'Tocco, volto o passkey del dispositivo', or:'oppure', enter:'Entra', no_admin:'Questo profilo non ha accesso amministrativo.', bad:'Email o password non validi.', checking:'Verifico…', no_bio:'Biometria non disponibile su questo dispositivo, usa email e password.', welcome:'Benvenuto. Apro il pannello…'},
-  sq:{title:'Hyrje e rezervuar', subtitle:'Vetëm kush e njeh rrugën vazhdon.', bio:'Hyr me biometri', bio_hint:'Prekje, fytyrë ose passkey i pajisjes', or:'ose', enter:'Hyr', no_admin:'Ky profil nuk ka qasje administrative.', bad:'Email ose fjalëkalim i pavlefshëm.', checking:'Po verifikoj…', no_bio:'Biometria nuk disponohet, përdor email dhe fjalëkalim.', welcome:'Mirësevini. Po hap panelin…'},
-  en:{title:'Restricted access', subtitle:'Only those who know the path go on.', bio:'Sign in with biometrics', bio_hint:'Device touch, face or passkey', or:'or', enter:'Enter', no_admin:'This profile has no admin access.', bad:'Invalid email or password.', checking:'Checking…', no_bio:'Biometrics unavailable, use email and password.', welcome:'Welcome. Opening the panel…'}
+  it:{title:'Accesso riservato', subtitle:'Solo chi conosce il cammino prosegue.', bio:'Accedi con la biometria', bio_hint:'Tocco, volto o passkey del dispositivo', or:'oppure', google:'Continua con Google', enter:'Entra', no_admin:'Questo profilo non ha accesso amministrativo.', bad:'Email o password non validi.', checking:'Verifico…', no_bio:'Biometria non disponibile su questo dispositivo, usa email e password.', welcome:'Benvenuto. Apro il pannello…'},
+  sq:{title:'Hyrje e rezervuar', subtitle:'Vetëm kush e njeh rrugën vazhdon.', bio:'Hyr me biometri', bio_hint:'Prekje, fytyrë ose passkey i pajisjes', or:'ose', google:'Vazhdo me Google', enter:'Hyr', no_admin:'Ky profil nuk ka qasje administrative.', bad:'Email ose fjalëkalim i pavlefshëm.', checking:'Po verifikoj…', no_bio:'Biometria nuk disponohet, përdor email dhe fjalëkalim.', welcome:'Mirësevini. Po hap panelin…'},
+  en:{title:'Restricted access', subtitle:'Only those who know the path go on.', bio:'Sign in with biometrics', bio_hint:'Device touch, face or passkey', or:'or', google:'Continue with Google', enter:'Enter', no_admin:'This profile has no admin access.', bad:'Invalid email or password.', checking:'Checking…', no_bio:'Biometrics unavailable, use email and password.', welcome:'Welcome. Opening the panel…'}
 };
 let lang = (localStorage.getItem('admin_lang')) || (navigator.language||'it').slice(0,2);
 if(!T[lang]) lang='it';
@@ -170,6 +178,17 @@ async function pwdLogin(){
   if(error){ msg(T[lang].bad); return; }
   afterAuth();
 }
+// Google OAuth: l'admin entra col suo account Google (lo stesso dell'app principale).
+async function googleLogin(){
+  if(!sb){ msg('Supabase non caricato'); return; }
+  msg(T[lang].checking);
+  const { error } = await sb.auth.signInWithOAuth({
+    provider:'google',
+    options:{ redirectTo: location.origin + '/' }
+  });
+  if(error){ msg(error.message || T[lang].bad); }
+}
+
 // Biometria: passkey del dispositivo (WebAuthn). Se la piattaforma non la espone, ripiega su email.
 async function bioLogin(){
   try{
