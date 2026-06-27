@@ -356,7 +356,16 @@ Deno.serve(async (req: Request) => {
     return json({ error: "forbidden", detail: "admin access required" }, 403);
   }
 
-  // Da qui in poi: l'utente e' admin attivo. Solo ora usiamo i privilegi service_role.
+  // Richiedi il secondo fattore (MFA, aal2): il copilota AI costa, va protetto come le altre azioni
+  // admin. Coerente con is_admin() lato DB: se il JWT non porta il claim aal (caso raro) non si blocca.
+  try {
+    const payload = JSON.parse(atob((jwt.split(".")[1] || "").replace(/-/g, "+").replace(/_/g, "/")));
+    if (payload?.aal && payload.aal !== "aal2") {
+      return json({ error: "mfa_required", detail: "second factor required" }, 403);
+    }
+  } catch (_e) { /* JWT non decodificabile: getUser ha gia validato la sessione, proseguo */ }
+
+  // Da qui in poi: l'utente e' admin attivo con MFA. Solo ora usiamo i privilegi service_role.
 
   // ── Body ──────────────────────────────────────────────────────────────────────
   const body = await req.json().catch(() => ({}));
