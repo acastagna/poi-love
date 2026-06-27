@@ -2301,7 +2301,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
     <button class="poi-subtab"        data-subtab="near"  onclick="setPoiSubtab('near')"><i class="ph-duotone ph-compass"></i> Vicini</button>
     <button class="poi-subtab"        data-subtab="lists" onclick="setPoiSubtab('lists')"><i class="ph-duotone ph-list-bullets"></i> Liste</button>
   </div>
-  <div class="poi-search-wrap"><i class="ph-duotone ph-magnifying-glass ps-ico"></i><input class="poi-search" id="poiSearchInput" type="text" placeholder="Cerca per nome o indirizzo…" oninput="_poiSearch(this.value)"></div>
+  <div class="poi-search-wrap"><i class="ph-duotone ph-magnifying-glass ps-ico"></i><input class="poi-search" id="poiSearchInput" type="text" placeholder="Cerca: nome, categoria, indirizzo, tag…" oninput="_poiSearch(this.value)"></div>
   <div id="poi-list-area"></div>
 </div>
 
@@ -5689,7 +5689,7 @@ function showTab(tab){
 let poiSubtab = 'mine'; // mine | loved | near
 function setPoiSubtab(t){
   poiSubtab=t;
-  const s=document.getElementById('poiSearchInput'); if(s){ s.value=''; s.placeholder = (t==='lists') ? 'Cerca tra le tue liste…' : 'Cerca per nome o indirizzo…'; }
+  const s=document.getElementById('poiSearchInput'); if(s){ s.value=''; s.placeholder = (t==='lists') ? 'Cerca tra le tue liste…' : 'Cerca: nome, categoria, indirizzo, tag…'; }
   document.querySelectorAll('.poi-subtab').forEach(b=>b.classList.toggle('active', b.dataset.subtab===t));
   if(t==='lists') renderPoiLists(); else renderPoiTab();
 }
@@ -5737,7 +5737,8 @@ function _poiSearch(q){
   const area=document.getElementById('poi-list-area'); if(!area) return;
   let visible=0;
   area.querySelectorAll('.poi-list-row').forEach(row=>{
-    const match = !q || row.textContent.toLowerCase().indexOf(q)>-1;
+    const hay = (row.getAttribute('data-search')||row.textContent).toLowerCase();
+    const match = !q || hay.indexOf(q)>-1;
     row.style.display = match ? '' : 'none';
     if(match) visible++;
   });
@@ -5830,9 +5831,12 @@ async function renderPoiTab(){
     // Etichetta visibilità tradotta
     const visLblT = vis==='private' ? t('vis_prv_lbl','Privato') : vis==='friends' ? t('vis_friends_lbl','Amici') : t('vis_pub_lbl','Pubblico');
 
+    // Mega-ricerca: tutti i campi cercabili in un attributo (nome, categoria, indirizzo, citta, descrizione, tag)
+    const _searchHay = `${p.name||''} ${p.cat||p.category||''} ${p.address||''} ${p.city||''} ${p.description||''} ${(Array.isArray(p.tags)?p.tags.join(' '):(p.tags||''))}`.toLowerCase().replace(/"/g,'&quot;');
+
     if(poiSubtab==='near'){
       // Lista vicini: click apre dettaglio, "Naviga" lancia maps esterne
-      return `<div class="poi-list-row" data-poi-key="${key}" style="cursor:pointer">
+      return `<div class="poi-list-row" data-poi-key="${key}" data-search="${_searchHay}" style="cursor:pointer">
         <div class="pi-emoji" onclick="openPoiFromTab('${key}')">${emoji}</div>
         <div class="pi-info" onclick="openPoiFromTab('${key}')">
           <div class="pi-name">${p.name}</div>
@@ -5848,7 +5852,7 @@ async function renderPoiTab(){
     }
 
     // Lista Miei/Loved: click apre dettaglio, azioni complete
-    return `<div class="poi-list-row" data-poi-key="${key}">
+    return `<div class="poi-list-row" data-poi-key="${key}" data-search="${_searchHay}">
       <div class="pi-emoji" onclick="openPoiFromTab('${key}')" style="cursor:pointer">${emoji}</div>
       <div class="pi-info" onclick="openPoiFromTab('${key}')" style="cursor:pointer">
         <div class="pi-name">${p.name}</div>
