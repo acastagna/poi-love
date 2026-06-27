@@ -10107,11 +10107,19 @@ async function _enrichPlace(p, cat){
   }catch(e){ /* degrado silenzioso ai dati OSM */ }
   return p;
 }
-async function _fetchRealPlaces(text){
+// Eredita la categoria dagli ultimi messaggi utente: i follow-up ("e domani?", "e di pesce?") continuano a cercare lo stesso tipo di posto
+function _lastPlaceCatFromHistory(){
+  try{
+    const users=poiaiHistory.filter(m=>m.role==='user').slice(-5).reverse();
+    for(const m of users){ const c=_detectPlaceQuery(m.content||''); if(c) return c; }
+  }catch(e){}
+  return null;
+}
+async function _fetchRealPlaces(text, catOverride){
   // posizione: GPS se c'e, altrimenti il centro della mappa (cosi cerca anche su desktop senza GPS, dove l'utente sta guardando)
   const origin = gpsPos || ((typeof map!=='undefined'&&map&&map.getCenter)?map.getCenter():null);
   if(!origin) return {cat:null, places:[], overpassDown:false};
-  const cat=_detectPlaceQuery(text);
+  const cat=catOverride||_detectPlaceQuery(text);
   if(!cat) return {cat:null, places:[], overpassDown:false};
   const lat=origin.lat, lng=origin.lng;
   let merged=[], overpassDown=false;
@@ -10279,6 +10287,13 @@ ${locationCtx}
 - Itinerari dell'utente: ${tripNames}.
 ${activePoiName?`- POI aperto adesso: "${activePoiName}".`:''}
 
+RICERCA POSTI (ferreo, non negoziabile):
+- Sei TU che cerchi. Quando l'utente parla di mangiare, bere, dormire o di un tipo di locale, l'app ti passa i posti REALI vicini: proponili per nome, dicendo quale conviene e perche.
+- Se nel raggio NON ci sono posti di quel tipo, dillo con onesta e con la distanza ("qui intorno non ce ne sono, il piu vicino e a circa 8 km, a Schio") e offri di allargare la ricerca. Mai inventare, mai fingere.
+- MAI scaricare sull'utente: vietato dire "cerca tu nella tab POI" o "dipende dai dati disponibili sulla mappa". Cercare e il TUO lavoro, l'hai gia fatto.
+- MAI risposte vaghe come "prova qualche trattoria locale" o "potresti provare un ristorante tipico": o fai un nome reale, o dici con onesta che li intorno non c'e nulla e quanto dista il primo.
+- Tieni il filo: se si parlava di dove mangiare qui intorno, un "e domani?" riguarda ancora dove mangiare qui intorno, non un discorso generico.
+
 STILE: prosa breve e calda (max 4 frasi), concreta. MAI emoji, MAI asterischi o cancelletti markdown (niente **grassetto**, niente #titoli), MAI sigle tipo "R1/R2", MAI parole in inglese. Quando suggerisci posti reali, l'app mostra gia da sola le schede cliccabili sotto la tua risposta: tu di' solo, a parole, quale conviene e perche. Rispondi sempre in ${langLabel}.`.trim();
 }
 
@@ -10307,13 +10322,13 @@ async function sendPoiAIMsg(){
     // GROUNDING anti-allucinazione: se l'utente cerca un posto, recupero i REALI (OSM + POI•LOVE) e li inietto come whitelist chiusa
     let groundingMsg=null;
     _lastGroundedPlaces=[];
-    const _gCat=_detectPlaceQuery(text);
+    const _gCat=_detectPlaceQuery(text)||_lastPlaceCatFromHistory();
     const _origin = gpsPos || ((typeof map!=='undefined'&&map&&map.getCenter)?map.getCenter():null);
     if(_gCat && _origin){
       const _le=document.getElementById(loadId);
       if(_le) _le.innerHTML=`<i class="ph-duotone ph-magnifying-glass" style="margin-right:6px"></i>Sto guardando cosa c'è qui intorno…`;
       let _g={cat:_gCat, places:[], overpassDown:false};
-      try{ _g=await Promise.race([_fetchRealPlaces(text), new Promise(r=>setTimeout(()=>r({cat:_gCat,places:[],overpassDown:true}),8000))]); }catch(e){}
+      try{ _g=await Promise.race([_fetchRealPlaces(text, _gCat), new Promise(r=>setTimeout(()=>r({cat:_gCat,places:[],overpassDown:true}),8000))]); }catch(e){}
       _lastGroundedPlaces=_g.places;
       groundingMsg={role:'system', content:_buildGroundingBlock(_g.cat, _g.places, _g.overpassDown)};
     }
