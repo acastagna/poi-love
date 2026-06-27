@@ -5521,23 +5521,64 @@ function toggleFieldDictation(targetId,btnId){
   try{ r.start(); }catch(e){ stopFieldDictationUI(); _fldRec=null; }
 }
 // "Suggerisci" il NOME via AI (serve credito, come per ILLI): usa indirizzo/coordinate/categoria
+// Cerca i NOMI REALI dei locali attorno a (lat,lng) su OpenStreetMap. Niente AI, niente invenzioni:
+// risolve il bug per cui l'AI prendeva il nome della via ("Contra della Ceramica") al posto del locale.
+async function _realNamesNear(lat,lng){
+  const q=`[out:json][timeout:10];(
+    nwr(around:90,${lat},${lng})[name][amenity];
+    nwr(around:90,${lat},${lng})[name][shop];
+    nwr(around:90,${lat},${lng})[name][tourism];
+    nwr(around:90,${lat},${lng})[name][leisure];
+    nwr(around:90,${lat},${lng})[name][craft];
+  );out center 50;`;
+  const els=await _overpassFetch(q);
+  if(!els) return [];
+  const out=[], seen=new Set();
+  for(const el of els){
+    const tg=el.tags||{};
+    const nm=tg['name:it']||tg.name;
+    if(!nm) continue;
+    if(Object.keys(tg).some(k=>/^(disused|abandoned|was|removed|demolished):/i.test(k)) || tg.disused==='yes'||tg.abandoned==='yes') continue;
+    const plat=el.lat ?? (el.center&&el.center.lat);
+    const plng=el.lon ?? (el.center&&el.center.lon);
+    if(plat==null||plng==null) continue;
+    const k=nm.toLowerCase().trim();
+    if(seen.has(k)) continue; seen.add(k);
+    out.push({name:nm, type:(tg.amenity||tg.shop||tg.tourism||tg.leisure||tg.craft||''), distM:Math.round(haversineKm(lat,lng,plat,plng)*1000)});
+  }
+  out.sort((a,b)=>a.distM-b.distM);
+  return out.slice(0,8);
+}
+// Suggerisce il nome del POI: prima il nome REALE da OSM, mai inventato dalla via.
 async function suggestPoiName(){
   const nameIn=document.getElementById('poiNameIn');
-  const _clean=s=>String(s||'').replace(/["'\n\r`]/g,' ').trim();  // niente virgolette/newline nel prompt (anti prompt-injection)
-  const address=_clean(document.getElementById('locStreet')?.textContent);
-  const coords=_clean(document.getElementById('locCoords')?.textContent);
-  const cats=_clean(Array.from(document.querySelectorAll('#addPoiSheet .chip.sel')).map(c=>c.textContent.trim()).join(', '));
-  if(!address && !coords && !cats){ showToast(t('name_need_loc','Indica prima dove si trova, poi te lo suggerisco')); return; }
+  const coordsTxt=String(document.getElementById('locCoords')?.textContent||'').trim();
+  const mm=coordsTxt.match(/(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)/);
+  const cats=Array.from(document.querySelectorAll('#addPoiSheet .chip.sel')).map(c=>c.textContent.trim()).filter(Boolean);
+  const cityParts=String(document.getElementById('locStreet')?.textContent||'').split(',').map(s=>s.trim()).filter(Boolean);
+  const city=cityParts.length?cityParts[cityParts.length>1?cityParts.length-2:0]:'';
+  if(!mm){ showToast(t('name_need_loc','Indica prima dove si trova, poi te lo suggerisco')); return; }
+  const lat=parseFloat(mm[1]), lng=parseFloat(mm[2]);
   const btn=document.getElementById('nameAiBtn'); let old='';
   if(btn){ old=btn.innerHTML; btn.disabled=true; btn.innerHTML='<i class="ph-duotone ph-circle-notch" style="animation:spin 1s linear infinite"></i>'; }
-  const langLabel=lang==='it'?'italiano':lang==='sq'?'albanese':'English';
-  const prompt=`Proponi UN nome breve e naturale (massimo 5 parole) per questo luogo, in ${langLabel}. Rispondi solo col nome, senza virgolette.${address?` Indirizzo: ${address}.`:''}${coords?` Coordinate: ${coords}.`:''}${cats?` Categoria: ${cats}.`:''}`;
+  const setName=v=>{ if(nameIn){ nameIn.value=String(v).substring(0,60); if(typeof onNameInput==='function') onNameInput(nameIn.value); if(typeof checkSave==='function') checkSave(); } };
   try{
-    const res=await fetch(GROQ_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${GROQ_KEY}`},body:JSON.stringify({model:GROQ_MODEL,messages:[{role:'user',content:prompt}],temperature:0.8,max_completion_tokens:24})});
-    const json=await res.json();
-    const nm=(json?.choices?.[0]?.message?.content||'').trim().replace(/^["']+|["']+$/g,'');
-    if(nm && nameIn){ nameIn.value=nm.substring(0,60); if(typeof onNameInput==='function') onNameInput(nameIn.value); }
-    else showToast(t('ai_gen_failed','Generazione non riuscita, riprova tra poco.'));
+    // 1) Nome REALE del locale a queste coordinate (OSM)
+    const real=await _realNamesNear(lat,lng);
+    if(real.length){
+      setName(real[0].name);
+      const extra=real.length>1?(lang==='it'?` (uno dei ${real.length} qui vicino)`:lang==='sq'?` (një nga ${real.length} këtu pranë)`:` (one of ${real.length} nearby)`):'';
+      showToast('📍 '+(lang==='it'?'Nome reale':lang==='sq'?'Emër real':'Real name')+': '+real[0].name+extra);
+      return;
+    }
+    // 2) Nessun nome reale: NON inventare dalla via. Segnaposto dalla categoria, oppure invito a scrivere.
+    if(cats.length){
+      const ph=cats[0]+(city?(' '+city):'');
+      if(nameIn && !nameIn.value.trim()) setName(ph);
+      showToast(lang==='it'?'Nessun nome ufficiale qui: ho messo un segnaposto, personalizzalo':lang==='sq'?'Asnjë emër zyrtar: vendos një emër':'No official name here: placeholder added, edit it');
+    } else {
+      showToast(lang==='it'?'Non trovo il nome ufficiale di questo posto, scrivilo tu':lang==='sq'?'Nuk gjeta emrin zyrtar, shkruaje ti':'No official name found, please type it');
+    }
   }catch(e){ showToast(t('ai_gen_failed','Generazione non riuscita, riprova tra poco.')); }
   finally{ if(btn){ btn.disabled=false; btn.innerHTML=old; } }
 }
@@ -5563,20 +5604,14 @@ async function aiSummarize(){
   const cats=Array.from(document.querySelectorAll('#addPoiSheet .chip.sel')).map(c=>c.textContent.trim()).join(', ');
   let prompt;
   if(isGenerate){
-    prompt=`Sei un travel writer che conosce bene questo luogo. Scrivi una descrizione personale e originale (massimo 180 caratteri) per questo posto.
+    prompt=`Scrivi una breve descrizione (massimo 180 caratteri) per un posto di tipo "${cats||'luogo'}"${(placeName&&placeName!=='questo posto')?` chiamato "${placeName}"`:''}, in ${langLabel}.
 
-Dati disponibili:
-Nome: "${placeName}"
-${address?`Indirizzo: ${address}`:''}
-${coords?`Coordinate: ${coords} — usa queste per capire la zona geografica e il contesto del luogo`:''}
-${cats?`Categoria: ${cats}`:''}
-
-Regole:
-- Ispirati a ciò che sai di questo luogo ma usa parole tue, non copiare da guide o siti
-- Tono caldo, personale, come se lo raccontassi a un amico
-- Niente cliché turistici ("luogo imperdibile", "posto magico", "da non perdere")
-- Non iniziare con il nome del posto
-- Rispondi SOLO con il testo della descrizione, senza virgolette, in ${langLabel}`;
+Regole ferree, rispettale tutte:
+- NON inventare fatti che non puoi conoscere: niente storia, premi, anni, persone, nomi di piatti o specialita specifiche di questo locale.
+- NON farti influenzare dal nome della via o dall'indirizzo: descrivi il TIPO di posto ("${cats||'luogo'}"), mai la toponomastica.
+- Scrivi qualcosa che sia vero per un qualsiasi posto di questo tipo, con tono caldo e personale, come se lo raccontassi a un amico.
+- Niente cliche turistici ("luogo imperdibile", "posto magico", "da non perdere"). Non iniziare col nome.
+- Rispondi SOLO col testo della descrizione, senza virgolette, in ${langLabel}.`;
   } else {
     prompt=`Sintetizza questo testo a massimo 180 caratteri mantenendo lo spirito e il tono del luogo. Rispondi solo con il testo sintetizzato, senza virgolette, in ${langLabel}:
 "${existingText}"`;
