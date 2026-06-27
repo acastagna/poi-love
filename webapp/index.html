@@ -1317,6 +1317,11 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 .itin-subtab{flex:1;height:36px;border:none;background:transparent;border-radius:9px;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px}
 .itin-subtab.active{background:var(--red);color:#fff}
 .itin-subtab i{font-size:15px}
+.itin-routes-intro{text-align:center;padding:48px 28px;max-width:420px;margin:0 auto}
+.itin-routes-hero{width:64px;height:64px;border-radius:20px;margin:0 auto 18px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--red),#9a1d1d);color:#fff;font-size:30px}
+.itin-routes-intro h3{font-size:19px;font-weight:800;color:var(--text);margin-bottom:10px}
+.itin-routes-intro p{font-size:13.5px;color:var(--muted);line-height:1.6;margin-bottom:16px}
+.itin-routes-soon{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--red);background:rgba(212,43,43,.1);border:1px solid rgba(212,43,43,.25);border-radius:999px;padding:6px 14px}
 .itin-lists-empty{padding:30px 24px;text-align:center;color:var(--muted);font-size:13px}
 .itin-list-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin:10px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:transform .12s}
 .itin-list-card:active{transform:scale(.98)}
@@ -2351,8 +2356,8 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
     <button class="itin-subtab active" data-subtab="trips" onclick="setItinSubtab('trips')">
       <i class="ph-duotone ph-navigation"></i> <span data-t="itin_subtab_trips">Itinerari</span>
     </button>
-    <button class="itin-subtab" data-subtab="lists" onclick="setItinSubtab('lists')">
-      <i class="ph-duotone ph-list-bullets"></i> <span data-t="itin_subtab_lists">Liste</span>
+    <button class="itin-subtab" data-subtab="routes" onclick="setItinSubtab('routes')">
+      <i class="ph-duotone ph-path"></i> <span data-t="itin_subtab_routes">Rotte Storiche</span>
     </button>
   </div>
 
@@ -2369,9 +2374,14 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
     <div class="itin-cards" id="itinCards"></div>
   </div>
 
-  <!-- AREA: Liste -->
-  <div id="itin-lists-area" hidden>
-    <div id="itin-lists-container"></div>
+  <!-- AREA: Rotte Storiche -->
+  <div id="itin-routes-area" hidden>
+    <div class="itin-routes-intro">
+      <div class="itin-routes-hero"><i class="ph-duotone ph-path"></i></div>
+      <h3 data-t="itin_routes_title">Rotte Storiche</h3>
+      <p data-t="itin_routes_desc">Percorsi tematici che seguono la storia, la cultura e i racconti di un luogo. Presto potrai esplorarle e crearne di tue.</p>
+      <span class="itin-routes-soon" data-t="itin_routes_soon">Presto disponibili</span>
+    </div>
   </div>
 
 </div>
@@ -4297,7 +4307,7 @@ const T={
     /* Itinerari overlay */
     trip_open_btn:'Apri',trip_change_cover:'Cambia copertina',trip_close:'Chiudi',trip_calendar:'Calendario viaggio',trip_map:'Mappa itinerario',trip_stops:'Tappe pianificate',trip_add_stop:'Aggiungi tappa',
     /* Itinerari / Tappe — view, card, dettaglio, trip landing */
-    itin_new:'Nuovo',itin_subtab_trips:'Itinerari',itin_subtab_lists:'Liste',itin_search_ph:'Cerca destinazione… es. Sarajevo, Bosnia',itin_ai_sub:'Suggerisce, pianifica, aggiunge tappe',itin_sheet_sub:'Crea l\'itinerario, poi aggiungi tappe e condividilo',itin_dest_lbl:'Destinazione',itin_fallback_trip:'Viaggio',itin_n_stops:'{n} tappe',itin_addtrip_none:'Nessun itinerario ancora. Creane uno per aggiungere "{name}".',
+    itin_new:'Nuovo',itin_subtab_trips:'Itinerari',itin_subtab_lists:'Liste',itin_subtab_routes:'Rotte Storiche',itin_routes_title:'Rotte Storiche',itin_routes_desc:'Percorsi tematici che seguono la storia, la cultura e i racconti di un luogo. Presto potrai esplorarle e crearne di tue.',itin_routes_soon:'Presto disponibili',itin_search_ph:'Cerca destinazione… es. Sarajevo, Bosnia',itin_ai_sub:'Suggerisce, pianifica, aggiunge tappe',itin_sheet_sub:'Crea l\'itinerario, poi aggiungi tappe e condividilo',itin_dest_lbl:'Destinazione',itin_fallback_trip:'Viaggio',itin_n_stops:'{n} tappe',itin_addtrip_none:'Nessun itinerario ancora. Creane uno per aggiungere "{name}".',
     trip_no_stops:'Nessuna tappa ancora, aggiungine una!',trip_status_suspended:'Sospesa',trip_status_done:'Completata',trip_status_planned:'Pianificata',trip_resume:'Riprendi',trip_suspend:'Sospendi',trip_edit:'Modifica',trip_delete:'Elimina',trip_vis_pub:'Pubblico',trip_vis_friends:'Amici',trip_vis_prv:'Privato',stop_note_ph:'Aggiungi note, promemoria, info pratiche…',
     tlp_badge_dest:'Destinazione',tlp_stops_lbl:'Tappe del viaggio',tlp_poi_lbl:'POI•LOVE lungo la rotta',tlp_cta_text:'Vuoi seguire questo itinerario o pianificarne uno simile?',tlp_open_app:'Apri POI•LOVE',tlp_share:'Condividi',tlp_stops_unavail:'Tappe non ancora disponibili',
     /* Liste */
@@ -4377,7 +4387,7 @@ const T={
     /* Itinerari overlay */
     trip_open_btn:'Hap',trip_change_cover:'Ndrysho kopertinën',trip_close:'Mbyll',trip_calendar:'Kalendari i udhëtimit',trip_map:'Harta e itinerarit',trip_stops:'Stacionet e planifikuara',trip_add_stop:'Shto stacion',
     /* Itinerari / Tappe — view, card, dettaglio, trip landing */
-    itin_new:'I ri',itin_subtab_trips:'Itinerare',itin_subtab_lists:'Lista',itin_search_ph:'Kërko destinacionin… p.sh. Sarajevë, Bosnjë',itin_ai_sub:'Sugjeron, planifikon, shton stacione',itin_sheet_sub:'Krijo itinerarin, pastaj shto stacione dhe ndaje',itin_dest_lbl:'Destinacioni',itin_fallback_trip:'Udhëtim',itin_n_stops:'{n} stacione',itin_addtrip_none:'Ende asnjë itinerar. Krijo një për të shtuar "{name}".',
+    itin_new:'I ri',itin_subtab_trips:'Itinerare',itin_subtab_lists:'Lista',itin_subtab_routes:'Rrugët Historike',itin_routes_title:'Rrugët Historike',itin_routes_desc:'Itinerare tematike që ndjekin historinë, kulturën dhe tregimet e një vendi. Së shpejti do të mund t\'i eksplorosh dhe të krijosh të tuat.',itin_routes_soon:'Së shpejti',itin_search_ph:'Kërko destinacionin… p.sh. Sarajevë, Bosnjë',itin_ai_sub:'Sugjeron, planifikon, shton stacione',itin_sheet_sub:'Krijo itinerarin, pastaj shto stacione dhe ndaje',itin_dest_lbl:'Destinacioni',itin_fallback_trip:'Udhëtim',itin_n_stops:'{n} stacione',itin_addtrip_none:'Ende asnjë itinerar. Krijo një për të shtuar "{name}".',
     trip_no_stops:'Ende asnjë stacion, shto një!',trip_status_suspended:'Pezulluar',trip_status_done:'Përfunduar',trip_status_planned:'Planifikuar',trip_resume:'Vazhdo',trip_suspend:'Pezullo',trip_edit:'Redakto',trip_delete:'Fshi',trip_vis_pub:'Publik',trip_vis_friends:'Miq',trip_vis_prv:'Privat',stop_note_ph:'Shto shënime, kujtesa, info praktike…',
     tlp_badge_dest:'Destinacioni',tlp_stops_lbl:'Stacionet e udhëtimit',tlp_poi_lbl:'POI•LOVE përgjatë rrugës',tlp_cta_text:'Dëshiron ta ndjekësh këtë itinerar ose të planifikosh një të ngjashëm?',tlp_open_app:'Hap POI•LOVE',tlp_share:'Nda',tlp_stops_unavail:'Stacionet ende nuk janë të disponueshme',
     /* Liste */
@@ -4457,7 +4467,7 @@ const T={
     /* Itinerari overlay */
     trip_open_btn:'Open',trip_change_cover:'Change cover',trip_close:'Close',trip_calendar:'Trip calendar',trip_map:'Itinerary map',trip_stops:'Planned stops',trip_add_stop:'Add stop',
     /* Itinerari / Tappe — view, card, detail, trip landing */
-    itin_new:'New',itin_subtab_trips:'Itineraries',itin_subtab_lists:'Lists',itin_search_ph:'Search a destination… e.g. Sarajevo, Bosnia',itin_ai_sub:'Suggests, plans, adds stops',itin_sheet_sub:'Create the itinerary, then add stops and share it',itin_dest_lbl:'Destination',itin_fallback_trip:'Trip',itin_n_stops:'{n} stops',itin_addtrip_none:'No itinerary yet. Create one to add "{name}".',
+    itin_new:'New',itin_subtab_trips:'Itineraries',itin_subtab_lists:'Lists',itin_subtab_routes:'Historic Routes',itin_routes_title:'Historic Routes',itin_routes_desc:'Themed routes that follow the history, culture and stories of a place. Soon you will be able to explore them and create your own.',itin_routes_soon:'Coming soon',itin_search_ph:'Search a destination… e.g. Sarajevo, Bosnia',itin_ai_sub:'Suggests, plans, adds stops',itin_sheet_sub:'Create the itinerary, then add stops and share it',itin_dest_lbl:'Destination',itin_fallback_trip:'Trip',itin_n_stops:'{n} stops',itin_addtrip_none:'No itinerary yet. Create one to add "{name}".',
     trip_no_stops:'No stops yet, add one!',trip_status_suspended:'Suspended',trip_status_done:'Completed',trip_status_planned:'Planned',trip_resume:'Resume',trip_suspend:'Suspend',trip_edit:'Edit',trip_delete:'Delete',trip_vis_pub:'Public',trip_vis_friends:'Friends',trip_vis_prv:'Private',stop_note_ph:'Add notes, reminders, practical info…',
     tlp_badge_dest:'Destination',tlp_stops_lbl:'Trip stops',tlp_poi_lbl:'POI•LOVE along the route',tlp_cta_text:'Want to follow this itinerary or plan a similar one?',tlp_open_app:'Open POI•LOVE',tlp_share:'Share',tlp_stops_unavail:'Stops not available yet',
     /* Lists */
@@ -6243,20 +6253,19 @@ function setItinSubtab(t){
   itinSubtab = t;
   document.querySelectorAll('.itin-subtab').forEach(b => b.classList.toggle('active', b.dataset.subtab===t));
   const tripsArea = document.getElementById('itin-trips-area');
-  const listsArea = document.getElementById('itin-lists-area');
+  const routesArea = document.getElementById('itin-routes-area');
   if(tripsArea) tripsArea.hidden = (t!=='trips');
-  if(listsArea) listsArea.hidden = (t!=='lists');
-  // Aggiorno titolo + bottone "Nuovo"
+  if(routesArea) routesArea.hidden = (t!=='routes');
+  // Aggiorno titolo
   const title = document.getElementById('itinTitle');
   if(title){
-    title.innerHTML = (t==='lists')
-      ? '<i class="ph-duotone ph-list-bullets" style="color:var(--red);font-size:20px;margin-right:6px"></i>'+window.t('itin_subtab_lists','Liste')
+    title.innerHTML = (t==='routes')
+      ? '<i class="ph-duotone ph-path" style="color:var(--red);font-size:20px;margin-right:6px"></i>'+window.t('itin_subtab_routes','Rotte Storiche')
       : '<i class="ph-duotone ph-navigation" style="color:var(--red);font-size:20px;margin-right:6px"></i>'+window.t('itin_subtab_trips','Itinerari');
   }
-  if(t==='lists') renderItinLists();
 }
 function onItinNewClick(){
-  if(itinSubtab==='lists'){ openAddList(); }
+  if(itinSubtab==='routes'){ showToast(window.t('itin_routes_soon','Presto disponibili')); }
   else { openNewTrip(); }
 }
 async function renderItinLists(){
