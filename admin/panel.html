@@ -1,0 +1,1346 @@
+<!--
+  © Alessandro Castagna — 321.al / EVOLAB
+  Tutti i diritti riservati. Uso non autorizzato vietato.
+  info@321.al · https://321.al
+-->
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>POI•LOVE · Pannello amministrativo</title>
+<style>
+/* ─────────────────────────────────────────────────────────────
+   Identità visiva: stessa palette del login (admin/index.html)
+   terra/oro/rosso, vetro, font di sistema.
+   ───────────────────────────────────────────────────────────── */
+:root{
+  --red:#D42B2B; --gold:#E8B04B; --ink:#16110d; --paper:#f4ece0;
+  --glass:rgba(22,16,12,.42); --line:rgba(244,236,224,.18);
+  --glass-soft:rgba(244,236,224,.06);
+  --ok:#9be6a8; --warn:#E8B04B; --bad:#ffb4b4;
+  --sidebar-w:248px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  color:var(--paper);
+  background:
+    radial-gradient(120% 80% at 12% -5%, rgba(232,176,75,.16), transparent 55%),
+    radial-gradient(100% 70% at 100% 0%, rgba(212,43,43,.12), transparent 50%),
+    #0c0907;
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+.grain{position:fixed;inset:0;opacity:.045;pointer-events:none;mix-blend-mode:overlay;z-index:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+/* ── Schermata di blocco (gate) prima che il pannello compaia ── */
+#gate{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;
+  background:#0c0907;flex-direction:column;gap:18px;transition:opacity .35s}
+#gate .spin{width:42px;height:42px;border-radius:50%;border:3px solid rgba(244,236,224,.18);
+  border-top-color:var(--gold);animation:spin .8s linear infinite}
+#gate p{font-size:13px;color:rgba(244,236,224,.6);letter-spacing:.4px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── Layout principale ── */
+.app{display:none;position:relative;z-index:1;min-height:100vh}
+.app.ready{display:grid;grid-template-columns:var(--sidebar-w) 1fr}
+
+/* Sidebar */
+.sidebar{
+  position:sticky;top:0;height:100vh;
+  background:var(--glass);backdrop-filter:blur(20px) saturate(1.2);-webkit-backdrop-filter:blur(20px) saturate(1.2);
+  border-right:1px solid var(--line);
+  display:flex;flex-direction:column;padding:22px 16px;gap:6px;
+}
+.s-brand{display:flex;align-items:center;gap:8px;font-weight:900;letter-spacing:.5px;font-size:18px;padding:4px 8px 16px}
+.s-brand .h{color:var(--red)}
+.s-brand .tag{font-size:8px;font-weight:800;letter-spacing:2px;color:var(--gold);border:1px solid var(--gold);
+  border-radius:20px;padding:3px 7px;margin-left:2px;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:11px;padding:11px 13px;border-radius:13px;cursor:pointer;
+  color:rgba(244,236,224,.72);font-size:13.5px;font-weight:600;border:1px solid transparent;
+  transition:background .18s,color .18s,border-color .18s;user-select:none}
+.nav-item:hover{background:var(--glass-soft);color:var(--paper)}
+.nav-item.on{background:linear-gradient(135deg,rgba(232,176,75,.22),rgba(212,43,43,.12));
+  color:var(--paper);border-color:rgba(232,176,75,.4)}
+.nav-item .ic{font-size:16px;width:20px;text-align:center;line-height:1}
+.nav-item .badge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;font-weight:800;
+  border-radius:10px;padding:1px 7px;min-width:18px;text-align:center;display:none}
+.nav-item .badge.show{display:inline-block}
+.s-spacer{flex:1}
+.s-user{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:13px;background:var(--glass-soft);
+  border:1px solid var(--line);margin-top:6px}
+.s-user img,.s-user .ava{width:32px;height:32px;border-radius:50%;object-fit:cover;flex:none;
+  background:linear-gradient(135deg,var(--gold),var(--red));display:flex;align-items:center;justify-content:center;
+  font-weight:800;color:#fff;font-size:13px}
+.s-user .meta{min-width:0}
+.s-user .nm{font-size:12.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.s-user .rl{font-size:10px;color:var(--gold);letter-spacing:.5px;text-transform:uppercase}
+.s-logout{width:100%;margin-top:8px;border:1px solid var(--line);background:transparent;color:rgba(244,236,224,.7);
+  border-radius:12px;padding:10px;font-size:12.5px;font-weight:600;font-family:inherit;cursor:pointer;transition:all .18s}
+.s-logout:hover{background:rgba(212,43,43,.18);color:#fff;border-color:rgba(212,43,43,.5)}
+
+/* Area contenuto */
+.content{padding:26px 30px 60px;min-width:0}
+.topbar{display:flex;align-items:center;gap:14px;margin-bottom:22px}
+.topbar h1{font-size:23px;font-weight:800;letter-spacing:.2px}
+.topbar .sub{font-size:12.5px;color:rgba(244,236,224,.55);margin-top:3px}
+.topbar .right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.langs{display:flex;gap:5px}
+.langs button{border:1px solid var(--line);background:transparent;color:rgba(244,236,224,.6);
+  border-radius:18px;padding:5px 11px;font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;transition:all .18s}
+.langs button.on{background:var(--gold);color:#16110d;border-color:var(--gold)}
+
+/* Pannelli vetro */
+.panel{background:var(--glass);backdrop-filter:blur(16px) saturate(1.15);-webkit-backdrop-filter:blur(16px) saturate(1.15);
+  border:1px solid var(--line);border-radius:20px;padding:20px;animation:fade .4s ease both}
+@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.section{display:none}
+.section.on{display:block}
+
+/* KPI cards */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+.kpi{background:var(--glass);border:1px solid var(--line);border-radius:18px;padding:18px;position:relative;overflow:hidden;
+  animation:fade .4s ease both}
+.kpi::after{content:"";position:absolute;right:-30px;top:-30px;width:90px;height:90px;border-radius:50%;
+  background:radial-gradient(circle,rgba(232,176,75,.18),transparent 70%)}
+.kpi .ic{font-size:20px;opacity:.85}
+.kpi .num{font-size:30px;font-weight:900;margin-top:8px;letter-spacing:-.5px}
+.kpi .lab{font-size:11.5px;color:rgba(244,236,224,.6);margin-top:2px}
+.kpi.alert .num{color:var(--gold)}
+
+/* Griglia due colonne */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.card-h{font-size:14px;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.card-h .ic{color:var(--gold)}
+
+/* Liste compatte */
+.mini-list{display:flex;flex-direction:column;gap:2px}
+.mini-row{display:flex;align-items:center;gap:11px;padding:9px 8px;border-radius:11px;transition:background .15s}
+.mini-row:hover{background:var(--glass-soft)}
+.mini-row .av{width:30px;height:30px;border-radius:9px;flex:none;object-fit:cover;
+  background:linear-gradient(135deg,var(--gold),var(--red));display:flex;align-items:center;justify-content:center;
+  font-weight:800;color:#fff;font-size:12px}
+.mini-row .av.round{border-radius:50%}
+.mini-row .tt{min-width:0;flex:1}
+.mini-row .tt .nm{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mini-row .tt .dt{font-size:11px;color:rgba(244,236,224,.5)}
+.mini-row .meta{font-size:11px;color:rgba(244,236,224,.5);white-space:nowrap}
+
+/* Tabelle */
+.tbl-wrap{overflow-x:auto;border-radius:14px;border:1px solid var(--line)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{text-align:left;padding:11px 13px;font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;
+  color:rgba(244,236,224,.5);background:rgba(244,236,224,.04);border-bottom:1px solid var(--line);white-space:nowrap}
+tbody td{padding:11px 13px;border-bottom:1px solid rgba(244,236,224,.07);vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:var(--glass-soft)}
+td .ttl{font-weight:600}
+td .sm{font-size:11px;color:rgba(244,236,224,.5)}
+
+/* Chip stati */
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;
+  border:1px solid var(--line);white-space:nowrap}
+.chip.green{color:var(--ok);border-color:rgba(155,230,168,.4);background:rgba(155,230,168,.1)}
+.chip.gold{color:var(--gold);border-color:rgba(232,176,75,.4);background:rgba(232,176,75,.1)}
+.chip.red{color:var(--bad);border-color:rgba(255,180,180,.4);background:rgba(255,180,180,.1)}
+.chip.dim{color:rgba(244,236,224,.6)}
+
+/* Bottoni azione */
+.btn{border:1px solid var(--line);background:var(--glass-soft);color:var(--paper);border-radius:11px;
+  padding:8px 13px;font-size:12.5px;font-weight:700;font-family:inherit;cursor:pointer;transition:all .16s;
+  display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+.btn:hover{background:rgba(244,236,224,.14)}
+.btn:active{transform:scale(.97)}
+.btn.gold{background:linear-gradient(135deg,var(--gold),#caa13e);color:#16110d;border-color:transparent}
+.btn.gold:hover{filter:brightness(1.06)}
+.btn.red{background:linear-gradient(135deg,var(--red),#9a1d1d);color:#fff;border-color:transparent}
+.btn.red:hover{filter:brightness(1.08)}
+.btn.green{background:linear-gradient(135deg,#3f9c52,#2f7a3f);color:#fff;border-color:transparent}
+.btn.sm{padding:6px 10px;font-size:11.5px;border-radius:9px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-row{display:flex;gap:6px;flex-wrap:wrap}
+
+/* Input / form */
+.field{margin-bottom:13px}
+.field label{display:block;font-size:11.5px;font-weight:700;color:rgba(244,236,224,.7);margin-bottom:6px;letter-spacing:.3px}
+input,select,textarea{width:100%;border:1px solid var(--line);background:rgba(244,236,224,.06);color:var(--paper);
+  border-radius:12px;padding:11px 13px;font-size:13.5px;font-family:inherit;outline:none;transition:border-color .18s}
+input::placeholder,textarea::placeholder{color:rgba(244,236,224,.4)}
+input:focus,select:focus,textarea:focus{border-color:var(--gold)}
+textarea{resize:vertical;min-height:78px}
+select option{background:#16110d;color:var(--paper)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+
+/* Search bar */
+.searchbar{display:flex;gap:8px;margin-bottom:14px}
+.searchbar input{flex:1}
+
+/* Empty / loading state */
+.empty{text-align:center;padding:42px 20px;color:rgba(244,236,224,.5)}
+.empty .ic{font-size:34px;opacity:.5;margin-bottom:10px}
+.empty p{font-size:13.5px}
+.empty .hint{font-size:11.5px;margin-top:4px;opacity:.7}
+.loading{display:flex;align-items:center;justify-content:center;gap:11px;padding:34px;color:rgba(244,236,224,.55);font-size:13px}
+.loading .spin{width:20px;height:20px;border-radius:50%;border:2.5px solid rgba(244,236,224,.18);border-top-color:var(--gold);animation:spin .8s linear infinite}
+/* Skeleton */
+.skel{height:14px;border-radius:7px;background:linear-gradient(90deg,rgba(244,236,224,.06),rgba(244,236,224,.13),rgba(244,236,224,.06));
+  background-size:200% 100%;animation:shimmer 1.3s linear infinite}
+@keyframes shimmer{from{background-position:200% 0}to{background-position:-200% 0}}
+.skel-row{display:flex;align-items:center;gap:11px;padding:9px 8px}
+.skel-row .skel.av{width:30px;height:30px;border-radius:9px;flex:none}
+.skel-row .skel.ln{flex:1}
+
+/* Toast */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(120px);z-index:10000;
+  background:var(--glass);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border:1px solid var(--line);border-radius:14px;padding:13px 20px;font-size:13.5px;font-weight:600;
+  box-shadow:0 18px 50px rgba(0,0,0,.5);transition:transform .35s cubic-bezier(.2,.8,.2,1);max-width:90vw}
+#toast.show{transform:translateX(-50%) translateY(0)}
+#toast.ok{border-color:rgba(155,230,168,.5)}
+#toast.err{border-color:rgba(255,180,180,.5)}
+
+/* AI copilota */
+.ai-modes{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.ai-mode{border:1px solid var(--line);background:var(--glass-soft);color:rgba(244,236,224,.75);border-radius:12px;
+  padding:9px 15px;font-size:12.5px;font-weight:700;font-family:inherit;cursor:pointer;transition:all .18s;
+  display:flex;align-items:center;gap:7px}
+.ai-mode.on{background:linear-gradient(135deg,rgba(232,176,75,.25),rgba(212,43,43,.14));color:var(--paper);border-color:rgba(232,176,75,.5)}
+.chat-box{display:flex;flex-direction:column;height:min(56vh,520px);min-height:340px}
+.chat-log{flex:1;overflow-y:auto;padding:6px 4px;display:flex;flex-direction:column;gap:12px}
+.bubble{max-width:84%;padding:12px 15px;border-radius:16px;font-size:13.5px;line-height:1.55;white-space:normal;word-break:break-word}
+.bubble.user{align-self:flex-end;background:linear-gradient(135deg,var(--red),#9a1d1d);color:#fff;border-bottom-right-radius:5px}
+.bubble.ai{align-self:flex-start;background:var(--glass-soft);border:1px solid var(--line);border-bottom-left-radius:5px}
+.bubble.ai strong{color:var(--gold);font-weight:800}
+.bubble.ai code{background:rgba(0,0,0,.35);padding:1px 6px;border-radius:6px;font-size:12.5px}
+.bubble.ai ul{margin:6px 0 6px 18px}
+.bubble.ai li{margin:3px 0}
+.bubble.ai a{color:var(--gold)}
+.bubble .usage{margin-top:8px;font-size:10.5px;color:rgba(244,236,224,.45);border-top:1px dashed var(--line);padding-top:6px}
+.bubble .route-cta{margin-top:10px}
+.chat-input{display:flex;gap:9px;margin-top:12px}
+.chat-input textarea{flex:1;min-height:46px;max-height:130px;padding:12px 14px}
+.typing{align-self:flex-start;display:flex;gap:4px;padding:14px 16px}
+.typing span{width:7px;height:7px;border-radius:50%;background:rgba(244,236,224,.5);animation:blink 1.2s infinite}
+.typing span:nth-child(2){animation-delay:.2s}.typing span:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,60%,100%{opacity:.25}30%{opacity:1}}
+
+/* Mobile: sidebar diventa barra in basso */
+@media(max-width:860px){
+  .app.ready{grid-template-columns:1fr}
+  .sidebar{position:fixed;bottom:0;left:0;right:0;top:auto;height:auto;flex-direction:row;
+    border-right:none;border-top:1px solid var(--line);padding:8px 6px;gap:2px;z-index:500;
+    justify-content:space-around;overflow-x:auto}
+  .s-brand,.s-spacer,.s-user,.s-logout{display:none}
+  .nav-item{flex-direction:column;gap:3px;padding:7px 9px;font-size:9.5px;border-radius:10px;flex:none;min-width:58px;text-align:center}
+  .nav-item .ic{font-size:18px}
+  .nav-item .label{white-space:nowrap}
+  .nav-item .badge{position:absolute;margin:0;top:2px;right:6px}
+  .nav-item{position:relative}
+  .content{padding:18px 14px 96px}
+  .kpis{grid-template-columns:1fr 1fr}
+  .grid2{grid-template-columns:1fr}
+  .row2,.row3{grid-template-columns:1fr}
+  .topbar{flex-wrap:wrap}
+}
+@media(max-width:480px){.kpis{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="grain"></div>
+
+<!-- Gate: spinner finché la verifica admin non è completata -->
+<div id="gate">
+  <div class="spin"></div>
+  <p id="gateMsg">Verifico l'accesso…</p>
+</div>
+
+<!-- App -->
+<div class="app" id="app">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="s-brand">POI<span class="h">•</span>LOVE<span class="tag">Admin</span></div>
+
+    <div class="nav-item on" data-sec="dashboard" onclick="openSection('dashboard')">
+      <span class="ic">📊</span><span class="label" data-t="nav_dashboard">Dashboard</span>
+    </div>
+    <div class="nav-item" data-sec="moderation" onclick="openSection('moderation')">
+      <span class="ic">🛡️</span><span class="label" data-t="nav_moderation">Moderazione</span>
+      <span class="badge" id="badgeReports"></span>
+    </div>
+    <div class="nav-item" data-sec="users" onclick="openSection('users')">
+      <span class="ic">👤</span><span class="label" data-t="nav_users">Utenti</span>
+    </div>
+    <div class="nav-item" data-sec="ailimits" onclick="openSection('ailimits')">
+      <span class="ic">⚙️</span><span class="label" data-t="nav_ailimits">Limiti AI</span>
+    </div>
+    <div class="nav-item" data-sec="copilot" onclick="openSection('copilot')">
+      <span class="ic">✨</span><span class="label" data-t="nav_copilot">Copilota AI</span>
+    </div>
+    <div class="nav-item" data-sec="create" onclick="openSection('create')">
+      <span class="ic">➕</span><span class="label" data-t="nav_create">Crea</span>
+    </div>
+    <div class="nav-item" data-sec="audit" onclick="openSection('audit')">
+      <span class="ic">📜</span><span class="label" data-t="nav_audit">Audit log</span>
+    </div>
+
+    <div class="s-spacer"></div>
+
+    <div class="s-user">
+      <div class="ava" id="meAva">A</div>
+      <div class="meta">
+        <div class="nm" id="meName">admin</div>
+        <div class="rl" data-t="role_admin">Amministratore</div>
+      </div>
+    </div>
+    <button class="s-logout" onclick="doLogout()" data-t="logout">Esci</button>
+  </aside>
+
+  <!-- Contenuto -->
+  <main class="content">
+    <div class="topbar">
+      <div>
+        <h1 id="secTitle" data-t="nav_dashboard">Dashboard</h1>
+        <div class="sub" id="secSub" data-t="sub_dashboard">Panoramica della piattaforma in tempo reale.</div>
+      </div>
+      <div class="right">
+        <div class="langs">
+          <button data-l="it" class="on" onclick="setLang('it')">IT</button>
+          <button data-l="sq" onclick="setLang('sq')">SQ</button>
+          <button data-l="en" onclick="setLang('en')">EN</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1) DASHBOARD -->
+    <section class="section on" id="sec-dashboard">
+      <div class="kpis" id="kpis">
+        <div class="kpi"><div class="ic">👥</div><div class="num skel" style="width:60%;height:30px"></div><div class="lab" data-t="kpi_users">Utenti totali</div></div>
+        <div class="kpi"><div class="ic">📍</div><div class="num skel" style="width:60%;height:30px"></div><div class="lab" data-t="kpi_pois">POI totali</div></div>
+        <div class="kpi alert"><div class="ic">🚩</div><div class="num skel" style="width:60%;height:30px"></div><div class="lab" data-t="kpi_reports">Segnalazioni aperte</div></div>
+        <div class="kpi"><div class="ic">🌱</div><div class="num skel" style="width:60%;height:30px"></div><div class="lab" data-t="kpi_new">Nuovi utenti 7gg</div></div>
+      </div>
+      <div class="grid2">
+        <div class="panel">
+          <div class="card-h"><span class="ic">📍</span><span data-t="latest_pois">Ultimi POI</span></div>
+          <div class="mini-list" id="latestPois"></div>
+        </div>
+        <div class="panel">
+          <div class="card-h"><span class="ic">🌱</span><span data-t="latest_users">Ultimi iscritti</span></div>
+          <div class="mini-list" id="latestUsers"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2) MODERAZIONE -->
+    <section class="section" id="sec-moderation">
+      <div class="panel">
+        <div class="card-h"><span class="ic">🛡️</span><span data-t="moderation_queue">Coda segnalazioni</span></div>
+        <div id="modTable"></div>
+      </div>
+    </section>
+
+    <!-- 3) UTENTI -->
+    <section class="section" id="sec-users">
+      <div class="panel">
+        <div class="searchbar">
+          <input id="userSearch" placeholder="Cerca per username…" onkeydown="if(event.key==='Enter')loadUsers()">
+          <button class="btn gold" onclick="loadUsers()" data-t="search">Cerca</button>
+        </div>
+        <div id="usersTable"></div>
+      </div>
+    </section>
+
+    <!-- 4) LIMITI AI -->
+    <section class="section" id="sec-ailimits">
+      <div class="panel">
+        <div class="card-h"><span class="ic">⚙️</span><span data-t="ailimits_title">Limiti AI per tier</span></div>
+        <div class="sub" style="font-size:12px;color:rgba(244,236,224,.55);margin-bottom:14px" data-t="ailimits_help">
+          Configura messaggi al giorno, token massimi e modello per ciascun livello. Salva su gamification_config.
+        </div>
+        <div id="aiLimitsTable"></div>
+        <div style="margin-top:16px;display:flex;gap:10px">
+          <button class="btn gold" id="saveLimitsBtn" onclick="saveAiLimits()" data-t="save_limits">Salva limiti</button>
+          <button class="btn" onclick="loadAiLimits()" data-t="reload">Ricarica</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5) COPILOTA AI -->
+    <section class="section" id="sec-copilot">
+      <div class="panel">
+        <div class="ai-modes">
+          <button class="ai-mode on" data-mode="chat" onclick="setAiMode('chat')"><span>💬</span><span data-t="mode_chat">Chat</span></button>
+          <button class="ai-mode" data-mode="route" onclick="setAiMode('route')"><span>🗺️</span><span data-t="mode_route">Traccia percorso</span></button>
+          <button class="ai-mode" data-mode="write" onclick="setAiMode('write')"><span>✍️</span><span data-t="mode_write">Scrivi testo</span></button>
+        </div>
+        <div class="chat-box">
+          <div class="chat-log" id="chatLog"></div>
+          <div class="chat-input">
+            <textarea id="chatInput" rows="1" placeholder="Scrivi al copilota…"
+              onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAi()}"></textarea>
+            <button class="btn gold" id="chatSend" onclick="sendAi()" data-t="send">Invia</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6) CREA CONTENUTI -->
+    <section class="section" id="sec-create">
+      <div class="grid2">
+        <!-- POI ufficiale -->
+        <div class="panel">
+          <div class="card-h"><span class="ic">📍</span><span data-t="create_poi">Crea POI ufficiale</span></div>
+          <div class="field"><label data-t="f_name">Nome</label><input id="poiName" placeholder="Es. Castello di Rozafa"></div>
+          <div class="field"><label data-t="f_desc">Descrizione</label><textarea id="poiDesc" placeholder="Una breve descrizione del luogo…"></textarea></div>
+          <div class="row2">
+            <div class="field"><label data-t="f_cat">Categoria</label>
+              <select id="poiCat">
+                <option value="culture">Cultura</option>
+                <option value="nature">Natura</option>
+                <option value="food">Cibo</option>
+                <option value="view">Panorama</option>
+                <option value="history">Storia</option>
+                <option value="other">Altro</option>
+              </select>
+            </div>
+            <div class="field"><label data-t="f_vis">Visibilità</label>
+              <select id="poiVis">
+                <option value="community">Community</option>
+                <option value="suggested_google">Suggerito</option>
+                <option value="private">Privato</option>
+              </select>
+            </div>
+          </div>
+          <div class="row2">
+            <div class="field"><label>Lat</label><input id="poiLat" placeholder="41.3275" inputmode="decimal"></div>
+            <div class="field"><label>Lng</label><input id="poiLng" placeholder="19.8187" inputmode="decimal"></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn" onclick="useMyLocation()" data-t="use_map">Usa la mia posizione</button>
+            <button class="btn gold" onclick="createPoi()" data-t="create_btn">Crea POI</button>
+          </div>
+        </div>
+
+        <!-- Percorso -->
+        <div class="panel">
+          <div class="card-h"><span class="ic">🗺️</span><span data-t="create_trip">Crea percorso</span></div>
+          <div class="field"><label data-t="f_trip_name">Nome percorso</label><input id="tripName" placeholder="Es. Tirana in un giorno"></div>
+          <div class="row2">
+            <div class="field"><label data-t="f_badge">Badge</label><input id="tripBadge" placeholder="🏛️ Storico"></div>
+            <div class="field"><label data-t="f_dates">Date</label><input id="tripDates" placeholder="12-13 giu 2026"></div>
+          </div>
+          <label style="display:block;font-size:11.5px;font-weight:700;color:rgba(244,236,224,.7);margin-bottom:6px" data-t="f_stops">Tappe</label>
+          <div id="stopsList"></div>
+          <button class="btn sm" onclick="addStopRow()" style="margin:4px 0 14px" data-t="add_stop">+ Aggiungi tappa</button>
+          <div class="btn-row">
+            <button class="btn gold" onclick="createTrip()" data-t="create_trip_btn">Crea percorso</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7) AUDIT LOG -->
+    <section class="section" id="sec-audit">
+      <div class="panel">
+        <div class="card-h"><span class="ic">📜</span><span data-t="audit_title">Registro azioni (ultimi 50)</span></div>
+        <div id="auditTable"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   POI•LOVE — Pannello amministrativo (single-file)
+   Un solo createClient. Solo anon key. Niente service_role qui.
+   ═══════════════════════════════════════════════════════════════ */
+
+const SUPABASE_URL  = 'https://ptppxwlafswfhbueakjt.supabase.co';
+const SUPABASE_ANON = 'sb_publishable_PC1xQ8XiQK9jpzwsAlFLxw_E-PKN40V';
+const ADMIN_AI_URL  = SUPABASE_URL + '/functions/v1/admin-ai';
+
+// Un solo client per tutta la pagina
+const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON) : null;
+
+// Stato globale leggero
+let ME = null;            // record profiles dell'admin loggato
+let SESSION = null;       // sessione Supabase (per access_token)
+let loaded = {};          // sezioni già caricate (lazy load)
+let aiMode = 'chat';      // modalità copilota
+let aiHistory = [];       // cronologia messaggi {role,content}
+
+/* ─────────────────────────── i18n (pattern T del login) ─────────────────────────── */
+const T = {
+  it:{
+    nav_dashboard:'Dashboard', nav_moderation:'Moderazione', nav_users:'Utenti', nav_ailimits:'Limiti AI',
+    nav_copilot:'Copilota AI', nav_create:'Crea', nav_audit:'Audit log',
+    sub_dashboard:'Panoramica della piattaforma in tempo reale.',
+    sub_moderation:'Segnalazioni da rivedere.', sub_users:'Gestione profili e moderazione.',
+    sub_ailimits:'Quote e modelli AI per livello.', sub_copilot:'Assistente operativo con accesso ai dati.',
+    sub_create:'Pubblica POI ufficiali e percorsi.', sub_audit:'Cronologia delle azioni amministrative.',
+    role_admin:'Amministratore', logout:'Esci',
+    kpi_users:'Utenti totali', kpi_pois:'POI totali', kpi_reports:'Segnalazioni aperte', kpi_new:'Nuovi utenti 7gg',
+    latest_pois:'Ultimi POI', latest_users:'Ultimi iscritti',
+    moderation_queue:'Coda segnalazioni', search:'Cerca',
+    ailimits_title:'Limiti AI per tier', ailimits_help:'Configura messaggi al giorno, token massimi e modello per ciascun livello. Salva su gamification_config.',
+    save_limits:'Salva limiti', reload:'Ricarica',
+    mode_chat:'Chat', mode_route:'Traccia percorso', mode_write:'Scrivi testo', send:'Invia',
+    create_poi:'Crea POI ufficiale', f_name:'Nome', f_desc:'Descrizione', f_cat:'Categoria', f_vis:'Visibilità',
+    use_map:'Usa la mia posizione', create_btn:'Crea POI',
+    create_trip:'Crea percorso', f_trip_name:'Nome percorso', f_badge:'Badge', f_dates:'Date', f_stops:'Tappe',
+    add_stop:'+ Aggiungi tappa', create_trip_btn:'Crea percorso',
+    audit_title:'Registro azioni (ultimi 50)',
+    // stati
+    st_open:'Aperta', st_reviewing:'In revisione', st_resolved:'Risolta', st_dismissed:'Respinta',
+    st_active:'Attivo', st_suspended:'Sospeso', st_banned:'Bannato',
+    // azioni
+    a_resolve:'Risolvi', a_dismiss:'Respingi', a_suspend:'Sospendi 7gg', a_ban:'Banna', a_reactivate:'Riattiva',
+    a_review:'In revisione',
+    // colonne
+    c_target:'Bersaglio', c_reason:'Motivo', c_status:'Stato', c_date:'Data', c_actions:'Azioni',
+    c_user:'Utente', c_tier:'Tier', c_admin:'Admin', c_action:'Azione',
+    c_msgs:'Msg/giorno', c_tokens:'Max token', c_model:'Modello', c_tier_h:'Livello',
+    // messaggi
+    empty_reports:'Nessuna segnalazione aperta', empty_reports_h:'La community è tranquilla.',
+    empty_users:'Nessun utente trovato', empty_audit:'Nessuna azione registrata',
+    backend_off:'Backend non ancora inizializzato', backend_off_h:'La migration 012_admin.sql va applicata al DB.',
+    loading:'Caricamento…', confirm_ban:'Bannare definitivamente questo utente?',
+    saved:'Salvato', error:'Si è verificato un errore', poi_created:'POI creato', trip_created:'Percorso creato',
+    fill_required:'Compila i campi obbligatori', no_geo:'Geolocalizzazione non disponibile',
+    reason_ph:'Motivo (opzionale)', create_route_btn:'Crea questo percorso', route_created:'Percorso creato dal copilota',
+    type_poi:'POI', type_user:'utente', ai_welcome:'Ciao. Sono il copilota amministrativo. Posso leggere le statistiche, suggerire moderazioni e tracciare percorsi. Come posso aiutarti?',
+    stop_name:'Nome tappa', cost:'Costo'
+  },
+  sq:{
+    nav_dashboard:'Paneli', nav_moderation:'Moderimi', nav_users:'Përdoruesit', nav_ailimits:'Limitet AI',
+    nav_copilot:'Kopiloti AI', nav_create:'Krijo', nav_audit:'Regjistri',
+    sub_dashboard:'Pamje e platformës në kohë reale.',
+    sub_moderation:'Raportime për t\'u rishikuar.', sub_users:'Menaxhimi i profileve dhe moderimi.',
+    sub_ailimits:'Kuotat dhe modelet AI sipas nivelit.', sub_copilot:'Asistent operativ me qasje në të dhëna.',
+    sub_create:'Publiko POI zyrtarë dhe itinerare.', sub_audit:'Historiku i veprimeve administrative.',
+    role_admin:'Administrator', logout:'Dil',
+    kpi_users:'Përdorues gjithsej', kpi_pois:'POI gjithsej', kpi_reports:'Raportime të hapura', kpi_new:'Përdorues të rinj 7d',
+    latest_pois:'POI të fundit', latest_users:'Regjistrimet e fundit',
+    moderation_queue:'Radha e raportimeve', search:'Kërko',
+    ailimits_title:'Limitet AI sipas nivelit', ailimits_help:'Konfiguro mesazhe në ditë, token maksimumi dhe modelin për çdo nivel. Ruaj në gamification_config.',
+    save_limits:'Ruaj limitet', reload:'Rifresko',
+    mode_chat:'Bisedë', mode_route:'Vizato itinerar', mode_write:'Shkruaj tekst', send:'Dërgo',
+    create_poi:'Krijo POI zyrtar', f_name:'Emri', f_desc:'Përshkrimi', f_cat:'Kategoria', f_vis:'Dukshmëria',
+    use_map:'Përdor pozicionin tim', create_btn:'Krijo POI',
+    create_trip:'Krijo itinerar', f_trip_name:'Emri i itinerarit', f_badge:'Stema', f_dates:'Datat', f_stops:'Ndalesat',
+    add_stop:'+ Shto ndalesë', create_trip_btn:'Krijo itinerar',
+    audit_title:'Regjistri i veprimeve (50 të fundit)',
+    st_open:'E hapur', st_reviewing:'Në rishikim', st_resolved:'E zgjidhur', st_dismissed:'E refuzuar',
+    st_active:'Aktiv', st_suspended:'Pezulluar', st_banned:'Bllokuar',
+    a_resolve:'Zgjidh', a_dismiss:'Refuzo', a_suspend:'Pezullo 7d', a_ban:'Blloko', a_reactivate:'Riaktivizo',
+    a_review:'Në rishikim',
+    c_target:'Objektivi', c_reason:'Arsyeja', c_status:'Statusi', c_date:'Data', c_actions:'Veprime',
+    c_user:'Përdoruesi', c_tier:'Niveli', c_admin:'Admin', c_action:'Veprimi',
+    c_msgs:'Msg/ditë', c_tokens:'Token maks', c_model:'Modeli', c_tier_h:'Niveli',
+    empty_reports:'Asnjë raportim i hapur', empty_reports_h:'Komuniteti është i qetë.',
+    empty_users:'Asnjë përdorues', empty_audit:'Asnjë veprim i regjistruar',
+    backend_off:'Backend-i ende i pa-inicializuar', backend_off_h:'Migrimi 012_admin.sql duhet aplikuar në DB.',
+    loading:'Po ngarkohet…', confirm_ban:'Të bllokohet përgjithmonë ky përdorues?',
+    saved:'U ruajt', error:'Ndodhi një gabim', poi_created:'POI u krijua', trip_created:'Itinerari u krijua',
+    fill_required:'Plotëso fushat e detyrueshme', no_geo:'Gjeolokalizimi i padisponueshëm',
+    reason_ph:'Arsyeja (opsionale)', create_route_btn:'Krijo këtë itinerar', route_created:'Itinerari u krijua nga kopiloti',
+    type_poi:'POI', type_user:'përdorues', ai_welcome:'Përshëndetje. Jam kopiloti administrativ. Mund të lexoj statistikat, të sugjeroj moderime dhe të vizatoj itinerare. Si mund të ndihmoj?',
+    stop_name:'Emri i ndalesës', cost:'Kosto'
+  },
+  en:{
+    nav_dashboard:'Dashboard', nav_moderation:'Moderation', nav_users:'Users', nav_ailimits:'AI limits',
+    nav_copilot:'AI copilot', nav_create:'Create', nav_audit:'Audit log',
+    sub_dashboard:'Real-time overview of the platform.',
+    sub_moderation:'Reports awaiting review.', sub_users:'Profile management and moderation.',
+    sub_ailimits:'AI quotas and models per tier.', sub_copilot:'Operational assistant with data access.',
+    sub_create:'Publish official POIs and routes.', sub_audit:'History of admin actions.',
+    role_admin:'Administrator', logout:'Sign out',
+    kpi_users:'Total users', kpi_pois:'Total POIs', kpi_reports:'Open reports', kpi_new:'New users 7d',
+    latest_pois:'Latest POIs', latest_users:'Latest signups',
+    moderation_queue:'Reports queue', search:'Search',
+    ailimits_title:'AI limits per tier', ailimits_help:'Set messages per day, max tokens and model for each tier. Saved to gamification_config.',
+    save_limits:'Save limits', reload:'Reload',
+    mode_chat:'Chat', mode_route:'Route', mode_write:'Write text', send:'Send',
+    create_poi:'Create official POI', f_name:'Name', f_desc:'Description', f_cat:'Category', f_vis:'Visibility',
+    use_map:'Use my location', create_btn:'Create POI',
+    create_trip:'Create route', f_trip_name:'Route name', f_badge:'Badge', f_dates:'Dates', f_stops:'Stops',
+    add_stop:'+ Add stop', create_trip_btn:'Create route',
+    audit_title:'Action log (last 50)',
+    st_open:'Open', st_reviewing:'Reviewing', st_resolved:'Resolved', st_dismissed:'Dismissed',
+    st_active:'Active', st_suspended:'Suspended', st_banned:'Banned',
+    a_resolve:'Resolve', a_dismiss:'Dismiss', a_suspend:'Suspend 7d', a_ban:'Ban', a_reactivate:'Reactivate',
+    a_review:'Review',
+    c_target:'Target', c_reason:'Reason', c_status:'Status', c_date:'Date', c_actions:'Actions',
+    c_user:'User', c_tier:'Tier', c_admin:'Admin', c_action:'Action',
+    c_msgs:'Msg/day', c_tokens:'Max tokens', c_model:'Model', c_tier_h:'Tier',
+    empty_reports:'No open reports', empty_reports_h:'The community is calm.',
+    empty_users:'No users found', empty_audit:'No actions logged',
+    backend_off:'Backend not initialized yet', backend_off_h:'Migration 012_admin.sql must be applied to the DB.',
+    loading:'Loading…', confirm_ban:'Permanently ban this user?',
+    saved:'Saved', error:'An error occurred', poi_created:'POI created', trip_created:'Route created',
+    fill_required:'Fill in the required fields', no_geo:'Geolocation unavailable',
+    reason_ph:'Reason (optional)', create_route_btn:'Create this route', route_created:'Route created by copilot',
+    type_poi:'POI', type_user:'user', ai_welcome:'Hi. I am the admin copilot. I can read stats, suggest moderation and draft routes. How can I help?',
+    stop_name:'Stop name', cost:'Cost'
+  }
+};
+let lang = localStorage.getItem('admin_lang') || (navigator.language||'it').slice(0,2);
+if(!T[lang]) lang='it';
+function t(k){ return (T[lang] && T[lang][k]) || (T.it[k]) || k; }
+
+function setLang(l){
+  if(!T[l]) return;
+  lang=l; localStorage.setItem('admin_lang', l);
+  document.documentElement.lang=l;
+  // testi statici marcati con data-t
+  document.querySelectorAll('[data-t]').forEach(el=>{ const k=el.dataset.t; if(T[l][k]!=null) el.textContent=T[l][k]; });
+  document.querySelectorAll('.langs button').forEach(b=>b.classList.toggle('on', b.dataset.l===l));
+  // sottotitolo della sezione attiva
+  const cur = document.querySelector('.nav-item.on');
+  if(cur) updateHeader(cur.dataset.sec);
+  // ricarica sezioni con contenuto localizzato già visto
+  const active = document.querySelector('.section.on');
+  if(active){ const sec=active.id.replace('sec-',''); loaded[sec]=false; runSection(sec); }
+}
+
+/* ─────────────────────────── Utility sicure ───────────────────────────
+   Sanitizzazione: NON si usa mai innerHTML con dati grezzi.
+   esc() esca i caratteri HTML; helper el() costruisce nodi DOM.       */
+function esc(s){
+  return String(s==null?'':s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function el(tag, attrs, children){
+  const n=document.createElement(tag);
+  if(attrs) for(const k in attrs){
+    if(k==='class') n.className=attrs[k];
+    else if(k==='text') n.textContent=attrs[k];
+    else if(k.startsWith('on') && typeof attrs[k]==='function') n.addEventListener(k.slice(2), attrs[k]);
+    else if(attrs[k]!=null) n.setAttribute(k, attrs[k]);
+  }
+  if(children) (Array.isArray(children)?children:[children]).forEach(c=>{
+    if(c==null) return;
+    n.appendChild(typeof c==='string' ? document.createTextNode(c) : c);
+  });
+  return n;
+}
+function initials(name){
+  const s=(name||'?').trim();
+  return s ? s.slice(0,1).toUpperCase() : '?';
+}
+function fmtDate(iso){
+  if(!iso) return '—';
+  try{ const d=new Date(iso);
+    return d.toLocaleDateString(lang==='en'?'en-GB':(lang==='sq'?'sq-AL':'it-IT'),{day:'2-digit',month:'short',year:'numeric'});
+  }catch(e){ return iso; }
+}
+function toast(text, kind){
+  const tEl=document.getElementById('toast');
+  tEl.textContent=text; tEl.className='show'+(kind?(' '+kind):'');
+  clearTimeout(toast._tm);
+  toast._tm=setTimeout(()=>{ tEl.className=tEl.className.replace('show','').trim(); }, 3200);
+}
+// Mostra un blocco di skeleton in un container
+function skeletons(container, rows){
+  container.textContent='';
+  for(let i=0;i<(rows||4);i++){
+    container.appendChild(el('div',{class:'skel-row'},[
+      el('div',{class:'skel av'}), el('div',{class:'skel ln',style:'height:14px'})
+    ]));
+  }
+}
+function loadingBox(container){
+  container.textContent='';
+  container.appendChild(el('div',{class:'loading'},[ el('div',{class:'spin'}), el('span',{text:t('loading')}) ]));
+}
+function emptyBox(container, msg, hint, icon){
+  container.textContent='';
+  const e=el('div',{class:'empty'});
+  e.appendChild(el('div',{class:'ic',text:icon||'🌙'}));
+  e.appendChild(el('p',{text:msg}));
+  if(hint) e.appendChild(el('div',{class:'hint',text:hint}));
+  container.appendChild(e);
+}
+// Riconosce l'errore "colonna/tabella non esiste" (migration non applicata)
+function isBackendMissing(err){
+  if(!err) return false;
+  const m=(err.message||err.msg||'').toLowerCase();
+  return err.code==='42P01' || err.code==='42703' || err.code==='PGRST205' || err.code==='PGRST204'
+      || m.includes('does not exist') || m.includes('could not find') || m.includes('schema cache');
+}
+function backendOff(container){
+  emptyBox(container, t('backend_off'), t('backend_off_h'), '🧱');
+}
+
+/* ─────────────────────────── GATE di sicurezza ───────────────────────────
+   All'apertura: sessione presente? is_admin? moderation_status active?
+   Altrimenti redirect a /index.html (login).                              */
+async function gate(){
+  if(!sb){ location.href='/index.html'; return; }
+  const { data:{ session } } = await sb.auth.getSession();
+  if(!session || !session.user){ location.href='/index.html'; return; }
+  SESSION = session;
+  const { data, error } = await sb.from('profiles')
+    .select('id,username,avatar_url,is_admin,moderation_status,special_tier')
+    .eq('id', session.user.id).single();
+  if(error || !data || data.is_admin!==true || data.moderation_status!=='active'){
+    // non admin oppure profilo sospeso: fuori
+    try{ await sb.auth.signOut(); }catch(e){}
+    location.href='/index.html';
+    return;
+  }
+  ME = data;
+  // popola intestazione utente
+  document.getElementById('meName').textContent = ME.username || 'admin';
+  const ava=document.getElementById('meAva');
+  if(ME.avatar_url){
+    const img=el('img',{src:ME.avatar_url,alt:''});
+    ava.replaceWith(img); img.id='meAva';
+  } else { ava.textContent = initials(ME.username); }
+  // mostra il pannello
+  const g=document.getElementById('gate'); g.style.opacity='0'; setTimeout(()=>g.remove(),360);
+  document.getElementById('app').classList.add('ready');
+  setLang(lang);
+  openSection('dashboard');
+  refreshReportsBadge(); // badge segnalazioni in sidebar
+}
+
+async function doLogout(){
+  try{ await sb.auth.signOut(); }catch(e){}
+  location.href='/index.html';
+}
+
+/* ─────────────────────────── Navigazione sezioni (lazy) ─────────────────────────── */
+const SUBKEY = { dashboard:'sub_dashboard', moderation:'sub_moderation', users:'sub_users',
+  ailimits:'sub_ailimits', copilot:'sub_copilot', create:'sub_create', audit:'sub_audit' };
+const TITLEKEY = { dashboard:'nav_dashboard', moderation:'nav_moderation', users:'nav_users',
+  ailimits:'nav_ailimits', copilot:'nav_copilot', create:'nav_create', audit:'nav_audit' };
+
+function updateHeader(sec){
+  document.getElementById('secTitle').textContent = t(TITLEKEY[sec]);
+  document.getElementById('secSub').textContent   = t(SUBKEY[sec]);
+}
+function openSection(sec){
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('on', n.dataset.sec===sec));
+  document.querySelectorAll('.section').forEach(s=>s.classList.toggle('on', s.id==='sec-'+sec));
+  updateHeader(sec);
+  runSection(sec);
+  // su mobile riporta in cima
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function runSection(sec){
+  if(loaded[sec]) return;
+  loaded[sec]=true;
+  switch(sec){
+    case 'dashboard': loadDashboard(); break;
+    case 'moderation': loadModeration(); break;
+    case 'users': loadUsers(); break;
+    case 'ailimits': loadAiLimits(); break;
+    case 'copilot': initCopilot(); break;
+    case 'create': initCreate(); break;
+    case 'audit': loadAudit(); break;
+  }
+}
+
+/* ═════════════════════════ 1) DASHBOARD ═════════════════════════ */
+async function loadDashboard(){
+  // KPI con count reali (head:true → niente righe, solo conteggio)
+  const kpis = document.querySelectorAll('#kpis .kpi .num');
+  // Utenti totali
+  countAsync(sb.from('profiles').select('id',{count:'exact',head:true}), kpis[0]);
+  // POI totali
+  countAsync(sb.from('pois').select('id',{count:'exact',head:true}), kpis[1]);
+  // Segnalazioni aperte (status open o reviewing)
+  countAsync(sb.from('reports').select('id',{count:'exact',head:true}).in('status',['open','reviewing']), kpis[2], true);
+  // Nuovi utenti 7gg
+  const since=new Date(Date.now()-7*864e5).toISOString();
+  countAsync(sb.from('profiles').select('id',{count:'exact',head:true}).gte('created_at',since), kpis[3]);
+
+  loadLatestPois();
+  loadLatestUsers();
+}
+async function countAsync(query, target, isReports){
+  try{
+    const { count, error } = await query;
+    if(error){ target.classList.remove('skel'); target.textContent = isBackendMissing(error)?'—':'!'; return; }
+    target.classList.remove('skel');
+    target.textContent = (count==null?0:count).toLocaleString(lang==='en'?'en-GB':'it-IT');
+  }catch(e){ target.classList.remove('skel'); target.textContent='—'; }
+}
+async function loadLatestPois(){
+  const box=document.getElementById('latestPois'); skeletons(box,5);
+  try{
+    const { data, error } = await sb.from('pois')
+      .select('id,name,category,love_count,created_at').order('created_at',{ascending:false}).limit(6);
+    if(error){ isBackendMissing(error)?backendOff(box):emptyBox(box,t('error'),null,'⚠️'); return; }
+    if(!data || !data.length){ emptyBox(box,'—',null,'📍'); return; }
+    box.textContent='';
+    data.forEach(p=>{
+      box.appendChild(el('div',{class:'mini-row'},[
+        el('div',{class:'av',text:'📍'}),
+        el('div',{class:'tt'},[
+          el('div',{class:'nm',text:p.name||'POI'}),
+          el('div',{class:'dt',text:(p.category||'—')+' · '+fmtDate(p.created_at)})
+        ]),
+        el('div',{class:'meta',text:'❤ '+(p.love_count||0)})
+      ]));
+    });
+  }catch(e){ emptyBox(box,t('error'),null,'⚠️'); }
+}
+async function loadLatestUsers(){
+  const box=document.getElementById('latestUsers'); skeletons(box,5);
+  try{
+    const { data, error } = await sb.from('profiles')
+      .select('id,username,avatar_url,special_tier,created_at').order('created_at',{ascending:false}).limit(6);
+    if(error){ isBackendMissing(error)?backendOff(box):emptyBox(box,t('error'),null,'⚠️'); return; }
+    if(!data || !data.length){ emptyBox(box,'—',null,'🌱'); return; }
+    box.textContent='';
+    data.forEach(u=>{
+      const av = u.avatar_url
+        ? el('img',{class:'av round',src:u.avatar_url,alt:''})
+        : el('div',{class:'av round',text:initials(u.username)});
+      box.appendChild(el('div',{class:'mini-row'},[
+        av,
+        el('div',{class:'tt'},[
+          el('div',{class:'nm',text:'@'+(u.username||'utente')}),
+          el('div',{class:'dt',text:fmtDate(u.created_at)})
+        ]),
+        el('div',{class:'meta',text:u.special_tier||'free'})
+      ]));
+    });
+  }catch(e){ emptyBox(box,t('error'),null,'⚠️'); }
+}
+
+// Badge segnalazioni aperte in sidebar
+async function refreshReportsBadge(){
+  try{
+    const { count, error } = await sb.from('reports').select('id',{count:'exact',head:true}).in('status',['open','reviewing']);
+    if(error) return;
+    const b=document.getElementById('badgeReports');
+    if(count && count>0){ b.textContent=count>99?'99+':count; b.classList.add('show'); }
+    else { b.classList.remove('show'); }
+  }catch(e){}
+}
+
+/* ═════════════════════════ 2) MODERAZIONE ═════════════════════════ */
+async function loadModeration(){
+  const box=document.getElementById('modTable'); loadingBox(box);
+  try{
+    const { data, error } = await sb.from('reports')
+      .select('id,reporter_id,target_type,target_id,reason,details,status,created_at')
+      .in('status',['open','reviewing']).order('created_at',{ascending:false}).limit(100);
+    if(error){ isBackendMissing(error)?backendOff(box):emptyBox(box,t('error'),null,'⚠️'); return; }
+    if(!data || !data.length){ emptyBox(box,t('empty_reports'),t('empty_reports_h'),'🕊️'); return; }
+
+    // costruzione tabella via DOM (no innerHTML grezzo)
+    const wrap=el('div',{class:'tbl-wrap'});
+    const table=el('table');
+    table.appendChild(el('thead',null, el('tr',null,[
+      el('th',{text:t('c_target')}), el('th',{text:t('c_reason')}),
+      el('th',{text:t('c_status')}), el('th',{text:t('c_date')}), el('th',{text:t('c_actions')})
+    ])));
+    const tb=el('tbody');
+    data.forEach(r=>{
+      const isUser = r.target_type==='user' || r.target_type==='profile';
+      const tgtLabel = (isUser? t('type_user') : (r.target_type==='poi'? t('type_poi') : (r.target_type||'?')));
+      const stChip = el('span',{class:'chip '+(r.status==='reviewing'?'gold':'red'),
+        text: r.status==='reviewing'? t('st_reviewing') : t('st_open')});
+
+      // celle azioni
+      const actions=el('div',{class:'btn-row'});
+      if(r.status==='open'){
+        actions.appendChild(el('button',{class:'btn sm', onclick:()=>setReportStatus(r.id,'reviewing'), text:t('a_review')}));
+      }
+      actions.appendChild(el('button',{class:'btn sm green', onclick:()=>setReportStatus(r.id,'resolved'), text:t('a_resolve')}));
+      actions.appendChild(el('button',{class:'btn sm', onclick:()=>setReportStatus(r.id,'dismissed'), text:t('a_dismiss')}));
+      if(isUser && r.target_id){
+        actions.appendChild(el('button',{class:'btn sm red',
+          onclick:()=>moderateUser(r.target_id,'suspended','reports#'+r.id, plus7d()), text:t('a_suspend')}));
+        actions.appendChild(el('button',{class:'btn sm red',
+          onclick:()=>{ if(confirm(t('confirm_ban'))) moderateUser(r.target_id,'banned','reports#'+r.id,null); }, text:t('a_ban')}));
+      }
+
+      tb.appendChild(el('tr',null,[
+        el('td',null,[ el('div',{class:'ttl',text:tgtLabel}), el('div',{class:'sm',text:(r.target_id||'').toString().slice(0,8)}) ]),
+        el('td',null,[ el('div',{text:r.reason||'—'}), r.details? el('div',{class:'sm',text:r.details}):null ]),
+        el('td',null,stChip),
+        el('td',{text:fmtDate(r.created_at)}),
+        el('td',null,actions)
+      ]));
+    });
+    table.appendChild(tb); wrap.appendChild(table);
+    box.textContent=''; box.appendChild(wrap);
+  }catch(e){ emptyBox(box,t('error'),null,'⚠️'); }
+}
+function plus7d(){ return new Date(Date.now()+7*864e5).toISOString(); }
+
+// Aggiorna lo status di una segnalazione (consentito all'admin via RLS)
+async function setReportStatus(id, status){
+  try{
+    const { error } = await sb.from('reports').update({ status }).eq('id', id);
+    if(error){ toast(t('error'),'err'); return; }
+    // log azione (best-effort: se la tabella non c'è, non blocca)
+    await logAudit('report_'+status, 'report', id, { status });
+    toast(t('saved'),'ok');
+    loaded.moderation=false; loadModeration();
+    refreshReportsBadge();
+  }catch(e){ toast(t('error'),'err'); }
+}
+
+/* ═════════════════════════ 3) UTENTI ═════════════════════════ */
+async function loadUsers(){
+  const box=document.getElementById('usersTable'); loadingBox(box);
+  const q=(document.getElementById('userSearch').value||'').trim();
+  try{
+    let query=sb.from('profiles')
+      .select('id,username,avatar_url,special_tier,moderation_status,moderation_reason,points,created_at')
+      .order('created_at',{ascending:false}).limit(60);
+    if(q) query=query.ilike('username','%'+q+'%');
+    const { data, error } = await query;
+    if(error){ isBackendMissing(error)?backendOff(box):emptyBox(box,t('error'),null,'⚠️'); return; }
+    if(!data || !data.length){ emptyBox(box,t('empty_users'),null,'🔍'); return; }
+
+    const wrap=el('div',{class:'tbl-wrap'});
+    const table=el('table');
+    table.appendChild(el('thead',null, el('tr',null,[
+      el('th',{text:t('c_user')}), el('th',{text:t('c_tier')}),
+      el('th',{text:t('c_status')}), el('th',{text:t('c_actions')})
+    ])));
+    const tb=el('tbody');
+    data.forEach(u=>{
+      const av = u.avatar_url
+        ? el('img',{class:'av round',src:u.avatar_url,alt:''})
+        : el('div',{class:'av round',text:initials(u.username)});
+      const st=u.moderation_status||'active';
+      const stChip=el('span',{class:'chip '+(st==='active'?'green':(st==='suspended'?'gold':'red')),
+        text: st==='active'? t('st_active') : (st==='suspended'? t('st_suspended') : t('st_banned'))});
+
+      const actions=el('div',{class:'btn-row'});
+      if(st==='active'){
+        actions.appendChild(el('button',{class:'btn sm gold',
+          onclick:()=>moderateUser(u.id,'suspended','manual',plus7d()), text:t('a_suspend')}));
+        actions.appendChild(el('button',{class:'btn sm red',
+          onclick:()=>{ if(confirm(t('confirm_ban'))) moderateUser(u.id,'banned','manual',null); }, text:t('a_ban')}));
+      } else {
+        actions.appendChild(el('button',{class:'btn sm green',
+          onclick:()=>moderateUser(u.id,'active','manual',null), text:t('a_reactivate')}));
+      }
+
+      tb.appendChild(el('tr',null,[
+        el('td',null, el('div',{style:'display:flex;align-items:center;gap:10px'},[
+          av, el('div',null,[ el('div',{class:'ttl',text:'@'+(u.username||'utente')}),
+            el('div',{class:'sm',text:(u.points!=null?(u.points+' pt · '):'')+fmtDate(u.created_at)}) ])
+        ])),
+        el('td',null, el('span',{class:'chip dim',text:u.special_tier||'free'})),
+        el('td',null,stChip),
+        el('td',null,actions)
+      ]));
+    });
+    table.appendChild(tb); wrap.appendChild(table);
+    box.textContent=''; box.appendChild(wrap);
+  }catch(e){ emptyBox(box,t('error'),null,'⚠️'); }
+}
+
+// Moderazione via RPC sicura (mai toccare is_admin dal client)
+async function moderateUser(targetId, status, reason, until){
+  try{
+    const { error } = await sb.rpc('admin_set_user_status', {
+      p_target: targetId, p_status: status, p_reason: reason||null, p_until: until||null
+    });
+    if(error){
+      if(isBackendMissing(error)) toast(t('backend_off'),'err');
+      else toast((error.message||t('error')),'err');
+      return;
+    }
+    // La RPC dovrebbe già scrivere su admin_audit_log; logghiamo comunque best-effort
+    await logAudit('user_'+status, 'user', targetId, { reason, until });
+    toast(t('saved'),'ok');
+    // ricarica le sezioni interessate
+    loaded.users=false; if(document.getElementById('sec-users').classList.contains('on')) loadUsers();
+    loaded.moderation=false; if(document.getElementById('sec-moderation').classList.contains('on')) loadModeration();
+    refreshReportsBadge();
+  }catch(e){ toast(t('error'),'err'); }
+}
+
+/* ═════════════════════════ 4) LIMITI AI ═════════════════════════ */
+const TIER_ORDER = ['free','professionista','sostenitore','mecenate'];
+let aiLimitsDraft = null; // copia modificabile in memoria
+
+async function loadAiLimits(){
+  const box=document.getElementById('aiLimitsTable'); loadingBox(box);
+  try{
+    const { data, error } = await sb.from('gamification_config').select('key,value').eq('key','ai_limits_per_tier').single();
+    if(error && !isBackendMissing(error) && error.code!=='PGRST116'){ emptyBox(box,t('error'),null,'⚠️'); return; }
+    if(error && isBackendMissing(error)){ backendOff(box); return; }
+    // value è jsonb: { tier: { messages, max_tokens, model } }
+    let cfg = (data && data.value) ? data.value : {};
+    // assicura tutti i tier presenti con default sensati
+    const defaults={ messages:20, max_tokens:1024, model:'sonnet' };
+    TIER_ORDER.forEach(tr=>{ if(!cfg[tr]) cfg[tr]=Object.assign({},defaults); });
+    aiLimitsDraft = JSON.parse(JSON.stringify(cfg));
+
+    const wrap=el('div',{class:'tbl-wrap'});
+    const table=el('table');
+    table.appendChild(el('thead',null, el('tr',null,[
+      el('th',{text:t('c_tier_h')}), el('th',{text:t('c_msgs')}),
+      el('th',{text:t('c_tokens')}), el('th',{text:t('c_model')})
+    ])));
+    const tb=el('tbody');
+    TIER_ORDER.forEach(tr=>{
+      const v=aiLimitsDraft[tr];
+      const inMsg=el('input',{type:'number',min:'0',value:(v.messages!=null?v.messages:''),style:'max-width:120px'});
+      inMsg.addEventListener('input',()=>{ aiLimitsDraft[tr].messages=parseInt(inMsg.value||'0',10); });
+      const inTok=el('input',{type:'number',min:'0',value:(v.max_tokens!=null?v.max_tokens:''),style:'max-width:140px'});
+      inTok.addEventListener('input',()=>{ aiLimitsDraft[tr].max_tokens=parseInt(inTok.value||'0',10); });
+      const inMod=el('input',{type:'text',value:(v.model||''),placeholder:'sonnet',style:'max-width:180px'});
+      inMod.addEventListener('input',()=>{ aiLimitsDraft[tr].model=inMod.value; });
+      tb.appendChild(el('tr',null,[
+        el('td',null, el('span',{class:'chip '+(tr==='free'?'dim':'gold'),text:tr})),
+        el('td',null,inMsg), el('td',null,inTok), el('td',null,inMod)
+      ]));
+    });
+    table.appendChild(tb); wrap.appendChild(table);
+    box.textContent=''; box.appendChild(wrap);
+  }catch(e){ emptyBox(box,t('error'),null,'⚠️'); }
+}
+async function saveAiLimits(){
+  if(!aiLimitsDraft){ return; }
+  const btn=document.getElementById('saveLimitsBtn'); btn.disabled=true;
+  try{
+    // upsert su gamification_config (consentito all'admin via RLS)
+    const { error } = await sb.from('gamification_config')
+      .upsert({ key:'ai_limits_per_tier', value: aiLimitsDraft }, { onConflict:'key' });
+    if(error){
+      if(isBackendMissing(error)) toast(t('backend_off'),'err'); else toast(error.message||t('error'),'err');
+      return;
+    }
+    await logAudit('ai_limits_update','config','ai_limits_per_tier', aiLimitsDraft);
+    toast(t('saved'),'ok');
+  }catch(e){ toast(t('error'),'err'); }
+  finally{ btn.disabled=false; }
+}
+
+/* ═════════════════════════ 5) COPILOTA AI ═════════════════════════ */
+function setAiMode(m){
+  aiMode=m;
+  document.querySelectorAll('.ai-mode').forEach(b=>b.classList.toggle('on', b.dataset.mode===m));
+}
+function initCopilot(){
+  const log=document.getElementById('chatLog');
+  if(log.childElementCount) return; // già inizializzato
+  appendBubble('ai', t('ai_welcome'));
+}
+
+// Renderer markdown SICURO: costruisce nodi, non usa innerHTML con HTML arbitrario.
+// Supporta: **grassetto**, `code`, liste con - o *, paragrafi/a-capo, link http(s).
+function renderMarkdownSafe(md){
+  const root=document.createDocumentFragment();
+  const lines=String(md==null?'':md).split(/\r?\n/);
+  let ul=null;
+  const flushUl=()=>{ if(ul){ root.appendChild(ul); ul=null; } };
+
+  lines.forEach(raw=>{
+    const line=raw.replace(/\s+$/,'');
+    const liMatch=line.match(/^\s*[-*]\s+(.*)$/);
+    if(liMatch){
+      if(!ul) ul=document.createElement('ul');
+      const li=document.createElement('li');
+      appendInline(li, liMatch[1]);
+      ul.appendChild(li);
+      return;
+    }
+    flushUl();
+    if(line.trim()===''){ return; } // riga vuota: separatore
+    const p=document.createElement('div'); p.style.margin='4px 0';
+    appendInline(p, line);
+    root.appendChild(p);
+  });
+  flushUl();
+  return root;
+}
+// Inline: **bold**, `code`, link. Tutto via createTextNode / createElement (no HTML injection).
+function appendInline(parent, text){
+  // tokenizza su **...**, `...`, e URL http(s)
+  const re=/(\*\*[^*]+\*\*)|(`[^`]+`)|(https?:\/\/[^\s)]+)/g;
+  let last=0, m;
+  while((m=re.exec(text))!==null){
+    if(m.index>last) parent.appendChild(document.createTextNode(text.slice(last,m.index)));
+    const tok=m[0];
+    if(tok.startsWith('**')){
+      const b=document.createElement('strong'); b.textContent=tok.slice(2,-2); parent.appendChild(b);
+    } else if(tok.startsWith('`')){
+      const c=document.createElement('code'); c.textContent=tok.slice(1,-1); parent.appendChild(c);
+    } else { // URL: anchor con href validato a http/https
+      const a=document.createElement('a');
+      a.href=tok; a.target='_blank'; a.rel='noopener noreferrer'; a.textContent=tok;
+      parent.appendChild(a);
+    }
+    last=re.lastIndex;
+  }
+  if(last<text.length) parent.appendChild(document.createTextNode(text.slice(last)));
+}
+
+function appendBubble(role, content, usage, routeData){
+  const log=document.getElementById('chatLog');
+  const b=el('div',{class:'bubble '+(role==='user'?'user':'ai')});
+  if(role==='user'){ b.textContent=content; }   // utente: solo testo
+  else { b.appendChild(renderMarkdownSafe(content)); } // ai: markdown sanitizzato
+  // usage/costo
+  if(usage){
+    const parts=[];
+    if(usage.in!=null) parts.push('in '+usage.in);
+    if(usage.out!=null) parts.push('out '+usage.out);
+    if(usage.cost_eur!=null) parts.push(t('cost')+' €'+Number(usage.cost_eur).toFixed(4));
+    if(parts.length) b.appendChild(el('div',{class:'usage',text:parts.join(' · ')}));
+  }
+  // bottone "Crea questo percorso" se la risposta route porta tappe strutturate
+  if(routeData && Array.isArray(routeData.stops) && routeData.stops.length){
+    const cta=el('div',{class:'route-cta'});
+    cta.appendChild(el('button',{class:'btn gold', text:t('create_route_btn'),
+      onclick:(ev)=>createRouteFromAi(routeData, ev.currentTarget)}));
+    b.appendChild(cta);
+  }
+  log.appendChild(b);
+  log.scrollTop=log.scrollHeight;
+  return b;
+}
+function appendTyping(){
+  const log=document.getElementById('chatLog');
+  const t=el('div',{class:'typing',id:'typingDots'},[el('span'),el('span'),el('span')]);
+  log.appendChild(t); log.scrollTop=log.scrollHeight; return t;
+}
+
+async function sendAi(){
+  const input=document.getElementById('chatInput');
+  const text=(input.value||'').trim();
+  if(!text) return;
+  input.value='';
+  document.getElementById('chatSend').disabled=true;
+  appendBubble('user', text);
+  aiHistory.push({ role:'user', content:text });
+  const typing=appendTyping();
+
+  try{
+    // Token di sessione: garantiamo che sia fresco
+    const { data:{ session } } = await sb.auth.getSession();
+    const accessToken = session && session.access_token;
+    if(!accessToken){ throw new Error('no session'); }
+
+    const res = await fetch(ADMIN_AI_URL, {
+      method:'POST',
+      headers:{
+        'Authorization':'Bearer '+accessToken,   // JWT utente: l'edge function ricava l'utente e verifica is_admin
+        'apikey': SUPABASE_ANON,
+        'Content-Type':'application/json'
+      },
+      body: JSON.stringify({
+        messages: aiHistory.slice(-12),  // ultimi turni
+        mode: aiMode,
+        context: { lang }
+      })
+    });
+    typing.remove();
+
+    if(res.status===403){
+      appendBubble('ai','**403** · '+ (lang==='it'?'Accesso negato: il gate admin lato server ha rifiutato la richiesta.':lang==='sq'?'Qasje e refuzuar: gate-i admin në server e refuzoi kërkesën.':'Access denied: the server-side admin gate rejected the request.'));
+      return;
+    }
+    if(!res.ok){
+      let msg=t('error');
+      try{ const j=await res.json(); if(j && j.error) msg=j.error; }catch(e){}
+      appendBubble('ai','⚠️ '+msg);
+      return;
+    }
+    const data = await res.json();
+    const reply = data.reply || '';
+    aiHistory.push({ role:'assistant', content:reply });
+    // se mode route, la edge function può restituire data.route con tappe
+    const routeData = data.data && (data.data.route || (Array.isArray(data.data.stops)? data.data : null));
+    appendBubble('ai', reply, data.usage, routeData);
+  }catch(e){
+    if(document.getElementById('typingDots')) document.getElementById('typingDots').remove();
+    appendBubble('ai','⚠️ '+t('error'));
+  }finally{
+    document.getElementById('chatSend').disabled=false;
+    input.focus();
+  }
+}
+
+// Crea trip + trip_stops reali dalle tappe proposte dal copilota
+async function createRouteFromAi(routeData, btn){
+  if(btn){ btn.disabled=true; }
+  try{
+    const { data:{ user } } = await sb.auth.getUser();
+    const ownerId = user ? user.id : ME.id;
+    const name = routeData.name || routeData.title || 'Percorso AI';
+    const { data:trip, error:e1 } = await sb.from('trips')
+      .insert({ owner_id:ownerId, name, badge:routeData.badge||null, dates_label:routeData.dates_label||null })
+      .select('id').single();
+    if(e1){ toast(isBackendMissing(e1)?t('backend_off'):t('error'),'err'); if(btn) btn.disabled=false; return; }
+
+    // tappe
+    const stops = routeData.stops.map((s,i)=>({
+      trip_id: trip.id,
+      name: s.name || ('Tappa '+(i+1)),
+      lat: (s.lat!=null? Number(s.lat): null),
+      lng: (s.lng!=null? Number(s.lng): null),
+      sort_order: (s.sort_order!=null? s.sort_order : i),
+      status: 'planned'
+    }));
+    const { error:e2 } = await sb.from('trip_stops').insert(stops);
+    if(e2){ toast(t('error'),'err'); if(btn) btn.disabled=false; return; }
+
+    await logAudit('route_create_ai','trip',trip.id,{ name, stops:stops.length });
+    toast(t('route_created'),'ok');
+    if(btn){ btn.textContent='✓'; }
+  }catch(e){ toast(t('error'),'err'); if(btn) btn.disabled=false; }
+}
+
+/* ═════════════════════════ 6) CREA CONTENUTI ═════════════════════════ */
+function initCreate(){
+  const box=document.getElementById('stopsList');
+  if(!box.childElementCount){ addStopRow(); addStopRow(); }
+}
+function addStopRow(){
+  const box=document.getElementById('stopsList');
+  const row=el('div',{class:'row3',style:'margin-bottom:8px;align-items:center'});
+  const nm=el('input',{placeholder:t('stop_name'),class:'stop-name'});
+  const la=el('input',{placeholder:'Lat',class:'stop-lat',inputmode:'decimal'});
+  const ln=el('input',{placeholder:'Lng',class:'stop-lng',inputmode:'decimal'});
+  row.appendChild(nm); row.appendChild(la); row.appendChild(ln);
+  box.appendChild(row);
+}
+// Geolocalizzazione del browser per riempire lat/lng del POI
+function useMyLocation(){
+  if(!navigator.geolocation){ toast(t('no_geo'),'err'); return; }
+  navigator.geolocation.getCurrentPosition(
+    pos=>{ document.getElementById('poiLat').value=pos.coords.latitude.toFixed(6);
+           document.getElementById('poiLng').value=pos.coords.longitude.toFixed(6);
+           toast('📍 '+pos.coords.latitude.toFixed(4)+', '+pos.coords.longitude.toFixed(4),'ok'); },
+    ()=>toast(t('no_geo'),'err'), { enableHighAccuracy:true, timeout:8000 }
+  );
+}
+// Crea un POI ufficiale (author_id = admin)
+async function createPoi(){
+  const name=(document.getElementById('poiName').value||'').trim();
+  const lat=parseFloat(document.getElementById('poiLat').value);
+  const lng=parseFloat(document.getElementById('poiLng').value);
+  if(!name || isNaN(lat) || isNaN(lng)){ toast(t('fill_required'),'err'); return; }
+  try{
+    const payload={
+      author_id: ME.id,
+      name,
+      description:(document.getElementById('poiDesc').value||'').trim() || null,
+      category:document.getElementById('poiCat').value,
+      visibility:document.getElementById('poiVis').value,
+      lat, lng
+    };
+    const { data, error } = await sb.from('pois').insert(payload).select('id').single();
+    if(error){ toast(isBackendMissing(error)?t('backend_off'):(error.message||t('error')),'err'); return; }
+    await logAudit('poi_create','poi',data.id,{ name });
+    toast(t('poi_created'),'ok');
+    // reset campi
+    ['poiName','poiDesc','poiLat','poiLng'].forEach(id=>document.getElementById(id).value='');
+    // aggiorna dashboard la prossima apertura
+    loaded.dashboard=false;
+  }catch(e){ toast(t('error'),'err'); }
+}
+// Crea un percorso (trip + trip_stops)
+async function createTrip(){
+  const name=(document.getElementById('tripName').value||'').trim();
+  if(!name){ toast(t('fill_required'),'err'); return; }
+  try{
+    const { data:trip, error:e1 } = await sb.from('trips')
+      .insert({ owner_id:ME.id, name,
+        badge:(document.getElementById('tripBadge').value||'').trim()||null,
+        dates_label:(document.getElementById('tripDates').value||'').trim()||null })
+      .select('id').single();
+    if(e1){ toast(isBackendMissing(e1)?t('backend_off'):(e1.message||t('error')),'err'); return; }
+
+    // raccogli tappe valide
+    const rows=document.querySelectorAll('#stopsList .row3');
+    const stops=[];
+    rows.forEach((r,i)=>{
+      const nm=(r.querySelector('.stop-name').value||'').trim();
+      if(!nm) return;
+      const la=parseFloat(r.querySelector('.stop-lat').value);
+      const ln=parseFloat(r.querySelector('.stop-lng').value);
+      stops.push({ trip_id:trip.id, name:nm,
+        lat:isNaN(la)?null:la, lng:isNaN(ln)?null:ln, sort_order:i, status:'planned' });
+    });
+    if(stops.length){
+      const { error:e2 } = await sb.from('trip_stops').insert(stops);
+      if(e2){ toast(t('error'),'err'); return; }
+    }
+    await logAudit('trip_create','trip',trip.id,{ name, stops:stops.length });
+    toast(t('trip_created'),'ok');
+    // reset
+    ['tripName','tripBadge','tripDates'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('stopsList').textContent=''; addStopRow(); addStopRow();
+  }catch(e){ toast(t('error'),'err'); }
+}
+
+/* ═════════════════════════ 7) AUDIT LOG ═════════════════════════ */
+async function loadAudit(){
+  const box=document.getElementById('auditTable'); loadingBox(box);
+  try{
+    const { data, error } = await sb.from('admin_audit_log')
+      .select('*').order('created_at',{ascending:false}).limit(50);
+    if(error){ isBackendMissing(error)?backendOff(box):emptyBox(box,t('error'),null,'⚠️'); return; }
+    if(!data || !data.length){ emptyBox(box,t('empty_audit'),null,'📜'); return; }
+
+    const wrap=el('div',{class:'tbl-wrap'});
+    const table=el('table');
+    table.appendChild(el('thead',null, el('tr',null,[
+      el('th',{text:t('c_date')}), el('th',{text:t('c_admin')}),
+      el('th',{text:t('c_action')}), el('th',{text:t('c_target')})
+    ])));
+    const tb=el('tbody');
+    data.forEach(a=>{
+      // colonne tollerate con nomi flessibili (lo schema esatto arriva con la migration)
+      const when = a.created_at || a.at || a.timestamp;
+      const adminId = a.admin_id || a.actor_id || a.admin || a.user_id;
+      const action = a.action || a.event || a.type || '—';
+      const targetType = a.target_type || a.entity || '';
+      const targetId = a.target_id || a.entity_id || a.target || '';
+      tb.appendChild(el('tr',null,[
+        el('td',{text:fmtDate(when)}),
+        el('td',null, el('span',{class:'sm',text:(adminId||'—').toString().slice(0,8)})),
+        el('td',null, el('span',{class:'chip dim',text:action})),
+        el('td',null,[ el('div',{text:targetType||'—'}), targetId? el('div',{class:'sm',text:targetId.toString().slice(0,8)}):null ])
+      ]));
+    });
+    table.appendChild(tb); wrap.appendChild(table);
+    box.textContent=''; box.appendChild(wrap);
+  }catch(e){ emptyBox(box,t('error'),null,'⚠️'); }
+}
+
+// Scrittura best-effort su admin_audit_log dal client.
+// La RPC admin_set_user_status logga già server-side; questo è un complemento
+// per le altre azioni. Se la tabella/colonne non esistono, fallisce in silenzio.
+async function logAudit(action, targetType, targetId, meta){
+  try{
+    await sb.from('admin_audit_log').insert({
+      admin_id: ME ? ME.id : null,
+      action,
+      target_type: targetType,
+      target_id: targetId ? String(targetId) : null,
+      meta: meta || null
+    });
+  }catch(e){ /* silenzioso: dipende dalla migration */ }
+}
+
+/* ─────────────────────────── Avvio ─────────────────────────── */
+gate();
+</script>
+</body>
+</html>

@@ -53,6 +53,28 @@ $$;
 revoke all on function public.is_admin(uuid) from public;
 grant execute on function public.is_admin(uuid) to anon, authenticated;
 
+-- ── 2b) HELPER is_active() — l'utente NON e bannato ne sospeso (in corso) ──────
+--    Serve a far valere DAVVERO la moderazione: usato nelle policy RESTRICTIVE qui
+--    sotto, blocca le scritture di un bannato/sospeso anche se il suo JWT e ancora
+--    valido (senza questo, il ban resterebbe una semplice etichetta cosmetica).
+create or replace function public.is_active(uid uuid default auth.uid())
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select not exists (
+    select 1 from public.profiles p
+    where p.id = uid
+      and ( p.moderation_status = 'banned'
+            or ( p.moderation_status = 'suspended'
+                 and (p.moderation_until is null or p.moderation_until > now()) ) )
+  );
+$$;
+revoke all on function public.is_active(uuid) from public;
+grant execute on function public.is_active(uuid) to anon, authenticated;
+
 -- ── 3) SEGNALAZIONI — report di POI o utenti (target polimorfico) ─────────────
 create table if not exists public.reports (
   id            uuid primary key default gen_random_uuid(),
@@ -132,6 +154,27 @@ drop policy if exists "gamification_config_admin_write" on public.gamification_c
 create policy "gamification_config_admin_write" on public.gamification_config
   for all using (public.is_admin()) with check (public.is_admin());
 
+-- ── 6b) APPLICAZIONE DELLA MODERAZIONE — policy RESTRICTIVE is_active() ────────
+--    Una policy RESTRICTIVE si combina in AND con quelle permissive gia esistenti
+--    (mig 001-011): non le tocca, ma aggiunge il vincolo "devi essere attivo per
+--    scrivere". Cosi un utente bannato/sospeso non puo piu creare ne modificare
+--    contenuti. Idempotente e tollerante: applica solo alle tabelle che esistono.
+do $$
+declare t text;
+begin
+  foreach t in array array['pois','loves','follows','reports','companions',
+                           'companion_members','trips','trip_stops','lists','list_pois']
+  loop
+    if exists (select 1 from information_schema.tables
+               where table_schema = 'public' and table_name = t) then
+      execute format('drop policy if exists %I on public.%I', 'require_active_ins', t);
+      execute format('create policy %I on public.%I as restrictive for insert with check (public.is_active())', 'require_active_ins', t);
+      execute format('drop policy if exists %I on public.%I', 'require_active_upd', t);
+      execute format('create policy %I on public.%I as restrictive for update using (public.is_active()) with check (public.is_active())', 'require_active_upd', t);
+    end if;
+  end loop;
+end $$;
+
 -- ── 7) ANTI-TAMPER: estende il trigger della mig 001 a is_admin + moderation_* ─
 --    is_admin: solo service_role/console. moderation_*: solo via RPC admin (app.admin_op='1').
 create or replace function public.protect_gamification_columns()
@@ -181,6 +224,11 @@ begin
   if not public.is_admin() then raise exception 'not authorized'; end if;
   if p_status not in ('active','suspended','banned') then raise exception 'invalid status'; end if;
   if p_target = auth.uid() then raise exception 'cannot moderate yourself'; end if;
+  -- un admin non puo moderare un altro admin (niente lockout/sabotaggio interno):
+  -- togliere il ruolo admin resta riservato a service_role/console SQL
+  if exists (select 1 from public.profiles where id = p_target and is_admin = true) then
+    raise exception 'cannot moderate an admin';
+  end if;
   perform set_config('app.admin_op', '1', true);   -- transaction-local: supera il trigger anti-tamper
   update public.profiles
      set moderation_status = p_status, moderation_reason = p_reason, moderation_until = p_until,
