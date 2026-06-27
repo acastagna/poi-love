@@ -1,0 +1,13 @@
+# © Alessandro Castagna — 321.al / EVOLAB
+# Tutti i diritti riservati. Uso non autorizzato vietato.
+# info@321.al · https://321.al
+#
+# admin.poilove.com — niente cache sull'HTML, cosi il pannello mostra sempre l'ultima versione.
+
+<IfModule mod_headers.c>
+  <FilesMatch "\.html$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+  </FilesMatch>
+</IfModule>
