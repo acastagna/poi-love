@@ -14,6 +14,11 @@ Sessione lunghissima, tutto deployato e verificato dal vivo. Commit fino a `ae70
 - **Mega-ricerca nel tab POI**: ogni riga ha `data-search` con nome+categoria+indirizzo+citta+descrizione+tag; `_poiSearch` cerca li dentro. Verificato dal vivo.
 - **Termini/Privacy nel footer**: pulsanti bianchi ai lati del logo nel footer nero della mappa, e a pie di pagina nella schermata di accesso.
 - **TODO.md riscritto** ordinato e prioritizzato.
+- **(notte fonda, in autonomia)** indirizzo POI **Albania-first** (Nominatim, risultati AL per primi); **estetica pannello admin ONLINE** (icone Phosphor ovunque + tema chiaro crema morbido/scuro con interruttore sole-luna, persistito); **copilota AI agentico PROGETTATO** (tool use nativo, proposte con approvazione umana, 5 poteri: query_data/historic_analysis/propose_poi/propose_historic_route/propose_project) + **migration `014_ai_copilot.sql` PRONTA nel repo ma NON applicata** (tabella ai_proposals, pois.is_approved/visibility 'official', trips.is_historic, RPC apply_ai_proposal; tocca pois/trips → serve OK). Design completo in scratchpad `copilota_design.md`.
+
+**Catturate (memoria `admin-phase2-requirements`, `poi-location-and-lens`):** switch tier da admin, tier Professionista Plus, livello Influencer (badge colore nuovo); schermata POI "dove si trova" (GPS, EXIF prima foto, tocca-mappa→lente, lente che intercetta i POI da OSM/Google; TripAdvisor/Facebook senza API pubbliche).
+
+**Prossimo grande lavoro (con Alessandro sveglio, e critico):** implementare il copilota agentico (applicare mig 014 + edge admin-ai con tool use + UI proposte nel panel).
 
 **Design fissato (NON ancora implementato), in memoria `poi-share-and-integrations`:**
 - Condivisione POI = teaser misterioso (zona + immagine AI + CTA; niente titolo/foto/indirizzo reali fino alla registrazione).
