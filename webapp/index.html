@@ -7994,11 +7994,13 @@ function onLocAddrInput(val){
   const lat=gpsPos?gpsPos.lat:CENTER[0];
   const lng=gpsPos?gpsPos.lng:CENTER[1];
   addrSearchTimer=setTimeout(()=>{
-    fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(val)}&format=json&limit=5&lat=${lat}&lon=${lng}&addressdetails=1`,
+    fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(val)}&format=json&limit=8&lat=${lat}&lon=${lng}&addressdetails=1`,
       {headers:{'Accept-Language':lang}})
       .then(r=>r.json()).then(results=>{
         if(!results.length){drop.classList.remove('open');return;}
-        drop.innerHTML=results.slice(0,5).map(r=>{
+        // Albania-first: i risultati in Albania vengono mostrati per primi, ma restano anche gli altri paesi
+        results.sort((a,b)=>((a.address&&a.address.country_code==='al')?0:1)-((b.address&&b.address.country_code==='al')?0:1));
+        drop.innerHTML=results.slice(0,6).map(r=>{
           const name=r.display_name.split(',')[0];
           const sub=r.display_name.split(',').slice(1,3).join(',').trim();
           const lat2=parseFloat(r.lat),lng2=parseFloat(r.lon);
