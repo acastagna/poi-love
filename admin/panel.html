@@ -10,36 +10,94 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
 <title>POI•LOVE · Pannello amministrativo</title>
+<!-- Phosphor Icons v2.1.1 — variante duotone (stessa libreria della webapp). Nessuna emoji nel pannello. -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+<!-- Tema: applicato PRIMA del paint per evitare flash. Default 'dark', persistito in localStorage 'admin_theme'. -->
+<script>
+  (function(){
+    try{
+      var saved = localStorage.getItem('admin_theme');
+      document.documentElement.setAttribute('data-theme', (saved==='light'||saved==='dark') ? saved : 'dark');
+    }catch(e){ document.documentElement.setAttribute('data-theme','dark'); }
+  })();
+</script>
 <style>
 /* ─────────────────────────────────────────────────────────────
    Identità visiva: stessa palette del login (admin/index.html)
    terra/oro/rosso, vetro, font di sistema.
    ───────────────────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────
+   TEMA — due palette complete dietro [data-theme].
+   • dark  (default): terra/oro/rosso su notte calda — invariato.
+   • light: crema/sabbia calda, NON bianco accecante, riposante.
+   Le variabili semantiche (--red/--gold/--ink/--paper/--glass/--line…)
+   restano gli STESSI nomi: tutto il resto del CSS le eredita senza modifiche.
+   Persistenza in localStorage 'admin_theme'; default dark.
+   ───────────────────────────────────────────────────────────── */
 :root{
+  --sidebar-w:248px;
+  /* tempi transizione tema */
+  --theme-tr:.5s cubic-bezier(.2,.8,.2,1);
+}
+
+/* ── TEMA SCURO (default — anche senza attributo, e con [data-theme="dark"]) ── */
+:root,
+html[data-theme="dark"]{
   --red:#D42B2B; --gold:#E8B04B; --ink:#16110d; --paper:#f4ece0;
   --glass:rgba(22,16,12,.42); --line:rgba(244,236,224,.18);
   --glass-soft:rgba(244,236,224,.06);
   --ok:#9be6a8; --warn:#E8B04B; --bad:#ffb4b4;
-  --sidebar-w:248px;
+  /* superfici/sfondo derivate, così body e chip non hard-codano i colori */
+  --bg-base:#0c0907;
+  --bg-glow-gold:rgba(232,176,75,.16);
+  --bg-glow-red:rgba(212,43,43,.12);
+  --on-accent:#16110d;            /* testo su oro/paper (pill lingua, chip) */
+  --field-bg:rgba(244,236,224,.06);
+  --select-bg:#16110d;
+  --grain-blend:overlay; --grain-op:.045;
+  --shadow-soft:0 18px 50px rgba(0,0,0,.5);
+  --muted:rgba(244,236,224,.6);            /* testo secondario */
 }
+
+/* ── TEMA CHIARO — crema/sabbia caldo, morbido, riposante ── */
+html[data-theme="light"]{
+  --red:#C12A2A; --gold:#B8862F; --ink:#3a2f23; --paper:#3a2f23;   /* "paper" = colore testo principale */
+  /* card/superfici in vetro caldo, non bianche */
+  --glass:rgba(255,251,243,.66);
+  --line:rgba(58,47,35,.14);
+  --glass-soft:rgba(58,47,35,.05);
+  --ok:#2f7a44; --warn:#9a6b16; --bad:#b23b3b;
+  --bg-base:#efe7d8;                          /* sabbia, mai #fff */
+  --bg-glow-gold:rgba(184,134,47,.14);
+  --bg-glow-red:rgba(193,42,42,.08);
+  --on-accent:#fbf6ec;                        /* testo su oro/rosso pieno */
+  --field-bg:rgba(255,251,243,.75);
+  --select-bg:#fbf6ec;
+  --grain-blend:multiply; --grain-op:.04;
+  --shadow-soft:0 18px 50px rgba(58,47,35,.18);
+  --muted:rgba(58,47,35,.62);
+}
+
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
+html{transition:background var(--theme-tr)}
 body{
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
   color:var(--paper);
   background:
-    radial-gradient(120% 80% at 12% -5%, rgba(232,176,75,.16), transparent 55%),
-    radial-gradient(100% 70% at 100% 0%, rgba(212,43,43,.12), transparent 50%),
-    #0c0907;
+    radial-gradient(120% 80% at 12% -5%, var(--bg-glow-gold), transparent 55%),
+    radial-gradient(100% 70% at 100% 0%, var(--bg-glow-red), transparent 50%),
+    var(--bg-base);
   -webkit-font-smoothing:antialiased;
   min-height:100vh;
+  transition:background var(--theme-tr), color var(--theme-tr);
 }
-.grain{position:fixed;inset:0;opacity:.045;pointer-events:none;mix-blend-mode:overlay;z-index:0;
+.grain{position:fixed;inset:0;opacity:var(--grain-op);pointer-events:none;mix-blend-mode:var(--grain-blend);z-index:0;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
 
 /* ── Schermata di blocco (gate) prima che il pannello compaia ── */
 #gate{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;
-  background:#0c0907;flex-direction:column;gap:18px;transition:opacity .35s}
+  background:var(--bg-base);flex-direction:column;gap:18px;transition:opacity .35s}
 #gate .spin{width:42px;height:42px;border-radius:50%;border:3px solid rgba(244,236,224,.18);
   border-top-color:var(--gold);animation:spin .8s linear infinite}
 #gate p{font-size:13px;color:rgba(244,236,224,.6);letter-spacing:.4px}
@@ -92,7 +150,31 @@ body{
 .langs{display:flex;gap:5px}
 .langs button{border:1px solid var(--line);background:transparent;color:rgba(244,236,224,.6);
   border-radius:18px;padding:5px 11px;font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;transition:all .18s}
-.langs button.on{background:var(--gold);color:#16110d;border-color:var(--gold)}
+.langs button.on{background:var(--gold);color:var(--on-accent);border-color:var(--gold)}
+
+/* ── Interruttore tema chiaro/scuro (topbar) ── */
+.theme-toggle{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;flex:none;
+  border:1px solid var(--line);background:var(--glass-soft);color:var(--paper);border-radius:50%;cursor:pointer;
+  font-family:inherit;transition:background .18s,color .18s,border-color .18s,transform .2s}
+.theme-toggle:hover{background:rgba(232,176,75,.18);border-color:rgba(232,176,75,.45);color:var(--gold)}
+.theme-toggle:active{transform:scale(.92)}
+.theme-toggle i{font-size:19px;line-height:1;transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+.theme-toggle:hover i{transform:rotate(35deg)}
+/* l'icona giusta è mostrata in base al tema: sole nel buio, luna nella luce */
+.theme-toggle .ico-sun{display:none}
+.theme-toggle .ico-moon{display:inline-block}
+html[data-theme="light"] .theme-toggle .ico-sun{display:inline-block}
+html[data-theme="light"] .theme-toggle .ico-moon{display:none}
+
+/* ── Icone Phosphor: dimensioni coerenti ovunque ── */
+i[class*="ph-"]{line-height:1;vertical-align:-2px}
+.nav-item .ic i,.nav-item .ic{font-size:18px}
+.kpi .ic i{font-size:22px}
+.card-h .ic i{font-size:16px}
+.empty .ic i{font-size:34px}
+.mini-row .av i{font-size:15px}
+.ai-mode i[class*="ph-"]{font-size:16px}
+.btn i[class*="ph-"]{font-size:15px}
 
 /* Pannelli vetro */
 .panel{background:var(--glass);backdrop-filter:blur(16px) saturate(1.15);-webkit-backdrop-filter:blur(16px) saturate(1.15);
@@ -128,7 +210,8 @@ body{
 .mini-row .tt{min-width:0;flex:1}
 .mini-row .tt .nm{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mini-row .tt .dt{font-size:11px;color:rgba(244,236,224,.5)}
-.mini-row .meta{font-size:11px;color:rgba(244,236,224,.5);white-space:nowrap}
+.mini-row .meta{font-size:11px;color:rgba(244,236,224,.5);white-space:nowrap;display:inline-flex;align-items:center}
+.mini-row .meta .meta-love{color:var(--red);font-size:13px;margin-right:1px}
 
 /* Tabelle */
 .tbl-wrap{overflow-x:auto;border-radius:14px;border:1px solid var(--line)}
@@ -155,7 +238,8 @@ td .sm{font-size:11px;color:rgba(244,236,224,.5)}
   display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
 .btn:hover{background:rgba(244,236,224,.14)}
 .btn:active{transform:scale(.97)}
-.btn.gold{background:linear-gradient(135deg,var(--gold),#caa13e);color:#16110d;border-color:transparent}
+.btn.gold{background:linear-gradient(135deg,var(--gold),#caa13e);color:#fff;border-color:transparent}
+html[data-theme="light"] .btn.gold{color:#fbf6ec}
 .btn.gold:hover{filter:brightness(1.06)}
 .btn.red{background:linear-gradient(135deg,var(--red),#9a1d1d);color:#fff;border-color:transparent}
 .btn.red:hover{filter:brightness(1.08)}
@@ -167,12 +251,13 @@ td .sm{font-size:11px;color:rgba(244,236,224,.5)}
 /* Input / form */
 .field{margin-bottom:13px}
 .field label{display:block;font-size:11.5px;font-weight:700;color:rgba(244,236,224,.7);margin-bottom:6px;letter-spacing:.3px}
-input,select,textarea{width:100%;border:1px solid var(--line);background:rgba(244,236,224,.06);color:var(--paper);
-  border-radius:12px;padding:11px 13px;font-size:13.5px;font-family:inherit;outline:none;transition:border-color .18s}
+input,select,textarea{width:100%;border:1px solid var(--line);background:var(--field-bg);color:var(--paper);
+  border-radius:12px;padding:11px 13px;font-size:13.5px;font-family:inherit;outline:none;transition:border-color .18s,background var(--theme-tr),color var(--theme-tr)}
 input::placeholder,textarea::placeholder{color:rgba(244,236,224,.4)}
+html[data-theme="light"] input::placeholder,html[data-theme="light"] textarea::placeholder{color:rgba(58,47,35,.42)}
 input:focus,select:focus,textarea:focus{border-color:var(--gold)}
 textarea{resize:vertical;min-height:78px}
-select option{background:#16110d;color:var(--paper)}
+select option{background:var(--select-bg);color:var(--paper)}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
 
@@ -199,10 +284,14 @@ select option{background:#16110d;color:var(--paper)}
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(120px);z-index:10000;
   background:var(--glass);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
   border:1px solid var(--line);border-radius:14px;padding:13px 20px;font-size:13.5px;font-weight:600;
-  box-shadow:0 18px 50px rgba(0,0,0,.5);transition:transform .35s cubic-bezier(.2,.8,.2,1);max-width:90vw}
+  box-shadow:var(--shadow-soft);transition:transform .35s cubic-bezier(.2,.8,.2,1);max-width:90vw}
+#toast{display:flex;align-items:center;gap:9px}
+#toast .toast-ic{font-size:18px;line-height:1;flex:none;color:var(--gold)}
 #toast.show{transform:translateX(-50%) translateY(0)}
 #toast.ok{border-color:rgba(155,230,168,.5)}
+#toast.ok .toast-ic{color:var(--ok)}
 #toast.err{border-color:rgba(255,180,180,.5)}
+#toast.err .toast-ic{color:var(--bad)}
 
 /* AI copilota */
 .ai-modes{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
@@ -215,6 +304,8 @@ select option{background:#16110d;color:var(--paper)}
 .bubble{max-width:84%;padding:12px 15px;border-radius:16px;font-size:13.5px;line-height:1.55;white-space:normal;word-break:break-word}
 .bubble.user{align-self:flex-end;background:linear-gradient(135deg,var(--red),#9a1d1d);color:#fff;border-bottom-right-radius:5px}
 .bubble.ai{align-self:flex-start;background:var(--glass-soft);border:1px solid var(--line);border-bottom-left-radius:5px}
+.bubble.with-ic{display:flex;align-items:flex-start;gap:9px}
+.bubble .bubble-ic{font-size:17px;line-height:1.4;flex:none;color:var(--warn)}
 .bubble.ai strong{color:var(--gold);font-weight:800}
 .bubble.ai code{background:rgba(0,0,0,.35);padding:1px 6px;border-radius:6px;font-size:12.5px}
 .bubble.ai ul{margin:6px 0 6px 18px}
@@ -248,6 +339,40 @@ select option{background:#16110d;color:var(--paper)}
   .topbar{flex-wrap:wrap}
 }
 @media(max-width:480px){.kpis{grid-template-columns:1fr}}
+
+/* ─────────────────────────────────────────────────────────────
+   RIFINITURE TEMA CHIARO
+   Nel tema scuro i testi attenuati usano rgba(244,236,224,..) (paper
+   chiaro su fondo notte). Sul crema servono toni scuri caldi: qui li
+   ritarghiamo in blocco, senza toccare le regole base del tema scuro.
+   ───────────────────────────────────────────────────────────── */
+html[data-theme="light"] .topbar .sub,
+html[data-theme="light"] .kpi .lab,
+html[data-theme="light"] .mini-row .tt .dt,
+html[data-theme="light"] .mini-row .meta,
+html[data-theme="light"] td .sm,
+html[data-theme="light"] .s-logout,
+html[data-theme="light"] .nav-item,
+html[data-theme="light"] .langs button,
+html[data-theme="light"] .ai-mode,
+html[data-theme="light"] .bubble .usage,
+html[data-theme="light"] .empty{color:rgba(58,47,35,.6)}
+html[data-theme="light"] thead th{color:rgba(58,47,35,.55);background:rgba(58,47,35,.05)}
+html[data-theme="light"] .loading,
+html[data-theme="light"] .empty .ic{color:rgba(58,47,35,.5)}
+html[data-theme="light"] .nav-item:hover,
+html[data-theme="light"] .nav-item.on{color:var(--ink)}
+html[data-theme="light"] .s-user .nm{color:var(--ink)}
+html[data-theme="light"] .typing span{background:rgba(58,47,35,.45)}
+/* la card di chat AI e i code-block: contrasto morbido anche al chiaro */
+html[data-theme="light"] .bubble.ai code{background:rgba(58,47,35,.1);color:var(--ink)}
+/* skeleton shimmer su fondo chiaro */
+html[data-theme="light"] .skel{background:linear-gradient(90deg,rgba(58,47,35,.06),rgba(58,47,35,.12),rgba(58,47,35,.06));background-size:200% 100%}
+/* righe tabella: bordi più caldi al chiaro */
+html[data-theme="light"] tbody td{border-bottom-color:rgba(58,47,35,.08)}
+/* la pillola lingua attiva e i chip: testo scuro leggibile sull'oro chiaro */
+html[data-theme="light"] .chip.gold{color:#7a5410}
+html[data-theme="light"] .chip.green{color:#236b39}
 </style>
 </head>
 <body>
@@ -266,26 +391,26 @@ select option{background:#16110d;color:var(--paper)}
     <div class="s-brand">POI<span class="h">•</span>LOVE<span class="tag">Admin</span></div>
 
     <div class="nav-item on" data-sec="dashboard" onclick="openSection('dashboard')">
-      <span class="ic">📊</span><span class="label" data-t="nav_dashboard">Dashboard</span>
+      <span class="ic"><i class="ph-duotone ph-chart-bar"></i></span><span class="label" data-t="nav_dashboard">Dashboard</span>
     </div>
     <div class="nav-item" data-sec="moderation" onclick="openSection('moderation')">
-      <span class="ic">🛡️</span><span class="label" data-t="nav_moderation">Moderazione</span>
+      <span class="ic"><i class="ph-duotone ph-shield-check"></i></span><span class="label" data-t="nav_moderation">Moderazione</span>
       <span class="badge" id="badgeReports"></span>
     </div>
     <div class="nav-item" data-sec="users" onclick="openSection('users')">
-      <span class="ic">👤</span><span class="label" data-t="nav_users">Utenti</span>
+      <span class="ic"><i class="ph-duotone ph-user"></i></span><span class="label" data-t="nav_users">Utenti</span>
     </div>
     <div class="nav-item" data-sec="ailimits" onclick="openSection('ailimits')">
-      <span class="ic">⚙️</span><span class="label" data-t="nav_ailimits">Limiti AI</span>
+      <span class="ic"><i class="ph-duotone ph-sliders-horizontal"></i></span><span class="label" data-t="nav_ailimits">Limiti AI</span>
     </div>
     <div class="nav-item" data-sec="copilot" onclick="openSection('copilot')">
-      <span class="ic">✨</span><span class="label" data-t="nav_copilot">Copilota AI</span>
+      <span class="ic"><i class="ph-duotone ph-sparkle"></i></span><span class="label" data-t="nav_copilot">Copilota AI</span>
     </div>
     <div class="nav-item" data-sec="create" onclick="openSection('create')">
-      <span class="ic">➕</span><span class="label" data-t="nav_create">Crea</span>
+      <span class="ic"><i class="ph-duotone ph-plus-circle"></i></span><span class="label" data-t="nav_create">Crea</span>
     </div>
     <div class="nav-item" data-sec="audit" onclick="openSection('audit')">
-      <span class="ic">📜</span><span class="label" data-t="nav_audit">Audit log</span>
+      <span class="ic"><i class="ph-duotone ph-scroll"></i></span><span class="label" data-t="nav_audit">Audit log</span>
     </div>
 
     <div class="s-spacer"></div>
@@ -313,24 +438,30 @@ select option{background:#16110d;color:var(--paper)}
           <button data-l="sq" onclick="setLang('sq')">SQ</button>
           <button data-l="en" onclick="setLang('en')">EN</button>
         </div>
+        <!-- Interruttore tema: sole quando sei al buio (per accendere la luce), luna quando sei alla luce -->
+        <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()"
+                aria-label="Cambia tema chiaro/scuro" title="Tema chiaro/scuro">
+          <i class="ph-duotone ph-sun ico-sun"></i>
+          <i class="ph-duotone ph-moon ico-moon"></i>
+        </button>
       </div>
     </div>
 
     <!-- 1) DASHBOARD -->
     <section class="section on" id="sec-dashboard">
       <div class="kpis" id="kpis">
-        <div class="kpi"><div class="ic">👥</div><div class="num skel" style="width:60%;height:30px"></div><div class="lab" data-t="kpi_users">Utenti totali</div></div>
-        <div class="kpi"><div class="ic">📍</div><div class="num skel" style="width:60%;height:30px"></div><div class="lab" data-t="kpi_pois">POI totali</div></div>
-        <div class="kpi alert"><div class="ic">🚩</div><div class="num skel" style="width:60%;height:30px"></div><div class="lab" data-t="kpi_reports">Segnalazioni aperte</div></div>
-        <div class="kpi"><div class="ic">🌱</div><div class="num skel" style="width:60%;height:30px"></div><div class="lab" data-t="kpi_new">Nuovi utenti 7gg</div></div>
+        <div class="kpi"><div class="ic"><i class="ph-duotone ph-users-three"></i></div><div class="num skel" style="width:60%;height:30px"></div><div class="lab" data-t="kpi_users">Utenti totali</div></div>
+        <div class="kpi"><div class="ic"><i class="ph-duotone ph-map-pin"></i></div><div class="num skel" style="width:60%;height:30px"></div><div class="lab" data-t="kpi_pois">POI totali</div></div>
+        <div class="kpi alert"><div class="ic"><i class="ph-duotone ph-flag-banner"></i></div><div class="num skel" style="width:60%;height:30px"></div><div class="lab" data-t="kpi_reports">Segnalazioni aperte</div></div>
+        <div class="kpi"><div class="ic"><i class="ph-duotone ph-plant"></i></div><div class="num skel" style="width:60%;height:30px"></div><div class="lab" data-t="kpi_new">Nuovi utenti 7gg</div></div>
       </div>
       <div class="grid2">
         <div class="panel">
-          <div class="card-h"><span class="ic">📍</span><span data-t="latest_pois">Ultimi POI</span></div>
+          <div class="card-h"><span class="ic"><i class="ph-duotone ph-map-pin"></i></span><span data-t="latest_pois">Ultimi POI</span></div>
           <div class="mini-list" id="latestPois"></div>
         </div>
         <div class="panel">
-          <div class="card-h"><span class="ic">🌱</span><span data-t="latest_users">Ultimi iscritti</span></div>
+          <div class="card-h"><span class="ic"><i class="ph-duotone ph-plant"></i></span><span data-t="latest_users">Ultimi iscritti</span></div>
           <div class="mini-list" id="latestUsers"></div>
         </div>
       </div>
@@ -339,7 +470,7 @@ select option{background:#16110d;color:var(--paper)}
     <!-- 2) MODERAZIONE -->
     <section class="section" id="sec-moderation">
       <div class="panel">
-        <div class="card-h"><span class="ic">🛡️</span><span data-t="moderation_queue">Coda segnalazioni</span></div>
+        <div class="card-h"><span class="ic"><i class="ph-duotone ph-shield-check"></i></span><span data-t="moderation_queue">Coda segnalazioni</span></div>
         <div id="modTable"></div>
       </div>
     </section>
@@ -358,8 +489,8 @@ select option{background:#16110d;color:var(--paper)}
     <!-- 4) LIMITI AI -->
     <section class="section" id="sec-ailimits">
       <div class="panel">
-        <div class="card-h"><span class="ic">⚙️</span><span data-t="ailimits_title">Limiti AI per tier</span></div>
-        <div class="sub" style="font-size:12px;color:rgba(244,236,224,.55);margin-bottom:14px" data-t="ailimits_help">
+        <div class="card-h"><span class="ic"><i class="ph-duotone ph-sliders-horizontal"></i></span><span data-t="ailimits_title">Limiti AI per tier</span></div>
+        <div class="sub" style="font-size:12px;color:var(--muted);margin-bottom:14px" data-t="ailimits_help">
           Configura messaggi al giorno, token massimi e modello per ciascun livello. Salva su gamification_config.
         </div>
         <div id="aiLimitsTable"></div>
@@ -374,9 +505,9 @@ select option{background:#16110d;color:var(--paper)}
     <section class="section" id="sec-copilot">
       <div class="panel">
         <div class="ai-modes">
-          <button class="ai-mode on" data-mode="chat" onclick="setAiMode('chat')"><span>💬</span><span data-t="mode_chat">Chat</span></button>
-          <button class="ai-mode" data-mode="route" onclick="setAiMode('route')"><span>🗺️</span><span data-t="mode_route">Traccia percorso</span></button>
-          <button class="ai-mode" data-mode="write" onclick="setAiMode('write')"><span>✍️</span><span data-t="mode_write">Scrivi testo</span></button>
+          <button class="ai-mode on" data-mode="chat" onclick="setAiMode('chat')"><i class="ph-duotone ph-chat-circle-dots"></i><span data-t="mode_chat">Chat</span></button>
+          <button class="ai-mode" data-mode="route" onclick="setAiMode('route')"><i class="ph-duotone ph-map-trifold"></i><span data-t="mode_route">Traccia percorso</span></button>
+          <button class="ai-mode" data-mode="write" onclick="setAiMode('write')"><i class="ph-duotone ph-pencil-simple-line"></i><span data-t="mode_write">Scrivi testo</span></button>
         </div>
         <div class="chat-box">
           <div class="chat-log" id="chatLog"></div>
@@ -394,7 +525,7 @@ select option{background:#16110d;color:var(--paper)}
       <div class="grid2">
         <!-- POI ufficiale -->
         <div class="panel">
-          <div class="card-h"><span class="ic">📍</span><span data-t="create_poi">Crea POI ufficiale</span></div>
+          <div class="card-h"><span class="ic"><i class="ph-duotone ph-map-pin-plus"></i></span><span data-t="create_poi">Crea POI ufficiale</span></div>
           <div class="field"><label data-t="f_name">Nome</label><input id="poiName" placeholder="Es. Castello di Rozafa"></div>
           <div class="field"><label data-t="f_desc">Descrizione</label><textarea id="poiDesc" placeholder="Una breve descrizione del luogo…"></textarea></div>
           <div class="row2">
@@ -428,13 +559,13 @@ select option{background:#16110d;color:var(--paper)}
 
         <!-- Percorso -->
         <div class="panel">
-          <div class="card-h"><span class="ic">🗺️</span><span data-t="create_trip">Crea percorso</span></div>
+          <div class="card-h"><span class="ic"><i class="ph-duotone ph-map-trifold"></i></span><span data-t="create_trip">Crea percorso</span></div>
           <div class="field"><label data-t="f_trip_name">Nome percorso</label><input id="tripName" placeholder="Es. Tirana in un giorno"></div>
           <div class="row2">
-            <div class="field"><label data-t="f_badge">Badge</label><input id="tripBadge" placeholder="🏛️ Storico"></div>
+            <div class="field"><label data-t="f_badge">Badge</label><input id="tripBadge" placeholder="es. Storico, Antico, Sacro…"></div>
             <div class="field"><label data-t="f_dates">Date</label><input id="tripDates" placeholder="12-13 giu 2026"></div>
           </div>
-          <label style="display:block;font-size:11.5px;font-weight:700;color:rgba(244,236,224,.7);margin-bottom:6px" data-t="f_stops">Tappe</label>
+          <label style="display:block;font-size:11.5px;font-weight:700;color:var(--muted);margin-bottom:6px" data-t="f_stops">Tappe</label>
           <div id="stopsList"></div>
           <button class="btn sm" onclick="addStopRow()" style="margin:4px 0 14px" data-t="add_stop">+ Aggiungi tappa</button>
           <div class="btn-row">
@@ -447,7 +578,7 @@ select option{background:#16110d;color:var(--paper)}
     <!-- 7) AUDIT LOG -->
     <section class="section" id="sec-audit">
       <div class="panel">
-        <div class="card-h"><span class="ic">📜</span><span data-t="audit_title">Registro azioni (ultimi 50)</span></div>
+        <div class="card-h"><span class="ic"><i class="ph-duotone ph-scroll"></i></span><span data-t="audit_title">Registro azioni (ultimi 50)</span></div>
         <div id="auditTable"></div>
       </div>
     </section>
@@ -611,6 +742,21 @@ function setLang(l){
   if(active){ const sec=active.id.replace('sec-',''); loaded[sec]=false; runSection(sec); }
 }
 
+/* ─────────────────────────── Tema chiaro/scuro ───────────────────────────
+   Default 'dark'. L'attributo è già impostato nel <head> prima del paint.
+   toggleTheme() inverte e persiste in localStorage 'admin_theme'.        */
+function applyTheme(theme){
+  const th = (theme==='light') ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', th);
+  try{ localStorage.setItem('admin_theme', th); }catch(e){}
+  const btn=document.getElementById('themeToggle');
+  if(btn){ btn.setAttribute('aria-pressed', th==='light' ? 'true' : 'false'); }
+}
+function toggleTheme(){
+  const cur = document.documentElement.getAttribute('data-theme')==='light' ? 'light' : 'dark';
+  applyTheme(cur==='light' ? 'dark' : 'light');
+}
+
 /* ─────────────────────────── Utility sicure ───────────────────────────
    Sanitizzazione: NON si usa mai innerHTML con dati grezzi.
    esc() esca i caratteri HTML; helper el() costruisce nodi DOM.       */
@@ -637,15 +783,25 @@ function initials(name){
   const s=(name||'?').trim();
   return s ? s.slice(0,1).toUpperCase() : '?';
 }
+/* Crea un'icona Phosphor duotone come nodo DOM (mai emoji, mai innerHTML grezzo).
+   Uso: phIcon('map-pin') → <i class="ph-duotone ph-map-pin"></i> */
+function phIcon(name, extraClass){
+  return el('i',{ class:'ph-duotone ph-'+name+(extraClass?(' '+extraClass):'') });
+}
 function fmtDate(iso){
   if(!iso) return '—';
   try{ const d=new Date(iso);
     return d.toLocaleDateString(lang==='en'?'en-GB':(lang==='sq'?'sq-AL':'it-IT'),{day:'2-digit',month:'short',year:'numeric'});
   }catch(e){ return iso; }
 }
-function toast(text, kind){
+// kind: 'ok' | 'err' | undefined. iconName opzionale forza un'icona specifica.
+function toast(text, kind, iconName){
   const tEl=document.getElementById('toast');
-  tEl.textContent=text; tEl.className='show'+(kind?(' '+kind):'');
+  tEl.textContent='';
+  const name = iconName || (kind==='ok'?'check-circle':(kind==='err'?'warning-circle':'info'));
+  tEl.appendChild(phIcon(name,'toast-ic'));
+  tEl.appendChild(document.createTextNode(text));
+  tEl.className='show'+(kind?(' '+kind):'');
   clearTimeout(toast._tm);
   toast._tm=setTimeout(()=>{ tEl.className=tEl.className.replace('show','').trim(); }, 3200);
 }
@@ -662,10 +818,11 @@ function loadingBox(container){
   container.textContent='';
   container.appendChild(el('div',{class:'loading'},[ el('div',{class:'spin'}), el('span',{text:t('loading')}) ]));
 }
+// icon = nome icona Phosphor (senza prefisso). Default 'moon' (stato vuoto neutro).
 function emptyBox(container, msg, hint, icon){
   container.textContent='';
   const e=el('div',{class:'empty'});
-  e.appendChild(el('div',{class:'ic',text:icon||'🌙'}));
+  e.appendChild(el('div',{class:'ic'}, phIcon(icon||'moon')));
   e.appendChild(el('p',{text:msg}));
   if(hint) e.appendChild(el('div',{class:'hint',text:hint}));
   container.appendChild(e);
@@ -678,7 +835,7 @@ function isBackendMissing(err){
       || m.includes('does not exist') || m.includes('could not find') || m.includes('schema cache');
 }
 function backendOff(container){
-  emptyBox(container, t('backend_off'), t('backend_off_h'), '🧱');
+  emptyBox(container, t('backend_off'), t('backend_off_h'), 'bricks');
 }
 
 /* ─────────────────────────── GATE di sicurezza ───────────────────────────
@@ -727,6 +884,8 @@ async function gate(){
   const g=document.getElementById('gate'); g.style.opacity='0'; setTimeout(()=>g.remove(),360);
   document.getElementById('app').classList.add('ready');
   setLang(lang);
+  // allinea lo stato del bottone tema all'attributo già applicato nel <head>
+  applyTheme(document.documentElement.getAttribute('data-theme'));
   openSection('dashboard');
   refreshReportsBadge(); // badge segnalazioni in sidebar
 }
@@ -798,28 +957,28 @@ async function loadLatestPois(){
   try{
     const { data, error } = await sb.from('pois')
       .select('id,name,category,love_count,created_at').order('created_at',{ascending:false}).limit(6);
-    if(error){ isBackendMissing(error)?backendOff(box):emptyBox(box,t('error'),null,'⚠️'); return; }
-    if(!data || !data.length){ emptyBox(box,'—',null,'📍'); return; }
+    if(error){ isBackendMissing(error)?backendOff(box):emptyBox(box,t('error'),null,'warning'); return; }
+    if(!data || !data.length){ emptyBox(box,'—',null,'map-pin'); return; }
     box.textContent='';
     data.forEach(p=>{
       box.appendChild(el('div',{class:'mini-row'},[
-        el('div',{class:'av',text:'📍'}),
+        el('div',{class:'av'}, phIcon('map-pin')),
         el('div',{class:'tt'},[
           el('div',{class:'nm',text:p.name||'POI'}),
           el('div',{class:'dt',text:(p.category||'—')+' · '+fmtDate(p.created_at)})
         ]),
-        el('div',{class:'meta',text:'❤ '+(p.love_count||0)})
+        el('div',{class:'meta'},[ phIcon('heart','meta-love'), document.createTextNode(' '+(p.love_count||0)) ])
       ]));
     });
-  }catch(e){ emptyBox(box,t('error'),null,'⚠️'); }
+  }catch(e){ emptyBox(box,t('error'),null,'warning'); }
 }
 async function loadLatestUsers(){
   const box=document.getElementById('latestUsers'); skeletons(box,5);
   try{
     const { data, error } = await sb.from('profiles')
       .select('id,username,avatar_url,special_tier,created_at').order('created_at',{ascending:false}).limit(6);
-    if(error){ isBackendMissing(error)?backendOff(box):emptyBox(box,t('error'),null,'⚠️'); return; }
-    if(!data || !data.length){ emptyBox(box,'—',null,'🌱'); return; }
+    if(error){ isBackendMissing(error)?backendOff(box):emptyBox(box,t('error'),null,'warning'); return; }
+    if(!data || !data.length){ emptyBox(box,'—',null,'plant'); return; }
     box.textContent='';
     data.forEach(u=>{
       const av = u.avatar_url
@@ -834,7 +993,7 @@ async function loadLatestUsers(){
         el('div',{class:'meta',text:u.special_tier||'free'})
       ]));
     });
-  }catch(e){ emptyBox(box,t('error'),null,'⚠️'); }
+  }catch(e){ emptyBox(box,t('error'),null,'warning'); }
 }
 
 // Badge segnalazioni aperte in sidebar
@@ -855,8 +1014,8 @@ async function loadModeration(){
     const { data, error } = await sb.from('reports')
       .select('id,reporter_id,target_type,target_id,reason,details,status,created_at')
       .in('status',['open','reviewing']).order('created_at',{ascending:false}).limit(100);
-    if(error){ isBackendMissing(error)?backendOff(box):emptyBox(box,t('error'),null,'⚠️'); return; }
-    if(!data || !data.length){ emptyBox(box,t('empty_reports'),t('empty_reports_h'),'🕊️'); return; }
+    if(error){ isBackendMissing(error)?backendOff(box):emptyBox(box,t('error'),null,'warning'); return; }
+    if(!data || !data.length){ emptyBox(box,t('empty_reports'),t('empty_reports_h'),'bird'); return; }
 
     // costruzione tabella via DOM (no innerHTML grezzo)
     const wrap=el('div',{class:'tbl-wrap'});
@@ -896,7 +1055,7 @@ async function loadModeration(){
     });
     table.appendChild(tb); wrap.appendChild(table);
     box.textContent=''; box.appendChild(wrap);
-  }catch(e){ emptyBox(box,t('error'),null,'⚠️'); }
+  }catch(e){ emptyBox(box,t('error'),null,'warning'); }
 }
 function plus7d(){ return new Date(Date.now()+7*864e5).toISOString(); }
 
@@ -923,8 +1082,8 @@ async function loadUsers(){
       .order('created_at',{ascending:false}).limit(60);
     if(q) query=query.ilike('username','%'+q+'%');
     const { data, error } = await query;
-    if(error){ isBackendMissing(error)?backendOff(box):emptyBox(box,t('error'),null,'⚠️'); return; }
-    if(!data || !data.length){ emptyBox(box,t('empty_users'),null,'🔍'); return; }
+    if(error){ isBackendMissing(error)?backendOff(box):emptyBox(box,t('error'),null,'warning'); return; }
+    if(!data || !data.length){ emptyBox(box,t('empty_users'),null,'magnifying-glass'); return; }
 
     const wrap=el('div',{class:'tbl-wrap'});
     const table=el('table');
@@ -964,7 +1123,7 @@ async function loadUsers(){
     });
     table.appendChild(tb); wrap.appendChild(table);
     box.textContent=''; box.appendChild(wrap);
-  }catch(e){ emptyBox(box,t('error'),null,'⚠️'); }
+  }catch(e){ emptyBox(box,t('error'),null,'warning'); }
 }
 
 // Moderazione via RPC sicura (mai toccare is_admin dal client)
@@ -996,7 +1155,7 @@ async function loadAiLimits(){
   const box=document.getElementById('aiLimitsTable'); loadingBox(box);
   try{
     const { data, error } = await sb.from('gamification_config').select('key,value').eq('key','ai_limits_per_tier').single();
-    if(error && !isBackendMissing(error) && error.code!=='PGRST116'){ emptyBox(box,t('error'),null,'⚠️'); return; }
+    if(error && !isBackendMissing(error) && error.code!=='PGRST116'){ emptyBox(box,t('error'),null,'warning'); return; }
     if(error && isBackendMissing(error)){ backendOff(box); return; }
     // value è jsonb: { tier: { messages, max_tokens, model } }
     let cfg = (data && data.value) ? data.value : {};
@@ -1027,7 +1186,7 @@ async function loadAiLimits(){
     });
     table.appendChild(tb); wrap.appendChild(table);
     box.textContent=''; box.appendChild(wrap);
-  }catch(e){ emptyBox(box,t('error'),null,'⚠️'); }
+  }catch(e){ emptyBox(box,t('error'),null,'warning'); }
 }
 async function saveAiLimits(){
   if(!aiLimitsDraft){ return; }
@@ -1106,11 +1265,15 @@ function appendInline(parent, text){
   if(last<text.length) parent.appendChild(document.createTextNode(text.slice(last)));
 }
 
-function appendBubble(role, content, usage, routeData){
+function appendBubble(role, content, usage, routeData, iconName){
   const log=document.getElementById('chatLog');
   const b=el('div',{class:'bubble '+(role==='user'?'user':'ai')});
   if(role==='user'){ b.textContent=content; }   // utente: solo testo
-  else { b.appendChild(renderMarkdownSafe(content)); } // ai: markdown sanitizzato
+  else {
+    // icona di stato opzionale (es. errori): nodo Phosphor, non emoji
+    if(iconName){ b.classList.add('with-ic'); b.appendChild(phIcon(iconName,'bubble-ic')); }
+    b.appendChild(renderMarkdownSafe(content)); // ai: markdown sanitizzato
+  }
   // usage/costo
   if(usage){
     const parts=[];
@@ -1174,7 +1337,7 @@ async function sendAi(){
     if(!res.ok){
       let msg=t('error');
       try{ const j=await res.json(); if(j && j.error) msg=j.error; }catch(e){}
-      appendBubble('ai','⚠️ '+msg);
+      appendBubble('ai', msg, null, null, 'warning-circle');
       return;
     }
     const data = await res.json();
@@ -1185,7 +1348,7 @@ async function sendAi(){
     appendBubble('ai', reply, data.usage, routeData);
   }catch(e){
     if(document.getElementById('typingDots')) document.getElementById('typingDots').remove();
-    appendBubble('ai','⚠️ '+t('error'));
+    appendBubble('ai', t('error'), null, null, 'warning-circle');
   }finally{
     document.getElementById('chatSend').disabled=false;
     input.focus();
@@ -1218,7 +1381,7 @@ async function createRouteFromAi(routeData, btn){
 
     await logAudit('route_create_ai','trip',trip.id,{ name, stops:stops.length });
     toast(t('route_created'),'ok');
-    if(btn){ btn.textContent='✓'; }
+    if(btn){ btn.textContent=''; btn.appendChild(phIcon('check')); }
   }catch(e){ toast(t('error'),'err'); if(btn) btn.disabled=false; }
 }
 
@@ -1242,7 +1405,7 @@ function useMyLocation(){
   navigator.geolocation.getCurrentPosition(
     pos=>{ document.getElementById('poiLat').value=pos.coords.latitude.toFixed(6);
            document.getElementById('poiLng').value=pos.coords.longitude.toFixed(6);
-           toast('📍 '+pos.coords.latitude.toFixed(4)+', '+pos.coords.longitude.toFixed(4),'ok'); },
+           toast(pos.coords.latitude.toFixed(4)+', '+pos.coords.longitude.toFixed(4),'ok','map-pin'); },
     ()=>toast(t('no_geo'),'err'), { enableHighAccuracy:true, timeout:8000 }
   );
 }
@@ -1312,8 +1475,8 @@ async function loadAudit(){
   try{
     const { data, error } = await sb.from('admin_audit_log')
       .select('*').order('created_at',{ascending:false}).limit(50);
-    if(error){ isBackendMissing(error)?backendOff(box):emptyBox(box,t('error'),null,'⚠️'); return; }
-    if(!data || !data.length){ emptyBox(box,t('empty_audit'),null,'📜'); return; }
+    if(error){ isBackendMissing(error)?backendOff(box):emptyBox(box,t('error'),null,'warning'); return; }
+    if(!data || !data.length){ emptyBox(box,t('empty_audit'),null,'scroll'); return; }
 
     const wrap=el('div',{class:'tbl-wrap'});
     const table=el('table');
@@ -1338,7 +1501,7 @@ async function loadAudit(){
     });
     table.appendChild(tb); wrap.appendChild(table);
     box.textContent=''; box.appendChild(wrap);
-  }catch(e){ emptyBox(box,t('error'),null,'⚠️'); }
+  }catch(e){ emptyBox(box,t('error'),null,'warning'); }
 }
 
 // Scrittura best-effort su admin_audit_log dal client.
