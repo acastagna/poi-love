@@ -6819,8 +6819,8 @@ function goToProfileStat(kind){
     showTab('poi');
     if(typeof setPoiSubtab==='function') setPoiSubtab('loved');
   } else if(kind==='list'){
-    showTab('itin');
-    if(typeof setItinSubtab==='function') setItinSubtab('lists');
+    showTab('poi');
+    if(typeof setPoiSubtab==='function') setPoiSubtab('lists');
   } else if(kind==='itin'){
     showTab('itin');
     if(typeof setItinSubtab==='function') setItinSubtab('trips');
@@ -8832,8 +8832,9 @@ function _sanitizeHandle(s){
     .replace(/\s+/g,'').replace(/[^a-z0-9_-]/g,'').substring(0,20);
 }
 function getVanityHandle(user){
-  // Priorità: handle scelto dall'utente → fallback dal nome (spazi rimossi, nessun simbolo strano)
-  if(myVanityHandle) return myVanityHandle;
+  // L'handle e SEMPRE uno slug pulito (minuscolo, niente spazi ne simboli, niente %20 nell'URL).
+  // Il NOME visualizzato resta separato e come l'utente l'ha scritto: qui si tocca solo l'handle.
+  if(myVanityHandle) return _sanitizeHandle(myVanityHandle);
   if(!user) return 'tu';
   const meta=user.user_metadata||{};
   const name=_sanitizeHandle(meta.full_name||meta.name||user.email?.split('@')[0]||'utente');
