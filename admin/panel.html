@@ -313,6 +313,55 @@ select option{background:var(--select-bg);color:var(--paper)}
 .bubble.ai a{color:var(--gold)}
 .bubble .usage{margin-top:8px;font-size:10.5px;color:rgba(244,236,224,.45);border-top:1px dashed var(--line);padding-top:6px}
 .bubble .route-cta{margin-top:10px}
+
+/* ── Proposte del copilota (write-tools): card sotto la bolla AI ──
+   L'AI non scrive nel DB: propone. Ogni proposta è una card con
+   tipo, riassunto leggibile del payload e azioni Approva/Rifiuta. */
+.proposals{align-self:flex-start;max-width:84%;display:flex;flex-direction:column;gap:10px;margin-top:2px}
+.prop-card{background:var(--glass);border:1px solid var(--line);border-radius:16px;padding:14px 15px;
+  animation:fade .35s ease both;position:relative;overflow:hidden}
+.prop-card::after{content:"";position:absolute;right:-26px;top:-26px;width:74px;height:74px;border-radius:50%;
+  background:radial-gradient(circle,rgba(232,176,75,.14),transparent 70%);pointer-events:none}
+.prop-head{display:flex;align-items:flex-start;gap:11px}
+.prop-ic{width:36px;height:36px;border-radius:11px;flex:none;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,rgba(232,176,75,.22),rgba(212,43,43,.14));color:var(--gold)}
+.prop-ic i[class*="ph-"]{font-size:19px}
+.prop-tt{min-width:0;flex:1}
+.prop-tt .knd{font-size:10.5px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--gold)}
+.prop-tt .ttl{font-size:14px;font-weight:800;margin-top:2px;word-break:break-word}
+.prop-summary{font-size:12.5px;line-height:1.5;color:var(--muted);margin-top:9px}
+.prop-summary .row{display:flex;gap:7px;margin:3px 0;align-items:baseline}
+.prop-summary .row .k{font-weight:700;color:var(--paper);opacity:.85;flex:none;min-width:64px}
+.prop-summary .row .v{min-width:0;word-break:break-word}
+.prop-summary ol{margin:5px 0 2px 18px;padding:0}
+.prop-summary ol li{margin:2px 0}
+.prop-summary .tag-line{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+.prop-summary .ptag{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;border:1px solid var(--line);
+  background:var(--glass-soft);color:var(--muted)}
+.prop-details{margin-top:10px;border-top:1px dashed var(--line);padding-top:9px;display:none}
+.prop-details.open{display:block}
+.prop-details pre{font-size:11px;line-height:1.5;white-space:pre-wrap;word-break:break-word;
+  background:rgba(0,0,0,.28);border:1px solid var(--line);border-radius:10px;padding:10px 12px;
+  max-height:240px;overflow:auto;color:var(--paper)}
+html[data-theme="light"] .prop-details pre{background:rgba(58,47,35,.07)}
+.prop-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:13px}
+.prop-link{border:none;background:transparent;color:var(--muted);font-family:inherit;font-size:11.5px;font-weight:700;
+  cursor:pointer;padding:8px 6px;display:inline-flex;align-items:center;gap:5px;transition:color .16s}
+.prop-link:hover{color:var(--gold)}
+.prop-link i[class*="ph-"]{font-size:14px}
+.prop-link:disabled{opacity:.5;cursor:not-allowed}
+/* esito: la card cambia stato dopo la decisione */
+.prop-card.decided .prop-actions{display:none}
+.prop-result{margin-top:12px;font-size:12px;font-weight:700;display:flex;align-items:flex-start;gap:7px;
+  border-top:1px solid var(--line);padding-top:10px}
+.prop-result i[class*="ph-"]{font-size:16px;flex:none;margin-top:1px}
+.prop-result.ok{color:var(--ok)}
+.prop-result.bad{color:var(--bad)}
+.prop-result.dim{color:var(--muted)}
+.prop-result.dim i.ph-circle-notch{animation:spin .8s linear infinite}
+.prop-card.is-rejected{opacity:.62}
+.prop-card.is-applied{border-color:rgba(155,230,168,.4)}
+
 .chat-input{display:flex;gap:9px;margin-top:12px}
 .chat-input textarea{flex:1;min-height:46px;max-height:130px;padding:12px 14px}
 .typing{align-self:flex-start;display:flex;gap:4px;padding:14px 16px}
@@ -648,7 +697,19 @@ const T = {
     fill_required:'Compila i campi obbligatori', no_geo:'Geolocalizzazione non disponibile',
     reason_ph:'Motivo (opzionale)', create_route_btn:'Crea questo percorso', route_created:'Percorso creato dal copilota',
     type_poi:'POI', type_user:'utente', ai_welcome:'Ciao. Sono il copilota amministrativo. Posso leggere le statistiche, suggerire moderazioni e tracciare percorsi. Come posso aiutarti?',
-    stop_name:'Nome tappa', cost:'Costo'
+    stop_name:'Nome tappa', cost:'Costo',
+    // ── Proposte del copilota ──
+    prop_kind_poi:'POI', prop_kind_route:'Rotta storica', prop_kind_project:'Progetto',
+    prop_approve:'Approva', prop_reject:'Rifiuta', prop_details:'Dettagli',
+    p_category:'Categoria', p_city:'Città', p_stops:'Tappe', p_route:'Rotta', p_new_pois:'Nuovi POI',
+    p_new_pois_n:(n)=>n+' '+(n===1?'nuovo POI da creare':'nuovi POI da creare'),
+    p_stops_n:(n)=>n+' '+(n===1?'tappa':'tappe'),
+    prop_applying:'Applico la proposta…',
+    prop_applied_poi:'POI creato in bozza (visibilità ufficiale, non ancora pubblicato). Pubblicalo dalla mappa quando è pronto.',
+    prop_applied_route:'Rotta storica e POI creati in bozza (non pubblicati). Rivedi e pubblica quando è pronto.',
+    prop_rejected:'Proposta rifiutata.',
+    prop_err_apply:'Errore durante l\'applicazione della proposta',
+    prop_err_decide:'Non è stato possibile aggiornare lo stato della proposta'
   },
   sq:{
     nav_dashboard:'Paneli', nav_moderation:'Moderimi', nav_users:'Përdoruesit', nav_ailimits:'Limitet AI',
@@ -684,7 +745,19 @@ const T = {
     fill_required:'Plotëso fushat e detyrueshme', no_geo:'Gjeolokalizimi i padisponueshëm',
     reason_ph:'Arsyeja (opsionale)', create_route_btn:'Krijo këtë itinerar', route_created:'Itinerari u krijua nga kopiloti',
     type_poi:'POI', type_user:'përdorues', ai_welcome:'Përshëndetje. Jam kopiloti administrativ. Mund të lexoj statistikat, të sugjeroj moderime dhe të vizatoj itinerare. Si mund të ndihmoj?',
-    stop_name:'Emri i ndalesës', cost:'Kosto'
+    stop_name:'Emri i ndalesës', cost:'Kosto',
+    // ── Propozimet e kopilotit ──
+    prop_kind_poi:'POI', prop_kind_route:'Itinerar historik', prop_kind_project:'Projekt',
+    prop_approve:'Mirato', prop_reject:'Refuzo', prop_details:'Detaje',
+    p_category:'Kategoria', p_city:'Qyteti', p_stops:'Ndalesat', p_route:'Itinerari', p_new_pois:'POI të rinj',
+    p_new_pois_n:(n)=>n+' '+(n===1?'POI i ri për t\'u krijuar':'POI të rinj për t\'u krijuar'),
+    p_stops_n:(n)=>n+' '+(n===1?'ndalesë':'ndalesa'),
+    prop_applying:'Po e zbatoj propozimin…',
+    prop_applied_poi:'POI u krijua si draft (dukshmëri zyrtare, ende i pabotuar). Botoje nga harta kur të jetë gati.',
+    prop_applied_route:'Itinerari historik dhe POI-t u krijuan si draft (të pabotuar). Rishikoji dhe botoji kur të jenë gati.',
+    prop_rejected:'Propozimi u refuzua.',
+    prop_err_apply:'Gabim gjatë zbatimit të propozimit',
+    prop_err_decide:'Nuk u arrit të përditësohej statusi i propozimit'
   },
   en:{
     nav_dashboard:'Dashboard', nav_moderation:'Moderation', nav_users:'Users', nav_ailimits:'AI limits',
@@ -720,7 +793,19 @@ const T = {
     fill_required:'Fill in the required fields', no_geo:'Geolocation unavailable',
     reason_ph:'Reason (optional)', create_route_btn:'Create this route', route_created:'Route created by copilot',
     type_poi:'POI', type_user:'user', ai_welcome:'Hi. I am the admin copilot. I can read stats, suggest moderation and draft routes. How can I help?',
-    stop_name:'Stop name', cost:'Cost'
+    stop_name:'Stop name', cost:'Cost',
+    // ── Copilot proposals ──
+    prop_kind_poi:'POI', prop_kind_route:'Historic route', prop_kind_project:'Project',
+    prop_approve:'Approve', prop_reject:'Reject', prop_details:'Details',
+    p_category:'Category', p_city:'City', p_stops:'Stops', p_route:'Route', p_new_pois:'New POIs',
+    p_new_pois_n:(n)=>n+' '+(n===1?'new POI to create':'new POIs to create'),
+    p_stops_n:(n)=>n+' '+(n===1?'stop':'stops'),
+    prop_applying:'Applying the proposal…',
+    prop_applied_poi:'POI created as a draft (official visibility, not published yet). Publish it from the map when ready.',
+    prop_applied_route:'Historic route and POIs created as drafts (unpublished). Review and publish when ready.',
+    prop_rejected:'Proposal rejected.',
+    prop_err_apply:'Error while applying the proposal',
+    prop_err_decide:'Could not update the proposal status'
   }
 };
 let lang = localStorage.getItem('admin_lang') || (navigator.language||'it').slice(0,2);
@@ -1346,6 +1431,11 @@ async function sendAi(){
     // se mode route, la edge function può restituire data.route con tappe
     const routeData = data.data && (data.data.route || (Array.isArray(data.data.stops)? data.data : null));
     appendBubble('ai', reply, data.usage, routeData);
+    // proposte write-tools (propose_poi / propose_historic_route / propose_project):
+    // l'edge le ha già inserite in ai_proposals (status=pending). Le mostriamo come card.
+    if(Array.isArray(data.proposals) && data.proposals.length){
+      appendProposals(data.proposals);
+    }
   }catch(e){
     if(document.getElementById('typingDots')) document.getElementById('typingDots').remove();
     appendBubble('ai', t('error'), null, null, 'warning-circle');
@@ -1383,6 +1473,222 @@ async function createRouteFromAi(routeData, btn){
     toast(t('route_created'),'ok');
     if(btn){ btn.textContent=''; btn.appendChild(phIcon('check')); }
   }catch(e){ toast(t('error'),'err'); if(btn) btn.disabled=false; }
+}
+
+/* ─────────────────────── Proposte del copilota (write-tools) ───────────────────────
+   L'AI non scrive nel DB: PROPONE. La edge function ha già inserito ogni proposta in
+   public.ai_proposals (status=pending). Qui mostriamo ciascuna come card con:
+   • tipo (POI / Rotta storica / Progetto) + titolo
+   • riassunto leggibile del payload (costruito a nodi DOM, niente innerHTML grezzo)
+   • Approva → update status=approved + RPC apply_ai_proposal (crea bozze)
+   • Rifiuta → update status=rejected
+   • Dettagli → espande il payload JSON (escapato).                                    */
+
+// helper i18n per le chiavi-funzione (plurali): T[lang].key(n) con fallback all'italiano
+function tn(key, n){
+  const fn = (T[lang] && T[lang][key]) || (T.it[key]);
+  return (typeof fn==='function') ? fn(n) : (fn||key);
+}
+// nome leggibile del tipo proposta + icona Phosphor coerente
+function propMeta(kind){
+  if(kind==='poi')     return { label:t('prop_kind_poi'),     icon:'map-pin-plus' };
+  if(kind==='route')   return { label:t('prop_kind_route'),   icon:'map-trifold' };
+  if(kind==='project') return { label:t('prop_kind_project'), icon:'stack' };
+  return { label:kind||'—', icon:'sparkle' };
+}
+// riga "chiave: valore" del riassunto (tutto testo, mai HTML)
+function propRow(k, v){
+  if(v==null || v==='') return null;
+  return el('div',{class:'row'},[ el('span',{class:'k',text:k}), el('span',{class:'v',text:String(v)}) ]);
+}
+
+// Costruisce il blocco "riassunto leggibile" specifico per ogni kind.
+function buildProposalSummary(kind, payload){
+  const box=el('div',{class:'prop-summary'});
+  const p = payload || {};
+
+  if(kind==='poi'){
+    // POI: nome + categoria + città (+ tag se presenti)
+    box.appendChild(propRow(t('p_category'), p.category));
+    box.appendChild(propRow(t('p_city'), p.city || p.address));
+    const tags = Array.isArray(p.tags) ? p.tags.filter(Boolean) : [];
+    if(tags.length){
+      const line=el('div',{class:'tag-line'});
+      tags.slice(0,8).forEach(tg=> line.appendChild(el('span',{class:'ptag',text:String(tg)})));
+      box.appendChild(line);
+    }
+  } else if(kind==='route' || kind==='project'){
+    // route/project: nome rotta + elenco tappe; per il progetto anche quanti POI nuovi
+    const route = p.route || {};
+    const stops = Array.isArray(route.stops) ? route.stops : [];
+    const newPois = Array.isArray(p.new_pois) ? p.new_pois : [];
+
+    box.appendChild(propRow(t('p_route'), route.name || p.title));
+    if(kind==='project' && newPois.length){
+      box.appendChild(propRow(t('p_new_pois'), tn('p_new_pois_n', newPois.length)));
+    }
+    if(stops.length){
+      box.appendChild(propRow(t('p_stops'), tn('p_stops_n', stops.length)));
+      const ol=el('ol');
+      stops.slice(0,12).forEach((s,i)=>{
+        const nm = (s && (s.name)) || (t('p_stops')+' '+(i+1));
+        ol.appendChild(el('li',{text:String(nm)}));
+      });
+      box.appendChild(ol);
+    }
+  }
+
+  if(!box.childElementCount){
+    // fallback: nessun campo riconosciuto, mostra almeno il titolo o un avviso neutro
+    box.appendChild(el('div',{text: p.title || p.name || '—'}));
+  }
+  return box;
+}
+
+// Render di tutte le proposte: un contenitore allineato a sinistra sotto la bolla AI.
+function appendProposals(proposals){
+  const log=document.getElementById('chatLog');
+  const wrap=el('div',{class:'proposals'});
+  proposals.forEach(pr=>{
+    if(!pr || !pr.id) return;
+    wrap.appendChild(buildProposalCard(pr));
+  });
+  if(wrap.childElementCount){
+    log.appendChild(wrap);
+    log.scrollTop=log.scrollHeight;
+  }
+}
+
+// Costruisce una singola card-proposta come nodi DOM (no innerHTML grezzo del payload).
+function buildProposalCard(pr){
+  const kind = pr.kind;
+  const meta = propMeta(kind);
+  const payload = pr.payload || {};
+  const title = pr.title || payload.title || payload.name || meta.label;
+
+  const card=el('div',{class:'prop-card', 'data-pid':pr.id});
+
+  // intestazione: icona + tipo + titolo
+  const head=el('div',{class:'prop-head'},[
+    el('div',{class:'prop-ic'}, phIcon(meta.icon)),
+    el('div',{class:'prop-tt'},[
+      el('div',{class:'knd',text:meta.label}),
+      el('div',{class:'ttl',text:title})
+    ])
+  ]);
+  card.appendChild(head);
+
+  // riassunto leggibile
+  card.appendChild(buildProposalSummary(kind, payload));
+
+  // riquadro dettagli (payload JSON escapato), nascosto di default
+  const details=el('div',{class:'prop-details'});
+  const pre=el('pre'); pre.textContent = safeJson(payload); // textContent → niente XSS
+  details.appendChild(pre);
+  card.appendChild(details);
+
+  // azioni: Approva / Rifiuta / Dettagli
+  const actions=el('div',{class:'prop-actions'});
+  const okBtn = el('button',{class:'btn green sm', onclick:(ev)=>approveProposal(pr, ev.currentTarget)},
+    [ phIcon('check-circle'), document.createTextNode(' '+t('prop_approve')) ]);
+  const noBtn = el('button',{class:'btn red sm', onclick:(ev)=>rejectProposal(pr, ev.currentTarget)},
+    [ phIcon('x-circle'), document.createTextNode(' '+t('prop_reject')) ]);
+  const detBtn = el('button',{class:'prop-link', onclick:(ev)=>toggleProposalDetails(ev.currentTarget)},
+    [ phIcon('caret-down'), document.createTextNode(' '+t('prop_details')) ]);
+  actions.appendChild(okBtn); actions.appendChild(noBtn); actions.appendChild(detBtn);
+  card.appendChild(actions);
+
+  return card;
+}
+
+// JSON stringify difensivo (evita cicli) per il pannello Dettagli
+function safeJson(obj){
+  try{ return JSON.stringify(obj, null, 2); }
+  catch(e){ return String(obj); }
+}
+
+// Espande/chiude il payload nella card
+function toggleProposalDetails(btn){
+  const card=btn.closest('.prop-card'); if(!card) return;
+  const det=card.querySelector('.prop-details'); if(!det) return;
+  const open=det.classList.toggle('open');
+  // ruota la freccia
+  const ic=btn.querySelector('i[class*="ph-"]');
+  if(ic){ ic.className = 'ph-duotone '+(open?'ph-caret-up':'ph-caret-down'); }
+}
+
+// Scrive l'esito nella card e disabilita le azioni
+function setProposalResult(card, kind, msg, iconName){
+  card.classList.add('decided');
+  // rimuovi eventuale esito precedente (es. retry)
+  const old=card.querySelector('.prop-result'); if(old) old.remove();
+  const res=el('div',{class:'prop-result '+(kind||'dim')},[ phIcon(iconName||'info'), el('span',{text:msg}) ]);
+  card.appendChild(res);
+}
+
+// APPROVA: 1) ai_proposals.status=approved  2) RPC apply_ai_proposal (crea bozze in transazione)
+async function approveProposal(pr, btn){
+  const card = btn.closest('.prop-card'); if(!card) return;
+  const buttons = card.querySelectorAll('.prop-actions button');
+  buttons.forEach(b=>b.disabled=true);
+  setProposalResult(card, 'dim', t('prop_applying'), 'circle-notch');
+
+  try{
+    // 1) marca approvata (RLS: solo admin). decided_at server-side via now().
+    const { error:eUpd } = await sb.from('ai_proposals')
+      .update({ status:'approved', decided_at:new Date().toISOString() })
+      .eq('id', pr.id);
+    if(eUpd){
+      buttons.forEach(b=>b.disabled=false);
+      setProposalResult(card, 'bad', t('prop_err_decide')+' · '+(eUpd.message||''), 'warning-circle');
+      toast(t('prop_err_decide'),'err');
+      return;
+    }
+
+    // 2) applica in transazione: crea POI bozza (+ rotta storica per route/project)
+    const { error:eRpc } = await sb.rpc('apply_ai_proposal', { p_id: pr.id });
+    if(eRpc){
+      // l'approvazione è andata a buon fine ma l'apply no: la card resta "approvata, non applicata"
+      buttons.forEach(b=>b.disabled=false);
+      setProposalResult(card, 'bad', t('prop_err_apply')+' · '+(eRpc.message||''), 'warning-circle');
+      toast(t('prop_err_apply'),'err');
+      return;
+    }
+
+    // esito positivo: POI/rotta nati in bozza, da pubblicare
+    card.classList.add('is-applied');
+    const okMsg = (pr.kind==='poi') ? t('prop_applied_poi') : t('prop_applied_route');
+    setProposalResult(card, 'ok', okMsg, 'check-circle');
+    toast(t('saved'),'ok');
+  }catch(e){
+    buttons.forEach(b=>b.disabled=false);
+    setProposalResult(card, 'bad', t('prop_err_apply'), 'warning-circle');
+    toast(t('error'),'err');
+  }
+}
+
+// RIFIUTA: ai_proposals.status=rejected. La card diventa "rifiutata".
+async function rejectProposal(pr, btn){
+  const card = btn.closest('.prop-card'); if(!card) return;
+  const buttons = card.querySelectorAll('.prop-actions button');
+  buttons.forEach(b=>b.disabled=true);
+  try{
+    const { error } = await sb.from('ai_proposals')
+      .update({ status:'rejected', decided_at:new Date().toISOString() })
+      .eq('id', pr.id);
+    if(error){
+      buttons.forEach(b=>b.disabled=false);
+      setProposalResult(card, 'bad', t('prop_err_decide')+' · '+(error.message||''), 'warning-circle');
+      toast(t('prop_err_decide'),'err');
+      return;
+    }
+    card.classList.add('is-rejected');
+    setProposalResult(card, 'dim', t('prop_rejected'), 'x-circle');
+  }catch(e){
+    buttons.forEach(b=>b.disabled=false);
+    setProposalResult(card, 'bad', t('prop_err_decide'), 'warning-circle');
+    toast(t('error'),'err');
+  }
 }
 
 /* ═════════════════════════ 6) CREA CONTENUTI ═════════════════════════ */

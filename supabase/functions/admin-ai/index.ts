@@ -4,7 +4,7 @@
  * info@321.al · https://321.al
  */
 // Edge Function: admin-ai
-// Copilota AI riservato all'amministratore di POI•LOVE.
+// Copilota AI AGENTICO riservato all'amministratore di POI•LOVE.
 //
 // SICUREZZA (non negoziabile):
 //   1) legge il JWT dall'header Authorization;
@@ -12,6 +12,7 @@
 //   3) con un client service_role (segreto, mai esposto al client) verifica che il profilo
 //      abbia is_admin = true E moderation_status = 'active'. Solo dopo questo gate la funzione
 //      tocca dati/statistiche con i privilegi service_role.
+//   4) richiede il secondo fattore (aal2) decodificando il claim aal del JWT.
 //
 // La service_role key vive SOLO qui dentro come segreto (Deno.env). Non esce mai dalla funzione.
 //
@@ -19,7 +20,17 @@
 // admin_audit_log (action='ai_call', meta con token e costo in euro). Prima di chiamare l'AI
 // si somma il costo del giorno per quell'admin; se supera DAILY_EUR_CAP si risponde 429.
 //
-// Provider: Claude (Anthropic) di default, fallback OpenAI. Chiavi come segreti.
+// AGENTICITA' (tool use nativo del provider):
+//   - 5 tool dichiarati: query_data, historic_analysis (READ), propose_poi,
+//     propose_historic_route, propose_project (WRITE).
+//   - I tool READ vengono eseguiti dalla edge nel loop (max 4 round) con service_role,
+//     SOLO select/count whitelisted su pois/profiles/reports/trips/user_routes, mai scritture.
+//   - I tool WRITE NON vengono eseguiti: la edge valida il payload, inserisce una riga in
+//     ai_proposals (status=pending, admin_id=user.id) e la mette in proposals[]. L'admin
+//     approva/rifiuta dal pannello; l'azione si materializza via RPC apply_ai_proposal.
+//
+// Provider: Claude (Anthropic) di default, fallback OpenAI. Chiavi come segreti. Il tool use
+// e' implementato in entrambi i dialetti (Anthropic tools / OpenAI tools).
 
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
@@ -64,6 +75,9 @@ const USD_TO_EUR = (() => {
 // Cap rigido sui token di output, indipendente dalla richiesta del client.
 const MAX_OUTPUT_TOKENS = 1500;
 
+// Massimo numero di round agentici (chiamata AI + esecuzione tool READ).
+const MAX_ROUNDS = 4;
+
 // ── Whitelist modelli ─────────────────────────────────────────────────────────
 const ANTHROPIC_ALLOWED = new Set<string>([
   "claude-sonnet-4-6",
@@ -106,25 +120,40 @@ interface ChatMessage {
 }
 type Mode = "chat" | "route" | "write";
 
+type SvcClient = ReturnType<typeof createClient>;
+
+// Proposta raccolta da un tool WRITE, gia' persistita in ai_proposals.
+interface ProposalOut {
+  id: string;
+  kind: "poi" | "route" | "project";
+  title: string;
+  summary: string;
+  payload: Record<string, unknown>;
+}
+
 // ── System prompt base (italiano, niente trattini lunghi, niente emoji a raffica) ──
 function baseSystemPrompt(mode: Mode): string {
   const common =
     "Sei il copilota dell'amministratore di POI•LOVE, la mappa comunitaria dei luoghi amati " +
     "(primo lancio a Tirana). Parli sempre in italiano, in modo conciso e diretto. " +
     "Stile: niente trattini lunghi, usa virgole o due punti al loro posto. Niente emoji a raffica. " +
-    "Rispondi solo su dati reali: usa le statistiche fresche fornite nel contesto, non inventare numeri. " +
-    "Se non hai un dato, dillo con onesta'.";
+    "Rispondi solo su dati reali: usa le statistiche fresche fornite nel contesto e i tool di lettura, non inventare numeri. " +
+    "Se non hai un dato, dillo con onesta'.\n\n" +
+    "Hai a disposizione strumenti (tool):\n" +
+    "- query_data e historic_analysis: SOLA LETTURA. Usali per leggere conteggi e righe reali dal database " +
+    "prima di rispondere o prima di proporre qualcosa. Non inventare: interroga.\n" +
+    "- propose_poi, propose_historic_route, propose_project: PROPOSTE. Non scrivono nel database: " +
+    "creano una proposta che l'amministratore approva o rifiuta a mano dal pannello. " +
+    "Usali quando l'admin chiede di creare un POI, una rotta storica o un intero progetto. " +
+    "I POI e le rotte nascono SEMPRE in bozza non pubblica. " +
+    "Quando proponi, prima leggi i dati reali con i tool di lettura per non duplicare e per usare coordinate plausibili.";
 
   if (mode === "route") {
     return (
       common +
-      "\n\nMODALITA' ROTTA: l'admin descrive un percorso o un'idea di itinerario. " +
-      "Proponi una sequenza di tappe ordinate e sensata. " +
-      "Per ogni tappa fornisci un nome chiaro e un breve hint. Se conosci coordinate plausibili, indicale, " +
-      "altrimenti lascia lat/lng a null (non inventare coordinate precise). " +
-      "Dopo il testo, includi SEMPRE un blocco JSON delimitato da ```json e ``` con questa forma esatta: " +
-      '{"stops":[{"name":"...","hint":"...","lat":null,"lng":null}]}. ' +
-      "Il blocco JSON deve essere valido e parsabile."
+      "\n\nMODALITA' ROTTA: l'admin descrive un percorso o un'idea di itinerario storico. " +
+      "Studia la zona con i tool di lettura, poi usa propose_historic_route con una sequenza di tappe ordinate e sensata. " +
+      "Per ogni tappa fornisci un nome chiaro; se conosci coordinate plausibili indicale, altrimenti lasciale a null."
     );
   }
   if (mode === "write") {
@@ -138,12 +167,12 @@ function baseSystemPrompt(mode: Mode): string {
   return (
     common +
     "\n\nMODALITA' CHAT: rispondi alle domande dell'admin sulla piattaforma, sui dati, sulla moderazione " +
-    "e sull'operativita'. Suggerisci azioni concrete quando ha senso."
+    "e sull'operativita'. Suggerisci azioni concrete quando ha senso, e quando serve interroga i dati reali."
   );
 }
 
 // ── Raccolta statistiche fresche con service_role (dopo il gate admin) ──────────
-async function gatherStats(svc: ReturnType<typeof createClient>) {
+async function gatherStats(svc: SvcClient) {
   const out: Record<string, unknown> = {};
 
   const usersCount = await svc
@@ -201,10 +230,7 @@ function statsToSystemMessage(stats: Record<string, unknown>): string {
 }
 
 // ── Somma del costo AI gia' speso oggi dall'admin (UTC day) ─────────────────────
-async function spentTodayEur(
-  svc: ReturnType<typeof createClient>,
-  adminId: string,
-): Promise<number> {
+async function spentTodayEur(svc: SvcClient, adminId: string): Promise<number> {
   const since = new Date();
   since.setUTCHours(0, 0, 0, 0);
 
@@ -226,17 +252,664 @@ async function spentTodayEur(
   return total;
 }
 
-// ── Provider: Anthropic ─────────────────────────────────────────────────────────
-async function callAnthropic(
+// ════════════════════════════════════════════════════════════════════════════
+//  DEFINIZIONE DEI TOOL (schema neutro, poi tradotto nei due dialetti provider)
+// ════════════════════════════════════════════════════════════════════════════
+
+interface ToolDef {
+  name: string;
+  description: string;
+  // JSON Schema dell'input (oggetto). Usato sia da Anthropic (input_schema) sia
+  // da OpenAI (function.parameters).
+  schema: Record<string, unknown>;
+  // 'read' viene eseguito dalla edge nel loop; 'write' diventa una proposta.
+  kind: "read" | "write";
+}
+
+// Tabelle leggibili dai tool READ e relative whitelist di campi/filtri.
+const READ_TABLES: Record<string, { columns: string; filters: string[] }> = {
+  pois: {
+    columns:
+      "id,title,description,category,tags,lat,lng,address,city,visibility,is_approved,created_via,created_at",
+    filters: ["category", "city", "visibility", "is_approved", "created_via"],
+  },
+  profiles: {
+    columns: "id,username,special_tier,moderation_status,created_at",
+    filters: ["special_tier", "moderation_status"],
+  },
+  reports: {
+    columns: "id,status,created_at",
+    filters: ["status"],
+  },
+  trips: {
+    columns: "id,name,badge,is_historic,is_published,created_at",
+    filters: ["is_historic", "is_published"],
+  },
+  user_routes: {
+    columns: "id,name,created_at",
+    filters: [],
+  },
+};
+
+const TOOLS: ToolDef[] = [
+  {
+    name: "query_data",
+    kind: "read",
+    description:
+      "Legge dati reali dal database (sola lettura). Restituisce conteggio o righe da una tabella " +
+      "consentita con filtri uguaglianza whitelisted. Tabelle: pois, profiles, reports, trips, user_routes. " +
+      "Usa mode='count' per contare, mode='rows' per leggere fino a 50 righe.",
+    schema: {
+      type: "object",
+      properties: {
+        table: {
+          type: "string",
+          enum: Object.keys(READ_TABLES),
+          description: "Tabella da leggere.",
+        },
+        mode: {
+          type: "string",
+          enum: ["count", "rows"],
+          description: "count = solo numero righe; rows = righe (max 50).",
+        },
+        filters: {
+          type: "object",
+          description:
+            "Filtri di uguaglianza opzionali, solo su colonne whitelisted della tabella. " +
+            "Es. {\"city\":\"Tirana\",\"visibility\":\"official\"}.",
+          additionalProperties: { type: ["string", "number", "boolean"] },
+        },
+        limit: {
+          type: "integer",
+          minimum: 1,
+          maximum: 50,
+          description: "Numero massimo di righe per mode='rows'. Default 20.",
+        },
+      },
+      required: ["table", "mode"],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "historic_analysis",
+    kind: "read",
+    description:
+      "Analizza le rotte storiche e i POI ufficiali esistenti in una citta' (sola lettura). " +
+      "Utile prima di proporre una rotta storica o un progetto, per non duplicare e per orientarsi. " +
+      "Restituisce il conteggio delle rotte storiche pubblicate e un campione di POI ufficiali della citta'.",
+    schema: {
+      type: "object",
+      properties: {
+        city: {
+          type: "string",
+          description: "Citta' su cui analizzare i POI ufficiali. Es. 'Tirana'.",
+        },
+        limit: {
+          type: "integer",
+          minimum: 1,
+          maximum: 50,
+          description: "Numero massimo di POI ufficiali da campionare. Default 20.",
+        },
+      },
+      required: [],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "propose_poi",
+    kind: "write",
+    description:
+      "Propone la creazione di un singolo POI ufficiale (bozza non pubblica). NON scrive nel database: " +
+      "crea una proposta che l'admin approva o rifiuta a mano. Usa 'name' per il titolo del POI.",
+    schema: {
+      type: "object",
+      properties: {
+        name: { type: "string", description: "Titolo del POI (colonna title)." },
+        description: { type: "string", description: "Descrizione del POI." },
+        category: { type: "string", description: "Categoria (stringa)." },
+        tags: { type: "array", items: { type: "string" }, description: "Tag opzionali." },
+        lat: { type: "number", description: "Latitudine (numero)." },
+        lng: { type: "number", description: "Longitudine (numero)." },
+        address: { type: "string", description: "Indirizzo opzionale." },
+        city: { type: "string", description: "Citta'." },
+        rationale: { type: "string", description: "Perche' proponi questo POI." },
+      },
+      required: ["name"],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "propose_historic_route",
+    kind: "write",
+    description:
+      "Propone una rotta storica (trip is_historic, bozza non pubblicata) con una sequenza di tappe. " +
+      "NON scrive nel database: crea una proposta che l'admin approva o rifiuta. " +
+      "Le tappe possono collegare POI esistenti (link_existing_poi_id) o nuovi POI proposti nel payload.",
+    schema: {
+      type: "object",
+      properties: {
+        title: { type: "string", description: "Nome della rotta storica." },
+        badge: { type: "string", description: "Etichetta breve / badge della rotta." },
+        city: { type: "string", description: "Citta' della rotta." },
+        stops: {
+          type: "array",
+          description: "Tappe ordinate della rotta (max 30).",
+          items: {
+            type: "object",
+            properties: {
+              name: { type: "string" },
+              lat: { type: "number" },
+              lng: { type: "number" },
+              link_existing_poi_id: {
+                type: "string",
+                description: "UUID di un POI esistente da collegare (opzionale).",
+              },
+              new_poi_ref: {
+                type: "string",
+                description: "Riferimento a un nuovo POI presente in new_pois (opzionale).",
+              },
+            },
+            required: ["name"],
+            additionalProperties: false,
+          },
+        },
+        new_pois: {
+          type: "array",
+          description: "Nuovi POI creati insieme alla rotta, referenziati dalle tappe via ref.",
+          items: {
+            type: "object",
+            properties: {
+              ref: { type: "string", description: "Identificatore locale referenziato da new_poi_ref." },
+              name: { type: "string" },
+              description: { type: "string" },
+              category: { type: "string" },
+              tags: { type: "array", items: { type: "string" } },
+              lat: { type: "number" },
+              lng: { type: "number" },
+              city: { type: "string" },
+            },
+            required: ["ref", "name"],
+            additionalProperties: false,
+          },
+        },
+        rationale: { type: "string", description: "Perche' questa rotta storica." },
+      },
+      required: ["title", "stops"],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "propose_project",
+    kind: "write",
+    description:
+      "Propone un progetto intero: una rotta storica piu' un set di nuovi POI collegati, in un colpo solo. " +
+      "NON scrive nel database: crea una proposta che l'admin approva o rifiuta. " +
+      "Tutto nasce in bozza non pubblica; l'applicazione e' transazionale lato DB.",
+    schema: {
+      type: "object",
+      properties: {
+        title: { type: "string", description: "Titolo del progetto." },
+        route: {
+          type: "object",
+          description: "La rotta storica del progetto.",
+          properties: {
+            name: { type: "string" },
+            badge: { type: "string" },
+            stops: {
+              type: "array",
+              description: "Tappe ordinate (max 30).",
+              items: {
+                type: "object",
+                properties: {
+                  name: { type: "string" },
+                  lat: { type: "number" },
+                  lng: { type: "number" },
+                  link_existing_poi_id: { type: "string" },
+                  new_poi_ref: { type: "string" },
+                },
+                required: ["name"],
+                additionalProperties: false,
+              },
+            },
+          },
+          required: ["name", "stops"],
+          additionalProperties: false,
+        },
+        new_pois: {
+          type: "array",
+          description: "Nuovi POI del progetto, referenziati dalle tappe via ref.",
+          items: {
+            type: "object",
+            properties: {
+              ref: { type: "string" },
+              name: { type: "string" },
+              description: { type: "string" },
+              category: { type: "string" },
+              tags: { type: "array", items: { type: "string" } },
+              lat: { type: "number" },
+              lng: { type: "number" },
+              city: { type: "string" },
+            },
+            required: ["ref", "name"],
+            additionalProperties: false,
+          },
+        },
+        rationale: { type: "string", description: "Perche' questo progetto." },
+      },
+      required: ["title", "route"],
+      additionalProperties: false,
+    },
+  },
+];
+
+const TOOL_BY_NAME: Record<string, ToolDef> = Object.fromEntries(
+  TOOLS.map((t) => [t.name, t]),
+);
+
+// ── Dialetti dei tool per i due provider ────────────────────────────────────────
+function anthropicTools() {
+  return TOOLS.map((t) => ({
+    name: t.name,
+    description: t.description,
+    input_schema: t.schema,
+  }));
+}
+
+function openaiTools() {
+  return TOOLS.map((t) => ({
+    type: "function" as const,
+    function: {
+      name: t.name,
+      description: t.description,
+      parameters: t.schema,
+    },
+  }));
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  ESECUZIONE TOOL READ (service_role, solo SELECT/COUNT whitelisted)
+// ════════════════════════════════════════════════════════════════════════════
+
+function clampLimit(v: unknown, def = 20): number {
+  const n = Number(v);
+  if (!Number.isFinite(n)) return def;
+  return Math.min(50, Math.max(1, Math.floor(n)));
+}
+
+async function runQueryData(
+  svc: SvcClient,
+  input: Record<string, unknown>,
+): Promise<Record<string, unknown>> {
+  const table = String(input?.table ?? "");
+  const spec = READ_TABLES[table];
+  if (!spec) return { error: `tabella non consentita: ${table}` };
+
+  const mode = input?.mode === "rows" ? "rows" : "count";
+
+  // Filtri: solo colonne whitelisted, solo uguaglianza.
+  const rawFilters =
+    input?.filters && typeof input.filters === "object" && !Array.isArray(input.filters)
+      ? (input.filters as Record<string, unknown>)
+      : {};
+  const appliedFilters: Record<string, unknown> = {};
+
+  if (mode === "count") {
+    let q = svc.from(table).select("id", { count: "exact", head: true });
+    for (const [k, v] of Object.entries(rawFilters)) {
+      if (!spec.filters.includes(k)) continue;
+      if (typeof v !== "string" && typeof v !== "number" && typeof v !== "boolean") continue;
+      q = q.eq(k, v);
+      appliedFilters[k] = v;
+    }
+    const { count, error } = await q;
+    if (error) return { error: error.message };
+    return { table, mode, count: count ?? 0, applied_filters: appliedFilters };
+  }
+
+  // rows
+  const limit = clampLimit(input?.limit);
+  let q = svc.from(table).select(spec.columns).order("created_at", { ascending: false }).limit(limit);
+  for (const [k, v] of Object.entries(rawFilters)) {
+    if (!spec.filters.includes(k)) continue;
+    if (typeof v !== "string" && typeof v !== "number" && typeof v !== "boolean") continue;
+    q = q.eq(k, v);
+    appliedFilters[k] = v;
+  }
+  const { data, error } = await q;
+  if (error) return { error: error.message };
+  return { table, mode, rows: data ?? [], count: (data ?? []).length, applied_filters: appliedFilters };
+}
+
+async function runHistoricAnalysis(
+  svc: SvcClient,
+  input: Record<string, unknown>,
+): Promise<Record<string, unknown>> {
+  const city = typeof input?.city === "string" ? input.city : "";
+  const limit = clampLimit(input?.limit);
+
+  const historicCount = await svc
+    .from("trips")
+    .select("id", { count: "exact", head: true })
+    .eq("is_historic", true)
+    .eq("is_published", true);
+
+  let poiQuery = svc
+    .from("pois")
+    .select("id,title,category,city,lat,lng,visibility")
+    .eq("visibility", "official")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  if (city) poiQuery = poiQuery.eq("city", city);
+
+  const officialPois = await poiQuery;
+
+  return {
+    city: city || "(tutte)",
+    historic_routes_published: historicCount.count ?? 0,
+    official_pois_sample: officialPois.data ?? [],
+    official_pois_count: (officialPois.data ?? []).length,
+  };
+}
+
+async function executeReadTool(
+  svc: SvcClient,
+  name: string,
+  input: Record<string, unknown>,
+): Promise<Record<string, unknown>> {
+  try {
+    if (name === "query_data") return await runQueryData(svc, input);
+    if (name === "historic_analysis") return await runHistoricAnalysis(svc, input);
+    return { error: `tool di lettura sconosciuto: ${name}` };
+  } catch (e) {
+    return { error: String(e instanceof Error ? e.message : e) };
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  VALIDAZIONE PAYLOAD TOOL WRITE (lato server, prima di inserire la proposta)
+// ════════════════════════════════════════════════════════════════════════════
+
+function asTrimmedString(v: unknown, max: number): string {
+  return String(v ?? "").trim().slice(0, max);
+}
+
+function isFiniteNum(v: unknown): boolean {
+  return typeof v === "number" && Number.isFinite(v);
+}
+
+function sanitizeTags(v: unknown): string[] {
+  if (!Array.isArray(v)) return [];
+  return v
+    .filter((x) => typeof x === "string")
+    .map((x) => (x as string).trim().slice(0, 60))
+    .filter(Boolean)
+    .slice(0, 20);
+}
+
+interface ValidationResult {
+  ok: boolean;
+  error?: string;
+  kind?: "poi" | "route" | "project";
+  title?: string;
+  summary?: string;
+  payload?: Record<string, unknown>;
+}
+
+// Valida un singolo POI (sia standalone sia annidato in new_pois).
+function validatePoiObj(
+  src: Record<string, unknown>,
+  requireRef: boolean,
+): { ok: boolean; error?: string; value?: Record<string, unknown> } {
+  const name = asTrimmedString(src?.name, 200);
+  if (!name) return { ok: false, error: "POI senza name" };
+
+  const out: Record<string, unknown> = { name };
+
+  if (requireRef) {
+    const ref = asTrimmedString(src?.ref, 80);
+    if (!ref) return { ok: false, error: `POI '${name}' senza ref` };
+    out.ref = ref;
+  }
+
+  if (src?.description !== undefined) out.description = asTrimmedString(src.description, 4000);
+  if (src?.category !== undefined) {
+    if (typeof src.category !== "string") return { ok: false, error: `category non stringa per '${name}'` };
+    out.category = asTrimmedString(src.category, 80);
+  }
+  if (src?.address !== undefined) out.address = asTrimmedString(src.address, 300);
+  if (src?.city !== undefined) out.city = asTrimmedString(src.city, 120);
+  if (src?.tags !== undefined) out.tags = sanitizeTags(src.tags);
+
+  if (src?.lat !== undefined && src.lat !== null) {
+    if (!isFiniteNum(src.lat) || (src.lat as number) < -90 || (src.lat as number) > 90) {
+      return { ok: false, error: `lat non valida per '${name}'` };
+    }
+    out.lat = src.lat;
+  }
+  if (src?.lng !== undefined && src.lng !== null) {
+    if (!isFiniteNum(src.lng) || (src.lng as number) < -180 || (src.lng as number) > 180) {
+      return { ok: false, error: `lng non valida per '${name}'` };
+    }
+    out.lng = src.lng;
+  }
+
+  return { ok: true, value: out };
+}
+
+// Valida le tappe di una rotta (max 30).
+function validateStops(
+  stops: unknown,
+): { ok: boolean; error?: string; value?: Array<Record<string, unknown>> } {
+  if (!Array.isArray(stops) || stops.length === 0) {
+    return { ok: false, error: "rotta senza tappe" };
+  }
+  if (stops.length > 30) {
+    return { ok: false, error: `troppe tappe: ${stops.length}, massimo 30` };
+  }
+  const out: Array<Record<string, unknown>> = [];
+  for (const s of stops as Array<Record<string, unknown>>) {
+    const name = asTrimmedString(s?.name, 200);
+    if (!name) return { ok: false, error: "tappa senza name" };
+    const stop: Record<string, unknown> = { name };
+    if (s?.lat !== undefined && s.lat !== null) {
+      if (!isFiniteNum(s.lat) || (s.lat as number) < -90 || (s.lat as number) > 90) {
+        return { ok: false, error: `lat tappa '${name}' non valida` };
+      }
+      stop.lat = s.lat;
+    }
+    if (s?.lng !== undefined && s.lng !== null) {
+      if (!isFiniteNum(s.lng) || (s.lng as number) < -180 || (s.lng as number) > 180) {
+        return { ok: false, error: `lng tappa '${name}' non valida` };
+      }
+      stop.lng = s.lng;
+    }
+    if (s?.link_existing_poi_id !== undefined) {
+      stop.link_existing_poi_id = asTrimmedString(s.link_existing_poi_id, 80);
+    }
+    if (s?.new_poi_ref !== undefined) {
+      stop.new_poi_ref = asTrimmedString(s.new_poi_ref, 80);
+    }
+    out.push(stop);
+  }
+  return { ok: true, value: out };
+}
+
+function validateNewPois(
+  newPois: unknown,
+): { ok: boolean; error?: string; value?: Array<Record<string, unknown>> } {
+  if (newPois === undefined || newPois === null) return { ok: true, value: [] };
+  if (!Array.isArray(newPois)) return { ok: false, error: "new_pois non e' un array" };
+  if (newPois.length > 30) return { ok: false, error: `troppi new_pois: ${newPois.length}, massimo 30` };
+  const out: Array<Record<string, unknown>> = [];
+  for (const p of newPois as Array<Record<string, unknown>>) {
+    const v = validatePoiObj(p, true);
+    if (!v.ok) return { ok: false, error: v.error };
+    out.push(v.value!);
+  }
+  return { ok: true, value: out };
+}
+
+// Valida il payload di un tool WRITE e produce {kind, title, summary, payload} normalizzato.
+function validateWritePayload(
+  name: string,
+  input: Record<string, unknown>,
+): ValidationResult {
+  if (name === "propose_poi") {
+    const v = validatePoiObj(input, false);
+    if (!v.ok) return { ok: false, error: v.error };
+    const poi = v.value!;
+    if (input?.rationale !== undefined) poi.rationale = asTrimmedString(input.rationale, 2000);
+    const title = String(poi.name);
+    return {
+      ok: true,
+      kind: "poi",
+      title,
+      summary: `POI proposto: ${title}` + (poi.city ? ` (${poi.city})` : ""),
+      payload: poi,
+    };
+  }
+
+  if (name === "propose_historic_route") {
+    const title = asTrimmedString(input?.title, 200);
+    if (!title) return { ok: false, error: "rotta senza title" };
+
+    const stopsRes = validateStops(input?.stops);
+    if (!stopsRes.ok) return { ok: false, error: stopsRes.error };
+
+    const newPoisRes = validateNewPois(input?.new_pois);
+    if (!newPoisRes.ok) return { ok: false, error: newPoisRes.error };
+
+    // Forma payload allineata alla RPC apply_ai_proposal: route.{name,badge,stops} + new_pois.
+    const payload: Record<string, unknown> = {
+      title,
+      route: {
+        name: title,
+        badge: asTrimmedString(input?.badge, 80) || undefined,
+        stops: stopsRes.value,
+      },
+      new_pois: newPoisRes.value,
+    };
+    if (input?.city !== undefined) (payload.route as Record<string, unknown>).city = asTrimmedString(input.city, 120);
+    if (input?.rationale !== undefined) payload.rationale = asTrimmedString(input.rationale, 2000);
+
+    return {
+      ok: true,
+      kind: "route",
+      title,
+      summary: `Rotta storica proposta: ${title} (${stopsRes.value!.length} tappe, ${newPoisRes.value!.length} nuovi POI)`,
+      payload,
+    };
+  }
+
+  if (name === "propose_project") {
+    const title = asTrimmedString(input?.title, 200);
+    if (!title) return { ok: false, error: "progetto senza title" };
+
+    const route =
+      input?.route && typeof input.route === "object" && !Array.isArray(input.route)
+        ? (input.route as Record<string, unknown>)
+        : null;
+    if (!route) return { ok: false, error: "progetto senza route" };
+
+    const routeName = asTrimmedString(route?.name, 200) || title;
+    const stopsRes = validateStops(route?.stops);
+    if (!stopsRes.ok) return { ok: false, error: stopsRes.error };
+
+    const newPoisRes = validateNewPois(input?.new_pois);
+    if (!newPoisRes.ok) return { ok: false, error: newPoisRes.error };
+
+    const payload: Record<string, unknown> = {
+      title,
+      route: {
+        name: routeName,
+        badge: asTrimmedString(route?.badge, 80) || undefined,
+        stops: stopsRes.value,
+      },
+      new_pois: newPoisRes.value,
+    };
+    if (input?.rationale !== undefined) payload.rationale = asTrimmedString(input.rationale, 2000);
+
+    return {
+      ok: true,
+      kind: "project",
+      title,
+      summary: `Progetto proposto: ${title} (rotta '${routeName}', ${stopsRes.value!.length} tappe, ${newPoisRes.value!.length} nuovi POI)`,
+      payload,
+    };
+  }
+
+  return { ok: false, error: `tool di scrittura sconosciuto: ${name}` };
+}
+
+// Inserisce la proposta validata in ai_proposals (pending) e logga in admin_audit_log.
+async function persistProposal(
+  svc: SvcClient,
+  adminId: string,
+  res: ValidationResult,
+): Promise<{ ok: boolean; proposal?: ProposalOut; error?: string }> {
+  const { kind, title, summary, payload } = res;
+  const rationale =
+    payload && typeof payload.rationale === "string" ? (payload.rationale as string) : null;
+
+  const { data, error } = await svc
+    .from("ai_proposals")
+    .insert({
+      admin_id: adminId,
+      kind,
+      title,
+      payload,
+      status: "pending",
+      rationale,
+    })
+    .select("id")
+    .single();
+
+  if (error || !data?.id) {
+    return { ok: false, error: error?.message ?? "insert ai_proposals failed" };
+  }
+
+  const proposalId = String(data.id);
+
+  try {
+    await svc.from("admin_audit_log").insert({
+      admin_id: adminId,
+      action: "ai_proposal_create",
+      target_type: kind,
+      target_id: proposalId,
+      meta: { kind, title, summary },
+    });
+  } catch (_e) {
+    // Il log non deve bloccare: la proposta e' gia' persistita.
+  }
+
+  return {
+    ok: true,
+    proposal: {
+      id: proposalId,
+      kind: kind!,
+      title: title!,
+      summary: summary!,
+      payload: payload!,
+    },
+  };
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  PROVIDER ANTHROPIC — loop agentico con tool use nativo
+// ════════════════════════════════════════════════════════════════════════════
+
+interface AgentResult {
+  reply: string;
+  proposals: ProposalOut[];
+  tokIn: number;
+  tokOut: number;
+}
+
+async function anthropicCall(
   model: string,
   systemPrompt: string,
-  messages: ChatMessage[],
-): Promise<{ reply: string; tokIn: number; tokOut: number }> {
-  // Anthropic vuole system separato e solo ruoli user/assistant nel body.
-  const conv = messages
-    .filter((m) => m.role === "user" || m.role === "assistant")
-    .map((m) => ({ role: m.role, content: m.content }));
-
+  msgs: unknown[],
+): Promise<{ data: any; tokIn: number; tokOut: number }> {
   const r = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
@@ -248,7 +921,8 @@ async function callAnthropic(
       model,
       max_tokens: MAX_OUTPUT_TOKENS,
       system: systemPrompt,
-      messages: conv,
+      tools: anthropicTools(),
+      messages: msgs,
     }),
   });
 
@@ -256,30 +930,115 @@ async function callAnthropic(
     const detail = await r.text().catch(() => "");
     throw new Error(`anthropic_${r.status}: ${detail.slice(0, 400)}`);
   }
-
   const data = await r.json();
-  const reply = Array.isArray(data?.content)
-    ? data.content
-        .filter((b: { type?: string }) => b?.type === "text")
-        .map((b: { text?: string }) => b?.text ?? "")
-        .join("")
-    : "";
   const tokIn = Number(data?.usage?.input_tokens) || 0;
   const tokOut = Number(data?.usage?.output_tokens) || 0;
-  return { reply, tokIn, tokOut };
+  return { data, tokIn, tokOut };
 }
 
-// ── Provider: OpenAI (fallback) ─────────────────────────────────────────────────
-async function callOpenAI(
+async function runAnthropic(
+  svc: SvcClient,
+  adminId: string,
   model: string,
   systemPrompt: string,
   messages: ChatMessage[],
-): Promise<{ reply: string; tokIn: number; tokOut: number }> {
-  const conv: ChatMessage[] = [
-    { role: "system", content: systemPrompt },
-    ...messages.filter((m) => m.role === "user" || m.role === "assistant"),
-  ];
+): Promise<AgentResult> {
+  // Solo user/assistant nel body; il system va separato.
+  const msgs: any[] = messages
+    .filter((m) => m.role === "user" || m.role === "assistant")
+    .map((m) => ({ role: m.role, content: m.content }));
 
+  let totalIn = 0;
+  let totalOut = 0;
+  const proposals: ProposalOut[] = [];
+  let finalText = "";
+
+  for (let round = 0; round < MAX_ROUNDS; round++) {
+    const { data, tokIn, tokOut } = await anthropicCall(model, systemPrompt, msgs);
+    totalIn += tokIn;
+    totalOut += tokOut;
+
+    const blocks: any[] = Array.isArray(data?.content) ? data.content : [];
+
+    // Testo prodotto in questo round.
+    const text = blocks
+      .filter((b) => b?.type === "text")
+      .map((b) => String(b?.text ?? ""))
+      .join("");
+    if (text) finalText = text;
+
+    const toolUses = blocks.filter((b) => b?.type === "tool_use");
+
+    if (data?.stop_reason !== "tool_use" || toolUses.length === 0) {
+      // Nessun tool richiesto: fine del loop.
+      break;
+    }
+
+    // Rimetti il turno assistant (con i blocchi tool_use) nella conversazione.
+    msgs.push({ role: "assistant", content: blocks });
+
+    // Esegui ogni tool e prepara i tool_result.
+    const toolResults: any[] = [];
+    for (const tu of toolUses) {
+      const name = String(tu?.name ?? "");
+      const input = (tu?.input && typeof tu.input === "object" ? tu.input : {}) as Record<string, unknown>;
+      const def = TOOL_BY_NAME[name];
+
+      let resultObj: Record<string, unknown>;
+      if (!def) {
+        resultObj = { error: `tool sconosciuto: ${name}` };
+      } else if (def.kind === "read") {
+        resultObj = await executeReadTool(svc, name, input);
+      } else {
+        // WRITE: non eseguire. Valida e persisti come proposta.
+        const v = validateWritePayload(name, input);
+        if (!v.ok) {
+          resultObj = { ok: false, error: v.error };
+        } else {
+          const p = await persistProposal(svc, adminId, v);
+          if (!p.ok) {
+            resultObj = { ok: false, error: p.error };
+          } else {
+            proposals.push(p.proposal!);
+            resultObj = {
+              ok: true,
+              proposal_id: p.proposal!.id,
+              kind: p.proposal!.kind,
+              status: "pending",
+              note: "Proposta creata. L'amministratore la approvera' o rifiutera' a mano dal pannello. Niente e' stato scritto nel database.",
+            };
+          }
+        }
+      }
+
+      toolResults.push({
+        type: "tool_result",
+        tool_use_id: tu?.id,
+        content: JSON.stringify(resultObj),
+      });
+    }
+
+    // Re-inietta i risultati come messaggio user.
+    msgs.push({ role: "user", content: toolResults });
+  }
+
+  if (!finalText) {
+    finalText = proposals.length
+      ? "Ho preparato le proposte qui sotto: rivedile e approva o rifiuta dal pannello."
+      : "Ok.";
+  }
+
+  return { reply: finalText, proposals, tokIn: totalIn, tokOut: totalOut };
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  PROVIDER OPENAI — loop agentico con tool use nativo (function calling)
+// ════════════════════════════════════════════════════════════════════════════
+
+async function openaiCall(
+  model: string,
+  msgs: unknown[],
+): Promise<{ data: any; tokIn: number; tokOut: number }> {
   const r = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -288,7 +1047,9 @@ async function callOpenAI(
     },
     body: JSON.stringify({
       model,
-      messages: conv,
+      messages: msgs,
+      tools: openaiTools(),
+      tool_choice: "auto",
       max_tokens: MAX_OUTPUT_TOKENS,
       temperature: 0.6,
     }),
@@ -298,12 +1059,109 @@ async function callOpenAI(
     const detail = await r.text().catch(() => "");
     throw new Error(`openai_${r.status}: ${detail.slice(0, 400)}`);
   }
-
   const data = await r.json();
-  const reply = data?.choices?.[0]?.message?.content ?? "";
   const tokIn = Number(data?.usage?.prompt_tokens) || 0;
   const tokOut = Number(data?.usage?.completion_tokens) || 0;
-  return { reply, tokIn, tokOut };
+  return { data, tokIn, tokOut };
+}
+
+async function runOpenAI(
+  svc: SvcClient,
+  adminId: string,
+  model: string,
+  systemPrompt: string,
+  messages: ChatMessage[],
+): Promise<AgentResult> {
+  const msgs: any[] = [
+    { role: "system", content: systemPrompt },
+    ...messages
+      .filter((m) => m.role === "user" || m.role === "assistant")
+      .map((m) => ({ role: m.role, content: m.content })),
+  ];
+
+  let totalIn = 0;
+  let totalOut = 0;
+  const proposals: ProposalOut[] = [];
+  let finalText = "";
+
+  for (let round = 0; round < MAX_ROUNDS; round++) {
+    const { data, tokIn, tokOut } = await openaiCall(model, msgs);
+    totalIn += tokIn;
+    totalOut += tokOut;
+
+    const choice = data?.choices?.[0];
+    const message = choice?.message ?? {};
+    const toolCalls: any[] = Array.isArray(message?.tool_calls) ? message.tool_calls : [];
+
+    if (typeof message?.content === "string" && message.content.trim()) {
+      finalText = message.content;
+    }
+
+    if (choice?.finish_reason !== "tool_calls" || toolCalls.length === 0) {
+      break;
+    }
+
+    // Rimetti il turno assistant (con i tool_calls) nella conversazione.
+    msgs.push({
+      role: "assistant",
+      content: message?.content ?? null,
+      tool_calls: toolCalls,
+    });
+
+    for (const tc of toolCalls) {
+      const name = String(tc?.function?.name ?? "");
+      let input: Record<string, unknown> = {};
+      try {
+        const parsed = JSON.parse(tc?.function?.arguments ?? "{}");
+        if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+          input = parsed as Record<string, unknown>;
+        }
+      } catch (_e) {
+        input = {};
+      }
+
+      const def = TOOL_BY_NAME[name];
+      let resultObj: Record<string, unknown>;
+      if (!def) {
+        resultObj = { error: `tool sconosciuto: ${name}` };
+      } else if (def.kind === "read") {
+        resultObj = await executeReadTool(svc, name, input);
+      } else {
+        const v = validateWritePayload(name, input);
+        if (!v.ok) {
+          resultObj = { ok: false, error: v.error };
+        } else {
+          const p = await persistProposal(svc, adminId, v);
+          if (!p.ok) {
+            resultObj = { ok: false, error: p.error };
+          } else {
+            proposals.push(p.proposal!);
+            resultObj = {
+              ok: true,
+              proposal_id: p.proposal!.id,
+              kind: p.proposal!.kind,
+              status: "pending",
+              note: "Proposta creata. L'amministratore la approvera' o rifiutera' a mano dal pannello. Niente e' stato scritto nel database.",
+            };
+          }
+        }
+      }
+
+      msgs.push({
+        role: "tool",
+        tool_call_id: tc?.id,
+        content: JSON.stringify(resultObj),
+      });
+    }
+  }
+
+  if (!finalText) {
+    finalText = proposals.length
+      ? "Ho preparato le proposte qui sotto: rivedile e approva o rifiuta dal pannello."
+      : "Ok.";
+  }
+
+  return { reply: finalText, proposals, tokIn: totalIn, tokOut: totalOut };
 }
 
 // ── Handler ─────────────────────────────────────────────────────────────────────
@@ -356,8 +1214,9 @@ Deno.serve(async (req: Request) => {
     return json({ error: "forbidden", detail: "admin access required" }, 403);
   }
 
-  // Richiedi il secondo fattore (MFA, aal2): il copilota AI costa, va protetto come le altre azioni
-  // admin. Coerente con is_admin() lato DB: se il JWT non porta il claim aal (caso raro) non si blocca.
+  // Richiedi il secondo fattore (MFA, aal2): il copilota AI costa e ora propone scritture,
+  // va protetto come le altre azioni admin. Coerente con is_admin() lato DB: se il JWT non
+  // porta il claim aal (caso raro) non si blocca.
   try {
     const payload = JSON.parse(atob((jwt.split(".")[1] || "").replace(/-/g, "+").replace(/_/g, "/")));
     if (payload?.aal && payload.aal !== "aal2") {
@@ -434,44 +1293,30 @@ Deno.serve(async (req: Request) => {
   const systemPrompt =
     baseSystemPrompt(mode) + "\n\n" + statsToSystemMessage(stats);
 
-  // ── Chiamata AI con fallback ──────────────────────────────────────────────────
-  let reply = "";
-  let tokIn = 0;
-  let tokOut = 0;
+  // ── Loop agentico con fallback provider ───────────────────────────────────────
+  let agent: AgentResult | null = null;
   let usedModel = model;
   let usedProvider = provider;
 
   try {
-    if (provider === "anthropic") {
-      const res = await callAnthropic(model, systemPrompt, messages);
-      reply = res.reply;
-      tokIn = res.tokIn;
-      tokOut = res.tokOut;
-    } else {
-      const res = await callOpenAI(model, systemPrompt, messages);
-      reply = res.reply;
-      tokIn = res.tokIn;
-      tokOut = res.tokOut;
-    }
+    agent =
+      provider === "anthropic"
+        ? await runAnthropic(svc, user.id, model, systemPrompt, messages)
+        : await runOpenAI(svc, user.id, model, systemPrompt, messages);
   } catch (primaryErr) {
-    // Fallback verso l'altro provider, se disponibile.
+    // Fallback verso l'altro provider, se disponibile e nessuna proposta e' stata
+    // ancora scritta (il fallback riparte da zero, evita duplicati).
     try {
       if (provider === "anthropic" && OPENAI_KEY) {
         usedProvider = "openai";
         usedModel = OPENAI_ALLOWED.has(OPENAI_MODEL) ? OPENAI_MODEL : "gpt-4o";
-        const res = await callOpenAI(usedModel, systemPrompt, messages);
-        reply = res.reply;
-        tokIn = res.tokIn;
-        tokOut = res.tokOut;
+        agent = await runOpenAI(svc, user.id, usedModel, systemPrompt, messages);
       } else if (provider === "openai" && ANTHROPIC_KEY) {
         usedProvider = "anthropic";
         usedModel = ANTHROPIC_ALLOWED.has(ANTHROPIC_MODEL)
           ? ANTHROPIC_MODEL
           : "claude-sonnet-4-6";
-        const res = await callAnthropic(usedModel, systemPrompt, messages);
-        reply = res.reply;
-        tokIn = res.tokIn;
-        tokOut = res.tokOut;
+        agent = await runAnthropic(svc, user.id, usedModel, systemPrompt, messages);
       } else {
         throw primaryErr;
       }
@@ -486,37 +1331,7 @@ Deno.serve(async (req: Request) => {
     }
   }
 
-  // ── Mode route: estrai le tappe dal blocco json e pulisci la reply mostrata ───
-  // Senza questo il pannello non riceve mai data.route e il bottone "Crea questo
-  // percorso" non comparirebbe: la modalita route resterebbe solo testo.
-  let routeOut:
-    | { stops: Array<{ name: string; hint: string; lat: number | null; lng: number | null }> }
-    | null = null;
-  if (mode === "route") {
-    const block = reply.match(/```json\s*([\s\S]*?)```/i);
-    if (block) {
-      try {
-        const parsed = JSON.parse(block[1].trim());
-        if (parsed && Array.isArray(parsed.stops) && parsed.stops.length) {
-          const stops = (parsed.stops as Array<Record<string, unknown>>)
-            .slice(0, 30)
-            .map((s) => ({
-              name: String(s?.name ?? "").slice(0, 200),
-              hint: String(s?.hint ?? "").slice(0, 400),
-              lat: typeof s?.lat === "number" ? s.lat : null,
-              lng: typeof s?.lng === "number" ? s.lng : null,
-            }))
-            .filter((s) => s.name);
-          if (stops.length) routeOut = { stops };
-        }
-      } catch (_e) {
-        routeOut = null;
-      }
-      // togli il blocco JSON grezzo dal testo che vede l'admin
-      reply = reply.replace(/```json\s*[\s\S]*?```/i, "").trim();
-    }
-  }
-
+  const { reply, proposals, tokIn, tokOut } = agent!;
   const cost = costEur(usedModel, tokIn, tokOut);
 
   // ── Log della chiamata in admin_audit_log (per il tetto di spesa) ─────────────
@@ -533,20 +1348,22 @@ Deno.serve(async (req: Request) => {
         tokens_in: tokIn,
         tokens_out: tokOut,
         cost_eur: cost,
+        proposals: proposals.length,
       },
     });
   } catch (_e) {
     // Il log non deve bloccare la risposta all'admin. Si prosegue.
   }
 
+  // ── Risposta finale come da contratto edge<->panel ────────────────────────────
   return json({
     reply,
+    proposals,
     usage: { in: tokIn, out: tokOut, cost_eur: cost },
     data: {
       provider: usedProvider,
       model: usedModel,
       mode,
-      route: routeOut,
       stats,
       spent_today_eur: Number((spent + cost).toFixed(4)),
       cap_eur: DAILY_EUR_CAP,
