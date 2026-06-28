@@ -1035,6 +1035,7 @@ async function runAnthropic(
 async function openaiCall(
   model: string,
   msgs: unknown[],
+  toolChoice: string = "auto",
 ): Promise<{ data: any; tokIn: number; tokOut: number }> {
   const r = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
@@ -1046,7 +1047,7 @@ async function openaiCall(
       model,
       messages: msgs,
       tools: openaiTools(),
-      tool_choice: "auto",
+      tool_choice: toolChoice,
       max_tokens: MAX_OUTPUT_TOKENS,
       temperature: 0.6,
     }),
@@ -1081,8 +1082,14 @@ async function runOpenAI(
   const proposals: ProposalOut[] = [];
   let finalText = "";
 
+  // Se l'admin chiede di AGIRE (creare, proporre, cercare, contare), al primo giro forziamo
+  // l'uso di uno strumento: gpt-4o non puo limitarsi a chiederti i dati a parole, deve fare.
+  const lastUser = [...messages].reverse().find((m) => m.role === "user")?.content || "";
+  const wantAction = /\b(crea|cre|monta|genera|inseris|aggiung|propon|voglio|fammi|metti|mostra|cerca|quant|elenca|trova)/i.test(lastUser);
+
   for (let round = 0; round < MAX_ROUNDS; round++) {
-    const { data, tokIn, tokOut } = await openaiCall(model, msgs);
+    const tc = (round === 0 && wantAction) ? "required" : "auto";
+    const { data, tokIn, tokOut } = await openaiCall(model, msgs, tc);
     totalIn += tokIn;
     totalOut += tokOut;
 
