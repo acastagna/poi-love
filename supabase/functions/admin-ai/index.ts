@@ -137,7 +137,8 @@ function baseSystemPrompt(mode: Mode): string {
     "Sei il copilota dell'amministratore di POI•LOVE, la mappa comunitaria dei luoghi amati (primo lancio a Tirana). Parli sempre in italiano, conciso e diretto. Niente trattini lunghi, niente emoji a raffica.\n\n" +
     "SEI PROATTIVO, NON un modulo da compilare. Quando l'admin chiede di creare un POI o una rotta, lo FAI TU: compili tutti i campi da solo e chiami SUBITO il tool di proposta. NON chiedere all'admin dati che puoi determinare da te.\n" +
     "- POSIZIONE: per un luogo noto usi le coordinate che gia conosci (es. Piazza Skanderbeg a Tirana ~41.3275, 19.8189; Piramide di Tirana ~41.3175, 19.8203; Castello di Scutari, Moschea Et'hem Bey, ecc.). Sono una BOZZA che l'admin aggiusta dopo: non serve la precisione al metro, serve proporre subito.\n" +
-    "- DESCRIZIONE: OBBLIGATORIA, mettila SEMPRE (un POI senza descrizione non deve esistere). La scrivi TU, da conoscitore del posto, calda e concreta, circa 200 caratteri. Non inventare premi o date false, descrivi il luogo per quello che e.\n" +
+    "- RICERCA PRIMA: prima di proporre un POI chiama SEMPRE lo strumento web_lookup col nome del luogo (e la citta') per leggere informazioni VERE. La descrizione la scrivi a partire da quello che trovi, mai a memoria.\n" +
+    "- DESCRIZIONE: OBBLIGATORIA, mettila SEMPRE (un POI senza descrizione non deve esistere). Calda e concreta, circa 200 caratteri, basata sui fatti trovati con web_lookup. Non inventare premi o date false, descrivi il luogo per quello che e.\n" +
     "- INDIRIZZO: lascialo pure vuoto se non lo sai con certezza, il sistema lo riempie da solo con l'indirizzo reale a partire dalle coordinate. Le coordinate mettile sempre.\n" +
     "- CATEGORIA: la scegli TU tra: cibo, lavoro, pernottare, natura, festa, cultura, pratico, benessere, love, audioguida, mappa, open_source. Per piazze, monumenti, storia usa 'cultura'.\n" +
     "- TAG: 2 o 3 pertinenti.\n" +
@@ -350,6 +351,25 @@ const TOOLS: ToolDef[] = [
         },
       },
       required: [],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "web_lookup",
+    kind: "read",
+    description:
+      "Cerca informazioni REALI su un luogo su internet (Wikipedia, multilingua sq/it/en) e restituisce un estratto " +
+      "enciclopedico con la fonte. USALO SEMPRE prima di proporre un POI, per scrivere una descrizione basata su fatti " +
+      "veri e non inventati. Passa il nome del luogo, meglio con la citta'. Es. 'Piazza Skanderbeg Tirana'.",
+    schema: {
+      type: "object",
+      properties: {
+        query: {
+          type: "string",
+          description: "Nome del luogo da cercare, meglio con la citta'. Es. 'Piramide di Tirana'.",
+        },
+      },
+      required: ["query"],
       additionalProperties: false,
     },
   },
@@ -609,6 +629,43 @@ async function runHistoricAnalysis(
   };
 }
 
+// Ricerca web reale su Wikipedia (multilingua): la descrizione del luogo nasce da fatti, non da fantasia.
+async function runWebLookup(input: Record<string, unknown>): Promise<Record<string, unknown>> {
+  const q = String(input?.query ?? "").trim().slice(0, 200);
+  if (!q) return { error: "query mancante" };
+  for (const lang of ["sq", "it", "en"]) {
+    try {
+      const url = "https://" + lang + ".wikipedia.org/w/api.php?action=query&format=json&redirects=1" +
+        "&prop=extracts|info&inprop=url&exintro=1&explaintext=1&generator=search&gsrlimit=1&gsrsearch=" +
+        encodeURIComponent(q);
+      const r = await fetch(url, { headers: { "User-Agent": "POI-LOVE-admin/1.0 (info@321.al)" } });
+      if (!r.ok) continue;
+      const d = await r.json();
+      const pages = d?.query?.pages;
+      if (!pages) continue;
+      const first: any = Object.values(pages)[0];
+      const extract = first?.extract ? String(first.extract).trim() : "";
+      if (extract && extract.length > 40) {
+        return {
+          source: "wikipedia",
+          lang,
+          title: first.title,
+          url: first.fullurl ??
+            ("https://" + lang + ".wikipedia.org/wiki/" + encodeURIComponent(String(first.title).replace(/ /g, "_"))),
+          extract: extract.slice(0, 1500),
+        };
+      }
+    } catch (_e) {
+      // prova la lingua successiva
+    }
+  }
+  return {
+    source: "wikipedia",
+    found: false,
+    note: "Nessuna voce enciclopedica trovata. Descrivi il luogo per categoria e contesto reale, senza inventare premi o fatti.",
+  };
+}
+
 async function executeReadTool(
   svc: SvcClient,
   name: string,
@@ -617,6 +674,7 @@ async function executeReadTool(
   try {
     if (name === "query_data") return await runQueryData(svc, input);
     if (name === "historic_analysis") return await runHistoricAnalysis(svc, input);
+    if (name === "web_lookup") return await runWebLookup(input);
     return { error: `tool di lettura sconosciuto: ${name}` };
   } catch (e) {
     return { error: String(e instanceof Error ? e.message : e) };
@@ -1122,9 +1180,15 @@ async function runOpenAI(
   // l'uso di uno strumento: gpt-4o non puo limitarsi a chiederti i dati a parole, deve fare.
   const lastUser = [...messages].reverse().find((m) => m.role === "user")?.content || "";
   const wantAction = /\b(crea|cre|monta|genera|inseris|aggiung|propon|voglio|fammi|metti|mostra|cerca|quant|elenca|trova)/i.test(lastUser);
+  // Se l'admin vuole CREARE qualcosa, forziamo gli strumenti finche' non c'e' una proposta:
+  // cosi il copilota cerca davvero (web_lookup) e poi monta la scheda, invece di chiedere i dati a parole.
+  const wantWrite = /\b(crea|cre|monta|genera|inseris|aggiung|propon|fammi|registr|costruisc|prepar|nuov)/i.test(lastUser);
+  let didWrite = false;
 
   for (let round = 0; round < MAX_ROUNDS; round++) {
-    const tc = (round === 0 && wantAction) ? "required" : "auto";
+    const tc = wantWrite
+      ? ((!didWrite && round < 4) ? "required" : "auto")
+      : ((round === 0 && wantAction) ? "required" : "auto");
     const { data, tokIn, tokOut } = await openaiCall(model, msgs, tc);
     totalIn += tokIn;
     totalOut += tokOut;
@@ -1176,6 +1240,7 @@ async function runOpenAI(
             resultObj = { ok: false, error: p.error };
           } else {
             proposals.push(p.proposal!);
+            didWrite = true;
             resultObj = {
               ok: true,
               proposal_id: p.proposal!.id,
