@@ -137,7 +137,8 @@ function baseSystemPrompt(mode: Mode): string {
     "Sei il copilota dell'amministratore di POI•LOVE, la mappa comunitaria dei luoghi amati (primo lancio a Tirana). Parli sempre in italiano, conciso e diretto. Niente trattini lunghi, niente emoji a raffica.\n\n" +
     "SEI PROATTIVO, NON un modulo da compilare. Quando l'admin chiede di creare un POI o una rotta, lo FAI TU: compili tutti i campi da solo e chiami SUBITO il tool di proposta. NON chiedere all'admin dati che puoi determinare da te.\n" +
     "- POSIZIONE: per un luogo noto usi le coordinate che gia conosci (es. Piazza Skanderbeg a Tirana ~41.3275, 19.8189; Piramide di Tirana ~41.3175, 19.8203; Castello di Scutari, Moschea Et'hem Bey, ecc.). Sono una BOZZA che l'admin aggiusta dopo: non serve la precisione al metro, serve proporre subito.\n" +
-    "- DESCRIZIONE: la scrivi TU, da conoscitore del posto, calda e concreta (max ~180 caratteri). Non inventare premi, date o fatti specifici falsi, ma descrivi il luogo per quello che e.\n" +
+    "- DESCRIZIONE: OBBLIGATORIA, mettila SEMPRE (un POI senza descrizione non deve esistere). La scrivi TU, da conoscitore del posto, calda e concreta, circa 200 caratteri. Non inventare premi o date false, descrivi il luogo per quello che e.\n" +
+    "- INDIRIZZO: lascialo pure vuoto se non lo sai con certezza, il sistema lo riempie da solo con l'indirizzo reale a partire dalle coordinate. Le coordinate mettile sempre.\n" +
     "- CATEGORIA: la scegli TU tra: cibo, lavoro, pernottare, natura, festa, cultura, pratico, benessere, love, audioguida, mappa, open_source. Per piazze, monumenti, storia usa 'cultura'.\n" +
     "- TAG: 2 o 3 pertinenti.\n" +
     "- Chiedi all'admin SOLO se il luogo e davvero ambiguo o inventato e non puoi saperne nulla. In ogni altro caso: PROPONI e basta, poi l'admin approva o corregge dalla scheda.\n\n" +
@@ -839,12 +840,47 @@ function validateWritePayload(
 }
 
 // Inserisce la proposta validata in ai_proposals (pending) e logga in admin_audit_log.
+// Indirizzo reale da OpenStreetMap (Nominatim): un POI con sole coordinate non basta.
+async function reverseGeocode(lat: number, lng: number): Promise<string | null> {
+  try {
+    const r = await fetch(
+      "https://nominatim.openstreetmap.org/reverse?format=json&zoom=18&addressdetails=1&lat=" + lat + "&lon=" + lng,
+      { headers: { "User-Agent": "POI-LOVE-admin/1.0", "Accept-Language": "sq,it,en" } },
+    );
+    if (!r.ok) return null;
+    const d = await r.json();
+    const dn = d && typeof d.display_name === "string" ? d.display_name : "";
+    return dn ? String(dn) : null;
+  } catch (_e) {
+    return null;
+  }
+}
+async function fillAddresses(kind: string | undefined, payload: Record<string, unknown> | undefined): Promise<void> {
+  if (!payload) return;
+  const need = (p: any) =>
+    p && typeof p.lat === "number" && typeof p.lng === "number" && (!p.address || !String(p.address).trim());
+  if (kind === "poi" && need(payload)) {
+    const a = await reverseGeocode(payload.lat as number, payload.lng as number);
+    if (a) payload.address = a;
+  } else if (kind === "project" || kind === "route") {
+    const nps = Array.isArray((payload as any).new_pois) ? (payload as any).new_pois.slice(0, 12) : [];
+    for (const p of nps) {
+      if (need(p)) {
+        const a = await reverseGeocode((p as any).lat, (p as any).lng);
+        if (a) (p as any).address = a;
+      }
+    }
+  }
+}
+
 async function persistProposal(
   svc: SvcClient,
   adminId: string,
   res: ValidationResult,
 ): Promise<{ ok: boolean; proposal?: ProposalOut; error?: string }> {
   const { kind, title, summary, payload } = res;
+  // Indirizzo reale: se il POI ha coordinate ma niente address, lo ricaviamo da OSM prima di salvare.
+  await fillAddresses(kind, payload as Record<string, unknown> | undefined);
   const rationale =
     payload && typeof payload.rationale === "string" ? (payload.rationale as string) : null;
 
