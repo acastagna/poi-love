@@ -40,10 +40,10 @@ alter table public.pois
 
 -- visibility ammette 'official' (POI curati dall'amministrazione)
 do $$ begin
-  if exists (select 1 from pg_constraint where conname='pois_visibility_chk') then
-    alter table public.pois drop constraint pois_visibility_chk;
+  if exists (select 1 from pg_constraint where conname='pois_visibility_check') then
+    alter table public.pois drop constraint pois_visibility_check;
   end if;
-  alter table public.pois add constraint pois_visibility_chk
+  alter table public.pois add constraint pois_visibility_check
     check (visibility in ('private','community','suggested_google','official'));
 end $$;
 
@@ -79,7 +79,7 @@ begin
   if pr.status <> 'approved' then raise exception 'proposal not approved'; end if;
 
   if pr.kind = 'poi' then
-    insert into public.pois(author_id,name,description,category,tags,lat,lng,address,city,visibility,is_approved,created_via)
+    insert into public.pois(author_id,title,description,category,tags,lat,lng,address,city,visibility,is_approved,created_via)
     values (auth.uid(), pr.payload->>'name', pr.payload->>'description', pr.payload->>'category',
             coalesce((select array_agg(x) from jsonb_array_elements_text(pr.payload->'tags') x),'{}'),
             (pr.payload->>'lat')::float8, (pr.payload->>'lng')::float8,
@@ -88,7 +88,7 @@ begin
 
   elsif pr.kind in ('route','project') then
     for poi in select * from jsonb_array_elements(coalesce(pr.payload->'new_pois','[]'::jsonb)) loop
-      insert into public.pois(author_id,name,description,category,tags,lat,lng,city,visibility,is_approved,created_via)
+      insert into public.pois(author_id,title,description,category,tags,lat,lng,city,visibility,is_approved,created_via)
       values (auth.uid(), poi->>'name', poi->>'description', poi->>'category',
               coalesce((select array_agg(x) from jsonb_array_elements_text(poi->'tags') x),'{}'),
               (poi->>'lat')::float8, (poi->>'lng')::float8, poi->>'city', 'official', false, 'ai')
