@@ -80,7 +80,9 @@ begin
 
   if pr.kind = 'poi' then
     insert into public.pois(author_id,title,description,category,tags,lat,lng,address,city,visibility,is_approved,created_via)
-    values (auth.uid(), pr.payload->>'name', pr.payload->>'description', pr.payload->>'category',
+    values (auth.uid(), pr.payload->>'name', pr.payload->>'description',
+            case when pr.payload->>'category' = any(enum_range(null::poi_category)::text[])
+                 then (pr.payload->>'category')::poi_category else 'cultura'::poi_category end,
             coalesce((select array_agg(x) from jsonb_array_elements_text(pr.payload->'tags') x),'{}'),
             (pr.payload->>'lat')::float8, (pr.payload->>'lng')::float8,
             pr.payload->>'address', pr.payload->>'city', 'official', false, 'ai')
@@ -89,7 +91,9 @@ begin
   elsif pr.kind in ('route','project') then
     for poi in select * from jsonb_array_elements(coalesce(pr.payload->'new_pois','[]'::jsonb)) loop
       insert into public.pois(author_id,title,description,category,tags,lat,lng,city,visibility,is_approved,created_via)
-      values (auth.uid(), poi->>'name', poi->>'description', poi->>'category',
+      values (auth.uid(), poi->>'name', poi->>'description',
+              case when poi->>'category' = any(enum_range(null::poi_category)::text[])
+                   then (poi->>'category')::poi_category else 'cultura'::poi_category end,
               coalesce((select array_agg(x) from jsonb_array_elements_text(poi->'tags') x),'{}'),
               (poi->>'lat')::float8, (poi->>'lng')::float8, poi->>'city', 'official', false, 'ai')
       returning id into new_id;
