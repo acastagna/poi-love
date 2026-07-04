@@ -1,7 +1,20 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
-> **Prossima ripresa: da definire.** Checkpoint sessione: `ae70c35` (HEAD su origin/main, 28/06/2026 notte).
-> **Priorità prossima sessione (vedi TODO riscritto): landing profilo personale, condivisione POI col teaser, sistema email + AcumbaMail nell'admin, presentazione 1/07, validazione legale, Admin FASE 2.**
+> **Prossima ripresa: collaudo di Alessandro (checklist della sessione 04/07) + Admin FASE 2 (email/AcumbaMail, rotte storiche admin, tier) + claim proprietà POI a pagamento + immagini Wikimedia.**
+> Checkpoint sessione: `57984f5`, tag `checkpoint-2026-07-04` (HEAD su origin/main). **Nessun lavoro non committato.**
+
+## Sessione 04/07/2026 — Review avversariale completa: 51 fix confermati, TUTTO deployato e verificato live
+
+Review multi-agente su tutto il sistema AI e creazione POI (6 revisori paralleli + verifica avversariale di ogni finding: 51 confermati, 1 confutato). Tutti corretti, deployati, verificati dal vivo. Commit `34d797c` (pannello+edge+migrazioni) e `57984f5` (webapp), tag `checkpoint-2026-07-04`.
+
+- **Sicurezza chiave OpenAI**: la vecchia chiave esposta in `poilove.com/config.js` era GIA MORTA (verificato live: OpenAI risponde 401; quasi certamente revocata dallo scanner anti-leak di OpenAI, da cui il "ha smesso di funzionare dopo 3 centesimi"). File svuotato sul server (ack di Alessandro) e verificato. La chiave viva (`sk-...xW0A`) sta SOLO nei secrets Supabase: non serve ruotarla, non serve toccarla.
+- **Edge `illi-chat` blindata e deployata**: auth JWT obbligatoria (verificato live: 401 senza login), limiti giornalieri per tier applicati (RPC `increment_ai_usage` + config `ai_limits_per_tier`), status HTTP veri (fine dei 200 finti mascherati da "Nessuna risposta."), storia sanitizzata (il campo `places` rompeva OpenAI dal 2° turno), timeout 20s.
+- **Webapp (22 fix, deployata)**: EXIF ora compila campi VISIBILI (la causa del "non prende i dati" era il pannello display:none); stato posizione `currentLocLatLng` (stop alle coordinate finte di Tirana o ereditate dal POI precedente; salvataggio bloccato senza posizione reale); toast onesti per foto senza GPS e da fotocamera in-app; fallback CDN exifr; `aiSummarize` usa i dati reali del posto e non cancella MAI gli appunti dell'utente; auto-suggerimento nome+categoria appena c'è la posizione; ILLI con token di sessione su tutte le chiamate (`_aiAuthHeaders`), errori 401/429 tradotti e mai salvati in storia, grounding ereditato solo sui follow-up, geocoding della città nominata nella domanda, timeout allineati; rimossi config.js/_groqKey dal client.
+- **Edge `admin-ai` (10 fix, deployata)**: loop non muore più su finish_reason; regex intento con boundary veri; sintesi finale a MAX_ROUNDS; descrizione (>=40 char) e coordinate OBBLIGATORIE nel validatore delle proposte; retry provider con backoff; fallback senza proposte duplicate; tetto spesa fail-closed; parità proattiva Anthropic.
+- **Pannello admin (10 fix, deployato)**: sezione "POI creati" LIVE (vedi/modifica/pubblica/elimina + filtri AI/ufficiali/bozze); storico chat copilota persistente; `title` al posto di `name` in createPoi (prima la creazione manuale falliva SEMPRE); categorie form allineate all'enum reale (prima erano inglesi, insert impossibile); visibility `official`; rilevamento falso successo RLS; proposte pending recuperabili al reload.
+- **DB**: migrazioni **015** (ai_chats + policy admin su pois) e **016** (apply_ai_proposal robusta: tetti caratteri, coordinate obbligatorie, risoluzione link sicura, audit title; trigger updated_at; ai_daily_usage + RPC testata; audit modifiche sensibili POI) **APPLICATE e verificate con query**.
+- **Nota di processo (ultimatum)**: la frustrazione nasceva dal pannello nuovo MAI deployato dalla sessione precedente, interrotta a metà giro. Regola permanente (memoria `regole-di-ferro`): ogni modifica chiude il giro scrivi→valida→deploya→verifica live, e gli stati a metà si dichiarano SEMPRE qui.
+- **Limite onesto**: il percorso autenticato (ILLI da utente loggato, copilota con MFA) non è collaudabile da terminale: serve il collaudo di Alessandro (checklist consegnata in chat).
 
 ## Sessione 28/06/2026 (sera e notte) — ILLI, Itinerari, profilo, fix vari + TODO riscritto
 

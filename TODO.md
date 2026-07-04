@@ -1,6 +1,17 @@
 # TODO — POI•LOVE
-> Aggiornato: **28/06/2026 (notte)** · Stato: admin LIVE con MFA, legali online, ILLI sistemato. Prossima tappa prodotto: **presentazione 1/07**, lancio pubblico **17/08**.
-> 🔒 Regola di ferro su TUTTO il nuovo: tre lingue perfette, ordine **SQ → IT → EN**, apertura automatica sulla lingua del device. Niente trattini lunghi. Chiavi/segreti solo server-side.
+> Aggiornato: **04/07/2026** · Stato: review completa fatta, 51 fix deployati e verificati live (webapp+admin+2 edge+2 migrazioni), tag `checkpoint-2026-07-04`. Lancio pubblico **17/08**.
+> 🔒 Regola di ferro su TUTTO il nuovo: tre lingue perfette, ordine **SQ → IT → EN**, apertura automatica sulla lingua del device. Niente trattini lunghi. Chiavi/segreti solo server-side. **Ogni modifica chiude il giro: scrivi → valida → deploya → verifica live.**
+
+---
+
+## ⚡ SUBITO (dalla sessione 04/07)
+
+- [ ] **Collaudo di Alessandro (checklist in chat del 04/07)**: EXIF che compila i campi, salvataggio bloccato senza posizione, ILLI dal 2° messaggio in poi, copilota che crea POI completo (descrizione+indirizzo+coordinate), sezione "POI creati" nel pannello.
+- [ ] **Claim proprietà POI a pagamento** (memoria `poi-ownership-and-media`): pulsante "reclama questo luogo" SOLO tier paganti → allarme in admin con embed code + nome richiedente + nome cedente. Tabella `poi_ownership_requests` + RLS + UI admin.
+- [ ] **Immagini licenziate del luogo** (Wikimedia Commons API, licenza CC + attribuzione) nel POI creato dal copilota e come proposta nella webapp.
+- [ ] **Descrizione 200 char nella fascia rossa del dettaglio POI** (webapp, sotto il titolo, font medio).
+- [ ] **`supabase/config.toml` versionato con `verify_jwt` esplicito per funzione** (nota della review: oggi il comportamento dipende dal default del deploy).
+- [ ] Minori rimandati dalla review: soft-delete POI dal pannello (oggi hard delete con audit), allineare `database/schema.sql` al DB vivo (visibility text, non enum), UA Nominatim con contatto anche nella webapp.
 
 ---
 
@@ -20,12 +31,22 @@
 
 ---
 
+## 🗺 Schermata POI "dove si trova" + lente (28/06 notte — memoria `poi-location-and-lens`)
+
+> Diagnosi fatta sul codice: tab in `setLocTab` (riga 7856), tap mappa in `_mapTapLocHandler` (7906), lente in `openLens` (4769).
+
+- [ ] **GPS** — deve dire dove siamo: verificare il flusso `setLocTab('gps')` → `reverseGeocodeAndShow`, che mostri la posizione reale e non resti in caricamento.
+- [ ] **Foto EXIF** — prendere i dati GPS dalla **prima foto** caricata (`applyExifToForm` deve leggere la prima immagine con GPS, non aspettare un tab).
+- [ ] **Indirizzo Albania-first** *(fix mirato)* — alle chiamate Nominatim del tab indirizzo (`locAddrIn`) aggiungere priorità Albania (es. `countrycodes=al` + una seconda query globale, AL primi); se l'utente nomina altri paesi, dare **anche** quei risultati.
+- [ ] **Tocca mappa → lente** *(fix mirato)* — oggi `_mapTapLocHandler` mette solo un pin; deve invece **aprire la lente** (`openLens`) sul punto toccato, **senza resettare** i campi già scritti (nome, descrizione).
+- [ ] **Lente intercetta i POI (pezzo grosso)** — oggi la lente fa solo reverse-geocode del punto. Deve elencare i **POI reali vicini**: DB POI•LOVE + OSM/Overpass (riuso `_fetchRealPlaces`) + Google Places (`place-enrich`). TripAdvisor/Facebook: niente API pubbliche facili, da valutare con onestà.
+
 ## 🟠 Admin FASE 2 (richieste 27-28/06 — vedi memoria `admin-phase2-requirements`)
 
 > Un mattone alla volta, DB/RLS dove serve. Chiavi AI solo nei secret/proxy.
 
-- [ ] **Icone Phosphor duotone ovunque** nel pannello, MAI emoji/icone di sistema. Bonificare i toast/sezioni di `panel.html`.
-- [ ] **Tema chiaro/scuro** selezionabile nel pannello.
+- [x] **Icone Phosphor duotone ovunque** + **tema chiaro/scuro** con interruttore sole/luna — FATTO 28/06, online su admin.poilove.com.
+- [x] **Copilota AI AGENTICO** — FATTO 28/06: migration 014 (ai_proposals, POI bozza, RPC apply_ai_proposal), edge con 5 tool (query_data/historic_analysis READ; propose_poi/route/project WRITE), UI proposte nel pannello (Approva/Rifiuta). Motore verificato end-to-end (proposta approvata → POI bozza). L'AI propone, l'admin approva.
 - [ ] **Sezione Rotte Storiche**: gestione delle rotte ufficiali dal pannello.
 - [ ] **Scheda icone/badge elementi ufficiali**: rotte, POI, liste + "in evidenza" (= **Professionista Pro**) e "suggerite" (= **Professionista Plus**, NUOVO tier da creare nello schema).
 - [ ] **Visibilità POI "ufficiale" + badge** nel form POI admin (oltre a privato/community/suggerito). Schema: `official` tra le visibility o flag `is_official`.
