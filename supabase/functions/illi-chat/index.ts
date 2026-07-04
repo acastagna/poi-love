@@ -122,6 +122,10 @@ function resolveTierLimits(configValue: unknown, tier: string): TierLimits {
 
 // ── Handler ───────────────────────────────────────────────────────────────────
 Deno.serve(async (req: Request) => {
+  // Rimborso quota: se il messaggio e' gia' stato contato ma OpenAI fallisce,
+  // lo si restituisce all'utente (RPC decrement_ai_usage, mig 017). Dichiarato
+  // fuori dal try per essere raggiungibile anche dal catch.
+  let refundQuota: (() => Promise<void>) | null = null;
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
   if (req.method !== "POST") return json({ error: "method_not_allowed" }, 405);
 
@@ -180,10 +184,18 @@ Deno.serve(async (req: Request) => {
     if (usageErr) {
       console.error("illi-chat: increment_ai_usage non disponibile (fail-open):", usageErr.message);
     } else {
+      // count e' POST-incremento: con limite N l'N-esimo messaggio ha count=N e passa
+      // (giusto: e' l'N-esimo), l'N+1-esimo ha count=N+1 e viene rifiutato. Limite esatto = N.
       const count = typeof usageData === "number" ? usageData : Number(usageData);
       if (Number.isFinite(count) && count > limits.messages) {
         return json({ error: "daily_limit", limit: limits.messages }, 429);
       }
+      // Messaggio contato: da qui in poi, se OpenAI fallisce, va rimborsato.
+      refundQuota = async () => {
+        refundQuota = null; // idempotente: al massimo un rimborso
+        const { error: refundErr } = await svc.rpc("decrement_ai_usage", { p_user: user.id });
+        if (refundErr) console.error("illi-chat: rimborso quota fallito:", refundErr.message);
+      };
     }
 
     // ── 6) Payload verso OpenAI: solo campi decisi qui, mai il body grezzo ─────
@@ -211,6 +223,7 @@ Deno.serve(async (req: Request) => {
     if (!r.ok) {
       const detail = await r.text().catch(() => "");
       console.error(`illi-chat: OpenAI ${r.status}:`, detail.slice(0, 500));
+      if (refundQuota) await refundQuota(); // il fallimento non e' colpa dell'utente
       return json({ error: "upstream", status: r.status }, r.status);
     }
 
@@ -220,6 +233,7 @@ Deno.serve(async (req: Request) => {
   } catch (e) {
     // Include il timeout (AbortSignal): meglio un 503 chiaro che uno spinner infinito.
     console.error("illi-chat: eccezione:", String(e));
+    if (refundQuota) await refundQuota(); // anche qui: quota restituita
     return json({ error: "internal" }, 503);
   }
 });

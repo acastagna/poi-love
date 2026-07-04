@@ -759,6 +759,7 @@ const T = {
     prop_applying:'Applico la proposta…',
     prop_applied_poi:'POI creato in bozza (visibilità ufficiale, non ancora pubblicato). Pubblicalo dalla mappa quando è pronto.',
     prop_applied_route:'Rotta storica e POI creati in bozza (non pubblicati). Rivedi e pubblica quando è pronto.',
+    prop_applied_project:'Progetto applicato: rotta storica e nuovi POI creati in bozza (non pubblicati). Rivedi tutto e pubblica quando è pronto.',
     prop_rejected:'Proposta rifiutata.',
     prop_err_apply:'Errore durante l\'applicazione della proposta',
     prop_err_decide:'Non è stato possibile aggiornare lo stato della proposta',
@@ -826,6 +827,7 @@ const T = {
     prop_applying:'Po e zbatoj propozimin…',
     prop_applied_poi:'POI u krijua si draft (dukshmëri zyrtare, ende i pabotuar). Botoje nga harta kur të jetë gati.',
     prop_applied_route:'Itinerari historik dhe POI-t u krijuan si draft (të pabotuar). Rishikoji dhe botoji kur të jenë gati.',
+    prop_applied_project:'Projekti u zbatua: itinerari historik dhe POI-t e rinj u krijuan si draft (të pabotuar). Rishiko gjithçka dhe botoji kur të jenë gati.',
     prop_rejected:'Propozimi u refuzua.',
     prop_err_apply:'Gabim gjatë zbatimit të propozimit',
     prop_err_decide:'Nuk u arrit të përditësohej statusi i propozimit',
@@ -893,6 +895,7 @@ const T = {
     prop_applying:'Applying the proposal…',
     prop_applied_poi:'POI created as a draft (official visibility, not published yet). Publish it from the map when ready.',
     prop_applied_route:'Historic route and POIs created as drafts (unpublished). Review and publish when ready.',
+    prop_applied_project:'Project applied: historic route and new POIs created as drafts (unpublished). Review everything and publish when ready.',
     prop_rejected:'Proposal rejected.',
     prop_err_apply:'Error while applying the proposal',
     prop_err_decide:'Could not update the proposal status',
@@ -1482,13 +1485,9 @@ function appendBubble(role, content, usage, routeData, iconName){
     if(usage.cost_eur!=null) parts.push(t('cost')+' €'+Number(usage.cost_eur).toFixed(4));
     if(parts.length) b.appendChild(el('div',{class:'usage',text:parts.join(' · ')}));
   }
-  // bottone "Crea questo percorso" se la risposta route porta tappe strutturate
-  if(routeData && Array.isArray(routeData.stops) && routeData.stops.length){
-    const cta=el('div',{class:'route-cta'});
-    cta.appendChild(el('button',{class:'btn gold', text:t('create_route_btn'),
-      onclick:(ev)=>createRouteFromAi(routeData, ev.currentTarget)}));
-    b.appendChild(cta);
-  }
+  // Le rotte del copilota passano SOLO da ai_proposals (propose_historic_route → Approva):
+  // il vecchio percorso diretto "Crea questo percorso" e' stato rimosso perche' scavalcava
+  // la coda di approvazione. routeData non viene piu' passato da nessun chiamante.
   log.appendChild(b);
   log.scrollTop=log.scrollHeight;
   return b;
@@ -1557,8 +1556,7 @@ async function sendAi(){
     aiHistory.push({ role:'assistant', content:reply });
     saveChat(); // il copilota RICORDA: persiste la conversazione in ai_chats
     // se mode route, la edge function può restituire data.route con tappe
-    const routeData = data.data && (data.data.route || (Array.isArray(data.data.stops)? data.data : null));
-    appendBubble('ai', reply, data.usage, routeData);
+    appendBubble('ai', reply, data.usage, null);
     // proposte write-tools (propose_poi / propose_historic_route / propose_project):
     // l'edge le ha già inserite in ai_proposals (status=pending). Le mostriamo come card.
     if(Array.isArray(data.proposals) && data.proposals.length){
@@ -1572,36 +1570,6 @@ async function sendAi(){
     document.getElementById('chatSend').disabled=false;
     input.focus();
   }
-}
-
-// Crea trip + trip_stops reali dalle tappe proposte dal copilota
-async function createRouteFromAi(routeData, btn){
-  if(btn){ btn.disabled=true; }
-  try{
-    const { data:{ user } } = await sb.auth.getUser();
-    const ownerId = user ? user.id : ME.id;
-    const name = routeData.name || routeData.title || 'Percorso AI';
-    const { data:trip, error:e1 } = await sb.from('trips')
-      .insert({ owner_id:ownerId, name, badge:routeData.badge||null, dates_label:routeData.dates_label||null })
-      .select('id').single();
-    if(e1){ toast(isBackendMissing(e1)?t('backend_off'):t('error'),'err'); if(btn) btn.disabled=false; return; }
-
-    // tappe
-    const stops = routeData.stops.map((s,i)=>({
-      trip_id: trip.id,
-      name: s.name || ('Tappa '+(i+1)),
-      lat: (s.lat!=null? Number(s.lat): null),
-      lng: (s.lng!=null? Number(s.lng): null),
-      sort_order: (s.sort_order!=null? s.sort_order : i),
-      status: 'planned'
-    }));
-    const { error:e2 } = await sb.from('trip_stops').insert(stops);
-    if(e2){ toast(t('error'),'err'); if(btn) btn.disabled=false; return; }
-
-    await logAudit('route_create_ai','trip',trip.id,{ name, stops:stops.length });
-    toast(t('route_created'),'ok');
-    if(btn){ btn.textContent=''; btn.appendChild(phIcon('check')); }
-  }catch(e){ toast(t('error'),'err'); if(btn) btn.disabled=false; }
 }
 
 /* ─────────────────────── Proposte del copilota (write-tools) ───────────────────────
@@ -1786,7 +1754,9 @@ async function approveProposal(pr, btn){
 
     // esito positivo: POI/rotta nati in bozza, da pubblicare
     card.classList.add('is-applied');
-    const okMsg = (pr.kind==='poi') ? t('prop_applied_poi') : t('prop_applied_route');
+    const okMsg = (pr.kind==='poi') ? t('prop_applied_poi')
+                : (pr.kind==='project') ? t('prop_applied_project')
+                : t('prop_applied_route');
     setProposalResult(card, 'ok', okMsg, 'check-circle');
     toast(t('saved'),'ok');
   }catch(e){

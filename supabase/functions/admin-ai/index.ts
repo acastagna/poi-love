@@ -705,6 +705,39 @@ function isFiniteNum(v: unknown): boolean {
   return typeof v === "number" && Number.isFinite(v);
 }
 
+// I 12 valori dell'enum poi_category del DB + sinonimi frequenti (italiano/inglese)
+// che il modello tende a usare. Tutto cio' che non si riconosce ricade su 'cultura',
+// ma in modo VISIBILE: il valore normalizzato finisce nel payload della proposta.
+const POI_CATEGORIES = new Set([
+  "cibo", "lavoro", "pernottare", "natura", "festa", "cultura",
+  "pratico", "benessere", "love", "audioguida", "mappa", "open_source",
+]);
+const CATEGORY_SYNONYMS: Record<string, string> = {
+  food: "cibo", restaurant: "cibo", ristorante: "cibo", pizzeria: "cibo", bar: "cibo",
+  cafe: "cibo", caffe: "cibo", cucina: "cibo",
+  work: "lavoro", coworking: "lavoro", ufficio: "lavoro",
+  hotel: "pernottare", sleep: "pernottare", alloggio: "pernottare", dormire: "pernottare",
+  nature: "natura", park: "natura", parco: "natura", panorama: "natura", view: "natura",
+  party: "festa", nightlife: "festa", club: "festa",
+  culture: "cultura", history: "cultura", storia: "cultura", museo: "cultura",
+  museum: "cultura", monumento: "cultura", monument: "cultura", arte: "cultura",
+  practical: "pratico", servizi: "pratico", service: "pratico",
+  wellness: "benessere", spa: "benessere", salute: "benessere",
+  romantico: "love", romantic: "love", amore: "love",
+  audio: "audioguida", audioguide: "audioguida",
+  map: "mappa",
+  opensource: "open_source", "open source": "open_source",
+};
+function normalizeCategory(v: unknown): string {
+  const raw = String(v ?? "").trim().toLowerCase().replace(/[-_]+/g, " ").trim();
+  const compact = raw.replace(/\s+/g, "_");
+  if (POI_CATEGORIES.has(compact)) return compact;
+  if (CATEGORY_SYNONYMS[raw]) return CATEGORY_SYNONYMS[raw];
+  const single = raw.replace(/\s+/g, "");
+  if (CATEGORY_SYNONYMS[single]) return CATEGORY_SYNONYMS[single];
+  return "cultura";
+}
+
 function sanitizeTags(v: unknown): string[] {
   if (!Array.isArray(v)) return [];
   return v
@@ -756,7 +789,9 @@ function validatePoiObj(
 
   if (src?.category !== undefined) {
     if (typeof src.category !== "string") return { ok: false, error: `category non stringa per '${name}'` };
-    out.category = asTrimmedString(src.category, 80);
+    // Normalizzata QUI sui 12 valori dell'enum poi_category: cosi' la card mostra
+    // all'admin la categoria che verra' DAVVERO scritta a DB (niente fallback silenziosi in SQL).
+    out.category = normalizeCategory(src.category);
   }
   if (src?.address !== undefined) out.address = asTrimmedString(src.address, 300);
   if (src?.city !== undefined) out.city = asTrimmedString(src.city, 120);
@@ -1539,15 +1574,23 @@ Deno.serve(async (req: Request) => {
     return json({ error: "forbidden", detail: "admin access required" }, 403);
   }
 
-  // Richiedi il secondo fattore (MFA, aal2): il copilota AI costa e ora propone scritture,
-  // va protetto come le altre azioni admin. Coerente con is_admin() lato DB: se il JWT non
-  // porta il claim aal (caso raro) non si blocca.
-  try {
-    const payload = JSON.parse(atob((jwt.split(".")[1] || "").replace(/-/g, "+").replace(/_/g, "/")));
-    if (payload?.aal && payload.aal !== "aal2") {
+  // Richiedi il secondo fattore (MFA, aal2): il copilota AI costa e propone scritture.
+  // FAIL-CLOSED: se il claim aal manca o il JWT non si decodifica, si blocca (403),
+  // non si prosegue. Base64url con padding esplicito prima di atob.
+  {
+    let aalOk = false;
+    try {
+      let b64 = (jwt.split(".")[1] || "").replace(/-/g, "+").replace(/_/g, "/");
+      b64 = b64.padEnd(b64.length + ((4 - (b64.length % 4)) % 4), "=");
+      const payload = JSON.parse(atob(b64));
+      aalOk = payload?.aal === "aal2";
+    } catch (_e) {
+      aalOk = false; // decodifica fallita = niente prova del secondo fattore
+    }
+    if (!aalOk) {
       return json({ error: "mfa_required", detail: "second factor required" }, 403);
     }
-  } catch (_e) { /* JWT non decodificabile: getUser ha gia validato la sessione, proseguo */ }
+  }
 
   // Da qui in poi: l'utente e' admin attivo con MFA. Solo ora usiamo i privilegi service_role.
 
