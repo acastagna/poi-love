@@ -39,7 +39,7 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/@phosphor-icons/web@2.1.1/src/index.js"></script>
-<script src="https://unpkg.com/exifr@7.1.3/dist/lite.umd.js"></script>
+<script src="https://unpkg.com/exifr@7.1.3/dist/lite.umd.js" onerror="(function(){var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/exifr@7.1.3/dist/lite.umd.js';document.head.appendChild(s);})()"></script>
 <!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
@@ -2493,9 +2493,9 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
           <!-- Nome luogo (amenity/poi name da geocoder) -->
           <div class="loc-name" id="locName" style="display:none"></div>
           <!-- Via + città -->
-          <div class="loc-street" id="locStreet">Rruga Ismail Qemali, Tiranë</div>
-          <!-- Coordinate — cliccabili per copiare -->
-          <div class="loc-coords" id="locCoords" onclick="copyCoords(this)" title="Tap per copiare">41.3275, 19.8189</div>
+          <div class="loc-street" id="locStreet"></div>
+          <!-- Coordinate, cliccabili per copiare. Nessun placeholder: le coordinate compaiono solo quando la posizione e reale -->
+          <div class="loc-coords" id="locCoords" onclick="copyCoords(this)" title="Tap per copiare">Posizione non impostata</div>
           <!-- Link condivisione inline -->
           <div class="loc-share-mini" id="locShareMini">
             <i class="ph-duotone ph-link" style="font-size:10px"></i>
@@ -2976,8 +2976,6 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 
 <div class="toast" id="toastMsg"></div>
 
-<!-- Chiavi esterne — file solo sul server, non nel repo -->
-<script src="/config.js" onerror="console.warn('config.js non trovato — ILLI·AI disabilitato')"></script>
 <script>
 /* ══════════════════════════════════════════
    SUPABASE — connessione reale
@@ -4358,7 +4356,27 @@ const T={
     ref_earn_pre:'Guadagni',ref_earn_post:'per ogni amico che si iscrive',
     ref_pts_placeholder:'punti',
     ref_admin_note:'(il valore si imposterà dal pannello admin)',
-    ref_close:'Chiudi',},
+    ref_close:'Chiudi',
+    /* Posizione POI + AI form + chat ILLI */
+    loc_not_set:'Posizione non impostata',
+    poi_set_location_first:'Imposta prima la posizione: GPS, foto, indirizzo o tocco sulla mappa',
+    photo_no_gps:'Questa foto non contiene la posizione GPS',
+    photo_camera_no_gps:'Le foto scattate dal browser non hanno il GPS: imposta la posizione con GPS Live',
+    photo_gps_found:'📍 GPS trovato nella foto: apri il tab "Foto EXIF" per usarlo',
+    exif_lib_missing:'Lettura dati foto non disponibile in questo momento, riprova',
+    exif_reading:'🔍 Leggo i dati della foto…',
+    exif_applied:'📍 Posizione dalla foto applicata',
+    exif_read_error:'Non riesco a leggere i dati di questa foto',
+    ai_desc_generated:'✨ Descrizione generata da ILLI•AI!',
+    ai_desc_enriched:'✨ Ho arricchito i tuoi appunti!',
+    name_real_found:'📍 Nome reale',
+    name_placeholder_set:'Nessun nome ufficiale qui: ho messo un segnaposto, personalizzalo',
+    name_no_official_keep:'Nessun nome ufficiale qui vicino: ho lasciato il tuo',
+    name_no_official:'Non trovo il nome ufficiale di questo posto, scrivilo tu',
+    overpass_down:'Il servizio dei luoghi non risponde ora, riprova tra poco',
+    illi_login:'Accedi per usare ILLI',
+    illi_limit:'Hai finito i messaggi di oggi per il tuo livello',
+    illi_error:'ILLI ha un problema tecnico, riprova tra poco',},
   sq:{nav_map:'Harta',nav_itin:'Itinerare',nav_profile:'Profili',mt_street:'Rrugore',mt_sat:'Satelitor',mt_routes:'Rrugët Historike',fab_poi:'Shëno një vend',fab_itin:'Stacion Itinerarit',add_title:'Ruaj këtë vend',add_sub:'Shto një vend që e do',add_challenge:'Arrin brenda 60 sekondave?',loc_hint_use:'Përdor si emër',congrats:'',lbl_name:'Emri i vendit',req:'E DETYRUESHME',lbl_where:'Ku ndodhet',loc_gps:'GPS Live',loc_exif:'EXIF Foto',loc_addr:'Adresë',loc_map:'Prek hartën',lbl_photos:'Foto',ph_main:'Kryesore',ph_2:'Foto 2',ph_3:'Foto 3',ph_hint:'Nuk jeni aty? Mund të shtoni foto më vonë.',lbl_story:'Trego',lbl_cat:'Kategori',lbl_list:'Shto në listë',lbl_route:'Rrugë Historike',route_none:'Asnjë rrugë historike',lbl_vis:'Dukshmëria',vis_pub_btn:'Publik',vis_prv_btn:'Privat',vis_share_btn:'Nda',save_disabled:'Fut emrin për të vazhduar',save_ready:'Shëno në hartë',google_suggest:'Sugjeroni te Google Maps',stop_title:'Stacion Itinerarit',stop_sub:'Pa foto. Planifiko tani, trego kur je aty.',stop_lbl_name:'Emri i stacionit',stop_lbl_cat:'Kategori',stop_lbl_vis:'Dukshmëria Itinerarit',itin_pub:'Publik',itin_prv:'Privat',stop_lbl_date:'Data e planifikuar',stop_save:'Shto stacionin',stat_poi:'POI',stat_love:'Love',stat_list:'Lista',stat_itin:'Itinerare',stat_comp:'Shoqëri',diffondi:'Përhap POI•LOVE',prof_lists:'Listat e mia',prof_new_list:'Listë e re',prof_tags:'Etiketat e mia',prof_new_tag:'Shto',prof_my_poi:'POI-të e mia',prof_add_poi:'Shto',prof_pub_toggle:'Si më shohin të tjerët',itin_h:'Itinerare Udhëtimi',itin_desc:'Planifikoni stacionet para nisjes. Gjeni shokë udhëtimi.',itin_open:'Hap Itineraret',itin_note:'Hartë, mini-kalendar, GPS live.',back:'Kthehu',cr_top:'Krijim i POI•LOVE nga 321.AL',cr_bot:'Projekt Open Source · Ide dhe Drejtim Krijues: Alessandro Castagna© · Liçensë MIT',
     /* Auth overlay */
     auth_tagline:'vendet e zemrës',auth_apple:'Apple ID',auth_passkey:'Hyr me biometri',auth_passkey_as:'Hyr si',auth_passkey_need_email:'✉️ Vendos email-in tënd më poshtë dhe shtyp "Dërgo linkun"',auth_or_magic:'ose me link magjik via email',auth_email_ph:'email-juaj@email.com',auth_email_send:'Dërgo linkun',auth_terms:'Duke hyrë pranoni Kushtet e shërbimit të POI•LOVE',auth_oss:'Projekt Open Source · Liçensë MIT · © 2026 321.AL',auth_continue_google:'Vazhdo me Google',auth_continue_apple:'Vazhdo me Apple',auth_continue_li:'Vazhdo me LinkedIn',auth_continue_fb:'Vazhdo me Facebook',auth_continue_x:'Vazhdo me X',auth_email_invalid:'Vendos një email të vlefshëm',auth_link_sent:'📧 Linku u dërgua! Kontrollo postën.',auth_welcome_back:'Mirëserdhe',auth_provider_off:'nuk është aktivuar ende (Supabase → Auth → Providers)',auth_soon:'së shpejti',auth_guest:'Hyr e shiko',guest_active:'👀 Po eksploron si vizitor, hyr për të krijuar vendet e tua',
@@ -4438,7 +4456,27 @@ const T={
     ref_earn_pre:'Fiton',ref_earn_post:'për çdo mik që regjistrohet',
     ref_pts_placeholder:'pikë',
     ref_admin_note:'(vlera do të caktohet nga paneli admin)',
-    ref_close:'Mbyll',},
+    ref_close:'Mbyll',
+    /* Posizione POI + AI form + chat ILLI */
+    loc_not_set:'Vendndodhja e pacaktuar',
+    poi_set_location_first:'Cakto më parë vendndodhjen: GPS, foto, adresë ose prekje në hartë',
+    photo_no_gps:'Kjo foto nuk përmban vendndodhjen GPS',
+    photo_camera_no_gps:'Fotot e shkrepura nga shfletuesi nuk kanë GPS: cakto vendndodhjen me GPS Live',
+    photo_gps_found:'📍 GPS u gjet në foto: hap skedën "EXIF Foto" për ta përdorur',
+    exif_lib_missing:'Leximi i të dhënave të fotos nuk është i disponueshëm tani, provo përsëri',
+    exif_reading:'🔍 Po lexoj të dhënat e fotos…',
+    exif_applied:'📍 Vendndodhja nga fotoja u aplikua',
+    exif_read_error:'Nuk arrij të lexoj të dhënat e kësaj fotoje',
+    ai_desc_generated:'✨ Përshkrimi u gjenerua nga ILLI•AI!',
+    ai_desc_enriched:'✨ Pasurova shënimet e tua!',
+    name_real_found:'📍 Emër real',
+    name_placeholder_set:'Asnjë emër zyrtar këtu: vendosa një emër të përkohshëm, personalizoje',
+    name_no_official_keep:'Asnjë emër zyrtar këtu pranë: mbajta emrin tënd',
+    name_no_official:'Nuk gjej emrin zyrtar të këtij vendi, shkruaje ti',
+    overpass_down:'Shërbimi i vendeve nuk përgjigjet tani, provo përsëri pas pak',
+    illi_login:'Hyr për të përdorur ILLI-n',
+    illi_limit:'I ke mbaruar mesazhet e sotme për nivelin tënd',
+    illi_error:'ILLI ka një problem teknik, provo përsëri pas pak',},
   en:{nav_map:'Map',nav_itin:'Itineraries',nav_profile:'Profile',mt_street:'Street',mt_sat:'Satellite',mt_routes:'Historic Routes',fab_poi:'Mark a place',fab_itin:'Itinerary Stop',add_title:'Save this place',add_sub:'Add a place you love',add_challenge:'Can you do it in 60 seconds?',loc_hint_use:'Use as name',congrats:'',lbl_name:'Place name',req:'REQUIRED',lbl_where:'Where is it',loc_gps:'GPS Live',loc_exif:'Photo EXIF',loc_addr:'Address',loc_map:'Tap map',lbl_photos:'Photos',ph_main:'Main',ph_2:'Photo 2',ph_3:'Photo 3',ph_hint:"Not there yet? You can add photos later.",lbl_story:'Tell your story',lbl_cat:'Categories',lbl_list:'Add to a list',lbl_route:'Historic Route',route_none:'No historic route',lbl_vis:'Visibility',vis_pub_btn:'Public',vis_prv_btn:'Private',vis_share_btn:'Share',save_disabled:'Enter the name to continue',save_ready:'Mark on map',google_suggest:'Suggest to Google Maps',stop_title:'Itinerary Stop',stop_sub:"No photos. Plan now, tell the story when you're there.",stop_lbl_name:'Stop name',stop_lbl_cat:'Category',stop_lbl_vis:'Itinerary Visibility',itin_pub:'Public',itin_prv:'Private',stop_lbl_date:'Planned date',stop_save:'Add stop',stat_poi:'POI',stat_love:'Love',stat_list:'Lists',stat_itin:'Itineraries',stat_comp:'Companions',diffondi:'Spread POI•LOVE',prof_lists:'My lists',prof_new_list:'New list',prof_tags:'My tags',prof_new_tag:'Add',prof_my_poi:'My POIs',prof_add_poi:'Add',prof_pub_toggle:'How others see me',itin_h:'Travel Itineraries',itin_desc:'Plan your stops before you leave. Find travel companions.',itin_open:'Open Itineraries',itin_note:'Map, mini-calendar, live GPS and companions.',back:'Back',cr_top:'POI•LOVE created by 321.AL',cr_bot:'Open Source Project · Creative Direction: Alessandro Castagna© · MIT License',
     /* Auth overlay */
     auth_tagline:'places of the heart',auth_apple:'Apple ID',auth_passkey:'Sign in with Biometrics',auth_passkey_as:'Sign in as',auth_passkey_need_email:'✉️ Enter your email below and tap "Send link"',auth_or_magic:'or with magic link via email',auth_email_ph:'your@email.com',auth_email_send:'Send link',auth_terms:'By signing in you accept POI•LOVE Terms of Service',auth_oss:'Open Source Project · MIT License · © 2026 321.AL',auth_continue_google:'Continue with Google',auth_continue_apple:'Continue with Apple',auth_continue_li:'Continue with LinkedIn',auth_continue_fb:'Continue with Facebook',auth_continue_x:'Continue with X',auth_email_invalid:'Enter a valid email',auth_link_sent:'📧 Link sent! Check your mail.',auth_welcome_back:'Welcome back',auth_provider_off:'not yet enabled (Supabase → Auth → Providers)',auth_soon:'soon',auth_guest:'Look around',guest_active:'👀 You are exploring as a guest, sign in to create your places',
@@ -4518,7 +4556,27 @@ const T={
     ref_earn_pre:'You earn',ref_earn_post:'for every friend who signs up',
     ref_pts_placeholder:'points',
     ref_admin_note:'(the value will be set from the admin panel)',
-    ref_close:'Close',}
+    ref_close:'Close',
+    /* Posizione POI + AI form + chat ILLI */
+    loc_not_set:'Location not set',
+    poi_set_location_first:'Set the location first: GPS, photo, address or tap on the map',
+    photo_no_gps:'This photo has no GPS location',
+    photo_camera_no_gps:'Browser camera shots have no GPS: set the location with GPS Live',
+    photo_gps_found:'📍 GPS found in the photo: open the "Photo EXIF" tab to use it',
+    exif_lib_missing:'Photo data reading is unavailable right now, try again',
+    exif_reading:'🔍 Reading photo data…',
+    exif_applied:'📍 Photo location applied',
+    exif_read_error:'Cannot read data from this photo',
+    ai_desc_generated:'✨ Description generated by ILLI•AI!',
+    ai_desc_enriched:'✨ Your notes have been enriched!',
+    name_real_found:'📍 Real name',
+    name_placeholder_set:'No official name here: placeholder added, edit it',
+    name_no_official_keep:'No official name nearby: kept yours',
+    name_no_official:'No official name found, please type it',
+    overpass_down:'The places service is not responding right now, try again shortly',
+    illi_login:'Sign in to use ILLI',
+    illi_limit:'You have used up today\'s messages for your level',
+    illi_error:'ILLI has a technical problem, try again shortly',}
 };
 
 /* Helper: t('key', fallback) — usato in JS dinamico */
@@ -5015,10 +5073,10 @@ function onNameInput(val){
         return {name,meta,lat:parseFloat(r.lat),lng:parseFloat(r.lon),type:r.type,cls:r.class};
       });
       if(items.length){ showAcSuggestion(items,val); return; }
-      // 0 risultati → prova correzione AI
-      if(typeof GROQ_KEY!=='undefined' && val.length>3){
+      // 0 risultati: prova correzione AI (edge illi-chat, token di sessione o anon key)
+      if(val.length>3){
         const res=await fetch(GROQ_URL,{method:'POST',
-          headers:{'Content-Type':'application/json','Authorization':`Bearer ${GROQ_KEY}`},
+          headers:await _aiAuthHeaders(),
           body:JSON.stringify({model:GROQ_MODEL,messages:[{role:'user',
             content:`Correggi l'errore di battitura nel nome di questo luogo: "${val}". Rispondi SOLO con il nome corretto, niente altro.`}],
             max_completion_tokens:20,temperature:0})});
@@ -5059,10 +5117,9 @@ function showAcSuggestion(items){
 function selectAcItem(name,lat,lng){
   document.getElementById('poiNameIn').value=name;
   document.getElementById('acDrop').classList.remove('open');
-  document.getElementById('locCoords').textContent=`${lat.toFixed(4)}, ${lng.toFixed(4)}`;
-  updateShareLink(lat,lng);
+  // Mostra il pannello risultato e registra la posizione (prima scriveva coordinate in un pannello nascosto)
+  reverseGeocodeAndShow(lat,lng,'addr');
   checkSave();
-  if(map)map.setView([lat,lng],17);
 }
 document.addEventListener('click',e=>{
   if(!e.target.closest('.autocomplete-wrap'))
@@ -5261,7 +5318,27 @@ function handleDeepLink(){
 const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 let exifSuggestedName='';
-let exifCache=null; // { lat, lng, name, street } — ultimo risultato EXIF disponibile
+let exifCache=null; // { lat, lng, name, street }, ultimo risultato EXIF disponibile
+// Unica fonte di verita della posizione del POI in creazione: settata SOLO da GPS reale,
+// EXIF applicato, indirizzo selezionato o tocco sulla mappa. Null = posizione non impostata.
+let currentLocLatLng=null; // { lat, lng, src:'gps'|'exif'|'addr'|'map' }
+let _autoNameSuggested=false; // suggerimento nome automatico: al massimo uno per apertura sheet
+let _photoFromCamera=false;   // true se l'ultima foto arriva dall'input Fotocamera (mai GPS nell'EXIF)
+// Registra la posizione corrente; se il form e aperto col nome vuoto avvia il suggerimento automatico
+function setCurrentLoc(lat,lng,src){
+  currentLocLatLng={lat:lat,lng:lng,src:src||'gps'};
+  _maybeAutoSuggestName();
+}
+function _maybeAutoSuggestName(){
+  if(_autoNameSuggested) return;
+  if(typeof editingPOIId!=='undefined'&&editingPOIId) return; // in modifica il nome esiste gia
+  const sheet=document.getElementById('addPoiSheet');
+  if(!sheet||!sheet.classList.contains('open')) return;
+  const nameIn=document.getElementById('poiNameIn');
+  if(!nameIn||nameIn.value.trim()) return;
+  _autoNameSuggested=true;
+  setTimeout(()=>{ try{ suggestPoiName(true); }catch(e){} },0); // non bloccante
+}
 function triggerPhoto(idx){
   // Nuovo flusso: popup centrale a 2 quadrati (Galleria + Fotocamera)
   openPhotoSource(idx);
@@ -5356,6 +5433,8 @@ function handlePhotoSourceFile(input){
   const slot = _photoSourceSlot;
   if(slot===null || slot<0 || slot>2){ input.value=''; return; }
   if(!input.files || !input.files[0]){ input.value=''; return; }
+  // Foto dalla fotocamera del browser: l'EXIF non conterra mai il GPS, l'utente va avvisato dopo lo scatto
+  _photoFromCamera = (input.id==='photoCameraIn');
   // Riusa la logica esistente di handlePhoto (lo slot POI gestisce upload + EXIF + preview)
   handlePhoto(input, slot);
   input.value=''; // reset per consentire re-selezione stesso file
@@ -5373,84 +5452,106 @@ function handlePhoto(input,idx){
     showToast(lang==='sq'?'Foto shtuar!':lang==='en'?'Photo added!':'Foto aggiunta!');
   };
   reader.readAsDataURL(file);
-  // EXIF GPS extraction — su qualsiasi foto caricata
-  if(typeof exifr!=='undefined'){
-    exifr.gps(file).then(gps=>{
-      if(!gps||!gps.latitude)return;
-      const lat=gps.latitude,lng=gps.longitude;
-      updateShareLink(lat,lng);
-      if(map)map.setView([lat,lng],17);
-      // Reverse geocode → nome luogo
-      fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`,{headers:{'Accept-Language':lang}})
-        .then(r=>r.json()).then(d=>{
-          if(!d||!d.display_name)return;
-          const parts=d.display_name.split(',');
-          const name=parts[0].trim();
-          const street=(d.address?.road||d.address?.pedestrian||'').trim();
-          const city=(d.address?.city||d.address?.town||d.address?.village||'').trim();
-          const country=(d.address?.country||'').trim();
-          // Mostra nome, via, nazione nel loc-result
-          const locName=document.getElementById('locName');
-          if(locName){locName.textContent=name;locName.style.display='block';}
-          const locStreet=document.getElementById('locStreet');
-          if(locStreet)locStreet.textContent=[street,city,country].filter(Boolean).join(', ');
-          // Salva in cache — usato dal tab EXIF
-          exifSuggestedName=name;
-          exifCache={lat,lng,name,street:[street,city,country].filter(Boolean).join(', ')};
-          // Aggiorna i campi anche subito se il tab EXIF è attivo
-          const activeTab=document.querySelector('.loc-tab.active span[data-t="loc_exif"]');
-          if(activeTab) applyExifToForm();
-          // Hint suggerimento nome
-          const hint=document.getElementById('locHint');
-          const hintName=document.getElementById('locHintName');
-          if(hint&&hintName){
-            hintName.innerHTML=emoToIcons(`📍 ${name}`);
-            hint.classList.add('show');
-            const nameIn=document.getElementById('poiNameIn');
-            if(nameIn&&!nameIn.value.trim()){nameIn.value=name;checkSave();}
-          }
-        }).catch(()=>{});
-    }).catch(()=>{});
+  // EXIF GPS extraction su qualsiasi foto caricata
+  const fromCamera=_photoFromCamera; _photoFromCamera=false;
+  if(typeof exifr==='undefined'){
+    // Libreria EXIF non caricata (CDN irraggiungibile): avvisa invece di tacere
+    showToast(t('exif_lib_missing','Lettura dati foto non disponibile in questo momento, riprova'));
+    return;
   }
+  exifr.gps(file).then(gps=>{
+    if(!gps||!gps.latitude){
+      // Foto senza GPS: dillo con onesta. Le foto della fotocamera in-browser non hanno MAI la posizione.
+      showToast(fromCamera?t('photo_camera_no_gps','Le foto scattate dal browser non hanno il GPS: imposta la posizione con GPS Live'):t('photo_no_gps','Questa foto non contiene la posizione GPS'));
+      return;
+    }
+    const lat=gps.latitude,lng=gps.longitude;
+    // Cache SUBITO: le coordinate non dipendono dal reverse geocode (che puo fallire)
+    exifCache={lat,lng,name:'',street:''};
+    if(locActiveTab==='exif'||!currentLocLatLng){
+      applyExifToForm(); // applica la posizione e arricchisce nome/via in background
+    } else {
+      _enrichExifCache(lat,lng); // posizione gia impostata da altra fonte: prepara cache e hint nome
+    }
+  }).catch(e=>{ console.warn('EXIF:',e); showToast(t('exif_read_error','Non riesco a leggere i dati di questa foto')); });
+}
+
+// Reverse geocode Nominatim: arricchisce exifCache con nome/via e propone il nome nel form.
+// Le coordinate restano valide anche se questa chiamata fallisce (cache gia settata a monte).
+function _enrichExifCache(lat,lng){
+  return fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`,{headers:{'Accept-Language':lang}})
+    .then(r=>r.json()).then(d=>{
+      if(!d||!d.display_name)return;
+      const parts=d.display_name.split(',');
+      const name=parts[0].trim();
+      const street=(d.address?.road||d.address?.pedestrian||'').trim();
+      const city=(d.address?.city||d.address?.town||d.address?.village||'').trim();
+      const country=(d.address?.country||'').trim();
+      const full=[street,city,country].filter(Boolean).join(', ');
+      if(exifCache&&exifCache.lat===lat&&exifCache.lng===lng){ exifCache.name=name; exifCache.street=full; }
+      exifSuggestedName=name;
+      // Se la posizione attiva e quella della foto, mostra nome e via nel pannello risultato
+      if(currentLocLatLng&&currentLocLatLng.src==='exif'){
+        const locName=document.getElementById('locName');
+        if(locName&&name){locName.textContent=name;locName.style.display='block';}
+        const locStreet=document.getElementById('locStreet');
+        if(locStreet&&full)locStreet.textContent=full;
+      }
+      // Hint "usa come nome" + prefill se il campo nome e vuoto
+      const hint=document.getElementById('locHint');
+      const hintName=document.getElementById('locHintName');
+      if(hint&&hintName&&name){
+        hintName.innerHTML=emoToIcons(`📍 ${name}`);
+        hint.classList.add('show');
+        const nameIn=document.getElementById('poiNameIn');
+        if(nameIn&&!nameIn.value.trim()){nameIn.value=name;checkSave();}
+      }
+    }).catch(e=>{ console.warn('Nominatim EXIF:',e); });
 }
 
 // Compila tutti i campi posizione dai dati EXIF cachati
 function applyExifToForm(){
   if(!exifCache){
-    // Nessun EXIF trovato finora — prova a estrarlo dalla prima foto disponibile
-    const file=photoFiles.find(Boolean);
-    if(!file){ showToast(t('poi_photo_first','📷 Carica prima una foto con GPS')); return; }
-    if(typeof exifr==='undefined'){ showToast('Libreria EXIF non disponibile'); return; }
-    showToast('🔍 Leggo i dati EXIF…');
-    exifr.gps(file).then(gps=>{
-      if(!gps||!gps.latitude){ showToast(t('poi_no_gps_photo','Nessun GPS trovato in questa foto')); return; }
-      const lat=gps.latitude, lng=gps.longitude;
-      fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`,{headers:{'Accept-Language':lang}})
-        .then(r=>r.json()).then(d=>{
-          const parts=(d?.display_name||'').split(',');
-          const name=parts[0]?.trim()||'';
-          const street=(d?.address?.road||d?.address?.pedestrian||'').trim();
-          const city=(d?.address?.city||d?.address?.town||d?.address?.village||'').trim();
-          const country=(d?.address?.country||'').trim();
-          exifCache={lat,lng,name,street:[street,city,country].filter(Boolean).join(', ')};
-          exifSuggestedName=name;
-          applyExifToForm(); // ora exifCache è pieno, richiama
-        }).catch(()=>{ exifCache={lat,lng,name:'',street:''}; applyExifToForm(); });
-    }).catch(()=>showToast('Errore lettura EXIF'));
+    // Nessun EXIF in cache: prova TUTTE le foto caricate finche una ha il GPS (non solo la prima)
+    const files=photoFiles.filter(Boolean);
+    if(!files.length){ showToast(t('poi_photo_first','📷 Carica prima una foto con GPS')); return; }
+    if(typeof exifr==='undefined'){ showToast(t('exif_lib_missing','Lettura dati foto non disponibile in questo momento, riprova')); return; }
+    showToast(t('exif_reading','🔍 Leggo i dati della foto…'));
+    (async()=>{
+      for(const f of files){
+        try{
+          const gps=await exifr.gps(f);
+          if(gps&&gps.latitude){
+            exifCache={lat:gps.latitude,lng:gps.longitude,name:'',street:''};
+            applyExifToForm(); // ora la cache c'e: applica e arricchisce nome/via
+            return;
+          }
+        }catch(e){ console.warn('EXIF:',e); }
+      }
+      showToast(t('poi_no_gps_photo','Nessun GPS trovato in questa foto'));
+    })();
     return;
   }
-  // Applica tutto
+  // Applica tutto e MOSTRA il pannello risultato (senza la classe 'show' resta display:none)
   document.getElementById('locCoords').textContent=`${exifCache.lat.toFixed(6)}, ${exifCache.lng.toFixed(6)}`;
   const locName=document.getElementById('locName');
   if(locName&&exifCache.name){locName.textContent=exifCache.name;locName.style.display='block';}
   const locStreet=document.getElementById('locStreet');
-  if(locStreet&&exifCache.street) locStreet.textContent=exifCache.street;
+  if(locStreet)locStreet.textContent=exifCache.street||'…';
+  document.getElementById('locResult').classList.add('show');
+  document.getElementById('locGpsLoading').style.display='none';
+  const shareTxtEl=document.getElementById('locShareTxt');
+  if(shareTxtEl)shareTxtEl.textContent=`poilove.com?at=${exifCache.lat.toFixed(5)},${exifCache.lng.toFixed(5)}`;
   updateShareLink(exifCache.lat,exifCache.lng);
   if(map) map.setView([exifCache.lat,exifCache.lng],17);
+  // La posizione della foto diventa quella attiva del POI
+  setCurrentLoc(exifCache.lat,exifCache.lng,'exif');
+  // Nome/via mancanti (es. cache dal photo picker senza reverse geocode): arricchisci ora
+  if(!exifCache.name&&!exifCache.street) _enrichExifCache(exifCache.lat,exifCache.lng);
   // Pre-compila nome se vuoto
   const nameIn=document.getElementById('poiNameIn');
   if(nameIn&&!nameIn.value.trim()&&exifCache.name){nameIn.value=exifCache.name;checkSave();}
-  showToast('📍 Posizione dalla foto applicata');
+  showToast(t('exif_applied','📍 Posizione dalla foto applicata'));
 }
 function acceptExifName(){
   if(!exifSuggestedName)return;
@@ -5536,7 +5637,7 @@ async function _realNamesNear(lat,lng){
     nwr(around:90,${lat},${lng})[name][craft];
   );out center 50;`;
   const els=await _overpassFetch(q);
-  if(!els) return [];
+  if(els===null) return null; // Overpass irraggiungibile: distinto da "zona senza locali mappati" ([])
   const out=[], seen=new Set();
   for(const el of els){
     const tg=el.tags||{};
@@ -5553,89 +5654,140 @@ async function _realNamesNear(lat,lng){
   out.sort((a,b)=>a.distM-b.distM);
   return out.slice(0,8);
 }
+// Cache dell'ultima ricerca di nomi reali: riusata da aiSummarize senza nuove fetch bloccanti
+let _realNearCache=null; // { lat, lng, list }
+// Mappa il tipo OSM (amenity/shop/tourism...) su una categoria del form
+function _osmTypeToCat(tp){
+  tp=String(tp||'').toLowerCase();
+  if(/restaurant|pizzeria|fast_food|cafe|bar|pub|ice_cream|bakery|pastry|food/.test(tp)) return 'Cibo';
+  if(/hotel|guest_house|hostel|apartment|motel|camp/.test(tp)) return 'Pernottare';
+  if(/park|garden|natur|beach|forest|viewpoint|picnic/.test(tp)) return 'Natura';
+  if(/museum|monument|attraction|gallery|artwork|historic|theatre/.test(tp)) return 'Cultura';
+  if(/pharmacy|hospital|clinic|doctor|dentist|fuel|bank|atm|supermarket|convenience/.test(tp)) return 'Pratico';
+  if(/spa|massage|sauna|wellness|beauty/.test(tp)) return 'Benessere';
+  return 'Cultura';
+}
 // Suggerisce il nome del POI: prima il nome REALE da OSM, mai inventato dalla via.
-async function suggestPoiName(){
+// auto=true quando parte da solo all'arrivo della posizione: niente toast d'errore, mai sovrascrivere.
+async function suggestPoiName(auto){
   const nameIn=document.getElementById('poiNameIn');
-  const coordsTxt=String(document.getElementById('locCoords')?.textContent||'').trim();
-  const mm=coordsTxt.match(/(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)/);
+  if(auto&&nameIn&&nameIn.value.trim()) return;
+  if(!currentLocLatLng){ if(!auto) showToast(t('name_need_loc','Indica prima dove si trova, poi te lo suggerisco')); return; }
+  const lat=currentLocLatLng.lat, lng=currentLocLatLng.lng;
   const cats=Array.from(document.querySelectorAll('#addPoiSheet .chip.sel')).map(c=>c.textContent.trim()).filter(Boolean);
   const cityParts=String(document.getElementById('locStreet')?.textContent||'').split(',').map(s=>s.trim()).filter(Boolean);
-  const city=cityParts.length?cityParts[cityParts.length>1?cityParts.length-2:0]:'';
-  if(!mm){ showToast(t('name_need_loc','Indica prima dove si trova, poi te lo suggerisco')); return; }
-  const lat=parseFloat(mm[1]), lng=parseFloat(mm[2]);
+  // Citta: penultima parte solo con 3+ pezzi (via, citta, nazione), altrimenti l'ultima (mai la via)
+  const city=cityParts.length>=3?cityParts[cityParts.length-2]:(cityParts[cityParts.length-1]||'');
   const btn=document.getElementById('nameAiBtn'); let old='';
   if(btn){ old=btn.innerHTML; btn.disabled=true; btn.innerHTML='<i class="ph-duotone ph-circle-notch" style="animation:spin 1s linear infinite"></i>'; }
   const setName=v=>{ if(nameIn){ nameIn.value=String(v).substring(0,60); if(typeof onNameInput==='function') onNameInput(nameIn.value); if(typeof checkSave==='function') checkSave(); } };
   try{
-    // 1) Nome REALE del locale a queste coordinate (OSM)
+    // 1) Nome REALE del locale a queste coordinate (OSM). null = servizio giu, [] = nessun locale mappato
     const real=await _realNamesNear(lat,lng);
+    if(real===null){ if(!auto) showToast(t('overpass_down','Il servizio dei luoghi non risponde ora, riprova tra poco')); return; }
+    _realNearCache={lat,lng,list:real};
     if(real.length){
+      if(auto&&nameIn&&nameIn.value.trim()) return; // nel frattempo l'utente ha scritto: non toccare
       setName(real[0].name);
+      // Categoria dal tipo OSM (amenity/shop), se l'utente non ne ha ancora scelte
+      if(!cats.length&&real[0].type){
+        const wanted=_osmTypeToCat(real[0].type).toLowerCase();
+        const chip=Array.from(document.querySelectorAll('#catChips .chip')).find(c=>c.textContent.trim().toLowerCase()===wanted);
+        if(chip&&!chip.classList.contains('sel')) toggleCat(chip);
+      }
       const extra=real.length>1?(lang==='it'?` (uno dei ${real.length} qui vicino)`:lang==='sq'?` (një nga ${real.length} këtu pranë)`:` (one of ${real.length} nearby)`):'';
-      showToast('📍 '+(lang==='it'?'Nome reale':lang==='sq'?'Emër real':'Real name')+': '+real[0].name+extra);
+      showToast(t('name_real_found','📍 Nome reale')+': '+real[0].name+extra);
       return;
     }
+    if(auto) return; // in automatico niente segnaposto ne avvisi: solo nomi reali
     // 2) Nessun nome reale: NON inventare dalla via. Segnaposto dalla categoria, oppure invito a scrivere.
     if(cats.length){
       const ph=cats[0]+(city?(' '+city):'');
-      if(nameIn && !nameIn.value.trim()) setName(ph);
-      showToast(lang==='it'?'Nessun nome ufficiale qui: ho messo un segnaposto, personalizzalo':lang==='sq'?'Asnjë emër zyrtar: vendos një emër':'No official name here: placeholder added, edit it');
+      if(nameIn&&!nameIn.value.trim()){
+        setName(ph);
+        showToast(t('name_placeholder_set','Nessun nome ufficiale qui: ho messo un segnaposto, personalizzalo'));
+      } else {
+        // Il campo era gia compilato: nessun segnaposto scritto, il toast non deve mentire
+        showToast(t('name_no_official_keep','Nessun nome ufficiale qui vicino: ho lasciato il tuo'));
+      }
     } else {
-      showToast(lang==='it'?'Non trovo il nome ufficiale di questo posto, scrivilo tu':lang==='sq'?'Nuk gjeta emrin zyrtar, shkruaje ti':'No official name found, please type it');
+      showToast(t('name_no_official','Non trovo il nome ufficiale di questo posto, scrivilo tu'));
     }
-  }catch(e){ showToast(t('ai_gen_failed','Generazione non riuscita, riprova tra poco.')); }
+  }catch(e){ console.warn('suggestPoiName:',e); if(!auto) showToast(t('ai_gen_failed','Generazione non riuscita, riprova tra poco.')); }
   finally{ if(btn){ btn.disabled=false; btn.innerHTML=old; } }
 }
 // toggleVoice (legacy) rimosso: la dettatura descrizione usa toggleFieldDictation('storyIn','voiceBtn').
 
 /* ══════════════════════════════════════════
-   AI SUMMARIZE (smart truncation, free)
+   AI SUMMARIZE — descrizione dai DATI REALI del form.
+   Se l'utente ha gia scritto appunti (anche brevi), li arricchisce: MAI cancellarli.
 ══════════════════════════════════════════ */
 async function aiSummarize(){
   const ta=document.getElementById('storyIn');
   const nameIn=document.getElementById('poiNameIn');
   const existingText=ta.value.trim();
-  const placeName=nameIn?.value.trim()||'questo posto';
-  const address=document.getElementById('locStreet')?.textContent||'';
-  const coords=document.getElementById('locCoords')?.textContent||'';
-
-  // Se c'è già testo lungo, lo sintetizza; altrimenti genera da zero
-  const isGenerate=existingText.length<20;
+  const placeName=nameIn?.value.trim()||'';
+  const address=(document.getElementById('locStreet')?.textContent||'').trim();
+  const coordsStr=currentLocLatLng?`${currentLocLatLng.lat.toFixed(5)}, ${currentLocLatLng.lng.toFixed(5)}`:'';
+  // Tipo OSM dalla cache dei nomi reali (nessuna nuova fetch bloccante)
+  let osmType='';
+  if(_realNearCache&&_realNearCache.list&&_realNearCache.list.length){
+    const match=placeName?_realNearCache.list.find(p=>p.name.toLowerCase()===placeName.toLowerCase()):null;
+    osmType=(match||_realNearCache.list[0]).type||'';
+  }
+  // Testo utente presente (anche 5 caratteri) = arricchire, mai sovrascrivere ignorandolo
+  const isGenerate=existingText.length===0;
   const btnEl=document.getElementById('aiSumBtn');
   if(btnEl){btnEl.disabled=true;btnEl.innerHTML='<i class="ph-duotone ph-circle-notch" style="animation:spin 1s linear infinite"></i>';}
 
   const langLabel=lang==='it'?'italiano':lang==='sq'?'albanese':'English';
   const cats=Array.from(document.querySelectorAll('#addPoiSheet .chip.sel')).map(c=>c.textContent.trim()).join(', ');
+  const facts=[
+    placeName?`- Nome: "${placeName}"`:null,
+    address&&address!=='…'?`- Indirizzo/zona: ${address}`:null,
+    coordsStr?`- Coordinate: ${coordsStr}`:null,
+    osmType?`- Tipo (OpenStreetMap): ${osmType}`:null,
+    cats?`- Categorie scelte dall'utente: ${cats}`:null
+  ].filter(Boolean).join('\n')||'- (nessun dato disponibile)';
   let prompt;
   if(isGenerate){
-    prompt=`Scrivi una breve descrizione (massimo 180 caratteri) per un posto di tipo "${cats||'luogo'}"${(placeName&&placeName!=='questo posto')?` chiamato "${placeName}"`:''}, in ${langLabel}.
+    prompt=`Scrivi una breve descrizione (massimo 200 caratteri) in ${langLabel} per QUESTO luogo reale:
+${facts}
 
-Regole ferree, rispettale tutte:
-- NON inventare fatti che non puoi conoscere: niente storia, premi, anni, persone, nomi di piatti o specialita specifiche di questo locale.
-- NON farti influenzare dal nome della via o dall'indirizzo: descrivi il TIPO di posto ("${cats||'luogo'}"), mai la toponomastica.
-- Scrivi qualcosa che sia vero per un qualsiasi posto di questo tipo, con tono caldo e personale, come se lo raccontassi a un amico.
-- Niente cliche turistici ("luogo imperdibile", "posto magico", "da non perdere"). Non iniziare col nome.
+Regole:
+- Descrivi proprio questo posto usando i dati qui sopra (nome, zona, tipo): niente frasi valide per qualunque posto.
+- NON inventare fatti verificabili che non conosci: niente premi, date, storia, persone o piatti specifici.
+- Tono caldo e personale, come lo racconteresti a un amico. Niente cliche turistici ("imperdibile", "magico", "da non perdere").
 - Rispondi SOLO col testo della descrizione, senza virgolette, in ${langLabel}.`;
   } else {
-    prompt=`Sintetizza questo testo a massimo 180 caratteri mantenendo lo spirito e il tono del luogo. Rispondi solo con il testo sintetizzato, senza virgolette, in ${langLabel}:
-"${existingText}"`;
+    prompt=`Parti da questi appunti dell'utente e arricchiscili: sono la base, non cancellarli e non ignorarli.
+Appunti: "${existingText}"
+
+Dati reali del luogo (usali solo se coerenti con gli appunti):
+${facts}
+
+Regole:
+- Riscrivi gli appunti in una descrizione fluida di massimo 200 caratteri, in ${langLabel}, conservando le informazioni e il punto di vista dell'utente.
+- NON inventare fatti verificabili che non conosci: niente premi, date, storia, persone o piatti specifici.
+- Rispondi SOLO col testo della descrizione, senza virgolette.`;
   }
 
   try {
     const res=await fetch(GROQ_URL,{method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':`Bearer ${GROQ_KEY}`},
+      headers:await _aiAuthHeaders(),
       body:JSON.stringify({model:GROQ_MODEL,messages:[{role:'user',content:prompt}],temperature:0.9,max_completion_tokens:120})});
     const json=await res.json();
     const generated=(json?.choices?.[0]?.message?.content||'').trim()
       .replace(/^["']|["']$/g,'').substring(0,200);
-    if(generated){
+    if(generated&&!(json&&json.error)){
       ta.value=generated;
       updateChar();
-      showToast(isGenerate?'✨ Descrizione generata da ILLI•AI!':'✨ Testo sintetizzato da ILLI•AI!');
+      showToast(isGenerate?t('ai_desc_generated','✨ Descrizione generata da ILLI•AI!'):t('ai_desc_enriched','✨ Ho arricchito i tuoi appunti!'));
     } else {
       showToast(t('ai_gen_failed','Generazione non riuscita, riprova tra poco.'));
     }
   } catch(err){
+    console.warn('aiSummarize:',err);
     showToast(t('ai_gen_failed','Generazione non riuscita, riprova tra poco.'));
   } finally {
     if(btnEl){btnEl.disabled=false;btnEl.innerHTML='<i class="ph-duotone ph-sparkle"></i>';}
@@ -6119,11 +6271,11 @@ async function runMapSearch(q){
   // Spell check: 0 risultati → chiedi a ILLI•AI la correzione
   if(!matched.length && !lugares.length && !streets.length){
     html='<div class="map-search-empty">Nessun risultato</div>';
-    // Suggerisci correzione via AI (solo se GROQ_KEY disponibile)
-    if(typeof GROQ_KEY!=='undefined' && q.length>3){
+    // Suggerisci correzione via AI (edge illi-chat, token di sessione o anon key)
+    if(q.length>3){
       try{
         const res=await fetch(GROQ_URL,{method:'POST',
-          headers:{'Content-Type':'application/json','Authorization':`Bearer ${GROQ_KEY}`},
+          headers:await _aiAuthHeaders(),
           body:JSON.stringify({model:GROQ_MODEL,messages:[{role:'user',
             content:`Correggi l'errore di battitura in questa ricerca di luoghi: "${q}". Rispondi SOLO con la versione corretta, niente altro.`}],
             max_completion_tokens:20,temperature:0})});
@@ -7418,6 +7570,15 @@ function openAddPOI(){
   closeFab();
   openSheet('addPoiOv','addPoiBg','addPoiSheet');
   if(window.innerWidth>=1024) document.body.classList.add('addpoi-open');
+  // Reset posizione: niente coordinate ereditate da POI precedenti o placeholder
+  currentLocLatLng=null;
+  _autoNameSuggested=false;
+  document.getElementById('locCoords').textContent=t('loc_not_set','Posizione non impostata');
+  document.getElementById('locStreet').textContent='';
+  const _ln=document.getElementById('locName'); if(_ln)_ln.style.display='none';
+  document.getElementById('locResult').classList.remove('show');
+  // GPS reale gia disponibile e tab GPS attivo: usa subito quella posizione
+  if(gpsPos&&locActiveTab==='gps') showLocResult(gpsPos.lat,gpsPos.lng);
   timerSec=0;
   document.getElementById('timerTime').textContent='0:00';
   document.getElementById('congratsBanner').className='congrats';
@@ -7916,14 +8077,16 @@ function _mapTapLocHandler(e){
   const tip=document.getElementById('locMapTip');
   if(tip){
     tip.style.display='flex';
-    tip.innerHTML='<i class="ph-duotone ph-map-pin" style="font-size:18px;color:var(--red)"></i><span>Posizione impostata — tocca di nuovo per cambiare</span>';
+    tip.innerHTML='<i class="ph-duotone ph-map-pin" style="font-size:18px;color:var(--red)"></i><span>Posizione impostata, tocca di nuovo per cambiare</span>';
   }
-  reverseGeocodeAndShow(lat,lng);
+  reverseGeocodeAndShow(lat,lng,'map');
   showToast(t('map_pos_set','📍 Posizione impostata sulla mappa'));
 }
 
-// Reverse geocode + aggiorna UI
-function reverseGeocodeAndShow(lat,lng){
+// Reverse geocode + aggiorna UI. src: 'gps' (default) | 'exif' | 'addr' | 'map'
+function reverseGeocodeAndShow(lat,lng,src){
+  // Registra la posizione reale: unica fonte usata poi da savePOI
+  setCurrentLoc(lat,lng,src||'gps');
   document.getElementById('locCoords').textContent=`${lat.toFixed(5)}, ${lng.toFixed(5)}`;
   const linkTxt=`poilove.com?at=${lat.toFixed(5)},${lng.toFixed(5)}`;
   const shareTxtEl=document.getElementById('locShareTxt');
@@ -8017,7 +8180,7 @@ function onLocAddrInput(val){
 function selectLocAddr(name,lat,lng){
   document.getElementById('locAddrIn').value=name;
   document.getElementById('locAddrDrop').classList.remove('open');
-  reverseGeocodeAndShow(lat,lng);
+  reverseGeocodeAndShow(lat,lng,'addr');
   // Suggerisci come nome POI
   const nameIn=document.getElementById('poiNameIn');
   if(nameIn&&!nameIn.value.trim()){nameIn.value=name;checkSave();}
@@ -8588,8 +8751,8 @@ function openAddPOIHere(){
 
 function openAddPOIAtCoords(lat,lng){
   openAddPOI();
-  // Aggiorna tab GPS + UI tramite reverseGeocodeAndShow
-  reverseGeocodeAndShow(lat,lng);
+  // Aggiorna UI e registra la posizione scelta sulla mappa
+  reverseGeocodeAndShow(lat,lng,'map');
   showToast(lang==='it'?'📍 Coordinate dalla mappa':lang==='sq'?'📍 Koordinatat nga harta':'📍 Coordinates from map');
 }
 
@@ -8607,11 +8770,13 @@ async function savePOI(){
   const cats=Array.from(document.querySelectorAll('#addPoiSheet .chip.sel'))
     .map(c=>c.textContent.trim()).join(', ')||'Generale';
   const desc=(document.getElementById('storyIn')||{}).value||'';
-  // Coordinate
-  const coordsTxt=document.getElementById('locCoords').textContent||'';
-  const parts=coordsTxt.split(',');
-  const lat2=parseFloat(parts[0])||CENTER[0];
-  const lng2=parseFloat(parts[1])||CENTER[1];
+  // Coordinate: SOLO dalla posizione reale impostata (GPS/EXIF/indirizzo/mappa), mai dal testo del DOM
+  if(!currentLocLatLng){
+    showToast(t('poi_set_location_first','Imposta prima la posizione: GPS, foto, indirizzo o tocco sulla mappa'));
+    return;
+  }
+  const lat2=currentLocLatLng.lat;
+  const lng2=currentLocLatLng.lng;
   const photos=photoData.filter(Boolean);
   const filesSnapshot=photoFiles.filter(Boolean); // cattura prima del reset
   const addr=document.getElementById('locStreet')?.textContent||'';
@@ -8632,7 +8797,7 @@ async function savePOI(){
         ?`<i class="ph-duotone ph-camera"></i><span class="slot-lbl">Principale</span>`
         :`<i class="ph-duotone ph-plus"></i><span class="slot-lbl">Foto ${i+1}</span>`;}
     });
-    exifSuggestedName=''; exifCache=null;
+    exifSuggestedName=''; exifCache=null; currentLocLatLng=null;
     window._unsplashSlots={};
     return;
   }
@@ -8686,7 +8851,7 @@ async function savePOI(){
   document.getElementById('locHint')?.classList.remove('show');
   const locNameEl=document.getElementById('locName');
   if(locNameEl)locNameEl.style.display='none';
-  exifSuggestedName=''; exifCache=null;
+  exifSuggestedName=''; exifCache=null; currentLocLatLng=null;
   window._unsplashSlots={}; // reset URL Unsplash scelti
   // Apri modal congratulazioni dopo breve ritardo (attendi chiusura sheet)
   setTimeout(()=>openSaveModal(name,lat2,lng2,sec),320);
@@ -9269,9 +9434,11 @@ function openEditPOI(){
     if(nameIn) nameIn.value=currentPOI.name||'';
     const storyIn=document.getElementById('storyIn');
     if(storyIn){ storyIn.value=(currentPOI.description||'').substring(0,200); updateChar(); }
-    // Coordinate
+    // Coordinate del POI in modifica: diventano la posizione attiva (assegnazione diretta, niente auto-suggest)
     if(currentPOI.lat&&currentPOI.lng){
+      currentLocLatLng={lat:currentPOI.lat,lng:currentPOI.lng,src:'map'};
       document.getElementById('locCoords').textContent=`${currentPOI.lat.toFixed(6)}, ${currentPOI.lng.toFixed(6)}`;
+      document.getElementById('locResult').classList.add('show');
       if(map) map.setView([currentPOI.lat,currentPOI.lng],16);
     }
     // ── Pre-seleziona categoria ──
@@ -9906,12 +10073,16 @@ document.addEventListener('click',e=>{
    ILLI•AI — OpenAI · gpt-4o-mini (ex Groq llama-3.3-70b)
    Formato OpenAI-compatible. MVP front-end.
 ═══════════════════════════════════════════════════════ */
-// ILLI•AI key (OpenAI) — caricata da config.js sul server, mai nel repo
-// Chiave OpenAI caricata da /config.js (escluso da git, solo sul server).
-// NB: la variabile resta GROQ_KEY per non toccare i punti di chiamata, ma ora contiene la chiave OpenAI (sk-...).
-const GROQ_KEY = (typeof window !== 'undefined' && window._groqKey) ? window._groqKey : '';
+// ILLI•AI passa dall'edge function illi-chat: la chiave OpenAI vive SOLO server-side.
+// Autorizzazione dal client: token di sessione Supabase se loggato, altrimenti anon key.
 const GROQ_URL='https://ptppxwlafswfhbueakjt.supabase.co/functions/v1/illi-chat';
 const GROQ_MODEL='gpt-4o-mini';
+// Header condivisi per tutte le chiamate alle edge function AI
+async function _aiAuthHeaders(){
+  let tok='';
+  try{ const {data:{session}}=await sb.auth.getSession(); tok=(session&&session.access_token)||''; }catch(e){}
+  return {'Content-Type':'application/json','Authorization':'Bearer '+(tok||SUPABASE_ANON),'apikey':SUPABASE_ANON};
+}
 
 // Conversazione in memoria per contesto multi-turno (formato OpenAI)
 let poiaiHistory=JSON.parse(localStorage.getItem('poiai_history')||'[]');
@@ -9953,7 +10124,7 @@ const _OSM_CATS=[
   {re:/\b(pasticceri[ae]|pastry)\b/i,                              label:'pasticceria',  osm:'shop~"pastry|confectionery"'},
   {re:/\b(panetteri[ae]|panificio|forno|pane|bakery|furr)\b/i,     label:'panetteria',   osm:'shop=bakery'},
   {re:/\b(ristorant[ei]|trattori[ae]|osteri[ae]|mangiare|cena|pranzo|restaurant|restorant)\b/i, label:'ristorante', osm:'amenity=restaurant'},
-  {re:/\b(bar|caff[eèé]|caffetteri[ae]|aperitiv[oi]|colazione|coffee|kafe)/i, label:'bar o caffè', osm:'amenity~"cafe|bar"'},
+  {re:/\b(bar|caff[eèé]|caffetteri[ae]|aperitiv[oi]|colazione|coffee|kafe)\b/i, label:'bar o caffè', osm:'amenity~"cafe|bar"'},
   {re:/\b(pub|birreri[ae]|birra|beer)\b/i,                         label:'pub',          osm:'amenity~"pub|bar"'},
   {re:/\b(hotel|alberg[hoi]|dormire|alloggi[oa]|b&b|bnb|pernott|accommodation)\b/i, label:'hotel o alloggio', osm:'tourism~"hotel|guest_house|hostel|apartment"'},
   {re:/\b(farmaci[ae]|pharmacy|farmaci)\b/i,                       label:'farmacia',     osm:'amenity=pharmacy'},
@@ -9989,7 +10160,7 @@ async function _overpassFetch(query){
   const ENDPOINTS=['https://overpass-api.de/api/interpreter','https://overpass.kumi.systems/api/interpreter'];
   for(const url of ENDPOINTS){
     const ctrl=new AbortController();
-    const t=setTimeout(()=>ctrl.abort(),9000);
+    const t=setTimeout(()=>ctrl.abort(),3500); // 3500ms a endpoint: entrambi i tentativi stanno nella race esterna di 8s
     try{
       const r=await fetch(url,{method:'POST',headers:{'Content-Type':'text/plain'},body:query,signal:ctrl.signal});
       clearTimeout(t);
@@ -10122,9 +10293,30 @@ function _lastPlaceCatFromHistory(){
   }catch(e){}
   return null;
 }
-async function _fetchRealPlaces(text, catOverride){
-  // posizione: GPS se c'e, altrimenti il centro della mappa (cosi cerca anche su desktop senza GPS, dove l'utente sta guardando)
-  const origin = gpsPos || ((typeof map!=='undefined'&&map&&map.getCenter)?map.getCenter():null);
+// Il contesto di ricerca precedente si eredita SOLO sui veri follow-up, non su ogni messaggio
+function _looksLikeFollowUp(text){
+  const tx=String(text||'').trim();
+  if(tx.length<40) return true;
+  return /\b(altr[oaie]|ancora|più vicino|piu vicino|apert[oaie]|invece|e se|quale|migliore)\b/i.test(tx);
+}
+// Se l'utente nomina una citta ("una pizzeria a Tirana"), geocodifica il toponimo con Nominatim (timeout 4s):
+// la ricerca posti parte da LI, non dal GPS. Fallback: null = usa il GPS/centro mappa.
+async function _geocodeAskedPlace(text){
+  const m=String(text||'').match(/\b(?:a|in|verso|per)\s+([A-ZÀ-Ù][a-zà-ù]{2,}(?:\s+[A-ZÀ-Ù][a-zà-ù]{2,})?)/);
+  if(!m) return null;
+  try{
+    const ctrl=new AbortController(); const tm=setTimeout(()=>ctrl.abort(),4000);
+    const r=await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q='+encodeURIComponent(m[1]),
+      {headers:{'Accept-Language':(typeof lang!=='undefined'?lang:'it')},signal:ctrl.signal});
+    clearTimeout(tm);
+    const d=await r.json();
+    if(d&&d[0]) return {lat:parseFloat(d[0].lat), lng:parseFloat(d[0].lon), label:m[1]};
+  }catch(e){}
+  return null;
+}
+async function _fetchRealPlaces(text, catOverride, originOverride){
+  // posizione: override esplicito (citta nominata nella domanda), poi GPS, poi centro mappa
+  const origin = originOverride || gpsPos || ((typeof map!=='undefined'&&map&&map.getCenter)?map.getCenter():null);
   if(!origin) return {cat:null, places:[], overpassDown:false};
   const cat=catOverride||_detectPlaceQuery(text);
   if(!cat) return {cat:null, places:[], overpassDown:false};
@@ -10190,8 +10382,8 @@ function _trCuisine(c){
   const M={italian:'italiana',pizza:'pizza',regional:'regionale',steak_house:'carne alla griglia',japanese:'giapponese',sushi:'sushi',chinese:'cinese',kebab:'kebab',burger:'hamburger',seafood:'pesce',fish:'pesce',vegetarian:'vegetariana',vegan:'vegana',ice_cream:'gelato',coffee_shop:'caffetteria',sandwich:'panini',mexican:'messicana',indian:'indiana',french:'francese',greek:'greca',mediterranean:'mediterranea',asian:'asiatica',bbq:'griglia',grill:'griglia',international:'internazionale',local:'cucina locale',pasta:'pasta',fast_food:'fast food',breakfast:'colazione',bakery:'forno',dessert:'dolci',thai:'thailandese',turkish:'turca',spanish:'spagnola',german:'tedesca',american:'americana',cake:'dolci',coffee:'caffe',wine:'vino',beer:'birra',friture:'fritto',balkan:'balcanica',albanian:'albanese'};
   return String(c).split(/[;,]/).map(x=>{ const k=x.trim().toLowerCase().replace(/\s+/g,'_'); return M[k]||x.trim().replace(/_/g,' '); }).filter(Boolean).join(', ');
 }
-function _buildGroundingBlock(cat, places, overpassDown){
-  const city=_gpsCity||'questa zona';
+function _buildGroundingBlock(cat, places, overpassDown, cityLabel){
+  const city=cityLabel||_gpsCity||'questa zona';
   if(!places.length){
     const motivo = overpassDown ? `la fonte dati (OpenStreetMap) non risponde in questo momento` : `nel raggio non ci sono ${cat.label} mappati`;
     return `GROUNDING OBBLIGATORIO — nessun posto reale trovato (regola assoluta, sovrascrive tutto):
@@ -10329,31 +10521,53 @@ async function sendPoiAIMsg(){
     // GROUNDING anti-allucinazione: se l'utente cerca un posto, recupero i REALI (OSM + POI•LOVE) e li inietto come whitelist chiusa
     let groundingMsg=null;
     _lastGroundedPlaces=[];
-    const _gCat=_detectPlaceQuery(text)||_lastPlaceCatFromHistory();
-    const _origin = gpsPos || ((typeof map!=='undefined'&&map&&map.getCenter)?map.getCenter():null);
+    // Categoria: dal testo corrente, oppure ereditata SOLO se il messaggio sembra un follow-up di ricerca
+    const _gCat=_detectPlaceQuery(text)||(_looksLikeFollowUp(text)?_lastPlaceCatFromHistory():null);
+    let _origin = gpsPos || ((typeof map!=='undefined'&&map&&map.getCenter)?map.getCenter():null);
+    let _askedLabel=null;
     if(_gCat && _origin){
       const _le=document.getElementById(loadId);
       if(_le) _le.innerHTML=`<i class="ph-duotone ph-magnifying-glass" style="margin-right:6px"></i>Sto guardando cosa c'è qui intorno…`;
+      // Citta nominata nella domanda ("una pizzeria a Tirana"): la ricerca parte da li, non dal GPS
+      const _asked=await _geocodeAskedPlace(text);
+      if(_asked){ _origin={lat:_asked.lat,lng:_asked.lng}; _askedLabel=_asked.label; }
       let _g={cat:_gCat, places:[], overpassDown:false};
-      try{ _g=await Promise.race([_fetchRealPlaces(text, _gCat), new Promise(r=>setTimeout(()=>r({cat:_gCat,places:[],overpassDown:true}),8000))]); }catch(e){}
+      try{ _g=await Promise.race([_fetchRealPlaces(text, _gCat, _origin), new Promise(r=>setTimeout(()=>r({cat:_gCat,places:[],overpassDown:true}),8000))]); }catch(e){}
       _lastGroundedPlaces=_g.places;
-      groundingMsg={role:'system', content:_buildGroundingBlock(_g.cat, _g.places, _g.overpassDown)};
+      groundingMsg={role:'system', content:_buildGroundingBlock(_g.cat, _g.places, _g.overpassDown, _askedLabel)};
     }
 
     const messages=[
       {role:'system',content:_buildPoiAISystemPrompt()},
       ...(groundingMsg?[groundingMsg]:[]),     // grounding subito dopo la personalita, vicino alla risposta
-      ...poiaiHistory.slice(-12) // max 12 turni
+      // Verso l'edge SOLO {role, content}: il campo 'places' resta locale per la UI, mai inviato a OpenAI
+      ...poiaiHistory.slice(-12).map(m=>({role:m.role,content:m.content}))
     ];
     const res=await fetch(GROQ_URL,{
       method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':`Bearer ${GROQ_KEY}`},
+      headers:await _aiAuthHeaders(),
       body:JSON.stringify({model:GROQ_MODEL,messages,temperature:groundingMsg?0.4:0.85,max_completion_tokens:512})
     });
-    const json=await res.json();
-    if(!res.ok) throw new Error(json?.error?.message||`HTTP ${res.status}`);
+    let json=null;
+    try{ json=await res.json(); }catch(e){}
+    if(!res.ok||(json&&json.error)){
+      // Messaggio dedicato e tradotto; l'errore NON entra mai nella storia della conversazione
+      const st=res.status;
+      const friendly=(st===401||st===403)?t('illi_login','Accedi per usare ILLI')
+        :(st===429?t('illi_limit','Hai finito i messaggi di oggi per il tuo livello')
+        :t('illi_error','ILLI ha un problema tecnico, riprova tra poco'));
+      console.warn('ILLI•AI:',st,json&&json.error);
+      const loadEl=document.getElementById(loadId);
+      if(loadEl) loadEl.outerHTML=`<div class="poiai-msg ai" style="color:var(--red)"><i class="ph-duotone ph-warning"></i> ${friendly}</div>`;
+      return;
+    }
 
-    const rawText=json?.choices?.[0]?.message?.content||'Nessuna risposta.';
+    const rawText=json?.choices?.[0]?.message?.content||'';
+    if(!rawText){
+      const loadEl=document.getElementById(loadId);
+      if(loadEl) loadEl.outerHTML=`<div class="poiai-msg ai" style="color:var(--red)"><i class="ph-duotone ph-warning"></i> ${t('illi_error','ILLI ha un problema tecnico, riprova tra poco')}</div>`;
+      return;
+    }
     poiaiHistory.push({role:'assistant',content:rawText,places:(_lastGroundedPlaces||[]).slice()}); _persistPoiaiHistory();
 
     // Estrai PLACES
@@ -10383,9 +10597,10 @@ async function sendPoiAIMsg(){
     if(voiceOn) speakText(cleanText.replace(/<[^>]+>/g,' '));
 
   }catch(err){
-    const loadEl=document.getElementById(loadId);
-    if(loadEl) loadEl.outerHTML=`<div class="poiai-msg ai" style="color:var(--red)"><i class="ph-duotone ph-warning"></i> ${err.message}</div>`;
+    // Mai testo tecnico grezzo in chat: messaggio tradotto, dettaglio solo in console
     console.error('ILLI•AI:',err);
+    const loadEl=document.getElementById(loadId);
+    if(loadEl) loadEl.outerHTML=`<div class="poiai-msg ai" style="color:var(--red)"><i class="ph-duotone ph-warning"></i> ${t('illi_error','ILLI ha un problema tecnico, riprova tra poco')}</div>`;
   }
 }
 
@@ -10845,7 +11060,7 @@ function handlePickerUpload(input){
     document.querySelectorAll('.photo-picker-thumb').forEach(t=>t.classList.remove('selected'));
     grid.insertAdjacentHTML('afterbegin',prev);
     document.getElementById('photoPickerConfirm').classList.add('show');
-    showToast(lang==='it'?'Foto caricata — premi Usa questa foto':'Photo loaded — press Use this photo');
+    showToast(lang==='it'?'Foto caricata: premi Usa questa foto':'Photo loaded: press Use this photo');
   };
   reader.readAsDataURL(file);
 }
@@ -10895,14 +11110,19 @@ async function confirmPhotoPicker(){
   closePhotoPicker();
   showToast(lang==='it'?'✅ Foto selezionata!':lang==='sq'?'✅ Foto e zgjedhur!':'✅ Photo selected!');
 
-  // EXIF: prova estrazione se file reale
-  if(file){
-    exifr?.gps(file).then(gps=>{
-      if(gps?.latitude&&!exifCache){
+  // EXIF: prova estrazione se file reale. La cache si aggiorna SEMPRE: vale la foto piu recente
+  if(file&&typeof exifr!=='undefined'){
+    exifr.gps(file).then(gps=>{
+      if(gps&&gps.latitude){
         exifCache={lat:gps.latitude,lng:gps.longitude,name:'',street:''};
-        showToast('📍 GPS trovato nella foto — apri tab EXIF per applicarlo');
+        if(locActiveTab==='exif'||!currentLocLatLng){
+          applyExifToForm(); // applica subito; nome/via arrivano dal reverse geocode interno
+        } else {
+          _enrichExifCache(gps.latitude,gps.longitude);
+          showToast(t('photo_gps_found','📍 GPS trovato nella foto: apri il tab "Foto EXIF" per usarlo'));
+        }
       }
-    }).catch(()=>{});
+    }).catch(e=>console.warn('EXIF picker:',e));
   }
 }
 </script>
