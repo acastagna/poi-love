@@ -422,6 +422,24 @@ html[data-theme="light"] tbody td{border-bottom-color:rgba(58,47,35,.08)}
 /* la pillola lingua attiva e i chip: testo scuro leggibile sull'oro chiaro */
 html[data-theme="light"] .chip.gold{color:#7a5410}
 html[data-theme="light"] .chip.green{color:#236b39}
+/* ── POI creati + storico chat + modal di modifica (mig 015) ── */
+.pois-bar{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.pois-bar input{flex:1;min-width:180px}
+.chat-bar{display:flex;gap:8px;margin-bottom:10px}
+.chat-history{margin-bottom:10px;border:1px solid var(--line);border-radius:14px;max-height:280px;overflow:auto}
+.chat-h-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 13px;cursor:pointer;border-bottom:1px solid var(--line)}
+.chat-h-row:last-child{border-bottom:none}
+.chat-h-row:hover{background:var(--line)}
+.chat-h-row.on{background:rgba(232,176,75,.12)}
+.chat-h-tt{display:flex;align-items:center;gap:8px;font-weight:600;font-size:13px;min-width:0;flex:1}
+.chat-h-tt span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chat-h-meta{display:flex;align-items:center;gap:8px;flex-shrink:0;color:var(--muted)}
+.icon-btn{background:none;border:none;color:var(--muted);cursor:pointer;padding:6px;border-radius:8px;display:inline-flex;align-items:center}
+.icon-btn:hover{color:var(--paper);background:var(--line)}
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;z-index:600;padding:18px}
+.modal-card{max-width:540px;width:100%;max-height:90vh;overflow:auto}
+.modal-h{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.modal-h .ttl{font-weight:800;font-size:16px;display:flex;align-items:center;gap:8px}
 </style>
 </head>
 <body>
@@ -457,6 +475,9 @@ html[data-theme="light"] .chip.green{color:#236b39}
     </div>
     <div class="nav-item" data-sec="create" onclick="openSection('create')">
       <span class="ic"><i class="ph-duotone ph-plus-circle"></i></span><span class="label" data-t="nav_create">Crea</span>
+    </div>
+    <div class="nav-item" data-sec="pois" onclick="openSection('pois')">
+      <span class="ic"><i class="ph-duotone ph-map-pin-line"></i></span><span class="label" data-t="nav_pois">POI creati</span>
     </div>
     <div class="nav-item" data-sec="audit" onclick="openSection('audit')">
       <span class="ic"><i class="ph-duotone ph-scroll"></i></span><span class="label" data-t="nav_audit">Audit log</span>
@@ -558,11 +579,16 @@ html[data-theme="light"] .chip.green{color:#236b39}
           <button class="ai-mode" data-mode="route" onclick="setAiMode('route')"><i class="ph-duotone ph-map-trifold"></i><span data-t="mode_route">Traccia percorso</span></button>
           <button class="ai-mode" data-mode="write" onclick="setAiMode('write')"><i class="ph-duotone ph-pencil-simple-line"></i><span data-t="mode_write">Scrivi testo</span></button>
         </div>
+        <div class="chat-bar">
+          <button class="btn sm" onclick="newChat()"><i class="ph-duotone ph-plus"></i><span data-t="chat_new">Nuova chat</span></button>
+          <button class="btn sm" onclick="toggleChatHistory()"><i class="ph-duotone ph-clock-counter-clockwise"></i><span data-t="chat_history">Storico</span></button>
+        </div>
+        <div id="chatHistory" class="chat-history" style="display:none"></div>
         <div class="chat-box">
           <div class="chat-log" id="chatLog"></div>
           <div class="chat-input">
             <textarea id="chatInput" rows="1" placeholder="Scrivi al copilota…"
-              onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAi()}"></textarea>
+              onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();if(!document.getElementById('chatSend').disabled)sendAi()}"></textarea>
             <button class="btn gold" id="chatSend" onclick="sendAi()" data-t="send">Invia</button>
           </div>
         </div>
@@ -579,13 +605,20 @@ html[data-theme="light"] .chip.green{color:#236b39}
           <div class="field"><label data-t="f_desc">Descrizione</label><textarea id="poiDesc" placeholder="Una breve descrizione del luogo…"></textarea></div>
           <div class="row2">
             <div class="field"><label data-t="f_cat">Categoria</label>
+              <!-- Valori = enum reale poi_category del DB (12 categorie) -->
               <select id="poiCat">
-                <option value="culture">Cultura</option>
-                <option value="nature">Natura</option>
-                <option value="food">Cibo</option>
-                <option value="view">Panorama</option>
-                <option value="history">Storia</option>
-                <option value="other">Altro</option>
+                <option value="cibo">Cibo</option>
+                <option value="lavoro">Lavoro</option>
+                <option value="pernottare">Pernottare</option>
+                <option value="natura">Natura</option>
+                <option value="festa">Festa</option>
+                <option value="cultura">Cultura</option>
+                <option value="pratico">Pratico</option>
+                <option value="benessere">Benessere</option>
+                <option value="love">Love</option>
+                <option value="audioguida">Audioguida</option>
+                <option value="mappa">Mappa</option>
+                <option value="open_source">Open source</option>
               </select>
             </div>
             <div class="field"><label data-t="f_vis">Visibilità</label>
@@ -593,6 +626,7 @@ html[data-theme="light"] .chip.green{color:#236b39}
                 <option value="community">Community</option>
                 <option value="suggested_google">Suggerito</option>
                 <option value="private">Privato</option>
+                <option value="official" data-t="st_official">Ufficiale</option>
               </select>
             </div>
           </div>
@@ -624,7 +658,24 @@ html[data-theme="light"] .chip.green{color:#236b39}
       </div>
     </section>
 
-    <!-- 7) AUDIT LOG -->
+    <!-- 7) POI CREATI — vedi / modifica / cancella -->
+    <section class="section" id="sec-pois">
+      <div class="panel">
+        <div class="card-h"><span class="ic"><i class="ph-duotone ph-map-pin-line"></i></span><span data-t="pois_title">POI creati</span></div>
+        <div class="pois-bar">
+          <input id="poiSearch" placeholder="Cerca per nome…" oninput="debouncePois()">
+          <select id="poiFilter" onchange="reloadPois()">
+            <option value="all" data-t="pf_all">Tutti</option>
+            <option value="ai" data-t="pf_ai">Creati dal copilota</option>
+            <option value="official" data-t="pf_official">Ufficiali</option>
+            <option value="draft" data-t="pf_draft">Bozze da approvare</option>
+          </select>
+        </div>
+        <div id="poisTable"></div>
+      </div>
+    </section>
+
+    <!-- 8) AUDIT LOG -->
     <section class="section" id="sec-audit">
       <div class="panel">
         <div class="card-h"><span class="ic"><i class="ph-duotone ph-scroll"></i></span><span data-t="audit_title">Registro azioni (ultimi 50)</span></div>
@@ -656,6 +707,7 @@ let SESSION = null;       // sessione Supabase (per access_token)
 let loaded = {};          // sezioni già caricate (lazy load)
 let aiMode = 'chat';      // modalità copilota
 let aiHistory = [];       // cronologia messaggi {role,content}
+let aiBusy = false;       // richiesta al copilota in volo: blocca invii concorrenti
 
 /* ─────────────────────────── i18n (pattern T del login) ─────────────────────────── */
 const T = {
@@ -709,7 +761,26 @@ const T = {
     prop_applied_route:'Rotta storica e POI creati in bozza (non pubblicati). Rivedi e pubblica quando è pronto.',
     prop_rejected:'Proposta rifiutata.',
     prop_err_apply:'Errore durante l\'applicazione della proposta',
-    prop_err_decide:'Non è stato possibile aggiornare lo stato della proposta'
+    prop_err_decide:'Non è stato possibile aggiornare lo stato della proposta',
+    // ── POI creati + storico chat (mig 015) ──
+    nav_pois:'POI creati', sub_pois:'Vedi, modifica e cancella i POI creati.',
+    pois_title:'POI creati', pois_search:'Cerca per nome…',
+    pois_empty:'Nessun POI', pois_empty_h:'Quando crei o approvi un POI compare qui.',
+    pf_all:'Tutti', pf_ai:'Creati dal copilota', pf_official:'Ufficiali', pf_draft:'Bozze da approvare',
+    c_poi:'POI', c_cat:'Categoria', c_state:'Stato',
+    st_draft:'Bozza', st_published:'Pubblico', st_official:'Ufficiale',
+    a_view:'Vedi', a_edit:'Modifica', a_publish:'Pubblica', a_delete:'Elimina',
+    view_poi:'Dettagli POI', edit_poi:'Modifica POI',
+    f_title:'Titolo', f_approved:'Pubblico (approvato e visibile)',
+    need_title:'Il titolo è obbligatorio', save_btn:'Salva', cancel_btn:'Annulla',
+    confirm_del_poi:'Eliminare definitivamente questo POI?', poi_deleted:'POI eliminato',
+    chat_new:'Nuova chat', chat_history:'Storico', chats_empty:'Nessuna conversazione salvata',
+    confirm_del_chat:'Eliminare questa conversazione?',
+    // ── Rifiniture pannello ──
+    chat_ph:'Scrivi al copilota…',
+    chat_stale:'Risposta scartata: nel frattempo hai cambiato chat',
+    rls_no_rows:'Nessuna modifica: permessi mancanti sul database (migrazione 015 non applicata?)',
+    f_coords:'Coordinate', f_address:'Indirizzo', f_city:'Città'
   },
   sq:{
     nav_dashboard:'Paneli', nav_moderation:'Moderimi', nav_users:'Përdoruesit', nav_ailimits:'Limitet AI',
@@ -757,7 +828,26 @@ const T = {
     prop_applied_route:'Itinerari historik dhe POI-t u krijuan si draft (të pabotuar). Rishikoji dhe botoji kur të jenë gati.',
     prop_rejected:'Propozimi u refuzua.',
     prop_err_apply:'Gabim gjatë zbatimit të propozimit',
-    prop_err_decide:'Nuk u arrit të përditësohej statusi i propozimit'
+    prop_err_decide:'Nuk u arrit të përditësohej statusi i propozimit',
+    // ── POI të krijuar + historiku i bisedave (mig 015) ──
+    nav_pois:'POI të krijuar', sub_pois:'Shiko, modifiko dhe fshi POI-t e krijuar.',
+    pois_title:'POI të krijuar', pois_search:'Kërko sipas emrit…',
+    pois_empty:'Asnjë POI', pois_empty_h:'Kur krijon ose miraton një POI, shfaqet këtu.',
+    pf_all:'Të gjithë', pf_ai:'Krijuar nga kopiloti', pf_official:'Zyrtarë', pf_draft:'Draft për miratim',
+    c_poi:'POI', c_cat:'Kategoria', c_state:'Statusi',
+    st_draft:'Draft', st_published:'Publik', st_official:'Zyrtar',
+    a_view:'Shiko', a_edit:'Modifiko', a_publish:'Boto', a_delete:'Fshi',
+    view_poi:'Detajet e POI', edit_poi:'Modifiko POI',
+    f_title:'Titulli', f_approved:'Publik (miratuar dhe i dukshëm)',
+    need_title:'Titulli është i detyrueshëm', save_btn:'Ruaj', cancel_btn:'Anulo',
+    confirm_del_poi:'Të fshihet përgjithmonë ky POI?', poi_deleted:'POI u fshi',
+    chat_new:'Bisedë e re', chat_history:'Historiku', chats_empty:'Asnjë bisedë e ruajtur',
+    confirm_del_chat:'Të fshihet kjo bisedë?',
+    // ── Rifiniture pannello ──
+    chat_ph:'Shkruaji kopilotit…',
+    chat_stale:'Përgjigjja u hodh poshtë: ndërkohë ke ndërruar bisedë',
+    rls_no_rows:'Asnjë ndryshim: mungojnë lejet në databazë (migrimi 015 i paaplikuar?)',
+    f_coords:'Koordinatat', f_address:'Adresa', f_city:'Qyteti'
   },
   en:{
     nav_dashboard:'Dashboard', nav_moderation:'Moderation', nav_users:'Users', nav_ailimits:'AI limits',
@@ -805,7 +895,26 @@ const T = {
     prop_applied_route:'Historic route and POIs created as drafts (unpublished). Review and publish when ready.',
     prop_rejected:'Proposal rejected.',
     prop_err_apply:'Error while applying the proposal',
-    prop_err_decide:'Could not update the proposal status'
+    prop_err_decide:'Could not update the proposal status',
+    // ── Created POIs + chat history (mig 015) ──
+    nav_pois:'Created POIs', sub_pois:'View, edit and delete created POIs.',
+    pois_title:'Created POIs', pois_search:'Search by name…',
+    pois_empty:'No POIs', pois_empty_h:'When you create or approve a POI it appears here.',
+    pf_all:'All', pf_ai:'Created by copilot', pf_official:'Official', pf_draft:'Drafts to approve',
+    c_poi:'POI', c_cat:'Category', c_state:'State',
+    st_draft:'Draft', st_published:'Public', st_official:'Official',
+    a_view:'View', a_edit:'Edit', a_publish:'Publish', a_delete:'Delete',
+    view_poi:'POI details', edit_poi:'Edit POI',
+    f_title:'Title', f_approved:'Public (approved and visible)',
+    need_title:'Title is required', save_btn:'Save', cancel_btn:'Cancel',
+    confirm_del_poi:'Permanently delete this POI?', poi_deleted:'POI deleted',
+    chat_new:'New chat', chat_history:'History', chats_empty:'No saved conversations',
+    confirm_del_chat:'Delete this conversation?',
+    // ── Panel refinements ──
+    chat_ph:'Write to the copilot…',
+    chat_stale:'Reply discarded: you switched chat in the meantime',
+    rls_no_rows:'No changes: missing database permissions (migration 015 not applied?)',
+    f_coords:'Coordinates', f_address:'Address', f_city:'City'
   }
 };
 let lang = localStorage.getItem('admin_lang') || (navigator.language||'it').slice(0,2);
@@ -818,6 +927,8 @@ function setLang(l){
   document.documentElement.lang=l;
   // testi statici marcati con data-t
   document.querySelectorAll('[data-t]').forEach(el=>{ const k=el.dataset.t; if(T[l][k]!=null) el.textContent=T[l][k]; });
+  // placeholder localizzati: setLang scrive textContent, gli attributi vanno aggiornati a mano
+  const ci=document.getElementById('chatInput'); if(ci) ci.placeholder=t('chat_ph');
   document.querySelectorAll('.langs button').forEach(b=>b.classList.toggle('on', b.dataset.l===l));
   // sottotitolo della sezione attiva
   const cur = document.querySelector('.nav-item.on');
@@ -982,9 +1093,9 @@ async function doLogout(){
 
 /* ─────────────────────────── Navigazione sezioni (lazy) ─────────────────────────── */
 const SUBKEY = { dashboard:'sub_dashboard', moderation:'sub_moderation', users:'sub_users',
-  ailimits:'sub_ailimits', copilot:'sub_copilot', create:'sub_create', audit:'sub_audit' };
+  ailimits:'sub_ailimits', copilot:'sub_copilot', create:'sub_create', pois:'sub_pois', audit:'sub_audit' };
 const TITLEKEY = { dashboard:'nav_dashboard', moderation:'nav_moderation', users:'nav_users',
-  ailimits:'nav_ailimits', copilot:'nav_copilot', create:'nav_create', audit:'nav_audit' };
+  ailimits:'nav_ailimits', copilot:'nav_copilot', create:'nav_create', pois:'nav_pois', audit:'nav_audit' };
 
 function updateHeader(sec){
   document.getElementById('secTitle').textContent = t(TITLEKEY[sec]);
@@ -1008,6 +1119,7 @@ function runSection(sec){
     case 'ailimits': loadAiLimits(); break;
     case 'copilot': initCopilot(); break;
     case 'create': initCreate(); break;
+    case 'pois': loadPois(); break;
     case 'audit': loadAudit(); break;
   }
 }
@@ -1041,7 +1153,7 @@ async function loadLatestPois(){
   const box=document.getElementById('latestPois'); skeletons(box,5);
   try{
     const { data, error } = await sb.from('pois')
-      .select('id,name,category,love_count,created_at').order('created_at',{ascending:false}).limit(6);
+      .select('id,title,category,love_count,created_at').order('created_at',{ascending:false}).limit(6);
     if(error){ isBackendMissing(error)?backendOff(box):emptyBox(box,t('error'),null,'warning'); return; }
     if(!data || !data.length){ emptyBox(box,'—',null,'map-pin'); return; }
     box.textContent='';
@@ -1049,7 +1161,7 @@ async function loadLatestPois(){
       box.appendChild(el('div',{class:'mini-row'},[
         el('div',{class:'av'}, phIcon('map-pin')),
         el('div',{class:'tt'},[
-          el('div',{class:'nm',text:p.name||'POI'}),
+          el('div',{class:'nm',text:p.title||'POI'}),
           el('div',{class:'dt',text:(p.category||'—')+' · '+fmtDate(p.created_at)})
         ]),
         el('div',{class:'meta'},[ phIcon('heart','meta-love'), document.createTextNode(' '+(p.love_count||0)) ])
@@ -1297,8 +1409,11 @@ function setAiMode(m){
 }
 function initCopilot(){
   const log=document.getElementById('chatLog');
-  if(log.childElementCount) return; // già inizializzato
-  appendBubble('ai', t('ai_welcome'));
+  if(!log.childElementCount) appendBubble('ai', t('ai_welcome'));
+  // placeholder localizzato (l'attributo nell'HTML è solo il default italiano)
+  const ci=document.getElementById('chatInput'); if(ci) ci.placeholder=t('chat_ph');
+  // proposte ancora in attesa: le card Approva/Rifiuta tornano visibili dopo un reload
+  loadPendingProposals();
 }
 
 // Renderer markdown SICURO: costruisce nodi, non usa innerHTML con HTML arbitrario.
@@ -1385,13 +1500,21 @@ function appendTyping(){
 }
 
 async function sendAi(){
+  if(aiBusy) return; // una richiesta alla volta: niente invii concorrenti
   const input=document.getElementById('chatInput');
   const text=(input.value||'').trim();
   if(!text) return;
+  aiBusy=true;
   input.value='';
   document.getElementById('chatSend').disabled=true;
   appendBubble('user', text);
   aiHistory.push({ role:'user', content:text });
+  saveChat(); // persiste subito il turno utente: non si perde se l'edge fallisce
+  // Fotografia della chat al momento dell'invio. newChat/openChat sostituiscono SEMPRE
+  // il riferimento di aiHistory; saveChat può solo valorizzare currentChatId da null.
+  const chatIdAtSend=currentChatId;
+  const historyRef=aiHistory;
+  const stale=()=> (aiHistory!==historyRef) || (chatIdAtSend!==null && currentChatId!==chatIdAtSend);
   const typing=appendTyping();
 
   try{
@@ -1414,6 +1537,8 @@ async function sendAi(){
       })
     });
     typing.remove();
+    // La chat è cambiata mentre la richiesta era in volo? Scarta tutto, toast leggero.
+    if(stale()){ toast(t('chat_stale'), null, 'arrows-clockwise'); return; }
 
     if(res.status===403){
       appendBubble('ai','**403** · '+ (lang==='it'?'Accesso negato: il gate admin lato server ha rifiutato la richiesta.':lang==='sq'?'Qasje e refuzuar: gate-i admin në server e refuzoi kërkesën.':'Access denied: the server-side admin gate rejected the request.'));
@@ -1426,8 +1551,11 @@ async function sendAi(){
       return;
     }
     const data = await res.json();
+    // ricontrollo dopo il parse (anche res.json() è asincrono)
+    if(stale()){ toast(t('chat_stale'), null, 'arrows-clockwise'); return; }
     const reply = data.reply || '';
     aiHistory.push({ role:'assistant', content:reply });
+    saveChat(); // il copilota RICORDA: persiste la conversazione in ai_chats
     // se mode route, la edge function può restituire data.route con tappe
     const routeData = data.data && (data.data.route || (Array.isArray(data.data.stops)? data.data : null));
     appendBubble('ai', reply, data.usage, routeData);
@@ -1437,9 +1565,10 @@ async function sendAi(){
       appendProposals(data.proposals);
     }
   }catch(e){
-    if(document.getElementById('typingDots')) document.getElementById('typingDots').remove();
-    appendBubble('ai', t('error'), null, null, 'warning-circle');
+    typing.remove(); // sicuro anche se già staccato dal DOM
+    if(!stale()) appendBubble('ai', t('error'), null, null, 'warning-circle');
   }finally{
+    aiBusy=false;
     document.getElementById('chatSend').disabled=false;
     input.focus();
   }
@@ -1691,6 +1820,24 @@ async function rejectProposal(pr, btn){
   }
 }
 
+// Recupera dal DB le proposte ancora in attesa (status=pending) dell'admin corrente
+// e le rimostra come card: sopravvivono a reload della pagina e cambio chat.
+async function loadPendingProposals(){
+  if(!ME) return;
+  try{
+    const { data, error } = await sb.from('ai_proposals')
+      .select('id,kind,title,payload,status,created_at')
+      .eq('admin_id', ME.id).eq('status','pending')
+      .order('created_at',{ascending:false}).limit(20);
+    if(error || !data || !data.length) return; // best-effort: mai bloccare la chat
+    const log=document.getElementById('chatLog');
+    if(!log) return;
+    // niente doppioni: salta le proposte con card già presente nel log
+    const missing=data.filter(pr=> pr && pr.id && !log.querySelector('.prop-card[data-pid="'+pr.id+'"]'));
+    if(missing.length) appendProposals(missing);
+  }catch(e){ /* silenzioso: il recupero non deve bloccare il copilota */ }
+}
+
 /* ═════════════════════════ 6) CREA CONTENUTI ═════════════════════════ */
 function initCreate(){
   const box=document.getElementById('stopsList');
@@ -1724,20 +1871,21 @@ async function createPoi(){
   try{
     const payload={
       author_id: ME.id,
-      name,
-      description:(document.getElementById('poiDesc').value||'').trim() || null,
+      title: name.slice(0,100),   // colonna DB reale: title (CHECK 1..100)
+      description:((document.getElementById('poiDesc').value||'').trim().slice(0,200)) || null, // CHECK <=200
       category:document.getElementById('poiCat').value,
       visibility:document.getElementById('poiVis').value,
       lat, lng
     };
     const { data, error } = await sb.from('pois').insert(payload).select('id').single();
     if(error){ toast(isBackendMissing(error)?t('backend_off'):(error.message||t('error')),'err'); return; }
-    await logAudit('poi_create','poi',data.id,{ name });
+    await logAudit('poi_create','poi',data.id,{ title: payload.title });
     toast(t('poi_created'),'ok');
     // reset campi
     ['poiName','poiDesc','poiLat','poiLng'].forEach(id=>document.getElementById(id).value='');
-    // aggiorna dashboard la prossima apertura
+    // aggiorna dashboard e lista POI alla prossima apertura
     loaded.dashboard=false;
+    loaded.pois=false;
   }catch(e){ toast(t('error'),'err'); }
 }
 // Crea un percorso (trip + trip_stops)
@@ -1823,6 +1971,266 @@ async function logAudit(action, targetType, targetId, meta){
       meta: meta || null
     });
   }catch(e){ /* silenzioso: dipende dalla migration */ }
+}
+
+/* ═════════════════════════ 7) POI CREATI — vedi / modifica / cancella ═════════════════════════ */
+const POI_CATS = ['cibo','lavoro','pernottare','natura','festa','cultura','pratico','benessere','love','audioguida','mappa','open_source'];
+const POI_VIS  = ['private','community','suggested_google','official'];
+let poiSearchTm = null;
+let poisSeq = 0; // token di generazione: vince l'ultima richiesta lanciata, non l'ultima che risolve
+function debouncePois(){ clearTimeout(poiSearchTm); poiSearchTm=setTimeout(reloadPois, 300); }
+function reloadPois(){ loaded.pois=false; loadPois(); }
+
+async function loadPois(){
+  const my=++poisSeq;
+  const box=document.getElementById('poisTable'); loadingBox(box);
+  const ph=document.getElementById('poiSearch'); if(ph) ph.placeholder=t('pois_search');
+  const q=(document.getElementById('poiSearch').value||'').trim();
+  const filter=document.getElementById('poiFilter').value||'all';
+  try{
+    let query=sb.from('pois')
+      .select('id,title,description,category,visibility,is_approved,created_via,lat,lng,address,city,love_count,created_at')
+      .order('created_at',{ascending:false}).limit(120);
+    if(filter==='ai') query=query.eq('created_via','ai');
+    else if(filter==='official') query=query.eq('visibility','official');
+    else if(filter==='draft') query=query.eq('is_approved',false);
+    if(q) query=query.ilike('title','%'+q+'%');
+    const { data, error } = await query;
+    if(my!==poisSeq) return; // nel frattempo è partita una richiesta più recente: non toccare il DOM
+    if(error){ isBackendMissing(error)?backendOff(box):emptyBox(box,t('error'),null,'warning'); return; }
+    if(!data||!data.length){ emptyBox(box,t('pois_empty'),t('pois_empty_h'),'map-pin'); return; }
+
+    const wrap=el('div',{class:'tbl-wrap'});
+    const table=el('table');
+    table.appendChild(el('thead',null, el('tr',null,[
+      el('th',{text:t('c_poi')}), el('th',{text:t('c_cat')}),
+      el('th',{text:t('c_state')}), el('th',{text:t('c_date')}), el('th',{text:t('c_actions')})
+    ])));
+    const tb=el('tbody');
+    data.forEach(p=>{
+      const stWrap=el('div',{class:'btn-row'});
+      stWrap.appendChild(p.is_approved===false
+        ? el('span',{class:'chip gold',text:t('st_draft')})
+        : el('span',{class:'chip green',text:t('st_published')}));
+      if(p.visibility==='official') stWrap.appendChild(el('span',{class:'chip dim',text:t('st_official')}));
+      if(p.created_via==='ai') stWrap.appendChild(el('span',{class:'chip dim',text:'AI'}));
+
+      const actions=el('div',{class:'btn-row'});
+      actions.appendChild(el('button',{class:'btn sm', onclick:()=>viewPoi(p), text:t('a_view')}));
+      actions.appendChild(el('button',{class:'btn sm gold', onclick:()=>editPoi(p), text:t('a_edit')}));
+      if(p.is_approved===false) actions.appendChild(el('button',{class:'btn sm green', onclick:()=>approvePoi(p.id), text:t('a_publish')}));
+      actions.appendChild(el('button',{class:'btn sm red', onclick:()=>deletePoi(p.id, p.title), text:t('a_delete')}));
+
+      const subtitle = p.address || p.city || (p.lat!=null? (Number(p.lat).toFixed(4)+', '+Number(p.lng).toFixed(4)) : '—');
+      tb.appendChild(el('tr',null,[
+        el('td',null,[ el('div',{class:'ttl',text:p.title||'—'}), el('div',{class:'sm',text:subtitle}) ]),
+        el('td',null, el('span',{class:'chip dim',text:p.category||'—'})),
+        el('td',null, stWrap),
+        el('td',{text:fmtDate(p.created_at)}),
+        el('td',null, actions)
+      ]));
+    });
+    table.appendChild(tb); wrap.appendChild(table);
+    box.textContent=''; box.appendChild(wrap);
+  }catch(e){ if(my===poisSeq) emptyBox(box,t('error'),null,'warning'); }
+}
+
+function viewPoi(p){
+  const rows=[
+    [t('f_title'), p.title], [t('f_desc'), p.description],
+    [t('f_cat'), p.category], [t('f_vis'), p.visibility],
+    [t('f_address'), p.address], [t('f_city'), p.city],
+    [t('f_coords'), (p.lat!=null? p.lat+', '+p.lng : '—')],
+    [t('c_date'), fmtDate(p.created_at)]
+  ];
+  const body=el('div');
+  rows.forEach(r=>{
+    body.appendChild(el('div',{class:'field'},[
+      el('label',{text:r[0]}),
+      el('div',{style:'font-size:13.5px;line-height:1.5',text:(r[1]!=null&&r[1]!==''?String(r[1]):'—')})
+    ]));
+  });
+  openModal(t('view_poi'), 'map-pin', body, null);
+}
+
+function editPoi(p){
+  const f={};
+  const body=el('div');
+  body.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_title')}), f.title=el('input',{value:p.title||''}) ]));
+  body.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_desc')}), f.description=el('textarea',{}, p.description||'') ]));
+
+  const catSel=el('select');
+  const cats = (p.category && !POI_CATS.includes(p.category)) ? POI_CATS.concat([p.category]) : POI_CATS;
+  cats.forEach(c=> catSel.appendChild(el('option',{value:c}, c)) );
+  if(p.category) catSel.value=p.category;
+  f.category=catSel;
+  body.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_cat')}), catSel ]));
+
+  const visSel=el('select');
+  POI_VIS.forEach(v=> visSel.appendChild(el('option',{value:v}, v)) );
+  if(p.visibility) visSel.value=p.visibility;
+  f.visibility=visSel;
+  body.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_vis')}), visSel ]));
+
+  const apprWrap=el('label',{style:'display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer'});
+  f.is_approved=el('input',{type:'checkbox'}); if(p.is_approved!==false) f.is_approved.checked=true;
+  apprWrap.appendChild(f.is_approved); apprWrap.appendChild(document.createTextNode(t('f_approved')));
+  body.appendChild(el('div',{class:'field'},[ apprWrap ]));
+
+  const ll=el('div',{class:'row2'});
+  ll.appendChild(el('div',{class:'field'},[ el('label',{text:'Lat'}), f.lat=el('input',{value:(p.lat!=null?p.lat:''),inputmode:'decimal'}) ]));
+  ll.appendChild(el('div',{class:'field'},[ el('label',{text:'Lng'}), f.lng=el('input',{value:(p.lng!=null?p.lng:''),inputmode:'decimal'}) ]));
+  body.appendChild(ll);
+
+  openModal(t('edit_poi'), 'pencil-simple-line', body, ()=>savePoi(p.id, f));
+}
+
+async function savePoi(id, f){
+  const patch={
+    title:(f.title.value||'').trim(),
+    description:(f.description.value||'').trim(),
+    category:f.category.value,
+    visibility:f.visibility.value,
+    is_approved:!!f.is_approved.checked
+  };
+  const lat=parseFloat(f.lat.value), lng=parseFloat(f.lng.value);
+  if(Number.isFinite(lat)) patch.lat=lat;
+  if(Number.isFinite(lng)) patch.lng=lng;
+  if(!patch.title){ toast(t('need_title'),'err'); return false; }
+  try{
+    // .select('id'): senza, PostgREST risponde 204 anche a 0 righe toccate (RLS)
+    // e il pannello mostrerebbe un falso successo con il DB immutato.
+    const { data, error } = await sb.from('pois').update(patch).eq('id',id).select('id');
+    if(error){ toast(isBackendMissing(error)?t('backend_off'):(error.message||t('error')),'err'); return false; }
+    if(!data || !data.length){ toast(t('rls_no_rows'),'err'); return false; }
+    await logAudit('poi_edit','poi',id,{ title:patch.title });
+    toast(t('saved'),'ok'); reloadPois(); return true;
+  }catch(e){ toast(t('error'),'err'); return false; }
+}
+
+async function approvePoi(id){
+  try{
+    const { data, error } = await sb.from('pois').update({ is_approved:true }).eq('id',id).select('id');
+    if(error){ toast(error.message||t('error'),'err'); return; }
+    if(!data || !data.length){ toast(t('rls_no_rows'),'err'); return; }
+    await logAudit('poi_publish','poi',id,{});
+    toast(t('saved'),'ok'); reloadPois();
+  }catch(e){ toast(t('error'),'err'); }
+}
+
+async function deletePoi(id, title){
+  if(!confirm(t('confirm_del_poi')+(title? '\n\n"'+title+'"' : ''))) return;
+  try{
+    const { data, error } = await sb.from('pois').delete().eq('id',id).select('id');
+    if(error){ toast(isBackendMissing(error)?t('backend_off'):(error.message||t('error')),'err'); return; }
+    if(!data || !data.length){ toast(t('rls_no_rows'),'err'); return; }
+    await logAudit('poi_delete','poi',id,{ title });
+    toast(t('poi_deleted'),'ok'); reloadPois();
+  }catch(e){ toast(t('error'),'err'); }
+}
+
+/* Modal generico: titolo, icona, corpo (nodo DOM), onSave opzionale (true/Promise<true> per chiudere). */
+function openModal(title, icon, bodyNode, onSave){
+  closeModal();
+  const ov=el('div',{class:'modal-ov', id:'modalOv'});
+  ov.addEventListener('click',(e)=>{ if(e.target===ov) closeModal(); });
+  const card=el('div',{class:'panel modal-card'});
+  card.appendChild(el('div',{class:'modal-h'},[
+    el('div',{class:'ttl'},[ phIcon(icon||'note'), document.createTextNode(title) ]),
+    el('button',{class:'icon-btn', onclick:closeModal}, phIcon('x'))
+  ]));
+  card.appendChild(bodyNode);
+  if(onSave){
+    const foot=el('div',{class:'btn-row', style:'margin-top:16px;justify-content:flex-end'});
+    foot.appendChild(el('button',{class:'btn', onclick:closeModal, text:t('cancel_btn')}));
+    const saveBtn=el('button',{class:'btn gold', text:t('save_btn')});
+    saveBtn.addEventListener('click', async ()=>{ saveBtn.disabled=true; const ok=await onSave(); if(ok!==false) closeModal(); else saveBtn.disabled=false; });
+    foot.appendChild(saveBtn);
+    card.appendChild(foot);
+  }
+  ov.appendChild(card);
+  document.body.appendChild(ov);
+}
+function closeModal(){ const m=document.getElementById('modalOv'); if(m) m.remove(); }
+
+/* ─────────────── Storico chat del copilota: ricorda le conversazioni ─────────────── */
+let currentChatId=null;
+
+async function saveChat(){
+  if(!ME || !aiHistory.length) return;
+  // fotografa i riferimenti: se la chat cambia mentre l'insert è in volo,
+  // non bisogna agganciare currentChatId alla chat sbagliata
+  const hist=aiHistory, chatId=currentChatId;
+  try{
+    const firstU=hist.find(m=>m.role==='user');
+    const title=(((firstU&&firstU.content)||'Chat')+'').slice(0,60);
+    if(!chatId){
+      const { data, error } = await sb.from('ai_chats')
+        .insert({ admin_id:ME.id, title, mode:aiMode, messages:hist }).select('id').single();
+      if(!error && data && aiHistory===hist) currentChatId=data.id;
+    } else {
+      await sb.from('ai_chats')
+        .update({ messages:hist, mode:aiMode, title, updated_at:new Date().toISOString() }).eq('id',chatId);
+    }
+  }catch(e){ /* lo storico non deve mai bloccare la chat */ }
+}
+
+function toggleChatHistory(){
+  const box=document.getElementById('chatHistory');
+  if(box.style.display==='none'){ box.style.display='block'; loadChats(); }
+  else { box.style.display='none'; }
+}
+
+async function loadChats(){
+  const box=document.getElementById('chatHistory'); loadingBox(box);
+  try{
+    const { data, error } = await sb.from('ai_chats')
+      .select('id,title,updated_at').order('updated_at',{ascending:false}).limit(50);
+    if(error){ isBackendMissing(error)?backendOff(box):emptyBox(box,t('error'),null,'warning'); return; }
+    if(!data||!data.length){ emptyBox(box, t('chats_empty'), null, 'chat-circle-dots'); return; }
+    box.textContent='';
+    data.forEach(c=>{
+      const row=el('div',{class:'chat-h-row'+(c.id===currentChatId?' on':'')},[
+        el('div',{class:'chat-h-tt'},[ phIcon('chat-circle-dots'), el('span',{text:c.title||'Chat'}) ]),
+        el('div',{class:'chat-h-meta'},[ el('span',{class:'sm',text:fmtDate(c.updated_at)}),
+          el('button',{class:'icon-btn', title:t('a_delete'), onclick:(ev)=>{ ev.stopPropagation(); deleteChat(c.id); }}, phIcon('trash')) ])
+      ]);
+      row.addEventListener('click',()=>openChat(c.id));
+      box.appendChild(row);
+    });
+  }catch(e){ emptyBox(box,t('error'),null,'warning'); }
+}
+
+async function openChat(id){
+  try{
+    const { data, error } = await sb.from('ai_chats').select('id,messages,mode').eq('id',id).single();
+    if(error||!data){ toast(t('error'),'err'); return; }
+    currentChatId=data.id;
+    aiHistory = Array.isArray(data.messages)? data.messages.slice() : [];
+    if(data.mode){ setAiMode(data.mode); }
+    const log=document.getElementById('chatLog'); log.textContent='';
+    if(aiHistory.length) aiHistory.forEach(m=> appendBubble(m.role==='user'?'user':'ai', m.content));
+    else appendBubble('ai', t('ai_welcome'));
+    loadPendingProposals(); // rimostra le card delle proposte ancora in attesa
+    document.getElementById('chatHistory').style.display='none';
+  }catch(e){ toast(t('error'),'err'); }
+}
+
+function newChat(){
+  currentChatId=null; aiHistory=[];
+  const log=document.getElementById('chatLog'); log.textContent='';
+  appendBubble('ai', t('ai_welcome'));
+  const box=document.getElementById('chatHistory'); if(box) box.style.display='none';
+}
+
+async function deleteChat(id){
+  if(!confirm(t('confirm_del_chat'))) return;
+  try{
+    const { error } = await sb.from('ai_chats').delete().eq('id',id);
+    if(error){ toast(error.message||t('error'),'err'); return; }
+    if(id===currentChatId){ newChat(); }
+    loadChats();
+  }catch(e){ toast(t('error'),'err'); }
 }
 
 /* ─────────────────────────── Avvio ─────────────────────────── */

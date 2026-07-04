@@ -240,7 +240,11 @@ async function spentTodayEur(svc: SvcClient, adminId: string): Promise<number> {
     .eq("action", "ai_call")
     .gte("created_at", since.toISOString());
 
-  if (error || !Array.isArray(data)) return 0;
+  if (error || !Array.isArray(data)) {
+    // Fail-closed: senza il totale del giorno il tetto di spesa non e' verificabile,
+    // quindi si lancia e il chiamante blocca la richiesta (mai assumere spesa 0).
+    throw new Error(error?.message ?? "admin_audit_log non leggibile");
+  }
 
   let total = 0;
   for (const row of data) {
@@ -382,17 +386,20 @@ const TOOLS: ToolDef[] = [
     schema: {
       type: "object",
       properties: {
-        name: { type: "string", description: "Titolo del POI (colonna title)." },
-        description: { type: "string", description: "Descrizione del POI." },
+        name: { type: "string", description: "Titolo del POI (colonna title), massimo 100 caratteri." },
+        description: {
+          type: "string",
+          description: "Descrizione del POI, OBBLIGATORIA: almeno 40 caratteri basati su fatti reali, massimo 200.",
+        },
         category: { type: "string", description: "Categoria (stringa)." },
         tags: { type: "array", items: { type: "string" }, description: "Tag opzionali." },
-        lat: { type: "number", description: "Latitudine (numero)." },
-        lng: { type: "number", description: "Longitudine (numero)." },
+        lat: { type: "number", description: "Latitudine (numero), OBBLIGATORIA." },
+        lng: { type: "number", description: "Longitudine (numero), OBBLIGATORIA." },
         address: { type: "string", description: "Indirizzo opzionale." },
         city: { type: "string", description: "Citta'." },
         rationale: { type: "string", description: "Perche' proponi questo POI." },
       },
-      required: ["name"],
+      required: ["name", "description", "lat", "lng"],
       additionalProperties: false,
     },
   },
@@ -439,14 +446,14 @@ const TOOLS: ToolDef[] = [
             properties: {
               ref: { type: "string", description: "Identificatore locale referenziato da new_poi_ref." },
               name: { type: "string" },
-              description: { type: "string" },
+              description: { type: "string", description: "OBBLIGATORIA: almeno 40 caratteri, massimo 200." },
               category: { type: "string" },
               tags: { type: "array", items: { type: "string" } },
               lat: { type: "number" },
               lng: { type: "number" },
               city: { type: "string" },
             },
-            required: ["ref", "name"],
+            required: ["ref", "name", "description", "lat", "lng"],
             additionalProperties: false,
           },
         },
@@ -501,14 +508,14 @@ const TOOLS: ToolDef[] = [
             properties: {
               ref: { type: "string" },
               name: { type: "string" },
-              description: { type: "string" },
+              description: { type: "string", description: "OBBLIGATORIA: almeno 40 caratteri, massimo 200." },
               category: { type: "string" },
               tags: { type: "array", items: { type: "string" } },
               lat: { type: "number" },
               lng: { type: "number" },
               city: { type: "string" },
             },
-            required: ["ref", "name"],
+            required: ["ref", "name", "description", "lat", "lng"],
             additionalProperties: false,
           },
         },
@@ -638,7 +645,12 @@ async function runWebLookup(input: Record<string, unknown>): Promise<Record<stri
       const url = "https://" + lang + ".wikipedia.org/w/api.php?action=query&format=json&redirects=1" +
         "&prop=extracts|info&inprop=url&exintro=1&explaintext=1&generator=search&gsrlimit=1&gsrsearch=" +
         encodeURIComponent(q);
-      const r = await fetch(url, { headers: { "User-Agent": "POI-LOVE-admin/1.0 (info@321.al)" } });
+      const r = await fetch(url, {
+        headers: { "User-Agent": "POI-LOVE-admin/1.0 (info@321.al)" },
+        // Timeout: una Wikipedia lenta non deve appendere l'intera richiesta admin.
+        // L'abort finisce nel catch qui sotto e si passa alla lingua successiva.
+        signal: AbortSignal.timeout(5000),
+      });
       if (!r.ok) continue;
       const d = await r.json();
       const pages = d?.query?.pages;
@@ -712,12 +724,15 @@ interface ValidationResult {
 }
 
 // Valida un singolo POI (sia standalone sia annidato in new_pois).
+// Vincoli allineati al DB: title 1..100, description obbligatoria e <= 200,
+// lat/lng NOT NULL. Gli errori sono parlanti, in italiano: il modello li legge
+// nel tool_result e si corregge al round successivo.
 function validatePoiObj(
   src: Record<string, unknown>,
   requireRef: boolean,
 ): { ok: boolean; error?: string; value?: Record<string, unknown> } {
-  const name = asTrimmedString(src?.name, 200);
-  if (!name) return { ok: false, error: "POI senza name" };
+  const name = asTrimmedString(src?.name, 100);
+  if (!name) return { ok: false, error: "POI senza name: indica il titolo del luogo (max 100 caratteri)" };
 
   const out: Record<string, unknown> = { name };
 
@@ -727,7 +742,18 @@ function validatePoiObj(
     out.ref = ref;
   }
 
-  if (src?.description !== undefined) out.description = asTrimmedString(src.description, 4000);
+  // Descrizione OBBLIGATORIA: un POI senza descrizione non deve esistere.
+  const description = asTrimmedString(src?.description, 200);
+  if (description.length < 40) {
+    return {
+      ok: false,
+      error:
+        `descrizione mancante o troppo corta per '${name}': serve una descrizione di almeno 40 caratteri ` +
+        "(idealmente circa 200), basata su fatti reali trovati con web_lookup. Richiama il tool con la descrizione compilata.",
+    };
+  }
+  out.description = description;
+
   if (src?.category !== undefined) {
     if (typeof src.category !== "string") return { ok: false, error: `category non stringa per '${name}'` };
     out.category = asTrimmedString(src.category, 80);
@@ -736,21 +762,31 @@ function validatePoiObj(
   if (src?.city !== undefined) out.city = asTrimmedString(src.city, 120);
   if (src?.tags !== undefined) out.tags = sanitizeTags(src.tags);
 
-  if (src?.lat !== undefined && src.lat !== null) {
-    if (!isFiniteNum(src.lat) || (src.lat as number) < -90 || (src.lat as number) > 90) {
-      return { ok: false, error: `lat non valida per '${name}'` };
-    }
-    out.lat = src.lat;
+  // Coordinate OBBLIGATORIE: senza lat/lng il POI non si puo' applicare ne' vedere sulla mappa.
+  if (!isFiniteNum(src?.lat) || (src.lat as number) < -90 || (src.lat as number) > 90) {
+    return {
+      ok: false,
+      error:
+        `lat mancante o non valida per '${name}': indica sempre la latitudine come numero ` +
+        "(va bene anche approssimativa, l'admin la aggiusta dopo). Richiama il tool con lat e lng compilate.",
+    };
   }
-  if (src?.lng !== undefined && src.lng !== null) {
-    if (!isFiniteNum(src.lng) || (src.lng as number) < -180 || (src.lng as number) > 180) {
-      return { ok: false, error: `lng non valida per '${name}'` };
-    }
-    out.lng = src.lng;
+  if (!isFiniteNum(src?.lng) || (src.lng as number) < -180 || (src.lng as number) > 180) {
+    return {
+      ok: false,
+      error:
+        `lng mancante o non valida per '${name}': indica sempre la longitudine come numero ` +
+        "(va bene anche approssimativa, l'admin la aggiusta dopo). Richiama il tool con lat e lng compilate.",
+    };
   }
+  out.lat = src.lat;
+  out.lng = src.lng;
 
   return { ok: true, value: out };
 }
+
+// UUID canonico: serve a scartare id POI malformati prima che esplodano nel cast SQL.
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 // Valida le tappe di una rotta (max 30).
 function validateStops(
@@ -780,7 +816,9 @@ function validateStops(
       stop.lng = s.lng;
     }
     if (s?.link_existing_poi_id !== undefined) {
-      stop.link_existing_poi_id = asTrimmedString(s.link_existing_poi_id, 80);
+      const rawId = asTrimmedString(s.link_existing_poi_id, 80);
+      // Solo UUID validi: un id malformato farebbe fallire il cast uuid all'approvazione.
+      stop.link_existing_poi_id = UUID_RE.test(rawId) ? rawId : null;
     }
     if (s?.new_poi_ref !== undefined) {
       stop.new_poi_ref = asTrimmedString(s.new_poi_ref, 80);
@@ -903,7 +941,13 @@ async function reverseGeocode(lat: number, lng: number): Promise<string | null> 
   try {
     const r = await fetch(
       "https://nominatim.openstreetmap.org/reverse?format=json&zoom=18&addressdetails=1&lat=" + lat + "&lon=" + lng,
-      { headers: { "User-Agent": "POI-LOVE-admin/1.0", "Accept-Language": "sq,it,en" } },
+      {
+        // La policy Nominatim richiede uno User-Agent identificante con contatto.
+        headers: { "User-Agent": "POI-LOVE-admin/1.0 (info@321.al)", "Accept-Language": "sq,it,en" },
+        // Timeout: un Nominatim lento non deve appendere l'intera richiesta admin.
+        // L'abort finisce nel catch e si prosegue senza indirizzo.
+        signal: AbortSignal.timeout(5000),
+      },
     );
     if (!r.ok) return null;
     const d = await r.json();
@@ -921,7 +965,10 @@ async function fillAddresses(kind: string | undefined, payload: Record<string, u
     const a = await reverseGeocode(payload.lat as number, payload.lng as number);
     if (a) payload.address = a;
   } else if (kind === "project" || kind === "route") {
-    const nps = Array.isArray((payload as any).new_pois) ? (payload as any).new_pois.slice(0, 12) : [];
+    // Massimo 3 reverse geocode per proposta: la policy Nominatim impone 1 req/s e una
+    // raffica di chiamate in serie allunga la risposta e rischia il blocco del servizio.
+    // Gli altri new_pois restano senza address: verranno arricchiti all'approvazione.
+    const nps = Array.isArray((payload as any).new_pois) ? (payload as any).new_pois.slice(0, 3) : [];
     for (const p of nps) {
       if (need(p)) {
         const a = await reverseGeocode((p as any).lat, (p as any).lng);
@@ -996,31 +1043,100 @@ interface AgentResult {
   tokOut: number;
 }
 
+// Errore di run agentico: porta con se' le proposte gia' persistite in ai_proposals e i
+// token gia' consumati. Il chiamante cosi' evita fallback che duplicherebbero le proposte
+// e logga comunque la spesa del run fallito.
+class AgentRunError extends Error {
+  proposals: ProposalOut[];
+  tokIn: number;
+  tokOut: number;
+  constructor(message: string, proposals: ProposalOut[], tokIn: number, tokOut: number) {
+    super(message);
+    this.name = "AgentRunError";
+    this.proposals = proposals;
+    this.tokIn = tokIn;
+    this.tokOut = tokOut;
+  }
+}
+
+// Intento dell'admin dall'ultimo messaggio user, condiviso dai due provider.
+// Solo verbi interi con boundary chiusi: niente match su "credo", "crescita", "nuovi".
+function detectIntent(messages: ChatMessage[]): { wantAction: boolean; wantWrite: boolean } {
+  const lastUser = [...messages].reverse().find((m) => m.role === "user")?.content || "";
+  const wantWrite =
+    /\b(crea|creami|creiamo|genera|generami|inserisci|aggiungi|proponi|proponimi|fammi|facciamo|registra|costruisci|prepara|monta|montami)\b/i
+      .test(lastUser);
+  const wantAction = wantWrite ||
+    /\b(voglio|metti|mostra|mostrami|cerca|cercami|quanti|quante|quanto|elenca|elencami|trova|trovami)\b/i
+      .test(lastUser);
+  return { wantAction, wantWrite };
+}
+
+// Status del provider che meritano un retry: sovraccarico o errore transiente.
+const RETRYABLE_STATUS = new Set([429, 500, 502, 503, 529]);
+
+function retryDelayMs(r: Response): number {
+  const s = Number(r.headers.get("retry-after"));
+  return Number.isFinite(s) && s > 0 ? Math.min(s * 1000, 15_000) : 2000;
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// Fetch verso il provider con 1 retry su errori transienti (rispettando Retry-After).
+// Se fallisce ancora, lancia un messaggio umano per l'admin; il dettaglio tecnico
+// grezzo resta solo in console.error.
+async function providerFetch(
+  provider: string,
+  doFetch: () => Promise<Response>,
+): Promise<Response> {
+  let r = await doFetch();
+  if (!r.ok && RETRYABLE_STATUS.has(r.status)) {
+    const detail = await r.text().catch(() => "");
+    console.error(`${provider}_${r.status} (primo tentativo, riprovo):`, detail.slice(0, 400));
+    await sleep(retryDelayMs(r));
+    r = await doFetch();
+  }
+  if (!r.ok) {
+    const detail = await r.text().catch(() => "");
+    console.error(`${provider}_${r.status}:`, detail.slice(0, 400));
+    throw new Error(
+      RETRYABLE_STATUS.has(r.status)
+        ? "Il provider AI e' sovraccarico, riprova tra un minuto."
+        : "Errore dal provider AI, dettagli nei log del server.",
+    );
+  }
+  return r;
+}
+
 async function anthropicCall(
   model: string,
   systemPrompt: string,
   msgs: unknown[],
+  toolChoice?: { type: string },
 ): Promise<{ data: any; tokIn: number; tokOut: number }> {
-  const r = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": ANTHROPIC_KEY,
-      "anthropic-version": "2023-06-01",
-    },
-    body: JSON.stringify({
-      model,
-      max_tokens: MAX_OUTPUT_TOKENS,
-      system: systemPrompt,
-      tools: anthropicTools(),
-      messages: msgs,
-    }),
-  });
+  const r = await providerFetch("anthropic", () =>
+    fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": ANTHROPIC_KEY,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model,
+        max_tokens: MAX_OUTPUT_TOKENS,
+        system: systemPrompt,
+        // I tool restano sempre dichiarati (il transcript puo' contenere blocchi tool_use):
+        // e' tool_choice a decidere se il modello deve usarli, puo' usarli o deve rispondere
+        // a parole ({type:"none"}).
+        tools: anthropicTools(),
+        ...(toolChoice ? { tool_choice: toolChoice } : {}),
+        messages: msgs,
+      }),
+    }));
 
-  if (!r.ok) {
-    const detail = await r.text().catch(() => "");
-    throw new Error(`anthropic_${r.status}: ${detail.slice(0, 400)}`);
-  }
   const data = await r.json();
   const tokIn = Number(data?.usage?.input_tokens) || 0;
   const tokOut = Number(data?.usage?.output_tokens) || 0;
@@ -1044,73 +1160,118 @@ async function runAnthropic(
   const proposals: ProposalOut[] = [];
   let finalText = "";
 
-  for (let round = 0; round < MAX_ROUNDS; round++) {
-    const { data, tokIn, tokOut } = await anthropicCall(model, systemPrompt, msgs);
-    totalIn += tokIn;
-    totalOut += tokOut;
+  // Stessa logica proattiva di runOpenAI (detectIntent condivisa): se l'admin vuole
+  // agire o creare, nei primi round si forza l'uso dei tool con tool_choice {type:"any"}.
+  const { wantAction, wantWrite } = detectIntent(messages);
+  let didWrite = false;
+  // True se anche l'ultimo round ha eseguito tool: serve una sintesi finale.
+  let exhaustedWithTools = false;
 
-    const blocks: any[] = Array.isArray(data?.content) ? data.content : [];
+  try {
+    for (let round = 0; round < MAX_ROUNDS; round++) {
+      // Mai forzare all'ultimo round: deve poter rispondere a parole.
+      const forceTools = round < MAX_ROUNDS - 1 &&
+        (wantWrite ? !didWrite : (round === 0 && wantAction));
+      const { data, tokIn, tokOut } = await anthropicCall(
+        model,
+        systemPrompt,
+        msgs,
+        forceTools ? { type: "any" } : undefined,
+      );
+      totalIn += tokIn;
+      totalOut += tokOut;
 
-    // Testo prodotto in questo round.
-    const text = blocks
-      .filter((b) => b?.type === "text")
-      .map((b) => String(b?.text ?? ""))
-      .join("");
-    if (text) finalText = text;
+      const blocks: any[] = Array.isArray(data?.content) ? data.content : [];
 
-    const toolUses = blocks.filter((b) => b?.type === "tool_use");
+      // Testo prodotto in questo round.
+      const text = blocks
+        .filter((b) => b?.type === "text")
+        .map((b) => String(b?.text ?? ""))
+        .join("");
+      if (text) finalText = text;
 
-    if (data?.stop_reason !== "tool_use" || toolUses.length === 0) {
-      // Nessun tool richiesto: fine del loop.
-      break;
-    }
+      const toolUses = blocks.filter((b) => b?.type === "tool_use");
 
-    // Rimetti il turno assistant (con i blocchi tool_use) nella conversazione.
-    msgs.push({ role: "assistant", content: blocks });
-
-    // Esegui ogni tool e prepara i tool_result.
-    const toolResults: any[] = [];
-    for (const tu of toolUses) {
-      const name = String(tu?.name ?? "");
-      const input = (tu?.input && typeof tu.input === "object" ? tu.input : {}) as Record<string, unknown>;
-      const def = TOOL_BY_NAME[name];
-
-      let resultObj: Record<string, unknown>;
-      if (!def) {
-        resultObj = { error: `tool sconosciuto: ${name}` };
-      } else if (def.kind === "read") {
-        resultObj = await executeReadTool(svc, name, input);
-      } else {
-        // WRITE: non eseguire. Valida e persisti come proposta.
-        const v = validateWritePayload(name, input);
-        if (!v.ok) {
-          resultObj = { ok: false, error: v.error };
-        } else {
-          const p = await persistProposal(svc, adminId, v);
-          if (!p.ok) {
-            resultObj = { ok: false, error: p.error };
-          } else {
-            proposals.push(p.proposal!);
-            resultObj = {
-              ok: true,
-              proposal_id: p.proposal!.id,
-              kind: p.proposal!.kind,
-              status: "pending",
-              note: "Proposta creata. L'amministratore la approvera' o rifiutera' a mano dal pannello. Niente e' stato scritto nel database.",
-            };
-          }
-        }
+      // stop_reason ignorato di proposito: contano solo i blocchi tool_use presenti.
+      if (toolUses.length === 0) {
+        // Nessun tool richiesto: fine del loop.
+        break;
       }
 
-      toolResults.push({
-        type: "tool_result",
-        tool_use_id: tu?.id,
-        content: JSON.stringify(resultObj),
-      });
+      // Rimetti il turno assistant (con i blocchi tool_use) nella conversazione.
+      msgs.push({ role: "assistant", content: blocks });
+
+      // Esegui ogni tool e prepara i tool_result.
+      const toolResults: any[] = [];
+      for (const tu of toolUses) {
+        const name = String(tu?.name ?? "");
+        const input = (tu?.input && typeof tu.input === "object" ? tu.input : {}) as Record<string, unknown>;
+        const def = TOOL_BY_NAME[name];
+
+        let resultObj: Record<string, unknown>;
+        if (!def) {
+          resultObj = { error: `tool sconosciuto: ${name}` };
+        } else if (def.kind === "read") {
+          resultObj = await executeReadTool(svc, name, input);
+        } else {
+          // WRITE: non eseguire. Valida e persisti come proposta.
+          const v = validateWritePayload(name, input);
+          if (!v.ok) {
+            resultObj = { ok: false, error: v.error };
+          } else {
+            const p = await persistProposal(svc, adminId, v);
+            if (!p.ok) {
+              resultObj = { ok: false, error: p.error };
+            } else {
+              proposals.push(p.proposal!);
+              didWrite = true;
+              resultObj = {
+                ok: true,
+                proposal_id: p.proposal!.id,
+                kind: p.proposal!.kind,
+                status: "pending",
+                note: "Proposta creata. L'amministratore la approvera' o rifiutera' a mano dal pannello. Niente e' stato scritto nel database.",
+              };
+            }
+          }
+        }
+
+        toolResults.push({
+          type: "tool_result",
+          tool_use_id: tu?.id,
+          content: JSON.stringify(resultObj),
+        });
+      }
+
+      // Re-inietta i risultati come messaggio user.
+      msgs.push({ role: "user", content: toolResults });
+
+      if (round === MAX_ROUNDS - 1) exhaustedWithTools = true;
     }
 
-    // Re-inietta i risultati come messaggio user.
-    msgs.push({ role: "user", content: toolResults });
+    // Round esauriti con tool eseguiti all'ultimo giro e nessun testo utile: una sola
+    // chiamata di sintesi con tool_choice {type:"none"} (i tool restano dichiarati perche'
+    // il transcript contiene blocchi tool_use), cosi' il modello legge i risultati e risponde.
+    if (exhaustedWithTools && !finalText) {
+      try {
+        const { data, tokIn, tokOut } = await anthropicCall(model, systemPrompt, msgs, { type: "none" });
+        totalIn += tokIn;
+        totalOut += tokOut;
+        const blocks: any[] = Array.isArray(data?.content) ? data.content : [];
+        const text = blocks
+          .filter((b) => b?.type === "text")
+          .map((b) => String(b?.text ?? ""))
+          .join("");
+        if (text) finalText = text;
+      } catch (e) {
+        // La sintesi e' un extra: se fallisce si usa il testo di ripiego qui sotto.
+        console.error("sintesi finale anthropic fallita:", e);
+      }
+    }
+  } catch (e) {
+    // Propaga proposte gia' create e token gia' spesi: il chiamante evita cosi'
+    // fallback duplicanti e logga comunque il costo del run interrotto.
+    throw new AgentRunError(String(e instanceof Error ? e.message : e), proposals, totalIn, totalOut);
   }
 
   if (!finalText) {
@@ -1131,26 +1292,23 @@ async function openaiCall(
   msgs: unknown[],
   toolChoice: string = "auto",
 ): Promise<{ data: any; tokIn: number; tokOut: number }> {
-  const r = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${OPENAI_KEY}`,
-    },
-    body: JSON.stringify({
-      model,
-      messages: msgs,
-      tools: openaiTools(),
-      tool_choice: toolChoice,
-      max_tokens: MAX_OUTPUT_TOKENS,
-      temperature: 0.6,
-    }),
-  });
+  const r = await providerFetch("openai", () =>
+    fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${OPENAI_KEY}`,
+      },
+      body: JSON.stringify({
+        model,
+        messages: msgs,
+        tools: openaiTools(),
+        tool_choice: toolChoice,
+        max_tokens: MAX_OUTPUT_TOKENS,
+        temperature: 0.6,
+      }),
+    }));
 
-  if (!r.ok) {
-    const detail = await r.text().catch(() => "");
-    throw new Error(`openai_${r.status}: ${detail.slice(0, 400)}`);
-  }
   const data = await r.json();
   const tokIn = Number(data?.usage?.prompt_tokens) || 0;
   const tokOut = Number(data?.usage?.completion_tokens) || 0;
@@ -1176,88 +1334,116 @@ async function runOpenAI(
   const proposals: ProposalOut[] = [];
   let finalText = "";
 
-  // Se l'admin chiede di AGIRE (creare, proporre, cercare, contare), al primo giro forziamo
-  // l'uso di uno strumento: gpt-4o non puo limitarsi a chiederti i dati a parole, deve fare.
-  const lastUser = [...messages].reverse().find((m) => m.role === "user")?.content || "";
-  const wantAction = /\b(crea|cre|monta|genera|inseris|aggiung|propon|voglio|fammi|metti|mostra|cerca|quant|elenca|trova)/i.test(lastUser);
-  // Se l'admin vuole CREARE qualcosa, forziamo gli strumenti finche' non c'e' una proposta:
-  // cosi il copilota cerca davvero (web_lookup) e poi monta la scheda, invece di chiedere i dati a parole.
-  const wantWrite = /\b(crea|cre|monta|genera|inseris|aggiung|propon|fammi|registr|costruisc|prepar|nuov)/i.test(lastUser);
+  // Logica proattiva condivisa (detectIntent): se l'admin chiede di AGIRE o CREARE,
+  // nei primi round forziamo l'uso degli strumenti: gpt-4o non puo' limitarsi a
+  // chiedere i dati a parole, deve fare. Mai forzare all'ultimo round.
+  const { wantAction, wantWrite } = detectIntent(messages);
   let didWrite = false;
+  // True se anche l'ultimo round ha eseguito tool: serve una sintesi finale.
+  let exhaustedWithTools = false;
 
-  for (let round = 0; round < MAX_ROUNDS; round++) {
-    const tc = wantWrite
-      ? ((!didWrite && round < 4) ? "required" : "auto")
-      : ((round === 0 && wantAction) ? "required" : "auto");
-    const { data, tokIn, tokOut } = await openaiCall(model, msgs, tc);
-    totalIn += tokIn;
-    totalOut += tokOut;
+  try {
+    for (let round = 0; round < MAX_ROUNDS; round++) {
+      // "required" solo finche' non c'e' una proposta e non siamo all'ultimo round:
+      // l'ultimo round deve poter rispondere a parole.
+      const forceTools = round < MAX_ROUNDS - 1 &&
+        (wantWrite ? !didWrite : (round === 0 && wantAction));
+      const { data, tokIn, tokOut } = await openaiCall(model, msgs, forceTools ? "required" : "auto");
+      totalIn += tokIn;
+      totalOut += tokOut;
 
-    const choice = data?.choices?.[0];
-    const message = choice?.message ?? {};
-    const toolCalls: any[] = Array.isArray(message?.tool_calls) ? message.tool_calls : [];
+      const choice = data?.choices?.[0];
+      const message = choice?.message ?? {};
+      const toolCalls: any[] = Array.isArray(message?.tool_calls) ? message.tool_calls : [];
 
-    if (typeof message?.content === "string" && message.content.trim()) {
-      finalText = message.content;
-    }
-
-    if (choice?.finish_reason !== "tool_calls" || toolCalls.length === 0) {
-      break;
-    }
-
-    // Rimetti il turno assistant (con i tool_calls) nella conversazione.
-    msgs.push({
-      role: "assistant",
-      content: message?.content ?? null,
-      tool_calls: toolCalls,
-    });
-
-    for (const tc of toolCalls) {
-      const name = String(tc?.function?.name ?? "");
-      let input: Record<string, unknown> = {};
-      try {
-        const parsed = JSON.parse(tc?.function?.arguments ?? "{}");
-        if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
-          input = parsed as Record<string, unknown>;
-        }
-      } catch (_e) {
-        input = {};
+      if (typeof message?.content === "string" && message.content.trim()) {
+        finalText = message.content;
       }
 
-      const def = TOOL_BY_NAME[name];
-      let resultObj: Record<string, unknown>;
-      if (!def) {
-        resultObj = { error: `tool sconosciuto: ${name}` };
-      } else if (def.kind === "read") {
-        resultObj = await executeReadTool(svc, name, input);
-      } else {
-        const v = validateWritePayload(name, input);
-        if (!v.ok) {
-          resultObj = { ok: false, error: v.error };
+      // finish_reason ignorato di proposito: con tool_choice forzato OpenAI puo'
+      // tornare "stop" anche con tool_calls popolati. Contano solo i tool richiesti.
+      if (toolCalls.length === 0) {
+        break;
+      }
+
+      // Rimetti il turno assistant (con i tool_calls) nella conversazione.
+      msgs.push({
+        role: "assistant",
+        content: message?.content ?? null,
+        tool_calls: toolCalls,
+      });
+
+      for (const tc of toolCalls) {
+        const name = String(tc?.function?.name ?? "");
+        let input: Record<string, unknown> = {};
+        try {
+          const parsed = JSON.parse(tc?.function?.arguments ?? "{}");
+          if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+            input = parsed as Record<string, unknown>;
+          }
+        } catch (_e) {
+          input = {};
+        }
+
+        const def = TOOL_BY_NAME[name];
+        let resultObj: Record<string, unknown>;
+        if (!def) {
+          resultObj = { error: `tool sconosciuto: ${name}` };
+        } else if (def.kind === "read") {
+          resultObj = await executeReadTool(svc, name, input);
         } else {
-          const p = await persistProposal(svc, adminId, v);
-          if (!p.ok) {
-            resultObj = { ok: false, error: p.error };
+          const v = validateWritePayload(name, input);
+          if (!v.ok) {
+            resultObj = { ok: false, error: v.error };
           } else {
-            proposals.push(p.proposal!);
-            didWrite = true;
-            resultObj = {
-              ok: true,
-              proposal_id: p.proposal!.id,
-              kind: p.proposal!.kind,
-              status: "pending",
-              note: "Proposta creata. L'amministratore la approvera' o rifiutera' a mano dal pannello. Niente e' stato scritto nel database.",
-            };
+            const p = await persistProposal(svc, adminId, v);
+            if (!p.ok) {
+              resultObj = { ok: false, error: p.error };
+            } else {
+              proposals.push(p.proposal!);
+              didWrite = true;
+              resultObj = {
+                ok: true,
+                proposal_id: p.proposal!.id,
+                kind: p.proposal!.kind,
+                status: "pending",
+                note: "Proposta creata. L'amministratore la approvera' o rifiutera' a mano dal pannello. Niente e' stato scritto nel database.",
+              };
+            }
           }
         }
+
+        msgs.push({
+          role: "tool",
+          tool_call_id: tc?.id,
+          content: JSON.stringify(resultObj),
+        });
       }
 
-      msgs.push({
-        role: "tool",
-        tool_call_id: tc?.id,
-        content: JSON.stringify(resultObj),
-      });
+      if (round === MAX_ROUNDS - 1) exhaustedWithTools = true;
     }
+
+    // Round esauriti con tool eseguiti all'ultimo giro e nessun testo utile: una sola
+    // chiamata di sintesi con tool_choice "none", cosi' il modello legge i risultati
+    // dei tool e risponde a parole invece di lasciare l'admin con un "Ok.".
+    if (exhaustedWithTools && !finalText) {
+      try {
+        const { data, tokIn, tokOut } = await openaiCall(model, msgs, "none");
+        totalIn += tokIn;
+        totalOut += tokOut;
+        const msg = data?.choices?.[0]?.message;
+        if (typeof msg?.content === "string" && msg.content.trim()) {
+          finalText = msg.content;
+        }
+      } catch (e) {
+        // La sintesi e' un extra: se fallisce si usa il testo di ripiego qui sotto.
+        console.error("sintesi finale openai fallita:", e);
+      }
+    }
+  } catch (e) {
+    // Propaga proposte gia' create e token gia' spesi: il chiamante evita cosi'
+    // fallback duplicanti e logga comunque il costo del run interrotto.
+    throw new AgentRunError(String(e instanceof Error ? e.message : e), proposals, totalIn, totalOut);
   }
 
   if (!finalText) {
@@ -1267,6 +1453,40 @@ async function runOpenAI(
   }
 
   return { reply: finalText, proposals, tokIn: totalIn, tokOut: totalOut };
+}
+
+// Logga i token di un run AI fallito in admin_audit_log (action='ai_call'): il tetto
+// di spesa deve vedere anche il costo dei run interrotti, altrimenti sottostima.
+async function logFailedAiCall(
+  svc: SvcClient,
+  adminId: string,
+  provider: string,
+  model: string,
+  mode: Mode,
+  run: AgentRunError | null,
+): Promise<void> {
+  if (!run || (run.tokIn <= 0 && run.tokOut <= 0)) return;
+  try {
+    await svc.from("admin_audit_log").insert({
+      admin_id: adminId,
+      action: "ai_call",
+      target_type: "ai",
+      target_id: model,
+      meta: {
+        provider,
+        model,
+        mode,
+        tokens_in: run.tokIn,
+        tokens_out: run.tokOut,
+        cost_eur: costEur(model, run.tokIn, run.tokOut),
+        proposals: run.proposals.length,
+        failed: true,
+      },
+    });
+  } catch (e) {
+    // Il log non deve bloccare, ma il fallimento va almeno in console.
+    console.error("log ai_call (run fallito) non riuscito:", e);
+  }
 }
 
 // ── Handler ─────────────────────────────────────────────────────────────────────
@@ -1367,11 +1587,19 @@ Deno.serve(async (req: Request) => {
   }
 
   // ── Tetto di spesa: blocca prima di chiamare l'AI ─────────────────────────────
+  // Fail-closed: se la verifica non riesce, NON si assume spesa 0 e non si chiama l'AI.
   let spent = 0;
   try {
     spent = await spentTodayEur(svc, user.id);
-  } catch (_e) {
-    spent = 0;
+  } catch (e) {
+    console.error("verifica tetto di spesa fallita:", e);
+    return json(
+      {
+        error: "spend_check_failed",
+        detail: "Verifica del tetto di spesa non riuscita, riprova tra poco.",
+      },
+      503,
+    );
   }
   if (spent >= DAILY_EUR_CAP) {
     return json(
@@ -1403,36 +1631,76 @@ Deno.serve(async (req: Request) => {
   let usedModel = model;
   let usedProvider = provider;
 
+  // Reply onesto quando un run si interrompe DOPO aver gia' creato proposte.
+  const interruptedReply =
+    "Ho creato la proposta ma la conversazione si e' interrotta: eccola qui sotto, " +
+    "rivedila e approva o rifiuta dal pannello.";
+
   try {
     agent =
       provider === "anthropic"
         ? await runAnthropic(svc, user.id, model, systemPrompt, messages)
         : await runOpenAI(svc, user.id, model, systemPrompt, messages);
   } catch (primaryErr) {
-    // Fallback verso l'altro provider, se disponibile e nessuna proposta e' stata
-    // ancora scritta (il fallback riparte da zero, evita duplicati).
-    try {
-      if (provider === "anthropic" && OPENAI_KEY) {
-        usedProvider = "openai";
-        usedModel = OPENAI_ALLOWED.has(OPENAI_MODEL) ? OPENAI_MODEL : "gpt-4o";
-        agent = await runOpenAI(svc, user.id, usedModel, systemPrompt, messages);
-      } else if (provider === "openai" && ANTHROPIC_KEY) {
-        usedProvider = "anthropic";
-        usedModel = ANTHROPIC_ALLOWED.has(ANTHROPIC_MODEL)
-          ? ANTHROPIC_MODEL
-          : "claude-sonnet-4-6";
-        agent = await runAnthropic(svc, user.id, usedModel, systemPrompt, messages);
-      } else {
-        throw primaryErr;
+    const primaryRun = primaryErr instanceof AgentRunError ? primaryErr : null;
+
+    if (primaryRun && primaryRun.proposals.length > 0) {
+      // Proposte gia' scritte in ai_proposals: NIENTE fallback (ripartirebbe da zero
+      // e duplicherebbe le proposte). Si restituisce onestamente quanto gia' creato;
+      // i token del run interrotto vengono loggati dal blocco ai_call qui sotto.
+      console.error("run primario interrotto dopo aver creato proposte:", primaryRun.message);
+      agent = {
+        reply: interruptedReply,
+        proposals: primaryRun.proposals,
+        tokIn: primaryRun.tokIn,
+        tokOut: primaryRun.tokOut,
+      };
+    } else {
+      // Nessuna proposta creata: si puo' tentare il fallback sull'altro provider.
+      // Prima si loggano i token gia' spesi dal run fallito (tetto di spesa onesto).
+      await logFailedAiCall(svc, user.id, provider, model, mode, primaryRun);
+      try {
+        if (provider === "anthropic" && OPENAI_KEY) {
+          usedProvider = "openai";
+          usedModel = OPENAI_ALLOWED.has(OPENAI_MODEL) ? OPENAI_MODEL : "gpt-4o";
+          agent = await runOpenAI(svc, user.id, usedModel, systemPrompt, messages);
+        } else if (provider === "openai" && ANTHROPIC_KEY) {
+          usedProvider = "anthropic";
+          usedModel = ANTHROPIC_ALLOWED.has(ANTHROPIC_MODEL)
+            ? ANTHROPIC_MODEL
+            : "claude-sonnet-4-6";
+          agent = await runAnthropic(svc, user.id, usedModel, systemPrompt, messages);
+        } else {
+          throw primaryErr;
+        }
+      } catch (fallbackErr) {
+        const fbRun = fallbackErr instanceof AgentRunError ? fallbackErr : null;
+        if (fbRun && fbRun.proposals.length > 0) {
+          // Anche il fallback si e' interrotto, ma DOPO aver creato proposte:
+          // stesse regole del run primario, si restituisce quanto creato.
+          console.error("fallback interrotto dopo aver creato proposte:", fbRun.message);
+          agent = {
+            reply: interruptedReply,
+            proposals: fbRun.proposals,
+            tokIn: fbRun.tokIn,
+            tokOut: fbRun.tokOut,
+          };
+        } else {
+          // Guardia fbRun !== primaryRun: se non c'era un secondo provider il throw
+          // rilancia primaryErr, gia' loggato sopra (niente doppio conteggio).
+          if (fbRun && fbRun !== primaryRun) {
+            await logFailedAiCall(svc, user.id, usedProvider, usedModel, mode, fbRun);
+          }
+          console.error("ai_provider_error:", fallbackErr);
+          return json(
+            {
+              error: "ai_provider_error",
+              detail: String(fallbackErr instanceof Error ? fallbackErr.message : fallbackErr),
+            },
+            502,
+          );
+        }
       }
-    } catch (fallbackErr) {
-      return json(
-        {
-          error: "ai_provider_error",
-          detail: String(fallbackErr instanceof Error ? fallbackErr.message : fallbackErr),
-        },
-        502,
-      );
     }
   }
 
