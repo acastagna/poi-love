@@ -20,21 +20,21 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="POI•LOVE">
 <meta property="og:url" content="https://poilove.com/">
-<meta property="og:title" content="POI•LOVE — i tuoi luoghi del cuore">
+<meta property="og:title" content="POI•LOVE: i tuoi luoghi del cuore">
 <meta property="og:description" content="I tuoi luoghi del cuore, su una mappa comunitaria. Salvali, raccontali, condividili. Open source. Prima istanza: Tirana, Albania.">
 <meta property="og:image" content="https://poilove.com/img/opengraph.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="POI•LOVE — i tuoi luoghi del cuore">
+<meta property="og:image:alt" content="POI•LOVE: i tuoi luoghi del cuore">
 <meta property="og:locale" content="it_IT">
 <meta property="og:locale:alternate" content="en_US">
 <meta property="og:locale:alternate" content="sq_AL">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@poilove">
-<meta name="twitter:title" content="POI•LOVE — i tuoi luoghi del cuore">
+<meta name="twitter:title" content="POI•LOVE: i tuoi luoghi del cuore">
 <meta name="twitter:description" content="I tuoi luoghi del cuore, su una mappa comunitaria. Salvali, raccontali, condividili. Open source. Prima istanza: Tirana, Albania.">
 <meta name="twitter:image" content="https://poilove.com/img/opengraph.jpg">
-<meta name="twitter:image:alt" content="POI•LOVE — i tuoi luoghi del cuore">
+<meta name="twitter:image:alt" content="POI•LOVE: i tuoi luoghi del cuore">
 <!-- Libs -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -2385,7 +2385,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
       <button class="poiai-voice-btn" id="poiaiVoiceBtn" onclick="togglePoiAIVoice()" title="ILLI legge le risposte ad alta voce"><i class="ph-duotone ph-speaker-slash"></i></button>
     </div>
     <div class="poiai-msgs" id="poiaiMsgs">
-      <div class="poiai-msg ai">Ciao! Sono <strong>ILLI•AI</strong>, la mascot di POI•LOVE — il tuo cuore-amico per scoprire luoghi e capire l'app. Posso suggerirti tappe, ristoranti, esperienze culturali, oppure aiutarti a usare POI•LOVE (POI, itinerari, compagni di viaggio). Da dove iniziamo? <i class="ph-duotone ph-heart"></i></div>
+      <div class="poiai-msg ai">Ciao! Sono <strong>ILLI•AI</strong>, la mascot di POI•LOVE, il tuo cuore-amico per scoprire luoghi e capire l'app. Posso suggerirti tappe, ristoranti, esperienze culturali, oppure aiutarti a usare POI•LOVE (POI, itinerari, compagni di viaggio). Da dove iniziamo? <i class="ph-duotone ph-heart"></i></div>
     </div>
     <div class="poiai-input-bar">
       <input class="poiai-input" id="poiaiInput" type="text"
@@ -3117,9 +3117,9 @@ async function runConnectionDiagnostics(){
     // Toast leggero solo se ci sono problemi e l'utente è loggato
     if(currentUser){
       if(!ok){
-        showToast?.('⚠ Connessione DB parziale — vedi console');
+        showToast?.('⚠ Connessione DB parziale, vedi console');
       } else if(report.missing.length){
-        showToast?.('⚠ Schema profilo da aggiornare — vedi console');
+        showToast?.('⚠ Schema profilo da aggiornare, vedi console');
       }
     }
     window.__poilove_diag = report; // Per ispezione manuale
@@ -7467,7 +7467,7 @@ function renderCompanionsTab(){
       ? `<button class="comp-act del" title="${t('comp_close_title','Chiudi e scioglie il gruppo')}" onclick="event.stopPropagation();deleteCompagnia('${safeCode}')"><i class="ph-duotone ph-trash"></i></button>`
       : `<button class="comp-act del-off" title="${t('comp_close_disabled_title','Disponibile solo quando rimangono in 2')}" disabled><i class="ph-duotone ph-trash"></i></button>`;
     const actionsRow = isMine ? `<div class="comp-actions">${actEdit}${actAdmin}${actDel}</div>
-      ${!canClose?`<div class="comp-close-hint"><i class="ph-duotone ph-lock-simple"></i> ${t('comp_close_hint','Puoi chiudere il gruppo solo quando rimaste in 2 — ora {n} {members}').replace('{n}', totalMembers).replace('{members}', memberWord)}</div>`:''}` : '';
+      ${!canClose?`<div class="comp-close-hint"><i class="ph-duotone ph-lock-simple"></i> ${t('comp_close_hint','Puoi chiudere il gruppo solo quando rimaste in 2: ora {n} {members}').replace('{n}', totalMembers).replace('{members}', memberWord)}</div>`:''}` : '';
     return `<div class="comp-card">
       ${creatorRow}
       <div class="comp-row">
@@ -7928,8 +7928,8 @@ function closeSharePoiDisambig(){
 }
 function sharePoiWith(type){
   closeSharePoiDisambig();
-  if(type==='followers') showToast('📡 Condivisione follower — prossimamente!');
-  else showToast('👥 Condivisione amici — prossimamente!');
+  if(type==='followers') showToast('📡 Condivisione follower: prossimamente!');
+  else showToast('👥 Condivisione amici: prossimamente!');
 }
 function shareVia(platform){
   closeSharePoiDisambig();
@@ -8305,7 +8305,7 @@ function selectAvStyle(name){
   renderAvEnvGrid();
 }
 function requestAvatarGen(){
-  showToast(`🎨 Ambiente scelto: ${avSelEnv} — il tuo avatar sarà generato da ILLI•AI`);
+  showToast(`🎨 Ambiente scelto: ${avSelEnv}, il tuo avatar sarà generato da ILLI•AI`);
   closeAvPopup();
 }
 
@@ -8984,7 +8984,7 @@ function selectEnv(idx){
   showToast(t('misc_env_selected','Ambiente selezionato!'));
 }
 function requestAvatarGen(){
-  showToast('🎨 Ambiente selezionato — avatar generato da ILLI•AI');
+  showToast('🎨 Ambiente selezionato: avatar generato da ILLI•AI');
 }
 
 /* ══════════════════════════════════════════
@@ -9795,7 +9795,7 @@ function calNav(tripId,dir){
 }
 function toggleCalDay(tripId,year,month,day){
   const MONTHS=['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
-  showToast(`📅 ${day} ${MONTHS[month]} ${year} — aggiornato`);
+  showToast(`📅 ${day} ${MONTHS[month]} ${year}: aggiornato`);
 }
 
 /* ── ITIN MAP (Leaflet) ── */
@@ -9885,7 +9885,7 @@ function inviteToStop(type){
     showToast('⚠️ Leggi il messaggio di sicurezza prima di procedere');
   } else {
     warn.classList.remove('show');
-    showToast('📩 Invito amico inviato — disponibile nell\'app');
+    showToast('📩 Invito amico inviato: disponibile nell\'app');
   }
 }
 function refreshStops(tripId){
@@ -9946,7 +9946,7 @@ function setTripVis(tripId,vis){
 }
 function shareTripLink(tripId){
   const t=TRIPS[tripId]; if(!t)return;
-  if(t.visibility==='prv'){showToast('⚠️ Viaggio privato — cambia visibilità per condividere');return;}
+  if(t.visibility==='prv'){showToast('⚠️ Viaggio privato: cambia visibilità per condividere');return;}
   const link=`https://poilove.com/trip/${t.shareId}`;
   navigator.clipboard?navigator.clipboard.writeText(link).then(()=>showToast(`🔗 Link copiato!`)):showToast(`🔗 ${link}`);
 }
@@ -10059,7 +10059,7 @@ function onItinSearch(val){
 function selectItinDest(name,lat,lng){
   document.getElementById('itinSearchIn').value=name;
   document.getElementById('itinAcDrop').classList.remove('open');
-  showToast(`🌍 ${name} — crea un nuovo viaggio nell'app`);
+  showToast(`🌍 ${name}: crea un nuovo viaggio nell'app`);
 }
 document.addEventListener('click',e=>{
   if(!e.target.closest('#itinAcDrop')&&!e.target.closest('#itinSearchIn'))
