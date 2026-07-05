@@ -2426,20 +2426,18 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
     </div>
     <div class="sh-body">
 
-      <!-- NOME con autocomplete -->
+      <!-- NOME: niente tendina (deprecata), il titolo lo propone il sistema -->
       <div class="sec-lbl"><span data-t="lbl_name">Nome del posto</span><span class="req-badge" data-t="req">OBBLIGATORIO</span></div>
       <div class="autocomplete-wrap">
         <input class="field-in" type="text" id="poiNameIn" style="padding-right:118px"
           placeholder="Come si chiama questo posto?"
-          oninput="onNameInput(this.value)"
-          onfocus="onNameFocus()"
+          oninput="checkSave()"
           autocomplete="off"/>
         <div class="in-field-tools" style="top:6px">
           <button class="ai" id="nameAiBtn" onclick="suggestPoiName()" title="Suggerisci" aria-label="Suggerisci con ILLI"><i class="ph-duotone ph-sparkle"></i></button>
           <button id="nameVoiceBtn" onclick="toggleFieldDictation('poiNameIn','nameVoiceBtn')" title="Detta" aria-label="Detta a voce"><i class="ph-duotone ph-microphone"></i></button>
           <button onclick="focusField('poiNameIn')" title="Scrivo io" aria-label="Scrivo io"><i class="ph-duotone ph-pencil-simple"></i></button>
         </div>
-        <div class="autocomplete-drop" id="acDrop"></div>
       </div>
 
       <!-- DOVE SI TROVA -->
@@ -5039,94 +5037,15 @@ function openGoogleMapsContrib(){
 }
 
 /* ══════════════════════════════════════════
-   AUTOCOMPLETE (Nominatim)
+   NOME DEL POSTO: NIENTE TENDINA (deprecata il 05/07/2026 per volere del founder).
+   Le proposte a tendina esistono SOLO sul campo INDIRIZZO (ricerca manuale).
+   Il nome lo propone il sistema (titolo intelligente del luogo), l'utente
+   puo sempre scriverlo o dettarlo. onNameInput resta per compatibilita
+   (dettatura e setName la richiamano) ma fa solo la validazione.
 ══════════════════════════════════════════ */
-let acTimer;
-function onNameFocus(){
-  if(!document.getElementById('poiNameIn').value && gpsPos){
-    const lat=gpsPos.lat,lng=gpsPos.lng;
-    fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`,{headers:{'Accept-Language':lang}})
-      .then(r=>r.json()).then(d=>{
-        if(d&&d.display_name){
-          const parts=d.display_name.split(',');
-          const suggestion=parts[0].trim();
-          showAcSuggestion([{name:suggestion,addr:parts.slice(1,3).join(',').trim(),lat,lng}]);
-        }
-      }).catch(()=>{});
-  }
-}
-function onNameInput(val){
-  clearTimeout(acTimer);
-  checkSave();
-  if(val.length<2){document.getElementById('acDrop').classList.remove('open');return;}
-  const lat=gpsPos?gpsPos.lat:CENTER[0],lng=gpsPos?gpsPos.lng:CENTER[1];
-  acTimer=setTimeout(async()=>{
-    try{
-      const r=await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(val)}&format=json&limit=6&lat=${lat}&lon=${lng}&addressdetails=1&namedetails=1`,{headers:{'Accept-Language':lang}});
-      const results=await r.json();
-      const items=results.slice(0,6).map(r=>{
-        const nd=r.namedetails||{};
-        const name=nd.name||nd['name:it']||nd['name:en']||r.display_name.split(',')[0];
-        const addr=r.address||{};
-        const via=(addr.road||addr.pedestrian||'');
-        const num=addr.house_number||'';
-        const city=addr.city||addr.town||addr.village||'';
-        const meta=[via+(num?' '+num:''),city].filter(Boolean).join(' · ');
-        return {name,meta,lat:parseFloat(r.lat),lng:parseFloat(r.lon),type:r.type,cls:r.class};
-      });
-      if(items.length){ showAcSuggestion(items,val); return; }
-      // 0 risultati: prova correzione AI (edge illi-chat, token di sessione o anon key)
-      if(val.length>3){
-        const res=await fetch(GROQ_URL,{method:'POST',
-          headers:await _aiAuthHeaders(),
-          body:JSON.stringify({model:GROQ_MODEL,messages:[{role:'user',
-            content:`Correggi l'errore di battitura nel nome di questo luogo: "${val}". Rispondi SOLO con il nome corretto, niente altro.`}],
-            max_completion_tokens:20,temperature:0})});
-        if(res.ok){
-          const j=await res.json();
-          const fix=(j?.choices?.[0]?.message?.content||'').trim().replace(/^["']|["']$/g,'');
-          if(fix && fix.toLowerCase()!==val.toLowerCase()){
-            const drop=document.getElementById('acDrop');
-            drop.innerHTML=`<div class="ac-item" onclick="document.getElementById('poiNameIn').value='${fix.replace(/'/g,"\\'")}';onNameInput('${fix.replace(/'/g,"\\'")}')">
-              <i class="ph-duotone ph-magic-wand"></i>
-              <div><div class="ac-item-name">Intendevi: <b>${fix.replace(/</g,'&lt;')}</b>?</div><div class="ac-item-addr">Tocca per cercare</div></div>
-            </div>`;
-            drop.classList.add('open');
-          }
-        }
-      }
-    }catch(e){}
-  },450);
-}
-function showAcSuggestion(items){
-  const drop=document.getElementById('acDrop');
-  if(!items.length){drop.classList.remove('open');return;}
-  function _icon(type,cls){
-    if(cls==='amenity'||type==='restaurant'||type==='cafe'||type==='bar'||type==='fast_food') return 'ph-fork-knife';
-    if(type==='hotel'||type==='hostel') return 'ph-bed';
-    if(cls==='shop') return 'ph-shopping-bag';
-    if(cls==='tourism') return 'ph-mountains';
-    if(cls==='highway') return 'ph-road-horizon';
-    return 'ph-map-pin';
-  }
-  drop.innerHTML=items.map(item=>`
-    <div class="ac-item" onclick="selectAcItem('${item.name.replace(/'/g,"\\'")}',${item.lat},${item.lng})">
-      <i class="ph-duotone ${_icon(item.type,item.cls)}"></i>
-      <div><div class="ac-item-name">${item.name.replace(/</g,'&lt;')}</div><div class="ac-item-addr">${(item.meta||'').replace(/</g,'&lt;')}</div></div>
-    </div>`).join('');
-  drop.classList.add('open');
-}
-function selectAcItem(name,lat,lng){
-  document.getElementById('poiNameIn').value=name;
-  document.getElementById('acDrop').classList.remove('open');
-  // Mostra il pannello risultato e registra la posizione (prima scriveva coordinate in un pannello nascosto)
-  reverseGeocodeAndShow(lat,lng,'addr');
+function onNameInput(_val){
   checkSave();
 }
-document.addEventListener('click',e=>{
-  if(!e.target.closest('.autocomplete-wrap'))
-    document.getElementById('acDrop').classList.remove('open');
-});
 
 /* ══════════════════════════════════════════
    SHARE LINK — formato: /demo?poi=ID o /demo?at=lat,lng
@@ -5720,20 +5639,27 @@ async function _smartPlaceTitle(lat,lng){
   let els=null;
   try{ els=await _overpassFetch(q); }catch(e){ els=null; }
   if(!els||!els.length) return null;
+  // Nome nella LINGUA DELL'APP: name:{lang} prima di tutto; poi il nome locale.
+  // Tra piu candidati vince chi HA il nome tradotto (es. il poligono "aeroporto"
+  // con name:it batte il terminal che ha solo il nome inglese), poi la distanza.
+  const _locName=(tg)=>tg['name:'+lang]||tg['short_name:'+lang]||null;
   let small=null, big=null;
   for(const el of els){
     const tg=el.tags||{};
-    const nm=tg['name:it']||tg['name:sq']||tg.name;
+    const loc=_locName(tg);
+    const nm=loc||tg.name;
     if(!nm) continue;
     if(Object.keys(tg).some(k=>/^(disused|abandoned|was|removed|demolished):/i.test(k))||tg.disused==='yes'||tg.abandoned==='yes') continue;
     const plat=el.lat ?? (el.center&&el.center.lat);
     const plng=el.lon ?? (el.center&&el.center.lon);
     if(plat==null||plng==null) continue;
     const d=haversineKm(lat,lng,plat,plng)*1000;
+    const cand={name:nm,d,hasLoc:!!loc};
+    const better=(a,b)=>!b || (a.hasLoc&&!b.hasLoc) || (a.hasLoc===b.hasLoc&&a.d<b.d);
     if(_isBigVenue(tg)){
-      if(!big||d<big.d) big={name:nm,d};
+      if(better(cand,big)) big=cand;
     } else if(d<=120){
-      if(!small||d<small.d) small={name:nm,d};
+      if(better(cand,small)) small=cand;
     }
   }
   if(small&&big&&small.name.toLowerCase()===big.name.toLowerCase()) small=null;
@@ -5768,21 +5694,25 @@ async function suggestPoiName(auto){
   if(btn){ old=btn.innerHTML; btn.disabled=true; btn.innerHTML='<i class="ph-duotone ph-circle-notch" style="animation:spin 1s linear infinite"></i>'; }
   const setName=v=>{ if(nameIn){ nameIn.value=String(v).substring(0,60); if(typeof onNameInput==='function') onNameInput(nameIn.value); if(typeof checkSave==='function') checkSave(); } };
   try{
-    // 1) Nome REALE del locale a queste coordinate (OSM). null = servizio giu, [] = nessun locale mappato
-    const real=await _realNamesNear(lat,lng);
-    if(real===null){ if(!auto) showToast(t('overpass_down','Il servizio dei luoghi non risponde ora, riprova tra poco')); return; }
-    _realNearCache={lat,lng,list:real};
-    if(real.length){
+    // 1) TITOLO INTELLIGENTE (il POSTO nel suo contesto: "Lounge · Aeroporto ...")
+    //    e nomi reali vicini (per la categoria), in parallelo. null = servizio giu.
+    const [real,smart]=await Promise.all([
+      _realNamesNear(lat,lng),
+      _smartPlaceTitle(lat,lng).catch(()=>null)
+    ]);
+    if(real===null&&!smart){ if(!auto) showToast(t('overpass_down','Il servizio dei luoghi non risponde ora, riprova tra poco')); return; }
+    if(real) _realNearCache={lat,lng,list:real};
+    const best=smart||(real&&real.length?real[0].name:null);
+    if(best){
       if(auto&&nameIn&&nameIn.value.trim()) return; // nel frattempo l'utente ha scritto: non toccare
-      setName(real[0].name);
+      setName(best);
       // Categoria dal tipo OSM (amenity/shop), se l'utente non ne ha ancora scelte
-      if(!cats.length&&real[0].type){
+      if(!cats.length&&real&&real.length&&real[0].type){
         const wanted=_osmTypeToCat(real[0].type).toLowerCase();
         const chip=Array.from(document.querySelectorAll('#catChips .chip')).find(c=>c.textContent.trim().toLowerCase()===wanted);
         if(chip&&!chip.classList.contains('sel')) toggleCat(chip);
       }
-      const extra=real.length>1?(lang==='it'?` (uno dei ${real.length} qui vicino)`:lang==='sq'?` (një nga ${real.length} këtu pranë)`:` (one of ${real.length} nearby)`):'';
-      showToast(t('name_real_found','📍 Nome reale')+': '+real[0].name+extra);
+      showToast(t('name_real_found','📍 Nome reale')+': '+best);
       return;
     }
     if(auto) return; // in automatico niente segnaposto ne avvisi: solo nomi reali
@@ -7695,7 +7625,6 @@ function closeAddPOI(){
     map.getContainer().style.cursor='';
   }
   if(_locTapMarker && map){ map.removeLayer(_locTapMarker); _locTapMarker=null; }
-  document.getElementById('acDrop').classList.remove('open');
   if(_fldRecOn&&_fldRec){ try{_fldRec.stop();}catch(e){} stopFieldDictationUI(); }
   // Reset modalità editing
   if(typeof editingPOIId!=='undefined'&&editingPOIId){
