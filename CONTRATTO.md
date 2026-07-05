@@ -68,7 +68,7 @@ info@321.al · https://321.al
 | Sezione "POI creati": vedi, modifica, pubblica, elimina | ✅ Fatto e live | 04/07 |
 | Storico chat del copilota | ✅ Fatto e live | 04/07 |
 | Sicurezza: doppio fattore obbligatorio senza scappatoie | ✅ Fatto e live | 04/07 |
-| Rotte storiche gestite dal pannello | ⬜ Da fare | prima del lancio |
+| Rotte storiche: sezione admin completa (crea/pubblica/tappe/rinomina/elimina) | ✅ Fatto e live | 05/07 |
 | Sistema email + AcumbaMail (serve la chiave da Alessandro) | ⬜ Da fare | prima del lancio |
 | Cambio tier utenti da admin + tier Professionista Plus + livello Influencer | 🔶 Vincolo DB sistemato (4 tier ammessi), UI admin da fare | prima del lancio |
 | Claim proprietà POI a pagamento: bottone webapp, allarme in admin con embed+nomi, approva/rifiuta, collaudato | ✅ Fatto e live | 05/07 |
@@ -99,7 +99,7 @@ info@321.al · https://321.al
 |---|---|---|
 | Condivisione POI col teaser misterioso (zona + immagine AI + registrati) | ⬜ Da fare | prima del lancio |
 | Landing personale del profilo (sfondo + avatar + Entra in POI•LOVE) | ⬜ Da fare | prima del lancio |
-| Itinerari → Rotte Storiche con pagina propria | 🔶 In parte (tab fatto) | prima del lancio |
+| Rotte storiche VISIBILI agli utenti: mappa (linea+tappe) e lista nel tab Itinerari; prima rotta reale "Tirana Storica" pubblicata | ✅ Fatto e live (resta la landing /route/slug) | 05/07 |
 | Frontend rotte utente V2 (tabella user_routes pronta, UI da costruire, flusso via AI) | ⬜ Da fare | prima del lancio |
 
 ### 7. Tier paganti e piattaforma (visione)
