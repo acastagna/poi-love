@@ -70,8 +70,8 @@ info@321.al · https://321.al
 | Sicurezza: doppio fattore obbligatorio senza scappatoie | ✅ Fatto e live | 04/07 |
 | Rotte storiche gestite dal pannello | ⬜ Da fare | prima del lancio |
 | Sistema email + AcumbaMail (serve la chiave da Alessandro) | ⬜ Da fare | prima del lancio |
-| Cambio tier utenti da admin + tier Professionista Plus + livello Influencer | ⬜ Da fare | prima del lancio |
-| Claim proprietà POI (a pagamento, con allarme in admin) | ⬜ Da fare | prima del lancio |
+| Cambio tier utenti da admin + tier Professionista Plus + livello Influencer | 🔶 Vincolo DB sistemato (4 tier ammessi), UI admin da fare | prima del lancio |
+| Claim proprietà POI a pagamento: bottone webapp, allarme in admin con embed+nomi, approva/rifiuta, collaudato | ✅ Fatto e live | 05/07 |
 | Categoria custom da "Altri" + zona "categorie più richieste" (rinomina e metti a sistema) | ⬜ Da fare | prima del lancio |
 | Badge visivo elementi UFFICIALI (rotte, POI, liste) + "in evidenza"(Pro) e "suggerite"(Plus) | ⬜ Da fare | prima del lancio |
 | Pannello multi-provider AI (immagini e testo, chiavi server-side, provider per funzione) | ⬜ Da fare | prima del lancio |
