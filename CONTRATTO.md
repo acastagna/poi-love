@@ -37,6 +37,17 @@ info@321.al · https://321.al
 | Descrizione 200 caratteri nella fascia rossa del dettaglio POI (+ modifica inline del proprietario) | ✅ Fatto e live | 05/07 |
 | Immagini licenziate del luogo (Wikimedia, con attribuzione) | ⬜ Da fare | prossimo giro |
 | Ricerca indirizzo più intelligente (errori di battitura + contesto città) | 🔶 In parte (Albania-first fatto) | da rifinire |
+| Tassonomia POI a 3 livelli: categoria ricca curata + luogo personale privato + tag autocomplete (memoria `poi_taxonomy_plan`) | ⬜ Studiato, da fare (FASE A client, FASE B DB) | prima del lancio |
+| Categorie autoaggiornanti per analisi della richiesta (data-driven, con curation admin) | ⬜ Studiato, da fare | dopo tassonomia |
+| Lente: "Tocca mappa" apre la lente senza resettare i campi scritti | ⬜ Da fare | prossimi giri |
+| Lente che intercetta i POI reali vicini (DB POI•LOVE + OSM + Google) | ⬜ Da fare (pezzo grosso) | prima del lancio |
+| FAB "+" come elenco azioni (POI / segna luogo / tappa / compagnia), "Sono qui" apre la lente | ⬜ Da fare | prossimi giri |
+| POI dentro le liste (openListDetail: aggiungi/rimuovi/riordina) | ⬜ Da fare | prima del lancio |
+| Filtri tag e categoria nel profilo (tocco un tag, vedo solo quelli) | ⬜ Da fare | prossimi giri |
+| Condivisione proprietaria (foglio POI•LOVE unico, mai il menu di sistema, oggi in ~8 punti) | ⬜ Da fare | prima del lancio |
+| Timer 60s con coppa verde / frase gentile; via le immagini AI dal POI (SPECS) | ⬜ Da fare | prossimi giri |
+| Tendina residua sul nome TAPPA itinerario da bonificare (tendine solo sull'indirizzo) | ⬜ Da fare | prossimi giri |
+| TTS voci iperrealistiche esterne (serve chiave + deroga no-TTS) e tastiera assistita | ⬜ Studiato (memoria `lente_mappa_strumento`) | dopo il lancio |
 
 ### 2. ILLI (l'AI degli utenti)
 | Passo | Stato | Quando |
@@ -44,6 +55,8 @@ info@321.al · https://321.al
 | Solo utenti loggati, limiti giornalieri per livello, rimborso su errore | ✅ Fatto e live | 04/07 |
 | Chat riparata dal 2° messaggio, errori gentili in 3 lingue | ✅ Fatto e live | 04/07 |
 | Cerca nella città nominata nella domanda, non solo vicino a te | ✅ Fatto e live | 04/07 |
+| Knowledge base admin a supporto di ILLI (voci per luoghi che l'AI non capisce, iniettate nel grounding) | ⬜ Da fare | prima del lancio |
+| Collaudo descrizioni sui FATTI da utente loggato | ⬜ In attesa di Alessandro | adesso |
 | Voce e audio (POIVOICE) | ⬜ Fase 2 | dopo il lancio |
 
 ### 3. Copilota e pannello admin
@@ -57,6 +70,10 @@ info@321.al · https://321.al
 | Sistema email + AcumbaMail (serve la chiave da Alessandro) | ⬜ Da fare | prima del lancio |
 | Cambio tier utenti da admin + tier Professionista Plus + livello Influencer | ⬜ Da fare | prima del lancio |
 | Claim proprietà POI (a pagamento, con allarme in admin) | ⬜ Da fare | prima del lancio |
+| Categoria custom da "Altri" + zona "categorie più richieste" (rinomina e metti a sistema) | ⬜ Da fare | prima del lancio |
+| Badge visivo elementi UFFICIALI (rotte, POI, liste) + "in evidenza"(Pro) e "suggerite"(Plus) | ⬜ Da fare | prima del lancio |
+| Pannello multi-provider AI (immagini e testo, chiavi server-side, provider per funzione) | ⬜ Da fare | prima del lancio |
+| Biometrico WebAuthn: accenderlo dal dashboard Supabase (client già pronto) | ⬜ Da fare (manuale, 5 min) | quando vuoi |
 | Codice di migrazione POI: cedi e riscatta (utenti e admin), collaudato end-to-end | ✅ Fatto e live | 05/07 |
 | Modifica POI del proprietario con AUTOSAVE (foto max 3 su server, descrizione inline) | ✅ Fatto e live | 05/07 |
 
@@ -67,6 +84,13 @@ info@321.al · https://321.al
 | Chiave AI solo server-side, file pubblico ripulito | ✅ Fatto e verificato | 04/07 |
 | Collaudo automatico end-to-end (utente vero usa-e-getta) | ✅ Fatto | 04/07 |
 | verify_jwt esplicito per funzione (config.toml versionato) | ⬜ Da fare | prossimo giro |
+| Love count atomico (RPC, oggi race condition) | ⬜ Da fare | prossimi giri |
+| Cache Google Places su tabella (7-30 giorni, tiene bassi i costi) | ⬜ Da fare | prima del lancio |
+| Soft-delete POI dal pannello + allineare database/schema.sql al DB vivo + UA Nominatim con contatto | ⬜ Da fare | prossimi giri |
+| Minori: deep-link senza limit, listener avatar duplicati, dead code, i18n residui, cache PWA meno aggressiva | ⬜ Da fare | prossimi giri |
+| Presence live compagnie (realtime Supabase) | ⬜ Da fare | dopo il lancio |
+| Media server: DNS Plesk da riparare (piano B Supabase copre) · WebP pull Plesk | ⬜ Da fare | quando serve |
+| App mobile Expo: push dei 17 file, test su device, build EAS | ⬜ Da fare | dopo il lancio |
 
 ### 5. Condivisione e landing
 | Passo | Stato | Quando |
@@ -74,6 +98,16 @@ info@321.al · https://321.al
 | Condivisione POI col teaser misterioso (zona + immagine AI + registrati) | ⬜ Da fare | prima del lancio |
 | Landing personale del profilo (sfondo + avatar + Entra in POI•LOVE) | ⬜ Da fare | prima del lancio |
 | Itinerari → Rotte Storiche con pagina propria | 🔶 In parte (tab fatto) | prima del lancio |
+| Frontend rotte utente V2 (tabella user_routes pronta, UI da costruire, flusso via AI) | ⬜ Da fare | prima del lancio |
+
+### 7. Tier paganti e piattaforma (visione)
+| Passo | Stato | Quando |
+|---|---|---|
+| Vantaggi tier UNO A UNO (memoria `tier_benefits`): punti x2, POI in evidenza, Muro Sostenitori, adotta rotta, QR business, itinerario in evidenza Mecenate | 🔶 In parte (limiti ILLI per tier FATTI, spunta verifica FATTA) | prima del lancio |
+| Tier Professionista Plus + livello Influencer (badge colore nuovo) | ⬜ Da fare | prima del lancio |
+| API pubblica / middleware per professionisti (tassisti, runner, Wolt, Patoko), import/export, webhook | ⬜ Visione studiata (memoria `poi_share_and_integrations`) | dopo il lancio |
+| POI•LOVE come sistema di consegna (delivery) | ⬜ Visione | dopo il lancio |
+| SOS sanitario con percorso preferenziale | ⬜ PROGETTO SEPARATO (deciso 28/06) | a parte |
 
 ### 6. Legale e lancio
 | Passo | Stato | Quando |
@@ -81,7 +115,10 @@ info@321.al · https://321.al
 | Termini e Privacy online in 3 lingue | ✅ Fatto e live | 27/06 |
 | Validazione legale dei testi (professionista) | ⬜ Da fare | prima del lancio |
 | Collaudo finale di Alessandro (checklist 5 prove) | ⬜ In attesa | adesso |
+| Presentazione aggiornata su project.poilove.com (screenshot delle novità) | ⬜ Da fare | prima del lancio |
+| OAuth: Facebook (App Review Meta) · Apple ($99/anno) | ⬜ Da fare | prima del lancio |
+| ProductHunt + candidatura Claude for OSS | ⬜ Da fare | col lancio |
 | Lancio pubblico Tirana | 🎯 Obiettivo | 17/08/2026 |
 
 ---
-*Aggiornato: 05/07/2026 mattina · si aggiorna a ogni giro di lavoro*
+*Aggiornato: 05/07/2026 (inventario COMPLETO: raccolto tutto da TODO, SAL e memoria) · si aggiorna a ogni giro di lavoro*
