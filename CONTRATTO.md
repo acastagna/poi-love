@@ -43,7 +43,7 @@ info@321.al · https://321.al
 | Lente esploratore: vista IBRIDA (stradale+satellite 40%+etichette), POI reali dentro il cerchio, zoom ad anello orario/antiorario fino a livello mondo, titolo intelligente | ✅ Fatto e live | 05/07 |
 | Lente: ghiera VISIBILE (48 tacche + segni piu/meno + suggerimento primo uso) e punti di interesse di GOOGLE col voto (OSM riserva) | ✅ Fatto e live | 05/07 |
 | Scheda aperta = zero bottoni flottanti; titolo POI rinominabile in loco; indirizzo mai vuoto; MAI la via/citta come nome (blocco) | ✅ Fatto e live | 05/07 |
-| FAB "+" come elenco azioni (POI / segna luogo / tappa / compagnia), "Sono qui" apre la lente | ⬜ Da fare | prossimi giri |
+| Menu "+": Lente di ingrandimento al primo posto (precaricata, zoom medio-largo), "Sono qui" al secondo | ✅ Fatto e live | 06/07 |
 | POI dentro le liste (openListDetail: aggiungi/rimuovi/riordina) | ⬜ Da fare | prima del lancio |
 | Filtri tag e categoria nel profilo (tocco un tag, vedo solo quelli) | ⬜ Da fare | prossimi giri |
 | Condivisione proprietaria (foglio POI•LOVE unico, mai il menu di sistema, oggi in ~8 punti) | ⬜ Da fare | prima del lancio |
