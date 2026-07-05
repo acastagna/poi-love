@@ -539,6 +539,10 @@ html[data-theme="light"] .chip.green{color:#236b39}
 
     <!-- 2) MODERAZIONE -->
     <section class="section" id="sec-moderation">
+      <div class="panel" style="margin-bottom:16px">
+        <div class="card-h"><span class="ic"><i class="ph-duotone ph-storefront"></i></span><span data-t="own_req_title">Richieste di proprietà POI</span></div>
+        <div id="ownReqTable"></div>
+      </div>
       <div class="panel">
         <div class="card-h"><span class="ic"><i class="ph-duotone ph-shield-check"></i></span><span data-t="moderation_queue">Coda segnalazioni</span></div>
         <div id="modTable"></div>
@@ -780,7 +784,7 @@ const T = {
     // ── Rifiniture pannello ──
     chat_ph:'Scrivi al copilota…',
     chat_stale:'Risposta scartata: nel frattempo hai cambiato chat',
-    rls_no_rows:'Nessuna modifica: permessi mancanti sul database (migrazione 015 non applicata?)',
+    rls_no_rows:'Nessuna modifica: permessi mancanti sul database (migrazione 015 non applicata?)',own_req_title:'Richieste di proprietà POI',own_req_empty:'Nessuna richiesta di proprietà in attesa',own_req_from:'Chiede',own_req_cede:'Cede',own_req_embed:'Copia codice embed',own_req_embed_copied:'Codice embed copiato',a_approve_transfer:'Approva e trasferisci',own_req_confirm:'Approvare? Il POI passerà al richiedente.',own_req_approved:'Proprietà trasferita',own_req_rejected:'Richiesta rifiutata',
     f_coords:'Coordinate', f_address:'Indirizzo', f_city:'Città'
   },
   sq:{
@@ -848,7 +852,7 @@ const T = {
     // ── Rifiniture pannello ──
     chat_ph:'Shkruaji kopilotit…',
     chat_stale:'Përgjigjja u hodh poshtë: ndërkohë ke ndërruar bisedë',
-    rls_no_rows:'Asnjë ndryshim: mungojnë lejet në databazë (migrimi 015 i paaplikuar?)',
+    rls_no_rows:'Asnjë ndryshim: mungojnë lejet në databazë (migrimi 015 i paaplikuar?)',own_req_title:'Kërkesa pronësie POI',own_req_empty:'Asnjë kërkesë pronësie në pritje',own_req_from:'Kërkon',own_req_cede:'Cedon',own_req_embed:'Kopjo kodin embed',own_req_embed_copied:'Kodi embed u kopjua',a_approve_transfer:'Mirato dhe transfero',own_req_confirm:'Të miratohet? POI do t\'i kalojë kërkuesit.',own_req_approved:'Pronësia u transferua',own_req_rejected:'Kërkesa u refuzua',
     f_coords:'Koordinatat', f_address:'Adresa', f_city:'Qyteti'
   },
   en:{
@@ -916,7 +920,7 @@ const T = {
     // ── Panel refinements ──
     chat_ph:'Write to the copilot…',
     chat_stale:'Reply discarded: you switched chat in the meantime',
-    rls_no_rows:'No changes: missing database permissions (migration 015 not applied?)',
+    rls_no_rows:'No changes: missing database permissions (migration 015 not applied?)',own_req_title:'POI ownership requests',own_req_empty:'No pending ownership requests',own_req_from:'Requesting',own_req_cede:'Ceding',own_req_embed:'Copy embed code',own_req_embed_copied:'Embed code copied',a_approve_transfer:'Approve and transfer',own_req_confirm:'Approve? The POI will pass to the requester.',own_req_approved:'Ownership transferred',own_req_rejected:'Request rejected',
     f_coords:'Coordinates', f_address:'Address', f_city:'City'
   }
 };
@@ -1199,16 +1203,68 @@ async function loadLatestUsers(){
 // Badge segnalazioni aperte in sidebar
 async function refreshReportsBadge(){
   try{
-    const { count, error } = await sb.from('reports').select('id',{count:'exact',head:true}).in('status',['open','reviewing']);
-    if(error) return;
+    const [rep2, own] = await Promise.all([
+      sb.from('reports').select('id',{count:'exact',head:true}).in('status',['open','reviewing']),
+      sb.from('poi_ownership_requests').select('id',{count:'exact',head:true}).eq('status','pending')
+    ]);
+    const tot=(rep2.count||0)+((own&&own.count)||0);
     const b=document.getElementById('badgeReports');
-    if(count && count>0){ b.textContent=count>99?'99+':count; b.classList.add('show'); }
+    if(tot>0){ b.textContent=tot>99?'99+':tot; b.classList.add('show'); }
     else { b.classList.remove('show'); }
   }catch(e){}
 }
 
+/* ── ALLARME richieste di proprieta' POI: chi chiede, chi cede, codice embed ── */
+async function loadOwnershipRequests(){
+  const box=document.getElementById('ownReqTable'); loadingBox(box);
+  try{
+    const { data, error } = await sb.from('poi_ownership_requests')
+      .select('id,poi_id,message,embed_code,created_at,requester:profiles!poi_ownership_requests_requester_id_fkey(username),owner:profiles!poi_ownership_requests_owner_id_fkey(username),poi:pois(title)')
+      .eq('status','pending').order('created_at',{ascending:false}).limit(50);
+    if(error){ isBackendMissing(error)?backendOff(box):emptyBox(box,t('error'),null,'warning'); return; }
+    if(!data||!data.length){ emptyBox(box,t('own_req_empty'),null,'storefront'); return; }
+    box.textContent='';
+    data.forEach(r=>{
+      const iframeSnippet='<iframe src="https://poilove.com/?poi='+r.poi_id+'&embed=1" width="360" height="440" style="border:0;border-radius:16px"></iframe>';
+      const row=el('div',{class:'panel',style:'margin-bottom:10px;padding:14px'},[
+        el('div',{style:'display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px'},[
+          el('span',{class:'ttl',text:(r.poi&&r.poi.title)||'POI'}),
+          el('span',{class:'chip gold',text:r.embed_code||''}),
+          el('span',{class:'sm',text:fmtDate(r.created_at)})
+        ]),
+        el('div',{class:'sm',style:'margin-bottom:4px'},[
+          document.createTextNode(t('own_req_from')+': '),
+          el('b',{text:'@'+((r.requester&&r.requester.username)||'?')}),
+          document.createTextNode('  ·  '+t('own_req_cede')+': '),
+          el('b',{text:'@'+((r.owner&&r.owner.username)||'?')})
+        ]),
+        r.message?el('div',{class:'sm',style:'margin-bottom:8px;font-style:italic',text:'"'+r.message+'"'}):null,
+        el('div',{style:'display:flex;align-items:center;gap:8px;flex-wrap:wrap'},[
+          el('button',{class:'btn sm green', onclick:()=>decideOwnership(r.id,true), text:t('a_approve_transfer')}),
+          el('button',{class:'btn sm red', onclick:()=>decideOwnership(r.id,false), text:t('prop_reject')}),
+          el('button',{class:'btn sm', text:t('own_req_embed'), onclick:()=>{
+            navigator.clipboard&&navigator.clipboard.writeText(iframeSnippet).then(()=>toast(t('own_req_embed_copied'),'ok')).catch(()=>{});
+          }})
+        ])
+      ]);
+      box.appendChild(row);
+    });
+  }catch(e){ emptyBox(box,t('error'),null,'warning'); }
+}
+async function decideOwnership(id, approve){
+  if(approve && !confirm(t('own_req_confirm'))) return;
+  try{
+    const { error } = await sb.rpc('decide_poi_ownership',{ p_request:id, p_approve:approve });
+    if(error){ toast(error.message||t('error'),'err'); return; }
+    toast(approve?t('own_req_approved'):t('own_req_rejected'),'ok');
+    loadOwnershipRequests(); refreshReportsBadge();
+    loaded.pois=false; // il POI ha cambiato proprietario
+  }catch(e){ toast(t('error'),'err'); }
+}
+
 /* ═════════════════════════ 2) MODERAZIONE ═════════════════════════ */
 async function loadModeration(){
+  loadOwnershipRequests();
   const box=document.getElementById('modTable'); loadingBox(box);
   try{
     const { data, error } = await sb.from('reports')
