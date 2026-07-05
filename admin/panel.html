@@ -479,6 +479,9 @@ html[data-theme="light"] .chip.green{color:#236b39}
     <div class="nav-item" data-sec="pois" onclick="openSection('pois')">
       <span class="ic"><i class="ph-duotone ph-map-pin-line"></i></span><span class="label" data-t="nav_pois">POI creati</span>
     </div>
+    <div class="nav-item" data-sec="routes" onclick="openSection('routes')">
+      <span class="ic"><i class="ph-duotone ph-path"></i></span><span class="label" data-t="nav_routes">Rotte Storiche</span>
+    </div>
     <div class="nav-item" data-sec="audit" onclick="openSection('audit')">
       <span class="ic"><i class="ph-duotone ph-scroll"></i></span><span class="label" data-t="nav_audit">Audit log</span>
     </div>
@@ -679,7 +682,23 @@ html[data-theme="light"] .chip.green{color:#236b39}
       </div>
     </section>
 
-    <!-- 8) AUDIT LOG -->
+    <!-- 8) ROTTE STORICHE -->
+    <section class="section" id="sec-routes">
+      <div class="panel" style="margin-bottom:16px">
+        <div class="card-h"><span class="ic"><i class="ph-duotone ph-path"></i></span><span data-t="rt_new">Nuova rotta storica</span></div>
+        <div class="row2">
+          <div class="field"><label data-t="f_trip_name">Nome percorso</label><input id="rtName" placeholder="Es. Tirana Storica"></div>
+          <div class="field"><label data-t="f_badge">Badge</label><input id="rtBadge" placeholder="es. Storico, Antico, Sacro…"></div>
+        </div>
+        <div class="btn-row"><button class="btn gold" onclick="createHistoricRoute()" data-t="rt_create">Crea rotta (bozza)</button></div>
+      </div>
+      <div class="panel">
+        <div class="card-h"><span class="ic"><i class="ph-duotone ph-list-bullets"></i></span><span data-t="rt_list">Rotte storiche</span></div>
+        <div id="routesTable"></div>
+      </div>
+    </section>
+
+    <!-- 9) AUDIT LOG -->
     <section class="section" id="sec-audit">
       <div class="panel">
         <div class="card-h"><span class="ic"><i class="ph-duotone ph-scroll"></i></span><span data-t="audit_title">Registro azioni (ultimi 50)</span></div>
@@ -784,7 +803,7 @@ const T = {
     // ── Rifiniture pannello ──
     chat_ph:'Scrivi al copilota…',
     chat_stale:'Risposta scartata: nel frattempo hai cambiato chat',
-    rls_no_rows:'Nessuna modifica: permessi mancanti sul database (migrazione 015 non applicata?)',own_req_title:'Richieste di proprietà POI',own_req_empty:'Nessuna richiesta di proprietà in attesa',own_req_from:'Chiede',own_req_cede:'Cede',own_req_embed:'Copia codice embed',own_req_embed_copied:'Codice embed copiato',a_approve_transfer:'Approva e trasferisci',own_req_confirm:'Approvare? Il POI passerà al richiedente.',own_req_approved:'Proprietà trasferita',own_req_rejected:'Richiesta rifiutata',
+    rls_no_rows:'Nessuna modifica: permessi mancanti sul database (migrazione 015 non applicata?)',own_req_title:'Richieste di proprietà POI',own_req_empty:'Nessuna richiesta di proprietà in attesa',own_req_from:'Chiede',own_req_cede:'Cede',own_req_embed:'Copia codice embed',own_req_embed_copied:'Codice embed copiato',a_approve_transfer:'Approva e trasferisci',own_req_confirm:'Approvare? Il POI passerà al richiedente.',own_req_approved:'Proprietà trasferita',own_req_rejected:'Richiesta rifiutata',nav_routes:'Rotte Storiche',sub_routes:'Crea, pubblica e gestisci le rotte storiche ufficiali.',rt_new:'Nuova rotta storica',rt_create:'Crea rotta (bozza)',rt_list:'Rotte storiche',rt_empty:'Nessuna rotta storica',rt_empty_h:'Creane una qui sopra o falla proporre al copilota.',rt_published:'Pubblicata',rt_publish:'Pubblica',rt_unpublish:'Nascondi',rt_stops_btn:'Tappe',rt_confirm_del:'Eliminare questa rotta e tutte le sue tappe?',
     f_coords:'Coordinate', f_address:'Indirizzo', f_city:'Città'
   },
   sq:{
@@ -852,7 +871,7 @@ const T = {
     // ── Rifiniture pannello ──
     chat_ph:'Shkruaji kopilotit…',
     chat_stale:'Përgjigjja u hodh poshtë: ndërkohë ke ndërruar bisedë',
-    rls_no_rows:'Asnjë ndryshim: mungojnë lejet në databazë (migrimi 015 i paaplikuar?)',own_req_title:'Kërkesa pronësie POI',own_req_empty:'Asnjë kërkesë pronësie në pritje',own_req_from:'Kërkon',own_req_cede:'Cedon',own_req_embed:'Kopjo kodin embed',own_req_embed_copied:'Kodi embed u kopjua',a_approve_transfer:'Mirato dhe transfero',own_req_confirm:'Të miratohet? POI do t\'i kalojë kërkuesit.',own_req_approved:'Pronësia u transferua',own_req_rejected:'Kërkesa u refuzua',
+    rls_no_rows:'Asnjë ndryshim: mungojnë lejet në databazë (migrimi 015 i paaplikuar?)',own_req_title:'Kërkesa pronësie POI',own_req_empty:'Asnjë kërkesë pronësie në pritje',own_req_from:'Kërkon',own_req_cede:'Cedon',own_req_embed:'Kopjo kodin embed',own_req_embed_copied:'Kodi embed u kopjua',a_approve_transfer:'Mirato dhe transfero',own_req_confirm:'Të miratohet? POI do t\'i kalojë kërkuesit.',own_req_approved:'Pronësia u transferua',own_req_rejected:'Kërkesa u refuzua',nav_routes:'Rrugët Historike',sub_routes:'Krijo, boto dhe menaxho rrugët historike zyrtare.',rt_new:'Rrugë e re historike',rt_create:'Krijo rrugën (draft)',rt_list:'Rrugët historike',rt_empty:'Asnjë rrugë historike',rt_empty_h:'Krijo një këtu sipër ose lëre kopilotin ta propozojë.',rt_published:'E botuar',rt_publish:'Boto',rt_unpublish:'Fshih',rt_stops_btn:'Ndalesat',rt_confirm_del:'Të fshihet kjo rrugë me të gjitha ndalesat?',
     f_coords:'Koordinatat', f_address:'Adresa', f_city:'Qyteti'
   },
   en:{
@@ -920,7 +939,7 @@ const T = {
     // ── Panel refinements ──
     chat_ph:'Write to the copilot…',
     chat_stale:'Reply discarded: you switched chat in the meantime',
-    rls_no_rows:'No changes: missing database permissions (migration 015 not applied?)',own_req_title:'POI ownership requests',own_req_empty:'No pending ownership requests',own_req_from:'Requesting',own_req_cede:'Ceding',own_req_embed:'Copy embed code',own_req_embed_copied:'Embed code copied',a_approve_transfer:'Approve and transfer',own_req_confirm:'Approve? The POI will pass to the requester.',own_req_approved:'Ownership transferred',own_req_rejected:'Request rejected',
+    rls_no_rows:'No changes: missing database permissions (migration 015 not applied?)',own_req_title:'POI ownership requests',own_req_empty:'No pending ownership requests',own_req_from:'Requesting',own_req_cede:'Ceding',own_req_embed:'Copy embed code',own_req_embed_copied:'Embed code copied',a_approve_transfer:'Approve and transfer',own_req_confirm:'Approve? The POI will pass to the requester.',own_req_approved:'Ownership transferred',own_req_rejected:'Request rejected',nav_routes:'Historic Routes',sub_routes:'Create, publish and manage official historic routes.',rt_new:'New historic route',rt_create:'Create route (draft)',rt_list:'Historic routes',rt_empty:'No historic routes',rt_empty_h:'Create one above or have the copilot propose it.',rt_published:'Published',rt_publish:'Publish',rt_unpublish:'Hide',rt_stops_btn:'Stops',rt_confirm_del:'Delete this route and all its stops?',
     f_coords:'Coordinates', f_address:'Address', f_city:'City'
   }
 };
@@ -1100,9 +1119,9 @@ async function doLogout(){
 
 /* ─────────────────────────── Navigazione sezioni (lazy) ─────────────────────────── */
 const SUBKEY = { dashboard:'sub_dashboard', moderation:'sub_moderation', users:'sub_users',
-  ailimits:'sub_ailimits', copilot:'sub_copilot', create:'sub_create', pois:'sub_pois', audit:'sub_audit' };
+  ailimits:'sub_ailimits', copilot:'sub_copilot', create:'sub_create', pois:'sub_pois', routes:'sub_routes', audit:'sub_audit' };
 const TITLEKEY = { dashboard:'nav_dashboard', moderation:'nav_moderation', users:'nav_users',
-  ailimits:'nav_ailimits', copilot:'nav_copilot', create:'nav_create', pois:'nav_pois', audit:'nav_audit' };
+  ailimits:'nav_ailimits', copilot:'nav_copilot', create:'nav_create', pois:'nav_pois', routes:'nav_routes', audit:'nav_audit' };
 
 function updateHeader(sec){
   document.getElementById('secTitle').textContent = t(TITLEKEY[sec]);
@@ -1127,6 +1146,7 @@ function runSection(sec){
     case 'copilot': initCopilot(); break;
     case 'create': initCreate(); break;
     case 'pois': loadPois(); break;
+    case 'routes': loadRoutesAdmin(); break;
     case 'audit': loadAudit(); break;
   }
 }
@@ -2153,6 +2173,102 @@ async function deletePoi(id, title){
     await logAudit('poi_delete','poi',id,{ title });
     toast(t('poi_deleted'),'ok'); reloadPois();
   }catch(e){ toast(t('error'),'err'); }
+}
+
+/* ═════════════════════════ 8) ROTTE STORICHE ═════════════════════════
+   Crea (bozza), pubblica/nascondi, rinomina, gestisci tappe, elimina.
+   Le policy admin (mig 021) coprono tutte le rotte, non solo le proprie. */
+async function createHistoricRoute(){
+  const name=(document.getElementById('rtName').value||'').trim();
+  const badge=(document.getElementById('rtBadge').value||'').trim();
+  if(!name){ toast(t('fill_required'),'err'); return; }
+  try{
+    const { data, error } = await sb.from('trips')
+      .insert({ owner_id:ME.id, name:name.slice(0,120), badge:badge||null, is_historic:true, is_published:false })
+      .select('id').single();
+    if(error){ toast(error.message||t('error'),'err'); return; }
+    await logAudit('route_create','trip',data.id,{ name });
+    toast(t('saved'),'ok');
+    document.getElementById('rtName').value=''; document.getElementById('rtBadge').value='';
+    loadRoutesAdmin();
+  }catch(e){ toast(t('error'),'err'); }
+}
+async function loadRoutesAdmin(){
+  const box=document.getElementById('routesTable'); loadingBox(box);
+  try{
+    const { data, error } = await sb.from('trips')
+      .select('id,name,badge,is_published,created_at,trip_stops(id,name,lat,lng,sort_order)')
+      .eq('is_historic',true).order('created_at',{ascending:false}).limit(100);
+    if(error){ isBackendMissing(error)?backendOff(box):emptyBox(box,t('error'),null,'warning'); return; }
+    if(!data||!data.length){ emptyBox(box,t('rt_empty'),t('rt_empty_h'),'path'); return; }
+    box.textContent='';
+    data.forEach(r=>{
+      const stops=(r.trip_stops||[]).sort((a,b)=>(a.sort_order||0)-(b.sort_order||0));
+      const head=el('div',{style:'display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px'},[
+        el('span',{class:'ttl',text:r.name}),
+        r.badge?el('span',{class:'chip dim',text:r.badge}):null,
+        el('span',{class:'chip '+(r.is_published?'green':'gold'),text:r.is_published?t('rt_published'):t('st_draft')}),
+        el('span',{class:'sm',text:stops.length+' '+t('f_stops')})
+      ]);
+      const stopsBox=el('div',{style:'display:none;margin:6px 0 10px'});
+      stops.forEach(st=>{
+        stopsBox.appendChild(el('div',{style:'display:flex;align-items:center;gap:8px;padding:4px 0;font-size:12.5px'},[
+          el('span',{class:'sm',text:(st.sort_order+1)+'.'}),
+          el('span',{style:'flex:1',text:st.name+(st.lat!=null?('  ('+Number(st.lat).toFixed(4)+', '+Number(st.lng).toFixed(4)+')'):'')}),
+          el('button',{class:'icon-btn',title:t('a_delete'),onclick:async()=>{
+            const { data:d2, error:e2 } = await sb.from('trip_stops').delete().eq('id',st.id).select('id');
+            if(e2||!d2||!d2.length){ toast(t('error'),'err'); return; }
+            toast(t('saved'),'ok'); loadRoutesAdmin();
+          }}, phIcon('trash'))
+        ]));
+      });
+      // aggiunta tappa: nome + lat + lng
+      const addRow=el('div',{style:'display:flex;gap:6px;margin-top:6px;flex-wrap:wrap'});
+      const inN=el('input',{placeholder:t('stop_name'),style:'flex:2;min-width:120px'});
+      const inLa=el('input',{placeholder:'Lat',inputmode:'decimal',style:'flex:1;min-width:80px'});
+      const inLo=el('input',{placeholder:'Lng',inputmode:'decimal',style:'flex:1;min-width:80px'});
+      addRow.appendChild(inN); addRow.appendChild(inLa); addRow.appendChild(inLo);
+      addRow.appendChild(el('button',{class:'btn sm',text:t('add_stop'),onclick:async()=>{
+        const nm=(inN.value||'').trim(); if(!nm){ toast(t('fill_required'),'err'); return; }
+        const la=parseFloat(inLa.value), lo=parseFloat(inLo.value);
+        const { error:e3 } = await sb.from('trip_stops').insert({ trip_id:r.id, name:nm.slice(0,120),
+          lat:Number.isFinite(la)?la:null, lng:Number.isFinite(lo)?lo:null, sort_order:stops.length, status:'planned' });
+        if(e3){ toast(e3.message||t('error'),'err'); return; }
+        toast(t('saved'),'ok'); loadRoutesAdmin();
+      }}));
+      stopsBox.appendChild(addRow);
+
+      const actions=el('div',{class:'btn-row'},[
+        el('button',{class:'btn sm '+(r.is_published?'':'green'),text:r.is_published?t('rt_unpublish'):t('rt_publish'),onclick:async()=>{
+          const { data:d4, error:e4 } = await sb.from('trips').update({ is_published:!r.is_published }).eq('id',r.id).select('id');
+          if(e4||!d4||!d4.length){ toast(t('rls_no_rows'),'err'); return; }
+          await logAudit(r.is_published?'route_unpublish':'route_publish','trip',r.id,{ name:r.name });
+          toast(t('saved'),'ok'); loadRoutesAdmin();
+        }}),
+        el('button',{class:'btn sm',text:t('rt_stops_btn'),onclick:()=>{ stopsBox.style.display=stopsBox.style.display==='none'?'block':'none'; }}),
+        el('button',{class:'btn sm gold',text:t('a_edit'),onclick:()=>{
+          const f={};
+          const body=el('div');
+          body.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_trip_name')}), f.name=el('input',{value:r.name}) ]));
+          body.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_badge')}), f.badge=el('input',{value:r.badge||''}) ]));
+          openModal(t('a_edit'),'path',body,async()=>{
+            const nm=(f.name.value||'').trim(); if(!nm){ toast(t('fill_required'),'err'); return false; }
+            const { data:d5, error:e5 } = await sb.from('trips').update({ name:nm.slice(0,120), badge:(f.badge.value||'').trim()||null }).eq('id',r.id).select('id');
+            if(e5||!d5||!d5.length){ toast(t('rls_no_rows'),'err'); return false; }
+            toast(t('saved'),'ok'); loadRoutesAdmin(); return true;
+          });
+        }}),
+        el('button',{class:'btn sm red',text:t('a_delete'),onclick:async()=>{
+          if(!confirm(t('rt_confirm_del'))) return;
+          const { data:d6, error:e6 } = await sb.from('trips').delete().eq('id',r.id).select('id');
+          if(e6||!d6||!d6.length){ toast(t('rls_no_rows'),'err'); return; }
+          await logAudit('route_delete','trip',r.id,{ name:r.name });
+          toast(t('saved'),'ok'); loadRoutesAdmin();
+        }})
+      ]);
+      box.appendChild(el('div',{class:'panel',style:'margin-bottom:10px;padding:14px'},[head,stopsBox,actions]));
+    });
+  }catch(e){ emptyBox(box,t('error'),null,'warning'); }
 }
 
 /* Modal generico: titolo, icona, corpo (nodo DOM), onSave opzionale (true/Promise<true> per chiudere). */
