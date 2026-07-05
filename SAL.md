@@ -28,6 +28,7 @@ Feedback di Alessandro dal collaudo live (aeroporto di Tirana). Commit `33bb50f`
 - **Titoli nella lingua dell'app**: il titolo intelligente ora sceglie name:it / name:sq / name:en da OSM in base alla lingua, e tra i candidati vince chi HA il nome tradotto. Verificato in browser: "Lahuta · Aeroporto Internazionale di Tirana Madre Teresa" (prima usciva in inglese).
 - **Tendina sul campo NOME rimossa (deprecata per regola del founder)**: le scelte a tendina esistono SOLO sull'indirizzo (ricerca manuale). Era la causa dei suggerimenti folli dal Kosovo: il prefill "Lahuta" riapriva la ricerca Nominatim globale. onNameInput ridotta a validazione, markup e handler eliminati.
 - **suggestPoiName** ora propone il titolo contestuale intelligente come prima scelta (non piu la prima parola secca), nomi vicini solo come ripiego; categoria sempre dal tipo OSM.
+- **Mini-mappa del punto POI (commit successivo, LIVE)**: nello sheet "Salva questo posto", tra i riferimenti del luogo e le foto, mappa interattiva larga tutta (180px mobile / 230px desktop), pallino rosso brand, pinch-zoom e trascinamento; appare quando c'e una posizione reale, si nasconde su nuovo POI, segue anche il flusso modifica. Verificata in browser (tile+marker+show/hide).
 - **CONTRATTO.md creato**: la traccia madre chiesta da Alessandro, ogni passo per settore con stato e tempistiche, da aggiornare a ogni giro insieme a SAL e TODO.
 
 ## Sessione 28/06/2026 (sera e notte) — ILLI, Itinerari, profilo, fix vari + TODO riscritto

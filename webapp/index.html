@@ -789,6 +789,10 @@ body::after{content:'';position:fixed;inset:0;z-index:99999;pointer-events:none;
 /* PHOTOS */
 .photo-row{display:flex;gap:10px;margin-bottom:14px}
 /* Mobile: 3 slot uguali in una riga */
+/* Mini-mappa del punto POI: larga tutto, alta come le foto, pizzica per zoomare */
+.loc-minimap{display:none;width:100%;height:180px;border-radius:16px;border:1.5px solid #C8BFB0;margin:10px 0 2px;overflow:hidden;position:relative;z-index:0;background:#f5f0e8}
+.loc-minimap.show{display:block}
+@media(min-width:900px){.loc-minimap{height:230px}}
 .photo-slot{flex:1;aspect-ratio:1;border-radius:16px;background:#f5f0e8;border:1.5px dashed #C8BFB0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;font-size:20px;transition:all .2s;color:var(--muted);overflow:hidden;position:relative}
 /* Desktop: cornice 350×350 px */
 @media(min-width:480px){
@@ -2511,6 +2515,9 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
         <span id="locNameHintTxt" style="flex:1;font-size:11px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
         <button class="loc-hint-accept" onclick="useDetectedName()">Usa come nome</button>
       </div>
+
+      <!-- Mini-mappa: il punto preciso del POI, zoomabile con le dita -->
+      <div class="loc-minimap" id="locMiniMap"></div>
 
       <!-- FOTO -->
       <div class="sec-lbl"><span data-t="lbl_photos">Foto</span></div>
@@ -5254,7 +5261,32 @@ let _photoFromCamera=false;   // true se l'ultima foto arriva dall'input Fotocam
 // Registra la posizione corrente; se il form e aperto col nome vuoto avvia il suggerimento automatico
 function setCurrentLoc(lat,lng,src){
   currentLocLatLng={lat:lat,lng:lng,src:src||'gps'};
+  updateLocMiniMap(lat,lng);
   _maybeAutoSuggestName();
+}
+
+/* Mini-mappa del punto POI nello sheet "Salva questo posto".
+   Istanza Leaflet propria (lazy), marker a pallino rosso brand (niente
+   immagini esterne), pizzica per zoomare e trascina per esplorare. */
+let _miniMap=null,_miniMarker=null;
+function updateLocMiniMap(lat,lng){
+  const el=document.getElementById('locMiniMap');
+  if(!el||typeof L==='undefined'||!Number.isFinite(lat)||!Number.isFinite(lng)) return;
+  el.classList.add('show');
+  if(!_miniMap){
+    _miniMap=L.map(el,{zoomControl:false,attributionControl:false,scrollWheelZoom:false,tap:false});
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(_miniMap);
+  }
+  if(_miniMarker){ _miniMarker.setLatLng([lat,lng]); }
+  else{
+    _miniMarker=L.circleMarker([lat,lng],{radius:9,color:'#fff',weight:3,fillColor:'#D42B2B',fillOpacity:1}).addTo(_miniMap);
+  }
+  // Il contenitore era display:none: Leaflet deve ricalcolare le misure prima del setView
+  setTimeout(()=>{ try{ _miniMap.invalidateSize(); _miniMap.setView([lat,lng],17); }catch(e){} },60);
+}
+function hideLocMiniMap(){
+  const el=document.getElementById('locMiniMap');
+  if(el) el.classList.remove('show');
 }
 function _maybeAutoSuggestName(){
   if(_autoNameSuggested) return;
@@ -7588,6 +7620,7 @@ function openAddPOI(){
   if(window.innerWidth>=1024) document.body.classList.add('addpoi-open');
   // Reset posizione: niente coordinate ereditate da POI precedenti o placeholder
   currentLocLatLng=null;
+  hideLocMiniMap();
   _autoNameSuggested=false;
   document.getElementById('locCoords').textContent=t('loc_not_set','Posizione non impostata');
   document.getElementById('locStreet').textContent='';
@@ -8820,7 +8853,7 @@ async function savePOI(){
         ?`<i class="ph-duotone ph-camera"></i><span class="slot-lbl">Principale</span>`
         :`<i class="ph-duotone ph-plus"></i><span class="slot-lbl">Foto ${i+1}</span>`;}
     });
-    exifSuggestedName=''; exifCache=null; currentLocLatLng=null;
+    exifSuggestedName=''; exifCache=null; currentLocLatLng=null; hideLocMiniMap();
     window._unsplashSlots={};
     return;
   }
@@ -8874,7 +8907,7 @@ async function savePOI(){
   document.getElementById('locHint')?.classList.remove('show');
   const locNameEl=document.getElementById('locName');
   if(locNameEl)locNameEl.style.display='none';
-  exifSuggestedName=''; exifCache=null; currentLocLatLng=null;
+  exifSuggestedName=''; exifCache=null; currentLocLatLng=null; hideLocMiniMap();
   window._unsplashSlots={}; // reset URL Unsplash scelti
   // Apri modal congratulazioni dopo breve ritardo (attendi chiusura sheet)
   setTimeout(()=>openSaveModal(name,lat2,lng2,sec),320);
@@ -9460,6 +9493,7 @@ function openEditPOI(){
     // Coordinate del POI in modifica: diventano la posizione attiva (assegnazione diretta, niente auto-suggest)
     if(currentPOI.lat&&currentPOI.lng){
       currentLocLatLng={lat:currentPOI.lat,lng:currentPOI.lng,src:'map'};
+      updateLocMiniMap(currentPOI.lat,currentPOI.lng);
       document.getElementById('locCoords').textContent=`${currentPOI.lat.toFixed(6)}, ${currentPOI.lng.toFixed(6)}`;
       document.getElementById('locResult').classList.add('show');
       if(map) map.setView([currentPOI.lat,currentPOI.lng],16);
