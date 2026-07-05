@@ -39,8 +39,8 @@ info@321.al · https://321.al
 | Ricerca indirizzo più intelligente (errori di battitura + contesto città) | 🔶 In parte (Albania-first fatto) | da rifinire |
 | Tassonomia POI a 3 livelli: categoria ricca curata + luogo personale privato + tag autocomplete (memoria `poi_taxonomy_plan`) | ⬜ Studiato, da fare (FASE A client, FASE B DB) | prima del lancio |
 | Categorie autoaggiornanti per analisi della richiesta (data-driven, con curation admin) | ⬜ Studiato, da fare | dopo tassonomia |
-| Lente: "Tocca mappa" apre la lente senza resettare i campi scritti | ⬜ Da fare | prossimi giri |
-| Lente che intercetta i POI reali vicini (DB POI•LOVE + OSM + Google) | ⬜ Da fare (pezzo grosso) | prima del lancio |
+| Lente: "Tocca mappa" apre la lente senza resettare i campi scritti ("Usa questo punto") | ✅ Fatto e live | 05/07 |
+| Lente esploratore: vista IBRIDA (stradale+satellite 40%+etichette), POI reali dentro il cerchio, zoom ad anello orario/antiorario fino a livello mondo, titolo intelligente | ✅ Fatto e live | 05/07 |
 | FAB "+" come elenco azioni (POI / segna luogo / tappa / compagnia), "Sono qui" apre la lente | ⬜ Da fare | prossimi giri |
 | POI dentro le liste (openListDetail: aggiungi/rimuovi/riordina) | ⬜ Da fare | prima del lancio |
 | Filtri tag e categoria nel profilo (tocco un tag, vedo solo quelli) | ⬜ Da fare | prossimi giri |
