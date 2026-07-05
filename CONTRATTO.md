@@ -28,6 +28,8 @@ info@321.al · https://321.al
 | Tendina rimossa dal campo nome (resta solo sull'indirizzo) | ✅ Fatto e live | 05/07 |
 | Descrizione AI dai dati reali, mai cancellare gli appunti | ✅ Fatto e live | 04/07 |
 | Mini-mappa del punto POI nello sheet (zoom con le dita) | ✅ Fatto e live | 05/07 |
+| Mini-mappa come strumento: mirino + "Fissa il punto" prende i riferimenti | ✅ Fatto e live | 05/07 |
+| Versione visibile anche nel footer nero della mappa | ✅ Fatto e live | 05/07 |
 | Descrizione 200 caratteri nella fascia rossa del dettaglio POI | ⬜ Da fare | prossimo giro |
 | Immagini licenziate del luogo (Wikimedia, con attribuzione) | ⬜ Da fare | prossimo giro |
 | Ricerca indirizzo più intelligente (errori di battitura + contesto città) | 🔶 In parte (Albania-first fatto) | da rifinire |
