@@ -32,6 +32,8 @@ info@321.al · https://321.al
 | Mini-mappa come strumento: mirino + "Fissa il punto" prende i riferimenti | ✅ Fatto e live | 05/07 |
 | Versione visibile anche nel footer nero della mappa | ✅ Fatto e live | 05/07 |
 | Scheda POI senza slot foto vuoti: + nel cerchio, foto a larghezza adattiva (1=100%, 2=50/50, 3=33x3) | ✅ Fatto e live | 05/07 |
+| Titoli che dicono COS'È (tipo + nome + contesto, in lingua) | ✅ Fatto e live | 05/07 |
+| Descrizioni AI sui FATTI (OSM+Wikipedia+Google: cosa/costi/come funziona, vietate le frasi vuote) | ✅ Fatto e live, da collaudare con login | 05/07 |
 | Descrizione 200 caratteri nella fascia rossa del dettaglio POI | ⬜ Da fare | prossimo giro |
 | Immagini licenziate del luogo (Wikimedia, con attribuzione) | ⬜ Da fare | prossimo giro |
 | Ricerca indirizzo più intelligente (errori di battitura + contesto città) | 🔶 In parte (Albania-first fatto) | da rifinire |
