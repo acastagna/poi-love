@@ -16,6 +16,7 @@ info@321.al · https://321.al
 3. Niente trattini lunghi nei testi. Chiavi e segreti solo lato server. Passi atomici e reversibili.
 4. Le tendine di scelta esistono SOLO sul campo indirizzo (ricerca manuale). I titoli li propone il sistema.
 5. Ogni sessione chiude con: commit, tag se importante, SAL aggiornato, questo contratto aggiornato.
+6. **Ogni passata pubblicata fa crescere la versione di 0.01** (costante APP_VERSION nella webapp, visibile nei footer). Il numero racconta quanta strada abbiamo fatto.
 
 ## Stato per settore
 
