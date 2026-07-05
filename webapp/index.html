@@ -5273,7 +5273,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='2.01';
+const APP_VERSION='2.02';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 console.info('POI•LOVE v'+APP_VERSION);
 
@@ -5685,10 +5685,46 @@ async function _realNamesNear(lat,lng){
     if(plat==null||plng==null) continue;
     const k=nm.toLowerCase().trim();
     if(seen.has(k)) continue; seen.add(k);
-    out.push({name:nm, type:(tg.amenity||tg.shop||tg.tourism||tg.leisure||tg.craft||''), distM:Math.round(haversineKm(lat,lng,plat,plng)*1000)});
+    // tags completi: servono alla descrizione AI (orari, cucina, costi, servizi)
+    out.push({name:nm, type:(tg.amenity||tg.shop||tg.tourism||tg.leisure||tg.craft||''), tags:tg, distM:Math.round(haversineKm(lat,lng,plat,plng)*1000)});
   }
   out.sort((a,b)=>a.distM-b.distM);
   return out.slice(0,8);
+}
+
+// Etichetta leggibile del tipo OSM nella lingua dell'app: dice COS'E' il posto.
+const _TYPE_LABELS={
+  lounge:{it:'Lounge',sq:'Lounge',en:'Lounge'},
+  restaurant:{it:'Ristorante',sq:'Restorant',en:'Restaurant'},
+  cafe:{it:'Caffè',sq:'Kafene',en:'Café'},
+  bar:{it:'Bar',sq:'Bar',en:'Bar'},
+  pub:{it:'Pub',sq:'Pub',en:'Pub'},
+  fast_food:{it:'Fast food',sq:'Fast food',en:'Fast food'},
+  bakery:{it:'Panificio',sq:'Furrë buke',en:'Bakery'},
+  ice_cream:{it:'Gelateria',sq:'Akullore',en:'Ice cream shop'},
+  hotel:{it:'Hotel',sq:'Hotel',en:'Hotel'},
+  guest_house:{it:'Guest house',sq:'Bujtinë',en:'Guest house'},
+  hostel:{it:'Ostello',sq:'Hostel',en:'Hostel'},
+  museum:{it:'Museo',sq:'Muze',en:'Museum'},
+  gallery:{it:'Galleria',sq:'Galeri',en:'Gallery'},
+  attraction:{it:'Attrazione',sq:'Atraksion',en:'Attraction'},
+  viewpoint:{it:'Punto panoramico',sq:'Pikë panoramike',en:'Viewpoint'},
+  pharmacy:{it:'Farmacia',sq:'Farmaci',en:'Pharmacy'},
+  hospital:{it:'Ospedale',sq:'Spital',en:'Hospital'},
+  supermarket:{it:'Supermercato',sq:'Supermarket',en:'Supermarket'},
+  mall:{it:'Centro commerciale',sq:'Qendër tregtare',en:'Mall'},
+  park:{it:'Parco',sq:'Park',en:'Park'},
+  beach:{it:'Spiaggia',sq:'Plazh',en:'Beach'},
+  spa:{it:'Spa',sq:'Spa',en:'Spa'},
+  gym:{it:'Palestra',sq:'Palestër',en:'Gym'},
+  cinema:{it:'Cinema',sq:'Kinema',en:'Cinema'},
+  theatre:{it:'Teatro',sq:'Teatër',en:'Theatre'},
+  library:{it:'Biblioteca',sq:'Bibliotekë',en:'Library'},
+  marketplace:{it:'Mercato',sq:'Treg',en:'Market'},
+};
+function _osmTypeLabel(type){
+  const e=_TYPE_LABELS[String(type||'').toLowerCase()];
+  return e?(e[lang]||e.it):'';
 }
 // Cache dell'ultima ricerca di nomi reali: riusata da aiSummarize senza nuove fetch bloccanti
 let _realNearCache=null; // { lat, lng, list }
@@ -5738,7 +5774,7 @@ async function _smartPlaceTitle(lat,lng){
     const plng=el.lon ?? (el.center&&el.center.lon);
     if(plat==null||plng==null) continue;
     const d=haversineKm(lat,lng,plat,plng)*1000;
-    const cand={name:nm,d,hasLoc:!!loc};
+    const cand={name:nm,d,hasLoc:!!loc,type:(tg.amenity||tg.shop||tg.tourism||tg.leisure||tg.aeroway||'')};
     const better=(a,b)=>!b || (a.hasLoc&&!b.hasLoc) || (a.hasLoc===b.hasLoc&&a.d<b.d);
     if(_isBigVenue(tg)){
       if(better(cand,big)) big=cand;
@@ -5747,10 +5783,21 @@ async function _smartPlaceTitle(lat,lng){
     }
   }
   if(small&&big&&small.name.toLowerCase()===big.name.toLowerCase()) small=null;
-  if(small&&big) return `${small.name} · ${big.name}`;
+  // Il titolo dice COS'E': "Lounge Lahuta", non solo "Lahuta". Il prefisso di tipo
+  // si aggiunge solo se il nome non contiene gia una parola di tipo (Pizzeria, Bar...).
+  const smallTitle=small?_withTypeLabel(small.name,small.type):null;
+  if(small&&big) return `${smallTitle} · ${big.name}`;
   if(big) return `${t('inside_prefix','Interno')} ${big.name}`;
-  if(small) return small.name;
+  if(small) return smallTitle;
   return null;
+}
+// Parole di tipo gia "dentro" ai nomi dei locali: se presenti, niente prefisso doppione
+const _TYPE_WORDS=/\b(pizzeria|trattoria|osteria|ristorante|restorant|restaurant|bar|caff[eè]|cafe|kafene|pub|hotel|hostel|ostello|bujtin[eë]|museo|muze|museum|lounge|spa|parco|park|teatro|teat[eë]r|theatre|cinema|kinema|farmacia|farmaci|pharmacy|supermercato|supermarket|mercato|treg|market|galleria|galeri|gallery|spiaggia|plazh|beach|palestra|gym|biblioteca|bibliotek[eë]|library|bakery|panificio|gelateria)\b/i;
+function _withTypeLabel(name,type){
+  const label=_osmTypeLabel(type);
+  if(!label) return name;
+  if(_TYPE_WORDS.test(name)) return name;
+  return label+' '+name;
 }
 // Mappa il tipo OSM (amenity/shop/tourism...) su una categoria del form
 function _osmTypeToCat(tp){
@@ -5822,6 +5869,71 @@ async function suggestPoiName(auto){
    AI SUMMARIZE — descrizione dai DATI REALI del form.
    Se l'utente ha gia scritto appunti (anche brevi), li arricchisce: MAI cancellarli.
 ══════════════════════════════════════════ */
+
+// Estratto Wikipedia del luogo (CORS aperto con origin=*), lingua app poi inglese. 3.5s a tentativo.
+async function _wikiFacts(query){
+  for(const l of [lang,'en']){
+    try{
+      const u=`https://${l}.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&prop=extracts&exintro=1&explaintext=1&generator=search&gsrlimit=1&gsrsearch=${encodeURIComponent(query)}`;
+      const r=await fetch(u,{signal:AbortSignal.timeout(3500)});
+      if(!r.ok) continue;
+      const d=await r.json();
+      const pages=d?.query?.pages; if(!pages) continue;
+      const first=Object.values(pages)[0];
+      const ex=(first?.extract||'').trim();
+      if(ex.length>60) return ex.slice(0,400);
+    }catch(e){ /* lingua successiva */ }
+  }
+  return null;
+}
+
+// Raccoglie i FATTI VERI del posto per la descrizione: tag OSM (orari, cucina,
+// costi, servizi), contesto (dentro quale struttura), Wikipedia, voti Google.
+async function _gatherPoiFacts(placeName,address){
+  const facts=[];
+  if(placeName) facts.push(`- Nome: "${placeName}"`);
+  if(address&&address!=='…') facts.push(`- Indirizzo/zona: ${address}`);
+  const lat=currentLocLatLng?currentLocLatLng.lat:null, lng=currentLocLatLng?currentLocLatLng.lng:null;
+
+  // 1) Tag OSM del locale (dalla cache o al volo)
+  let match=null;
+  if(_realNearCache&&_realNearCache.list&&_realNearCache.list.length){
+    match=placeName?_realNearCache.list.find(p=>placeName.toLowerCase().includes(p.name.toLowerCase())||p.name.toLowerCase().includes(placeName.toLowerCase().split(' · ')[0])):null;
+    match=match||_realNearCache.list[0];
+  } else if(lat!=null){
+    try{ const fresh=await _realNamesNear(lat,lng); if(fresh&&fresh.length){ _realNearCache={lat,lng,list:fresh}; match=fresh[0]; } }catch(e){}
+  }
+  if(match){
+    const tg=match.tags||{};
+    const label=_osmTypeLabel(match.type)||match.type;
+    if(label) facts.push(`- Cos'e (OpenStreetMap): ${label}`);
+    const interesting={cuisine:'Cucina',opening_hours:'Orari',fee:'Ingresso a pagamento',charge:'Costo',stars:'Stelle',brand:'Catena',
+      internet_access:'Wi-Fi',outdoor_seating:'Tavoli all\'aperto',takeaway:'Asporto',delivery:'Consegna',wheelchair:'Accesso disabili',
+      phone:'Telefono',website:'Sito'};
+    for(const k in interesting){ if(tg[k]) facts.push(`- ${interesting[k]}: ${tg[k]}`); }
+  }
+
+  // 2) Contesto: dentro quale struttura siamo (aeroporto, centro commerciale...)
+  let wikiQuery=placeName||'';
+  if(lat!=null){
+    try{
+      const smart=await _smartPlaceTitle(lat,lng);
+      if(smart&&smart.includes(' · ')) { const bigN=smart.split(' · ').pop(); facts.push(`- Si trova dentro: ${bigN}`); wikiQuery=wikiQuery||bigN; }
+    }catch(e){}
+  }
+
+  // 3) Wikipedia (posti noti) e 4) Google (voto, prezzo, aperto) in parallelo
+  const cityPart=(address||'').split(',').map(s=>s.trim()).filter(Boolean).slice(-2,-1)[0]||'';
+  const [wiki,goog]=await Promise.all([
+    wikiQuery?_wikiFacts(`${wikiQuery} ${cityPart}`.trim()).catch(()=>null):Promise.resolve(null),
+    (placeName&&lat!=null)?_enrichPlace({name:placeName.split(' · ')[0],lat,lng}).catch(()=>({})):Promise.resolve({})
+  ]);
+  if(wiki) facts.push(`- Wikipedia: ${wiki}`);
+  if(goog&&goog.rating) facts.push(`- Google: voto ${goog.rating}${goog.reviews?` (${goog.reviews} recensioni)`:''}${goog.priceLevel?`, fascia prezzo ${'€'.repeat(goog.priceLevel)}`:''}${goog.openNow===true?', aperto ora':goog.openNow===false?', chiuso ora':''}`);
+  if(goog&&goog.desc) facts.push(`- Descrizione Google: ${String(goog.desc).slice(0,200)}`);
+  return facts;
+}
+
 async function aiSummarize(){
   const ta=document.getElementById('storyIn');
   const nameIn=document.getElementById('poiNameIn');
@@ -5829,12 +5941,6 @@ async function aiSummarize(){
   const placeName=nameIn?.value.trim()||'';
   const address=(document.getElementById('locStreet')?.textContent||'').trim();
   const coordsStr=currentLocLatLng?`${currentLocLatLng.lat.toFixed(5)}, ${currentLocLatLng.lng.toFixed(5)}`:'';
-  // Tipo OSM dalla cache dei nomi reali (nessuna nuova fetch bloccante)
-  let osmType='';
-  if(_realNearCache&&_realNearCache.list&&_realNearCache.list.length){
-    const match=placeName?_realNearCache.list.find(p=>p.name.toLowerCase()===placeName.toLowerCase()):null;
-    osmType=(match||_realNearCache.list[0]).type||'';
-  }
   // Testo utente presente (anche 5 caratteri) = arricchire, mai sovrascrivere ignorandolo
   const isGenerate=existingText.length===0;
   const btnEl=document.getElementById('aiSumBtn');
@@ -5842,40 +5948,49 @@ async function aiSummarize(){
 
   const langLabel=lang==='it'?'italiano':lang==='sq'?'albanese':'English';
   const cats=Array.from(document.querySelectorAll('#addPoiSheet .chip.sel')).map(c=>c.textContent.trim()).join(', ');
-  const facts=[
-    placeName?`- Nome: "${placeName}"`:null,
-    address&&address!=='…'?`- Indirizzo/zona: ${address}`:null,
-    coordsStr?`- Coordinate: ${coordsStr}`:null,
-    osmType?`- Tipo (OpenStreetMap): ${osmType}`:null,
-    cats?`- Categorie scelte dall'utente: ${cats}`:null
-  ].filter(Boolean).join('\n')||'- (nessun dato disponibile)';
+  // FATTI VERI raccolti dal mondo: tag OSM (orari, cucina, costi), contesto,
+  // Wikipedia, Google (voto, fascia prezzo, aperto/chiuso). Niente fatti = niente frasi.
+  const factList=await _gatherPoiFacts(placeName,address);
+  if(coordsStr) factList.push(`- Coordinate: ${coordsStr}`);
+  if(cats) factList.push(`- Categorie scelte dall'utente: ${cats}`);
+  const facts=factList.join('\n')||'- (nessun dato disponibile)';
+  const bannedWords='accogliente, incantevole, unico, magico, suggestivo, imperdibile, atmosfera, esperienza, angolo, gioiello, cuore di, oasi, paradiso';
   let prompt;
   if(isGenerate){
-    prompt=`Scrivi una breve descrizione (massimo 200 caratteri) in ${langLabel} per QUESTO luogo reale:
+    prompt=`Scrivi la descrizione di un luogo per una mappa. MASSIMO 200 caratteri, in ${langLabel}.
+
+La descrizione DEVE dare INFORMAZIONI, in quest'ordine e solo se presenti nei FATTI:
+1) COS'E' esattamente (tipo di posto);
+2) COSA CI TROVI (servizi, cucina, cosa si fa);
+3) QUANTO COSTA / ORARI / COME FUNZIONA.
+
+VIETATO ASSOLUTO:
+- queste parole e simili: ${bannedWords};
+- qualsiasi frase che andrebbe bene per un altro posto qualunque;
+- inventare prezzi, orari, premi, storia o dettagli NON presenti nei FATTI. Se un dato manca, non ne parli.
+
+FATTI (unica fonte permessa):
 ${facts}
 
-Regole:
-- Descrivi proprio questo posto usando i dati qui sopra (nome, zona, tipo): niente frasi valide per qualunque posto.
-- NON inventare fatti verificabili che non conosci: niente premi, date, storia, persone o piatti specifici.
-- Tono caldo e personale, come lo racconteresti a un amico. Niente cliche turistici ("imperdibile", "magico", "da non perdere").
-- Rispondi SOLO col testo della descrizione, senza virgolette, in ${langLabel}.`;
+Rispondi SOLO con la descrizione, senza virgolette, in ${langLabel}.`;
   } else {
     prompt=`Parti da questi appunti dell'utente e arricchiscili: sono la base, non cancellarli e non ignorarli.
 Appunti: "${existingText}"
 
-Dati reali del luogo (usali solo se coerenti con gli appunti):
+FATTI reali del luogo (usali solo se coerenti con gli appunti):
 ${facts}
 
 Regole:
-- Riscrivi gli appunti in una descrizione fluida di massimo 200 caratteri, in ${langLabel}, conservando le informazioni e il punto di vista dell'utente.
-- NON inventare fatti verificabili che non conosci: niente premi, date, storia, persone o piatti specifici.
+- Massimo 200 caratteri, in ${langLabel}, conservando informazioni e punto di vista dell'utente.
+- Aggiungi SOLO informazioni prese dai FATTI (cos'e, cosa offre, costi, orari). Niente parole vuote: ${bannedWords}.
+- NON inventare nulla che non sia negli appunti o nei FATTI.
 - Rispondi SOLO col testo della descrizione, senza virgolette.`;
   }
 
   try {
     const res=await fetch(GROQ_URL,{method:'POST',
       headers:await _aiAuthHeaders(),
-      body:JSON.stringify({model:GROQ_MODEL,messages:[{role:'user',content:prompt}],temperature:0.9,max_completion_tokens:120})});
+      body:JSON.stringify({model:GROQ_MODEL,messages:[{role:'user',content:prompt}],temperature:0.4,max_completion_tokens:160})});
     const json=await res.json();
     const generated=(json?.choices?.[0]?.message?.content||'').trim()
       .replace(/^["']|["']$/g,'').substring(0,200);
