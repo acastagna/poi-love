@@ -32,7 +32,52 @@ Deno.serve(async (req: Request) => {
     const KEY = Deno.env.get("GOOGLE_PLACES_KEY");
     if (!KEY) return json({ error: "no_key" }, 200); // degrado: il client usa i dati OSM
 
-    const { name, lat, lng, radius } = await req.json();
+    const { name, lat, lng, radius, mode, language } = await req.json();
+
+    // ── MODALITA' NEARBY: i punti di interesse di Google intorno a un punto ──
+    // Usata dalla LENTE: restituisce fino a 20 posti veri (nome, posizione, voto,
+    // tipo) ordinati per distanza. Stessa chiave server-side, niente nel client.
+    if (mode === "nearby") {
+      if (lat == null || lng == null) return json({ error: "bad_request" }, 400);
+      const lc = (language === "sq" || language === "en") ? language : "it";
+      const nb = {
+        maxResultCount: 20,
+        languageCode: lc,
+        rankPreference: "POPULARITY",
+        locationRestriction: {
+          circle: {
+            center: { latitude: Number(lat), longitude: Number(lng) },
+            radius: Math.max(50, Math.min(1500, Number(radius) || 300)),
+          },
+        },
+      };
+      const r = await fetch("https://places.googleapis.com/v1/places:searchNearby", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Goog-Api-Key": KEY,
+          "X-Goog-FieldMask":
+            "places.displayName,places.location,places.rating,places.userRatingCount,places.primaryType,places.primaryTypeDisplayName",
+        },
+        body: JSON.stringify(nb),
+        signal: AbortSignal.timeout(7000),
+      });
+      const d = await r.json();
+      if (!r.ok) return json({ error: "google_error", detail: d?.error?.message || r.status }, 200);
+      const places = (d?.places || []).map((p: any) => ({
+        name: p.displayName?.text || "",
+        lat: p.location?.latitude ?? null,
+        lng: p.location?.longitude ?? null,
+        rating: p.rating ?? null,
+        reviews: p.userRatingCount ?? null,
+        type: p.primaryType || "",
+        typeLabel: p.primaryTypeDisplayName?.text || "",
+      })).filter((p: any) => p.name && p.lat != null);
+      // Prima i posti che contano (piu recensioni), gli sconosciuti in coda
+      places.sort((a: any, b: any) => (b.reviews || 0) - (a.reviews || 0));
+      return json({ found: places.length > 0, places }, 200);
+    }
+
     if (!name || lat == null || lng == null) return json({ error: "bad_request" }, 400);
 
     const body = {
