@@ -789,6 +789,20 @@ body::after{content:'';position:fixed;inset:0;z-index:99999;pointer-events:none;
 /* PHOTOS */
 .photo-row{display:flex;gap:10px;margin-bottom:14px}
 /* Mobile: 3 slot uguali in una riga */
+/* Descrizione nella fascia rossa del dettaglio POI (sotto il titolo, font medio) */
+.pdm-hero-desc{color:#fff;opacity:.94;font-size:13.5px;line-height:1.45;font-weight:500;margin:8px 0 0;white-space:pre-wrap}
+.pdm-hero-desc-edit{background:rgba(255,255,255,.18);border:none;border-radius:8px;color:#fff;width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;margin-left:8px;flex-shrink:0}
+.pdm-hero-desc-ta{width:100%;margin-top:8px;border:none;border-radius:10px;padding:9px 11px;font-family:inherit;font-size:13.5px;line-height:1.45;min-height:74px;resize:vertical;background:rgba(255,255,255,.94);color:#222}
+.pdm-hero-desc-count{color:#fff;opacity:.7;font-size:10px;text-align:right;margin-top:3px}
+/* Bottone cessione POI (solo proprietario) */
+.pdm-transfer-btn{display:flex;align-items:center;gap:8px;margin:10px 18px 0;padding:10px 14px;border:1.5px dashed var(--red);border-radius:12px;background:none;color:var(--red);font-family:inherit;font-size:12px;font-weight:800;cursor:pointer;width:calc(100% - 36px)}
+.pdm-transfer-btn:active{transform:scale(.98)}
+/* Codice di migrazione mostrato in grande */
+.transfer-code-big{font-family:monospace;font-size:26px;font-weight:900;letter-spacing:2px;color:var(--red);text-align:center;padding:16px 10px;background:#FFF3F0;border:1.5px dashed var(--red);border-radius:14px;margin:14px 18px;user-select:all}
+.redeem-input{width:calc(100% - 36px);margin:12px 18px 4px;border:1.5px solid var(--border);border-radius:12px;padding:12px;font-family:monospace;font-size:16px;letter-spacing:1px;text-transform:uppercase;text-align:center}
+.micro-modal-note{font-size:11px;color:var(--muted);padding:0 20px 14px;line-height:1.5}
+.micro-modal-cta{display:block;width:calc(100% - 36px);margin:6px 18px 14px;padding:12px;border:none;border-radius:12px;background:var(--red);color:#fff;font-family:inherit;font-size:13px;font-weight:800;cursor:pointer}
+
 /* Mini-mappa del punto POI: larga tutto, alta come le foto, pizzica per zoomare.
    E' anche uno strumento: muovi la mappa sotto il mirino e "Fissa il punto"
    prende tutti i riferimenti di quella posizione (geocodifica). */
@@ -2123,7 +2137,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
       <div class="profile-sec">
         <div class="prof-sec-lbl">
           <span data-t="prof_my_poi">I miei POI</span>
-          <button class="prof-sec-add" onclick="openAddPOI()"><i class="ph-duotone ph-plus"></i> <span data-t="prof_add_poi">Aggiungi</span></button>
+          <button class="prof-sec-add" onclick="openRedeemModal()" style="margin-right:6px"><i class="ph-duotone ph-key"></i> <span data-t="redeem_btn">Riscatta codice</span></button><button class="prof-sec-add" onclick="openAddPOI()"><i class="ph-duotone ph-plus"></i> <span data-t="prof_add_poi">Aggiungi</span></button>
         </div>
         <div class="poi-board" id="poiBoard">
           <!-- I POI reali dell'utente vengono caricati qui da Supabase (eq author_id) -->
@@ -2822,7 +2836,11 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
       <h2 class="pdm-hero-title" id="detailName">—</h2>
       <div class="pdm-hero-tags" id="detailTagsStrip">
         <span class="pdm-hero-tag" id="detailTag"><i class="ph-duotone ph-tag"></i> Luogo</span>
+        <button class="pdm-hero-desc-edit" id="heroDescEditBtn" style="display:none" onclick="startHeroDescEdit()" title="Modifica descrizione"><i class="ph-duotone ph-pencil-simple"></i></button>
       </div>
+      <!-- La descrizione VIVE QUI, nella fascia rossa: un POI senza descrizione non esiste -->
+      <p class="pdm-hero-desc" id="detailHeroDesc" style="display:none"></p>
+      <div id="detailHeroDescEditor" style="display:none"></div>
     </div>
     <!-- 6. Link condivisione -->
     <div class="pdm-share-link" id="detailShareLink" onclick="copyDetailLink()">
@@ -2830,6 +2848,10 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
       <span id="detailShareLinkTxt"></span>
       <button onclick="event.stopPropagation();copyDetailLink()" title="Copia link"><i class="ph-duotone ph-copy"></i></button>
     </div>
+    <!-- 6b. Cessione POI (solo proprietario): genera il codice di migrazione -->
+    <button class="pdm-transfer-btn" id="detailTransferBtn" style="display:none" onclick="generateTransferCode()">
+      <i class="ph-duotone ph-arrows-left-right"></i> <span data-t="transfer_btn">Cedi il POI: codice di migrazione</span>
+    </button>
     <!-- 7. Love -->
     <div class="pdm-love-row">
       <button class="love-btn love-btn-big" id="loveBtn" onclick="toggleLove()">
@@ -2849,6 +2871,28 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
       <i class="ph-duotone ph-caret-right pdm-author-arrow"></i>
     </div>
     <div id="detailDesc" style="display:none"></div>
+  </div>
+</div>
+
+<!-- CESSIONE POI: mostra il codice generato -->
+<div class="micro-modal-ov" id="transferOv" onclick="closeTransferModal()">
+  <div class="micro-modal" onclick="event.stopPropagation()">
+    <div class="micro-modal-handle"></div>
+    <div class="micro-modal-title"><i class="ph-duotone ph-arrows-left-right"></i> <span data-t="transfer_title">Codice di migrazione</span></div>
+    <div class="transfer-code-big" id="transferCodeTxt">—</div>
+    <div class="micro-modal-note" data-t="transfer_note">Consegna questo codice alla persona che riceverà il POI: lo inserirà nel suo profilo con "Riscatta codice". Vale 30 giorni, un solo uso. Generarne uno nuovo annulla il precedente.</div>
+    <button class="micro-modal-cta" onclick="copyTransferCode()"><span data-t="transfer_copy">Copia il codice</span></button>
+  </div>
+</div>
+
+<!-- RISCATTO CODICE: ricevi un POI ceduto -->
+<div class="micro-modal-ov" id="redeemOv" onclick="closeRedeemModal()">
+  <div class="micro-modal" onclick="event.stopPropagation()">
+    <div class="micro-modal-handle"></div>
+    <div class="micro-modal-title"><i class="ph-duotone ph-key"></i> <span data-t="redeem_title">Riscatta un codice di migrazione</span></div>
+    <input class="redeem-input" id="redeemCodeIn" placeholder="PL-XXXX-XXXX" autocomplete="off" autocapitalize="characters"/>
+    <div class="micro-modal-note" data-t="redeem_note">Inserisci il codice che hai ricevuto: il POI diventerà tuo.</div>
+    <button class="micro-modal-cta" onclick="redeemTransferCode()"><span data-t="redeem_go">Riscatta</span></button>
   </div>
 </div>
 
@@ -3493,6 +3537,12 @@ function openDBDetail(p) {
   if (editBtn) editBtn.style.display = isOwner ? 'flex' : 'none';
   const deleteBtn = document.getElementById('detailDeleteBtn');
   if (deleteBtn) deleteBtn.style.display = isOwner ? 'flex' : 'none';
+  // Descrizione nella fascia rossa (+ matita se tuo) e bottone di cessione
+  const edBox=document.getElementById('detailHeroDescEditor');
+  if(edBox){ edBox.style.display='none'; edBox.innerHTML=''; }
+  _renderHeroDesc();
+  const trBtn=document.getElementById('detailTransferBtn');
+  if(trBtn) trBtn.style.display=isOwner?'flex':'none';
   openSheet('detailOv', 'detailBg', 'detailSheet');
   // Posiziona X fuori dalla card dopo l'animazione
   setTimeout(positionDetailClose, 380);
@@ -4327,7 +4377,7 @@ const T={
     /* Profile background popup */
     bg_change_title:'Cambia sfondo profilo',bg_change_sub:'Carica una tua foto, scegli un paesaggio, oppure fattelo dipingere da ILLI•AI.',bg_tab_upload:'Upload',bg_tab_landscapes:'Paesaggi',bg_upload_drop_title:"Carica un'immagine panoramica",bg_upload_drop_sub:'JPG, PNG · max 8 MB · meglio se larga',bg_search_ph:'Cerca: tirana, mare, montagne…',bg_use_photo:'Usa questa foto',bg_loading:'Carico…',bg_painting:'ILLI•AI sta dipingendo lo sfondo…',bg_painting_long:'(può richiedere 15-30 sec)',bg_use_bg:'Usa questo sfondo',bg_generate_again:'Genera un altro',bg_ai_prompt_ph:'Es: panorama di Tirana al tramonto, luci calde, montagne sullo sfondo, atmosfera cinematografica',bg_generate_btn:'Genera con ILLI•AI',bg_describe:"Descrivi lo sfondo del tuo profilo. ILLI•AI genererà un'immagine panoramica con Flux.",bg_error_size:'Immagine > 8 MB, troppo grande',bg_error_invalid:"Seleziona un'immagine valida",bg_updated:'🖼 Sfondo aggiornato',bg_gradient_updated:'🎨 Sfondo aggiornato',bg_landscape_updated:'🖼 Sfondo paesaggio aggiornato',bg_writeprompt:'Scrivi una descrizione',
     /* Avatar popup */
-    av_change_title:'Cambia avatar',av_change_sub:'Carica una tua foto, scegli da Unsplash, oppure fattela dipingere da ILLI•AI.',av_tab_upload:'Upload',av_tab_unsplash:'Unsplash',av_upload_drop_title:'Carica una foto',av_upload_drop_sub:'JPG, PNG · max 5 MB',av_use_photo:'Usa questa foto',av_painting:'ILLI•AI sta dipingendo…',av_painting_long:'(può richiedere 10-25 sec)',av_use_avatar:'Usa questo avatar',av_generate_again:'Genera un altro',av_search_ph:'Cerca: portrait, montagne, mare…',av_ai_prompt_ph:'Es: ritratto stile cinematografico, illuminazione calda, montagne sullo sfondo, espressione serena',av_describe:'Descrivi come vuoi essere ritratto/a. ILLI•AI userà Flux per dipingere.',av_avatar_updated:'✓ Avatar aggiornato',av_error_size:'Immagine > 5 MB, troppo grande',ai_gen_failed:'Generazione non riuscita, riprova tra poco.',av_writeprompt:'Scrivi una descrizione',gps_searching:'Cerco la tua posizione…',gps_you_here:'Tu sei qui',gps_denied:'Permesso posizione negato: attivalo per poilove.com nelle impostazioni del telefono.',gps_unavailable:'Posizione non disponibile in questo momento.',gps_timeout:'Il GPS ci sta mettendo troppo, riprova tra poco.',mic_unsupported:'Dettatura vocale non supportata su questo browser, scrivi pure a mano',mic_denied:'Microfono bloccato: abilita il permesso nelle impostazioni',mic_nospeech:'Non ho sentito nulla, riprova',mic_error:'Errore dettatura, riprova',sos_refresh_title:'Aggiorna tutto, svuota cache',sos_refresh_sub:'Ricarica l\'app pulita per vedere l\'ultima versione',sos_refresh_confirm:'Svuotare la cache e ricaricare l\'app aggiornata?',sos_refresh_working:'Pulizia in corso, ricarico…',field_suggest:'Suggerisci',field_dictate:'Detta',field_write:'Scrivo io',name_need_loc:'Indica prima dove si trova, poi te lo suggerisco',lens_point:'Questo punto',lens_poi:'POI',lens_nav:'Naviga',lens_add:'Aggiungi',lens_ai:'Chiedi AI',lens_share:'Condividi',lens_save_poi:'Salva il POI',lens_ask_prefix:'Raccontami qualcosa su ',soon:'Presto disponibile',inside_prefix:'Interno',map_fix_point:'Fissa il punto',map_point_fixed:'Punto fissato: prendo i riferimenti del luogo…',ph_add:'Aggiungi foto',
+    av_change_title:'Cambia avatar',av_change_sub:'Carica una tua foto, scegli da Unsplash, oppure fattela dipingere da ILLI•AI.',av_tab_upload:'Upload',av_tab_unsplash:'Unsplash',av_upload_drop_title:'Carica una foto',av_upload_drop_sub:'JPG, PNG · max 5 MB',av_use_photo:'Usa questa foto',av_painting:'ILLI•AI sta dipingendo…',av_painting_long:'(può richiedere 10-25 sec)',av_use_avatar:'Usa questo avatar',av_generate_again:'Genera un altro',av_search_ph:'Cerca: portrait, montagne, mare…',av_ai_prompt_ph:'Es: ritratto stile cinematografico, illuminazione calda, montagne sullo sfondo, espressione serena',av_describe:'Descrivi come vuoi essere ritratto/a. ILLI•AI userà Flux per dipingere.',av_avatar_updated:'✓ Avatar aggiornato',av_error_size:'Immagine > 5 MB, troppo grande',ai_gen_failed:'Generazione non riuscita, riprova tra poco.',av_writeprompt:'Scrivi una descrizione',gps_searching:'Cerco la tua posizione…',gps_you_here:'Tu sei qui',gps_denied:'Permesso posizione negato: attivalo per poilove.com nelle impostazioni del telefono.',gps_unavailable:'Posizione non disponibile in questo momento.',gps_timeout:'Il GPS ci sta mettendo troppo, riprova tra poco.',mic_unsupported:'Dettatura vocale non supportata su questo browser, scrivi pure a mano',mic_denied:'Microfono bloccato: abilita il permesso nelle impostazioni',mic_nospeech:'Non ho sentito nulla, riprova',mic_error:'Errore dettatura, riprova',sos_refresh_title:'Aggiorna tutto, svuota cache',sos_refresh_sub:'Ricarica l\'app pulita per vedere l\'ultima versione',sos_refresh_confirm:'Svuotare la cache e ricaricare l\'app aggiornata?',sos_refresh_working:'Pulizia in corso, ricarico…',field_suggest:'Suggerisci',field_dictate:'Detta',field_write:'Scrivo io',name_need_loc:'Indica prima dove si trova, poi te lo suggerisco',lens_point:'Questo punto',lens_poi:'POI',lens_nav:'Naviga',lens_add:'Aggiungi',lens_ai:'Chiedi AI',lens_share:'Condividi',lens_save_poi:'Salva il POI',lens_ask_prefix:'Raccontami qualcosa su ',soon:'Presto disponibile',inside_prefix:'Interno',map_fix_point:'Fissa il punto',map_point_fixed:'Punto fissato: prendo i riferimenti del luogo…',ph_add:'Aggiungi foto',autosaved:'✓ Salvato',autosave_err:'Salvataggio non riuscito, riprova',photo_upload_err:'Caricamento foto non riuscito, riprova',desc_add_hint:'Aggiungi la descrizione: cos\'è, cosa trovi, come funziona…',transfer_btn:'Cedi il POI: codice di migrazione',transfer_title:'Codice di migrazione',transfer_note:'Consegna questo codice a chi riceverà il POI: lo inserirà nel suo profilo con "Riscatta codice". Vale 30 giorni, un solo uso. Un nuovo codice annulla il precedente.',transfer_copy:'Copia il codice',transfer_copied:'Codice copiato!',transfer_only_owner:'Solo il proprietario può cedere il POI',redeem_btn:'Riscatta codice',redeem_title:'Riscatta un codice di migrazione',redeem_note:'Inserisci il codice che hai ricevuto: il POI diventerà tuo.',redeem_go:'Riscatta',redeem_ok:'Il POI ora è tuo',redeem_bad:'Codice non valido o già usato',error_generic:'Qualcosa è andato storto, riprova',
     /* Common toasts */
     toast_login_required:'⚠️ Accedi per salvare il POI',toast_no_user:'Nessun utente selezionato',toast_bio_updated:'Bio aggiornata',toast_invite_ready:'📧 Invito pronto per',toast_invite_dest1:'destinatario',toast_invite_destN:'destinatari',toast_only_local:'⚠ Lista salvata solo localmente',toast_list_added:'+ Lista',toast_tag_added:'+ Tag',
     /* POI · edit/delete/save toasts */
@@ -4427,7 +4477,7 @@ const T={
     /* Profile background popup */
     bg_change_title:'Ndrysho sfondin e profilit',bg_change_sub:'Ngarko një foto tënde, zgjidh një peizazh, ose lëre ILLI•AI ta vizatojë.',bg_tab_upload:'Ngarko',bg_tab_landscapes:'Peizazhe',bg_upload_drop_title:'Ngarko një imazh panoramik',bg_upload_drop_sub:'JPG, PNG · max 8 MB · më mirë e gjerë',bg_search_ph:'Kërko: tirana, det, male…',bg_use_photo:'Përdor këtë foto',bg_loading:'Po ngarkohet…',bg_painting:'ILLI•AI po vizaton sfondin…',bg_painting_long:'(mund të zgjasë 15-30 sek)',bg_use_bg:'Përdor këtë sfond',bg_generate_again:'Gjenero një tjetër',bg_ai_prompt_ph:'P.sh.: panorama e Tiranës në perëndim, drita të ngrohta, male në sfond, atmosferë kinematografike',bg_generate_btn:'Gjenero me ILLI•AI',bg_describe:'Përshkruaj sfondin e profilit. ILLI•AI do të gjenerojë një imazh panoramik me Flux.',bg_error_size:'Imazhi > 8 MB, shumë i madh',bg_error_invalid:'Zgjidh një imazh të vlefshëm',bg_updated:'🖼 Sfondi u përditësua',bg_gradient_updated:'🎨 Sfondi u përditësua',bg_landscape_updated:'🖼 Sfondi peizazh u përditësua',bg_writeprompt:'Shkruaj një përshkrim',
     /* Avatar popup */
-    av_change_title:'Ndrysho avatarin',av_change_sub:'Ngarko një foto tënde, zgjidh nga Unsplash, ose lëre ILLI•AI ta vizatojë.',av_tab_upload:'Ngarko',av_tab_unsplash:'Unsplash',av_upload_drop_title:'Ngarko një foto',av_upload_drop_sub:'JPG, PNG · max 5 MB',av_use_photo:'Përdor këtë foto',av_painting:'ILLI•AI po vizaton…',av_painting_long:'(mund të zgjasë 10-25 sek)',av_use_avatar:'Përdor këtë avatar',av_generate_again:'Gjenero një tjetër',av_search_ph:'Kërko: portrait, male, det…',av_ai_prompt_ph:'P.sh.: portret kinematografik, ndriçim i ngrohtë, male në sfond, shprehje e qetë',av_describe:'Përshkruaj si do të portretizohesh. ILLI•AI do të përdorë Flux për të vizatuar.',av_avatar_updated:'✓ Avatari u përditësua',av_error_size:'Imazhi > 5 MB, shumë i madh',ai_gen_failed:'Gjenerimi dështoi, provo përsëri pas pak.',av_writeprompt:'Shkruaj një përshkrim',gps_searching:'Po kërkoj vendndodhjen tënde…',gps_you_here:'Ti je këtu',gps_denied:'Leja e vendndodhjes u refuzua: aktivizoje për poilove.com te cilësimet e telefonit.',gps_unavailable:'Vendndodhja nuk është e disponueshme tani.',gps_timeout:'GPS po vonon shumë, provo përsëri pas pak.',mic_unsupported:'Diktimi me zë nuk mbështetet në këtë shfletues, shkruaj me dorë',mic_denied:'Mikrofoni i bllokuar: lejo qasjen te cilësimet',mic_nospeech:'Nuk dëgjova asgjë, provo përsëri',mic_error:'Gabim në diktim, provo përsëri',sos_refresh_title:'Përditëso gjithçka, pastro memorien',sos_refresh_sub:'Ringarko aplikacionin e pastër për të parë versionin e fundit',sos_refresh_confirm:'Të pastrohet memoria dhe të ringarkohet aplikacioni i përditësuar?',sos_refresh_working:'Po pastrohet, po ringarkoj…',field_suggest:'Sugjero',field_dictate:'Dikto',field_write:'Shkruaj vetë',name_need_loc:'Trego më parë ku ndodhet, pastaj ta sugjeroj',lens_point:'Ky vend',lens_poi:'POI',lens_nav:'Navigo',lens_add:'Shto',lens_ai:'Pyet AI',lens_share:'Ndaj',lens_save_poi:'Ruaj POI-n',lens_ask_prefix:'Më trego diçka për ',soon:'Së shpejti',inside_prefix:'Brenda',map_fix_point:'Fikso pikën',map_point_fixed:'Pika u fiksua: po marr referencat e vendit…',ph_add:'Shto foto',
+    av_change_title:'Ndrysho avatarin',av_change_sub:'Ngarko një foto tënde, zgjidh nga Unsplash, ose lëre ILLI•AI ta vizatojë.',av_tab_upload:'Ngarko',av_tab_unsplash:'Unsplash',av_upload_drop_title:'Ngarko një foto',av_upload_drop_sub:'JPG, PNG · max 5 MB',av_use_photo:'Përdor këtë foto',av_painting:'ILLI•AI po vizaton…',av_painting_long:'(mund të zgjasë 10-25 sek)',av_use_avatar:'Përdor këtë avatar',av_generate_again:'Gjenero një tjetër',av_search_ph:'Kërko: portrait, male, det…',av_ai_prompt_ph:'P.sh.: portret kinematografik, ndriçim i ngrohtë, male në sfond, shprehje e qetë',av_describe:'Përshkruaj si do të portretizohesh. ILLI•AI do të përdorë Flux për të vizatuar.',av_avatar_updated:'✓ Avatari u përditësua',av_error_size:'Imazhi > 5 MB, shumë i madh',ai_gen_failed:'Gjenerimi dështoi, provo përsëri pas pak.',av_writeprompt:'Shkruaj një përshkrim',gps_searching:'Po kërkoj vendndodhjen tënde…',gps_you_here:'Ti je këtu',gps_denied:'Leja e vendndodhjes u refuzua: aktivizoje për poilove.com te cilësimet e telefonit.',gps_unavailable:'Vendndodhja nuk është e disponueshme tani.',gps_timeout:'GPS po vonon shumë, provo përsëri pas pak.',mic_unsupported:'Diktimi me zë nuk mbështetet në këtë shfletues, shkruaj me dorë',mic_denied:'Mikrofoni i bllokuar: lejo qasjen te cilësimet',mic_nospeech:'Nuk dëgjova asgjë, provo përsëri',mic_error:'Gabim në diktim, provo përsëri',sos_refresh_title:'Përditëso gjithçka, pastro memorien',sos_refresh_sub:'Ringarko aplikacionin e pastër për të parë versionin e fundit',sos_refresh_confirm:'Të pastrohet memoria dhe të ringarkohet aplikacioni i përditësuar?',sos_refresh_working:'Po pastrohet, po ringarkoj…',field_suggest:'Sugjero',field_dictate:'Dikto',field_write:'Shkruaj vetë',name_need_loc:'Trego më parë ku ndodhet, pastaj ta sugjeroj',lens_point:'Ky vend',lens_poi:'POI',lens_nav:'Navigo',lens_add:'Shto',lens_ai:'Pyet AI',lens_share:'Ndaj',lens_save_poi:'Ruaj POI-n',lens_ask_prefix:'Më trego diçka për ',soon:'Së shpejti',inside_prefix:'Brenda',map_fix_point:'Fikso pikën',map_point_fixed:'Pika u fiksua: po marr referencat e vendit…',ph_add:'Shto foto',autosaved:'✓ U ruajt',autosave_err:'Ruajtja dështoi, provo përsëri',photo_upload_err:'Ngarkimi i fotos dështoi, provo përsëri',desc_add_hint:'Shto përshkrimin: çfarë është, çfarë gjen, si funksionon…',transfer_btn:'Cedo POI-n: kodi i migrimit',transfer_title:'Kodi i migrimit',transfer_note:'Jepja këtë kod personit që do të marrë POI-n: do ta fusë te profili i tij me "Shlyej kodin". Vlen 30 ditë, vetëm një përdorim. Një kod i ri anulon të mëparshmin.',transfer_copy:'Kopjo kodin',transfer_copied:'Kodi u kopjua!',transfer_only_owner:'Vetëm pronari mund ta cedojë POI-n',redeem_btn:'Shlyej kodin',redeem_title:'Shlyej një kod migrimi',redeem_note:'Fut kodin që ke marrë: POI do të bëhet i yti.',redeem_go:'Shlyej',redeem_ok:'POI tani është i yti',redeem_bad:'Kod i pavlefshëm ose i përdorur',error_generic:'Diçka shkoi keq, provo përsëri',
     /* Common toasts */
     toast_login_required:'⚠️ Hyni për të ruajtur POI-n',toast_no_user:'Asnjë përdorues i zgjedhur',toast_bio_updated:'Bio u përditësua',toast_invite_ready:'📧 Ftesa gati për',toast_invite_dest1:'marrës',toast_invite_destN:'marrës',toast_only_local:'⚠ Lista u ruajt vetëm lokalisht',toast_list_added:'+ Listë',toast_tag_added:'+ Etiketë',
     /* POI · edit/delete/save toasts */
@@ -4527,7 +4577,7 @@ const T={
     /* Profile background popup */
     bg_change_title:'Change profile background',bg_change_sub:'Upload a photo, pick a landscape, or have ILLI•AI paint it for you.',bg_tab_upload:'Upload',bg_tab_landscapes:'Landscapes',bg_upload_drop_title:'Upload a panoramic image',bg_upload_drop_sub:'JPG, PNG · max 8 MB · wide preferred',bg_search_ph:'Search: tirana, sea, mountains…',bg_use_photo:'Use this photo',bg_loading:'Loading…',bg_painting:'ILLI•AI is painting the background…',bg_painting_long:'(may take 15-30 sec)',bg_use_bg:'Use this background',bg_generate_again:'Generate another',bg_ai_prompt_ph:'E.g. Tirana skyline at sunset, warm lights, mountains in the background, cinematic atmosphere',bg_generate_btn:'Generate with ILLI•AI',bg_describe:'Describe your profile background. ILLI•AI will generate a panoramic image with Flux.',bg_error_size:'Image > 8 MB, too big',bg_error_invalid:'Please select a valid image',bg_updated:'🖼 Background updated',bg_gradient_updated:'🎨 Background updated',bg_landscape_updated:'🖼 Landscape background updated',bg_writeprompt:'Write a description',
     /* Avatar popup */
-    av_change_title:'Change avatar',av_change_sub:'Upload a photo, pick from Unsplash, or have ILLI•AI paint it for you.',av_tab_upload:'Upload',av_tab_unsplash:'Unsplash',av_upload_drop_title:'Upload a photo',av_upload_drop_sub:'JPG, PNG · max 5 MB',av_use_photo:'Use this photo',av_painting:'ILLI•AI is painting…',av_painting_long:'(may take 10-25 sec)',av_use_avatar:'Use this avatar',av_generate_again:'Generate another',av_search_ph:'Search: portrait, mountains, sea…',av_ai_prompt_ph:'E.g. cinematic portrait, warm lighting, mountains in the background, calm expression',av_describe:'Describe how you want to be portrayed. ILLI•AI will use Flux to paint.',av_avatar_updated:'✓ Avatar updated',av_error_size:'Image > 5 MB, too big',ai_gen_failed:'Generation failed, please try again shortly.',av_writeprompt:'Write a description',gps_searching:'Finding your location…',gps_you_here:'You are here',gps_denied:'Location permission denied: enable it for poilove.com in your phone settings.',gps_unavailable:'Location unavailable right now.',gps_timeout:'GPS is taking too long, try again shortly.',mic_unsupported:'Voice dictation not supported on this browser, please type instead',mic_denied:'Microphone blocked: enable the permission in settings',mic_nospeech:'I did not hear anything, try again',mic_error:'Dictation error, try again',sos_refresh_title:'Refresh everything, clear cache',sos_refresh_sub:'Reload the app clean to see the latest version',sos_refresh_confirm:'Clear the cache and reload the updated app?',sos_refresh_working:'Clearing, reloading…',field_suggest:'Suggest',field_dictate:'Dictate',field_write:'I will type',name_need_loc:'Set the location first, then I will suggest one',lens_point:'This spot',lens_poi:'POI',lens_nav:'Navigate',lens_add:'Add',lens_ai:'Ask AI',lens_share:'Share',lens_save_poi:'Save the POI',lens_ask_prefix:'Tell me something about ',soon:'Coming soon',inside_prefix:'Inside',map_fix_point:'Fix the point',map_point_fixed:'Point fixed: fetching the place references…',ph_add:'Add photo',
+    av_change_title:'Change avatar',av_change_sub:'Upload a photo, pick from Unsplash, or have ILLI•AI paint it for you.',av_tab_upload:'Upload',av_tab_unsplash:'Unsplash',av_upload_drop_title:'Upload a photo',av_upload_drop_sub:'JPG, PNG · max 5 MB',av_use_photo:'Use this photo',av_painting:'ILLI•AI is painting…',av_painting_long:'(may take 10-25 sec)',av_use_avatar:'Use this avatar',av_generate_again:'Generate another',av_search_ph:'Search: portrait, mountains, sea…',av_ai_prompt_ph:'E.g. cinematic portrait, warm lighting, mountains in the background, calm expression',av_describe:'Describe how you want to be portrayed. ILLI•AI will use Flux to paint.',av_avatar_updated:'✓ Avatar updated',av_error_size:'Image > 5 MB, too big',ai_gen_failed:'Generation failed, please try again shortly.',av_writeprompt:'Write a description',gps_searching:'Finding your location…',gps_you_here:'You are here',gps_denied:'Location permission denied: enable it for poilove.com in your phone settings.',gps_unavailable:'Location unavailable right now.',gps_timeout:'GPS is taking too long, try again shortly.',mic_unsupported:'Voice dictation not supported on this browser, please type instead',mic_denied:'Microphone blocked: enable the permission in settings',mic_nospeech:'I did not hear anything, try again',mic_error:'Dictation error, try again',sos_refresh_title:'Refresh everything, clear cache',sos_refresh_sub:'Reload the app clean to see the latest version',sos_refresh_confirm:'Clear the cache and reload the updated app?',sos_refresh_working:'Clearing, reloading…',field_suggest:'Suggest',field_dictate:'Dictate',field_write:'I will type',name_need_loc:'Set the location first, then I will suggest one',lens_point:'This spot',lens_poi:'POI',lens_nav:'Navigate',lens_add:'Add',lens_ai:'Ask AI',lens_share:'Share',lens_save_poi:'Save the POI',lens_ask_prefix:'Tell me something about ',soon:'Coming soon',inside_prefix:'Inside',map_fix_point:'Fix the point',map_point_fixed:'Point fixed: fetching the place references…',ph_add:'Add photo',autosaved:'✓ Saved',autosave_err:'Save failed, try again',photo_upload_err:'Photo upload failed, try again',desc_add_hint:'Add the description: what it is, what you find, how it works…',transfer_btn:'Hand over the POI: migration code',transfer_title:'Migration code',transfer_note:'Give this code to the person receiving the POI: they will enter it in their profile via "Redeem code". Valid 30 days, single use. A new code cancels the previous one.',transfer_copy:'Copy the code',transfer_copied:'Code copied!',transfer_only_owner:'Only the owner can hand over the POI',redeem_btn:'Redeem code',redeem_title:'Redeem a migration code',redeem_note:'Enter the code you received: the POI becomes yours.',redeem_go:'Redeem',redeem_ok:'The POI is now yours',redeem_bad:'Invalid or already used code',error_generic:'Something went wrong, try again',
     /* Common toasts */
     toast_login_required:'⚠️ Sign in to save the POI',toast_no_user:'No user selected',toast_bio_updated:'Bio updated',toast_invite_ready:'📧 Invitation ready for',toast_invite_dest1:'recipient',toast_invite_destN:'recipients',toast_only_local:'⚠ List saved only locally',toast_list_added:'+ List',toast_tag_added:'+ Tag',
     /* POI · edit/delete/save toasts */
@@ -5273,7 +5323,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='2.02';
+const APP_VERSION='2.03';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 console.info('POI•LOVE v'+APP_VERSION);
 
@@ -7884,15 +7934,126 @@ function _fillUserSlot(el, url, idx){
   const img = document.createElement('img');
   img.src = url; img.alt = ''; img.loading = 'lazy';
   el.appendChild(img);
-  const acts = document.createElement('div');
-  acts.className = 'pdm-slot-acts';
-  acts.innerHTML =
-    `<button class="pdm-slot-act sa-cam" title="Sostituisci foto" onclick="_pickPhotoForSlot(${idx},this.closest('.pdm-photos'))"><i class="ph-duotone ph-camera"></i></button>` +
-    `<button class="pdm-slot-act sa-del" title="Elimina foto" onclick="_deleteSlot(${idx},this.closest('.pdm-photos'))"><i class="ph-duotone ph-trash"></i></button>`;
-  el.appendChild(acts);
+  // Sostituisci/elimina solo se il POI e' tuo (o e' un POI locale demo)
+  if(_stripEditable()){
+    const acts = document.createElement('div');
+    acts.className = 'pdm-slot-acts';
+    acts.innerHTML =
+      `<button class="pdm-slot-act sa-cam" title="Sostituisci foto" onclick="_pickPhotoForSlot(${idx},this.closest('.pdm-photos'))"><i class="ph-duotone ph-camera"></i></button>` +
+      `<button class="pdm-slot-act sa-del" title="Elimina foto" onclick="_deleteSlot(${idx},this.closest('.pdm-photos'))"><i class="ph-duotone ph-trash"></i></button>`;
+    el.appendChild(acts);
+  }
 }
 
 // (generazione foto POI con AI rimossa: i POI senza foto mostrano uno slot vuoto col "+")
+
+/* ── PROPRIETA E AUTOSAVE ─────────────────────────────────────────────────
+   Quando il POI e' TUO: foto (max 3) e descrizione si modificano dalla scheda
+   e OGNI modifica si salva DA SOLA nel database (autosave). Niente tasto salva. */
+function _canEditCurrentPoi(){
+  return !!(currentUser && currentPOI && currentPOI.id && currentPOI.author_id===currentUser.id);
+}
+// La striscia foto e' modificabile se il POI e' tuo, oppure se e' un POI locale demo (senza id)
+function _stripEditable(){
+  return (!currentPOI || !currentPOI.id) || _canEditCurrentPoi();
+}
+// Salva SUBITO la modifica nel DB, con verifica righe (mai falsi successi)
+async function _autosavePoiPatch(patch){
+  if(!_canEditCurrentPoi()) return false;
+  try{
+    const { data, error } = await sb.from('pois').update(patch).eq('id',currentPOI.id).select('id');
+    if(error || !data || !data.length){
+      console.warn('autosave POI:', error&&error.message);
+      showToast(t('autosave_err','Salvataggio non riuscito, riprova'));
+      return false;
+    }
+    Object.assign(currentPOI, patch);
+    showToast(t('autosaved','✓ Salvato'));
+    return true;
+  }catch(e){ console.warn('autosave POI:',e); showToast(t('autosave_err','Salvataggio non riuscito, riprova')); return false; }
+}
+
+/* Descrizione nella fascia rossa: modifica inline col pennino, autosave a ogni pausa */
+let _heroDescTimer=null;
+function startHeroDescEdit(){
+  if(!_canEditCurrentPoi()) return;
+  const pEl=document.getElementById('detailHeroDesc');
+  const box=document.getElementById('detailHeroDescEditor');
+  if(box.style.display!=='none') return; // gia in modifica
+  pEl.style.display='none';
+  box.style.display='block';
+  box.innerHTML='';
+  const ta=document.createElement('textarea');
+  ta.className='pdm-hero-desc-ta'; ta.maxLength=200;
+  ta.value=currentPOI.description||'';
+  const cnt=document.createElement('div');
+  cnt.className='pdm-hero-desc-count';
+  const upd=()=>{ cnt.textContent=ta.value.length+' / 200'; };
+  upd();
+  ta.addEventListener('input',()=>{
+    upd();
+    clearTimeout(_heroDescTimer);
+    _heroDescTimer=setTimeout(()=>_saveHeroDesc(ta.value),1200); // autosave mentre scrivi
+  });
+  ta.addEventListener('blur',()=>{
+    clearTimeout(_heroDescTimer);
+    _saveHeroDesc(ta.value).then(()=>{
+      box.style.display='none'; box.innerHTML='';
+      _renderHeroDesc();
+    });
+  });
+  box.appendChild(ta); box.appendChild(cnt);
+  ta.focus();
+}
+async function _saveHeroDesc(v){
+  const desc=String(v||'').trim().slice(0,200);
+  if(desc===(currentPOI.description||'')) return true;
+  return _autosavePoiPatch({description:desc});
+}
+function _renderHeroDesc(){
+  const pEl=document.getElementById('detailHeroDesc');
+  const btn=document.getElementById('heroDescEditBtn');
+  const desc=(currentPOI&&currentPOI.description||'').trim();
+  if(desc){ pEl.textContent=desc; pEl.style.display='block'; }
+  else if(_canEditCurrentPoi()){ pEl.textContent=t('desc_add_hint','Aggiungi la descrizione: cos\'e, cosa si trova, come funziona…'); pEl.style.display='block'; pEl.style.opacity='.6'; }
+  else { pEl.style.display='none'; }
+  if(desc) pEl.style.opacity='.94';
+  if(btn) btn.style.display=_canEditCurrentPoi()?'inline-flex':'none';
+}
+
+/* ── CODICE DI MIGRAZIONE: cedi e riscatta ── */
+async function generateTransferCode(){
+  if(!_canEditCurrentPoi()){ showToast(t('transfer_only_owner','Solo il proprietario puo cedere il POI')); return; }
+  try{
+    const { data, error } = await sb.rpc('generate_poi_transfer_code',{ p_poi: currentPOI.id });
+    if(error){ showToast(error.message||t('error_generic','Qualcosa e andato storto, riprova')); return; }
+    document.getElementById('transferCodeTxt').textContent=data;
+    document.getElementById('transferOv').classList.add('open');
+  }catch(e){ showToast(t('error_generic','Qualcosa e andato storto, riprova')); }
+}
+function closeTransferModal(){ document.getElementById('transferOv').classList.remove('open'); }
+function copyTransferCode(){
+  const code=document.getElementById('transferCodeTxt').textContent;
+  navigator.clipboard&&navigator.clipboard.writeText(code).then(()=>showToast(t('transfer_copied','Codice copiato!'))).catch(()=>{});
+}
+function openRedeemModal(){
+  if(!currentUser){ showToast(t('illi_login','Accedi per continuare')); return; }
+  document.getElementById('redeemCodeIn').value='';
+  document.getElementById('redeemOv').classList.add('open');
+  setTimeout(()=>document.getElementById('redeemCodeIn').focus(),350);
+}
+function closeRedeemModal(){ document.getElementById('redeemOv').classList.remove('open'); }
+async function redeemTransferCode(){
+  const code=(document.getElementById('redeemCodeIn').value||'').trim();
+  if(code.length<8){ showToast(t('redeem_bad','Inserisci il codice completo')); return; }
+  try{
+    const { data, error } = await sb.rpc('redeem_poi_transfer_code',{ p_code: code });
+    if(error){ showToast(error.message||t('redeem_bad','Codice non valido')); return; }
+    closeRedeemModal();
+    showToast(t('redeem_ok','Il POI ora e tuo')+ (data&&data.title?': '+data.title:''));
+    if(typeof loadPOIsFromDB==='function') loadPOIsFromDB(); // la mappa e le liste si aggiornano
+  }catch(e){ showToast(t('redeem_bad','Codice non valido')); }
+}
 
 // _fillEmptySlot rimossa il 05/07/2026: niente slot vuoti nella scheda POI,
 // l'aggiunta passa dal + nel cerchio bianco (pdm-add-circle).
@@ -7914,8 +8075,8 @@ function _renderAllSlots(container){
     ctr.innerHTML = `<i class="ph-duotone ph-camera"></i> ${nUser} foto`;
     container.appendChild(ctr);
   }
-  // + nel cerchio bianco finche' c'e' posto (max 3 foto)
-  if(nUser < 3){
+  // + nel cerchio bianco finche' c'e' posto (max 3 foto), solo se puoi modificare
+  if(nUser < 3 && _stripEditable()){
     const add = document.createElement('button');
     add.type = 'button';
     add.className = 'pdm-add-circle';
@@ -7942,13 +8103,29 @@ function _pickPhotoForSlot(idx, container){
     const file = e.target.files?.[0];
     if(!file) return;
     const reader = new FileReader();
-    reader.onload = (ev)=>{
-      // idx oltre la fine = aggiunta (dal + nel cerchio), altrimenti sostituzione
+    reader.onload = async (ev)=>{
+      const prev = container._slots.slice(); // per tornare indietro se l'upload fallisce
+      // anteprima immediata (dataURL), poi upload reale se il POI e' tuo
       if(idx >= container._slots.length) container._slots.push({ type:'user', url: ev.target.result });
       else container._slots[idx] = { type:'user', url: ev.target.result };
-      if(typeof currentPOI!=='undefined')
-        currentPOI.photos = container._slots.map(s=>s.url);
       _renderAllSlots(container);
+      if(_canEditCurrentPoi()){
+        // AUTOSAVE: la foto si carica sul server (WebP) e il POI si aggiorna da solo.
+        // Nel DB vanno SOLO URL, mai le immagini in base64.
+        const urls = await uploadPhotosToMediaServer([file], currentPOI.id);
+        if(!urls.length){
+          container._slots = prev; _renderAllSlots(container);
+          showToast(t('photo_upload_err','Caricamento foto non riuscito, riprova'));
+          return;
+        }
+        const realIdx = Math.min(idx, container._slots.length-1);
+        container._slots[realIdx] = { type:'user', url: urls[0] };
+        currentPOI.photos = container._slots.map(sl=>sl.url);
+        _renderAllSlots(container);
+        await _autosavePoiPatch({ photos: currentPOI.photos });
+      } else if(typeof currentPOI!=='undefined'){
+        currentPOI.photos = container._slots.map(sl=>sl.url); // POI locale demo: solo in memoria
+      }
     };
     reader.readAsDataURL(file);
   };
@@ -7964,6 +8141,7 @@ function _deleteSlot(idx, container){
   if(typeof currentPOI!=='undefined')
     currentPOI.photos = container._slots.map(s=>s.url);
   _renderAllSlots(container);
+  if(_canEditCurrentPoi()) _autosavePoiPatch({ photos: currentPOI.photos }); // autosave anche qui
 }
 
 // Mappa il nome categoria → classe CSS colore tag
