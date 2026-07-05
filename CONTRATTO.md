@@ -34,7 +34,7 @@ info@321.al · https://321.al
 | Scheda POI senza slot foto vuoti: + nel cerchio, foto a larghezza adattiva (1=100%, 2=50/50, 3=33x3) | ✅ Fatto e live | 05/07 |
 | Titoli che dicono COS'È (tipo + nome + contesto, in lingua) | ✅ Fatto e live | 05/07 |
 | Descrizioni AI sui FATTI (OSM+Wikipedia+Google: cosa/costi/come funziona, vietate le frasi vuote) | ✅ Fatto e live, da collaudare con login | 05/07 |
-| Descrizione 200 caratteri nella fascia rossa del dettaglio POI | ⬜ Da fare | prossimo giro |
+| Descrizione 200 caratteri nella fascia rossa del dettaglio POI (+ modifica inline del proprietario) | ✅ Fatto e live | 05/07 |
 | Immagini licenziate del luogo (Wikimedia, con attribuzione) | ⬜ Da fare | prossimo giro |
 | Ricerca indirizzo più intelligente (errori di battitura + contesto città) | 🔶 In parte (Albania-first fatto) | da rifinire |
 
@@ -57,6 +57,8 @@ info@321.al · https://321.al
 | Sistema email + AcumbaMail (serve la chiave da Alessandro) | ⬜ Da fare | prima del lancio |
 | Cambio tier utenti da admin + tier Professionista Plus + livello Influencer | ⬜ Da fare | prima del lancio |
 | Claim proprietà POI (a pagamento, con allarme in admin) | ⬜ Da fare | prima del lancio |
+| Codice di migrazione POI: cedi e riscatta (utenti e admin), collaudato end-to-end | ✅ Fatto e live | 05/07 |
+| Modifica POI del proprietario con AUTOSAVE (foto max 3 su server, descrizione inline) | ✅ Fatto e live | 05/07 |
 
 ### 4. Backend, database e sicurezza
 | Passo | Stato | Quando |
