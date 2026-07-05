@@ -35,7 +35,7 @@ info@321.al · https://321.al
 | Titoli che dicono COS'È (tipo + nome + contesto, in lingua) | ✅ Fatto e live | 05/07 |
 | Descrizioni AI sui FATTI (OSM+Wikipedia+Google: cosa/costi/come funziona, vietate le frasi vuote) | ✅ Fatto e live, da collaudare con login | 05/07 |
 | Descrizione 200 caratteri nella fascia rossa del dettaglio POI (+ modifica inline del proprietario) | ✅ Fatto e live | 05/07 |
-| Immagini licenziate del luogo (Wikimedia, con attribuzione) | ⬜ Da fare | prossimo giro |
+| Immagini licenziate del luogo (Wikimedia con attribuzione): proposta nel form, credito CC sulla foto, copilota le allega da solo | ✅ Fatto e live | 05/07 |
 | Ricerca indirizzo più intelligente (errori di battitura + contesto città) | 🔶 In parte (Albania-first fatto) | da rifinire |
 | Tassonomia POI a 3 livelli: categoria ricca curata + luogo personale privato + tag autocomplete (memoria `poi_taxonomy_plan`) | ⬜ Studiato, da fare (FASE A client, FASE B DB) | prima del lancio |
 | Categorie autoaggiornanti per analisi della richiesta (data-driven, con curation admin) | ⬜ Studiato, da fare | dopo tassonomia |
