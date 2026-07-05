@@ -7,7 +7,7 @@ info@321.al · https://321.al
 # CONTRATTO DI LAVORO · POI•LOVE
 
 > **Questa è la traccia ufficiale del progetto.** Ogni passo che facciamo è definito qui: cosa, in quale settore, con quale stato e quale tempistica. Si aggiorna a OGNI giro di lavoro, insieme a SAL.md (il diario) e TODO.md (la lista operativa).
-> Versione app corrente: **2.00** (partenza ufficiale 04/07/2026). Lancio pubblico: **lunedì 17/08/2026, Tirana**.
+> Versione app corrente: **2.16** (partenza ufficiale 2.00 il 04/07/2026). Lancio pubblico: **lunedì 17/08/2026, Tirana**.
 
 ## Le regole del contratto (valgono per ogni passo)
 
@@ -43,7 +43,8 @@ info@321.al · https://321.al
 | Lente esploratore: vista IBRIDA (stradale+satellite 40%+etichette), POI reali dentro il cerchio, zoom ad anello orario/antiorario fino a livello mondo, titolo intelligente | ✅ Fatto e live | 05/07 |
 | Lente: ghiera VISIBILE (48 tacche + segni piu/meno + suggerimento primo uso) e punti di interesse di GOOGLE col voto (OSM riserva) | ✅ Fatto e live | 05/07 |
 | Scheda aperta = zero bottoni flottanti; titolo POI rinominabile in loco; indirizzo mai vuoto; MAI la via/citta come nome (blocco) | ✅ Fatto e live | 05/07 |
-| Menu "+": Lente di ingrandimento al primo posto (precaricata, zoom medio-largo), "Sono qui" al secondo | ✅ Fatto e live | 06/07 |
+| Menu "+": Lente di ingrandimento al primo posto (precaricata, zoom medio-largo); "Sono qui: crea POI" RIMOSSO (il POI si crea dalla lente col bottone Salva) | ✅ Fatto e live | 06/07 |
+| Lente NERA per visibilità: ghiera, mirino e campana neri, faccette chiare, frecce e +/− bianchi da obiettivo fotografico | ✅ Fatto e live | 06/07 |
 | POI dentro le liste (openListDetail: aggiungi/rimuovi/riordina) | ⬜ Da fare | prima del lancio |
 | Filtri tag e categoria nel profilo (tocco un tag, vedo solo quelli) | ⬜ Da fare | prossimi giri |
 | Condivisione proprietaria (foglio POI•LOVE unico, mai il menu di sistema, oggi in ~8 punti) | ⬜ Da fare | prima del lancio |

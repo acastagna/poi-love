@@ -1,7 +1,13 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
-> **Prossima ripresa: collaudo di Alessandro (checklist della sessione 04/07) + Admin FASE 2 (email/AcumbaMail, rotte storiche admin, tier) + claim proprietà POI a pagamento + immagini Wikimedia.**
+> **Prossima ripresa: teaser misterioso di condivisione POI (zona + immagine + invito a registrarsi), poi avanti col contratto. Collaudi manuali di Alessandro in attesa (checklist 04/07 + claim a pagamento + copilota foto).**
 > Checkpoint sessione: `57984f5`, tag `checkpoint-2026-07-04` (HEAD su origin/main). **Nessun lavoro non committato.**
+
+## Sessione 06/07/2026 — Ricerca avanzata, lente nera, menu asciugato (v2.14 → v2.16)
+
+- **v2.14**: menu "+" riordinato con la Lente di ingrandimento al primo posto, lente e mappa precaricate all'avvio con zoom medio-largo (14); frecce della ghiera incise a 3 passate con punta grande.
+- **v2.15**: ricerca con correzione avanzata: normalizzazione accenti/ç/ë, tolleranza refusi fino a 2 lettere (fuzzy+Levenshtein), "Forse cercavi" istantaneo su un dizionario di luoghi albanesi, Albania sempre prima nei risultati (Nominatim countrycodes=al prima del resto), rotte storiche cercabili. Commit `9f82b3a`.
+- **v2.16**: "Sono qui: crea POI" rimosso dal menu "+" (il POI si crea dalla lente con "Salva il POI"); lente NERA al posto del grigio che non si vedeva: ghiera, mirino e campana in nero quasi pieno, faccette della zigrinatura chiare sul nero, frecce orario/antiorario e segni +/− BIANCHI nitidi come le marcature degli obiettivi fotografici. Verificata in browser (screenshot ok) e live (md5 identico, versione nei footer). Commit `2d65e85`.
 
 ## Sessione 04/07/2026 — Review avversariale completa: 51 fix confermati, TUTTO deployato e verificato live
 
