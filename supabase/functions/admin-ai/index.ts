@@ -1013,6 +1013,27 @@ async function fillAddresses(kind: string | undefined, payload: Record<string, u
   }
 }
 
+// Foto RAPPRESENTATIVA a licenza libera: l'immagine principale dell'articolo
+// Wikipedia del luogo (coerente per definizione). Timeout 4s per lingua.
+async function licensedImageFor(name: string): Promise<string | null> {
+  const base = String(name || "").trim();
+  if (!base) return null;
+  for (const l of ["it", "sq", "en"]) {
+    try {
+      const u = `https://${l}.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrsearch=${encodeURIComponent(base)}&gsrlimit=1&prop=pageimages&piprop=original&pilicense=free`;
+      const r = await fetch(u, { signal: AbortSignal.timeout(4000) });
+      if (!r.ok) continue;
+      const d = await r.json();
+      const pages = d?.query?.pages;
+      if (!pages) continue;
+      const pg: any = Object.values(pages)[0];
+      const src = pg?.original?.source;
+      if (src && (pg.original.width || 0) >= 500) return String(src);
+    } catch (_e) { /* lingua successiva */ }
+  }
+  return null;
+}
+
 async function persistProposal(
   svc: SvcClient,
   adminId: string,
@@ -1021,6 +1042,11 @@ async function persistProposal(
   const { kind, title, summary, payload } = res;
   // Indirizzo reale: se il POI ha coordinate ma niente address, lo ricaviamo da OSM prima di salvare.
   await fillAddresses(kind, payload as Record<string, unknown> | undefined);
+  // Foto a licenza libera per il POI singolo (se il luogo e' noto su Wikipedia)
+  if (kind === "poi" && payload && !payload.photo) {
+    const ph = await licensedImageFor(String(payload.name ?? ""));
+    if (ph) payload.photo = ph;
+  }
   const rationale =
     payload && typeof payload.rationale === "string" ? (payload.rationale as string) : null;
 
