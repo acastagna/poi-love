@@ -3391,6 +3391,7 @@ sb.auth.getSession().then(({ data: { session } }) => {
     loadUserLovesCount();
     applyPendingReferral();
     applyPendingJoin();
+    window._pendingOpened=false; // nuovo ciclo: azzera la mutua esclusione pending POI/profilo
     openPendingSharedPoi();
     openPendingSharedProfile();
   } else {
@@ -3521,6 +3522,7 @@ function onAuthStateUpdate(event) {
     loadUserLovesCount();
     applyPendingReferral();
     applyPendingJoin();
+    window._pendingOpened=false; // nuovo ciclo: azzera la mutua esclusione pending POI/profilo
     openPendingSharedPoi();
     openPendingSharedProfile();
     // "Ricordami" — salva snapshot leggero per pre-fill UX al prossimo avvio
@@ -6036,7 +6038,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='2.25';
+const APP_VERSION='2.26';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 console.info('POI•LOVE v'+APP_VERSION);
 // Le rotte storiche pubblicate sono contenuto PUBBLICO: si caricano per tutti,
@@ -7103,7 +7105,7 @@ function navigateToPoi(lat, lng, name){
   openNavPicker(lat, lng, name||'');
 }
 
-// Condivisione: usa Web Share API se disponibile, altrimenti clipboard + toast
+// Condivisione: apre il foglio proprietario POI•LOVE (mai il menu di sistema)
 async function sharePoiByKey(key){
   const p = _poiFromKey(key);
   if(!p) return;
@@ -7846,7 +7848,7 @@ async function sharePlaceToContact(){
   if(!_mapPopupCtx) return;
   const { lat, lng, name } = _mapPopupCtx;
   const url = `https://www.google.com/maps?q=${lat},${lng}`;
-  const text = `Ti consiglio "${name}" — l'ho trovato su POI•LOVE`;
+  const text = `Ti consiglio "${name}", l'ho trovato su POI•LOVE`;
   openShareSheet({ title: name, url, text });
 }
 
@@ -9700,15 +9702,25 @@ function _catLabel(c){ return (lang==='sq'?c.label_sq:lang==='en'?c.label_en:c.l
 function catLabelByKey(key){ const c=_POI_CATS.find(x=>x.key===key); return c?_catLabel(c):''; }
 function buildCatPicker(){
   const box=document.getElementById('catPicker'); if(!box||!_POI_CATS.length) return;
-  let html=''; let curGrp=null;
+  const icoSafe=x=>String(x||'map-pin').replace(/[^a-z0-9-]/gi,'')||'map-pin';
+  const grpLbl=txt=>{ const d=document.createElement('div'); d.className='cat-grp-lbl'; d.textContent=txt||''; return d; };
+  const catChip=(cls,icon,label)=>{ const b=document.createElement('button'); b.type='button'; b.className=cls;
+    const i2=document.createElement('i'); i2.className='ph-duotone ph-'+icoSafe(icon); b.appendChild(i2);
+    b.appendChild(document.createTextNode(label||'')); return b; };
+  box.textContent=''; let curGrp=null;
   _POI_CATS.forEach(c=>{
     const g=_CAT_GROUP_OF[c.macro]||'services';
-    if(g!==curGrp){ curGrp=g; const gl=_CAT_GROUP_LBL[g]||{}; html+=`<div class="cat-grp-lbl">${String(gl[lang]||gl.it||'').replace(/</g,'&lt;')}</div>`; }
-    html+=`<button type="button" class="cat-chip" data-key="${c.key}" data-macro="${c.macro}" data-color="${c.color}" onclick="selectCat(this)"><i class="ph-duotone ph-${c.icon}"></i>${String(_catLabel(c)).replace(/</g,'&lt;')}</button>`;
+    if(g!==curGrp){ curGrp=g; const gl=_CAT_GROUP_LBL[g]||{}; box.appendChild(grpLbl(String(gl[lang]||gl.it||''))); }
+    const chip=catChip('cat-chip', c.icon, _catLabel(c));
+    chip.dataset.key=c.key; chip.dataset.macro=c.macro; chip.dataset.color=c.color;
+    chip.addEventListener('click',function(){ selectCat(this); });
+    box.appendChild(chip);
   });
-  html+=`<div class="cat-grp-lbl"></div><button type="button" class="cat-chip cat-other" onclick="askOtherCategory()"><i class="ph-duotone ph-plus"></i>${t('cat_other','Altra categoria')}</button>`;
-  box.innerHTML=html;
-  if(_selCatKey){ const b=box.querySelector('.cat-chip[data-key="'+_selCatKey+'"]'); if(b) _applyCatSel(b); }
+  box.appendChild(grpLbl(''));
+  const other=catChip('cat-chip cat-other','plus',t('cat_other','Altra categoria'));
+  other.addEventListener('click',askOtherCategory);
+  box.appendChild(other);
+  if(_selCatKey){ const b=box.querySelector('.cat-chip[data-key="'+CSS.escape(_selCatKey)+'"]'); if(b) _applyCatSel(b); }
 }
 function _applyCatSel(btn){
   document.querySelectorAll('#catPicker .cat-chip').forEach(c=>{c.classList.remove('sel');c.style.background='';});
@@ -9758,7 +9770,14 @@ function _tagSuggest(prefix){
       const {data}=await sb.rpc('suggest_tags',{p_prefix:prefix});
       const cur=new Set(Array.from(document.querySelectorAll('#sheetTagsContainer .tag-chip-inline')).map(e=>e.firstChild.textContent.trim().toLowerCase()));
       const sugg=(data||[]).filter(x=>!cur.has(String(x).toLowerCase())).slice(0,8);
-      box.innerHTML=sugg.map(x=>{const v=String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/'/g,'&#39;').replace(/"/g,'&quot;');return `<button type="button" onclick="_pickTagSuggest('${v}')">#${v}</button>`;}).join('');
+      box.textContent='';
+      sugg.forEach(x=>{
+        const val=String(x);
+        const b=document.createElement('button');
+        b.type='button'; b.textContent='#'+val; b.dataset.tag=val;
+        b.addEventListener('click',()=>_pickTagSuggest(b.dataset.tag));
+        box.appendChild(b);
+      });
     }catch(_){}
   },220);
 }
