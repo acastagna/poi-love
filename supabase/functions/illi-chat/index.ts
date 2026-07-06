@@ -4,26 +4,26 @@
  * info@321.al · https://321.al
  */
 // Edge Function: illi-chat
-// Proxy server-side per le chiamate di ILLI•AI a OpenAI. La chiave (OPENAI_KEY) vive
-// come SEGRETO sul server, MAI nel client ne nel repo.
+// Proxy server-side per le chiamate di ILLI•AI. MULTI-PROVIDER: il motore (OpenAI o
+// Anthropic) e il modello si scelgono dal PANNELLO ADMIN (config gamification_config
+// key "illi_engine" = { provider, model }). Le CHIAVI (OPENAI_KEY, ANTHROPIC_KEY)
+// restano SEGRETI in Deno.env, MAI nel client ne nel repo: il pannello sceglie solo
+// QUALE motore usare, mai la chiave. Fail-safe: se il provider scelto non ha la
+// chiave configurata, si ripiega su OpenAI. La risposta e' SEMPRE normalizzata alla
+// shape OpenAI (json.choices[0].message.content), cosi il client non cambia.
 //
 // SICUREZZA (non negoziabile, stesso schema di admin-ai):
 //   1) legge il JWT dall'header Authorization;
 //   2) crea un client Supabase con ANON key + quel JWT e chiama auth.getUser():
 //      senza utente valido risponde 401 { error: "auth_required" };
 //   3) con un client service_role (segreto, mai esposto al client) legge il tier
-//      dell'utente (profiles.special_tier) e i limiti AI per tier dalla config
-//      gamification_config key "ai_limits_per_tier";
+//      dell'utente (profiles.special_tier), i limiti AI per tier e il motore attivo;
 //   4) conta i messaggi del giorno via RPC increment_ai_usage(p_user): oltre la
 //      soglia del tier risponde 429 { error: "daily_limit", limit: N }.
 //
-// SANITIZZAZIONE: dei messages in ingresso passano a OpenAI SOLO { role, content }
+// SANITIZZAZIONE: dei messages in ingresso passano al provider SOLO { role, content }
 // (max 14 messaggi, content max 4000 caratteri). Campi extra tipo "places" vengono
 // scartati qui e non arrivano mai al provider.
-//
-// STATUS HTTP VERI: 401 auth, 429 limite, 400 body vuoto, 503 no_key/eccezione,
-// status reale di OpenAI se il provider risponde non-ok. Successo: 200 con il body
-// OpenAI tale e quale (il client legge json.choices).
 
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
@@ -47,11 +47,11 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
 const ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 const OPENAI_KEY = Deno.env.get("OPENAI_KEY") ?? "";
+const ANTHROPIC_KEY = Deno.env.get("ANTHROPIC_KEY") ?? "";
 
 // ── Costanti ──────────────────────────────────────────────────────────────────
-// Modelli ammessi dal client: solo i piccoli/economici. Niente gpt-4 pieno.
-const ALLOWED_MODELS = new Set(["gpt-4o-mini", "gpt-4.1-mini", "gpt-4o-mini-2024-07-18"]);
 const DEFAULT_MODEL = "gpt-4o-mini";
+const DEFAULT_ANTHROPIC_MODEL = "claude-3-5-haiku-latest";
 
 // Difese di default se la config non c'e o e incompleta (tier free).
 const DEFAULT_DAILY_MESSAGES = 10;
@@ -61,8 +61,8 @@ const DEFAULT_MAX_TOKENS = 800;
 const MAX_MESSAGES = 14;
 const MAX_CONTENT_CHARS = 4000;
 
-// Timeout verso OpenAI: su mobile stallato meglio un errore chiaro che uno spinner infinito.
-const OPENAI_TIMEOUT_MS = 20000;
+// Timeout verso il provider: su mobile stallato meglio un errore chiaro che uno spinner infinito.
+const PROVIDER_TIMEOUT_MS = 20000;
 
 // ── Tipi ──────────────────────────────────────────────────────────────────────
 type Role = "user" | "assistant" | "system";
@@ -75,10 +75,12 @@ interface TierLimits {
   maxTokens: number;
   model: string | null;
 }
+interface Engine {
+  provider: "openai" | "anthropic";
+  model: string;
+}
 
 // ── Sanitizzazione messages ───────────────────────────────────────────────────
-// Riduce ogni elemento a { role, content } puliti: role solo tra i tre ammessi,
-// content stringa troncata. Tutto il resto (campi extra, tipi strani) si butta.
 function sanitizeMessages(raw: unknown): ChatMessage[] {
   if (!Array.isArray(raw)) return [];
   const out: ChatMessage[] = [];
@@ -90,13 +92,10 @@ function sanitizeMessages(raw: unknown): ChatMessage[] {
     if (typeof content !== "string" || !content.trim()) continue;
     out.push({ role, content: content.slice(0, MAX_CONTENT_CHARS) });
   }
-  // Tengo gli ultimi 14: il contesto recente vale piu di quello vecchio.
   return out.slice(-MAX_MESSAGES);
 }
 
 // ── Risoluzione limiti del tier dalla config ──────────────────────────────────
-// Config attesa (seed in 012_admin.sql): { tier: { messages_per_day, max_tokens, model } }.
-// Accetto anche la chiave "messages" per robustezza. Fallback: valori free di default.
 function resolveTierLimits(configValue: unknown, tier: string): TierLimits {
   const limits: TierLimits = {
     messages: DEFAULT_DAILY_MESSAGES,
@@ -114,23 +113,43 @@ function resolveTierLimits(configValue: unknown, tier: string): TierLimits {
   const tok = Number(entry.max_tokens);
   if (Number.isFinite(tok) && tok > 0) limits.maxTokens = Math.floor(tok);
 
-  // Il modello del tier vale SOLO se presente in config come stringa non vuota.
   if (typeof entry.model === "string" && entry.model.trim()) limits.model = entry.model.trim();
 
   return limits;
 }
 
+// ── Risoluzione del MOTORE attivo (scelto dall'admin) ─────────────────────────
+// Config attesa: { provider: "openai"|"anthropic", model: "..." }.
+// Default: OpenAI gpt-4o-mini (comportamento storico, zero regressione).
+// L'admin e' fidato ma il valore viene validato per formato; se il provider scelto
+// non ha la chiave configurata si ripiega su OpenAI (fail-safe).
+function resolveEngine(configValue: unknown): Engine {
+  let provider: "openai" | "anthropic" = "openai";
+  let model = DEFAULT_MODEL;
+  if (configValue && typeof configValue === "object") {
+    const c = configValue as Record<string, unknown>;
+    const p = typeof c.provider === "string" ? c.provider.trim().toLowerCase() : "";
+    if (p === "anthropic") { provider = "anthropic"; model = DEFAULT_ANTHROPIC_MODEL; }
+    const m = typeof c.model === "string" ? c.model.trim() : "";
+    if (m) model = m;
+  }
+  // Validazione formato: niente stringhe assurde nel nome modello.
+  if (provider === "anthropic" && !/^claude-[a-z0-9._-]+$/i.test(model)) model = DEFAULT_ANTHROPIC_MODEL;
+  if (provider === "openai" && !/^gpt-[a-z0-9._-]+$/i.test(model)) model = DEFAULT_MODEL;
+  // Fail-safe: provider scelto senza chiave -> OpenAI.
+  if (provider === "anthropic" && !ANTHROPIC_KEY) { provider = "openai"; model = DEFAULT_MODEL; }
+  return { provider, model };
+}
+
 // ── Handler ───────────────────────────────────────────────────────────────────
 Deno.serve(async (req: Request) => {
-  // Rimborso quota: se il messaggio e' gia' stato contato ma OpenAI fallisce,
-  // lo si restituisce all'utente (RPC decrement_ai_usage, mig 017). Dichiarato
-  // fuori dal try per essere raggiungibile anche dal catch.
+  // Rimborso quota: se il messaggio e' gia' stato contato ma il provider fallisce,
+  // lo si restituisce all'utente (RPC decrement_ai_usage, mig 017).
   let refundQuota: (() => Promise<void>) | null = null;
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
   if (req.method !== "POST") return json({ error: "method_not_allowed" }, 405);
 
   try {
-    // Config minima presente?
     if (!SUPABASE_URL || !ANON_KEY || !SERVICE_ROLE_KEY) {
       console.error("illi-chat: env supabase mancante (url/anon/service_role)");
       return json({ error: "internal" }, 503);
@@ -151,22 +170,36 @@ Deno.serve(async (req: Request) => {
     const user = userData?.user;
     if (userErr || !user) return json({ error: "auth_required" }, 401);
 
-    // ── 2) Chiave provider: senza chiave inutile consumare quota utente ────────
-    if (!OPENAI_KEY) return json({ error: "no_key" }, 503);
-
-    // ── 3) Body sanitizzato PRIMA di contare: un body vuoto non brucia quota ───
-    const body = await req.json().catch(() => ({}));
-    const messages = sanitizeMessages(body?.messages);
-    if (!messages.length) return json({ error: "bad_request" }, 400);
-
-    // ── 4) Tier e limiti con service_role (la chiave non esce mai da qui) ──────
+    // Client service_role: la chiave non esce mai da qui.
     const svc = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
 
-    const [profileRes, configRes] = await Promise.all([
+    const body = await req.json().catch(() => ({}));
+
+    // ── engine_status: solo admin, sola lettura, nessuna quota consumata ───────
+    // Serve al pannello per mostrare quali chiavi sono configurate e quale motore
+    // e' attivo, senza mai esporre le chiavi.
+    if (body?.mode === "engine_status") {
+      const { data: prof } = await svc.from("profiles").select("is_admin").eq("id", user.id).maybeSingle();
+      if (!(prof as { is_admin?: boolean } | null)?.is_admin) return json({ error: "forbidden" }, 403);
+      const { data: eng } = await svc.from("gamification_config").select("value").eq("key", "illi_engine").maybeSingle();
+      const active = resolveEngine((eng as { value?: unknown } | null)?.value);
+      return json({
+        providers: { openai: !!OPENAI_KEY, anthropic: !!ANTHROPIC_KEY },
+        active,
+      }, 200);
+    }
+
+    // ── 2) Body sanitizzato PRIMA di contare: un body vuoto non brucia quota ───
+    const messages = sanitizeMessages(body?.messages);
+    if (!messages.length) return json({ error: "bad_request" }, 400);
+
+    // ── 3) Tier, limiti e motore con service_role ─────────────────────────────
+    const [profileRes, configRes, engineRes] = await Promise.all([
       svc.from("profiles").select("special_tier").eq("id", user.id).maybeSingle(),
       svc.from("gamification_config").select("value").eq("key", "ai_limits_per_tier").maybeSingle(),
+      svc.from("gamification_config").select("value").eq("key", "illi_engine").maybeSingle(),
     ]);
     if (profileRes.error) console.error("illi-chat: lettura profilo fallita:", profileRes.error.message);
     if (configRes.error) console.error("illi-chat: lettura config fallita:", configRes.error.message);
@@ -174,66 +207,108 @@ Deno.serve(async (req: Request) => {
     const rawTier = (profileRes.data as { special_tier?: unknown } | null)?.special_tier;
     const tier = typeof rawTier === "string" && rawTier.trim() ? rawTier.trim() : "free";
     const limits = resolveTierLimits((configRes.data as { value?: unknown } | null)?.value, tier);
+    const engine = resolveEngine((engineRes.data as { value?: unknown } | null)?.value);
 
-    // ── 5) Contatore giornaliero via RPC: oltre soglia si rifiuta con 429 ──────
-    // La RPC increment_ai_usage arriva con la migrazione 016: se non esiste ancora
-    // fail-open transitorio (loggato), MAI bloccare gli utenti per un deploy a meta.
+    // Chiave del provider effettivo: senza chiave inutile consumare quota utente.
+    if (engine.provider === "openai" && !OPENAI_KEY) return json({ error: "no_key" }, 503);
+    if (engine.provider === "anthropic" && !ANTHROPIC_KEY) return json({ error: "no_key" }, 503);
+
+    // ── 4) Contatore giornaliero via RPC: oltre soglia si rifiuta con 429 ──────
     const { data: usageData, error: usageErr } = await svc.rpc("increment_ai_usage", {
       p_user: user.id,
     });
     if (usageErr) {
       console.error("illi-chat: increment_ai_usage non disponibile (fail-open):", usageErr.message);
     } else {
-      // count e' POST-incremento: con limite N l'N-esimo messaggio ha count=N e passa
-      // (giusto: e' l'N-esimo), l'N+1-esimo ha count=N+1 e viene rifiutato. Limite esatto = N.
       const count = typeof usageData === "number" ? usageData : Number(usageData);
       if (Number.isFinite(count) && count > limits.messages) {
         return json({ error: "daily_limit", limit: limits.messages }, 429);
       }
-      // Messaggio contato: da qui in poi, se OpenAI fallisce, va rimborsato.
       refundQuota = async () => {
-        refundQuota = null; // idempotente: al massimo un rimborso
+        refundQuota = null; // idempotente
         const { error: refundErr } = await svc.rpc("decrement_ai_usage", { p_user: user.id });
         if (refundErr) console.error("illi-chat: rimborso quota fallito:", refundErr.message);
       };
     }
 
-    // ── 6) Payload verso OpenAI: solo campi decisi qui, mai il body grezzo ─────
-    // Modello: whitelist sul valore chiesto dal client, override dal tier se in config.
-    const clientModel = ALLOWED_MODELS.has(body?.model) ? body.model : DEFAULT_MODEL;
-    const model = limits.model ?? clientModel;
-    const payload = {
-      model,
-      messages,
-      temperature: typeof body?.temperature === "number" ? body.temperature : 0.7,
-      max_completion_tokens: Math.min(
-        Number(body?.max_completion_tokens) || 512,
-        limits.maxTokens,
-      ),
-    };
+    const temperature = typeof body?.temperature === "number" ? body.temperature : 0.7;
+    const maxTokens = Math.min(Number(body?.max_completion_tokens) || 512, limits.maxTokens);
 
+    // ── 5) Dispatch al provider scelto ────────────────────────────────────────
+    if (engine.provider === "anthropic") {
+      // Anthropic vuole il system separato e solo ruoli user/assistant nei messages.
+      const systemPrompt = messages.filter((m) => m.role === "system").map((m) => m.content).join("\n\n");
+      const amsgs = messages
+        .filter((m) => m.role !== "system")
+        .map((m) => ({ role: m.role, content: m.content }));
+      if (!amsgs.length) return json({ error: "bad_request" }, 400);
+
+      const r = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": ANTHROPIC_KEY,
+          "anthropic-version": "2023-06-01",
+        },
+        body: JSON.stringify({
+          model: engine.model,
+          max_tokens: maxTokens,
+          temperature,
+          ...(systemPrompt ? { system: systemPrompt } : {}),
+          messages: amsgs,
+        }),
+        signal: AbortSignal.timeout(PROVIDER_TIMEOUT_MS),
+      });
+      if (!r.ok) {
+        const detail = await r.text().catch(() => "");
+        console.error(`illi-chat: Anthropic ${r.status}:`, detail.slice(0, 500));
+        if (refundQuota) await refundQuota();
+        return json({ error: "upstream", status: r.status }, r.status);
+      }
+      const ad = await r.json();
+      const text = Array.isArray(ad?.content)
+        ? ad.content.filter((b: any) => b?.type === "text").map((b: any) => b.text).join("")
+        : "";
+      // Normalizzo alla shape OpenAI: il client legge json.choices[0].message.content.
+      return json({
+        choices: [{
+          index: 0,
+          message: { role: "assistant", content: text },
+          finish_reason: ad?.stop_reason ?? "stop",
+        }],
+        usage: {
+          prompt_tokens: ad?.usage?.input_tokens ?? null,
+          completion_tokens: ad?.usage?.output_tokens ?? null,
+        },
+        model: ad?.model ?? engine.model,
+        provider: "anthropic",
+      }, 200);
+    }
+
+    // ── OpenAI (default) ──────────────────────────────────────────────────────
+    const payload = {
+      model: engine.model,
+      messages,
+      temperature,
+      max_completion_tokens: maxTokens,
+    };
     const r = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: { "Content-Type": "application/json", "Authorization": `Bearer ${OPENAI_KEY}` },
       body: JSON.stringify(payload),
-      signal: AbortSignal.timeout(OPENAI_TIMEOUT_MS),
+      signal: AbortSignal.timeout(PROVIDER_TIMEOUT_MS),
     });
-
-    // ── 7) Status veri: se OpenAI fallisce si inoltra il SUO status, non 200 ───
     if (!r.ok) {
       const detail = await r.text().catch(() => "");
       console.error(`illi-chat: OpenAI ${r.status}:`, detail.slice(0, 500));
-      if (refundQuota) await refundQuota(); // il fallimento non e' colpa dell'utente
+      if (refundQuota) await refundQuota();
       return json({ error: "upstream", status: r.status }, r.status);
     }
-
-    // Successo: risposta OpenAI tale e quale, il client legge json.choices.
     const data = await r.json();
     return json(data, 200);
   } catch (e) {
-    // Include il timeout (AbortSignal): meglio un 503 chiaro che uno spinner infinito.
     console.error("illi-chat: eccezione:", String(e));
-    if (refundQuota) await refundQuota(); // anche qui: quota restituita
+    if (refundQuota) await refundQuota();
     return json({ error: "internal" }, 503);
   }
 });

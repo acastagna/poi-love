@@ -576,6 +576,23 @@ html[data-theme="light"] .chip.green{color:#236b39}
 
     <!-- 4) LIMITI AI -->
     <section class="section" id="sec-ailimits">
+      <div class="panel" style="margin-bottom:16px">
+        <div class="card-h"><span class="ic"><i class="ph-duotone ph-robot"></i></span><span data-t="engine_title">Motore di ILLI</span></div>
+        <div class="sub" style="font-size:12px;color:var(--muted);margin-bottom:14px" data-t="engine_help">Scegli quale intelligenza alimenta ILLI. Le chiavi API restano nei segreti di Supabase: qui scegli solo il motore e il modello.</div>
+        <div class="row2">
+          <div class="field"><label data-t="engine_provider">Provider</label>
+            <select id="illiProvider" onchange="onIlliProviderChange()">
+              <option value="openai">OpenAI</option>
+              <option value="anthropic">Anthropic (Claude)</option>
+            </select>
+          </div>
+          <div class="field"><label data-t="engine_model">Modello</label>
+            <select id="illiModel"></select>
+          </div>
+        </div>
+        <div id="illiEngineStatus" class="sm" style="margin:6px 0 12px;display:flex;gap:6px;flex-wrap:wrap;align-items:center"></div>
+        <div class="btn-row"><button class="btn gold" onclick="saveIlliEngine()" data-t="engine_save">Salva motore</button></div>
+      </div>
       <div class="panel">
         <div class="card-h"><span class="ic"><i class="ph-duotone ph-sliders-horizontal"></i></span><span data-t="ailimits_title">Limiti AI per tier</span></div>
         <div class="sub" style="font-size:12px;color:var(--muted);margin-bottom:14px" data-t="ailimits_help">
@@ -841,6 +858,10 @@ const T = {
     latest_pois:'Ultimi POI', latest_users:'Ultimi iscritti',
     moderation_queue:'Coda segnalazioni', search:'Cerca',
     ailimits_title:'Limiti AI per tier', ailimits_help:'Configura messaggi al giorno, token massimi e modello per ciascun livello. Salva su gamification_config.',
+    engine_title:'Motore di ILLI', engine_help:'Scegli quale intelligenza alimenta ILLI. Le chiavi API restano nei segreti di Supabase: qui scegli solo il motore e il modello.',
+    engine_provider:'Provider', engine_model:'Modello', engine_save:'Salva motore',
+    engine_key_ok:'chiave configurata', engine_key_missing:'chiave mancante',
+    engine_anthropic_nokey:'Per usare Anthropic imposta ANTHROPIC_KEY nei segreti di Supabase (Edge Functions). Finché manca, ILLI resta su OpenAI.',
     save_limits:'Salva limiti', reload:'Ricarica',
     mode_chat:'Chat', mode_route:'Traccia percorso', mode_write:'Scrivi testo', send:'Invia',
     create_poi:'Crea POI ufficiale', f_name:'Nome', f_desc:'Descrizione', f_cat:'Categoria', f_vis:'Visibilità',
@@ -934,6 +955,10 @@ const T = {
     latest_pois:'POI të fundit', latest_users:'Regjistrimet e fundit',
     moderation_queue:'Radha e raportimeve', search:'Kërko',
     ailimits_title:'Limitet AI sipas nivelit', ailimits_help:'Konfiguro mesazhe në ditë, token maksimumi dhe modelin për çdo nivel. Ruaj në gamification_config.',
+    engine_title:'Motori i ILLI-t', engine_help:'Zgjidh cila inteligjencë e ushqen ILLI-n. Çelësat API rrinë në sekretet e Supabase: këtu zgjedh vetëm motorin dhe modelin.',
+    engine_provider:'Provider', engine_model:'Modeli', engine_save:'Ruaj motorin',
+    engine_key_ok:'çelësi i konfiguruar', engine_key_missing:'çelësi mungon',
+    engine_anthropic_nokey:'Për të përdorur Anthropic vendos ANTHROPIC_KEY te sekretet e Supabase (Edge Functions). Deri atëherë, ILLI rri në OpenAI.',
     save_limits:'Ruaj limitet', reload:'Rifresko',
     mode_chat:'Bisedë', mode_route:'Vizato itinerar', mode_write:'Shkruaj tekst', send:'Dërgo',
     create_poi:'Krijo POI zyrtar', f_name:'Emri', f_desc:'Përshkrimi', f_cat:'Kategoria', f_vis:'Dukshmëria',
@@ -1023,6 +1048,10 @@ const T = {
     latest_pois:'Latest POIs', latest_users:'Latest signups',
     moderation_queue:'Reports queue', search:'Search',
     ailimits_title:'AI limits per tier', ailimits_help:'Set messages per day, max tokens and model for each tier. Saved to gamification_config.',
+    engine_title:'ILLI engine', engine_help:'Choose which intelligence powers ILLI. API keys stay in Supabase secrets: here you only pick the engine and model.',
+    engine_provider:'Provider', engine_model:'Model', engine_save:'Save engine',
+    engine_key_ok:'key configured', engine_key_missing:'key missing',
+    engine_anthropic_nokey:'To use Anthropic set ANTHROPIC_KEY in Supabase secrets (Edge Functions). Until then, ILLI stays on OpenAI.',
     save_limits:'Save limits', reload:'Reload',
     mode_chat:'Chat', mode_route:'Route', mode_write:'Write text', send:'Send',
     create_poi:'Create official POI', f_name:'Name', f_desc:'Description', f_cat:'Category', f_vis:'Visibility',
@@ -1617,7 +1646,72 @@ async function moderateUser(targetId, status, reason, until){
 const TIER_ORDER = ['free','professionista','sostenitore','mecenate'];
 let aiLimitsDraft = null; // copia modificabile in memoria
 
+/* ── Motore di ILLI (multi-provider, scelto dall'admin) ──────────────────────
+   Il pannello sceglie solo provider + modello (salvati in gamification_config.
+   illi_engine). Le CHIAVI API restano nei segreti Supabase (Deno.env dell'edge):
+   qui mostriamo solo se sono configurate, mai il loro valore. */
+const ILLI_MODELS = {
+  openai: ['gpt-4o-mini','gpt-4.1-mini','gpt-4o'],
+  anthropic: ['claude-3-5-haiku-latest','claude-sonnet-4-6']
+};
+let _illiEngine = { provider:'openai', model:'gpt-4o-mini' };
+let _illiKeys = { openai:null, anthropic:null };
+function _fillIlliModels(provider, selected){
+  const sel=document.getElementById('illiModel'); if(!sel) return; sel.textContent='';
+  (ILLI_MODELS[provider]||[]).forEach(m=> sel.appendChild(el('option',{value:m},m)) );
+  if(selected && !(ILLI_MODELS[provider]||[]).includes(selected)) sel.appendChild(el('option',{value:selected},selected));
+  if(selected) sel.value=selected;
+}
+function onIlliProviderChange(){
+  const p=document.getElementById('illiProvider').value;
+  _fillIlliModels(p, (ILLI_MODELS[p]||[])[0]);
+  _renderIlliStatus();
+}
+function _renderIlliStatus(){
+  const box=document.getElementById('illiEngineStatus'); if(!box) return;
+  box.textContent='';
+  const chip=(name,ok)=> el('span',{class:'chip '+(ok?'green':'dim'),text:name+': '+(ok? t('engine_key_ok') : (ok===false? t('engine_key_missing') : '…'))});
+  box.appendChild(chip('OpenAI', _illiKeys.openai));
+  box.appendChild(chip('Anthropic', _illiKeys.anthropic));
+  const p=document.getElementById('illiProvider').value;
+  if(p==='anthropic' && _illiKeys.anthropic===false){
+    box.appendChild(el('div',{class:'sm',style:'flex-basis:100%;color:var(--red);margin-top:4px',text:t('engine_anthropic_nokey')}));
+  }
+}
+async function loadIlliEngine(){
+  try{
+    const { data } = await sb.from('gamification_config').select('value').eq('key','illi_engine').maybeSingle();
+    if(data && data.value && typeof data.value==='object'){
+      _illiEngine = { provider: (data.value.provider==='anthropic'?'anthropic':'openai'), model: data.value.model||'' };
+    }
+  }catch(_){}
+  const psel=document.getElementById('illiProvider'); if(psel) psel.value=_illiEngine.provider;
+  _fillIlliModels(_illiEngine.provider, _illiEngine.model);
+  _renderIlliStatus();
+  // stato chiavi via edge (admin-only, non espone mai i valori)
+  try{
+    const { data, error } = await sb.functions.invoke('illi-chat', { body:{ mode:'engine_status' } });
+    if(!error && data && data.providers){
+      _illiKeys = { openai: !!data.providers.openai, anthropic: !!data.providers.anthropic };
+    }
+  }catch(_){ }
+  _renderIlliStatus();
+}
+async function saveIlliEngine(){
+  const provider=document.getElementById('illiProvider').value;
+  const model=document.getElementById('illiModel').value;
+  if(!model){ toast(t('error'),'err'); return; }
+  try{
+    const { error } = await sb.from('gamification_config').upsert({ key:'illi_engine', value:{ provider, model } }, { onConflict:'key' });
+    if(error){ toast(isBackendMissing(error)?t('backend_off'):(error.message||t('error')),'err'); return; }
+    await logAudit('illi_engine_update','config','illi_engine',{ provider, model });
+    toast(t('saved'),'ok');
+    loadIlliEngine();
+  }catch(e){ toast(t('error'),'err'); }
+}
+
 async function loadAiLimits(){
+  loadIlliEngine();
   const box=document.getElementById('aiLimitsTable'); loadingBox(box);
   try{
     const { data, error } = await sb.from('gamification_config').select('key,value').eq('key','ai_limits_per_tier').single();
