@@ -120,7 +120,8 @@ info@321.al · https://321.al
 | Passo | Stato | Quando |
 |---|---|---|
 | Termini e Privacy online in 3 lingue | ✅ Fatto e live | 27/06 |
-| Validazione legale dei testi (professionista) | ⬜ Da fare | prima del lancio |
+| Testi legali allineati al codice reale (privacy+termini: media server, tag community, tracciamento categorie, cessione/reclamo POI, OAuth Facebook/Apple, tier Plus/Influencer; data 06/07) | ✅ Fatto e live | 06/07 |
+| Validazione legale FINALE (avvocato): consenso lente pre-login verso Google, SCC/DPF trasferimenti extra-UE realmente firmati, ruolo media.poilove.com nel registro, nomina DPO+rappresentante Albania, dati di terzi (email invitati, volti nelle foto) | ⬜ Serve Alessandro/legale | prima del lancio |
 | Collaudo finale di Alessandro (checklist 5 prove) | ⬜ In attesa | adesso |
 | Presentazione aggiornata su project.poilove.com (screenshot delle novità) | ⬜ Da fare | prima del lancio |
 | OAuth: Facebook (App Review Meta) · Apple ($99/anno) | ⬜ Da fare | prima del lancio |
