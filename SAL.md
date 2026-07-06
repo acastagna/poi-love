@@ -3,7 +3,7 @@
 > **Prossima ripresa: teaser misterioso di condivisione POI (zona + immagine + invito a registrarsi), poi avanti col contratto. Collaudi manuali di Alessandro in attesa (checklist 04/07 + claim a pagamento + copilota foto).**
 > Checkpoint sessione: `57984f5`, tag `checkpoint-2026-07-04` (HEAD su origin/main). **Nessun lavoro non committato.**
 
-## Sessione 06/07/2026 — Ricerca avanzata, lente nera, teaser condivisione (v2.14 → v2.38)
+## Sessione 06/07/2026 — Ricerca avanzata, lente nera, teaser condivisione (v2.14 → v2.39)
 
 - **Verifica finale end-to-end (workflow 7 agenti) + v2.36-2.38**. v2.36-2.37: coppa VERDE entro 60s, MEDAGLIA "Complimenti" con messaggio caldo oltre 60s (non piu coppa). Verifica finale: verdetto PRONTO CON NOTE, ZERO bloccanti, sicurezza pulita al 100% (edge protette, RLS su 28 tabelle, colonne pois/trips scrivibili solo via RPC, nessuna chiave nel client, 14 RPC client-server coerenti). Sweep live: 4 URL 200, tutte le RPC/tabelle presenti, 6 tier nei limiti AI. Unico bug funzionale trovato e CORRETTO (v2.38): i chip-filtro CATEGORIA cercavano l etichetta sottocategoria ma la riga aveva solo il macro, davano "Nessun risultato"; ora l etichetta e nel testo cercabile. Collaudato (chip "Pizzeria" trova "Da Mario"). +2 note cosmetiche chiuse. TUTTO live (v2.38).
 
@@ -387,3 +387,6 @@ Analisi condotta con il calcolatore Kairos (kairos/calcolatore-data-favorevole.h
 - Luoghi Personali (Casa/Lavoro) in localStorage
 - Fix sistema Love (DB reale, non solo CSS)
 - Compressione WebP automatica upload foto
+
+
+- **v2.39 FIX descrizione AI (bug reale segnalato dal founder da casa)**: creando un POI a casa sua (Via Ca Nova 47, Zugliano) l AI generava "Ristorante... piatti tipici... prezzi variabili... prenotazione consigliata" — puttanate inventate, e Google Maps diceva altro. Causa: _gatherPoiFacts faceva `match = match || primo_locale_vicino`, cioe adottava il locale piu vicino (il ristorante "Opa" a ~80-90m sulla stessa via) come identita di QUESTO posto. Fix: un locale conta come questo posto SOLO se il nome combacia o se e proprio li (distM<=40m); altrimenti niente identita rubata. Inoltre, se non c e identita reale (OSM/Wikipedia/Google) e si sta generando, l AI NON inventa piu: chiede all utente di scrivere lui cos e (toast ai_no_facts). Rinforzato il prompt contro i riempitivi (prezzi/orari/prenotazione se non nei fatti). Collaudo deterministico: Opa a 60m NON adottato (fatti = solo indirizzo), a 15m adottato. Il titolo resta vuoto a casa (nessuna attivita li: giusto, lo scrive lui). Live (v2.39).
