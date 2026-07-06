@@ -7,7 +7,7 @@ info@321.al · https://321.al
 # CONTRATTO DI LAVORO · POI•LOVE
 
 > **Questa è la traccia ufficiale del progetto.** Ogni passo che facciamo è definito qui: cosa, in quale settore, con quale stato e quale tempistica. Si aggiorna a OGNI giro di lavoro, insieme a SAL.md (il diario) e TODO.md (la lista operativa).
-> Versione app corrente: **2.17** (partenza ufficiale 2.00 il 04/07/2026). Lancio pubblico: **lunedì 17/08/2026, Tirana**.
+> Versione app corrente: **2.18** (partenza ufficiale 2.00 il 04/07/2026). Lancio pubblico: **lunedì 17/08/2026, Tirana**.
 
 ## Le regole del contratto (valgono per ogni passo)
 
@@ -46,6 +46,7 @@ info@321.al · https://321.al
 | Menu "+": Lente di ingrandimento al primo posto (precaricata, zoom medio-largo); "Sono qui: crea POI" RIMOSSO (il POI si crea dalla lente col bottone Salva) | ✅ Fatto e live | 06/07 |
 | Lente NERA per visibilità: ghiera, mirino e campana neri, faccette chiare, frecce e +/− bianchi da obiettivo fotografico | ✅ Fatto e live | 06/07 |
 | Teaser misterioso sul link POI condiviso: da sloggato foto sfocata + categoria + zona (mai nome o punto esatto) + gate di registrazione; dopo il login il POI si apre da solo (regge anche il giro OAuth) | ✅ Fatto e live | 06/07 |
+| Menu "+": "Crea POI" (ex Segna un luogo) al primo posto, Lente al secondo; lente aperta SOLO su richiesta (tolto il long-press che la apriva da solo) | ✅ Fatto e live | 06/07 |
 | POI dentro le liste (openListDetail: aggiungi/rimuovi/riordina) | ⬜ Da fare | prima del lancio |
 | Filtri tag e categoria nel profilo (tocco un tag, vedo solo quelli) | ⬜ Da fare | prossimi giri |
 | Condivisione proprietaria (foglio POI•LOVE unico, mai il menu di sistema, oggi in ~8 punti) | ⬜ Da fare | prima del lancio |
