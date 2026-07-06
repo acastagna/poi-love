@@ -487,6 +487,9 @@ html[data-theme="light"] .chip.green{color:#236b39}
     <div class="nav-item" data-sec="categories" onclick="openSection('categories')">
       <span class="ic"><i class="ph-duotone ph-squares-four"></i></span><span class="label" data-t="nav_categories">Categorie</span>
     </div>
+    <div class="nav-item" data-sec="tags" onclick="openSection('tags')">
+      <span class="ic"><i class="ph-duotone ph-tag"></i></span><span class="label" data-t="nav_tags">Tag</span>
+    </div>
     <div class="nav-item" data-sec="knowledge" onclick="openSection('knowledge')">
       <span class="ic"><i class="ph-duotone ph-brain"></i></span><span class="label" data-t="nav_knowledge">Knowledge ILLI</span>
     </div>
@@ -684,6 +687,7 @@ html[data-theme="light"] .chip.green{color:#236b39}
             <option value="ai" data-t="pf_ai">Creati dal copilota</option>
             <option value="official" data-t="pf_official">Ufficiali</option>
             <option value="draft" data-t="pf_draft">Bozze da approvare</option>
+            <option value="removed" data-t="pf_removed">Rimossi (nascosti)</option>
           </select>
         </div>
         <div id="poisTable"></div>
@@ -741,6 +745,28 @@ html[data-theme="light"] .chip.green{color:#236b39}
       <div class="panel">
         <div class="card-h"><span class="ic"><i class="ph-duotone ph-squares-four"></i></span><span data-t="cat_list_title">Categorie attive e spente</span></div>
         <div id="catTable"></div>
+      </div>
+    </section>
+
+    <!-- 8c-bis) TAG (curatela community) -->
+    <section class="section" id="sec-tags">
+      <div class="panel" style="margin-bottom:16px">
+        <div class="card-h"><span class="ic"><i class="ph-duotone ph-tag"></i></span><span data-t="tag_add_title">Evidenzia un tag</span></div>
+        <div class="sm" style="margin-bottom:10px" data-t="tag_help">I tag sono liberi e li scrivono gli utenti. Qui li organizzi: evidenziane alcuni (appaiono sempre nei suggerimenti), rinominali o uniscili, elimina o blocca quelli sbagliati.</div>
+        <div class="row2">
+          <div class="field"><label data-t="tag_name">Tag</label><input id="tagName" placeholder="es. panorama" autocomplete="off"></div>
+          <div class="field" style="display:flex;align-items:flex-end;gap:8px">
+            <button class="btn gold" onclick="curateTag('feature')" data-t="tag_feature">Evidenzia</button>
+            <button class="btn" onclick="curateTag('block')" data-t="tag_block">Blocca</button>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="card-h"><span class="ic"><i class="ph-duotone ph-list-bullets"></i></span><span data-t="tag_list_title">Tag della community</span>
+          <button class="btn sm" style="margin-left:auto" onclick="loadTagsAdmin()" data-t="tag_refresh">Aggiorna</button>
+        </div>
+        <div class="field" style="margin:8px 0"><input id="tagFilter" placeholder="Filtra…" autocomplete="off" oninput="renderTagList()"></div>
+        <div id="tagTable"></div>
       </div>
     </section>
 
@@ -823,6 +849,14 @@ const T = {
     add_stop:'+ Aggiungi tappa', create_trip_btn:'Crea percorso',
     audit_title:'Registro azioni (ultimi 50)',
     nav_categories:'Categorie', sub_categories:'Tassonomia data-driven: cura le categorie e promuovi le richieste della community.',
+    nav_tags:'Tag', sub_tags:'Cura i tag liberi della community: evidenzia, rinomina, unisci, elimina o blocca.',
+    tag_add_title:'Evidenzia un tag', tag_help:'I tag sono liberi e li scrivono gli utenti. Qui li organizzi: evidenziane alcuni (appaiono sempre nei suggerimenti), rinominali o uniscili, elimina o blocca quelli sbagliati.',
+    tag_name:'Tag', tag_feature:'Evidenzia', tag_unfeature:'Togli evidenza', tag_block:'Blocca', tag_unblock:'Sblocca',
+    tag_list_title:'Tag della community', tag_refresh:'Aggiorna', tag_empty:'Ancora nessun tag',
+    tag_featured:'In evidenza', tag_blocked:'Bloccato', tag_rename:'Rinomina',
+    tag_name_req:'Scrivi un tag', tag_rename_ask:'Nuovo nome per il tag "%s" (unisce se esiste già):',
+    tag_renamed:'Rinominato su %n POI', tag_deleted:'Rimosso da %n POI',
+    tag_del_confirm:'Eliminare il tag "%s" da tutti i POI?', tag_block_confirm:'Bloccare questo tag? Verrà rimosso dai POI e non sarà più suggerito.',
     cat_req_title:'Richieste dalla community', cat_req_help:'Ogni volta che qualcuno non trova la categoria giusta lascia una traccia qui. Tu decidi cosa promuovere.',
     cat_req_empty:'Nessuna richiesta in attesa', cat_req_promote:'Promuovi', cat_new_title:'Nuova categoria / modifica',
     cat_macro:'Macro (enum)', cat_icon:'Icona Phosphor', cat_color:'Colore', cat_sort:'Ordine', cat_save:'Salva categoria',
@@ -871,14 +905,15 @@ const T = {
     nav_pois:'POI creati', sub_pois:'Vedi, modifica e cancella i POI creati.',
     pois_title:'POI creati', pois_search:'Cerca per nome…',
     pois_empty:'Nessun POI', pois_empty_h:'Quando crei o approvi un POI compare qui.',
-    pf_all:'Tutti', pf_ai:'Creati dal copilota', pf_official:'Ufficiali', pf_draft:'Bozze da approvare',
+    pf_all:'Tutti', pf_ai:'Creati dal copilota', pf_official:'Ufficiali', pf_draft:'Bozze da approvare', pf_removed:'Rimossi (nascosti)',
     c_poi:'POI', c_cat:'Categoria', c_state:'Stato',
-    st_draft:'Bozza', st_published:'Pubblico', st_official:'Ufficiale',
-    a_view:'Vedi', a_edit:'Modifica', a_publish:'Pubblica', a_delete:'Elimina',
+    st_draft:'Bozza', st_published:'Pubblico', st_official:'Ufficiale', st_removed:'Rimosso',
+    a_view:'Vedi', a_edit:'Modifica', a_publish:'Pubblica', a_delete:'Elimina', a_remove:'Rimuovi', a_restore:'Ripristina', a_delete_hard:'Elimina per sempre',
     view_poi:'Dettagli POI', edit_poi:'Modifica POI',
     f_title:'Titolo', f_approved:'Pubblico (approvato e visibile)',
     need_title:'Il titolo è obbligatorio', save_btn:'Salva', cancel_btn:'Annulla',
     confirm_del_poi:'Eliminare definitivamente questo POI?', poi_deleted:'POI eliminato',
+    remove_ask:'Nascondi questo POI al pubblico (reversibile). Motivo (facoltativo):', poi_removed:'POI rimosso (nascosto)', poi_restored:'POI ripristinato', confirm_del_poi_hard:'Eliminare DEFINITIVAMENTE questo POI? Non è più recuperabile.',
     chat_new:'Nuova chat', chat_history:'Storico', chats_empty:'Nessuna conversazione salvata',
     confirm_del_chat:'Eliminare questa conversazione?',
     // ── Rifiniture pannello ──
@@ -907,6 +942,14 @@ const T = {
     add_stop:'+ Shto ndalesë', create_trip_btn:'Krijo itinerar',
     audit_title:'Regjistri i veprimeve (50 të fundit)',
     nav_categories:'Kategoritë', sub_categories:'Taksonomia data-driven: kuro kategoritë dhe promovo kërkesat e komunitetit.',
+    nav_tags:'Etiketa', sub_tags:'Kuro etiketat e lira të komunitetit: thekso, riemërto, bashko, fshi ose blloko.',
+    tag_add_title:'Thekso një etiketë', tag_help:'Etiketat janë të lira dhe i shkruajnë përdoruesit. Këtu i organizon: thekso disa (shfaqen gjithmonë te sugjerimet), riemërto ose bashko, fshi apo blloko ato të gabuara.',
+    tag_name:'Etiketë', tag_feature:'Thekso', tag_unfeature:'Hiq theksimin', tag_block:'Blloko', tag_unblock:'Zhblloko',
+    tag_list_title:'Etiketat e komunitetit', tag_refresh:'Rifresko', tag_empty:'Ende asnjë etiketë',
+    tag_featured:'E theksuar', tag_blocked:'E bllokuar', tag_rename:'Riemërto',
+    tag_name_req:'Shkruaj një etiketë', tag_rename_ask:'Emër i ri për etiketën "%s" (bashkon nëse ekziston):',
+    tag_renamed:'U riemërtua në %n POI', tag_deleted:'U hoq nga %n POI',
+    tag_del_confirm:'Të fshihet etiketa "%s" nga të gjitha POI-t?', tag_block_confirm:'Ta bllokosh këtë etiketë? Do të hiqet nga POI-t dhe nuk do të sugjerohet më.',
     cat_req_title:'Kërkesat nga komuniteti', cat_req_help:'Sa herë dikush nuk gjen kategorinë e duhur lë një gjurmë këtu. Ti vendos çfarë të promovosh.',
     cat_req_empty:'Asnjë kërkesë në pritje', cat_req_promote:'Promovo', cat_new_title:'Kategori e re / ndrysho',
     cat_macro:'Makro (enum)', cat_icon:'Ikona Phosphor', cat_color:'Ngjyra', cat_sort:'Renditja', cat_save:'Ruaj kategorinë',
@@ -951,14 +994,15 @@ const T = {
     nav_pois:'POI të krijuar', sub_pois:'Shiko, modifiko dhe fshi POI-t e krijuar.',
     pois_title:'POI të krijuar', pois_search:'Kërko sipas emrit…',
     pois_empty:'Asnjë POI', pois_empty_h:'Kur krijon ose miraton një POI, shfaqet këtu.',
-    pf_all:'Të gjithë', pf_ai:'Krijuar nga kopiloti', pf_official:'Zyrtarë', pf_draft:'Draft për miratim',
+    pf_all:'Të gjithë', pf_ai:'Krijuar nga kopiloti', pf_official:'Zyrtarë', pf_draft:'Draft për miratim', pf_removed:'Të hequr (të fshehur)',
     c_poi:'POI', c_cat:'Kategoria', c_state:'Statusi',
-    st_draft:'Draft', st_published:'Publik', st_official:'Zyrtar',
-    a_view:'Shiko', a_edit:'Modifiko', a_publish:'Boto', a_delete:'Fshi',
+    st_draft:'Draft', st_published:'Publik', st_official:'Zyrtar', st_removed:'I hequr',
+    a_view:'Shiko', a_edit:'Modifiko', a_publish:'Boto', a_delete:'Fshi', a_remove:'Hiq', a_restore:'Rikthe', a_delete_hard:'Fshi përgjithmonë',
     view_poi:'Detajet e POI', edit_poi:'Modifiko POI',
     f_title:'Titulli', f_approved:'Publik (miratuar dhe i dukshëm)',
     need_title:'Titulli është i detyrueshëm', save_btn:'Ruaj', cancel_btn:'Anulo',
     confirm_del_poi:'Të fshihet përgjithmonë ky POI?', poi_deleted:'POI u fshi',
+    remove_ask:'Fshihe këtë POI nga publiku (i kthyeshëm). Arsyeja (opsionale):', poi_removed:'POI u hoq (i fshehur)', poi_restored:'POI u rikthye', confirm_del_poi_hard:'Të fshihet PËRGJITHMONË ky POI? Nuk rikuperohet më.',
     chat_new:'Bisedë e re', chat_history:'Historiku', chats_empty:'Asnjë bisedë e ruajtur',
     confirm_del_chat:'Të fshihet kjo bisedë?',
     // ── Rifiniture pannello ──
@@ -987,6 +1031,14 @@ const T = {
     add_stop:'+ Add stop', create_trip_btn:'Create route',
     audit_title:'Action log (last 50)',
     nav_categories:'Categories', sub_categories:'Data-driven taxonomy: curate categories and promote community requests.',
+    nav_tags:'Tags', sub_tags:'Curate the community free tags: feature, rename, merge, delete or block.',
+    tag_add_title:'Feature a tag', tag_help:'Tags are free and written by users. Here you organize them: feature some (always shown in suggestions), rename or merge, delete or block the wrong ones.',
+    tag_name:'Tag', tag_feature:'Feature', tag_unfeature:'Unfeature', tag_block:'Block', tag_unblock:'Unblock',
+    tag_list_title:'Community tags', tag_refresh:'Refresh', tag_empty:'No tags yet',
+    tag_featured:'Featured', tag_blocked:'Blocked', tag_rename:'Rename',
+    tag_name_req:'Type a tag', tag_rename_ask:'New name for tag "%s" (merges if it already exists):',
+    tag_renamed:'Renamed on %n POIs', tag_deleted:'Removed from %n POIs',
+    tag_del_confirm:'Delete tag "%s" from all POIs?', tag_block_confirm:'Block this tag? It will be removed from POIs and no longer suggested.',
     cat_req_title:'Community requests', cat_req_help:'Whenever someone cannot find the right category a trace lands here. You decide what to promote.',
     cat_req_empty:'No pending requests', cat_req_promote:'Promote', cat_new_title:'New category / edit',
     cat_macro:'Macro (enum)', cat_icon:'Phosphor icon', cat_color:'Color', cat_sort:'Sort', cat_save:'Save category',
@@ -1031,14 +1083,15 @@ const T = {
     nav_pois:'Created POIs', sub_pois:'View, edit and delete created POIs.',
     pois_title:'Created POIs', pois_search:'Search by name…',
     pois_empty:'No POIs', pois_empty_h:'When you create or approve a POI it appears here.',
-    pf_all:'All', pf_ai:'Created by copilot', pf_official:'Official', pf_draft:'Drafts to approve',
+    pf_all:'All', pf_ai:'Created by copilot', pf_official:'Official', pf_draft:'Drafts to approve', pf_removed:'Removed (hidden)',
     c_poi:'POI', c_cat:'Category', c_state:'State',
-    st_draft:'Draft', st_published:'Public', st_official:'Official',
-    a_view:'View', a_edit:'Edit', a_publish:'Publish', a_delete:'Delete',
+    st_draft:'Draft', st_published:'Public', st_official:'Official', st_removed:'Removed',
+    a_view:'View', a_edit:'Edit', a_publish:'Publish', a_delete:'Delete', a_remove:'Remove', a_restore:'Restore', a_delete_hard:'Delete forever',
     view_poi:'POI details', edit_poi:'Edit POI',
     f_title:'Title', f_approved:'Public (approved and visible)',
     need_title:'Title is required', save_btn:'Save', cancel_btn:'Cancel',
     confirm_del_poi:'Permanently delete this POI?', poi_deleted:'POI deleted',
+    remove_ask:'Hide this POI from the public (reversible). Reason (optional):', poi_removed:'POI removed (hidden)', poi_restored:'POI restored', confirm_del_poi_hard:'PERMANENTLY delete this POI? It cannot be recovered.',
     chat_new:'New chat', chat_history:'History', chats_empty:'No saved conversations',
     confirm_del_chat:'Delete this conversation?',
     // ── Panel refinements ──
@@ -1224,9 +1277,9 @@ async function doLogout(){
 
 /* ─────────────────────────── Navigazione sezioni (lazy) ─────────────────────────── */
 const SUBKEY = { dashboard:'sub_dashboard', moderation:'sub_moderation', users:'sub_users',
-  ailimits:'sub_ailimits', copilot:'sub_copilot', create:'sub_create', pois:'sub_pois', routes:'sub_routes', audit:'sub_audit', categories:'sub_categories' , knowledge:'sub_knowledge' };
+  ailimits:'sub_ailimits', copilot:'sub_copilot', create:'sub_create', pois:'sub_pois', routes:'sub_routes', audit:'sub_audit', categories:'sub_categories' , tags:'sub_tags', knowledge:'sub_knowledge' };
 const TITLEKEY = { dashboard:'nav_dashboard', moderation:'nav_moderation', users:'nav_users',
-  ailimits:'nav_ailimits', copilot:'nav_copilot', create:'nav_create', pois:'nav_pois', routes:'nav_routes', categories:'nav_categories', knowledge:'nav_knowledge', audit:'nav_audit' };
+  ailimits:'nav_ailimits', copilot:'nav_copilot', create:'nav_create', pois:'nav_pois', routes:'nav_routes', categories:'nav_categories', tags:'nav_tags', knowledge:'nav_knowledge', audit:'nav_audit' };
 
 function updateHeader(sec){
   document.getElementById('secTitle').textContent = t(TITLEKEY[sec]);
@@ -1253,6 +1306,7 @@ function runSection(sec){
     case 'pois': loadPois(); break;
     case 'routes': loadRoutesAdmin(); break;
     case 'categories': loadCategoriesAdmin(); break;
+    case 'tags': loadTagsAdmin(); break;
     case 'knowledge': loadKnowledgeAdmin(); break;
     case 'audit': loadAudit(); break;
   }
@@ -2202,6 +2256,78 @@ async function saveCategory(){
   loadCategoriesAdmin();
 }
 
+/* ═════════════════════════ 8c-bis) TAG (curatela) ═════════════════════════ */
+let _adminTags=[];
+async function loadTagsAdmin(){
+  const box=document.getElementById('tagTable'); loadingBox(box);
+  try{
+    const { data, error } = await sb.rpc('admin_list_tags',{p_limit:1000});
+    if(error){ isBackendMissing(error)?backendOff(box):emptyBox(box,(error.message||t('error')),null,'warning'); return; }
+    _adminTags = Array.isArray(data)?data:[];
+    if(!_adminTags.length){ emptyBox(box,t('tag_empty'),null,'tag'); return; }
+    renderTagList();
+  }catch(e){ emptyBox(box,t('error'),null,'warning'); }
+}
+function renderTagList(){
+  const box=document.getElementById('tagTable'); if(!box) return;
+  const f=(document.getElementById('tagFilter').value||'').trim().toLowerCase();
+  const rows=_adminTags.filter(r=>!f||String(r.tag||'').toLowerCase().includes(f));
+  if(!rows.length){ emptyBox(box,t('tag_empty'),null,'tag'); return; }
+  box.textContent='';
+  rows.forEach(r=>{
+    const tg=String(r.tag||'');
+    const chips=el('div',{style:'display:flex;gap:5px;flex-wrap:wrap'});
+    if(r.featured) chips.appendChild(el('span',{class:'chip gold',text:t('tag_featured')}));
+    if(r.blocked)  chips.appendChild(el('span',{class:'chip',style:'background:var(--red);color:#fff',text:t('tag_blocked')}));
+    box.appendChild(el('div',{style:'display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid rgba(128,128,128,.15);flex-wrap:wrap'},[
+      el('span',{class:'ttl',style:'min-width:110px',text:'#'+tg}),
+      el('span',{class:'chip dim',text:'×'+(r.uses||0)}),
+      chips,
+      el('div',{style:'flex:1'}),
+      el('button',{class:'btn sm',text:t('tag_rename'),onclick:()=>renameTagAdmin(tg)}),
+      el('button',{class:'btn sm',text:r.featured?t('tag_unfeature'):t('tag_feature'),onclick:()=>toggleFeatureTag(tg,!r.featured)}),
+      el('button',{class:'btn sm',text:r.blocked?t('tag_unblock'):t('tag_block'),onclick:()=>toggleBlockTag(tg,!r.blocked)}),
+      el('button',{class:'icon-btn',title:t('a_delete'),onclick:()=>deleteTagAdmin(tg)}, phIcon('trash'))
+    ]));
+  });
+}
+async function curateTag(mode){
+  const tg=(document.getElementById('tagName').value||'').trim().toLowerCase();
+  if(!tg){ toast(t('tag_name_req'),'err'); return; }
+  const args={p_tag:tg};
+  if(mode==='feature') args.p_featured=true;
+  if(mode==='block')   args.p_blocked=true;
+  const { error } = await sb.rpc('admin_curate_tag',args);
+  if(error){ toast(error.message||t('error'),'err'); return; }
+  toast(t('saved'),'ok'); document.getElementById('tagName').value=''; loadTagsAdmin();
+}
+async function toggleFeatureTag(tg,on){
+  const { error } = await sb.rpc('admin_curate_tag',{p_tag:tg,p_featured:on});
+  if(error){ toast(error.message||t('error'),'err'); return; }
+  toast(t('saved'),'ok'); loadTagsAdmin();
+}
+async function toggleBlockTag(tg,on){
+  if(on && !confirm(t('tag_block_confirm'))) return;
+  const { error } = await sb.rpc('admin_curate_tag',{p_tag:tg,p_blocked:on});
+  if(error){ toast(error.message||t('error'),'err'); return; }
+  toast(t('saved'),'ok'); loadTagsAdmin();
+}
+async function renameTagAdmin(oldTag){
+  const nv=prompt(t('tag_rename_ask').replace('%s',oldTag), oldTag);
+  if(nv===null) return;
+  const nn=String(nv).trim().toLowerCase();
+  if(!nn||nn===oldTag){ return; }
+  const { data, error } = await sb.rpc('admin_rename_tag',{p_old:oldTag,p_new:nn});
+  if(error){ toast(error.message||t('error'),'err'); return; }
+  toast(t('tag_renamed').replace('%n',String(data??0)),'ok'); loadTagsAdmin();
+}
+async function deleteTagAdmin(tg){
+  if(!confirm(t('tag_del_confirm').replace('%s',tg))) return;
+  const { data, error } = await sb.rpc('admin_delete_tag',{p_tag:tg});
+  if(error){ toast(error.message||t('error'),'err'); return; }
+  toast(t('tag_deleted').replace('%n',String(data??0)),'ok'); loadTagsAdmin();
+}
+
 
 /* ═════════════════════════ 8d) KNOWLEDGE ILLI ═════════════════════════ */
 async function loadKnowledgeAdmin(){
@@ -2329,11 +2455,13 @@ async function loadPois(){
   const filter=document.getElementById('poiFilter').value||'all';
   try{
     let query=sb.from('pois')
-      .select('id,title,description,category,visibility,is_approved,created_via,lat,lng,address,city,love_count,created_at')
+      .select('id,title,description,category,visibility,is_approved,created_via,lat,lng,address,city,love_count,created_at,removed_at,removed_reason')
       .order('created_at',{ascending:false}).limit(120);
-    if(filter==='ai') query=query.eq('created_via','ai');
-    else if(filter==='official') query=query.eq('visibility','official');
-    else if(filter==='draft') query=query.eq('is_approved',false);
+    if(filter==='ai') query=query.eq('created_via','ai').is('removed_at',null);
+    else if(filter==='official') query=query.eq('visibility','official').is('removed_at',null);
+    else if(filter==='draft') query=query.eq('is_approved',false).is('removed_at',null);
+    else if(filter==='removed') query=query.not('removed_at','is',null);
+    else query=query.is('removed_at',null); // "Tutti" mostra i visibili, non i rimossi
     if(q) query=query.ilike('title','%'+q+'%');
     const { data, error } = await query;
     if(my!==poisSeq) return; // nel frattempo è partita una richiesta più recente: non toccare il DOM
@@ -2348,18 +2476,29 @@ async function loadPois(){
     ])));
     const tb=el('tbody');
     data.forEach(p=>{
+      const isRemoved = !!p.removed_at;
       const stWrap=el('div',{class:'btn-row'});
-      stWrap.appendChild(p.is_approved===false
-        ? el('span',{class:'chip gold',text:t('st_draft')})
-        : el('span',{class:'chip green',text:t('st_published')}));
-      if(p.visibility==='official') stWrap.appendChild(el('span',{class:'chip dim',text:t('st_official')}));
-      if(p.created_via==='ai') stWrap.appendChild(el('span',{class:'chip dim',text:'AI'}));
+      if(isRemoved){
+        stWrap.appendChild(el('span',{class:'chip',style:'background:var(--red);color:#fff',text:t('st_removed')}));
+        if(p.removed_reason) stWrap.appendChild(el('span',{class:'chip dim',text:p.removed_reason}));
+      } else {
+        stWrap.appendChild(p.is_approved===false
+          ? el('span',{class:'chip gold',text:t('st_draft')})
+          : el('span',{class:'chip green',text:t('st_published')}));
+        if(p.visibility==='official') stWrap.appendChild(el('span',{class:'chip dim',text:t('st_official')}));
+        if(p.created_via==='ai') stWrap.appendChild(el('span',{class:'chip dim',text:'AI'}));
+      }
 
       const actions=el('div',{class:'btn-row'});
       actions.appendChild(el('button',{class:'btn sm', onclick:()=>viewPoi(p), text:t('a_view')}));
-      actions.appendChild(el('button',{class:'btn sm gold', onclick:()=>editPoi(p), text:t('a_edit')}));
-      if(p.is_approved===false) actions.appendChild(el('button',{class:'btn sm green', onclick:()=>approvePoi(p.id), text:t('a_publish')}));
-      actions.appendChild(el('button',{class:'btn sm red', onclick:()=>deletePoi(p.id, p.title), text:t('a_delete')}));
+      if(isRemoved){
+        actions.appendChild(el('button',{class:'btn sm green', onclick:()=>restorePoi(p.id), text:t('a_restore')}));
+        actions.appendChild(el('button',{class:'btn sm red', onclick:()=>deletePoi(p.id, p.title), text:t('a_delete_hard')}));
+      } else {
+        actions.appendChild(el('button',{class:'btn sm gold', onclick:()=>editPoi(p), text:t('a_edit')}));
+        if(p.is_approved===false) actions.appendChild(el('button',{class:'btn sm green', onclick:()=>approvePoi(p.id), text:t('a_publish')}));
+        actions.appendChild(el('button',{class:'btn sm red', onclick:()=>softDeletePoi(p.id, p.title), text:t('a_remove')}));
+      }
 
       const subtitle = p.address || p.city || (p.lat!=null? (Number(p.lat).toFixed(4)+', '+Number(p.lng).toFixed(4)) : '—');
       tb.appendChild(el('tr',null,[
@@ -2458,8 +2597,29 @@ async function approvePoi(id){
   }catch(e){ toast(t('error'),'err'); }
 }
 
+// Soft-delete REVERSIBILE (regola: niente si cancella). Nasconde il POI al pubblico
+// salvando lo stato per il ripristino. La cancellazione vera è deletePoi (solo per rimossi).
+async function softDeletePoi(id, title){
+  const reason=prompt(t('remove_ask')+(title? '\n\n"'+title+'"' : ''), '');
+  if(reason===null) return; // annullato
+  try{
+    const { data, error } = await sb.rpc('admin_soft_delete_poi',{p_id:id,p_reason:(reason||'').trim()||null});
+    if(error){ toast(error.message||t('error'),'err'); return; }
+    if(data!==true){ toast(t('rls_no_rows'),'err'); return; }
+    toast(t('poi_removed'),'ok'); reloadPois();
+  }catch(e){ toast(t('error'),'err'); }
+}
+async function restorePoi(id){
+  try{
+    const { data, error } = await sb.rpc('admin_restore_poi',{p_id:id});
+    if(error){ toast(error.message||t('error'),'err'); return; }
+    if(data!==true){ toast(t('rls_no_rows'),'err'); return; }
+    toast(t('poi_restored'),'ok'); reloadPois();
+  }catch(e){ toast(t('error'),'err'); }
+}
+// Cancellazione DEFINITIVA (irreversibile): disponibile solo sui POI già rimossi.
 async function deletePoi(id, title){
-  if(!confirm(t('confirm_del_poi')+(title? '\n\n"'+title+'"' : ''))) return;
+  if(!confirm(t('confirm_del_poi_hard')+(title? '\n\n"'+title+'"' : ''))) return;
   try{
     const { data, error } = await sb.from('pois').delete().eq('id',id).select('id');
     if(error){ toast(isBackendMissing(error)?t('backend_off'):(error.message||t('error')),'err'); return; }

@@ -44,3 +44,6 @@ Thumbs.db
 # Sorgenti Photoshop: fuori dal repo (vanno in magazzino)
 *.psd
 *.PSD
+
+# Supabase CLI: file locali temporanei (non committare)
+supabase/.temp/
