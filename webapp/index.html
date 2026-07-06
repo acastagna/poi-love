@@ -2152,7 +2152,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
     <button class="plnd-cta" id="plndCta" onclick="profileLandingCta()"></button>
     <div class="plnd-hint" id="plndHint"></div>
   </div>
-  <div class="plnd-foot">POI•LOVE · i luoghi del cuore · <span class="app-ver"></span></div>
+  <div class="plnd-foot">POI•LOVE · <span data-t="auth_tagline">i luoghi del cuore</span> · <span class="app-ver"></span></div>
 </div>
 <!-- TEASER POI CONDIVISO: chi apre un link ?poi= da sloggato vede il mistero, non il posto -->
 <div id="poiTeaser">
@@ -3362,8 +3362,7 @@ let currentUser = null;
 let guestMode = false;
 function enterGuestMode() {
   guestMode = true;
-  hidePoiTeaser();
-  try{ localStorage.removeItem('pl_pending_poi'); }catch(_){}
+  hidePoiTeaser(); // pl_pending_poi resta: se poi si registra, il POI condiviso si apre
   hideProfileLanding();
   // Il profilo pubblico e' visibile anche da ospite: aprilo se c'era una vetrina
   try{ if(localStorage.getItem('pl_pending_profile')) setTimeout(openPendingSharedProfile,700); }catch(_){}
@@ -4467,15 +4466,6 @@ function joinOrCreateCompagnia(){
   closeSheet('compagniaOv','compagniaBg','compagniaSheet');
 }
 
-// ── LOVE toggle (atomico: RPC toggle_love, mai piu' race sul contatore) ──
-async function toggleLoveDB(poiId, badgeEl) {
-  if (!currentUser) { showToast('Accedi per dare LOVE'); document.getElementById('authOverlay').style.display = 'flex'; return; }
-  const { data, error } = await sb.rpc('toggle_love', { p_poi_id: poiId });
-  if (error) { showToast(t('error_generic','Qualcosa è andato storto, riprova')); return; }
-  const r = (typeof data === 'string') ? JSON.parse(data) : data;
-  if (badgeEl && r && r.love_count != null) badgeEl.textContent = r.love_count;
-  showToast(r && r.loved ? '❤️ LOVE!' : '💔 LOVE rimosso');
-}
 
 /* ══════════════════════════════════════════
    BADGE SYSTEM
@@ -4680,7 +4670,7 @@ function generateAvatar(){
 const T={
   it:{nav_map:'Mappa',nav_itin:'Itinerari',nav_profile:'Profilo',mt_street:'Stradale',mt_sat:'Satellite',mt_routes:'Rotte Storiche',fab_poi:'Crea POI',fab_itin:'Tappa Itinerario',add_title:'Salva questo posto',add_sub:'Aggiungi un luogo che ami',add_challenge:'Riesci in 60 secondi?',loc_hint_use:'Usa come nome',congrats:'',lbl_name:'Nome del posto',req:'OBBLIGATORIO',lbl_where:'Dove si trova',loc_gps:'GPS Live',loc_exif:'Foto EXIF',loc_addr:'Indirizzo',loc_map:'Tocca mappa',lbl_photos:'Foto',ph_main:'Principale',ph_2:'Foto 2',ph_3:'Foto 3',ph_hint:'Non sei sul posto? Puoi aggiungere foto in seguito.',lbl_story:'Racconta',lbl_cat:'Categorie',lbl_list:'Aggiungi a una lista',lbl_route:'Rotta Storica',route_none:'Nessuna rotta storica',lbl_vis:'Visibilità',vis_pub_btn:'Pubblico',vis_prv_btn:'Privato',vis_share_btn:'Condividi',save_disabled:'Inserisci il nome per continuare',save_ready:'Segna sulla mappa',google_suggest:'Consiglia a Google Maps',stop_title:'Tappa Itinerario',stop_sub:'Senza foto. Pianifica ora, racconta quando ci sei.',stop_lbl_name:'Nome della tappa',stop_lbl_cat:'Categoria',stop_lbl_vis:'Visibilità Itinerario',itin_pub:'Pubblico',itin_prv:'Privato',stop_lbl_date:'Data prevista',stop_save:'Aggiungi tappa',stat_poi:'POI',stat_love:'Love',stat_list:'Liste',stat_itin:'Itinerari',stat_comp:'Compagnie',diffondi:'Diffondi POI•LOVE',prof_lists:'Le mie liste',prof_new_list:'Nuova lista',prof_tags:'I miei tag',prof_new_tag:'Aggiungi',prof_my_poi:'I miei POI',prof_add_poi:'Aggiungi',prof_pub_toggle:'Come mi vedono gli altri',itin_h:'Itinerari di Viaggio',itin_desc:'Pianifica le tue tappe prima di partire. Trova compagni di viaggio. Trasforma ogni tappa in un POI quando sei sul posto.',itin_open:'Apri Itinerari',itin_note:'Mappa, mini-calendario, GPS live e compagni.',back:'Indietro',cr_top:'Creazione di POI•LOVE di 321.AL',cr_bot:'Progetto Open Source · Ideazione e Dir. Creativa: Alessandro Castagna© · Licenza MIT',
     /* Auth overlay */
-    auth_tagline:'i luoghi del cuore',auth_apple:'ID Apple',auth_passkey:'Accedi con Biometria',auth_passkey_as:'Accedi come',auth_passkey_need_email:'✉️ Inserisci la tua email qui sotto e premi "Invia link"',auth_or_magic:'oppure con magic link via email',auth_email_ph:'la-tua@email.com',auth_email_send:'Invia link',auth_terms:'Accedendo accetti i Termini di servizio di POI•LOVE',auth_oss:'Progetto Open Source · MIT License · © 2026 321.AL',auth_continue_google:'Continua con Google',auth_continue_apple:'Continua con Apple',auth_continue_li:'Continua con LinkedIn',auth_continue_fb:'Continua con Facebook',auth_continue_x:'Continua con X',auth_email_invalid:'Inserisci una email valida',auth_link_sent:'📧 Link inviato! Controlla la mail.',auth_welcome_back:'Bentornato',auth_provider_off:'non ancora attivato (Supabase → Auth → Providers)',auth_soon:'presto',auth_guest:'Entra e guarda',guest_active:'👀 Stai esplorando come ospite, accedi per creare i tuoi luoghi',list_add_poi:'Aggiungi un POI',list_added:'Aggiunto alla lista',list_removed:'Rimosso dalla lista',list_pick_title:'I tuoi POI',list_pick_none:'Nessun altro POI da aggiungere: creane uno dalla mappa',list_empty_tap:'Lista ancora vuota: aggiungi un POI qui sotto',plnd_kicker:'Ti invita su POI•LOVE',plnd_cta:'Entra in POI•LOVE',plnd_hint:'Gratis: dentro in 30 secondi',teaser_kicker:'Qualcuno ha condiviso con te un posto del cuore',teaser_title:'Un luogo misterioso ti aspetta',teaser_loves:'love ricevuti',teaser_cta:'Registrati e scoprilo',teaser_hint:'Nome e punto esatto si svelano dopo il login',
+    auth_tagline:'i luoghi del cuore',auth_apple:'ID Apple',auth_passkey:'Accedi con Biometria',auth_passkey_as:'Accedi come',auth_passkey_need_email:'✉️ Inserisci la tua email qui sotto e premi "Invia link"',auth_or_magic:'oppure con magic link via email',auth_email_ph:'la-tua@email.com',auth_email_send:'Invia link',auth_terms:'Accedendo accetti i Termini di servizio di POI•LOVE',auth_oss:'Progetto Open Source · MIT License · © 2026 321.AL',auth_continue_google:'Continua con Google',auth_continue_apple:'Continua con Apple',auth_continue_li:'Continua con LinkedIn',auth_continue_fb:'Continua con Facebook',auth_continue_x:'Continua con X',auth_email_invalid:'Inserisci una email valida',auth_link_sent:'📧 Link inviato! Controlla la mail.',auth_welcome_back:'Bentornato',auth_provider_off:'non ancora attivato (Supabase → Auth → Providers)',auth_soon:'presto',auth_guest:'Entra e guarda',guest_active:'👀 Stai esplorando come ospite, accedi per creare i tuoi luoghi',list_move_up:'Su',list_move_down:'Giù',love_login:'Accedi per dare LOVE ❤️',love_on:'❤️ LOVE!',love_off:'💔 LOVE rimosso',list_add_poi:'Aggiungi un POI',list_added:'Aggiunto alla lista',list_removed:'Rimosso dalla lista',list_pick_title:'I tuoi POI',list_pick_none:'Nessun altro POI da aggiungere: creane uno dalla mappa',list_empty_tap:'Lista ancora vuota: aggiungi un POI qui sotto',plnd_kicker:'Ti invita su POI•LOVE',plnd_cta:'Entra in POI•LOVE',plnd_hint:'Gratis: dentro in 30 secondi',teaser_kicker:'Qualcuno ha condiviso con te un posto del cuore',teaser_title:'Un luogo misterioso ti aspetta',teaser_cta:'Registrati e scoprilo',teaser_hint:'Nome e punto esatto si svelano dopo il login',
     /* POI list actions */
     act_navigate:'Naviga verso',act_open_map:'Apri sulla mappa',act_share:'Condividi',act_visibility:'Visibilità',act_suggest_google:'Suggerisci a Google Maps',act_edit:'Modifica',act_delete:'Elimina',vis_pub_lbl:'Pubblico',vis_friends_lbl:'Amici',vis_prv_lbl:'Privato',vis_changed:'Visibilità',toast_link_copied:'🔗 Link copiato',toast_navigate_to:'🧭 Naviga verso',toast_google_opened:'📤 Aperto su Google Maps',toast_google_marked:'📤 Aperto su Google Maps · POI marcato come "suggerito"',delete_confirm:'Eliminare',delete_confirm_warn:'Questa azione non può essere annullata.',delete_done:'eliminato',delete_error:'Errore eliminazione:',vis_save_error:'Errore salvando visibilità',poi_not_found:'POI non trovato',edit_in_detail:'Tocca "Modifica" nel dettaglio',
     /* Itinerari overlay */
@@ -4780,7 +4770,7 @@ const T={
     illi_error:'ILLI ha un problema tecnico, riprova tra poco',},
   sq:{nav_map:'Harta',nav_itin:'Itinerare',nav_profile:'Profili',mt_street:'Rrugore',mt_sat:'Satelitor',mt_routes:'Rrugët Historike',fab_poi:'Krijo POI',fab_itin:'Stacion Itinerarit',add_title:'Ruaj këtë vend',add_sub:'Shto një vend që e do',add_challenge:'Arrin brenda 60 sekondave?',loc_hint_use:'Përdor si emër',congrats:'',lbl_name:'Emri i vendit',req:'E DETYRUESHME',lbl_where:'Ku ndodhet',loc_gps:'GPS Live',loc_exif:'EXIF Foto',loc_addr:'Adresë',loc_map:'Prek hartën',lbl_photos:'Foto',ph_main:'Kryesore',ph_2:'Foto 2',ph_3:'Foto 3',ph_hint:'Nuk jeni aty? Mund të shtoni foto më vonë.',lbl_story:'Trego',lbl_cat:'Kategori',lbl_list:'Shto në listë',lbl_route:'Rrugë Historike',route_none:'Asnjë rrugë historike',lbl_vis:'Dukshmëria',vis_pub_btn:'Publik',vis_prv_btn:'Privat',vis_share_btn:'Nda',save_disabled:'Fut emrin për të vazhduar',save_ready:'Shëno në hartë',google_suggest:'Sugjeroni te Google Maps',stop_title:'Stacion Itinerarit',stop_sub:'Pa foto. Planifiko tani, trego kur je aty.',stop_lbl_name:'Emri i stacionit',stop_lbl_cat:'Kategori',stop_lbl_vis:'Dukshmëria Itinerarit',itin_pub:'Publik',itin_prv:'Privat',stop_lbl_date:'Data e planifikuar',stop_save:'Shto stacionin',stat_poi:'POI',stat_love:'Love',stat_list:'Lista',stat_itin:'Itinerare',stat_comp:'Shoqëri',diffondi:'Përhap POI•LOVE',prof_lists:'Listat e mia',prof_new_list:'Listë e re',prof_tags:'Etiketat e mia',prof_new_tag:'Shto',prof_my_poi:'POI-të e mia',prof_add_poi:'Shto',prof_pub_toggle:'Si më shohin të tjerët',itin_h:'Itinerare Udhëtimi',itin_desc:'Planifikoni stacionet para nisjes. Gjeni shokë udhëtimi.',itin_open:'Hap Itineraret',itin_note:'Hartë, mini-kalendar, GPS live.',back:'Kthehu',cr_top:'Krijim i POI•LOVE nga 321.AL',cr_bot:'Projekt Open Source · Ide dhe Drejtim Krijues: Alessandro Castagna© · Liçensë MIT',
     /* Auth overlay */
-    auth_tagline:'vendet e zemrës',auth_apple:'Apple ID',auth_passkey:'Hyr me biometri',auth_passkey_as:'Hyr si',auth_passkey_need_email:'✉️ Vendos email-in tënd më poshtë dhe shtyp "Dërgo linkun"',auth_or_magic:'ose me link magjik via email',auth_email_ph:'email-juaj@email.com',auth_email_send:'Dërgo linkun',auth_terms:'Duke hyrë pranoni Kushtet e shërbimit të POI•LOVE',auth_oss:'Projekt Open Source · Liçensë MIT · © 2026 321.AL',auth_continue_google:'Vazhdo me Google',auth_continue_apple:'Vazhdo me Apple',auth_continue_li:'Vazhdo me LinkedIn',auth_continue_fb:'Vazhdo me Facebook',auth_continue_x:'Vazhdo me X',auth_email_invalid:'Vendos një email të vlefshëm',auth_link_sent:'📧 Linku u dërgua! Kontrollo postën.',auth_welcome_back:'Mirëserdhe',auth_provider_off:'nuk është aktivuar ende (Supabase → Auth → Providers)',auth_soon:'së shpejti',auth_guest:'Hyr e shiko',guest_active:'👀 Po eksploron si vizitor, hyr për të krijuar vendet e tua',list_add_poi:'Shto një POI',list_added:'U shtua në listë',list_removed:'U hoq nga lista',list_pick_title:'POI-të e tua',list_pick_none:'Asnjë POI tjetër për të shtuar: krijo një nga harta',list_empty_tap:'Lista bosh: shto një POI më poshtë',plnd_kicker:'Të fton në POI•LOVE',plnd_cta:'Hyr në POI•LOVE',plnd_hint:'Falas: brenda për 30 sekonda',teaser_kicker:'Dikush ndau me ty një vend të zemrës',teaser_title:'Një vend misterioz të pret',teaser_loves:'love të marra',teaser_cta:'Regjistrohu dhe zbuloje',teaser_hint:'Emri dhe pika e saktë zbulohen pas hyrjes',
+    auth_tagline:'vendet e zemrës',auth_apple:'Apple ID',auth_passkey:'Hyr me biometri',auth_passkey_as:'Hyr si',auth_passkey_need_email:'✉️ Vendos email-in tënd më poshtë dhe shtyp "Dërgo linkun"',auth_or_magic:'ose me link magjik via email',auth_email_ph:'email-juaj@email.com',auth_email_send:'Dërgo linkun',auth_terms:'Duke hyrë pranoni Kushtet e shërbimit të POI•LOVE',auth_oss:'Projekt Open Source · Liçensë MIT · © 2026 321.AL',auth_continue_google:'Vazhdo me Google',auth_continue_apple:'Vazhdo me Apple',auth_continue_li:'Vazhdo me LinkedIn',auth_continue_fb:'Vazhdo me Facebook',auth_continue_x:'Vazhdo me X',auth_email_invalid:'Vendos një email të vlefshëm',auth_link_sent:'📧 Linku u dërgua! Kontrollo postën.',auth_welcome_back:'Mirëserdhe',auth_provider_off:'nuk është aktivuar ende (Supabase → Auth → Providers)',auth_soon:'së shpejti',auth_guest:'Hyr e shiko',guest_active:'👀 Po eksploron si vizitor, hyr për të krijuar vendet e tua',list_move_up:'Lart',list_move_down:'Poshtë',love_login:'Hyr për të dhënë LOVE ❤️',love_on:'❤️ LOVE!',love_off:'💔 LOVE u hoq',list_add_poi:'Shto një POI',list_added:'U shtua në listë',list_removed:'U hoq nga lista',list_pick_title:'POI-të e tua',list_pick_none:'Asnjë POI tjetër për të shtuar: krijo një nga harta',list_empty_tap:'Lista bosh: shto një POI më poshtë',plnd_kicker:'Të fton në POI•LOVE',plnd_cta:'Hyr në POI•LOVE',plnd_hint:'Falas: brenda për 30 sekonda',teaser_kicker:'Dikush ndau me ty një vend të zemrës',teaser_title:'Një vend misterioz të pret',teaser_cta:'Regjistrohu dhe zbuloje',teaser_hint:'Emri dhe pika e saktë zbulohen pas hyrjes',
     /* POI list actions */
     act_navigate:'Navigo te',act_open_map:'Hap në hartë',act_share:'Nda',act_visibility:'Dukshmëria',act_suggest_google:'Sugjero te Google Maps',act_edit:'Redakto',act_delete:'Fshi',vis_pub_lbl:'Publik',vis_friends_lbl:'Miq',vis_prv_lbl:'Privat',vis_changed:'Dukshmëria',toast_link_copied:'🔗 Linku u kopjua',toast_navigate_to:'🧭 Navigo te',toast_google_opened:'📤 Hapur në Google Maps',toast_google_marked:'📤 Hapur në Google Maps · POI shënuar si "i sugjeruar"',delete_confirm:'Fshi',delete_confirm_warn:'Ky veprim nuk mund të zhbëhet.',delete_done:'u fshi',delete_error:'Gabim fshirjeje:',vis_save_error:'Gabim duke ruajtur dukshmërinë',poi_not_found:'POI nuk u gjet',edit_in_detail:'Prek "Redakto" në detaj',
     /* Itinerari overlay */
@@ -4880,7 +4870,7 @@ const T={
     illi_error:'ILLI ka një problem teknik, provo përsëri pas pak',},
   en:{nav_map:'Map',nav_itin:'Itineraries',nav_profile:'Profile',mt_street:'Street',mt_sat:'Satellite',mt_routes:'Historic Routes',fab_poi:'Create POI',fab_itin:'Itinerary Stop',add_title:'Save this place',add_sub:'Add a place you love',add_challenge:'Can you do it in 60 seconds?',loc_hint_use:'Use as name',congrats:'',lbl_name:'Place name',req:'REQUIRED',lbl_where:'Where is it',loc_gps:'GPS Live',loc_exif:'Photo EXIF',loc_addr:'Address',loc_map:'Tap map',lbl_photos:'Photos',ph_main:'Main',ph_2:'Photo 2',ph_3:'Photo 3',ph_hint:"Not there yet? You can add photos later.",lbl_story:'Tell your story',lbl_cat:'Categories',lbl_list:'Add to a list',lbl_route:'Historic Route',route_none:'No historic route',lbl_vis:'Visibility',vis_pub_btn:'Public',vis_prv_btn:'Private',vis_share_btn:'Share',save_disabled:'Enter the name to continue',save_ready:'Mark on map',google_suggest:'Suggest to Google Maps',stop_title:'Itinerary Stop',stop_sub:"No photos. Plan now, tell the story when you're there.",stop_lbl_name:'Stop name',stop_lbl_cat:'Category',stop_lbl_vis:'Itinerary Visibility',itin_pub:'Public',itin_prv:'Private',stop_lbl_date:'Planned date',stop_save:'Add stop',stat_poi:'POI',stat_love:'Love',stat_list:'Lists',stat_itin:'Itineraries',stat_comp:'Companions',diffondi:'Spread POI•LOVE',prof_lists:'My lists',prof_new_list:'New list',prof_tags:'My tags',prof_new_tag:'Add',prof_my_poi:'My POIs',prof_add_poi:'Add',prof_pub_toggle:'How others see me',itin_h:'Travel Itineraries',itin_desc:'Plan your stops before you leave. Find travel companions.',itin_open:'Open Itineraries',itin_note:'Map, mini-calendar, live GPS and companions.',back:'Back',cr_top:'POI•LOVE created by 321.AL',cr_bot:'Open Source Project · Creative Direction: Alessandro Castagna© · MIT License',
     /* Auth overlay */
-    auth_tagline:'places of the heart',auth_apple:'Apple ID',auth_passkey:'Sign in with Biometrics',auth_passkey_as:'Sign in as',auth_passkey_need_email:'✉️ Enter your email below and tap "Send link"',auth_or_magic:'or with magic link via email',auth_email_ph:'your@email.com',auth_email_send:'Send link',auth_terms:'By signing in you accept POI•LOVE Terms of Service',auth_oss:'Open Source Project · MIT License · © 2026 321.AL',auth_continue_google:'Continue with Google',auth_continue_apple:'Continue with Apple',auth_continue_li:'Continue with LinkedIn',auth_continue_fb:'Continue with Facebook',auth_continue_x:'Continue with X',auth_email_invalid:'Enter a valid email',auth_link_sent:'📧 Link sent! Check your mail.',auth_welcome_back:'Welcome back',auth_provider_off:'not yet enabled (Supabase → Auth → Providers)',auth_soon:'soon',auth_guest:'Look around',guest_active:'👀 You are exploring as a guest, sign in to create your places',list_add_poi:'Add a POI',list_added:'Added to the list',list_removed:'Removed from the list',list_pick_title:'Your POIs',list_pick_none:'No other POI to add: create one from the map',list_empty_tap:'Empty list: add a POI below',plnd_kicker:'Invites you to POI•LOVE',plnd_cta:'Join POI•LOVE',plnd_hint:'Free: join in 30 seconds',teaser_kicker:'Someone shared a beloved place with you',teaser_title:'A mystery place awaits you',teaser_loves:'loves received',teaser_cta:'Sign up and reveal it',teaser_hint:'Name and exact spot unlock after login',
+    auth_tagline:'places of the heart',auth_apple:'Apple ID',auth_passkey:'Sign in with Biometrics',auth_passkey_as:'Sign in as',auth_passkey_need_email:'✉️ Enter your email below and tap "Send link"',auth_or_magic:'or with magic link via email',auth_email_ph:'your@email.com',auth_email_send:'Send link',auth_terms:'By signing in you accept POI•LOVE Terms of Service',auth_oss:'Open Source Project · MIT License · © 2026 321.AL',auth_continue_google:'Continue with Google',auth_continue_apple:'Continue with Apple',auth_continue_li:'Continue with LinkedIn',auth_continue_fb:'Continue with Facebook',auth_continue_x:'Continue with X',auth_email_invalid:'Enter a valid email',auth_link_sent:'📧 Link sent! Check your mail.',auth_welcome_back:'Welcome back',auth_provider_off:'not yet enabled (Supabase → Auth → Providers)',auth_soon:'soon',auth_guest:'Look around',guest_active:'👀 You are exploring as a guest, sign in to create your places',list_move_up:'Up',list_move_down:'Down',love_login:'Sign in to give LOVE ❤️',love_on:'❤️ LOVE!',love_off:'💔 LOVE removed',list_add_poi:'Add a POI',list_added:'Added to the list',list_removed:'Removed from the list',list_pick_title:'Your POIs',list_pick_none:'No other POI to add: create one from the map',list_empty_tap:'Empty list: add a POI below',plnd_kicker:'Invites you to POI•LOVE',plnd_cta:'Join POI•LOVE',plnd_hint:'Free: join in 30 seconds',teaser_kicker:'Someone shared a beloved place with you',teaser_title:'A mystery place awaits you',teaser_cta:'Sign up and reveal it',teaser_hint:'Name and exact spot unlock after login',
     /* POI list actions */
     act_navigate:'Navigate to',act_open_map:'Open on map',act_share:'Share',act_visibility:'Visibility',act_suggest_google:'Suggest to Google Maps',act_edit:'Edit',act_delete:'Delete',vis_pub_lbl:'Public',vis_friends_lbl:'Friends',vis_prv_lbl:'Private',vis_changed:'Visibility',toast_link_copied:'🔗 Link copied',toast_navigate_to:'🧭 Navigate to',toast_google_opened:'📤 Opened in Google Maps',toast_google_marked:'📤 Opened in Google Maps · POI marked as "suggested"',delete_confirm:'Delete',delete_confirm_warn:'This action cannot be undone.',delete_done:'deleted',delete_error:'Delete error:',vis_save_error:'Error saving visibility',poi_not_found:'POI not found',edit_in_detail:'Tap "Edit" in detail',
     /* Itinerari overlay */
@@ -5892,18 +5882,21 @@ function showProfileLanding(prof){
           document.getElementById('plndLoveN').textContent=data.reduce((a,r)=>a+(r.love_count|0),0);
         });
     }
-    try{ localStorage.setItem('pl_pending_profile', name); }catch(_){}
+    try{ localStorage.setItem('pl_pending_profile', name); localStorage.setItem('pl_pending_ts', String(Date.now())); }catch(_){}
     el.classList.add('show');
   }catch(_){}
 }
 function hideProfileLanding(){ const el=document.getElementById('profileLanding'); if(el) el.classList.remove('show'); }
 function profileLandingCta(){
-  // Sotto c'è già il login, col campo email in evidenza
+  // Chiude la vetrina e porta al login (riaprendolo se serve)
   hideProfileLanding();
+  const a=document.getElementById('authOverlay'); if(a) a.style.display='flex';
   try{ const em=document.querySelector('#authOverlay input[type="email"]'); if(em) em.focus(); }catch(_){}
 }
 function openPendingSharedProfile(){
   // Dopo il login (o da ospite): il profilo della vetrina si apre da solo
+  if(_pendingExpired()) return;
+  if(window._pendingOpened) return; // il POI condiviso ha la precedenza: niente doppio modal
   let h=null; try{ h=localStorage.getItem('pl_pending_profile'); }catch(_){}
   if(!h||!sb) return;
   try{ localStorage.removeItem('pl_pending_profile'); }catch(_){}
@@ -5942,20 +5935,34 @@ function showPoiTeaser(p){
     if(lv>0){ lvBox.style.display='inline-flex'; document.getElementById('ptLovesN').textContent=lv+' love'; } else { lvBox.style.display='none'; }
     document.getElementById('ptCta').textContent=t('teaser_cta','Registrati e scoprilo');
     document.getElementById('ptHint').textContent=t('teaser_hint','Nome e punto esatto si svelano dopo il login');
-    try{ localStorage.setItem('pl_pending_poi', p.id); }catch(_){}
+    try{ localStorage.setItem('pl_pending_poi', p.id); localStorage.setItem('pl_pending_ts', String(Date.now())); }catch(_){}
     el.classList.add('show');
   }catch(_){}
 }
 function hidePoiTeaser(){ const el=document.getElementById('poiTeaser'); if(el) el.classList.remove('show'); }
 function poiTeaserCta(){
-  // Chiude la card: sotto c'è già il login, col campo email in evidenza
+  // Chiude la card e porta al login (riaprendolo se l'utente era entrato come ospite)
   hidePoiTeaser();
+  const a=document.getElementById('authOverlay'); if(a) a.style.display='flex';
   try{ const em=document.querySelector('#authOverlay input[type="email"]'); if(em) em.focus(); }catch(_){}
+}
+function _pendingExpired(){
+  // I pending valgono 7 giorni: niente aperture a sorpresa settimane dopo
+  try{
+    const ts=parseInt(localStorage.getItem('pl_pending_ts')||'0',10);
+    if(ts && (Date.now()-ts) > 7*24*3600*1000){
+      localStorage.removeItem('pl_pending_poi'); localStorage.removeItem('pl_pending_profile'); localStorage.removeItem('pl_pending_ts');
+      return true;
+    }
+  }catch(_){}
+  return false;
 }
 function openPendingSharedPoi(){
   // Dopo il login: se c'era un teaser in sospeso, il POI vero si apre da solo
+  if(_pendingExpired()) return;
   let id=null; try{ id=localStorage.getItem('pl_pending_poi'); }catch(_){}
   if(!id||!sb||!currentUser) return;
+  window._pendingOpened=true; // mutua esclusione col pending profilo: uno solo si apre
   try{ localStorage.removeItem('pl_pending_poi'); }catch(_){}
   hidePoiTeaser();
   sb.from('pois').select('id,name:title,description,lat,lng,category,love_count,photos,author_id,address,profiles(username,avatar_url)')
@@ -5972,9 +5979,13 @@ function handleDeepLink(){
   const at    = params.get('at');
 
   if(poiId && sb){
-    // Carica il POI specifico dal DB e apri il detail
+    // Da sloggato il payload contiene SOLO cio che il teaser mostra (niente nome,
+    // coordinate o descrizione in Network); da loggato la scheda completa.
+    const cols = currentUser
+      ? 'id,name:title,description,lat,lng,category,love_count,photos,author_id,address,profiles(username,avatar_url)'
+      : 'id,category,love_count,photos,address';
     sb.from('pois')
-      .select('id,name:title,description,lat,lng,category,love_count,photos,author_id,address,profiles(username,avatar_url)')
+      .select(cols)
       .eq('id', poiId)
       .single()
       .then(({data, error})=>{
@@ -6028,7 +6039,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='2.22';
+const APP_VERSION='2.23';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 console.info('POI•LOVE v'+APP_VERSION);
 // Le rotte storiche pubblicate sono contenuto PUBBLICO: si caricano per tutti,
@@ -7918,7 +7929,7 @@ async function _loadListPois(listId){
 }
 function _renderListPoiRows(){
   const box=document.getElementById('listDetailPoiList'); if(!box) return;
-  const esc=x=>String(x||'').replace(/</g,'&lt;');
+  const esc=x=>String(x||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
   document.getElementById('listDetailCount').textContent=t('list_count_poi','{n} POI').replace('{n}',_listPoiRows.length);
   const rows=_listPoiRows.map((r,i)=>{
     const p=r.pois, ph=(p.photos&&p.photos[0])||null;
@@ -7929,8 +7940,8 @@ function _renderListPoiRows(){
         <div class="ld-poi-addr">${esc(p.address||'')}</div>
       </div>
       <div class="ld-poi-btns">
-        <button type="button" onclick="moveListPoi(${i},-1)" ${i===0?'disabled':''} title="Su"><i class="ph-duotone ph-caret-up"></i></button>
-        <button type="button" onclick="moveListPoi(${i},1)" ${i===_listPoiRows.length-1?'disabled':''} title="Giù"><i class="ph-duotone ph-caret-down"></i></button>
+        <button type="button" onclick="moveListPoi(${i},-1)" ${i===0?'disabled':''} title="${t('list_move_up','Su')}"><i class="ph-duotone ph-caret-up"></i></button>
+        <button type="button" onclick="moveListPoi(${i},1)" ${i===_listPoiRows.length-1?'disabled':''} title="${t('list_move_down','Giù')}"><i class="ph-duotone ph-caret-down"></i></button>
         <button type="button" class="danger" onclick="removePoiFromList('${r.id}')" title="${t('list_remove_from','Rimuovi dalla lista')}"><i class="ph-duotone ph-x"></i></button>
       </div>
     </div>`;
@@ -7946,14 +7957,19 @@ function openListPoiOnMap(i){
   if(map&&p.lat!=null) map.setView([p.lat,p.lng],17);
   setTimeout(()=>{ try{ openDBDetail(p); }catch(_){} },350);
 }
-async function _persistListOrder(){
-  for(let i=0;i<_listPoiRows.length;i++){
-    const r=_listPoiRows[i];
-    if(r.sort_order!==i+1){
-      const {error}=await sb.from('poi_lists').update({sort_order:i+1}).eq('id',r.id);
-      if(!error) r.sort_order=i+1;
+let _persistChain=Promise.resolve(); // i salvataggi dell'ordine si accodano: mai due loop sovrapposti
+function _persistListOrder(){
+  const snapshot=_listPoiRows.slice();
+  _persistChain=_persistChain.then(async()=>{
+    for(let i=0;i<snapshot.length;i++){
+      const r=snapshot[i];
+      if(r.sort_order!==i+1){
+        const {error}=await sb.from('poi_lists').update({sort_order:i+1}).eq('id',r.id);
+        if(!error) r.sort_order=i+1;
+      }
     }
-  }
+  }).catch(()=>{});
+  return _persistChain;
 }
 function moveListPoi(i,dir){
   const j=i+dir; if(j<0||j>=_listPoiRows.length) return;
@@ -7984,7 +8000,7 @@ async function openListPoiPicker(){
   const inList=new Set(_listPoiRows.map(r=>r.poi_id));
   const {data,error}=await sb.from('pois').select('id,title,photos,address').eq('author_id',currentUser.id).order('created_at',{ascending:false}).limit(200);
   if(error){ box.innerHTML='<div class="pub-profile-empty">'+t('error_generic','Qualcosa è andato storto, riprova')+'</div>'; return; }
-  const esc=x=>String(x||'').replace(/</g,'&lt;');
+  const esc=x=>String(x||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
   const cands=(data||[]).filter(p=>!inList.has(p.id));
   const head=`<div class="ld-picker-head"><button type="button" class="ld-picker-back" onclick="_renderListPoiRows()"><i class="ph-duotone ph-arrow-left"></i></button> ${t('list_pick_title','I tuoi POI')}</div>`;
   if(!cands.length){ box.innerHTML=head+`<div class="pub-profile-empty">${t('list_pick_none','Nessun altro POI da aggiungere: creane uno dalla mappa')}</div>`; return; }
@@ -8011,10 +8027,12 @@ function _refreshListCards(){
 function _rebuildSheetListChips(lists){
   const scroll=document.getElementById('sheetListScroll'); if(!scroll) return;
   const addBtn=scroll.querySelector('.chip-add');
+  // La selezione dell'utente sopravvive al rebuild (arriva anche su TOKEN_REFRESHED col form aperto)
+  const selected=new Set(Array.from(scroll.querySelectorAll('.chip.sel-b[data-list-id]')).map(c=>c.dataset.listId));
   scroll.querySelectorAll('.chip:not(.chip-add)').forEach(c=>c.remove());
   (lists||[]).forEach(l=>{
     const chip=document.createElement('button');
-    chip.className='chip'; chip.type='button'; chip.textContent=l.name; chip.dataset.listId=l.id;
+    chip.className='chip'+(selected.has(l.id)?' sel-b':''); chip.type='button'; chip.textContent=l.name; chip.dataset.listId=l.id;
     chip.onclick=function(){ toggleList(this); };
     if(addBtn) scroll.insertBefore(chip,addBtn); else scroll.appendChild(chip);
   });
@@ -9345,40 +9363,31 @@ async function _checkUserLove(poiId){
 }
 
 async function toggleLove(){
+  // RPC atomica toggle_love: il contatore lo decide il server (fine della race
+  // e dell'update bloccato dalle RLS sui POI altrui). UI ottimistica con rollback.
   if(!currentUser){
-    showToast('Accedi per dare LOVE ❤️');
+    showToast(t('love_login','Accedi per dare LOVE ❤️'));
     document.getElementById('authOverlay').style.display='flex';
     return;
   }
   if(!currentPOI?.id){ showToast(t('poi_not_found','POI non trovato')); return; }
   const btn=document.getElementById('loveBtn'),heart=document.getElementById('loveHeart'),cnt=document.getElementById('loveCnt');
-  const alreadyLoved=btn.classList.contains('loved');
-  // Optimistic UI update
-  const newCount=parseInt(cnt.textContent||'0')+(alreadyLoved?-1:1);
-  btn.classList.toggle('loved',!alreadyLoved);
-  heart.className=alreadyLoved?'ph-duotone ph-heart':'ph-fill ph-heart';
-  cnt.textContent=Math.max(0,newCount);
-  if(alreadyLoved){
-    // Rimuovi love
-    const {error:delErr}=await sb.from('loves').delete().eq('poi_id',currentPOI.id).eq('user_id',currentUser.id);
-    if(delErr){ showToast('Errore rimozione LOVE'); return; }
-    await sb.from('pois').update({love_count:Math.max(0,newCount)}).eq('id',currentPOI.id);
-    currentPOI.love_count=Math.max(0,newCount);
-    showToast('💔 LOVE rimosso');
-  } else {
-    // Aggiungi love
-    const {error:insErr}=await sb.from('loves').insert({poi_id:currentPOI.id,user_id:currentUser.id});
-    if(insErr){
-      // Rollback UI se errore (es. duplicato)
-      btn.classList.remove('loved'); heart.className='ph-duotone ph-heart'; cnt.textContent=parseInt(cnt.textContent)-1;
-      return;
-    }
-    await sb.from('pois').update({love_count:newCount}).eq('id',currentPOI.id);
-    currentPOI.love_count=newCount;
-    showToast('❤️ LOVE!');
-    // I punti li ha gia' accreditati il trigger DB (love_given): ricarico love + punti reali per il badge
-    loadUserLovesCount();
+  const wasLoved=btn.classList.contains('loved');
+  btn.classList.toggle('loved',!wasLoved);
+  heart.className=wasLoved?'ph-duotone ph-heart':'ph-fill ph-heart';
+  const {data,error}=await sb.rpc('toggle_love',{p_poi_id:currentPOI.id});
+  if(error){
+    btn.classList.toggle('loved',wasLoved);
+    heart.className=wasLoved?'ph-fill ph-heart':'ph-duotone ph-heart';
+    showToast(t('error_generic','Qualcosa è andato storto, riprova'));
+    return;
   }
+  const r=(typeof data==='string')?JSON.parse(data):data;
+  btn.classList.toggle('loved',!!(r&&r.loved));
+  heart.className=(r&&r.loved)?'ph-fill ph-heart':'ph-duotone ph-heart';
+  if(r&&r.love_count!=null){ cnt.textContent=r.love_count; currentPOI.love_count=r.love_count; }
+  showToast(r&&r.loved?t('love_on','❤️ LOVE!'):t('love_off','💔 LOVE rimosso'));
+  if(r&&r.loved) loadUserLovesCount(); // i punti li accredita il trigger DB (love_given)
 }
 function openNavigation(){
   if(!currentPOI) return;
@@ -10228,19 +10237,6 @@ window.addEventListener('DOMContentLoaded',()=>{
 /* ══════════════════════════════════════════
    LONG PRESS COORDS → AGGIUNGI POI
 ══════════════════════════════════════════ */
-function openAddPOIHere(){
-  closeFab();
-  if(gpsPos){
-    openLens(gpsPos.lat,gpsPos.lng);
-  } else {
-    showToast('📍 Rilevamento GPS...');
-    navigator.geolocation?.getCurrentPosition(
-      pos=>{ gpsPos={lat:pos.coords.latitude,lng:pos.coords.longitude}; openLens(gpsPos.lat,gpsPos.lng); },
-      ()=>showToast(t('gps_unavailable','Posizione non disponibile in questo momento.')),
-      {enableHighAccuracy:true,timeout:10000,maximumAge:60000}
-    );
-  }
-}
 
 function openAddPOIAtCoords(lat,lng){
   openAddPOI();
