@@ -6414,7 +6414,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='2.51';
+const APP_VERSION='2.52';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 console.info('POI•LOVE v'+APP_VERSION);
 // Le rotte storiche pubblicate sono contenuto PUBBLICO: si caricano per tutti,
@@ -12593,20 +12593,36 @@ function _looksLikeFollowUp(text){
 }
 // Se l'utente nomina una citta ("una pizzeria a Tirana"), geocodifica il toponimo con Nominatim (timeout 4s):
 // la ricerca posti parte da LI, non dal GPS. Fallback: null = usa il GPS/centro mappa.
+// Parole comuni che seguono le preposizioni ma NON sono citta (cosi "a mangiare",
+// "a cena", "a valona stasera" non vengono geocodificate come toponimi).
+const _CITY_STOP=new Set(('mangiare mangio mangi cena cenare ceno pranzo pranzare colazione bere dormire aperitivo aperitivi '
++'bene male tardi presto stasera stamattina stanotte stamane domani oggi ieri adesso ora dopo prima mezzogiorno mezzanotte notte sera mattina pomeriggio '
++'qui li lì la casa te me noi voi loro lui lei qualcosa qualcuno qualche questo quello cui che chi cosa dove come quando quanto perche piedi tavola tavolo '
++'ristorante ristoranti trattoria osteria pizzeria pizza sushi kebab bar caffe caffè pub hotel albergo locale locali posto posti zona giro tappa tappe meta gente amici gruppo cena '
++'destra sinistra dritto nord sud est ovest fuori dentro qualsiasi').split(/\s+/));
+// true se il risultato Nominatim e un LUOGO vero (citta/paese/quartiere), non una via o un negozio.
+function _isPlaceResult(x){
+  if(!x) return false;
+  if(x.class==='place'||x.class==='boundary') return true;
+  return /^(city|town|village|municipality|hamlet|suburb|locality|neighbourhood|administrative|state|region|county|island|city_district|quarter|borough)$/i.test(x.type||'');
+}
+// Se l'utente nomina una citta (anche minuscola: "a valona", "vicino durazzo"), la geocodifica
+// con Nominatim, bias Italia+Balcani, e la accetta SOLO se e davvero un luogo. La ricerca posti
+// parte da LI, non dal GPS. Ritorna null = usa il GPS/centro mappa.
 async function _geocodeAskedPlace(text){
-  // "a/in/verso/per Tirana", ma anche "vicino Valona", "vicino a Valona", "presso Berat",
-  // "dalle parti di Saranda", "zona di Durazzo", "nei pressi di Scutari".
-  const m=String(text||'').match(/\b(?:[Aa]|[Aa]d|[Ii]n|[Vv]erso|[Pp]er|[Vv]icino(?:\s+(?:a|ad))?|[Pp]resso|[Zz]ona(?:\s+di)?|nei\s+pressi\s+di|dalle\s+parti\s+di|dintorni\s+di)\s+([A-ZÀ-Ù][a-zà-ù]{2,}(?:\s+[A-ZÀ-Ù][a-zà-ù]{2,})?)/);
+  const m=String(text||'').match(/\b(?:a|ad|in|verso|per|vicino(?:\s+(?:a|ad))?|presso|zona\s+di|nei\s+pressi\s+di|dalle\s+parti\s+di|dintorni\s+di)\s+([a-zà-ù][a-zà-ù'’.\-]{1,}(?:\s+[a-zà-ù][a-zà-ù'’.\-]{1,})?)/i);
   if(!m) return null;
-  const place=m[1];
+  let words=m[1].trim().split(/\s+/);
+  // togli le parole-tempo/comuni in coda ("valona stasera" -> "valona"); se la 1a e comune, non e citta
+  while(words.length>1 && _CITY_STOP.has(words[words.length-1].toLowerCase())) words.pop();
+  if(!words.length || _CITY_STOP.has(words[0].toLowerCase())) return null;
+  const place=words.join(' ');
   const lg=(typeof lang!=='undefined'?lang:'it');
-  // BIAS geografico Italia+Balcani (dove opera POI•LOVE): senza questo "Valona" (Vlorë) finisce
-  // in Belgio, "Berat" altrove, ecc. viewbox = lon_min,lat_max,lon_max,lat_min.
-  const VIEWBOX='6.0,47.6,26.5,34.7';
+  const VIEWBOX='6.0,47.6,26.5,34.7'; // lon_min,lat_max,lon_max,lat_min (Italia..Balcani)
   const _q=async(bounded)=>{
     const ctrl=new AbortController(); const tm=setTimeout(()=>ctrl.abort(),4500);
     try{
-      const url='https://nominatim.openstreetmap.org/search?format=json&limit=5&addressdetails=1&q='+encodeURIComponent(place)
+      const url='https://nominatim.openstreetmap.org/search?format=json&limit=6&addressdetails=1&q='+encodeURIComponent(place)
         +'&viewbox='+VIEWBOX+(bounded?'&bounded=1':'');
       const r=await fetch(url,{headers:{'Accept-Language':lg},signal:ctrl.signal});
       clearTimeout(tm);
@@ -12615,11 +12631,11 @@ async function _geocodeAskedPlace(text){
     }catch(e){ clearTimeout(tm); return []; }
   };
   try{
-    // 1) dentro Italia+Balcani (preferisci un centro abitato); 2) fallback globale se nulla in zona
+    // Accetta SOLO un vero luogo (citta/paese). Se non ne esce nessuno, non e una citta: null.
     let d=await _q(true);
-    let pick=d.find(x=>/city|town|village|municipality|administrative/.test(x.type||x.class||'')) || d[0];
-    if(!pick){ d=await _q(false); pick=d.find(x=>/city|town|village|municipality/.test(x.type||''))||d[0]; }
-    if(pick) return {lat:parseFloat(pick.lat), lng:parseFloat(pick.lon), label:place};
+    let pick=d.find(_isPlaceResult);
+    if(!pick){ d=await _q(false); pick=d.find(_isPlaceResult); }
+    if(pick) return {lat:parseFloat(pick.lat), lng:parseFloat(pick.lon), label:(pick.name||place)};
   }catch(e){}
   return null;
 }
