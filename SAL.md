@@ -3,7 +3,9 @@
 > **Prossima ripresa: teaser misterioso di condivisione POI (zona + immagine + invito a registrarsi), poi avanti col contratto. Collaudi manuali di Alessandro in attesa (checklist 04/07 + claim a pagamento + copilota foto).**
 > Checkpoint sessione: `57984f5`, tag `checkpoint-2026-07-04` (HEAD su origin/main). **Nessun lavoro non committato.**
 
-## Sessione 06/07/2026 — Ricerca avanzata, lente nera, teaser condivisione (v2.14 → v2.22)
+## Sessione 06/07/2026 — Ricerca avanzata, lente nera, teaser condivisione (v2.14 → v2.23)
+
+- **v2.23 review avversariale del giorno: 16 difetti confermati, tutti corretti**. Squadra di 24 agenti (4 revisori + verifica scettica di ogni finding, 4 confutati). Il piu grave: il fix del love atomico era agganciato a una funzione MORTA, il bottone vero usava ancora il vecchio percorso, e sui POI degli altri il contatore non si salvava affatto (bloccato in silenzio dalle RLS): ora il bottone vivo chiama la RPC e il collaudo incrociato vero (utente B che lovva il POI di A dal bottone) da 0 a 1 a 0 anche a DB. Gli altri: XSS da attributo nelle miniature liste (escape completo), love possibile ai bannati via SECURITY DEFINER (mig 025: blocco is_active + search_path blindato), policy anti-bannati mai arrivate su poi_lists (il loop della 012 puntava alla tabella inesistente), selezione liste azzerata dal refresh token col form aperto, pending POI cancellato entrando da ospite (funnel rotto) e CTA morta in guest mode, riordino liste con salvataggi sovrapposti (ora in coda), pending senza scadenza (ora 7 giorni) e doppio modal possibile, query teaser che scaricava comunque nome e coordinate (ora select minimale), tagline e tooltip non tradotti, 2 funzioni morte rimosse. Tutto deployato e verificato live (md5 identico, v2.23).
 
 - **v2.22 box foto fluidi**: i 3 riquadri foto del form Crea POI erano fissi a 350px (enormi, sbordavano dalla spalla con uno scroll orizzontale scomodo). Ora sono un terzo della larghezza del pannello ciascuno, quadrati, e si adattano da soli al ridimensionamento. Misurato dal vivo: spalla 626px, box 184px; telefono 375px, box 105px; mai overflow.
 
