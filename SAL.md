@@ -3,7 +3,9 @@
 > **Prossima ripresa: teaser misterioso di condivisione POI (zona + immagine + invito a registrarsi), poi avanti col contratto. Collaudi manuali di Alessandro in attesa (checklist 04/07 + claim a pagamento + copilota foto).**
 > Checkpoint sessione: `57984f5`, tag `checkpoint-2026-07-04` (HEAD su origin/main). **Nessun lavoro non committato.**
 
-## Sessione 06/07/2026 — Ricerca avanzata, lente nera, teaser condivisione (v2.14 → v2.33)
+## Sessione 06/07/2026 — Ricerca avanzata, lente nera, teaser condivisione (v2.14 → v2.34)
+
+- **v2.34 adotta una rotta (perk Professionista+)**: un professionista sostiene una rotta storica pubblica con una dedica visibile (mig 038: adopt_route/release_route RPC definer, colonne adopted_by/dedication protette). Nella lista rotte compare "Adottata da @utente: <dedica>" e un bottone Adotta/Rilascia per i tier idonei; la dedica appare anche nel popup della rotta sulla mappa. Collaudo e2e: pro adotta con dedica, join adottante ok, un altro pro non puo rubarla (already adopted), rilascio ok; TROVATO E CORRETTO un baco NULL (v_tier NULL not in (...) e NULL, non true: un free passava il controllo) con is null or not in. Live (v2.34). Resta 1 solo perk tier: QR business.
 
 - **v2.33 itinerario in evidenza (perk Mecenate/Plus)**: stesso schema sicuro dei POI in evidenza (mig 037): colonna trips.is_featured protetta (revoca UPDATE + grant colonne, scrive solo la RPC), set_trip_featured con tetto per tier (Mecenate/Plus 1), badge "In evidenza" sulle card e toggle stella per i tier idonei. Aggiunte anche colonne adopted_by + dedication (pronte per "adotta una rotta"). Collaudo e2e: edit trip ok, is_featured diretto 403, RPC mecenate ok; in browser badge e toggle funzionanti. Live (v2.33). Restano 2 perk tier: adotta rotta, QR business.
 
