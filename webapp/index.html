@@ -2799,12 +2799,11 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
       <!-- NOME: niente tendina (deprecata), il titolo lo propone il sistema -->
       <div class="sec-lbl"><span data-t="lbl_name">Nome del posto</span><span class="req-badge" data-t="req">OBBLIGATORIO</span></div>
       <div class="autocomplete-wrap">
-        <input class="field-in" type="text" id="poiNameIn" style="padding-right:118px"
+        <input class="field-in" type="text" id="poiNameIn" style="padding-right:82px"
           placeholder="Come si chiama questo posto?"
           oninput="checkSave()"
           autocomplete="off"/>
         <div class="in-field-tools" style="top:6px">
-          <button class="ai" id="nameAiBtn" onclick="suggestPoiName()" title="Suggerisci" aria-label="Suggerisci con ILLI"><i class="ph-duotone ph-sparkle"></i></button>
           <button id="nameVoiceBtn" onclick="toggleFieldDictation('poiNameIn','nameVoiceBtn')" title="Detta" aria-label="Detta a voce"><i class="ph-duotone ph-microphone"></i></button>
           <button onclick="focusField('poiNameIn')" title="Scrivo io" aria-label="Scrivo io"><i class="ph-duotone ph-pencil-simple"></i></button>
         </div>
@@ -2924,7 +2923,6 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
       <div class="field-wrap" style="position:relative;margin-bottom:4px">
         <textarea class="field-in field-ta" id="storyIn" style="padding-bottom:42px;margin-bottom:0" placeholder="L'anima di questo posto… (fino a 200 caratteri)" maxlength="200" oninput="updateChar()"></textarea>
         <div class="in-field-tools" style="bottom:7px">
-          <button class="ai" id="aiSumBtn" onclick="aiSummarize()" title="Suggerisci" aria-label="Suggerisci con ILLI"><i class="ph-duotone ph-sparkle"></i></button>
           <button id="voiceBtn" onclick="toggleFieldDictation('storyIn','voiceBtn')" title="Detta" aria-label="Detta a voce"><i class="ph-duotone ph-microphone"></i></button>
           <button onclick="focusField('storyIn')" title="Scrivo io" aria-label="Scrivo io"><i class="ph-duotone ph-pencil-simple"></i></button>
         </div>
@@ -6250,7 +6248,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='2.42';
+const APP_VERSION='2.43';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 console.info('POI•LOVE v'+APP_VERSION);
 // Le rotte storiche pubblicate sono contenuto PUBBLICO: si caricano per tutti,
@@ -6343,6 +6341,7 @@ function hideLocMiniMap(){
   if(w) w.classList.remove('show');
 }
 function _maybeAutoSuggestName(){
+  return; // AI di compilazione rimossa dal pannello POI (richiesta founder 06/07): il nome lo scrive l'utente
   if(_autoNameSuggested) return;
   if(typeof editingPOIId!=='undefined'&&editingPOIId) return; // in modifica il nome esiste gia
   const sheet=document.getElementById('addPoiSheet');
