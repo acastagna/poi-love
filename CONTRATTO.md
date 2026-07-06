@@ -7,7 +7,7 @@ info@321.al · https://321.al
 # CONTRATTO DI LAVORO · POI•LOVE
 
 > **Questa è la traccia ufficiale del progetto.** Ogni passo che facciamo è definito qui: cosa, in quale settore, con quale stato e quale tempistica. Si aggiorna a OGNI giro di lavoro, insieme a SAL.md (il diario) e TODO.md (la lista operativa).
-> Versione app corrente: **2.35** (partenza ufficiale 2.00 il 04/07/2026). Lancio pubblico: **lunedì 17/08/2026, Tirana**.
+> Versione app corrente: **2.36** (partenza ufficiale 2.00 il 04/07/2026). Lancio pubblico: **lunedì 17/08/2026, Tirana**.
 
 ## Le regole del contratto (valgono per ogni passo)
 
@@ -51,7 +51,7 @@ info@321.al · https://321.al
 | POI dentro le liste: dettaglio con POI veri (miniatura+indirizzo), aggiungi dal picker, riordina con frecce (persistito), rimuovi, tocca e si apre sulla mappa; chip liste nel form creazione ora salvano davvero; FIX tabella giusta poi_lists (list_pois non esisteva: conteggi rotti da sempre); migrazione 022 policy UPDATE | ✅ Fatto e live (v2.20) | 06/07 |
 | Filtri tag e categoria nella lista POI: chip categoria+tag, combinati con la ricerca | ✅ Fatto e live (v2.31) | 06/07 |
 | Condivisione proprietaria: UN solo foglio POI•LOVE (Follower/Amici per i POI + WhatsApp/Telegram/Email/Facebook/X/Copia), instradati tutti i 9 punti (POI, lista, itinerario, luogo personale, lente, ILLI, contatto); tolto il menu di sistema del telefono ovunque (zero navigator.share) | ✅ Fatto e live (v2.25) | 06/07 |
-| Timer 60s con coppa verde / frase gentile; via le immagini AI dal POI (SPECS) | ⬜ Da fare | prossimi giri |
+| Timer 60s con coppa VERDE + frase gentile (3 lingue) FATTO; resta: togliere le immagini AI generate dalle foto POI (photo picker usa pollinations) | 🔶 Timer/coppa fatti, foto-AI da decidere | prossimi giri |
 | Tendina rimossa dal nome TAPPA itinerario (tendine solo sull'indirizzo) | ✅ Fatto e live (v2.31) | 06/07 |
 | TTS voci iperrealistiche esterne (serve chiave + deroga no-TTS) e tastiera assistita | ⬜ Studiato (memoria `lente_mappa_strumento`) | dopo il lancio |
 
@@ -121,7 +121,7 @@ info@321.al · https://321.al
 |---|---|---|
 | Termini e Privacy online in 3 lingue | ✅ Fatto e live | 27/06 |
 | Testi legali allineati al codice reale (privacy+termini: media server, tag community, tracciamento categorie, cessione/reclamo POI, OAuth Facebook/Apple, tier Plus/Influencer; data 06/07) | ✅ Fatto e live | 06/07 |
-| Validazione legale FINALE (avvocato): consenso lente pre-login verso Google, SCC/DPF trasferimenti extra-UE realmente firmati, ruolo media.poilove.com nel registro, nomina DPO+rappresentante Albania, dati di terzi (email invitati, volti nelle foto) | ⬜ Serve Alessandro/legale | prima del lancio |
+| Validazione legale FINALE (legale): rimandata a dopo, non bloccante per il lancio (analisi testi gia fatta, testi allineati). Eda in pista quando sara il momento | 🕓 Rimandata (decisione 06/07) | dopo |
 | Collaudo finale di Alessandro (checklist 5 prove) | ⬜ In attesa | adesso |
 | Presentazione aggiornata su project.poilove.com (screenshot delle novità) | ⬜ Da fare | prima del lancio |
 | OAuth: Facebook (App Review Meta) · Apple ($99/anno) | ⬜ Da fare | prima del lancio |
