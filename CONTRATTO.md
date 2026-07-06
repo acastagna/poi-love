@@ -7,7 +7,7 @@ info@321.al · https://321.al
 # CONTRATTO DI LAVORO · POI•LOVE
 
 > **Questa è la traccia ufficiale del progetto.** Ogni passo che facciamo è definito qui: cosa, in quale settore, con quale stato e quale tempistica. Si aggiorna a OGNI giro di lavoro, insieme a SAL.md (il diario) e TODO.md (la lista operativa).
-> Versione app corrente: **2.27** (partenza ufficiale 2.00 il 04/07/2026). Lancio pubblico: **lunedì 17/08/2026, Tirana**.
+> Versione app corrente: **2.28** (partenza ufficiale 2.00 il 04/07/2026). Lancio pubblico: **lunedì 17/08/2026, Tirana**.
 
 ## Le regole del contratto (valgono per ogni passo)
 
@@ -61,7 +61,7 @@ info@321.al · https://321.al
 | Solo utenti loggati, limiti giornalieri per livello, rimborso su errore | ✅ Fatto e live | 04/07 |
 | Chat riparata dal 2° messaggio, errori gentili in 3 lingue | ✅ Fatto e live | 04/07 |
 | Cerca nella città nominata nella domanda, non solo vicino a te | ✅ Fatto e live | 04/07 |
-| Knowledge base admin a supporto di ILLI (voci per luoghi che l'AI non capisce, iniettate nel grounding) | ⬜ Da fare | prima del lancio |
+| Knowledge base admin a supporto di ILLI: tabella illi_knowledge (titolo, parole chiave, contenuto, lingua, attiva), pannello admin per crearle/modificarle, iniezione nel grounding quando la domanda contiene una parola chiave | ✅ Fatto e live (v2.28) | 06/07 |
 | Collaudo descrizioni sui FATTI da utente loggato | ⬜ In attesa di Alessandro | adesso |
 | Voce e audio (POIVOICE) | ⬜ Fase 2 | dopo il lancio |
 
