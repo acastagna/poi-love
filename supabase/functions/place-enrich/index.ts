@@ -131,6 +131,59 @@ Deno.serve(async (req: Request) => {
       return json(payload, 200);
     }
 
+    // ── MODALITA' DISCOVER: cerca posti per TESTO (es. "sushi") vicino a un punto ──
+    // Usata da ILLI per trovare una cucina SPECIFICA dove nearby (popolarita') non basta.
+    // searchText con locationBias: piu mirato per "sushi"/"kebab". Cache come nearby.
+    if (mode === "discover") {
+      const query = String(name || "").trim();
+      if (!query || lat == null || lng == null) return json({ error: "bad_request" }, 400);
+      const lc = (language === "sq" || language === "en") ? language : "it";
+      const rad = Math.max(200, Math.min(3000, Number(radius) || 1500));
+      const rlat = Number(lat).toFixed(3);
+      const rlng = Number(lng).toFixed(3);
+      const dkey = `discover:${query.toLowerCase().slice(0, 40)}:${rlat}:${rlng}:${Math.round(rad / 100) * 100}:${lc}`;
+      const CACHE_TTL_MS = 7 * 24 * 3600 * 1000;
+      if (svc) {
+        try {
+          const cutoff = new Date(Date.now() - CACHE_TTL_MS).toISOString();
+          const { data: hit } = await svc.from("places_cache").select("payload").eq("key", dkey).gte("created_at", cutoff).maybeSingle();
+          if (hit?.payload) return json(hit.payload, 200);
+        } catch (_e) { /* cache giu */ }
+      }
+      const r = await fetch("https://places.googleapis.com/v1/places:searchText", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Goog-Api-Key": KEY,
+          "X-Goog-FieldMask": "places.displayName,places.location,places.rating,places.userRatingCount,places.primaryType,places.primaryTypeDisplayName",
+        },
+        body: JSON.stringify({
+          textQuery: query,
+          maxResultCount: 12,
+          languageCode: lc,
+          locationBias: { circle: { center: { latitude: Number(lat), longitude: Number(lng) }, radius: rad } },
+        }),
+        signal: AbortSignal.timeout(7000),
+      });
+      const dd = await r.json();
+      if (!r.ok) return json({ error: "google_error", detail: dd?.error?.message || r.status }, 200);
+      const dplaces = (dd?.places || []).map((p: any) => ({
+        name: p.displayName?.text || "",
+        lat: p.location?.latitude ?? null,
+        lng: p.location?.longitude ?? null,
+        rating: p.rating ?? null,
+        reviews: p.userRatingCount ?? null,
+        type: p.primaryType || "",
+        typeLabel: p.primaryTypeDisplayName?.text || "",
+      })).filter((p: any) => p.name && p.lat != null);
+      dplaces.sort((a: any, b: any) => (b.reviews || 0) - (a.reviews || 0));
+      const dpayload = { found: dplaces.length > 0, places: dplaces };
+      if (svc && dplaces.length > 0) {
+        try { await svc.from("places_cache").upsert({ key: dkey, payload: dpayload, created_at: new Date().toISOString() }); } catch (_e) { /* ignore */ }
+      }
+      return json(dpayload, 200);
+    }
+
     if (!name || lat == null || lng == null) return json({ error: "bad_request" }, 400);
 
     const body = {

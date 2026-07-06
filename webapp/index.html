@@ -6414,7 +6414,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='2.48';
+const APP_VERSION='2.49';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 console.info('POI•LOVE v'+APP_VERSION);
 // Le rotte storiche pubblicate sono contenuto PUBBLICO: si caricano per tutti,
@@ -12474,6 +12474,57 @@ async function _enrichPlace(p, cat){
   }catch(e){ /* degrado silenzioso ai dati OSM */ }
   return p;
 }
+// SCOPERTA via Google (place-enrich modalita nearby, la STESSA della lente): copertura
+// vera dove OSM e povero (Albania in primis). Ritorna posti reali gia con voto/recensioni.
+// Fail-open: se Google non risponde, ritorna [] e restano OSM + POI•LOVE.
+async function _googleNearbyPlaces(cat, lat, lng, radiusM){
+  try{
+    const r=await fetch(SUPABASE_URL+'/functions/v1/place-enrich',{
+      method:'POST', headers:await _aiAuthHeaders(),
+      body:JSON.stringify({mode:'nearby', lat, lng, radius:Math.min(1500,Math.max(300,radiusM||1200)), language:(typeof lang!=='undefined'?lang:'it')})
+    });
+    if(!r.ok) return [];
+    const d=await r.json();
+    if(!d || !Array.isArray(d.places)) return [];
+    const re=cat && cat.re ? cat.re : null;
+    const generic = !re || (cat && (cat.label==='ristorante'));
+    return d.places
+      .filter(p=>p && p.name && p.lat!=null && p.lng!=null)
+      .map(p=>({
+        name:p.name, lat:p.lat, lng:p.lng,
+        distM:Math.round(haversineKm(lat,lng,p.lat,p.lng)*1000),
+        kind:p.typeLabel||(cat&&cat.label)||'', typeLabel:p.typeLabel||'', gType:p.type||'',
+        rating:(typeof p.rating==='number'?p.rating:null), reviews:p.reviews||null, src:'google'
+      }))
+      .filter(p=>{
+        const gt=(p.gType||'');
+        if(generic) return _FOOD_TYPE_RE.test(gt) || /\b(restaurant|restorant|tavern|trattori|osteri|ristorant|food|bistro|grill|kitchen)\b/i.test((p.name||''));
+        const hay=(gt+' '+(p.typeLabel||'')+' '+(p.name||'')).toLowerCase().replace(/_/g,' ');
+        return re.test(hay);
+      });
+  }catch(e){ return []; }
+}
+// SCOPERTA MIRATA via Google searchText (place-enrich modalita discover): trova una
+// cucina SPECIFICA ("sushi", "kebab") dove nearby-per-popolarita non basta. Fail-open.
+async function _googleDiscover(queryText, lat, lng, radiusM){
+  try{
+    const r=await fetch(SUPABASE_URL+'/functions/v1/place-enrich',{
+      method:'POST', headers:await _aiAuthHeaders(),
+      body:JSON.stringify({mode:'discover', name:queryText, lat, lng, radius:Math.min(3000,Math.max(400,radiusM||1500)), language:(typeof lang!=='undefined'?lang:'it')})
+    });
+    if(!r.ok) return [];
+    const d=await r.json();
+    if(!d || !Array.isArray(d.places)) return [];
+    return d.places
+      .filter(p=>p && p.name && p.lat!=null && p.lng!=null)
+      .map(p=>({
+        name:p.name, lat:p.lat, lng:p.lng,
+        distM:Math.round(haversineKm(lat,lng,p.lat,p.lng)*1000),
+        kind:p.typeLabel||queryText, typeLabel:p.typeLabel||'', gType:p.type||'',
+        rating:(typeof p.rating==='number'?p.rating:null), reviews:p.reviews||null, src:'google'
+      }));
+  }catch(e){ return []; }
+}
 // Eredita la categoria dagli ultimi messaggi utente: i follow-up ("e domani?", "e di pesce?") continuano a cercare lo stesso tipo di posto
 function _lastPlaceCatFromHistory(){
   try{
@@ -12483,23 +12534,41 @@ function _lastPlaceCatFromHistory(){
   return null;
 }
 // Il contesto di ricerca precedente si eredita SOLO sui veri follow-up, non su ogni messaggio
+let _lastAskedOrigin=null, _lastAskedLabel=null;   // citta nominata di recente, per i follow-up
 function _looksLikeFollowUp(text){
   const tx=String(text||'').trim();
   if(tx.length<40) return true;
-  return /\b(altr[oaie]|ancora|più vicino|piu vicino|apert[oaie]|invece|e se|quale|migliore)\b/i.test(tx);
+  return /\b(altr[oaie]|ancora|più vicino|piu vicino|apert[oaie]|invece|e se|quale|migliore|cerca|trova|tira|fuori|dai|mostra|fammi|segnal|procedi|fallo|vai|conferm|per cortesia|per favore)\b/i.test(tx);
 }
 // Se l'utente nomina una citta ("una pizzeria a Tirana"), geocodifica il toponimo con Nominatim (timeout 4s):
 // la ricerca posti parte da LI, non dal GPS. Fallback: null = usa il GPS/centro mappa.
 async function _geocodeAskedPlace(text){
-  const m=String(text||'').match(/\b(?:a|in|verso|per)\s+([A-ZÀ-Ù][a-zà-ù]{2,}(?:\s+[A-ZÀ-Ù][a-zà-ù]{2,})?)/);
+  // "a/in/verso/per Tirana", ma anche "vicino Valona", "vicino a Valona", "presso Berat",
+  // "dalle parti di Saranda", "zona di Durazzo", "nei pressi di Scutari".
+  const m=String(text||'').match(/\b(?:[Aa]|[Aa]d|[Ii]n|[Vv]erso|[Pp]er|[Vv]icino(?:\s+(?:a|ad))?|[Pp]resso|[Zz]ona(?:\s+di)?|nei\s+pressi\s+di|dalle\s+parti\s+di|dintorni\s+di)\s+([A-ZÀ-Ù][a-zà-ù]{2,}(?:\s+[A-ZÀ-Ù][a-zà-ù]{2,})?)/);
   if(!m) return null;
+  const place=m[1];
+  const lg=(typeof lang!=='undefined'?lang:'it');
+  // BIAS geografico Italia+Balcani (dove opera POI•LOVE): senza questo "Valona" (Vlorë) finisce
+  // in Belgio, "Berat" altrove, ecc. viewbox = lon_min,lat_max,lon_max,lat_min.
+  const VIEWBOX='6.0,47.6,26.5,34.7';
+  const _q=async(bounded)=>{
+    const ctrl=new AbortController(); const tm=setTimeout(()=>ctrl.abort(),4500);
+    try{
+      const url='https://nominatim.openstreetmap.org/search?format=json&limit=5&addressdetails=1&q='+encodeURIComponent(place)
+        +'&viewbox='+VIEWBOX+(bounded?'&bounded=1':'');
+      const r=await fetch(url,{headers:{'Accept-Language':lg},signal:ctrl.signal});
+      clearTimeout(tm);
+      const d=await r.json();
+      return Array.isArray(d)?d:[];
+    }catch(e){ clearTimeout(tm); return []; }
+  };
   try{
-    const ctrl=new AbortController(); const tm=setTimeout(()=>ctrl.abort(),4000);
-    const r=await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q='+encodeURIComponent(m[1]),
-      {headers:{'Accept-Language':(typeof lang!=='undefined'?lang:'it')},signal:ctrl.signal});
-    clearTimeout(tm);
-    const d=await r.json();
-    if(d&&d[0]) return {lat:parseFloat(d[0].lat), lng:parseFloat(d[0].lon), label:m[1]};
+    // 1) dentro Italia+Balcani (preferisci un centro abitato); 2) fallback globale se nulla in zona
+    let d=await _q(true);
+    let pick=d.find(x=>/city|town|village|municipality|administrative/.test(x.type||x.class||'')) || d[0];
+    if(!pick){ d=await _q(false); pick=d.find(x=>/city|town|village|municipality/.test(x.type||''))||d[0]; }
+    if(pick) return {lat:parseFloat(pick.lat), lng:parseFloat(pick.lon), label:place};
   }catch(e){}
   return null;
 }
@@ -12521,16 +12590,37 @@ async function _fetchRealPlaces(text, catOverride, originOverride){
       const k=p.name.toLowerCase().trim();
       if(seen.has(k)) continue; seen.add(k); merged.push(p);
     }
-    merged.sort((a,b)=>_qualityScore(b)-_qualityScore(a));   // qualita reale, non solo distanza
-    if(overpassDown) break;   // OSM giu: inutile ritentare altri raggi, uso i POI locali
-    if(merged.length>=4) break;
+    if(overpassDown) break;   // OSM giu: inutile ritentare altri raggi, uso i POI locali + Google
+    if(merged.length>=6) break;
   }
+  // SCOPERTA GOOGLE: la copertura vera (come la lente). Fondamentale dove OSM e povero (Albania).
+  // Cucina SPECIFICA (sushi, kebab...) -> ricerca testuale mirata (discover), filtrata per distanza
+  // (searchText fa da bias, non da recinto: senza filtro "sushi vicino Valona" tirerebbe Tirana).
+  // Categoria generica (ristorante/mangiare) -> nearby.
+  let g=[];
+  if(cat.re && cat.label!=='ristorante'){
+    const maxM=(cat.wide?45:22)*1000;
+    g=(await _googleDiscover(cat.label, lat, lng, cat.wide?3000:1800)).filter(p=>p.distM<=maxM);
+    if(!g.length) g=await _googleNearbyPlaces(cat, lat, lng, cat.wide?1500:1200);
+  } else {
+    g=await _googleNearbyPlaces(cat, lat, lng, cat.wide?1500:1200);
+  }
+  { const seen=new Set(merged.map(p=>p.name.toLowerCase().trim()));
+    for(const p of g){ const k=p.name.toLowerCase().trim(); if(seen.has(k)) continue; seen.add(k); merged.push(p); } }
+  // Fallback: cucina specifica senza NULLA (ne OSM ne Google) -> ristoranti generici da Google,
+  // cosi ILLI non resta a mani vuote e puo dire "niente sushi dedicato ma questi ristoranti vicini".
+  let genericFallback=false;
+  if(!merged.length && cat.label!=='ristorante' && _FOOD_CATS.includes((cat.label||'').toLowerCase())){
+    const gg=await _googleNearbyPlaces({label:'ristorante',re:null}, lat, lng, 1500);
+    if(gg.length){ merged=gg; genericFallback=true; }
+  }
+  merged.sort((a,b)=>_qualityScore(b)-_qualityScore(a));   // qualita reale, non solo distanza
   // Arricchimento Google (voto, recensioni, prezzo, stato) sui migliori candidati; poi via i chiusi definitivi e riordino
   let top=merged.slice(0,8);
-  await Promise.all(top.map(p=>_enrichPlace(p, cat)));
+  await Promise.all(top.map(p=>_enrichPlace(p, genericFallback?{label:'ristorante',re:null}:cat)));
   top=top.filter(p=>!p.mismatch && p.businessStatus!=='CLOSED_PERMANENTLY');   // via i match sbagliati (gioielleria/via) e i chiusi definitivi
   top.sort((a,b)=>_qualityScore(b)-_qualityScore(a));
-  return {cat, places:top, overpassDown};
+  return {cat, places:top, overpassDown, genericFallback};
 }
 function _fmtDist(m){ return m<1000 ? `a ${m} m` : `a ${(m/1000).toFixed(1).replace('.',',')} km`; }
 // "aperto adesso" da opening_hours OSM (casi comuni). Ritorna true/false/null (null = non so, ILLI non afferma).
@@ -12571,17 +12661,20 @@ function _trCuisine(c){
   const M={italian:'italiana',pizza:'pizza',regional:'regionale',steak_house:'carne alla griglia',japanese:'giapponese',sushi:'sushi',chinese:'cinese',kebab:'kebab',burger:'hamburger',seafood:'pesce',fish:'pesce',vegetarian:'vegetariana',vegan:'vegana',ice_cream:'gelato',coffee_shop:'caffetteria',sandwich:'panini',mexican:'messicana',indian:'indiana',french:'francese',greek:'greca',mediterranean:'mediterranea',asian:'asiatica',bbq:'griglia',grill:'griglia',international:'internazionale',local:'cucina locale',pasta:'pasta',fast_food:'fast food',breakfast:'colazione',bakery:'forno',dessert:'dolci',thai:'thailandese',turkish:'turca',spanish:'spagnola',german:'tedesca',american:'americana',cake:'dolci',coffee:'caffe',wine:'vino',beer:'birra',friture:'fritto',balkan:'balcanica',albanian:'albanese'};
   return String(c).split(/[;,]/).map(x=>{ const k=x.trim().toLowerCase().replace(/\s+/g,'_'); return M[k]||x.trim().replace(/_/g,' '); }).filter(Boolean).join(', ');
 }
-function _buildGroundingBlock(cat, places, overpassDown, cityLabel){
+function _buildGroundingBlock(cat, places, overpassDown, cityLabel, genericFallback){
   const city=cityLabel||_gpsCity||'questa zona';
   if(!places.length){
-    const motivo = overpassDown ? `la fonte dati (OpenStreetMap) non risponde in questo momento` : `nel raggio non ci sono ${cat.label} mappati`;
+    const motivo = overpassDown ? `la fonte dati non risponde in questo momento` : `non risultano ${cat.label} nella zona`;
     return `GROUNDING OBBLIGATORIO — nessun posto reale trovato (regola assoluta, sovrascrive tutto):
 Ho cercato "${cat.label}" vicino a ${city}: ${motivo}.
-NON inventare NESSUN nome di locale, NESSUN indirizzo, NESSUNA distanza.
-Dillo onestamente in 1-2 frasi calde (es. "Qui intorno non trovo ${cat.label} mappati, ma...").
-Invita l'utente ad allargare la zona, a crearlo lui col tasto + (Crea POI), oppure proponi un altro tipo di posto da cercare.
+NON inventare NESSUN nome di locale, NESSUN indirizzo, NESSUNA distanza. NON nominare altre citta a caso.
+Dillo onestamente in 1-2 frasi calde riferite a ${city} (es. "A ${city} non trovo ${cat.label}, ma...").
+Invita l'utente ad allargare la zona, a crearlo lui col tasto + (Crea POI), oppure proponi un altro tipo di posto vicino a ${city}.
 NON includere il blocco ===PLACES===.`;
   }
+  const introFallback = genericFallback
+    ? `Non ho trovato ${cat.label} DEDICATI vicino a ${city}, ma questi sono buoni ristoranti reali nella zona (alcuni potrebbero servire anche ${cat.label}). Dillo con onesta: "${cat.label} dedicati non ne trovo a ${city}, ma qui vicino ci sono questi ristoranti".`
+    : `L'utente cerca "${cat.label}" vicino a ${city}. Questi sono gli UNICI posti reali esistenti in zona:`;
   const lista=places.map(p=>{
     const det=[_fmtDist(p.distM)];
     if(p.src==='POI•LOVE') det.push('verificato su POI•LOVE');
@@ -12595,8 +12688,7 @@ NON includere il blocco ===PLACES===.`;
     return `- ${p.name} — ${det.join(' · ')}`;
   }).join('\n');
   return `GROUNDING OBBLIGATORIO — anti-invenzione (regola assoluta, sovrascrive TUTTO il resto):
-L'utente cerca "${cat.label}" vicino a ${city}.
-Ho già interrogato OpenStreetMap e il database POI•LOVE. Questi sono gli UNICI posti reali esistenti vicino all'utente:
+${introFallback}
 
 ${lista}
 
@@ -12653,7 +12745,7 @@ function _buildPoiAISystemPrompt(){
   const tripNames=Object.values(TRIPS).map(t=>t.name).join(', ')||'nessuno';
   const activePoiName=currentPOI?.name||null;
   const langLabel=lang==='it'?'italiano':lang==='sq'?'albanese':'English';
-  const locationCtx=_gpsCity?`L'utente si trova ADESSO a ${_gpsCity}. Quando suggerisci posti reali (ristoranti, pizzerie, esperienze), proponi SOLO luoghi vicini a qui, nella sua citta o zona. MAI Tirana o altre citta se non e li che si trova.`:(gpsPos?`L'utente e circa a ${gpsPos.lat.toFixed(3)},${gpsPos.lng.toFixed(3)}: deduci la zona dalle coordinate, NON assumere Tirana.`:'');
+  const locationCtx=_gpsCity?`L'utente in questo momento si trova a ${_gpsCity}. Se NON nomina un'altra citta, proponi posti vicino a qui. Se invece nomina o chiede esplicitamente un'altra citta o zona (es. "vicino Valona", "a Berat"), usa QUELLA e non ${_gpsCity}. Il blocco GROUNDING ti dice sempre la citta giusta della ricerca: fidati di quello.`:(gpsPos?`L'utente e circa a ${gpsPos.lat.toFixed(3)},${gpsPos.lng.toFixed(3)}: deduci la zona dalle coordinate. Se nomina una citta, usa quella.`:'');
 
   return `Sei ILLI•AI, la mascot ufficiale e Travel Advisor di POI•LOVE — mappa comunitaria dei luoghi amati nei Balcani e nel mondo. Ti chiamano "ILLI" per affetto: sei il piccolo cuore-amico che accompagna chi ama un luogo.
 
@@ -12717,13 +12809,15 @@ async function sendPoiAIMsg(){
     if(_gCat && _origin){
       const _le=document.getElementById(loadId);
       if(_le) _le.innerHTML=`<i class="ph-duotone ph-magnifying-glass" style="margin-right:6px"></i>Sto guardando cosa c'è qui intorno…`;
-      // Citta nominata nella domanda ("una pizzeria a Tirana"): la ricerca parte da li, non dal GPS
+      // Citta nominata nella domanda ("una pizzeria a Tirana", "sushi vicino Valona"): la ricerca
+      // parte da LI, non dal GPS. E la si RICORDA per i follow-up ("tiramelo fuori", "e domani?").
       const _asked=await _geocodeAskedPlace(text);
-      if(_asked){ _origin={lat:_asked.lat,lng:_asked.lng}; _askedLabel=_asked.label; }
+      if(_asked){ _origin={lat:_asked.lat,lng:_asked.lng}; _askedLabel=_asked.label; _lastAskedOrigin={lat:_asked.lat,lng:_asked.lng}; _lastAskedLabel=_asked.label; }
+      else if(_looksLikeFollowUp(text) && _lastAskedOrigin){ _origin=_lastAskedOrigin; _askedLabel=_lastAskedLabel; }
       let _g={cat:_gCat, places:[], overpassDown:false};
-      try{ _g=await Promise.race([_fetchRealPlaces(text, _gCat, _origin), new Promise(r=>setTimeout(()=>r({cat:_gCat,places:[],overpassDown:true}),8000))]); }catch(e){}
+      try{ _g=await Promise.race([_fetchRealPlaces(text, _gCat, _origin), new Promise(r=>setTimeout(()=>r({cat:_gCat,places:[],overpassDown:true}),9000))]); }catch(e){}
       _lastGroundedPlaces=_g.places;
-      groundingMsg={role:'system', content:_buildGroundingBlock(_g.cat, _g.places, _g.overpassDown, _askedLabel)};
+      groundingMsg={role:'system', content:_buildGroundingBlock(_g.cat, _g.places, _g.overpassDown, _askedLabel, _g.genericFallback)};
     }
 
     const kbMsg=_matchIlliKnowledge(text); // conoscenze curate dall'admin (se pertinenti)
