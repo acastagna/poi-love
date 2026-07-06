@@ -229,6 +229,8 @@ td .sm{font-size:11px;color:rgba(244,236,224,.5)}
   border:1px solid var(--line);white-space:nowrap}
 .chip.green{color:var(--ok);border-color:rgba(155,230,168,.4);background:rgba(155,230,168,.1)}
 .chip.gold{color:var(--gold);border-color:rgba(232,176,75,.4);background:rgba(232,176,75,.1)}
+.tier-select{background:var(--glass-soft,rgba(255,255,255,.06));color:inherit;border:1px solid rgba(128,128,128,.3);border-radius:9px;padding:5px 8px;font-size:12px;font-family:inherit;cursor:pointer;max-width:150px}
+html[data-theme="light"] .tier-select{background:#fff;color:var(--ink);border-color:rgba(0,0,0,.15)}
 .chip.red{color:var(--bad);border-color:rgba(255,180,180,.4);background:rgba(255,180,180,.1)}
 .chip.dim{color:rgba(244,236,224,.6)}
 
@@ -809,6 +811,7 @@ const T = {
     // colonne
     c_target:'Bersaglio', c_reason:'Motivo', c_status:'Stato', c_date:'Data', c_actions:'Azioni',
     c_user:'Utente', c_tier:'Tier', c_admin:'Admin', c_action:'Azione',
+    tier_free:'Free', tier_professionista:'Professionista', tier_professionista_plus:'Professionista Plus', tier_sostenitore:'Sostenitore', tier_mecenate:'Mecenate', tier_influencer:'Influencer', tier_saved:'Tier aggiornato',
     c_msgs:'Msg/giorno', c_tokens:'Max token', c_model:'Modello', c_tier_h:'Livello',
     // messaggi
     empty_reports:'Nessuna segnalazione aperta', empty_reports_h:'La community è tranquilla.',
@@ -884,6 +887,7 @@ const T = {
     a_review:'Në rishikim',
     c_target:'Objektivi', c_reason:'Arsyeja', c_status:'Statusi', c_date:'Data', c_actions:'Veprime',
     c_user:'Përdoruesi', c_tier:'Niveli', c_admin:'Admin', c_action:'Veprimi',
+    tier_free:'Free', tier_professionista:'Profesionist', tier_professionista_plus:'Profesionist Plus', tier_sostenitore:'Mbështetës', tier_mecenate:'Mecenat', tier_influencer:'Influencer', tier_saved:'Niveli u përditësua',
     c_msgs:'Msg/ditë', c_tokens:'Token maks', c_model:'Modeli', c_tier_h:'Niveli',
     empty_reports:'Asnjë raportim i hapur', empty_reports_h:'Komuniteti është i qetë.',
     empty_users:'Asnjë përdorues', empty_audit:'Asnjë veprim i regjistruar',
@@ -958,6 +962,7 @@ const T = {
     a_review:'Review',
     c_target:'Target', c_reason:'Reason', c_status:'Status', c_date:'Date', c_actions:'Actions',
     c_user:'User', c_tier:'Tier', c_admin:'Admin', c_action:'Action',
+    tier_free:'Free', tier_professionista:'Professional', tier_professionista_plus:'Professional Plus', tier_sostenitore:'Supporter', tier_mecenate:'Patron', tier_influencer:'Influencer', tier_saved:'Tier updated',
     c_msgs:'Msg/day', c_tokens:'Max tokens', c_model:'Model', c_tier_h:'Tier',
     empty_reports:'No open reports', empty_reports_h:'The community is calm.',
     empty_users:'No users found', empty_audit:'No actions logged',
@@ -1452,7 +1457,7 @@ async function loadUsers(){
           av, el('div',null,[ el('div',{class:'ttl',text:'@'+(u.username||'utente')}),
             el('div',{class:'sm',text:(u.points!=null?(u.points+' pt · '):'')+fmtDate(u.created_at)}) ])
         ])),
-        el('td',null, el('span',{class:'chip dim',text:u.special_tier||'free'})),
+        el('td',null, tierSelect(u.id, u.special_tier)),
         el('td',null,stChip),
         el('td',null,actions)
       ]));
@@ -1460,6 +1465,35 @@ async function loadUsers(){
     table.appendChild(tb); wrap.appendChild(table);
     box.textContent=''; box.appendChild(wrap);
   }catch(e){ emptyBox(box,t('error'),null,'warning'); }
+}
+
+// Menu tier: cambia il livello dell'utente via RPC admin (mai update diretto)
+const TIER_OPTS=[
+  {v:'', k:'tier_free'},
+  {v:'professionista', k:'tier_professionista'},
+  {v:'professionista_plus', k:'tier_professionista_plus'},
+  {v:'sostenitore', k:'tier_sostenitore'},
+  {v:'mecenate', k:'tier_mecenate'},
+  {v:'influencer', k:'tier_influencer'}
+];
+function tierSelect(userId, current){
+  const sel=el('select',{class:'tier-select','aria-label':t('c_tier')});
+  TIER_OPTS.forEach(o=>{
+    const opt=el('option',{value:o.v,text:t(o.k)});
+    if((current||'')===o.v) opt.setAttribute('selected','selected');
+    sel.appendChild(opt);
+  });
+  sel.addEventListener('change',()=>setUserTier(userId, sel.value, sel));
+  return sel;
+}
+async function setUserTier(targetId, tier, selEl){
+  if(selEl) selEl.disabled=true;
+  try{
+    const { error } = await sb.rpc('admin_set_user_tier', { p_target: targetId, p_tier: tier||null });
+    if(error){ toast(isBackendMissing(error)?t('backend_off'):(error.message||t('error')),'err'); }
+    else { toast(t('tier_saved'),'ok'); }
+  }catch(e){ toast(t('error'),'err'); }
+  if(selEl) selEl.disabled=false;
 }
 
 // Moderazione via RPC sicura (mai toccare is_admin dal client)
