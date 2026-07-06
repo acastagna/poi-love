@@ -6414,7 +6414,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='2.52';
+const APP_VERSION='2.53';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 console.info('POI•LOVE v'+APP_VERSION);
 // Le rotte storiche pubblicate sono contenuto PUBBLICO: si caricano per tutti,
@@ -12312,7 +12312,7 @@ const _OSM_CATS=[
   {re:/\b(gelateri[ae]|gelat[oi]|ice cream|akullore)\b/i,          label:'gelateria',    osm:'amenity=ice_cream'},
   {re:/\b(pasticceri[ae]|pastry)\b/i,                              label:'pasticceria',  osm:'shop~"pastry|confectionery"'},
   {re:/\b(panetteri[ae]|panificio|forno|pane|bakery|furr)\b/i,     label:'panetteria',   osm:'shop=bakery'},
-  {re:/\b(ristorant[ei]|trattori[ae]|osteri[ae]|mangiare|cena|pranzo|restaurant|restorant)\b/i, label:'ristorante', osm:'amenity=restaurant'},
+  {re:/\b(ristorant[ei]|trattori[ae]|osteri[ae]|mangi(?:o|a|amo|ate|are|ano|i)|cen(?:a|o|i|are|iamo|ate)|pranz(?:o|i|are|iamo|ate)|restaurant|restorant)\b/i, label:'ristorante', osm:'amenity=restaurant'},
   {re:/\b(bar|caff[eèé]|caffetteri[ae]|aperitiv[oi]|colazione|coffee|kafe)\b/i, label:'bar o caffè', osm:'amenity~"cafe|bar"'},
   {re:/\b(pub|birreri[ae]|birra|beer)\b/i,                         label:'pub',          osm:'amenity~"pub|bar"'},
   {re:/\b(hotel|alberg[hoi]|dormire|alloggi[oa]|b&b|bnb|pernott|accommodation)\b/i, label:'hotel o alloggio', osm:'tourism~"hotel|guest_house|hostel|apartment"'},
@@ -12326,7 +12326,7 @@ const _OSM_CATS=[
 function _detectPlaceQuery(text){
   if(!text) return null;
   if(/\b(era|fu|com'era|cosa ne pensi|ti piace|secondo te|ricordi|anni fa|tempo fa|ha chiuso|aveva chiuso)\b/i.test(text)) return null;   // domande su passato/opinione: non far partire la ricerca
-  const wantsSearch=/\b(consigl|suggeris|trov|cerc|dove|vicin|dintorn|qui intorno|nei paraggi|paraggi|zona|migliore|miglior|posto|locale|mangiare|dormire)\b/i.test(text);
+  const wantsSearch=/\b(consigl|suggeris|trov|cerc|dove|vicin|dintorn|qui intorno|nei paraggi|paraggi|zona|migliore|miglior|posto|locale|mangi|cen[aoi]|pranz|dorm|bere|beviamo)\b/i.test(text);
   const looksLikeAsk=/\b(un[ao]?|qualche|due|tre|dei|delle|degli|che)\b/i.test(text) || text.trim().split(/\s+/).length<=5;
   for(const c of _OSM_CATS){
     if(c.re.test(text) && (wantsSearch || looksLikeAsk)) return c;
@@ -12593,6 +12593,52 @@ function _looksLikeFollowUp(text){
 }
 // Se l'utente nomina una citta ("una pizzeria a Tirana"), geocodifica il toponimo con Nominatim (timeout 4s):
 // la ricerca posti parte da LI, non dal GPS. Fallback: null = usa il GPS/centro mappa.
+// Gazetteer citta con COORDINATE + alias (italiano E albanese): rende il riconoscimento
+// TYPO-PROOF ("vl0ona" -> Valona) e istantaneo per le citta chiave, senza dipendere da
+// Nominatim (che sui refusi fallisce). Le altre citta le prende comunque Nominatim.
+const _CITY_GAZ=[
+  {label:'Valona', lat:40.4686, lng:19.4914, aliases:['valona','vlore','vlora','vlorë']},
+  {label:'Tirana', lat:41.3275, lng:19.8187, aliases:['tirana','tirane','tiranë','tiran']},
+  {label:'Durazzo', lat:41.3231, lng:19.4414, aliases:['durazzo','durres','durrës','durrsi']},
+  {label:'Scutari', lat:42.0685, lng:19.5126, aliases:['scutari','shkoder','shkodra','shkodër']},
+  {label:'Saranda', lat:39.8756, lng:20.0053, aliases:['saranda','sarande','sarandë','santi quaranta']},
+  {label:'Berat', lat:40.7058, lng:19.9522, aliases:['berat','berati']},
+  {label:'Argirocastro', lat:40.0757, lng:20.1388, aliases:['argirocastro','gjirokaster','gjirokastra','gjirokastër']},
+  {label:'Coriza', lat:40.6186, lng:20.7808, aliases:['coriza','korce','korça','korçë']},
+  {label:'Elbasan', lat:41.1125, lng:20.0822, aliases:['elbasan','elbasani']},
+  {label:'Fier', lat:40.7239, lng:19.5567, aliases:['fier','fieri']},
+  {label:'Pogradec', lat:40.9025, lng:20.6525, aliases:['pogradec','pogradeci']},
+  {label:'Kruja', lat:41.5089, lng:19.7922, aliases:['kruja','kruje','krujë']},
+  {label:'Ksamil', lat:39.7667, lng:20.0011, aliases:['ksamil','ksamili']},
+  {label:'Himara', lat:40.1017, lng:19.7447, aliases:['himara','himare','himarë']},
+  {label:'Lezha', lat:41.7836, lng:19.6436, aliases:['lezha','lezhe','lezhë','alessio']},
+  {label:'Kavaja', lat:41.1856, lng:19.5569, aliases:['kavaja','kavaje','kavajë']},
+  {label:'Lushnja', lat:40.9419, lng:19.7050, aliases:['lushnja','lushnje','lushnjë']},
+  // Italia (zona del founder + grandi citta)
+  {label:'Zugliano', lat:45.7167, lng:11.5500, aliases:['zugliano']},
+  {label:'Vicenza', lat:45.5455, lng:11.5354, aliases:['vicenza']},
+  {label:'Schio', lat:45.7128, lng:11.3567, aliases:['schio']},
+  {label:'Thiene', lat:45.7078, lng:11.4786, aliases:['thiene']},
+  {label:'Bassano del Grappa', lat:45.7658, lng:11.7342, aliases:['bassano','bassano del grappa']},
+  {label:'Padova', lat:45.4064, lng:11.8768, aliases:['padova']},
+  {label:'Verona', lat:45.4384, lng:10.9916, aliases:['verona']},
+  {label:'Venezia', lat:45.4408, lng:12.3155, aliases:['venezia','venice']},
+  {label:'Milano', lat:45.4642, lng:9.1900, aliases:['milano']},
+  {label:'Roma', lat:41.9028, lng:12.4964, aliases:['roma']}
+];
+// Corrispondenza fuzzy col gazetteer (refusi fino a 2 lettere). Ritorna {city, corrected} o null.
+function _matchCityGaz(place){
+  const n=_srchNorm(place); if(n.length<3) return null;
+  let best=null, bestD=99;
+  for(const c of _CITY_GAZ){
+    for(const a of c.aliases){
+      const an=_srchNorm(a);
+      if(an===n) return {city:c, corrected:false};
+      if(Math.abs(an.length-n.length)<=2){ const d=_lev2(n,an); if(d<bestD){ bestD=d; best=c; } }
+    }
+  }
+  return (best && bestD<=2) ? {city:best, corrected:true} : null;
+}
 // Parole comuni che seguono le preposizioni ma NON sono citta (cosi "a mangiare",
 // "a cena", "a valona stasera" non vengono geocodificate come toponimi).
 const _CITY_STOP=new Set(('mangiare mangio mangi cena cenare ceno pranzo pranzare colazione bere dormire aperitivo aperitivi '
@@ -12610,13 +12656,16 @@ function _isPlaceResult(x){
 // con Nominatim, bias Italia+Balcani, e la accetta SOLO se e davvero un luogo. La ricerca posti
 // parte da LI, non dal GPS. Ritorna null = usa il GPS/centro mappa.
 async function _geocodeAskedPlace(text){
-  const m=String(text||'').match(/\b(?:a|ad|in|verso|per|vicino(?:\s+(?:a|ad))?|presso|zona\s+di|nei\s+pressi\s+di|dalle\s+parti\s+di|dintorni\s+di)\s+([a-zà-ù][a-zà-ù'’.\-]{1,}(?:\s+[a-zà-ù][a-zà-ù'’.\-]{1,})?)/i);
+  const m=String(text||'').match(/\b(?:a|ad|in|verso|per|vicino(?:\s+(?:a|ad))?|presso|zona\s+di|nei\s+pressi\s+di|dalle\s+parti\s+di|dintorni\s+di)\s+([a-zà-ù][a-zà-ù0-9'’.\-]{1,}(?:\s+[a-zà-ù][a-zà-ù0-9'’.\-]{1,})?)/i);
   if(!m) return null;
   let words=m[1].trim().split(/\s+/);
   // togli le parole-tempo/comuni in coda ("valona stasera" -> "valona"); se la 1a e comune, non e citta
   while(words.length>1 && _CITY_STOP.has(words[words.length-1].toLowerCase())) words.pop();
   if(!words.length || _CITY_STOP.has(words[0].toLowerCase())) return null;
   const place=words.join(' ');
+  // 1) GAZETTEER fuzzy: typo-proof e istantaneo ("vl0ona"->Valona). Se corretto, lo segnala.
+  const gz=_matchCityGaz(place);
+  if(gz) return {lat:gz.city.lat, lng:gz.city.lng, label:gz.city.label, corrected:gz.corrected, typed:place};
   const lg=(typeof lang!=='undefined'?lang:'it');
   const VIEWBOX='6.0,47.6,26.5,34.7'; // lon_min,lat_max,lon_max,lat_min (Italia..Balcani)
   const _q=async(bounded)=>{
@@ -12635,7 +12684,7 @@ async function _geocodeAskedPlace(text){
     let d=await _q(true);
     let pick=d.find(_isPlaceResult);
     if(!pick){ d=await _q(false); pick=d.find(_isPlaceResult); }
-    if(pick) return {lat:parseFloat(pick.lat), lng:parseFloat(pick.lon), label:(pick.name||place)};
+    if(pick) return {lat:parseFloat(pick.lat), lng:parseFloat(pick.lon), label:(pick.name||place), corrected:false, typed:place};
   }catch(e){}
   return null;
 }
@@ -12737,11 +12786,12 @@ function _trCuisine(c){
   const M={italian:'italiana',pizza:'pizza',regional:'regionale',steak_house:'carne alla griglia',japanese:'giapponese',sushi:'sushi',chinese:'cinese',kebab:'kebab',burger:'hamburger',seafood:'pesce',fish:'pesce',vegetarian:'vegetariana',vegan:'vegana',ice_cream:'gelato',coffee_shop:'caffetteria',sandwich:'panini',mexican:'messicana',indian:'indiana',french:'francese',greek:'greca',mediterranean:'mediterranea',asian:'asiatica',bbq:'griglia',grill:'griglia',international:'internazionale',local:'cucina locale',pasta:'pasta',fast_food:'fast food',breakfast:'colazione',bakery:'forno',dessert:'dolci',thai:'thailandese',turkish:'turca',spanish:'spagnola',german:'tedesca',american:'americana',cake:'dolci',coffee:'caffe',wine:'vino',beer:'birra',friture:'fritto',balkan:'balcanica',albanian:'albanese'};
   return String(c).split(/[;,]/).map(x=>{ const k=x.trim().toLowerCase().replace(/\s+/g,'_'); return M[k]||x.trim().replace(/_/g,' '); }).filter(Boolean).join(', ');
 }
-function _buildGroundingBlock(cat, places, overpassDown, cityLabel, genericFallback){
+function _buildGroundingBlock(cat, places, overpassDown, cityLabel, genericFallback, correctedFrom){
   const city=cityLabel||_gpsCity||'questa zona';
+  const corr=correctedFrom?`NOTA: l'utente ha scritto "${correctedFrom}" ma intende ${city}. INIZIA la risposta facendoglielo notare con garbo (es. "Immagino tu intenda ${city}...") e poi prosegui normalmente.\n`:'';
   if(!places.length){
     const motivo = overpassDown ? `la fonte dati non risponde in questo momento` : `non risultano ${cat.label} nella zona`;
-    return `GROUNDING OBBLIGATORIO — nessun posto reale trovato (regola assoluta, sovrascrive tutto):
+    return `${corr}GROUNDING OBBLIGATORIO — nessun posto reale trovato (regola assoluta, sovrascrive tutto):
 Ho cercato "${cat.label}" vicino a ${city}: ${motivo}.
 NON inventare NESSUN nome di locale, NESSUN indirizzo, NESSUNA distanza. NON nominare altre citta a caso.
 Dillo onestamente in 1-2 frasi calde riferite a ${city} (es. "A ${city} non trovo ${cat.label}, ma...").
@@ -12763,7 +12813,7 @@ NON includere il blocco ===PLACES===.`;
     if(p.website) det.push('ha sito web'); if(p.outdoor) det.push("tavoli all'aperto"); if(p.wheelchair) det.push('accessibile');
     return `- ${p.name} — ${det.join(' · ')}`;
   }).join('\n');
-  return `GROUNDING OBBLIGATORIO — anti-invenzione (regola assoluta, sovrascrive TUTTO il resto):
+  return `${corr}GROUNDING OBBLIGATORIO — anti-invenzione (regola assoluta, sovrascrive TUTTO il resto):
 ${introFallback}
 
 ${lista}
@@ -12888,12 +12938,14 @@ async function sendPoiAIMsg(){
       // Citta nominata nella domanda ("una pizzeria a Tirana", "sushi vicino Valona"): la ricerca
       // parte da LI, non dal GPS. E la si RICORDA per i follow-up ("tiramelo fuori", "e domani?").
       const _asked=await _geocodeAskedPlace(text);
-      if(_asked){ _origin={lat:_asked.lat,lng:_asked.lng}; _askedLabel=_asked.label; _lastAskedOrigin={lat:_asked.lat,lng:_asked.lng}; _lastAskedLabel=_asked.label; }
+      let _correctedFrom=null;
+      if(_asked){ _origin={lat:_asked.lat,lng:_asked.lng}; _askedLabel=_asked.label; _lastAskedOrigin={lat:_asked.lat,lng:_asked.lng}; _lastAskedLabel=_asked.label;
+        if(_asked.corrected && _asked.typed && _srchNorm(_asked.typed)!==_srchNorm(_asked.label)) _correctedFrom=_asked.typed; }
       else if(_looksLikeFollowUp(text) && _lastAskedOrigin){ _origin=_lastAskedOrigin; _askedLabel=_lastAskedLabel; }
       let _g={cat:_gCat, places:[], overpassDown:false};
       try{ _g=await Promise.race([_fetchRealPlaces(text, _gCat, _origin), new Promise(r=>setTimeout(()=>r({cat:_gCat,places:[],overpassDown:true}),12000))]); }catch(e){}
       _lastGroundedPlaces=_g.places;
-      groundingMsg={role:'system', content:_buildGroundingBlock(_g.cat, _g.places, _g.overpassDown, _askedLabel, _g.genericFallback)};
+      groundingMsg={role:'system', content:_buildGroundingBlock(_g.cat, _g.places, _g.overpassDown, _askedLabel, _g.genericFallback, _correctedFrom)};
     }
 
     const kbMsg=_matchIlliKnowledge(text); // conoscenze curate dall'admin (se pertinenti)
