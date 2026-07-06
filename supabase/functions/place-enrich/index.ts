@@ -10,6 +10,10 @@
 // la chiave manca o Google non risponde: chi chiama deve gestire { found:false } / errori.
 
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { createClient } from "jsr:@supabase/supabase-js@2";
+
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
+const ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
 
 const CORS: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
@@ -29,6 +33,18 @@ Deno.serve(async (req: Request) => {
   if (req.method !== "POST") return json({ error: "method_not_allowed" }, 405);
 
   try {
+    // Solo utenti LOGGATI: la sola anon key (pubblica) non basta, altrimenti chiunque
+    // puo bruciare la quota Google. Gli ospiti degradano lato client sui dati OSM.
+    const authHeader = req.headers.get("Authorization") ?? "";
+    const jwt = authHeader.toLowerCase().startsWith("bearer ") ? authHeader.slice(7).trim() : "";
+    if (!jwt || !SUPABASE_URL || !ANON_KEY) return json({ error: "auth_required" }, 401);
+    const userClient = createClient(SUPABASE_URL, ANON_KEY, {
+      global: { headers: { Authorization: `Bearer ${jwt}` } },
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+    const { data: userData, error: userErr } = await userClient.auth.getUser();
+    if (userErr || !userData?.user) return json({ error: "auth_required" }, 401);
+
     const KEY = Deno.env.get("GOOGLE_PLACES_KEY");
     if (!KEY) return json({ error: "no_key" }, 200); // degrado: il client usa i dati OSM
 

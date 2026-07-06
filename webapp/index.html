@@ -5588,7 +5588,7 @@ async function _lensLoadPois(){
   try{
     const gr=await fetch(SUPABASE_URL+'/functions/v1/place-enrich',{
       method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+SUPABASE_ANON},
+      headers:await _aiAuthHeaders(),
       body:JSON.stringify({mode:'nearby',lat,lng,radius:rM,language:lang}),
       signal:AbortSignal.timeout(6500)
     });
@@ -6172,7 +6172,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='2.31';
+const APP_VERSION='2.32';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 console.info('POI•LOVE v'+APP_VERSION);
 // Le rotte storiche pubblicate sono contenuto PUBBLICO: si caricano per tutti,
@@ -12118,7 +12118,7 @@ async function _enrichPlace(p, cat){
   try{
     const r=await fetch(SUPABASE_URL+'/functions/v1/place-enrich',{
       method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+SUPABASE_ANON},
+      headers:await _aiAuthHeaders(),
       body:JSON.stringify({name:p.name, lat:p.lat, lng:p.lng, radius:600})
     });
     const d=await r.json();
