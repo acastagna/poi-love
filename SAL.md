@@ -3,7 +3,9 @@
 > **Prossima ripresa: teaser misterioso di condivisione POI (zona + immagine + invito a registrarsi), poi avanti col contratto. Collaudi manuali di Alessandro in attesa (checklist 04/07 + claim a pagamento + copilota foto).**
 > Checkpoint sessione: `57984f5`, tag `checkpoint-2026-07-04` (HEAD su origin/main). **Nessun lavoro non committato.**
 
-## Sessione 06/07/2026 — Ricerca avanzata, lente nera, teaser condivisione (v2.14 → v2.35)
+## Sessione 06/07/2026 — Ricerca avanzata, lente nera, teaser condivisione (v2.14 → v2.38)
+
+- **Verifica finale end-to-end (workflow 7 agenti) + v2.36-2.38**. v2.36-2.37: coppa VERDE entro 60s, MEDAGLIA "Complimenti" con messaggio caldo oltre 60s (non piu coppa). Verifica finale: verdetto PRONTO CON NOTE, ZERO bloccanti, sicurezza pulita al 100% (edge protette, RLS su 28 tabelle, colonne pois/trips scrivibili solo via RPC, nessuna chiave nel client, 14 RPC client-server coerenti). Sweep live: 4 URL 200, tutte le RPC/tabelle presenti, 6 tier nei limiti AI. Unico bug funzionale trovato e CORRETTO (v2.38): i chip-filtro CATEGORIA cercavano l etichetta sottocategoria ma la riga aveva solo il macro, davano "Nessun risultato"; ora l etichetta e nel testo cercabile. Collaudato (chip "Pizzeria" trova "Da Mario"). +2 note cosmetiche chiuse. TUTTO live (v2.38).
 
 - **v2.35 QR business (perk Professionista+) — CLUSTER TIER COMPLETO**: nel dettaglio di un proprio POI, il professionista trova "QR business" che apre un QR stampabile (blu, punta a poilove.com/?poi=id) con nome del posto e download ad alta risoluzione. Collaudato in browser (bottone visibile al pro proprietario, modale, QR col poi id, download). Con questo TUTTI i 7 vantaggi tier sono reali e live: limiti ILLI per tier, spunta verifica, punti x2, POI in evidenza (tetto), Muro dei Sostenitori, itinerario in evidenza, adotta rotta, QR business. Live (v2.35).
 
