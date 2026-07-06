@@ -7,7 +7,7 @@ info@321.al · https://321.al
 # CONTRATTO DI LAVORO · POI•LOVE
 
 > **Questa è la traccia ufficiale del progetto.** Ogni passo che facciamo è definito qui: cosa, in quale settore, con quale stato e quale tempistica. Si aggiorna a OGNI giro di lavoro, insieme a SAL.md (il diario) e TODO.md (la lista operativa).
-> Versione app corrente: **2.21** (partenza ufficiale 2.00 il 04/07/2026). Lancio pubblico: **lunedì 17/08/2026, Tirana**.
+> Versione app corrente: **2.22** (partenza ufficiale 2.00 il 04/07/2026). Lancio pubblico: **lunedì 17/08/2026, Tirana**.
 
 ## Le regole del contratto (valgono per ogni passo)
 
@@ -45,6 +45,7 @@ info@321.al · https://321.al
 | Scheda aperta = zero bottoni flottanti; titolo POI rinominabile in loco; indirizzo mai vuoto; MAI la via/citta come nome (blocco) | ✅ Fatto e live | 05/07 |
 | Menu "+": Lente di ingrandimento al primo posto (precaricata, zoom medio-largo); "Sono qui: crea POI" RIMOSSO (il POI si crea dalla lente col bottone Salva) | ✅ Fatto e live | 06/07 |
 | Lente NERA per visibilità: ghiera, mirino e campana neri, faccette chiare, frecce e +/− bianchi da obiettivo fotografico | ✅ Fatto e live | 06/07 |
+| Box foto del form fluidi: un terzo della spalla ciascuno, quadrati, si adattano al ridimensionamento (via i 350px fissi che sbordavano) | ✅ Fatto e live (v2.22) | 06/07 |
 | Teaser misterioso sul link POI condiviso: da sloggato foto sfocata + categoria + zona (mai nome o punto esatto) + gate di registrazione; dopo il login il POI si apre da solo (regge anche il giro OAuth) | ✅ Fatto e live | 06/07 |
 | Menu "+": "Crea POI" (ex Segna un luogo) al primo posto, Lente al secondo; lente aperta SOLO su richiesta (tolto il long-press che la apriva da solo) | ✅ Fatto e live | 06/07 |
 | POI dentro le liste: dettaglio con POI veri (miniatura+indirizzo), aggiungi dal picker, riordina con frecce (persistito), rimuovi, tocca e si apre sulla mappa; chip liste nel form creazione ora salvano davvero; FIX tabella giusta poi_lists (list_pois non esisteva: conteggi rotti da sempre); migrazione 022 policy UPDATE | ✅ Fatto e live (v2.20) | 06/07 |

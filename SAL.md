@@ -3,7 +3,9 @@
 > **Prossima ripresa: teaser misterioso di condivisione POI (zona + immagine + invito a registrarsi), poi avanti col contratto. Collaudi manuali di Alessandro in attesa (checklist 04/07 + claim a pagamento + copilota foto).**
 > Checkpoint sessione: `57984f5`, tag `checkpoint-2026-07-04` (HEAD su origin/main). **Nessun lavoro non committato.**
 
-## Sessione 06/07/2026 — Ricerca avanzata, lente nera, teaser condivisione (v2.14 → v2.21)
+## Sessione 06/07/2026 — Ricerca avanzata, lente nera, teaser condivisione (v2.14 → v2.22)
+
+- **v2.22 box foto fluidi**: i 3 riquadri foto del form Crea POI erano fissi a 350px (enormi, sbordavano dalla spalla con uno scroll orizzontale scomodo). Ora sono un terzo della larghezza del pannello ciascuno, quadrati, e si adattano da soli al ridimensionamento. Misurato dal vivo: spalla 626px, box 184px; telefono 375px, box 105px; mai overflow.
 
 - **v2.21 love atomico + 2 difetti audit trovati e corretti**: il toggle love faceva 4 query separate (due tocchi simultanei perdevano love) e usava una chiamata RPC malformata. Ora un unica RPC transazionale `toggle_love` (mig 023): il contatore e sempre il conteggio vero, solo utenti loggati (anonimo respinto 42501, verificato). Collaudando ho trovato: 1) ogni love scriveva una riga di audit perche love_count era tra i campi sensibili (rumore infinito), 2) eliminare un utente con anche una sola riga di audit era IMPOSSIBILE (admin_id NOT NULL + FK SET NULL). Mig 024 corregge entrambi. Test REST reali con utente usa e getta: love on 1, love off 0, anonimo respinto. Live verificato (md5 identico, v2.21).
 
