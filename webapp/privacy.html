@@ -45,7 +45,7 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Hel
 
 # Informativa sulla privacy di POI•LOVE
 
-*Ultimo aggiornamento: 27/06/2026*
+*Ultimo aggiornamento: 06/07/2026*
 
 POI•LOVE è la mappa comunitaria dei luoghi amati: uno spazio dove le persone segnano, raccontano e condividono i posti a cui tengono. Per farlo funzionare trattiamo alcuni tuoi dati personali. Questa informativa ti spiega, in modo onesto e leggibile, quali dati raccogliamo, perché, su quale base giuridica, con chi li condividiamo, per quanto li conserviamo e quali diritti hai.
 
@@ -72,7 +72,7 @@ Raccogliamo solo i dati che servono a far funzionare l'app. Ecco l'elenco comple
 
 ### 2.1 Dati di registrazione e account
 - **Email** e, in caso di registrazione classica, **password** (conservata solo in forma cifrata, non in chiaro).
-- Se ti registri tramite **Google, X (Twitter) o LinkedIn**, riceviamo dal provider che scegli: email, nome o handle, immagine del profilo.
+- Se ti registri tramite un provider esterno (**Google, Facebook, Apple, X (Twitter) o LinkedIn**), riceviamo dal provider che scegli: email, nome o handle, immagine del profilo. Se non compili un username, ne generiamo uno di default partendo dalla parte iniziale della tua email (la parte prima della @): puoi cambiarlo in qualsiasi momento dal profilo.
 
 *Perché:* per creare il tuo account, autenticarti, permetterti di recuperare l'accesso e gestire il servizio. Senza questi dati non possiamo darti un account.
 
@@ -98,12 +98,18 @@ La posizione è uno dei dati più delicati che trattiamo, perché può rivelare 
 
 Leggi con attenzione la **sezione 4** su consenso e foto: le foto possono ritrarre persone, e qui ci sono regole e responsabilità precise.
 
-Per ridurre i rischi, quando carichi una foto **rimuoviamo i metadati EXIF** (che includono GPS preciso, data, modello del dispositivo) prima di pubblicarla.
+Le foto che carichi vengono elaborate e archiviate tramite il nostro media server media.poilove.com (vedi sezione 5). Per ridurre i rischi, quando carichi una foto **rimuoviamo i metadati EXIF** (che includono GPS preciso, data, modello del dispositivo) prima di pubblicarla. Se usi una foto per creare un POI, possiamo leggere la posizione GPS contenuta nei suoi metadati al solo scopo di proporre il punto sulla mappa: quel dato non viene ripubblicato con la foto.
 
 ### 2.5 Contenuti che crei
 - **POI** (luoghi che salvi), **"love" e preferiti**, **liste**, **itinerari di viaggio** con relative tappe, **compagnie di viaggio** (gruppi con altri utenti), relazioni di **follow** (chi segui e chi ti segue).
 
 *Perché:* sono il cuore dell'app. Servono a costruire la tua mappa, condividere i luoghi, organizzare viaggi e seguire altre persone.
+
+**Tag liberi sui POI.** Quando crei un POI puoi aggiungere tag testuali liberi (fino a 10). I tag dei POI pubblici sono visibili a tutta la comunità e vengono usati come suggerimenti di completamento automatico anche per chi non ha effettuato l'accesso. Non inserire nei tag dati personali tuoi o di altri.
+
+**Segnalazione di una categoria mancante.** Se segnali che manca una categoria, registriamo il termine cercato insieme al tuo identificativo utente, per aggiornare e curare le categorie della piattaforma.
+
+**Cessione e reclamo di un POI.** Se cedi un POI tramite codice o richiedi la proprietà di un luogo, trattiamo l'identità di chi cede e di chi riceve (identificativi e nome pubblico) ed eventuali messaggi di testo libero che scrivi nella richiesta: questi dati sono visibili all'amministrazione per gestire e validare l'operazione.
 
 Alcuni di questi contenuti possono includere dati di **altre persone** (ad esempio i membri di una compagnia di viaggio, o l'email di chi inviti). Vedi la sezione 4.4.
 
@@ -124,7 +130,7 @@ Alcuni di questi contenuti possono includere dati di **altre persone** (ad esemp
 *Perché:* per mantenere la piattaforma sicura, gestire le segnalazioni, proteggere gli utenti e adempiere agli obblighi di legge. Conserviamo questi dati anche come prova in caso di abusi o contestazioni.
 
 ### 2.9 Abbonamenti a pagamento
-- Se attivi un **abbonamento** a uno dei tier a pagamento (**Professionista, Sostenitore, Mecenate**), trattiamo i dati necessari a gestirlo: tier scelto, stato dell'abbonamento, data di attivazione e di rinnovo o cessazione, e i vantaggi collegati.
+- Se attivi un **abbonamento** a uno dei tier a pagamento (**Professionista, Professionista Plus, Sostenitore, Mecenate**, ed eventuali profili dedicati come **Influencer**), trattiamo i dati necessari a gestirlo: tier scelto, stato dell'abbonamento, data di attivazione e di rinnovo o cessazione, e i vantaggi collegati.
 - I **dati di pagamento** veri e propri (ad esempio i dati della carta) sono trattati direttamente dal fornitore di pagamento che useremo al momento dell'attivazione, secondo la sua informativa: noi non conserviamo i numeri di carta.
 
 *Perché:* per attivare e gestire l'abbonamento, riconoscerti i vantaggi del tier, emettere eventuali documenti contabili e adempiere agli obblighi fiscali e di legge.
@@ -207,9 +213,15 @@ Per far funzionare POI•LOVE ci appoggiamo ad alcuni fornitori esterni, che tra
 | **X (Twitter)** e **LinkedIn** (login OAuth) | Email, nome/handle, avatar | Accesso con il tuo account | **Stati Uniti** |
 | **OpenAI** | I **messaggi** che invii all'assistente AI **ILLI** e al **copilota amministrativo**, che possono includere la città o la zona di cui parli | Elaborare le risposte dell'assistente AI | **Stati Uniti**, con garanzie adeguate |
 | **Anthropic** | I **messaggi** che invii all'assistente AI **ILLI** e al **copilota amministrativo**, che possono includere la città o la zona di cui parli | Elaborare le risposte dell'assistente AI | **Stati Uniti**, con garanzie adeguate |
-| **OpenStreetMap / Nominatim / Overpass** | Coordinate e testo dell'indirizzo cercato | Ricerca luoghi e conversione tra indirizzi e coordinate | Server in **Europa** |
+| **OpenStreetMap / Nominatim / Overpass** | Coordinate e testo dell'indirizzo cercato, incluse le coordinate live quando cerchi luoghi reali vicino a te | Ricerca luoghi, conversione tra indirizzi e coordinate, elenco dei posti reali vicini | Server in **Europa** |
+| **media.poilove.com** (nostro media server) | Le foto che carichi (POI e avatar) e un token che identifica la tua sessione | Archiviare e servire le foto dei luoghi e del profilo | **Germania** (server del progetto) |
+| **api.qrserver.com** (goQR) | L'indirizzo pubblico del tuo profilo (che contiene il tuo username) | Generare il codice QR del profilo | Estero |
+| **ui-avatars.com** | Le iniziali o il nome che compaiono nel tuo profilo | Generare un avatar segnaposto | Estero |
+| **image.pollinations.ai** | Il testo che scrivi per generare un'immagine o un avatar con l'AI | Generazione di immagini con AI su tua richiesta | Estero |
+| **Tile mappa (OpenStreetMap, ESRI ArcGIS) e CDN/font (jsDelivr, unpkg, Google Fonts)** | La zona della mappa che stai guardando, e in generale il tuo indirizzo IP e il tipo di dispositivo | Mostrare le mappe e caricare librerie e font | UE / USA |
+| **App di navigazione (Google Maps, Waze, Apple Maps)** | Le coordinate del luogo verso cui chiedi indicazioni | Aprire la navigazione stradale su tua richiesta | USA |
 
-A seconda della funzione e della configurazione, i messaggi inviati all'assistente AI possono essere elaborati da **OpenAI** oppure da **Anthropic**. In entrambi i casi i server sono negli **Stati Uniti** e il trattamento avviene secondo l'informativa del fornitore. **Non inserire dati sensibili o riservati** (ad esempio dati su salute, dati di altre persone, password o documenti) nelle chat con l'assistente AI.
+A seconda della funzione e della configurazione, i messaggi inviati all'assistente AI possono essere elaborati da **OpenAI** oppure da **Anthropic**. La funzione lente, che mostra i luoghi reali vicini, invia le tue coordinate live a Google Places anche quando non hai effettuato l'accesso: usala solo se accetti questo invio. Il copilota amministrativo (Anthropic) può ricevere, lato amministrazione, campioni di dati reali della piattaforma (ad esempio username, tier, stato di moderazione) per assistere la gestione. In entrambi i casi i server sono negli **Stati Uniti** e il trattamento avviene secondo l'informativa del fornitore. **Non inserire dati sensibili o riservati** (ad esempio dati su salute, dati di altre persone, password o documenti) nelle chat con l'assistente AI.
 
 Non vendiamo i tuoi dati e non li cediamo a terzi per finalità pubblicitarie.
 
