@@ -3,7 +3,9 @@
 > **Prossima ripresa: teaser misterioso di condivisione POI (zona + immagine + invito a registrarsi), poi avanti col contratto. Collaudi manuali di Alessandro in attesa (checklist 04/07 + claim a pagamento + copilota foto).**
 > Checkpoint sessione: `57984f5`, tag `checkpoint-2026-07-04` (HEAD su origin/main). **Nessun lavoro non committato.**
 
-## Sessione 06/07/2026 — Ricerca avanzata, lente nera, teaser condivisione (v2.14 → v2.55)
+## Sessione 06/07/2026 — Ricerca avanzata, lente nera, teaser condivisione (v2.14 → v2.56)
+
+- **Link condiviso vince sul GPS (webapp v2.56)**. Richiesta founder: aprendo un link condiviso, la mappa deve aprirsi sul luogo del link, non dove sei col GPS. Causa: race — il GPS `getCurrentPosition` (riga ~5418) faceva `map.setView(gpsPos)` quando risolveva (spesso DOPO handleDeepLink a 800ms), sovrascrivendo il posto condiviso. Fix: flag `_deepLinkActive` (true se l'URL ha `?poi=` o `?at=`) che BLOCCA l'auto-center GPS; il deep-link centra sul posto e vince. Anche `openPendingSharedPoi` (riapertura post-OAuth, URL senza `?poi=`) imposta il flag. `centerMap` (mirino "centra su di me") lo azzera, così l'utente può tornare a sé. Collaudato in preview: con `?at=41.3275,19.8187` la mappa si centra sul link (41.327,19.819), flag attivo, nessun override. Deployato (v2.56).
 
 - **ILLI schede: qualità cucine + 4+altri + due distanze + icone da categoria (webapp v2.55 + place-enrich v20)**. Feedback founder su schermata (messicano "non trovo" ma ce ne sono 8; una risposta sola; icone dal nome; distanza ambigua). Fatto:
   - **Query cucine migliore**: aggiunto `gq` (query Google in inglese) a ogni cucina — "mexican restaurant"/"vegan restaurant"/"sushi restaurant" trovano i posti VERI (prima "messicano" tornava Serendipity/Wild West a caso o nulla). Nuova categoria **vegano/vegetariano** (Fresh Garden, green & protein...). Aggiunta pesce.

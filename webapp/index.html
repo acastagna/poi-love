@@ -5334,6 +5334,9 @@ const POIS=[];
 
 let map,tileStreet,tileSat,tileLabels,routeLayer,currentPOI;
 let gpsPos=null,gpsRegistered=false,userLocMarker=null,_gpsCity='';
+// Link condiviso (?poi= o ?at=): le coordinate del link VINCONO sulla posizione GPS.
+// Finche' e' attivo, il GPS non ricentra la mappa (altrimenti il posto condiviso "scappa").
+let _deepLinkActive = /[?&](poi|at)=/i.test(location.search);
 // Reverse-geocoda la posizione GPS in NOME CITTA, cosi ILLI sa davvero dove sei: le coordinate da sole non bastano, il modello rispondeva Tirana
 async function _refreshGpsCity(){
   if(!gpsPos) return;
@@ -5414,8 +5417,9 @@ function initMap(){
     navigator.geolocation.getCurrentPosition(pos=>{
       gpsPos={lat:pos.coords.latitude,lng:pos.coords.longitude};
       _refreshGpsCity();
-      // Centra la mappa sulla posizione reale
-      if(map) map.setView([gpsPos.lat,gpsPos.lng],15);
+      // Centra la mappa sulla posizione reale — MA se sto aprendo un link condiviso,
+      // il posto del link vince: non ricentro sul GPS (altrimenti il posto scappa).
+      if(map && !_deepLinkActive) map.setView([gpsPos.lat,gpsPos.lng],15);
       // Marker "Tu sei qui" (pallino blu)
       if(!userLocMarker){
         userLocMarker=L.circleMarker([gpsPos.lat,gpsPos.lng],{
@@ -6053,6 +6057,7 @@ function _showRouteSuggestThanks(card){
 
 function centerMap(){
   if(!map) return;
+  _deepLinkActive=false;   // l'utente ha scelto di tornare a se: da ora il GPS puo ricentrare
   if(gpsPos){ map.setView([gpsPos.lat,gpsPos.lng],16); return; }
   if(!navigator.geolocation){ showToast(t('gps_unavailable','Posizione non disponibile in questo momento.')); return; }
   showToast(t('gps_searching','Cerco la tua posizione…'));
@@ -6365,6 +6370,7 @@ function openPendingSharedPoi(){
   window._pendingOpened=true; // mutua esclusione col pending profilo: uno solo si apre
   try{ localStorage.removeItem('pl_pending_poi'); }catch(_){}
   hidePoiTeaser();
+  _deepLinkActive=true;   // il POI condiviso vince sul GPS anche dopo il giro OAuth (URL senza ?poi=)
   sb.from('pois').select('id,name:title,description,lat,lng,category,love_count,photos,author_id,address,profiles(username,avatar_url)')
     .eq('id',id).single().then(({data,error})=>{
       if(error||!data) return;
@@ -6439,7 +6445,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='2.55';
+const APP_VERSION='2.56';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 console.info('POI•LOVE v'+APP_VERSION);
 // Le rotte storiche pubblicate sono contenuto PUBBLICO: si caricano per tutti,
