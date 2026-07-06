@@ -7,7 +7,7 @@ info@321.al · https://321.al
 # CONTRATTO DI LAVORO · POI•LOVE
 
 > **Questa è la traccia ufficiale del progetto.** Ogni passo che facciamo è definito qui: cosa, in quale settore, con quale stato e quale tempistica. Si aggiorna a OGNI giro di lavoro, insieme a SAL.md (il diario) e TODO.md (la lista operativa).
-> Versione app corrente: **2.25** (partenza ufficiale 2.00 il 04/07/2026). Lancio pubblico: **lunedì 17/08/2026, Tirana**.
+> Versione app corrente: **2.26** (partenza ufficiale 2.00 il 04/07/2026). Lancio pubblico: **lunedì 17/08/2026, Tirana**.
 
 ## Le regole del contratto (valgono per ogni passo)
 
@@ -38,7 +38,7 @@ info@321.al · https://321.al
 | Immagini licenziate del luogo (Wikimedia con attribuzione): proposta nel form, credito CC sulla foto, copilota le allega da solo | ✅ Fatto e live | 05/07 |
 | Ricerca con correzione avanzata: fuzzy senza accenti, refusi fino a 2 lettere, "Forse cercavi" albanese istantaneo, Albania sempre prima, rotte cercabili | ✅ Fatto e live | 06/07 |
 | Tassonomia POI a 3 livelli: L1 categoria RICCA data-driven (29 sottocategorie curate trilingui in tabella poi_categories, scelta singola, 6 gruppi con icone/colori), L2 luogo personale (esiste), L3 tag REALI salvati con autocomplete dalla community (RPC suggest_tags); mig 026-027 | ✅ Fatto e live (v2.24) | 06/07 |
-| Categorie autoaggiornanti per analisi della richiesta: "Altra categoria" + ricerche registrano una traccia (category_requests via log_category_request); manca la UI admin per promuoverle a categoria (curation) | 🔶 Spina dorsale dati FATTA, curation admin da fare | dopo tassonomia |
+| Categorie autoaggiornanti per analisi della richiesta: traccia in category_requests + UI admin "Categorie" (triage richieste raggruppate, Promuovi che precompila il form, gestione categorie attive/spente, salva su poi_categories); curation completa | ✅ Fatto e live | 06/07 |
 | Lente: "Tocca mappa" apre la lente senza resettare i campi scritti ("Usa questo punto") | ✅ Fatto e live | 05/07 |
 | Lente esploratore: vista IBRIDA (stradale+satellite 40%+etichette), POI reali dentro il cerchio, zoom ad anello orario/antiorario fino a livello mondo, titolo intelligente | ✅ Fatto e live | 05/07 |
 | Lente: ghiera VISIBILE (48 tacche + segni piu/meno + suggerimento primo uso) e punti di interesse di GOOGLE col voto (OSM riserva) | ✅ Fatto e live | 05/07 |
