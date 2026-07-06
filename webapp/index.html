@@ -6245,7 +6245,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='2.36';
+const APP_VERSION='2.37';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 console.info('POI•LOVE v'+APP_VERSION);
 // Le rotte storiche pubblicate sono contenuto PUBBLICO: si caricano per tutti,
@@ -9098,13 +9098,13 @@ function showCongrats(sec){
       :lang==='en'?'You mapped this place in record time!'
       :'Hai mappato questo luogo con amore e velocità. Grazie!';
   } else {
-    icon.innerHTML='<i class="ph-duotone ph-chalkboard-teacher" style="font-size:28px;color:#92400E"></i>';
-    title.textContent=lang==='sq'?`Faleminderit! ${sec} sekonda`
-      :lang==='en'?`Thank you! ${sec} seconds`
-      :`Grazie dell'impegno! ${sec} secondi`;
-    sub.textContent=lang==='sq'?'Keni marrë kohën tuaj për të hartografuar me dashuri këtë vend.'
-      :lang==='en'?'You took extra time to lovingly map this place. That dedication matters.'
-      :'Ti sei preso del tempo in più per mappare amorevolmente questo luogo. Ogni secondo vale.';
+    icon.innerHTML='<i class="ph-fill ph-medal" style="font-size:28px;color:#CA8A04"></i>';
+    title.textContent=lang==='sq'?`Urime! ${sec} sekonda`
+      :lang==='en'?`Congratulations! ${sec} seconds`
+      :`Complimenti! ${sec} secondi`;
+    sub.textContent=lang==='sq'?'E shoh që kujdesesh vërtet për këtë vend: do të jetë me siguri me vlerë të madhe.'
+      :lang==='en'?'I can see you really care about creating this place: it will surely be of great value.'
+      :'Vedo che ci tieni davvero a creare questo POI: sarà sicuramente di grande valore.';
   }
 }
 
