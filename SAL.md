@@ -3,7 +3,9 @@
 > **Prossima ripresa: teaser misterioso di condivisione POI (zona + immagine + invito a registrarsi), poi avanti col contratto. Collaudi manuali di Alessandro in attesa (checklist 04/07 + claim a pagamento + copilota foto).**
 > Checkpoint sessione: `57984f5`, tag `checkpoint-2026-07-04` (HEAD su origin/main). **Nessun lavoro non committato.**
 
-## Sessione 06/07/2026 — Ricerca avanzata, lente nera, teaser condivisione (v2.14 → v2.34)
+## Sessione 06/07/2026 — Ricerca avanzata, lente nera, teaser condivisione (v2.14 → v2.35)
+
+- **v2.35 QR business (perk Professionista+) — CLUSTER TIER COMPLETO**: nel dettaglio di un proprio POI, il professionista trova "QR business" che apre un QR stampabile (blu, punta a poilove.com/?poi=id) con nome del posto e download ad alta risoluzione. Collaudato in browser (bottone visibile al pro proprietario, modale, QR col poi id, download). Con questo TUTTI i 7 vantaggi tier sono reali e live: limiti ILLI per tier, spunta verifica, punti x2, POI in evidenza (tetto), Muro dei Sostenitori, itinerario in evidenza, adotta rotta, QR business. Live (v2.35).
 
 - **v2.34 adotta una rotta (perk Professionista+)**: un professionista sostiene una rotta storica pubblica con una dedica visibile (mig 038: adopt_route/release_route RPC definer, colonne adopted_by/dedication protette). Nella lista rotte compare "Adottata da @utente: <dedica>" e un bottone Adotta/Rilascia per i tier idonei; la dedica appare anche nel popup della rotta sulla mappa. Collaudo e2e: pro adotta con dedica, join adottante ok, un altro pro non puo rubarla (already adopted), rilascio ok; TROVATO E CORRETTO un baco NULL (v_tier NULL not in (...) e NULL, non true: un free passava il controllo) con is null or not in. Live (v2.34). Resta 1 solo perk tier: QR business.
 
