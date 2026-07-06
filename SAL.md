@@ -3,7 +3,9 @@
 > **Prossima ripresa: teaser misterioso di condivisione POI (zona + immagine + invito a registrarsi), poi avanti col contratto. Collaudi manuali di Alessandro in attesa (checklist 04/07 + claim a pagamento + copilota foto).**
 > Checkpoint sessione: `57984f5`, tag `checkpoint-2026-07-04` (HEAD su origin/main). **Nessun lavoro non committato.**
 
-## Sessione 06/07/2026 — Ricerca avanzata, lente nera, teaser condivisione (v2.14 → v2.18)
+## Sessione 06/07/2026 — Ricerca avanzata, lente nera, teaser condivisione (v2.14 → v2.19)
+
+- **v2.19 landing personale del profilo**: chi apre `poilove.com?@nome` (o /@nome) da sloggato non vede piu il login nudo: vede la vetrina della persona a tutto schermo (copertina scelta come sfondo, avatar, nome, @handle, bio, numeri veri di POI pubblici e love, bottone "Entra in POI•LOVE" nelle 3 lingue). Dopo il login il profilo si apre da solo (handle in localStorage, regge il giro OAuth); da ospite pure, perche il profilo pubblico e visibile anche senza account. Collaudato in browser: vetrina con 5 POI e 1 love, CTA che scopre il login, ingresso ospite che apre il profilo giusto. Live verificato (md5 identico, v2.19 nei footer).
 
 - **v2.18 menu e lente su richiesta**: "Segna un luogo" rinominato "Crea POI" e messo al primo posto del menu +, Lente di ingrandimento al secondo, nelle 3 lingue. Tolto il long-press sulla mappa che apriva la lente da sola dopo 300ms: ora la lente si apre SOLO quando la chiedi (menu + o "Tocca mappa" nella creazione POI). Verificato in browser: long-press simulato non la apre, dal menu si apre. Live verificato (md5 identico, v2.18 nei footer).
 

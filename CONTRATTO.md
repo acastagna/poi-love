@@ -7,7 +7,7 @@ info@321.al · https://321.al
 # CONTRATTO DI LAVORO · POI•LOVE
 
 > **Questa è la traccia ufficiale del progetto.** Ogni passo che facciamo è definito qui: cosa, in quale settore, con quale stato e quale tempistica. Si aggiorna a OGNI giro di lavoro, insieme a SAL.md (il diario) e TODO.md (la lista operativa).
-> Versione app corrente: **2.18** (partenza ufficiale 2.00 il 04/07/2026). Lancio pubblico: **lunedì 17/08/2026, Tirana**.
+> Versione app corrente: **2.19** (partenza ufficiale 2.00 il 04/07/2026). Lancio pubblico: **lunedì 17/08/2026, Tirana**.
 
 ## Le regole del contratto (valgono per ogni passo)
 
@@ -100,8 +100,8 @@ info@321.al · https://321.al
 ### 5. Condivisione e landing
 | Passo | Stato | Quando |
 |---|---|---|
-| Condivisione POI col teaser misterioso (zona + immagine AI + registrati) | ⬜ Da fare | prima del lancio |
-| Landing personale del profilo (sfondo + avatar + Entra in POI•LOVE) | ⬜ Da fare | prima del lancio |
+| Condivisione POI col teaser misterioso (zona + foto sfocata + registrati) | ✅ Fatto e live (v2.17) | 06/07 |
+| Landing personale del profilo: vetrina su ?@nome da sloggato (copertina, avatar, bio, numeri veri POI/Love, Entra in POI•LOVE); dopo login o da ospite il profilo si apre da solo | ✅ Fatto e live (v2.19) | 06/07 |
 | Rotte storiche VISIBILI agli utenti: mappa (linea+tappe) e lista nel tab Itinerari; prima rotta reale "Tirana Storica" pubblicata | ✅ Fatto e live (resta la landing /route/slug) | 05/07 |
 | Frontend rotte utente V2 (tabella user_routes pronta, UI da costruire, flusso via AI) | ⬜ Da fare | prima del lancio |
 
