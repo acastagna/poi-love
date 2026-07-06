@@ -6245,7 +6245,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='2.35';
+const APP_VERSION='2.36';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 console.info('POI•LOVE v'+APP_VERSION);
 // Le rotte storiche pubblicate sono contenuto PUBBLICO: si caricano per tutti,
@@ -9090,7 +9090,7 @@ function showCongrats(sec){
   const fast=sec<=TIMER_GOAL;
   banner.className='congrats show '+(fast?'fast':'slow');
   if(fast){
-    icon.innerHTML='<i class="ph-duotone ph-trophy" style="font-size:28px;color:#D97706"></i>';
+    icon.innerHTML='<i class="ph-fill ph-trophy" style="font-size:28px;color:#16A34A"></i>';
     title.textContent=lang==='sq'?`Bravo! ${sec} sekonda`
       :lang==='en'?`Bravo! ${sec} seconds`
       :`Bravo, sei un razzo! ${sec} secondi`;
