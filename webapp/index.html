@@ -1627,6 +1627,13 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 .poiai-title{color:#fff;font-size:14px;font-weight:900;letter-spacing:.2px}
 .poiai-sub{color:rgba(255,255,255,.6);font-size:10px;margin-top:1px}
 .poiai-badge{background:rgba(212,43,43,.3);border:1px solid rgba(212,43,43,.5);border-radius:6px;padding:2px 7px;font-size:9px;font-weight:800;color:#FCA5A5;letter-spacing:.3px}
+.poiai-country{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:8px 14px;background:#eef2f8;border-bottom:1px solid var(--border)}
+html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
+.poiai-country .pc-lbl{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
+.pc-btn{font-size:12px;font-weight:700;padding:5px 12px;border-radius:999px;border:1.5px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;transition:all .12s}
+.pc-btn.on{background:#285EA7;color:#fff;border-color:#285EA7}
+.pc-free{flex:1;min-width:90px;font-size:12px;padding:5px 11px;border-radius:999px;border:1.5px solid var(--border);background:var(--card);color:var(--text);outline:none;font-family:inherit}
+.pc-free.on{border-color:#285EA7;font-weight:700}
 .poiai-msgs{padding:12px 14px;min-height:100px;max-height:260px;overflow-y:auto;display:flex;flex-direction:column;gap:10px}
 .poiai-msg{max-width:90%}
 .poiai-msg.ai{background:#EBF2FC;border-radius:0 12px 12px 12px;padding:10px 12px;font-size:12px;color:var(--text);line-height:1.6}
@@ -2799,6 +2806,14 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
       </div>
       <div class="poiai-badge">AI</div>
       <button class="poiai-voice-btn" id="poiaiVoiceBtn" onclick="togglePoiAIVoice()" title="ILLI legge le risposte ad alta voce"><i class="ph-duotone ph-speaker-slash"></i></button>
+    </div>
+    <div class="poiai-country" id="poiaiCountry">
+      <span class="pc-lbl" data-t="illi_search_in">Cerca in:</span>
+      <button class="pc-btn" data-c="al" onclick="setIlliCountry('al')">Albania</button>
+      <button class="pc-btn" data-c="it" onclick="setIlliCountry('it')">Italia</button>
+      <button class="pc-btn on" data-c="" onclick="setIlliCountry('')" data-t="illi_country_auto">Auto</button>
+      <input class="pc-free" id="poiaiCountryFree" placeholder="Altro paese…" data-tp="illi_country_ph"
+        onchange="setIlliCountry(this.value)" onkeydown="if(event.key==='Enter'){setIlliCountry(this.value);this.blur();}">
     </div>
     <div class="poiai-msgs" id="poiaiMsgs">
       <div class="poiai-msg ai">Ciao! Sono <strong>ILLI•AI</strong>, la mascot di POI•LOVE, il tuo cuore-amico per scoprire luoghi e capire l'app. Posso suggerirti tappe, ristoranti, esperienze culturali, oppure aiutarti a usare POI•LOVE (POI, itinerari, compagni di viaggio). Da dove iniziamo? <i class="ph-duotone ph-heart"></i></div>
@@ -5039,6 +5054,7 @@ const T={
     name_no_official_keep:'Nessun nome ufficiale qui vicino: ho lasciato il tuo',
     name_no_official:'Non trovo il nome ufficiale di questo posto, scrivilo tu',
     overpass_down:'Il servizio dei luoghi non risponde ora, riprova tra poco',
+    illi_search_in:'Cerca in:',illi_country_auto:'Auto',illi_country_ph:'Altro paese…',illi_country_set:'ILLI cercherà in: ',
     illi_login:'Accedi per usare ILLI',
     illi_limit:'Hai finito i messaggi di oggi per il tuo livello',
     illi_error:'ILLI ha un problema tecnico, riprova tra poco',},
@@ -5139,6 +5155,7 @@ const T={
     name_no_official_keep:'Asnjë emër zyrtar këtu pranë: mbajta emrin tënd',
     name_no_official:'Nuk gjej emrin zyrtar të këtij vendi, shkruaje ti',
     overpass_down:'Shërbimi i vendeve nuk përgjigjet tani, provo përsëri pas pak',
+    illi_search_in:'Kërko në:',illi_country_auto:'Auto',illi_country_ph:'Shtet tjetër…',illi_country_set:'ILLI do të kërkojë në: ',
     illi_login:'Hyr për të përdorur ILLI-n',
     illi_limit:'I ke mbaruar mesazhet e sotme për nivelin tënd',
     illi_error:'ILLI ka një problem teknik, provo përsëri pas pak',},
@@ -5239,6 +5256,7 @@ const T={
     name_no_official_keep:'No official name nearby: kept yours',
     name_no_official:'No official name found, please type it',
     overpass_down:'The places service is not responding right now, try again shortly',
+    illi_search_in:'Search in:',illi_country_auto:'Auto',illi_country_ph:'Other country…',illi_country_set:'ILLI will search in: ',
     illi_login:'Sign in to use ILLI',
     illi_limit:'You have used up today\'s messages for your level',
     illi_error:'ILLI has a technical problem, try again shortly',}
@@ -6414,7 +6432,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='2.53';
+const APP_VERSION='2.54';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 console.info('POI•LOVE v'+APP_VERSION);
 // Le rotte storiche pubblicate sono contenuto PUBBLICO: si caricano per tutti,
@@ -8737,6 +8755,7 @@ async function refreshProfileStats(){
 function openIlliAI(){
   // ILLI•AI ha il suo spazio dedicato: tab #illiView
   showTab('illi');
+  try{ _renderIlliCountry(); }catch(e){}
   setTimeout(()=>{
     const inp = document.getElementById('poiaiInput');
     if(inp) inp.focus();
@@ -12326,7 +12345,7 @@ const _OSM_CATS=[
 function _detectPlaceQuery(text){
   if(!text) return null;
   if(/\b(era|fu|com'era|cosa ne pensi|ti piace|secondo te|ricordi|anni fa|tempo fa|ha chiuso|aveva chiuso)\b/i.test(text)) return null;   // domande su passato/opinione: non far partire la ricerca
-  const wantsSearch=/\b(consigl|suggeris|trov|cerc|dove|vicin|dintorn|qui intorno|nei paraggi|paraggi|zona|migliore|miglior|posto|locale|mangi|cen[aoi]|pranz|dorm|bere|beviamo)\b/i.test(text);
+  const wantsSearch=/\b(consigl|suggeris|trov|cerc|dove|vicin|intorn|dintorn|paragg|zona|miglior|post|local|mangi|cen|pranz|dorm|bere|bev|apert|voglio|vorre|posso|dammi|indica)/i.test(text);
   const looksLikeAsk=/\b(un[ao]?|qualche|due|tre|dei|delle|degli|che)\b/i.test(text) || text.trim().split(/\s+/).length<=5;
   for(const c of _OSM_CATS){
     if(c.re.test(text) && (wantsSearch || looksLikeAsk)) return c;
@@ -12500,6 +12519,7 @@ async function _enrichPlace(p, cat){
       if(_googleMismatch(d, cat)){ p.mismatch=true; return p; }   // match sbagliato (via, o gioielleria al posto della pizzeria): scarta
       p.rating=d.rating; p.reviews=d.reviews; p.priceLevel=d.priceLevel; p.businessStatus=d.businessStatus; p.gType=d.primaryType; p.typeLabel=d.typeLabel; p.desc=d.desc;
       if(d.openNow!=null) p.openNow=d.openNow;   // Google piu affidabile dell'orario OSM
+      if(Array.isArray(d.hoursPeriods)) p.hoursPeriods=d.hoursPeriods;   // per "aperto alle 23:00"
     }
   }catch(e){ /* degrado silenzioso ai dati OSM */ }
   return p;
@@ -12540,7 +12560,7 @@ async function _googleDiscover(queryText, lat, lng, radiusM){
   try{
     const r=await fetch(SUPABASE_URL+'/functions/v1/place-enrich',{
       method:'POST', headers:await _aiAuthHeaders(),
-      body:JSON.stringify({mode:'discover', name:queryText, lat, lng, radius:Math.min(3000,Math.max(400,radiusM||1500)), language:(typeof lang!=='undefined'?lang:'it')})
+      body:JSON.stringify({mode:'discover', name:queryText, lat, lng, radius:Math.min(50000,Math.max(400,radiusM||1500)), language:(typeof lang!=='undefined'?lang:'it')})
     });
     if(!r.ok) return [];
     const d=await r.json();
@@ -12561,7 +12581,7 @@ async function _fsqPlaces(queryText, lat, lng, radiusM){
   try{
     const r=await fetch(SUPABASE_URL+'/functions/v1/place-enrich',{
       method:'POST', headers:await _aiAuthHeaders(),
-      body:JSON.stringify({mode:'fsq', name:queryText||'', lat, lng, radius:Math.min(3000,Math.max(400,radiusM||1500))})
+      body:JSON.stringify({mode:'fsq', name:queryText||'', lat, lng, radius:Math.min(50000,Math.max(400,radiusM||1500))})
     });
     if(!r.ok) return [];
     const d=await r.json();
@@ -12626,11 +12646,33 @@ const _CITY_GAZ=[
   {label:'Milano', lat:45.4642, lng:9.1900, aliases:['milano']},
   {label:'Roma', lat:41.9028, lng:12.4964, aliases:['roma']}
 ];
-// Corrispondenza fuzzy col gazetteer (refusi fino a 2 lettere). Ritorna {city, corrected} o null.
+// Paese di ricerca scelto dall'utente (bottoni Italia/Albania + campo libero). '' = auto.
+const _IT_CITIES=new Set(['zugliano','vicenza','schio','thiene','bassano del grappa','padova','verona','venezia','milano','roma']);
+let _illiCountry=(()=>{ try{ return localStorage.getItem('illi_country')||''; }catch(e){ return ''; } })();
+function setIlliCountry(v){
+  v=String(v||'').trim(); const low=v.toLowerCase();
+  if(low==='italia'||low==='italy'||low==='it') v='it';
+  else if(low==='albania'||low==='shqiperia'||low==='shqipëria'||low==='al') v='al';
+  else v=low;
+  _illiCountry=v; try{ localStorage.setItem('illi_country', v); }catch(e){}
+  _renderIlliCountry();
+  if(v && v!=='it' && v!=='al' && typeof showToast==='function') showToast(t('illi_country_set','ILLI cercherà in: ')+v);
+}
+function _renderIlliCountry(){
+  const bar=document.getElementById('poiaiCountry'); if(!bar) return;
+  bar.querySelectorAll('.pc-btn').forEach(b=>b.classList.toggle('on', (b.dataset.c||'')===_illiCountry));
+  const free=document.getElementById('poiaiCountryFree');
+  if(free){ const custom=(_illiCountry&&_illiCountry!=='it'&&_illiCountry!=='al')?_illiCountry:'';
+    if(document.activeElement!==free) free.value=custom; free.classList.toggle('on', !!custom); }
+}
+// Corrispondenza fuzzy col gazetteer (refusi fino a 2 lettere). Rispetta il paese scelto.
 function _matchCityGaz(place){
+  if(_illiCountry && _illiCountry!=='it' && _illiCountry!=='al') return null; // paese custom: solo Nominatim
   const n=_srchNorm(place); if(n.length<3) return null;
+  const cc=(_illiCountry==='it'||_illiCountry==='al')?_illiCountry.toUpperCase():null;
   let best=null, bestD=99;
   for(const c of _CITY_GAZ){
+    if(cc){ const country=_IT_CITIES.has(_srchNorm(c.label))?'IT':'AL'; if(country!==cc) continue; }
     for(const a of c.aliases){
       const an=_srchNorm(a);
       if(an===n) return {city:c, corrected:false};
@@ -12668,11 +12710,16 @@ async function _geocodeAskedPlace(text){
   if(gz) return {lat:gz.city.lat, lng:gz.city.lng, label:gz.city.label, corrected:gz.corrected, typed:place};
   const lg=(typeof lang!=='undefined'?lang:'it');
   const VIEWBOX='6.0,47.6,26.5,34.7'; // lon_min,lat_max,lon_max,lat_min (Italia..Balcani)
+  // Paese scelto dall'utente: it/al = countrycodes; nome libero = cerca in quel paese (niente viewbox Balcani).
+  const isIT=_illiCountry==='it', isAL=_illiCountry==='al';
+  const custom=(_illiCountry && !isIT && !isAL)?_illiCountry:'';
+  const cc = isIT?'it':isAL?'al':'';
   const _q=async(bounded)=>{
     const ctrl=new AbortController(); const tm=setTimeout(()=>ctrl.abort(),4500);
     try{
-      const url='https://nominatim.openstreetmap.org/search?format=json&limit=6&addressdetails=1&q='+encodeURIComponent(place)
-        +'&viewbox='+VIEWBOX+(bounded?'&bounded=1':'');
+      let url='https://nominatim.openstreetmap.org/search?format=json&limit=6&addressdetails=1&q='+encodeURIComponent(custom?(place+', '+custom):place);
+      if(cc) url+='&countrycodes='+cc;
+      if(!custom) url+='&viewbox='+VIEWBOX+(bounded?'&bounded=1':''); // per il paese libero: ricerca globale in quel paese
       const r=await fetch(url,{headers:{'Accept-Language':lg},signal:ctrl.signal});
       clearTimeout(tm);
       const d=await r.json();
@@ -12688,32 +12735,68 @@ async function _geocodeAskedPlace(text){
   }catch(e){}
   return null;
 }
-async function _fetchRealPlaces(text, catOverride, originOverride){
+// Distanza massima richiesta: "a 30 km", "entro 20 km", "max 15 km da valona".
+function _parseRadiusKm(text){
+  const m=String(text||'').match(/(\d{1,3})\s*(?:km|chilometr|kilometr)/i);
+  if(m){ const k=parseInt(m[1],10); if(k>=1&&k<=300) return k; }
+  return null;
+}
+// Orario desiderato: "alle 23", "alle 23:30", "per le 22", "a mezzanotte", "stasera tardi".
+function _parseWantedTime(text){
+  const t=String(text||'').toLowerCase();
+  const m=t.match(/\b(?:alle|per le|verso le|entro le|dalle|le)\s+(\d{1,2})(?:[:.](\d{2}))?\b/);
+  if(m){ const h=+m[1]; const mi=m[2]?+m[2]:0; if(h>=0&&h<=24) return {h:h%24, mi}; }
+  if(/mezzanotte/.test(t)) return {h:0,mi:0};
+  if(/mezzogiorno/.test(t)) return {h:12,mi:0};
+  if(/stanotte|notte fonda|tarda notte/.test(t)) return {h:23,mi:30};
+  if(/tardi/.test(t)) return {h:22,mi:30};
+  return null;
+}
+// Aperto a (giorno, ora:min) dai periods Google (day 0=domenica). null se orari sconosciuti.
+function _openAtDatetime(periods, day, h, mi){
+  if(!Array.isArray(periods)||!periods.length) return null;
+  const t=h*60+(mi||0);
+  for(const p of periods){
+    if(!p||!p.open) continue;
+    const od=p.open.day, ot=(p.open.hour||0)*60+(p.open.minute||0);
+    if(!p.close) return true; // aperto 24h
+    const cd=p.close.day, ct=(p.close.hour||0)*60+(p.close.minute||0);
+    if(od===cd){ if(od===day && t>=ot && t<=ct) return true; }
+    else { // attraversa la mezzanotte
+      if(od===day && t>=ot) return true;
+      if(cd===day && t<=ct) return true;
+    }
+  }
+  return false;
+}
+async function _fetchRealPlaces(text, catOverride, originOverride, opts){
+  opts=opts||{};
   // posizione: override esplicito (citta nominata nella domanda), poi GPS, poi centro mappa
   const origin = originOverride || gpsPos || ((typeof map!=='undefined'&&map&&map.getCenter)?map.getCenter():null);
   if(!origin) return {cat:null, places:[], overpassDown:false};
   const cat=catOverride||_detectPlaceQuery(text);
   if(!cat) return {cat:null, places:[], overpassDown:false};
   const lat=origin.lat, lng=origin.lng;
+  const reqKm = (typeof opts.radiusKm==='number' && opts.radiusKm>0) ? Math.min(opts.radiusKm,300) : null;
   const specific = cat.re && cat.label!=='ristorante';
-  const wideM = (cat.wide?45:22)*1000;
-  const osmRadKm = cat.wide?35:15;
+  const wideM = reqKm ? reqKm*1000 : (cat.wide?45:22)*1000;
+  const osmRadKm = reqKm ? Math.min(reqKm,40) : (cat.wide?35:15);
   // TUTTE le fonti IN PARALLELO: il tempo totale e quello della fonte piu lenta (~4s),
   // non la somma (che sforava il timeout e lasciava ILLI a mani vuote). Ognuna fail-safe.
   const [osmRes, gRaw, fqRaw, plRaw] = await Promise.all([
     Promise.race([searchRealPlaces(cat, lat, lng, osmRadKm*1000), new Promise(r=>setTimeout(()=>r({places:[],overpassDown:false}),3000))]).catch(()=>({places:[],overpassDown:true})),
     (specific
-      ? _googleDiscover(cat.label, lat, lng, cat.wide?3000:1800)
+      ? _googleDiscover(cat.label, lat, lng, reqKm?reqKm*1000:(cat.wide?3000:1800))
       : _googleNearbyPlaces(cat, lat, lng, cat.wide?1500:1200)
     ).catch(()=>[]),
-    _fsqPlaces(specific?cat.label:'', lat, lng, cat.wide?3000:1800).catch(()=>[]),
-    _poilovePlaces(cat, lat, lng, cat.wide?25:12).catch(()=>[])
+    _fsqPlaces(specific?cat.label:'', lat, lng, reqKm?reqKm*1000:(cat.wide?3000:1800)).catch(()=>[]),
+    _poilovePlaces(cat, lat, lng, reqKm?reqKm:(cat.wide?25:12)).catch(()=>[])
   ]);
   const overpassDown = !!osmRes.overpassDown;
   const local = _localPoiPlaces(lat,lng,osmRadKm,cat);
-  // le fonti "bias" (discover/foursquare) sulle cucine specifiche: filtra per distanza reale
-  const g  = specific ? (gRaw||[]).filter(p=>p.distM<=wideM) : (gRaw||[]);
-  const fq = specific ? (fqRaw||[]).filter(p=>p.distM<=wideM) : (fqRaw||[]);
+  // le fonti "bias" (discover/foursquare) o un raggio richiesto: filtra per distanza reale
+  const g  = (specific||reqKm) ? (gRaw||[]).filter(p=>p.distM<=wideM) : (gRaw||[]);
+  const fq = (specific||reqKm) ? (fqRaw||[]).filter(p=>p.distM<=wideM) : (fqRaw||[]);
   // MERGE unico, dedup per nome. Ordine di preferenza: POI•LOVE (live+cache) -> Google -> Foursquare -> OSM.
   let merged=[]; { const seen=new Set();
     for(const p of [...(plRaw||[]), ...local, ...g, ...fq, ...(osmRes.places||[])]){
@@ -12744,8 +12827,16 @@ async function _fetchRealPlaces(text, catOverride, originOverride){
     new Promise(r=>setTimeout(r,4500))
   ]);
   top=top.filter(p=>!p.mismatch && p.businessStatus!=='CLOSED_PERMANENTLY');   // via i match sbagliati (gioielleria/via) e i chiusi definitivi
-  top.sort((a,b)=>_qualityScore(b)-_qualityScore(a));
-  return {cat, places:top, overpassDown, genericFallback};
+  // Raggio richiesto ("max 30 km"): taglia i troppo lontani.
+  if(reqKm) top=top.filter(p=>p.distM<=reqKm*1000);
+  // Orario richiesto ("alle 23:00"): calcola chi e aperto a quell'ora e mettili davanti.
+  if(opts.wantedTime){ const day=(new Date()).getDay();
+    top.forEach(p=>{ p.openAtWanted=_openAtDatetime(p.hoursPeriods, day, opts.wantedTime.h, opts.wantedTime.mi); }); }
+  top.sort((a,b)=>{
+    if(opts.wantedTime){ const oa=a.openAtWanted===true?1:0, ob=b.openAtWanted===true?1:0; if(oa!==ob) return ob-oa; }
+    return _qualityScore(b)-_qualityScore(a);
+  });
+  return {cat, places:top, overpassDown, genericFallback, wantedTime:opts.wantedTime||null, radiusKm:reqKm||null};
 }
 function _fmtDist(m){ return m<1000 ? `a ${m} m` : `a ${(m/1000).toFixed(1).replace('.',',')} km`; }
 // "aperto adesso" da opening_hours OSM (casi comuni). Ritorna true/false/null (null = non so, ILLI non afferma).
@@ -12786,12 +12877,15 @@ function _trCuisine(c){
   const M={italian:'italiana',pizza:'pizza',regional:'regionale',steak_house:'carne alla griglia',japanese:'giapponese',sushi:'sushi',chinese:'cinese',kebab:'kebab',burger:'hamburger',seafood:'pesce',fish:'pesce',vegetarian:'vegetariana',vegan:'vegana',ice_cream:'gelato',coffee_shop:'caffetteria',sandwich:'panini',mexican:'messicana',indian:'indiana',french:'francese',greek:'greca',mediterranean:'mediterranea',asian:'asiatica',bbq:'griglia',grill:'griglia',international:'internazionale',local:'cucina locale',pasta:'pasta',fast_food:'fast food',breakfast:'colazione',bakery:'forno',dessert:'dolci',thai:'thailandese',turkish:'turca',spanish:'spagnola',german:'tedesca',american:'americana',cake:'dolci',coffee:'caffe',wine:'vino',beer:'birra',friture:'fritto',balkan:'balcanica',albanian:'albanese'};
   return String(c).split(/[;,]/).map(x=>{ const k=x.trim().toLowerCase().replace(/\s+/g,'_'); return M[k]||x.trim().replace(/_/g,' '); }).filter(Boolean).join(', ');
 }
-function _buildGroundingBlock(cat, places, overpassDown, cityLabel, genericFallback, correctedFrom){
+function _buildGroundingBlock(cat, places, overpassDown, cityLabel, genericFallback, correctedFrom, wantedTime, radiusKm){
   const city=cityLabel||_gpsCity||'questa zona';
   const corr=correctedFrom?`NOTA: l'utente ha scritto "${correctedFrom}" ma intende ${city}. INIZIA la risposta facendoglielo notare con garbo (es. "Immagino tu intenda ${city}...") e poi prosegui normalmente.\n`:'';
+  const _hm=wantedTime?(String(wantedTime.h).padStart(2,'0')+':'+String(wantedTime.mi||0).padStart(2,'0')):'';
+  const timeNote=wantedTime?`VINCOLO ORARIO: l'utente vuole per le ${_hm}. Proponi PRIMA i posti segnati "aperto alle ${_hm}". Se un posto e "CHIUSO alle ${_hm}" NON proporlo come aperto; puoi menzionarlo solo dicendo che a quell'ora e chiuso. Se nessuno risulta aperto a ${_hm}, dillo con onesta.\n`:'';
+  const distNote=radiusKm?`VINCOLO DISTANZA: solo posti entro ${radiusKm} km (gia filtrati).\n`:'';
   if(!places.length){
     const motivo = overpassDown ? `la fonte dati non risponde in questo momento` : `non risultano ${cat.label} nella zona`;
-    return `${corr}GROUNDING OBBLIGATORIO — nessun posto reale trovato (regola assoluta, sovrascrive tutto):
+    return `${corr}${timeNote}${distNote}GROUNDING OBBLIGATORIO — nessun posto reale trovato (regola assoluta, sovrascrive tutto):
 Ho cercato "${cat.label}" vicino a ${city}: ${motivo}.
 NON inventare NESSUN nome di locale, NESSUN indirizzo, NESSUNA distanza. NON nominare altre citta a caso.
 Dillo onestamente in 1-2 frasi calde riferite a ${city} (es. "A ${city} non trovo ${cat.label}, ma...").
@@ -12809,11 +12903,13 @@ NON includere il blocco ===PLACES===.`;
     const _pr=_priceLabel(p.priceLevel); if(_pr) det.push('prezzo '+_pr);
     if(p.veg) det.push(p.veg==='solo'?'solo vegetariano/vegano':'opzioni vegetariane');
     if(p.openNow===true) det.push('aperto adesso'); else if(p.openNow===false) det.push('ora risulta chiuso');
+    if(wantedTime && p.openAtWanted===true) det.push('aperto alle '+_hm);
+    else if(wantedTime && p.openAtWanted===false) det.push('CHIUSO alle '+_hm);
     if(p.hours) det.push('orari: '+p.hours);
     if(p.website) det.push('ha sito web'); if(p.outdoor) det.push("tavoli all'aperto"); if(p.wheelchair) det.push('accessibile');
     return `- ${p.name} — ${det.join(' · ')}`;
   }).join('\n');
-  return `${corr}GROUNDING OBBLIGATORIO — anti-invenzione (regola assoluta, sovrascrive TUTTO il resto):
+  return `${corr}${timeNote}${distNote}GROUNDING OBBLIGATORIO — anti-invenzione (regola assoluta, sovrascrive TUTTO il resto):
 ${introFallback}
 
 ${lista}
@@ -12942,10 +13038,12 @@ async function sendPoiAIMsg(){
       if(_asked){ _origin={lat:_asked.lat,lng:_asked.lng}; _askedLabel=_asked.label; _lastAskedOrigin={lat:_asked.lat,lng:_asked.lng}; _lastAskedLabel=_asked.label;
         if(_asked.corrected && _asked.typed && _srchNorm(_asked.typed)!==_srchNorm(_asked.label)) _correctedFrom=_asked.typed; }
       else if(_looksLikeFollowUp(text) && _lastAskedOrigin){ _origin=_lastAskedOrigin; _askedLabel=_lastAskedLabel; }
+      const _radiusKm=_parseRadiusKm(text);
+      const _wantedTime=_parseWantedTime(text);
       let _g={cat:_gCat, places:[], overpassDown:false};
-      try{ _g=await Promise.race([_fetchRealPlaces(text, _gCat, _origin), new Promise(r=>setTimeout(()=>r({cat:_gCat,places:[],overpassDown:true}),12000))]); }catch(e){}
+      try{ _g=await Promise.race([_fetchRealPlaces(text, _gCat, _origin, {radiusKm:_radiusKm, wantedTime:_wantedTime}), new Promise(r=>setTimeout(()=>r({cat:_gCat,places:[],overpassDown:true}),12000))]); }catch(e){}
       _lastGroundedPlaces=_g.places;
-      groundingMsg={role:'system', content:_buildGroundingBlock(_g.cat, _g.places, _g.overpassDown, _askedLabel, _g.genericFallback, _correctedFrom)};
+      groundingMsg={role:'system', content:_buildGroundingBlock(_g.cat, _g.places, _g.overpassDown, _askedLabel, _g.genericFallback, _correctedFrom, _g.wantedTime, _g.radiusKm)};
     }
 
     const kbMsg=_matchIlliKnowledge(text); // conoscenze curate dall'admin (se pertinenti)

@@ -68,7 +68,7 @@ Deno.serve(async (req: Request) => {
       if (!FOURSQUARE_KEY) return json({ found: false, places: [] }, 200);
       if (lat == null || lng == null) return json({ error: "bad_request" }, 400);
       const query = String(name || "").trim();
-      const rad = Math.max(200, Math.min(3000, Number(radius) || 1500));
+      const rad = Math.max(200, Math.min(50000, Number(radius) || 1500));
       const rlat = Number(lat).toFixed(3);
       const rlng = Number(lng).toFixed(3);
       const fkey = `fsq:${query.toLowerCase().slice(0, 40)}:${rlat}:${rlng}:${Math.round(rad / 100) * 100}`;
@@ -194,7 +194,7 @@ Deno.serve(async (req: Request) => {
       const query = String(name || "").trim();
       if (!query || lat == null || lng == null) return json({ error: "bad_request" }, 400);
       const lc = (language === "sq" || language === "en") ? language : "it";
-      const rad = Math.max(200, Math.min(3000, Number(radius) || 1500));
+      const rad = Math.max(200, Math.min(50000, Number(radius) || 1500));
       const rlat = Number(lat).toFixed(3);
       const rlng = Number(lng).toFixed(3);
       const dkey = `discover:${query.toLowerCase().slice(0, 40)}:${rlat}:${rlng}:${Math.round(rad / 100) * 100}:${lc}`;
@@ -260,7 +260,7 @@ Deno.serve(async (req: Request) => {
         "Content-Type": "application/json",
         "X-Goog-Api-Key": KEY,
         "X-Goog-FieldMask":
-          "places.displayName,places.rating,places.userRatingCount,places.priceLevel,places.businessStatus,places.currentOpeningHours.openNow,places.location,places.formattedAddress,places.primaryType,places.primaryTypeDisplayName,places.editorialSummary",
+          "places.displayName,places.rating,places.userRatingCount,places.priceLevel,places.businessStatus,places.currentOpeningHours.openNow,places.regularOpeningHours.periods,places.location,places.formattedAddress,places.primaryType,places.primaryTypeDisplayName,places.editorialSummary",
       },
       body: JSON.stringify(body),
     });
@@ -281,6 +281,7 @@ Deno.serve(async (req: Request) => {
       priceLevel: p.priceLevel ?? null,    // PRICE_LEVEL_INEXPENSIVE | MODERATE | EXPENSIVE | VERY_EXPENSIVE
       businessStatus: p.businessStatus ?? null, // OPERATIONAL | CLOSED_TEMPORARILY | CLOSED_PERMANENTLY
       openNow: p.currentOpeningHours?.openNow ?? null,
+      hoursPeriods: p.regularOpeningHours?.periods ?? null, // per "aperto alle 23:00": {open:{day,hour,minute},close:{...}}
       glat: p.location?.latitude ?? null,
       glng: p.location?.longitude ?? null,
       address: p.formattedAddress ?? null,
