@@ -15,6 +15,9 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
 const ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+// Fonte recensioni AGGIUNTIVA (oltre Google): Foursquare Places. Chiave = SEGRETO Deno.env
+// (FOURSQUARE_KEY), mai nel repo/client. Se manca, la modalita fsq degrada a vuoto (fail-open).
+const FOURSQUARE_KEY = Deno.env.get("FOURSQUARE_KEY") ?? "";
 
 const CORS: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
@@ -56,10 +59,58 @@ Deno.serve(async (req: Request) => {
       } catch (_e) { /* limitatore giu: non blocco la lente */ }
     }
 
+    const { name, lat, lng, radius, mode, language } = await req.json();
+
+    // ── MODALITA' FSQ: Foursquare, fonte recensioni AGGIUNTIVA e indipendente da Google ──
+    // Serve a ILLI per allargare l'insieme "chiunque lascia recensioni". Fail-open totale:
+    // senza FOURSQUARE_KEY o su errore ritorna vuoto, senza mai bloccare nulla.
+    if (mode === "fsq") {
+      if (!FOURSQUARE_KEY) return json({ found: false, places: [] }, 200);
+      if (lat == null || lng == null) return json({ error: "bad_request" }, 400);
+      const query = String(name || "").trim();
+      const rad = Math.max(200, Math.min(3000, Number(radius) || 1500));
+      const rlat = Number(lat).toFixed(3);
+      const rlng = Number(lng).toFixed(3);
+      const fkey = `fsq:${query.toLowerCase().slice(0, 40)}:${rlat}:${rlng}:${Math.round(rad / 100) * 100}`;
+      const CACHE_TTL_MS = 7 * 24 * 3600 * 1000;
+      if (svc) {
+        try {
+          const cutoff = new Date(Date.now() - CACHE_TTL_MS).toISOString();
+          const { data: hit } = await svc.from("places_cache").select("payload").eq("key", fkey).gte("created_at", cutoff).maybeSingle();
+          if (hit?.payload) return json(hit.payload, 200);
+        } catch (_e) { /* cache giu */ }
+      }
+      try {
+        const url = `https://api.foursquare.com/v3/places/search?ll=${Number(lat)},${Number(lng)}&radius=${rad}&limit=20&sort=RATING`
+          + (query ? `&query=${encodeURIComponent(query)}` : "")
+          + `&fields=name,geocodes,rating,stats,categories,location`;
+        const r = await fetch(url, {
+          headers: { "Authorization": FOURSQUARE_KEY, "Accept": "application/json" },
+          signal: AbortSignal.timeout(7000),
+        });
+        if (!r.ok) return json({ found: false, places: [] }, 200);
+        const fd = await r.json();
+        const fplaces = (fd?.results || []).map((p: any) => ({
+          name: p?.name || "",
+          lat: p?.geocodes?.main?.latitude ?? null,
+          lng: p?.geocodes?.main?.longitude ?? null,
+          rating: (typeof p?.rating === "number") ? Math.round((p.rating / 2) * 10) / 10 : null, // 0-10 -> 0-5
+          reviews: p?.stats?.total_ratings ?? null,
+          type: (p?.categories?.[0]?.name) || "",
+          typeLabel: (p?.categories?.[0]?.name) || "",
+        })).filter((p: any) => p.name && p.lat != null);
+        const fpayload = { found: fplaces.length > 0, places: fplaces };
+        if (svc && fplaces.length > 0) {
+          try { await svc.from("places_cache").upsert({ key: fkey, payload: fpayload, created_at: new Date().toISOString() }); } catch (_e) { /* ignore */ }
+        }
+        return json(fpayload, 200);
+      } catch (_e) {
+        return json({ found: false, places: [] }, 200);
+      }
+    }
+
     const KEY = Deno.env.get("GOOGLE_PLACES_KEY");
     if (!KEY) return json({ error: "no_key" }, 200); // degrado: il client usa i dati OSM
-
-    const { name, lat, lng, radius, mode, language } = await req.json();
 
     // ── MODALITA' NEARBY: i punti di interesse di Google intorno a un punto ──
     // Usata dalla LENTE: restituisce fino a 20 posti veri (nome, posizione, voto,

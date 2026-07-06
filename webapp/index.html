@@ -6414,7 +6414,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='2.49';
+const APP_VERSION='2.50';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 console.info('POI•LOVE v'+APP_VERSION);
 // Le rotte storiche pubblicate sono contenuto PUBBLICO: si caricano per tutti,
@@ -12333,17 +12333,47 @@ function _detectPlaceQuery(text){
   }
   return null;
 }
+// Testo cercabile di un POI POI•LOVE: titolo + categoria + sottocategoria + TAG + descrizione.
+function _poiHaystack(p){
+  const tags=Array.isArray(p.tags)?p.tags.join(' '):(p.tags||'');
+  return [p.name, p.category, p.subcategory, tags, p.description, p.address, p.city].filter(Boolean).join(' ').toLowerCase();
+}
 function _localPoiPlaces(lat,lng,radiusKm,cat){
   const all=[...(window._dbPOIs||[]), ...(typeof POIS!=='undefined'?POIS:[])];
   const seen=new Set();
   const re = cat && cat.re ? cat.re : null;
   return all
     .filter(p=>p && p.name && typeof p.lat==='number' && typeof p.lng==='number')
-    .filter(p=>!re || re.test(p.name) || re.test(p.category||'') || re.test(p.description||''))  // pertinenza: niente "casa mia" tra le pizzerie
-    .map(p=>({name:p.name, lat:p.lat, lng:p.lng, distM:Math.round(haversineKm(lat,lng,p.lat,p.lng)*1000), kind:p.category||'POI', src:'POI•LOVE'}))
+    .filter(p=>!re || re.test(_poiHaystack(p)))  // match su titolo/categoria/sottocategoria/tag/descrizione; niente "casa mia" tra le pizzerie
+    .map(p=>({name:p.name, lat:p.lat, lng:p.lng, distM:Math.round(haversineKm(lat,lng,p.lat,p.lng)*1000), kind:p.subcategory||p.category||'POI', src:'POI•LOVE', loveCount:p.love_count||0, tags:Array.isArray(p.tags)?p.tags:[]}))
     .filter(p=>p.distM<=radiusKm*1000)
     .filter(p=>{const k=p.name.toLowerCase().trim(); if(seen.has(k))return false; seen.add(k); return true;})
     .sort((a,b)=>a.distM-b.distM);
+}
+// Ricerca LIVE nel DB POI•LOVE vicino all'origine (anche una citta diversa dal GPS): titolo,
+// zona, categoria, sottocategoria, TAG. Cosi i luoghi amati dalla community entrano SEMPRE
+// nell'insieme, ovunque cerchi l'utente. Bounding-box + haversine (niente PostGIS).
+async function _poilovePlaces(cat, lat, lng, radiusKm){
+  if(typeof sb==='undefined' || !sb) return [];
+  const R=Math.max(1,Math.min(radiusKm||8,50));
+  const dLat=R/111, dLng=R/(111*Math.max(0.2,Math.cos(lat*Math.PI/180)));
+  try{
+    const {data,error}=await sb.from('pois')
+      .select('id,name:title,description,lat,lng,category,subcategory,tags,love_count,visibility,address')
+      .in('visibility',['community','suggested_google','official'])
+      .gte('lat',lat-dLat).lte('lat',lat+dLat).gte('lng',lng-dLng).lte('lng',lng+dLng)
+      .limit(80);
+    if(error||!Array.isArray(data)) return [];
+    const re=cat && cat.re ? cat.re : null;
+    const seen=new Set();
+    return data
+      .filter(p=>p && p.name && p.lat!=null && p.lng!=null)
+      .filter(p=>!re || re.test(_poiHaystack(p)))
+      .map(p=>({name:p.name, lat:p.lat, lng:p.lng, distM:Math.round(haversineKm(lat,lng,p.lat,p.lng)*1000), kind:p.subcategory||p.category||'POI', src:'POI•LOVE', loveCount:p.love_count||0, tags:Array.isArray(p.tags)?p.tags:[]}))
+      .filter(p=>p.distM<=R*1000)
+      .filter(p=>{const k=p.name.toLowerCase().trim(); if(seen.has(k))return false; seen.add(k); return true;})
+      .sort((a,b)=>a.distM-b.distM);
+  }catch(e){ return []; }
 }
 async function _overpassFetch(query){
   const ENDPOINTS=['https://overpass-api.de/api/interpreter','https://overpass.kumi.systems/api/interpreter'];
@@ -12525,6 +12555,27 @@ async function _googleDiscover(queryText, lat, lng, radiusM){
       }));
   }catch(e){ return []; }
 }
+// Foursquare: fonte recensioni AGGIUNTIVA (place-enrich mode fsq). Fail-open: se la chiave
+// FOURSQUARE_KEY non e nei segreti, l'edge ritorna vuoto e qui non entra nulla, zero rischio.
+async function _fsqPlaces(queryText, lat, lng, radiusM){
+  try{
+    const r=await fetch(SUPABASE_URL+'/functions/v1/place-enrich',{
+      method:'POST', headers:await _aiAuthHeaders(),
+      body:JSON.stringify({mode:'fsq', name:queryText||'', lat, lng, radius:Math.min(3000,Math.max(400,radiusM||1500))})
+    });
+    if(!r.ok) return [];
+    const d=await r.json();
+    if(!d || !Array.isArray(d.places)) return [];
+    return d.places
+      .filter(p=>p && p.name && p.lat!=null && p.lng!=null)
+      .map(p=>({
+        name:p.name, lat:p.lat, lng:p.lng,
+        distM:Math.round(haversineKm(lat,lng,p.lat,p.lng)*1000),
+        kind:p.typeLabel||queryText||'', typeLabel:p.typeLabel||'', gType:p.type||'',
+        rating:(typeof p.rating==='number'?p.rating:null), reviews:p.reviews||null, src:'foursquare'
+      }));
+  }catch(e){ return []; }
+}
 // Eredita la categoria dagli ultimi messaggi utente: i follow-up ("e domani?", "e di pesce?") continuano a cercare lo stesso tipo di posto
 function _lastPlaceCatFromHistory(){
   try{
@@ -12607,6 +12658,22 @@ async function _fetchRealPlaces(text, catOverride, originOverride){
   }
   { const seen=new Set(merged.map(p=>p.name.toLowerCase().trim()));
     for(const p of g){ const k=p.name.toLowerCase().trim(); if(seen.has(k)) continue; seen.add(k); merged.push(p); } }
+  // FOURSQUARE: altra fonte con recensioni (fail-open, vuoto se la chiave non c'e). Cosi
+  // l'insieme non e "solo Google": chiunque lascia recensioni contribuisce.
+  try{
+    const specific=cat.re && cat.label!=='ristorante';
+    const fq=(await _fsqPlaces(specific?cat.label:'', lat, lng, cat.wide?3000:1800))
+      .filter(p=> specific ? p.distM<=(cat.wide?45:22)*1000 : true);
+    const seen=new Set(merged.map(p=>p.name.toLowerCase().trim()));
+    for(const p of fq){ const k=p.name.toLowerCase().trim(); if(seen.has(k)) continue; seen.add(k); merged.push(p); }
+  }catch(e){}
+  // POI•LOVE LIVE dal DB vicino all'origine (titolo/zona/categoria/tag): i luoghi della community
+  // entrano SEMPRE nell'insieme, ovunque cerchi l'utente, e hanno priorita (+100 in _qualityScore).
+  try{
+    const pl=await _poilovePlaces(cat, lat, lng, cat.wide?25:12);
+    const seen=new Set(merged.map(p=>p.name.toLowerCase().trim()));
+    for(const p of pl){ const k=p.name.toLowerCase().trim(); if(seen.has(k)) continue; seen.add(k); merged.push(p); }
+  }catch(e){}
   // Fallback: cucina specifica senza NULLA (ne OSM ne Google) -> ristoranti generici da Google,
   // cosi ILLI non resta a mani vuote e puo dire "niente sushi dedicato ma questi ristoranti vicini".
   let genericFallback=false;
@@ -12679,7 +12746,7 @@ NON includere il blocco ===PLACES===.`;
     const det=[_fmtDist(p.distM)];
     if(p.src==='POI•LOVE') det.push('verificato su POI•LOVE');
     if(p.cuisine) det.push('cucina: '+_trCuisine(p.cuisine));
-    if(typeof p.rating==='number') det.push(`voto Google ${String(p.rating).replace('.',',')}/5${p.reviews?` su ${p.reviews} recensioni`:''}`);
+    if(typeof p.rating==='number'){ const fonte=p.src==='foursquare'?'Foursquare':(p.src==='google'?'Google':'community'); det.push(`voto ${fonte} ${String(p.rating).replace('.',',')}/5${p.reviews?` su ${p.reviews} recensioni`:''}`); }
     const _pr=_priceLabel(p.priceLevel); if(_pr) det.push('prezzo '+_pr);
     if(p.veg) det.push(p.veg==='solo'?'solo vegetariano/vegano':'opzioni vegetariane');
     if(p.openNow===true) det.push('aperto adesso'); else if(p.openNow===false) det.push('ora risulta chiuso');
