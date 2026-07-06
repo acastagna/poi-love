@@ -482,6 +482,9 @@ html[data-theme="light"] .chip.green{color:#236b39}
     <div class="nav-item" data-sec="routes" onclick="openSection('routes')">
       <span class="ic"><i class="ph-duotone ph-path"></i></span><span class="label" data-t="nav_routes">Rotte Storiche</span>
     </div>
+    <div class="nav-item" data-sec="categories" onclick="openSection('categories')">
+      <span class="ic"><i class="ph-duotone ph-squares-four"></i></span><span class="label" data-t="nav_categories">Categorie</span>
+    </div>
     <div class="nav-item" data-sec="audit" onclick="openSection('audit')">
       <span class="ic"><i class="ph-duotone ph-scroll"></i></span><span class="label" data-t="nav_audit">Audit log</span>
     </div>
@@ -698,6 +701,44 @@ html[data-theme="light"] .chip.green{color:#236b39}
       </div>
     </section>
 
+    <!-- 8c) CATEGORIE (tassonomia data-driven) -->
+    <section class="section" id="sec-categories">
+      <div class="panel" style="margin-bottom:16px">
+        <div class="card-h"><span class="ic"><i class="ph-duotone ph-lightbulb"></i></span><span data-t="cat_req_title">Richieste dalla community</span></div>
+        <div class="sm" style="margin-bottom:10px" data-t="cat_req_help">Ogni volta che qualcuno non trova la categoria giusta lascia una traccia qui. Tu decidi cosa promuovere.</div>
+        <div id="catReqTable"></div>
+      </div>
+      <div class="panel" style="margin-bottom:16px">
+        <div class="card-h"><span class="ic"><i class="ph-duotone ph-plus-circle"></i></span><span data-t="cat_new_title">Nuova categoria / modifica</span></div>
+        <div class="row2">
+          <div class="field"><label>Key</label><input id="catKey" placeholder="es. gelateria" autocomplete="off"></div>
+          <div class="field"><label data-t="cat_macro">Macro (enum)</label><select id="catMacro">
+            <option value="cibo">cibo</option><option value="lavoro">lavoro</option><option value="pernottare">pernottare</option>
+            <option value="natura">natura</option><option value="festa">festa</option><option value="cultura">cultura</option>
+            <option value="pratico">pratico</option><option value="benessere">benessere</option><option value="love">love</option>
+            <option value="audioguida">audioguida</option><option value="mappa">mappa</option><option value="open_source">open_source</option>
+          </select></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label>Etichetta IT</label><input id="catIt" autocomplete="off"></div>
+          <div class="field"><label>Etichetta SQ</label><input id="catSq" autocomplete="off"></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label>Etichetta EN</label><input id="catEn" autocomplete="off"></div>
+          <div class="field"><label data-t="cat_icon">Icona Phosphor</label><input id="catIcon" placeholder="ice-cream" autocomplete="off"></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label data-t="cat_color">Colore</label><input id="catColor" placeholder="#D42B2B" autocomplete="off"></div>
+          <div class="field"><label data-t="cat_sort">Ordine</label><input id="catSort" type="number" value="99"></div>
+        </div>
+        <div class="btn-row"><button class="btn gold" onclick="saveCategory()" data-t="cat_save">Salva categoria</button></div>
+      </div>
+      <div class="panel">
+        <div class="card-h"><span class="ic"><i class="ph-duotone ph-squares-four"></i></span><span data-t="cat_list_title">Categorie attive e spente</span></div>
+        <div id="catTable"></div>
+      </div>
+    </section>
+
     <!-- 9) AUDIT LOG -->
     <section class="section" id="sec-audit">
       <div class="panel">
@@ -753,6 +794,12 @@ const T = {
     create_trip:'Crea percorso', f_trip_name:'Nome percorso', f_badge:'Badge', f_dates:'Date', f_stops:'Tappe',
     add_stop:'+ Aggiungi tappa', create_trip_btn:'Crea percorso',
     audit_title:'Registro azioni (ultimi 50)',
+    nav_categories:'Categorie', sub_categories:'Tassonomia data-driven: cura le categorie e promuovi le richieste della community.',
+    cat_req_title:'Richieste dalla community', cat_req_help:'Ogni volta che qualcuno non trova la categoria giusta lascia una traccia qui. Tu decidi cosa promuovere.',
+    cat_req_empty:'Nessuna richiesta in attesa', cat_req_promote:'Promuovi', cat_new_title:'Nuova categoria / modifica',
+    cat_macro:'Macro (enum)', cat_icon:'Icona Phosphor', cat_color:'Colore', cat_sort:'Ordine', cat_save:'Salva categoria',
+    cat_list_title:'Categorie attive e spente', cat_on:'Attiva', cat_off:'Spenta', cat_edit:'Modifica',
+    cat_saved:'Categoria salvata', cat_key_req:'Key, macro e le 3 etichette sono obbligatorie',
     // stati
     st_open:'Aperta', st_reviewing:'In revisione', st_resolved:'Risolta', st_dismissed:'Respinta',
     st_active:'Attivo', st_suspended:'Sospeso', st_banned:'Bannato',
@@ -825,6 +872,12 @@ const T = {
     create_trip:'Krijo itinerar', f_trip_name:'Emri i itinerarit', f_badge:'Stema', f_dates:'Datat', f_stops:'Ndalesat',
     add_stop:'+ Shto ndalesë', create_trip_btn:'Krijo itinerar',
     audit_title:'Regjistri i veprimeve (50 të fundit)',
+    nav_categories:'Kategoritë', sub_categories:'Taksonomia data-driven: kuro kategoritë dhe promovo kërkesat e komunitetit.',
+    cat_req_title:'Kërkesat nga komuniteti', cat_req_help:'Sa herë dikush nuk gjen kategorinë e duhur lë një gjurmë këtu. Ti vendos çfarë të promovosh.',
+    cat_req_empty:'Asnjë kërkesë në pritje', cat_req_promote:'Promovo', cat_new_title:'Kategori e re / ndrysho',
+    cat_macro:'Makro (enum)', cat_icon:'Ikona Phosphor', cat_color:'Ngjyra', cat_sort:'Renditja', cat_save:'Ruaj kategorinë',
+    cat_list_title:'Kategoritë aktive dhe të fikura', cat_on:'Aktive', cat_off:'E fikur', cat_edit:'Ndrysho',
+    cat_saved:'Kategoria u ruajt', cat_key_req:'Key, makro dhe 3 etiketat janë të detyrueshme',
     st_open:'E hapur', st_reviewing:'Në rishikim', st_resolved:'E zgjidhur', st_dismissed:'E refuzuar',
     st_active:'Aktiv', st_suspended:'Pezulluar', st_banned:'Bllokuar',
     a_resolve:'Zgjidh', a_dismiss:'Refuzo', a_suspend:'Pezullo 7d', a_ban:'Blloko', a_reactivate:'Riaktivizo',
@@ -893,6 +946,12 @@ const T = {
     create_trip:'Create route', f_trip_name:'Route name', f_badge:'Badge', f_dates:'Dates', f_stops:'Stops',
     add_stop:'+ Add stop', create_trip_btn:'Create route',
     audit_title:'Action log (last 50)',
+    nav_categories:'Categories', sub_categories:'Data-driven taxonomy: curate categories and promote community requests.',
+    cat_req_title:'Community requests', cat_req_help:'Whenever someone cannot find the right category a trace lands here. You decide what to promote.',
+    cat_req_empty:'No pending requests', cat_req_promote:'Promote', cat_new_title:'New category / edit',
+    cat_macro:'Macro (enum)', cat_icon:'Phosphor icon', cat_color:'Color', cat_sort:'Sort', cat_save:'Save category',
+    cat_list_title:'Active and disabled categories', cat_on:'Active', cat_off:'Off', cat_edit:'Edit',
+    cat_saved:'Category saved', cat_key_req:'Key, macro and the 3 labels are required',
     st_open:'Open', st_reviewing:'Reviewing', st_resolved:'Resolved', st_dismissed:'Dismissed',
     st_active:'Active', st_suspended:'Suspended', st_banned:'Banned',
     a_resolve:'Resolve', a_dismiss:'Dismiss', a_suspend:'Suspend 7d', a_ban:'Ban', a_reactivate:'Reactivate',
@@ -1119,9 +1178,9 @@ async function doLogout(){
 
 /* ─────────────────────────── Navigazione sezioni (lazy) ─────────────────────────── */
 const SUBKEY = { dashboard:'sub_dashboard', moderation:'sub_moderation', users:'sub_users',
-  ailimits:'sub_ailimits', copilot:'sub_copilot', create:'sub_create', pois:'sub_pois', routes:'sub_routes', audit:'sub_audit' };
+  ailimits:'sub_ailimits', copilot:'sub_copilot', create:'sub_create', pois:'sub_pois', routes:'sub_routes', audit:'sub_audit', categories:'sub_categories' };
 const TITLEKEY = { dashboard:'nav_dashboard', moderation:'nav_moderation', users:'nav_users',
-  ailimits:'nav_ailimits', copilot:'nav_copilot', create:'nav_create', pois:'nav_pois', routes:'nav_routes', audit:'nav_audit' };
+  ailimits:'nav_ailimits', copilot:'nav_copilot', create:'nav_create', pois:'nav_pois', routes:'nav_routes', categories:'nav_categories', audit:'nav_audit' };
 
 function updateHeader(sec){
   document.getElementById('secTitle').textContent = t(TITLEKEY[sec]);
@@ -1147,6 +1206,7 @@ function runSection(sec){
     case 'create': initCreate(); break;
     case 'pois': loadPois(); break;
     case 'routes': loadRoutesAdmin(); break;
+    case 'categories': loadCategoriesAdmin(); break;
     case 'audit': loadAudit(); break;
   }
 }
@@ -1970,6 +2030,102 @@ async function createTrip(){
 }
 
 /* ═════════════════════════ 7) AUDIT LOG ═════════════════════════ */
+
+/* ═════════════════════════ 8c) CATEGORIE (tassonomia data-driven) ═════════════════════════ */
+async function loadCategoriesAdmin(){
+  // Richieste della community, raggruppate per termine
+  const rb=document.getElementById('catReqTable'); loadingBox(rb);
+  try{
+    const { data, error } = await sb.from('category_requests')
+      .select('term,lang,source,created_at').order('created_at',{ascending:false}).limit(500);
+    if(error){ isBackendMissing(error)?backendOff(rb):emptyBox(rb,t('error'),null,'warning'); }
+    else if(!data||!data.length){ emptyBox(rb,t('cat_req_empty'),null,'lightbulb'); }
+    else{
+      const groups={};
+      data.forEach(r=>{
+        const k=String(r.term||'').trim().toLowerCase(); if(!k) return;
+        if(!groups[k]) groups[k]={term:r.term.trim(),count:0,langs:new Set()};
+        groups[k].count++; if(r.lang) groups[k].langs.add(r.lang);
+      });
+      rb.textContent='';
+      Object.values(groups).sort((a,b)=>b.count-a.count).forEach(g=>{
+        rb.appendChild(el('div',{style:'display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid rgba(128,128,128,.15);flex-wrap:wrap'},[
+          el('span',{class:'ttl',style:'flex:1;min-width:120px',text:g.term}),
+          el('span',{class:'chip dim',text:'\u00d7'+g.count}),
+          g.langs.size?el('span',{class:'sm',text:[...g.langs].join(', ')}):null,
+          el('button',{class:'btn sm gold',text:t('cat_req_promote'),onclick:()=>promoteCatRequest(g.term)}),
+          el('button',{class:'icon-btn',title:t('a_delete'),onclick:()=>discardCatRequest(g.term)}, phIcon('trash'))
+        ]));
+      });
+    }
+  }catch(e){ emptyBox(rb,t('error'),null,'warning'); }
+  // Elenco categorie
+  const cb=document.getElementById('catTable'); loadingBox(cb);
+  try{
+    const { data, error } = await sb.from('poi_categories')
+      .select('key,macro,label_it,label_sq,label_en,icon,color,sort,active,official').order('sort');
+    if(error){ isBackendMissing(error)?backendOff(cb):emptyBox(cb,t('error'),null,'warning'); return; }
+    if(!data||!data.length){ emptyBox(cb,t('error'),null,'squares-four'); return; }
+    cb.textContent='';
+    data.forEach(c=>{
+      const ico=el('span',{style:'width:28px;height:28px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;color:#fff;background:'+(c.color||'#D42B2B')}, phIcon(c.icon||'map-pin'));
+      cb.appendChild(el('div',{style:'display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid rgba(128,128,128,.15);flex-wrap:wrap'},[
+        ico,
+        el('span',{class:'ttl',style:'min-width:110px',text:c.label_it}),
+        el('span',{class:'sm',style:'flex:1',text:c.key+' \u00b7 '+c.macro+' \u00b7 '+c.sort}),
+        el('span',{class:'chip '+(c.active?'green':'dim'),text:c.active?t('cat_on'):t('cat_off')}),
+        el('button',{class:'btn sm',text:t('cat_edit'),onclick:()=>fillCatForm(c)}),
+        el('button',{class:'btn sm',text:c.active?t('cat_off'):t('cat_on'),onclick:async()=>{
+          const { data:d2, error:e2 } = await sb.from('poi_categories').update({active:!c.active}).eq('key',c.key).select('key');
+          if(e2||!d2||!d2.length){ toast(t('error'),'err'); return; }
+          toast(t('saved'),'ok'); loadCategoriesAdmin();
+        }})
+      ]));
+    });
+  }catch(e){ emptyBox(cb,t('error'),null,'warning'); }
+}
+function fillCatForm(c){
+  document.getElementById('catKey').value=c.key||'';
+  document.getElementById('catMacro').value=c.macro||'cultura';
+  document.getElementById('catIt').value=c.label_it||'';
+  document.getElementById('catSq').value=c.label_sq||'';
+  document.getElementById('catEn').value=c.label_en||'';
+  document.getElementById('catIcon').value=c.icon||'';
+  document.getElementById('catColor').value=c.color||'';
+  document.getElementById('catSort').value=c.sort!=null?c.sort:99;
+  document.getElementById('catKey').scrollIntoView({behavior:'smooth',block:'center'});
+}
+function promoteCatRequest(term){
+  // Prefill del form: l'admin rifinisce etichette, icona e colore, poi salva
+  const key=String(term||'').trim().toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'').slice(0,40);
+  fillCatForm({key, macro:'cultura', label_it:term.trim(), label_sq:term.trim(), label_en:term.trim(), icon:'map-pin', color:'#D42B2B', sort:99});
+  toast(t('cat_new_title'),'ok','pencil-simple');
+}
+async function discardCatRequest(term){
+  const { error } = await sb.from('category_requests').delete().ilike('term', String(term||'').trim());
+  if(error){ toast(error.message||t('error'),'err'); return; }
+  toast(t('saved'),'ok'); loadCategoriesAdmin();
+}
+async function saveCategory(){
+  const key=(document.getElementById('catKey').value||'').trim().toLowerCase().replace(/[^a-z0-9_]+/g,'_').replace(/^_+|_+$/g,'');
+  const macro=document.getElementById('catMacro').value;
+  const it_=(document.getElementById('catIt').value||'').trim();
+  const sq_=(document.getElementById('catSq').value||'').trim();
+  const en_=(document.getElementById('catEn').value||'').trim();
+  if(!key||!macro||!it_||!sq_||!en_){ toast(t('cat_key_req'),'err'); return; }
+  const icon=(document.getElementById('catIcon').value||'map-pin').trim().replace(/^ph-/,'');
+  let color=(document.getElementById('catColor').value||'#D42B2B').trim();
+  if(!/^#[0-9a-fA-F]{6}$/.test(color)) color='#D42B2B';
+  const sort=parseInt(document.getElementById('catSort').value,10);
+  const { data, error } = await sb.from('poi_categories').upsert({
+    key, macro, label_it:it_.slice(0,60), label_sq:sq_.slice(0,60), label_en:en_.slice(0,60),
+    icon:icon.slice(0,40), color, sort:Number.isFinite(sort)?sort:99, active:true, official:true
+  },{onConflict:'key'}).select('key');
+  if(error||!data||!data.length){ toast((error&&error.message)||t('error'),'err'); return; }
+  toast(t('cat_saved'),'ok');
+  loadCategoriesAdmin();
+}
+
 async function loadAudit(){
   const box=document.getElementById('auditTable'); loadingBox(box);
   try{
