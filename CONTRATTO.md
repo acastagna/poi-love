@@ -7,7 +7,7 @@ info@321.al · https://321.al
 # CONTRATTO DI LAVORO · POI•LOVE
 
 > **Questa è la traccia ufficiale del progetto.** Ogni passo che facciamo è definito qui: cosa, in quale settore, con quale stato e quale tempistica. Si aggiorna a OGNI giro di lavoro, insieme a SAL.md (il diario) e TODO.md (la lista operativa).
-> Versione app corrente: **2.26** (partenza ufficiale 2.00 il 04/07/2026). Lancio pubblico: **lunedì 17/08/2026, Tirana**.
+> Versione app corrente: **2.27** (partenza ufficiale 2.00 il 04/07/2026). Lancio pubblico: **lunedì 17/08/2026, Tirana**.
 
 ## Le regole del contratto (valgono per ogni passo)
 
@@ -74,10 +74,10 @@ info@321.al · https://321.al
 | Sicurezza: doppio fattore obbligatorio senza scappatoie | ✅ Fatto e live | 04/07 |
 | Rotte storiche: sezione admin completa (crea/pubblica/tappe/rinomina/elimina) | ✅ Fatto e live | 05/07 |
 | Sistema email + AcumbaMail (serve la chiave da Alessandro) | ⬜ Da fare | prima del lancio |
-| Cambio tier utenti da admin + tier Professionista Plus + livello Influencer | 🔶 Vincolo DB sistemato (4 tier ammessi), UI admin da fare | prima del lancio |
+| Cambio tier utenti da admin (menu a tendina, RPC admin_set_user_tier sicura) + tier Professionista Plus + livello Influencer (badge dedicati nella webapp); vincolo DB ripulito (erano 2 CHECK in conflitto, ora 5 tier) | ✅ Fatto e live | 06/07 |
 | Claim proprietà POI a pagamento: bottone webapp, allarme in admin con embed+nomi, approva/rifiuta, collaudato | ✅ Fatto e live | 05/07 |
 | Categoria custom da "Altri" + zona "categorie più richieste" (rinomina e metti a sistema) | ⬜ Da fare | prima del lancio |
-| Badge visivo elementi UFFICIALI (rotte, POI, liste) + "in evidenza"(Pro) e "suggerite"(Plus) | ⬜ Da fare | prima del lancio |
+| Badge visivo elementi UFFICIALI: sigillo oro sui POI ufficiali (dettaglio + marker mappa con anello oro), sottocategoria nell etichetta; "in evidenza"(Pro)/"suggerite"(Plus) restano da fare | 🔶 POI ufficiali FATTI, evidenza/suggerite da fare | prima del lancio |
 | Pannello multi-provider AI (immagini e testo, chiavi server-side, provider per funzione) | ⬜ Da fare | prima del lancio |
 | Biometrico WebAuthn: accenderlo dal dashboard Supabase (client già pronto) | ⬜ Da fare (manuale, 5 min) | quando vuoi |
 | Codice di migrazione POI: cedi e riscatta (utenti e admin), collaudato end-to-end | ✅ Fatto e live | 05/07 |
@@ -111,7 +111,7 @@ info@321.al · https://321.al
 | Passo | Stato | Quando |
 |---|---|---|
 | Vantaggi tier UNO A UNO (memoria `tier_benefits`): punti x2, POI in evidenza, Muro Sostenitori, adotta rotta, QR business, itinerario in evidenza Mecenate | 🔶 In parte (limiti ILLI per tier FATTI, spunta verifica FATTA) | prima del lancio |
-| Tier Professionista Plus + livello Influencer (badge colore nuovo) | ⬜ Da fare | prima del lancio |
+| Tier Professionista Plus + livello Influencer (badge colore nuovo) | ✅ Fatto e live (v2.27) | 06/07 |
 | API pubblica / middleware per professionisti (tassisti, runner, Wolt, Patoko), import/export, webhook | ⬜ Visione studiata (memoria `poi_share_and_integrations`) | dopo il lancio |
 | POI•LOVE come sistema di consegna (delivery) | ⬜ Visione | dopo il lancio |
 | SOS sanitario con percorso preferenziale | ⬜ PROGETTO SEPARATO (deciso 28/06) | a parte |
