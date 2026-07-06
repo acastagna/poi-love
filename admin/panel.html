@@ -714,6 +714,11 @@ html[data-theme="light"] .chip.green{color:#236b39}
     <!-- 8) ROTTE STORICHE -->
     <section class="section" id="sec-routes">
       <div class="panel" style="margin-bottom:16px">
+        <div class="card-h"><span class="ic"><i class="ph-duotone ph-map-trifold"></i></span><span data-t="rsug_title">Segnalazioni dalla community</span></div>
+        <div class="sm" style="margin-bottom:10px" data-t="rsug_help">Rotte proposte dagli utenti. Valuta, poi "Crea rotta" (nasce bozza col credito al segnalatore già attaccato): rifinisci descrizione, immagine e tappe, e pubblica. Il segnalatore riceverà il ringraziamento pubblico.</div>
+        <div id="routeSuggTable"></div>
+      </div>
+      <div class="panel" style="margin-bottom:16px">
         <div class="card-h"><span class="ic"><i class="ph-duotone ph-path"></i></span><span data-t="rt_new">Nuova rotta storica</span></div>
         <div class="row2">
           <div class="field"><label data-t="f_trip_name">Nome percorso</label><input id="rtName" placeholder="Es. Tirana Storica"></div>
@@ -941,6 +946,8 @@ const T = {
     chat_ph:'Scrivi al copilota…',
     chat_stale:'Risposta scartata: nel frattempo hai cambiato chat',
     rls_no_rows:'Nessuna modifica: permessi mancanti sul database (migrazione 015 non applicata?)',own_req_title:'Richieste di proprietà POI',own_req_empty:'Nessuna richiesta di proprietà in attesa',own_req_from:'Chiede',own_req_cede:'Cede',own_req_embed:'Copia codice embed',own_req_embed_copied:'Codice embed copiato',a_approve_transfer:'Approva e trasferisci',own_req_confirm:'Approvare? Il POI passerà al richiedente.',own_req_approved:'Proprietà trasferita',own_req_rejected:'Richiesta rifiutata',nav_routes:'Rotte Storiche',sub_routes:'Crea, pubblica e gestisci le rotte storiche ufficiali.',rt_new:'Nuova rotta storica',rt_create:'Crea rotta (bozza)',rt_list:'Rotte storiche',rt_empty:'Nessuna rotta storica',rt_empty_h:'Creane una qui sopra o falla proporre al copilota.',rt_published:'Pubblicata',rt_publish:'Pubblica',rt_unpublish:'Nascondi',rt_stops_btn:'Tappe',rt_confirm_del:'Eliminare questa rotta e tutte le sue tappe?',
+    rsug_title:'Segnalazioni dalla community', rsug_help:'Rotte proposte dagli utenti. Valuta, poi "Crea rotta" (nasce bozza col credito al segnalatore già attaccato): rifinisci descrizione, immagine e tappe, e pubblica. Il segnalatore riceverà il ringraziamento pubblico.', rsug_empty:'Nessuna segnalazione in attesa', rsug_by:'da', rsug_anon:'un membro', rsug_create:'Crea rotta', rsug_dismiss:'Scarta', rsug_created:'Rotta bozza creata col credito. Rifiniscila e pubblicala.', rsug_dismiss_confirm:'Scartare questa segnalazione?',
+    f_route_desc:'Descrizione', f_route_desc_ph:'Descrizione attinente che vedranno gli utenti', f_route_cover:'Immagine di copertina (URL https)', f_route_cover_err:'L\'immagine deve essere un URL https',
     f_coords:'Coordinate', f_address:'Indirizzo', f_city:'Città'
   },
   sq:{
@@ -1034,6 +1041,8 @@ const T = {
     chat_ph:'Shkruaji kopilotit…',
     chat_stale:'Përgjigjja u hodh poshtë: ndërkohë ke ndërruar bisedë',
     rls_no_rows:'Asnjë ndryshim: mungojnë lejet në databazë (migrimi 015 i paaplikuar?)',own_req_title:'Kërkesa pronësie POI',own_req_empty:'Asnjë kërkesë pronësie në pritje',own_req_from:'Kërkon',own_req_cede:'Cedon',own_req_embed:'Kopjo kodin embed',own_req_embed_copied:'Kodi embed u kopjua',a_approve_transfer:'Mirato dhe transfero',own_req_confirm:'Të miratohet? POI do t\'i kalojë kërkuesit.',own_req_approved:'Pronësia u transferua',own_req_rejected:'Kërkesa u refuzua',nav_routes:'Rrugët Historike',sub_routes:'Krijo, boto dhe menaxho rrugët historike zyrtare.',rt_new:'Rrugë e re historike',rt_create:'Krijo rrugën (draft)',rt_list:'Rrugët historike',rt_empty:'Asnjë rrugë historike',rt_empty_h:'Krijo një këtu sipër ose lëre kopilotin ta propozojë.',rt_published:'E botuar',rt_publish:'Boto',rt_unpublish:'Fshih',rt_stops_btn:'Ndalesat',rt_confirm_del:'Të fshihet kjo rrugë me të gjitha ndalesat?',
+    rsug_title:'Sugjerime nga komuniteti', rsug_help:'Rrugë të propozuara nga përdoruesit. Vlerëso, pastaj "Krijo rrugën" (lind draft me kreditin e sugjeruesit të bashkangjitur): rifino përshkrimin, imazhin dhe ndalesat, dhe boto. Sugjeruesi do të marrë falënderimin publik.', rsug_empty:'Asnjë sugjerim në pritje', rsug_by:'nga', rsug_anon:'një anëtar', rsug_create:'Krijo rrugën', rsug_dismiss:'Hidhe', rsug_created:'Rruga draft u krijua me kreditin. Rifinoje dhe botoje.', rsug_dismiss_confirm:'Ta hedhësh këtë sugjerim?',
+    f_route_desc:'Përshkrimi', f_route_desc_ph:'Përshkrim i përshtatshëm që do shohin përdoruesit', f_route_cover:'Imazhi i kopertinës (URL https)', f_route_cover_err:'Imazhi duhet të jetë një URL https',
     f_coords:'Koordinatat', f_address:'Adresa', f_city:'Qyteti'
   },
   en:{
@@ -1127,6 +1136,8 @@ const T = {
     chat_ph:'Write to the copilot…',
     chat_stale:'Reply discarded: you switched chat in the meantime',
     rls_no_rows:'No changes: missing database permissions (migration 015 not applied?)',own_req_title:'POI ownership requests',own_req_empty:'No pending ownership requests',own_req_from:'Requesting',own_req_cede:'Ceding',own_req_embed:'Copy embed code',own_req_embed_copied:'Embed code copied',a_approve_transfer:'Approve and transfer',own_req_confirm:'Approve? The POI will pass to the requester.',own_req_approved:'Ownership transferred',own_req_rejected:'Request rejected',nav_routes:'Historic Routes',sub_routes:'Create, publish and manage official historic routes.',rt_new:'New historic route',rt_create:'Create route (draft)',rt_list:'Historic routes',rt_empty:'No historic routes',rt_empty_h:'Create one above or have the copilot propose it.',rt_published:'Published',rt_publish:'Publish',rt_unpublish:'Hide',rt_stops_btn:'Stops',rt_confirm_del:'Delete this route and all its stops?',
+    rsug_title:'Community suggestions', rsug_help:'Routes proposed by users. Review, then "Create route" (a draft is born with the suggester credit already attached): refine description, image and stops, then publish. The suggester gets a public thank-you.', rsug_empty:'No pending suggestions', rsug_by:'by', rsug_anon:'a member', rsug_create:'Create route', rsug_dismiss:'Dismiss', rsug_created:'Draft route created with the credit. Refine and publish it.', rsug_dismiss_confirm:'Dismiss this suggestion?',
+    f_route_desc:'Description', f_route_desc_ph:'A fitting description users will see', f_route_cover:'Cover image (https URL)', f_route_cover_err:'The image must be an https URL',
     f_coords:'Coordinates', f_address:'Address', f_city:'City'
   }
 };
@@ -2726,6 +2737,50 @@ async function deletePoi(id, title){
 /* ═════════════════════════ 8) ROTTE STORICHE ═════════════════════════
    Crea (bozza), pubblica/nascondi, rinomina, gestisci tappe, elimina.
    Le policy admin (mig 021) coprono tutte le rotte, non solo le proprie. */
+
+// Segnalazioni di rotte dagli utenti: valuta, crea (con credito) o scarta.
+async function loadRouteSuggestions(){
+  const box=document.getElementById('routeSuggTable'); if(!box) return; loadingBox(box);
+  try{
+    const { data, error } = await sb.from('route_suggestions')
+      .select('id,name,description,area,created_at,user_id,suggester:profiles!route_suggestions_user_id_fkey(username,display_name)')
+      .eq('status','pending').order('created_at',{ascending:false}).limit(100);
+    if(error){ isBackendMissing(error)?backendOff(box):emptyBox(box,t('error'),null,'warning'); return; }
+    if(!data||!data.length){ emptyBox(box,t('rsug_empty'),null,'map-trifold'); return; }
+    box.textContent='';
+    data.forEach(s=>{
+      const who=(s.suggester&&(s.suggester.display_name||s.suggester.username))||t('rsug_anon');
+      const head=el('div',{style:'display:flex;align-items:center;gap:8px;flex-wrap:wrap'},[
+        el('span',{class:'ttl',style:'flex:1;min-width:120px',text:s.name}),
+        s.area?el('span',{class:'chip dim',text:s.area}):null,
+        el('span',{class:'sm',text:t('rsug_by')+' '+who})
+      ]);
+      const desc = s.description ? el('div',{class:'sm',style:'opacity:.85;margin:5px 0',text:s.description}) : null;
+      const acts=el('div',{class:'btn-row',style:'margin-top:6px'},[
+        el('button',{class:'btn sm gold',text:t('rsug_create'),onclick:()=>createRouteFromSuggestion(s.id)}),
+        el('button',{class:'btn sm',text:t('rsug_dismiss'),onclick:()=>dismissRouteSuggestion(s.id)})
+      ]);
+      box.appendChild(el('div',{style:'padding:10px 0;border-bottom:1px solid rgba(128,128,128,.15)'},[head,desc,acts]));
+    });
+  }catch(e){ emptyBox(box,t('error'),null,'warning'); }
+}
+async function createRouteFromSuggestion(id){
+  try{
+    const { data, error } = await sb.rpc('admin_route_from_suggestion',{ p_suggestion_id:id });
+    if(error){ toast(error.message||t('error'),'err'); return; }
+    toast(t('rsug_created'),'ok','check');
+    loadRouteSuggestions(); loadRoutesAdmin();
+  }catch(e){ toast(t('error'),'err'); }
+}
+async function dismissRouteSuggestion(id){
+  if(!confirm(t('rsug_dismiss_confirm'))) return;
+  try{
+    const { data, error } = await sb.rpc('admin_dismiss_route_suggestion',{ p_suggestion_id:id });
+    if(error){ toast(error.message||t('error'),'err'); return; }
+    toast(t('saved'),'ok'); loadRouteSuggestions();
+  }catch(e){ toast(t('error'),'err'); }
+}
+
 async function createHistoricRoute(){
   const name=(document.getElementById('rtName').value||'').trim();
   const badge=(document.getElementById('rtBadge').value||'').trim();
@@ -2742,21 +2797,25 @@ async function createHistoricRoute(){
   }catch(e){ toast(t('error'),'err'); }
 }
 async function loadRoutesAdmin(){
+  loadRouteSuggestions();
   const box=document.getElementById('routesTable'); loadingBox(box);
   try{
     const { data, error } = await sb.from('trips')
-      .select('id,name,badge,is_published,created_at,trip_stops(id,name,lat,lng,sort_order)')
+      .select('id,name,badge,description,cover_url,is_published,created_at,suggested_by,suggester:profiles!trips_suggested_by_fkey(username,display_name),trip_stops(id,name,lat,lng,sort_order)')
       .eq('is_historic',true).order('created_at',{ascending:false}).limit(100);
     if(error){ isBackendMissing(error)?backendOff(box):emptyBox(box,t('error'),null,'warning'); return; }
     if(!data||!data.length){ emptyBox(box,t('rt_empty'),t('rt_empty_h'),'path'); return; }
     box.textContent='';
     data.forEach(r=>{
       const stops=(r.trip_stops||[]).sort((a,b)=>(a.sort_order||0)-(b.sort_order||0));
+      const who=r.suggested_by&&r.suggester?(r.suggester.display_name||r.suggester.username||''):'';
       const head=el('div',{style:'display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px'},[
         el('span',{class:'ttl',text:r.name}),
         r.badge?el('span',{class:'chip dim',text:r.badge}):null,
+        r.cover_url?el('span',{class:'chip dim',text:'🖼'}):null,
         el('span',{class:'chip '+(r.is_published?'green':'gold'),text:r.is_published?t('rt_published'):t('st_draft')}),
-        el('span',{class:'sm',text:stops.length+' '+t('f_stops')})
+        el('span',{class:'sm',text:stops.length+' '+t('f_stops')}),
+        who?el('span',{class:'chip dim',text:'🙏 '+who}):null
       ]);
       const stopsBox=el('div',{style:'display:none;margin:6px 0 10px'});
       stops.forEach(st=>{
@@ -2799,10 +2858,18 @@ async function loadRoutesAdmin(){
           const body=el('div');
           body.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_trip_name')}), f.name=el('input',{value:r.name}) ]));
           body.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_badge')}), f.badge=el('input',{value:r.badge||''}) ]));
+          body.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_route_desc')}), f.description=el('textarea',{rows:'4',placeholder:t('f_route_desc_ph')}, r.description||'') ]));
+          body.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_route_cover')}), f.cover=el('input',{value:r.cover_url||'',placeholder:'https://…'}) ]));
+          if(r.cover_url){ const pv=el('img',{src:r.cover_url,style:'width:100%;max-height:120px;object-fit:cover;border-radius:10px;margin-top:6px'}); body.appendChild(pv); }
           openModal(t('a_edit'),'path',body,async()=>{
             const nm=(f.name.value||'').trim(); if(!nm){ toast(t('fill_required'),'err'); return false; }
-            const { data:d5, error:e5 } = await sb.from('trips').update({ name:nm.slice(0,120), badge:(f.badge.value||'').trim()||null }).eq('id',r.id).select('id');
-            if(e5||!d5||!d5.length){ toast(t('rls_no_rows'),'err'); return false; }
+            let cover=(f.cover.value||'').trim();
+            if(cover && !/^https:\/\//i.test(cover)){ toast(t('f_route_cover_err'),'err'); return false; }
+            const { data:d5, error:e5 } = await sb.from('trips').update({
+              name:nm.slice(0,120), badge:(f.badge.value||'').trim()||null,
+              description:(f.description.value||'').trim().slice(0,1500)||null, cover_url:cover||null
+            }).eq('id',r.id).select('id');
+            if(e5||!d5||!d5.length){ toast((e5&&e5.message)||t('rls_no_rows'),'err'); return false; }
             toast(t('saved'),'ok'); loadRoutesAdmin(); return true;
           });
         }}),
