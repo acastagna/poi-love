@@ -1680,6 +1680,8 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 .route-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px}
 .route-name{font-size:13px;font-weight:700;color:var(--text)}
 .route-meta{font-size:10px;color:var(--muted);margin-top:1px}
+.poi-official .poi-bubble{box-shadow:0 0 0 2.5px #FFD34D,0 3px 10px rgba(0,0,0,.35)}
+.poi-official-seal{position:absolute;top:-6px;right:-6px;font-size:15px;color:#FFD34D;filter:drop-shadow(0 1px 1px rgba(0,0,0,.5));pointer-events:none}
 .route-badge-official{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:800;color:var(--blue);background:#EBF2FC;padding:5px 10px;border-radius:8px;white-space:nowrap;flex-shrink:0}
 .route-badge-official i{font-size:13px}
 </style>
@@ -3752,7 +3754,7 @@ async function loadPOIsFromDB() {
   // NB: la colonna nel DB è 'title' (non 'name') → alias inline title→name
   const { data, error } = await sb
     .from('pois')
-    .select('id,name:title,description,lat,lng,category,subcategory,tags,love_count,photos,author_id,profiles(username,avatar_url)')
+    .select('id,name:title,description,lat,lng,category,subcategory,tags,visibility,love_count,photos,author_id,profiles(username,avatar_url)')
     .order('love_count', { ascending: false })
     .limit(200);
   if (error) { console.warn('loadPOIs:', error.message); return; }
@@ -3782,9 +3784,10 @@ function addDBMarker(p) {
   // ontouchend → mobile: fires immediately, preventDefault() blocca ghost click
   // onclick     → desktop: mouse click standard
   // bubblingMouseEvents:false → il click sul marker non propaga alla mappa
+  const _official = p.visibility==='official';
   const icon = L.divIcon({
     className: '',
-    html: `<div class="poi-marker" ontouchend="window._openPoiById('${safeId}');event.stopPropagation();event.preventDefault()" onclick="window._openPoiById('${safeId}');event.stopPropagation()"><div class="poi-bubble"><i class="ph-duotone ph-map-pin" style="font-size:15px;color:#fff;pointer-events:none"></i><div class="poi-badge">${p.love_count || 0}</div></div><div class="poi-tail"></div><div class="poi-label">${label.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div></div>`,
+    html: `<div class="poi-marker${_official?' poi-official':''}" ontouchend="window._openPoiById('${safeId}');event.stopPropagation();event.preventDefault()" onclick="window._openPoiById('${safeId}');event.stopPropagation()"><div class="poi-bubble">${_official?'<i class="ph-fill ph-seal-check poi-official-seal"></i>':''}<i class="ph-duotone ph-map-pin" style="font-size:15px;color:#fff;pointer-events:none"></i><div class="poi-badge">${p.love_count || 0}</div></div><div class="poi-tail"></div><div class="poi-label">${label.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div></div>`,
     iconSize: [46, 68], iconAnchor: [23, 68]
   });
   if(!window._dbMarkers) window._dbMarkers = {};
@@ -3803,7 +3806,10 @@ function openDBDetail(p) {
   const cat = p.category || 'Luogo';
   const tag = document.getElementById('detailTag');
   tag.className = 'pdm-hero-tag';
-  tag.innerHTML = `<i class="ph-duotone ph-tag"></i> ${cat}`;
+  const _subLbl = (p.subcategory && typeof catLabelByKey==='function') ? catLabelByKey(p.subcategory) : '';
+  const _catTxt = String(_subLbl || cat).replace(/</g,'&lt;');
+  tag.innerHTML = `<i class="ph-duotone ph-tag"></i> ${_catTxt}` +
+    (p.visibility==='official' ? ` <i class="ph-fill ph-seal-check" title="${t('route_official','Ufficiale')}" style="color:#FFD34D;margin-left:4px"></i>` : '');
   // Hero: titolo grande (renderer dedicato: mantiene la matita del proprietario)
   const _dn=document.getElementById('detailName');
   if(_dn.childNodes.length&&_dn.childNodes[0].nodeType===3){ _dn.childNodes[0].nodeValue=p.name||p.title||'—'; }
@@ -4515,6 +4521,23 @@ const SPECIAL_TIERS={
       {i:'ph-push-pin',     k:'tier_mec_p3', t:'Un tuo itinerario nella sezione In Evidenza'},
       {i:'ph-map-pin-line', k:'tier_mec_p4', t:'5 dei tuoi POI in evidenza sulla mappa'},
       {i:'ph-users-three',  k:'tier_mec_p5', t:'Amministratore di una compagnia in evidenza'}
+    ]},
+  professionista_plus:{labelKey:'tier_professionista_plus', label:'Professionista Plus', icon:'ph-fill ph-briefcase', style:'background:linear-gradient(135deg,#0f766e 0%,#052e2b 52%,#14b8a6 100%);color:#ccfbf1;border-color:rgba(94,234,212,.6);box-shadow:0 3px 14px rgba(20,184,166,.5),inset 0 1px 0 rgba(255,255,255,.3)',
+    pitchKey:'tier_proplus_pitch', pitch:'Tutto del Professionista, con priorita e strumenti avanzati.',
+    ctaKey:'tier_proplus_cta', cta:'Passa a Professionista Plus',
+    perks:[
+      {i:'ph-infinity',      k:'tier_proplus_p1', t:'ILLI•AI senza limiti con priorita'},
+      {i:'ph-map-pin-line',  k:'tier_proplus_p2', t:'Piu POI in evidenza sulla mappa'},
+      {i:'ph-qr-code',       k:'tier_proplus_p3', t:'Piu QR business per le tue attivita'},
+      {i:'ph-chart-line-up', k:'tier_proplus_p4', t:'Statistiche avanzate dei tuoi luoghi'}
+    ]},
+  influencer:{labelKey:'tier_influencer', label:'Influencer', icon:'ph-fill ph-megaphone', style:'background:linear-gradient(135deg,#be185d 0%,#2a0a1a 52%,#ec4899 100%);color:#fce7f3;border-color:rgba(249,168,212,.65);box-shadow:0 3px 14px rgba(236,72,153,.5),inset 0 1px 0 rgba(255,255,255,.35)',
+    pitchKey:'tier_infl_pitch', pitch:'Per chi porta la community: visibilita e punti moltiplicati.',
+    ctaKey:'tier_infl_cta', cta:'Diventa Influencer',
+    perks:[
+      {i:'ph-chart-line-up', k:'tier_infl_p1', t:'Punti raddoppiati su ogni azione'},
+      {i:'ph-seal-check',    k:'tier_infl_p2', t:'Spunta e profilo in evidenza'},
+      {i:'ph-users-three',   k:'tier_infl_p3', t:'I tuoi itinerari consigliati alla community'}
     ]}
 };
 function getBadge(n){return BADGES.find(b=>n>=b.min&&n<=b.max)||BADGES[0]}
@@ -4715,7 +4738,7 @@ const T={
     foll_modal_title:'Follower',foll_modal_sub:'Visibile a chi ti segue',
     /* Tier / Livelli */
     tier_lvl_amatore:'Amatore',tier_lvl_viaggiatore:'Viaggiatore',tier_lvl_giramondo:'Giramondo',tier_lvl_instancabile:'Instancabile',tier_lvl_leggenda:'Leggenda',
-    tier_professionista:'Professionista',tier_sostenitore:'Sostenitore',tier_mecenate:'Mecenate',
+    tier_professionista:'Professionista',tier_professionista_plus:'Professionista Plus',tier_influencer:'Influencer',tier_sostenitore:'Sostenitore',tier_mecenate:'Mecenate',
     tier_pro_pitch:'Per chi vive POI•LOVE da professionista: gli strumenti al massimo.',
     tier_pro_cta:'Passa a Professionista',
     tier_pro_p1:'ILLI•AI senza limiti, ogni giorno',tier_pro_p2:'Profilo influencer: punti raddoppiati',tier_pro_p3:'Adotta una rotta culturale con la tua dedica',tier_pro_p4:'Un QR business incluso per la tua attivita',tier_pro_p5:'Inviti agli eventi POI•LOVE dal vivo',tier_pro_p6:'La tua voce sulla roadmap del progetto',
@@ -4815,7 +4838,7 @@ const T={
     foll_modal_title:'Ndjekës',foll_modal_sub:'I dukshëm për ata që të ndjekin',
     /* Tier / Livelli */
     tier_lvl_amatore:'Amator',tier_lvl_viaggiatore:'Udhëtar',tier_lvl_giramondo:'Endacak',tier_lvl_instancabile:'I palodhur',tier_lvl_leggenda:'Legjendë',
-    tier_professionista:'Profesionist',tier_sostenitore:'Mbështetës',tier_mecenate:'Mecen',
+    tier_professionista:'Profesionist',tier_professionista_plus:'Profesionist Plus',tier_influencer:'Influencer',tier_sostenitore:'Mbështetës',tier_mecenate:'Mecen',
     tier_pro_pitch:'Për ata që e jetojnë POI•LOVE si profesionistë: mjetet në maksimum.',
     tier_pro_cta:'Kalo te Profesionisti',
     tier_pro_p1:'ILLI•AI pa kufij, çdo ditë',tier_pro_p2:'Profil influencer: pikë të dyfishuara',tier_pro_p3:'Birëso një rrugë kulturore me dedikimin tënd',tier_pro_p4:'Një QR biznesi i përfshirë për aktivitetin tënd',tier_pro_p5:'Ftesa në eventet POI•LOVE drejtpërdrejt',tier_pro_p6:'Zëri yt në planin e projektit',
@@ -4915,7 +4938,7 @@ const T={
     foll_modal_title:'Followers',foll_modal_sub:'Visible to those who follow you',
     /* Tier / Levels */
     tier_lvl_amatore:'Amateur',tier_lvl_viaggiatore:'Traveler',tier_lvl_giramondo:'Globetrotter',tier_lvl_instancabile:'Tireless',tier_lvl_leggenda:'Legend',
-    tier_professionista:'Professional',tier_sostenitore:'Supporter',tier_mecenate:'Patron',
+    tier_professionista:'Professional',tier_professionista_plus:'Professional Plus',tier_influencer:'Influencer',tier_sostenitore:'Supporter',tier_mecenate:'Patron',
     tier_pro_pitch:'For those who live POI•LOVE professionally: tools at their fullest.',
     tier_pro_cta:'Go Professional',
     tier_pro_p1:'Unlimited ILLI•AI, every day',tier_pro_p2:'Influencer profile: double points',tier_pro_p3:'Adopt a cultural route with your dedication',tier_pro_p4:'A business QR included for your activity',tier_pro_p5:'Invitations to live POI•LOVE events',tier_pro_p6:'Your voice on the project roadmap',
@@ -6038,7 +6061,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='2.26';
+const APP_VERSION='2.27';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 console.info('POI•LOVE v'+APP_VERSION);
 // Le rotte storiche pubblicate sono contenuto PUBBLICO: si caricano per tutti,
