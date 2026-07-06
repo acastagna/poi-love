@@ -141,6 +141,18 @@ function resolveEngine(configValue: unknown): Engine {
   return { provider, model };
 }
 
+// Modello effettivo: il motore (illi_engine) fissa provider + modello globale, ma il
+// campo "model" per-tier (ai_limits_per_tier) puo' ancora scegliere un modello DIVERSO
+// per un livello, purche' compatibile col provider attivo. Un valore non valido per il
+// provider (o vuoto) viene ignorato e si usa il modello del motore.
+function pickModel(engine: Engine, tierModel: string | null): string {
+  if (tierModel) {
+    if (engine.provider === "anthropic" && /^claude-[a-z0-9._-]+$/i.test(tierModel)) return tierModel;
+    if (engine.provider === "openai" && /^gpt-[a-z0-9._-]+$/i.test(tierModel)) return tierModel;
+  }
+  return engine.model;
+}
+
 // ── Handler ───────────────────────────────────────────────────────────────────
 Deno.serve(async (req: Request) => {
   // Rimborso quota: se il messaggio e' gia' stato contato ma il provider fallisce,
@@ -208,6 +220,8 @@ Deno.serve(async (req: Request) => {
     const tier = typeof rawTier === "string" && rawTier.trim() ? rawTier.trim() : "free";
     const limits = resolveTierLimits((configRes.data as { value?: unknown } | null)?.value, tier);
     const engine = resolveEngine((engineRes.data as { value?: unknown } | null)?.value);
+    // provider dal motore globale; modello = override per-tier se valido, altrimenti motore
+    const model = pickModel(engine, limits.model);
 
     // Chiave del provider effettivo: senza chiave inutile consumare quota utente.
     if (engine.provider === "openai" && !OPENAI_KEY) return json({ error: "no_key" }, 503);
@@ -241,7 +255,7 @@ Deno.serve(async (req: Request) => {
       const amsgs = messages
         .filter((m) => m.role !== "system")
         .map((m) => ({ role: m.role, content: m.content }));
-      if (!amsgs.length) return json({ error: "bad_request" }, 400);
+      if (!amsgs.length) { if (refundQuota) await refundQuota(); return json({ error: "bad_request" }, 400); }
 
       const r = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
@@ -251,7 +265,7 @@ Deno.serve(async (req: Request) => {
           "anthropic-version": "2023-06-01",
         },
         body: JSON.stringify({
-          model: engine.model,
+          model,
           max_tokens: maxTokens,
           temperature,
           ...(systemPrompt ? { system: systemPrompt } : {}),
@@ -280,14 +294,14 @@ Deno.serve(async (req: Request) => {
           prompt_tokens: ad?.usage?.input_tokens ?? null,
           completion_tokens: ad?.usage?.output_tokens ?? null,
         },
-        model: ad?.model ?? engine.model,
+        model: ad?.model ?? model,
         provider: "anthropic",
       }, 200);
     }
 
     // ── OpenAI (default) ──────────────────────────────────────────────────────
     const payload = {
-      model: engine.model,
+      model,
       messages,
       temperature,
       max_completion_tokens: maxTokens,
