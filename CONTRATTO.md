@@ -7,7 +7,7 @@ info@321.al · https://321.al
 # CONTRATTO DI LAVORO · POI•LOVE
 
 > **Questa è la traccia ufficiale del progetto.** Ogni passo che facciamo è definito qui: cosa, in quale settore, con quale stato e quale tempistica. Si aggiorna a OGNI giro di lavoro, insieme a SAL.md (il diario) e TODO.md (la lista operativa).
-> Versione app corrente: **2.32** (partenza ufficiale 2.00 il 04/07/2026). Lancio pubblico: **lunedì 17/08/2026, Tirana**.
+> Versione app corrente: **2.33** (partenza ufficiale 2.00 il 04/07/2026). Lancio pubblico: **lunedì 17/08/2026, Tirana**.
 
 ## Le regole del contratto (valgono per ogni passo)
 
@@ -110,7 +110,7 @@ info@321.al · https://321.al
 ### 7. Tier paganti e piattaforma (visione)
 | Passo | Stato | Quando |
 |---|---|---|
-| Vantaggi tier UNO A UNO: limiti ILLI, spunta verifica, punti x2, POI in evidenza, Muro dei Sostenitori tutti FATTI. Restano: adotta rotta, QR business, itinerario in evidenza Mecenate | 🔶 Restano 3 perk | prima del lancio |
+| Vantaggi tier: limiti ILLI, spunta, punti x2, POI in evidenza, Muro Sostenitori, itinerario in evidenza (Mecenate) FATTI. Restano: adotta rotta (colonne DB pronte), QR business | 🔶 Restano 2 perk | prima del lancio |
 | Tier Professionista Plus + livello Influencer (badge colore nuovo) | ✅ Fatto e live (v2.27) | 06/07 |
 | API pubblica / middleware per professionisti (tassisti, runner, Wolt, Patoko), import/export, webhook | ⬜ Visione studiata (memoria `poi_share_and_integrations`) | dopo il lancio |
 | POI•LOVE come sistema di consegna (delivery) | ⬜ Visione | dopo il lancio |
