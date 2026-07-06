@@ -6061,13 +6061,14 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='2.27';
+const APP_VERSION='2.28';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 console.info('POI•LOVE v'+APP_VERSION);
 // Le rotte storiche pubblicate sono contenuto PUBBLICO: si caricano per tutti,
 // loggati o no (piccolo ritardo per lasciar nascere mappa e client).
 setTimeout(()=>{ try{ loadHistoricRoutes(); }catch(e){} }, 900);
 setTimeout(()=>{ try{ loadPoiCategories(); }catch(e){} }, 700);
+setTimeout(()=>{ try{ loadIlliKnowledge(); }catch(e){} }, 750);
 // PRECARICA la lente: l'overlay viene reso invisibile ma presente per un attimo,
 // il magnifier si inizializza e scarica le prime tile. Alla prima apertura: istantanea.
 setTimeout(()=>{
@@ -9697,6 +9698,42 @@ function selectLocAddr(name,lat,lng){
   if(nameIn&&!nameIn.value.trim()){nameIn.value=name;checkSave();}
 }
 /* ══════════════════════════════════════════
+   ILLI KNOWLEDGE BASE — voci curate dall'admin (tabella illi_knowledge)
+   Quando la domanda contiene una parola chiave di una voce attiva, la voce
+   viene iniettata nel grounding come fatto vero (whitelist), cosi ILLI sa
+   cose che l'AI generica non conosce. Cache al boot, match lato client.
+══════════════════════════════════════════ */
+let _ILLI_KB=[];
+async function loadIlliKnowledge(){
+  if(!sb) return;
+  try{
+    const {data,error}=await sb.from('illi_knowledge')
+      .select('title,keywords,content,lang').eq('active',true).limit(500);
+    if(error||!data) return;
+    _ILLI_KB=data.map(v=>({
+      title:v.title||'', content:v.content||'', lang:v.lang||null,
+      keys:(Array.isArray(v.keywords)?v.keywords:[]).map(k=>_srchNorm(k)).filter(Boolean)
+    })).filter(v=>v.content && v.keys.length);
+  }catch(_){}
+}
+function _matchIlliKnowledge(text){
+  if(!_ILLI_KB.length) return null;
+  const q=_srchNorm(text); if(!q) return null;
+  const hits=[];
+  for(const v of _ILLI_KB){
+    if(v.lang && v.lang!==lang) continue;
+    // match se una parola chiave compare come parola/inizio-parola nella domanda
+    if(v.keys.some(k=>k && (q===k || q.includes(' '+k) || q.startsWith(k+' ') || q.includes(k)))){
+      hits.push(v);
+    }
+    if(hits.length>=3) break; // basta il piu rilevante, niente prompt gonfio
+  }
+  if(!hits.length) return null;
+  const body=hits.map(h=>'- '+h.title+': '+h.content).join('\n').slice(0,1600);
+  return {role:'system', content:'CONOSCENZE VERIFICATE POI•LOVE (usa questi fatti se pertinenti, non inventare oltre):\n'+body};
+}
+
+/* ══════════════════════════════════════════
    TASSONOMIA POI — L1 categoria data-driven (tabella poi_categories)
    Set ricco curato, trilingue, aggiornabile senza toccare il sorgente.
    Scelta SINGOLA (la categoria e OGGETTIVA: cos'e il posto).
@@ -12182,8 +12219,10 @@ async function sendPoiAIMsg(){
       groundingMsg={role:'system', content:_buildGroundingBlock(_g.cat, _g.places, _g.overpassDown, _askedLabel)};
     }
 
+    const kbMsg=_matchIlliKnowledge(text); // conoscenze curate dall'admin (se pertinenti)
     const messages=[
       {role:'system',content:_buildPoiAISystemPrompt()},
+      ...(kbMsg?[kbMsg]:[]),                    // knowledge base prima del grounding luoghi
       ...(groundingMsg?[groundingMsg]:[]),     // grounding subito dopo la personalita, vicino alla risposta
       // Verso l'edge SOLO {role, content}: il campo 'places' resta locale per la UI, mai inviato a OpenAI
       ...poiaiHistory.slice(-12).map(m=>({role:m.role,content:m.content}))

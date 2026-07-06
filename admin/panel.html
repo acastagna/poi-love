@@ -487,6 +487,9 @@ html[data-theme="light"] .chip.green{color:#236b39}
     <div class="nav-item" data-sec="categories" onclick="openSection('categories')">
       <span class="ic"><i class="ph-duotone ph-squares-four"></i></span><span class="label" data-t="nav_categories">Categorie</span>
     </div>
+    <div class="nav-item" data-sec="knowledge" onclick="openSection('knowledge')">
+      <span class="ic"><i class="ph-duotone ph-brain"></i></span><span class="label" data-t="nav_knowledge">Knowledge ILLI</span>
+    </div>
     <div class="nav-item" data-sec="audit" onclick="openSection('audit')">
       <span class="ic"><i class="ph-duotone ph-scroll"></i></span><span class="label" data-t="nav_audit">Audit log</span>
     </div>
@@ -741,6 +744,29 @@ html[data-theme="light"] .chip.green{color:#236b39}
       </div>
     </section>
 
+    <!-- 8d) KNOWLEDGE ILLI -->
+    <section class="section" id="sec-knowledge">
+      <div class="panel" style="margin-bottom:16px">
+        <div class="card-h"><span class="ic"><i class="ph-duotone ph-brain"></i></span><span data-t="kb_new_title">Nuova conoscenza / modifica</span></div>
+        <div class="sm" style="margin-bottom:10px" data-t="kb_help">Voci che ILLI usa quando la domanda contiene una delle parole chiave. Solo fatti veri: diventano whitelist per l'AI.</div>
+        <input type="hidden" id="kbId">
+        <div class="field"><label data-t="kb_title">Titolo</label><input id="kbTitle" placeholder="Es. Bunk'Art 2" autocomplete="off"></div>
+        <div class="field"><label data-t="kb_keywords">Parole chiave (separate da virgola)</label><input id="kbKeywords" placeholder="bunkart, bunker, museo comunismo" autocomplete="off"></div>
+        <div class="field"><label data-t="kb_content">Contenuto (fatti veri)</label><textarea id="kbContent" rows="4" placeholder="Museo nel bunker antiatomico sotto il Ministero degli Interni, a Tirana. Racconta la storia del regime. Ingresso a pagamento."></textarea></div>
+        <div class="row2">
+          <div class="field"><label data-t="kb_lang">Lingua</label><select id="kbLang">
+            <option value="" data-t="kb_lang_all">Tutte</option><option value="it">it</option><option value="sq">sq</option><option value="en">en</option>
+          </select></div>
+          <div class="field"><label data-t="kb_active">Attiva</label><select id="kbActive"><option value="1" data-t="kb_yes">Sì</option><option value="0" data-t="kb_no">No</option></select></div>
+        </div>
+        <div class="btn-row"><button class="btn gold" onclick="saveKnowledge()" data-t="kb_save">Salva conoscenza</button><button class="btn" onclick="resetKnowledgeForm()" data-t="kb_clear">Pulisci</button></div>
+      </div>
+      <div class="panel">
+        <div class="card-h"><span class="ic"><i class="ph-duotone ph-list-bullets"></i></span><span data-t="kb_list_title">Conoscenze salvate</span></div>
+        <div id="kbTable"></div>
+      </div>
+    </section>
+
     <!-- 9) AUDIT LOG -->
     <section class="section" id="sec-audit">
       <div class="panel">
@@ -802,6 +828,11 @@ const T = {
     cat_macro:'Macro (enum)', cat_icon:'Icona Phosphor', cat_color:'Colore', cat_sort:'Ordine', cat_save:'Salva categoria',
     cat_list_title:'Categorie attive e spente', cat_on:'Attiva', cat_off:'Spenta', cat_edit:'Modifica',
     cat_saved:'Categoria salvata', cat_key_req:'Key, macro e le 3 etichette sono obbligatorie',
+    nav_knowledge:'Knowledge ILLI', sub_knowledge:'Conoscenze curate che ILLI usa come fatti veri.',
+    kb_new_title:'Nuova conoscenza / modifica', kb_help:'Voci che ILLI usa quando la domanda contiene una delle parole chiave. Solo fatti veri: diventano whitelist per l\'AI.',
+    kb_title:'Titolo', kb_keywords:'Parole chiave (separate da virgola)', kb_content:'Contenuto (fatti veri)', kb_lang:'Lingua', kb_lang_all:'Tutte',
+    kb_active:'Attiva', kb_yes:'Sì', kb_no:'No', kb_save:'Salva conoscenza', kb_clear:'Pulisci', kb_list_title:'Conoscenze salvate',
+    kb_empty:'Nessuna conoscenza ancora', kb_req:'Titolo, almeno una parola chiave e il contenuto sono obbligatori', kb_saved:'Conoscenza salvata',
     // stati
     st_open:'Aperta', st_reviewing:'In revisione', st_resolved:'Risolta', st_dismissed:'Respinta',
     st_active:'Attivo', st_suspended:'Sospeso', st_banned:'Bannato',
@@ -881,6 +912,11 @@ const T = {
     cat_macro:'Makro (enum)', cat_icon:'Ikona Phosphor', cat_color:'Ngjyra', cat_sort:'Renditja', cat_save:'Ruaj kategorinë',
     cat_list_title:'Kategoritë aktive dhe të fikura', cat_on:'Aktive', cat_off:'E fikur', cat_edit:'Ndrysho',
     cat_saved:'Kategoria u ruajt', cat_key_req:'Key, makro dhe 3 etiketat janë të detyrueshme',
+    nav_knowledge:'Knowledge ILLI', sub_knowledge:'Njohuri të kuruara që ILLI i përdor si fakte të vërteta.',
+    kb_new_title:'Njohuri e re / ndrysho', kb_help:'Zëra që ILLI përdor kur pyetja përmban një nga fjalët kyçe. Vetëm fakte të vërteta.',
+    kb_title:'Titulli', kb_keywords:'Fjalë kyçe (ndara me presje)', kb_content:'Përmbajtja (fakte të vërteta)', kb_lang:'Gjuha', kb_lang_all:'Të gjitha',
+    kb_active:'Aktive', kb_yes:'Po', kb_no:'Jo', kb_save:'Ruaj njohurinë', kb_clear:'Pastro', kb_list_title:'Njohuritë e ruajtura',
+    kb_empty:'Asnjë njohuri ende', kb_req:'Titulli, të paktën një fjalë kyçe dhe përmbajtja janë të detyrueshme', kb_saved:'Njohuria u ruajt',
     st_open:'E hapur', st_reviewing:'Në rishikim', st_resolved:'E zgjidhur', st_dismissed:'E refuzuar',
     st_active:'Aktiv', st_suspended:'Pezulluar', st_banned:'Bllokuar',
     a_resolve:'Zgjidh', a_dismiss:'Refuzo', a_suspend:'Pezullo 7d', a_ban:'Blloko', a_reactivate:'Riaktivizo',
@@ -956,6 +992,11 @@ const T = {
     cat_macro:'Macro (enum)', cat_icon:'Phosphor icon', cat_color:'Color', cat_sort:'Sort', cat_save:'Save category',
     cat_list_title:'Active and disabled categories', cat_on:'Active', cat_off:'Off', cat_edit:'Edit',
     cat_saved:'Category saved', cat_key_req:'Key, macro and the 3 labels are required',
+    nav_knowledge:'ILLI Knowledge', sub_knowledge:'Curated knowledge ILLI uses as true facts.',
+    kb_new_title:'New knowledge / edit', kb_help:'Entries ILLI uses when the question contains one of the keywords. Facts only.',
+    kb_title:'Title', kb_keywords:'Keywords (comma separated)', kb_content:'Content (true facts)', kb_lang:'Language', kb_lang_all:'All',
+    kb_active:'Active', kb_yes:'Yes', kb_no:'No', kb_save:'Save knowledge', kb_clear:'Clear', kb_list_title:'Saved knowledge',
+    kb_empty:'No knowledge yet', kb_req:'Title, at least one keyword and content are required', kb_saved:'Knowledge saved',
     st_open:'Open', st_reviewing:'Reviewing', st_resolved:'Resolved', st_dismissed:'Dismissed',
     st_active:'Active', st_suspended:'Suspended', st_banned:'Banned',
     a_resolve:'Resolve', a_dismiss:'Dismiss', a_suspend:'Suspend 7d', a_ban:'Ban', a_reactivate:'Reactivate',
@@ -1183,9 +1224,9 @@ async function doLogout(){
 
 /* ─────────────────────────── Navigazione sezioni (lazy) ─────────────────────────── */
 const SUBKEY = { dashboard:'sub_dashboard', moderation:'sub_moderation', users:'sub_users',
-  ailimits:'sub_ailimits', copilot:'sub_copilot', create:'sub_create', pois:'sub_pois', routes:'sub_routes', audit:'sub_audit', categories:'sub_categories' };
+  ailimits:'sub_ailimits', copilot:'sub_copilot', create:'sub_create', pois:'sub_pois', routes:'sub_routes', audit:'sub_audit', categories:'sub_categories' , knowledge:'sub_knowledge' };
 const TITLEKEY = { dashboard:'nav_dashboard', moderation:'nav_moderation', users:'nav_users',
-  ailimits:'nav_ailimits', copilot:'nav_copilot', create:'nav_create', pois:'nav_pois', routes:'nav_routes', categories:'nav_categories', audit:'nav_audit' };
+  ailimits:'nav_ailimits', copilot:'nav_copilot', create:'nav_create', pois:'nav_pois', routes:'nav_routes', categories:'nav_categories', knowledge:'nav_knowledge', audit:'nav_audit' };
 
 function updateHeader(sec){
   document.getElementById('secTitle').textContent = t(TITLEKEY[sec]);
@@ -1212,6 +1253,7 @@ function runSection(sec){
     case 'pois': loadPois(); break;
     case 'routes': loadRoutesAdmin(); break;
     case 'categories': loadCategoriesAdmin(); break;
+    case 'knowledge': loadKnowledgeAdmin(); break;
     case 'audit': loadAudit(); break;
   }
 }
@@ -2158,6 +2200,68 @@ async function saveCategory(){
   if(error||!data||!data.length){ toast((error&&error.message)||t('error'),'err'); return; }
   toast(t('cat_saved'),'ok');
   loadCategoriesAdmin();
+}
+
+
+/* ═════════════════════════ 8d) KNOWLEDGE ILLI ═════════════════════════ */
+async function loadKnowledgeAdmin(){
+  const box=document.getElementById('kbTable'); loadingBox(box);
+  try{
+    const { data, error } = await sb.from('illi_knowledge')
+      .select('id,title,keywords,content,lang,active,updated_at').order('updated_at',{ascending:false}).limit(300);
+    if(error){ isBackendMissing(error)?backendOff(box):emptyBox(box,t('error'),null,'warning'); return; }
+    if(!data||!data.length){ emptyBox(box,t('kb_empty'),null,'brain'); return; }
+    box.textContent='';
+    data.forEach(k=>{
+      const kws=(Array.isArray(k.keywords)?k.keywords:[]).slice(0,8);
+      const chips=el('div',{style:'display:flex;gap:4px;flex-wrap:wrap;margin:3px 0'});
+      kws.forEach(w=>chips.appendChild(el('span',{class:'chip dim',text:w})));
+      box.appendChild(el('div',{style:'padding:9px 0;border-bottom:1px solid rgba(128,128,128,.15)'},[
+        el('div',{style:'display:flex;align-items:center;gap:8px;flex-wrap:wrap'},[
+          el('span',{class:'ttl',style:'flex:1;min-width:120px',text:k.title}),
+          el('span',{class:'chip '+(k.active?'green':'dim'),text:k.active?t('cat_on'):t('cat_off')}),
+          k.lang?el('span',{class:'chip dim',text:k.lang}):null,
+          el('button',{class:'btn sm',text:t('cat_edit'),onclick:()=>fillKnowledgeForm(k)}),
+          el('button',{class:'icon-btn',title:t('a_delete'),onclick:()=>deleteKnowledge(k.id)}, phIcon('trash'))
+        ]),
+        chips,
+        el('div',{class:'sm',style:'opacity:.8',text:String(k.content||'').slice(0,140)})
+      ]));
+    });
+  }catch(e){ emptyBox(box,t('error'),null,'warning'); }
+}
+function fillKnowledgeForm(k){
+  document.getElementById('kbId').value=k.id||'';
+  document.getElementById('kbTitle').value=k.title||'';
+  document.getElementById('kbKeywords').value=(Array.isArray(k.keywords)?k.keywords:[]).join(', ');
+  document.getElementById('kbContent').value=k.content||'';
+  document.getElementById('kbLang').value=k.lang||'';
+  document.getElementById('kbActive').value=k.active?'1':'0';
+  document.getElementById('kbTitle').scrollIntoView({behavior:'smooth',block:'center'});
+}
+function resetKnowledgeForm(){
+  ['kbId','kbTitle','kbKeywords','kbContent'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('kbLang').value=''; document.getElementById('kbActive').value='1';
+}
+async function saveKnowledge(){
+  const id=document.getElementById('kbId').value||null;
+  const title=(document.getElementById('kbTitle').value||'').trim();
+  const keywords=(document.getElementById('kbKeywords').value||'').split(',').map(x=>x.trim().toLowerCase()).filter(Boolean).slice(0,20);
+  const content=(document.getElementById('kbContent').value||'').trim();
+  const lang=document.getElementById('kbLang').value||null;
+  const active=document.getElementById('kbActive').value==='1';
+  if(!title||!keywords.length||!content){ toast(t('kb_req'),'err'); return; }
+  const row={ title:title.slice(0,120), keywords, content:content.slice(0,2000), lang, active, updated_at:new Date().toISOString() };
+  let res;
+  if(id) res=await sb.from('illi_knowledge').update(row).eq('id',id).select('id');
+  else   res=await sb.from('illi_knowledge').insert(row).select('id');
+  if(res.error||!res.data||!res.data.length){ toast((res.error&&res.error.message)||t('error'),'err'); return; }
+  toast(t('kb_saved'),'ok'); resetKnowledgeForm(); loadKnowledgeAdmin();
+}
+async function deleteKnowledge(id){
+  const { error } = await sb.from('illi_knowledge').delete().eq('id',id);
+  if(error){ toast(error.message||t('error'),'err'); return; }
+  toast(t('saved'),'ok'); loadKnowledgeAdmin();
 }
 
 async function loadAudit(){
