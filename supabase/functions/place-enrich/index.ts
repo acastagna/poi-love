@@ -81,19 +81,24 @@ Deno.serve(async (req: Request) => {
         } catch (_e) { /* cache giu */ }
       }
       try {
-        const url = `https://api.foursquare.com/v3/places/search?ll=${Number(lat)},${Number(lng)}&radius=${rad}&limit=20&sort=RATING`
+        // API Foursquare Places attuale (host places-api, header versione, Bearer, coordinate top-level).
+        const url = `https://places-api.foursquare.com/places/search?ll=${Number(lat)},${Number(lng)}&radius=${rad}&limit=20&sort=RATING`
           + (query ? `&query=${encodeURIComponent(query)}` : "")
-          + `&fields=name,geocodes,rating,stats,categories,location`;
+          + `&fields=name,latitude,longitude,rating,stats,categories`;
         const r = await fetch(url, {
-          headers: { "Authorization": FOURSQUARE_KEY, "Accept": "application/json" },
+          headers: {
+            "Authorization": `Bearer ${FOURSQUARE_KEY}`,
+            "X-Places-Api-Version": "2025-06-17",
+            "Accept": "application/json",
+          },
           signal: AbortSignal.timeout(7000),
         });
         if (!r.ok) return json({ found: false, places: [] }, 200);
         const fd = await r.json();
         const fplaces = (fd?.results || []).map((p: any) => ({
           name: p?.name || "",
-          lat: p?.geocodes?.main?.latitude ?? null,
-          lng: p?.geocodes?.main?.longitude ?? null,
+          lat: p?.latitude ?? null,
+          lng: p?.longitude ?? null,
           rating: (typeof p?.rating === "number") ? Math.round((p.rating / 2) * 10) / 10 : null, // 0-10 -> 0-5
           reviews: p?.stats?.total_ratings ?? null,
           type: (p?.categories?.[0]?.name) || "",
