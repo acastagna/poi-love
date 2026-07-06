@@ -27,7 +27,7 @@ info@321.al · https://321.al
 | Titolo intelligente del luogo (capisce aeroporto/mall/museo, non la via) | ✅ Fatto e live | 04-05/07 |
 | Titoli nella lingua dell'app (it/sq/en da OpenStreetMap) | ✅ Fatto e live | 05/07 |
 | Tendina rimossa dal campo nome (resta solo sull'indirizzo) | ✅ Fatto e live | 05/07 |
-| Descrizione AI dai dati reali, mai cancellare gli appunti | ✅ Fatto e live | 04/07 |
+| AI di compilazione RIMOSSA dal pannello POI (nome + descrizione) su richiesta founder 06/07: si scrive/detta a mano. La descrizione fact-based resta nel codice ma non e piu triggerata | ✅ Rimossa e live (v2.43) | 06/07 |
 | Mini-mappa del punto POI nello sheet (zoom con le dita) | ✅ Fatto e live | 05/07 |
 | Mini-mappa come strumento: mirino + "Fissa il punto" prende i riferimenti | ✅ Fatto e live | 05/07 |
 | Versione visibile anche nel footer nero della mappa | ✅ Fatto e live | 05/07 |
