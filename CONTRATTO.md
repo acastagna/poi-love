@@ -7,7 +7,7 @@ info@321.al · https://321.al
 # CONTRATTO DI LAVORO · POI•LOVE
 
 > **Questa è la traccia ufficiale del progetto.** Ogni passo che facciamo è definito qui: cosa, in quale settore, con quale stato e quale tempistica. Si aggiorna a OGNI giro di lavoro, insieme a SAL.md (il diario) e TODO.md (la lista operativa).
-> Versione app corrente: **2.31** (partenza ufficiale 2.00 il 04/07/2026). Lancio pubblico: **lunedì 17/08/2026, Tirana**.
+> Versione app corrente: **2.32** (partenza ufficiale 2.00 il 04/07/2026). Lancio pubblico: **lunedì 17/08/2026, Tirana**.
 
 ## Le regole del contratto (valgono per ogni passo)
 
@@ -89,7 +89,7 @@ info@321.al · https://321.al
 | Migrazioni 012-017 applicate (moderazione, copilota, chat, contatori, audit) | ✅ Fatto e verificato | 04/07 |
 | Chiave AI solo server-side, file pubblico ripulito | ✅ Fatto e verificato | 04/07 |
 | Collaudo automatico end-to-end (utente vero usa-e-getta) | ✅ Fatto | 04/07 |
-| verify_jwt esplicito per funzione (config.toml versionato) | ⬜ Da fare | prossimo giro |
+| Colonne POI sensibili blindate (solo via RPC), tier nuovi con limiti AI, referral corretto, place-enrich con gate auth (redeploy edge manuale) | 🔶 Backend blindato; deploy place-enrich manca | 06/07 |
 | Love count atomico: RPC toggle_love transazionale (mig 023), solo utenti loggati, contatore sempre esatto; bonus mig 024: love fuori dall audit (era rumore) e utenti eliminabili anche con audit | ✅ Fatto e live (v2.21) | 06/07 |
 | Review avversariale del giorno (24 agenti): 16 difetti confermati e TUTTI corretti, tra cui il bottone love vero non agganciato alla RPC (i love sui POI altrui non si salvavano), XSS negli attributi delle miniature liste, love dei bannati (mig 025 con is_active + search_path blindato), policy anti-bannati mancanti su poi_lists, selezione chip persa al refresh token, pending con scadenza 7gg | ✅ Fatto e live (v2.23) | 06/07 |
 | Cache Google Places su tabella (7-30 giorni, tiene bassi i costi) | ⬜ Da fare | prima del lancio |
