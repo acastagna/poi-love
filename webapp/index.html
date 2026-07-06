@@ -6414,7 +6414,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='2.50';
+const APP_VERSION='2.51';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 console.info('POI•LOVE v'+APP_VERSION);
 // Le rotte storiche pubblicate sono contenuto PUBBLICO: si caricano per tutti,
@@ -12630,50 +12630,38 @@ async function _fetchRealPlaces(text, catOverride, originOverride){
   const cat=catOverride||_detectPlaceQuery(text);
   if(!cat) return {cat:null, places:[], overpassDown:false};
   const lat=origin.lat, lng=origin.lng;
-  let merged=[], overpassDown=false;
-  const _radii = cat.wide ? [10,25,35] : [3,8,15];   // cucine etniche/rare: raggio largo (a Zugliano i messicani sono a 8-20 km, Schio/Vicenza/Rosa)
-  for(const rKm of _radii){
-    const osmRes=await searchRealPlaces(cat, lat, lng, rKm*1000);
-    overpassDown = osmRes.overpassDown;
-    const local=_localPoiPlaces(lat,lng,rKm,cat);
-    const seen=new Set(); merged=[];
-    for(const p of [...local, ...osmRes.places]){
-      const k=p.name.toLowerCase().trim();
-      if(seen.has(k)) continue; seen.add(k); merged.push(p);
+  const specific = cat.re && cat.label!=='ristorante';
+  const wideM = (cat.wide?45:22)*1000;
+  const osmRadKm = cat.wide?35:15;
+  // TUTTE le fonti IN PARALLELO: il tempo totale e quello della fonte piu lenta (~4s),
+  // non la somma (che sforava il timeout e lasciava ILLI a mani vuote). Ognuna fail-safe.
+  const [osmRes, gRaw, fqRaw, plRaw] = await Promise.all([
+    Promise.race([searchRealPlaces(cat, lat, lng, osmRadKm*1000), new Promise(r=>setTimeout(()=>r({places:[],overpassDown:false}),3000))]).catch(()=>({places:[],overpassDown:true})),
+    (specific
+      ? _googleDiscover(cat.label, lat, lng, cat.wide?3000:1800)
+      : _googleNearbyPlaces(cat, lat, lng, cat.wide?1500:1200)
+    ).catch(()=>[]),
+    _fsqPlaces(specific?cat.label:'', lat, lng, cat.wide?3000:1800).catch(()=>[]),
+    _poilovePlaces(cat, lat, lng, cat.wide?25:12).catch(()=>[])
+  ]);
+  const overpassDown = !!osmRes.overpassDown;
+  const local = _localPoiPlaces(lat,lng,osmRadKm,cat);
+  // le fonti "bias" (discover/foursquare) sulle cucine specifiche: filtra per distanza reale
+  const g  = specific ? (gRaw||[]).filter(p=>p.distM<=wideM) : (gRaw||[]);
+  const fq = specific ? (fqRaw||[]).filter(p=>p.distM<=wideM) : (fqRaw||[]);
+  // MERGE unico, dedup per nome. Ordine di preferenza: POI•LOVE (live+cache) -> Google -> Foursquare -> OSM.
+  let merged=[]; { const seen=new Set();
+    for(const p of [...(plRaw||[]), ...local, ...g, ...fq, ...(osmRes.places||[])]){
+      if(!p||!p.name) continue;
+      const k=p.name.toLowerCase().trim(); if(seen.has(k)) continue; seen.add(k); merged.push(p);
     }
-    if(overpassDown) break;   // OSM giu: inutile ritentare altri raggi, uso i POI locali + Google
-    if(merged.length>=6) break;
   }
-  // SCOPERTA GOOGLE: la copertura vera (come la lente). Fondamentale dove OSM e povero (Albania).
-  // Cucina SPECIFICA (sushi, kebab...) -> ricerca testuale mirata (discover), filtrata per distanza
-  // (searchText fa da bias, non da recinto: senza filtro "sushi vicino Valona" tirerebbe Tirana).
-  // Categoria generica (ristorante/mangiare) -> nearby.
-  let g=[];
-  if(cat.re && cat.label!=='ristorante'){
-    const maxM=(cat.wide?45:22)*1000;
-    g=(await _googleDiscover(cat.label, lat, lng, cat.wide?3000:1800)).filter(p=>p.distM<=maxM);
-    if(!g.length) g=await _googleNearbyPlaces(cat, lat, lng, cat.wide?1500:1200);
-  } else {
-    g=await _googleNearbyPlaces(cat, lat, lng, cat.wide?1500:1200);
+  // Cucina specifica senza NULLA dalle fonti mirate: ripiego una volta su Google nearby.
+  if(specific && !merged.length){
+    try{ const gn=await _googleNearbyPlaces(cat, lat, lng, cat.wide?1500:1200);
+      const seen=new Set(); for(const p of gn){ const k=p.name.toLowerCase().trim(); if(seen.has(k))continue; seen.add(k); merged.push(p); }
+    }catch(e){}
   }
-  { const seen=new Set(merged.map(p=>p.name.toLowerCase().trim()));
-    for(const p of g){ const k=p.name.toLowerCase().trim(); if(seen.has(k)) continue; seen.add(k); merged.push(p); } }
-  // FOURSQUARE: altra fonte con recensioni (fail-open, vuoto se la chiave non c'e). Cosi
-  // l'insieme non e "solo Google": chiunque lascia recensioni contribuisce.
-  try{
-    const specific=cat.re && cat.label!=='ristorante';
-    const fq=(await _fsqPlaces(specific?cat.label:'', lat, lng, cat.wide?3000:1800))
-      .filter(p=> specific ? p.distM<=(cat.wide?45:22)*1000 : true);
-    const seen=new Set(merged.map(p=>p.name.toLowerCase().trim()));
-    for(const p of fq){ const k=p.name.toLowerCase().trim(); if(seen.has(k)) continue; seen.add(k); merged.push(p); }
-  }catch(e){}
-  // POI•LOVE LIVE dal DB vicino all'origine (titolo/zona/categoria/tag): i luoghi della community
-  // entrano SEMPRE nell'insieme, ovunque cerchi l'utente, e hanno priorita (+100 in _qualityScore).
-  try{
-    const pl=await _poilovePlaces(cat, lat, lng, cat.wide?25:12);
-    const seen=new Set(merged.map(p=>p.name.toLowerCase().trim()));
-    for(const p of pl){ const k=p.name.toLowerCase().trim(); if(seen.has(k)) continue; seen.add(k); merged.push(p); }
-  }catch(e){}
   // Fallback: cucina specifica senza NULLA (ne OSM ne Google) -> ristoranti generici da Google,
   // cosi ILLI non resta a mani vuote e puo dire "niente sushi dedicato ma questi ristoranti vicini".
   let genericFallback=false;
@@ -12684,7 +12672,12 @@ async function _fetchRealPlaces(text, catOverride, originOverride){
   merged.sort((a,b)=>_qualityScore(b)-_qualityScore(a));   // qualita reale, non solo distanza
   // Arricchimento Google (voto, recensioni, prezzo, stato) sui migliori candidati; poi via i chiusi definitivi e riordino
   let top=merged.slice(0,8);
-  await Promise.all(top.map(p=>_enrichPlace(p, genericFallback?{label:'ristorante',re:null}:cat)));
+  // Arricchimento con TETTO di tempo: i posti da Google/Foursquare hanno gia il voto; se l'enrich
+  // (che aggiunge aperto/prezzo/descrizione) e lento, non blocca oltre 4.5s. Cosi ILLI resta veloce.
+  await Promise.race([
+    Promise.all(top.map(p=>_enrichPlace(p, genericFallback?{label:'ristorante',re:null}:cat))),
+    new Promise(r=>setTimeout(r,4500))
+  ]);
   top=top.filter(p=>!p.mismatch && p.businessStatus!=='CLOSED_PERMANENTLY');   // via i match sbagliati (gioielleria/via) e i chiusi definitivi
   top.sort((a,b)=>_qualityScore(b)-_qualityScore(a));
   return {cat, places:top, overpassDown, genericFallback};
@@ -12882,7 +12875,7 @@ async function sendPoiAIMsg(){
       if(_asked){ _origin={lat:_asked.lat,lng:_asked.lng}; _askedLabel=_asked.label; _lastAskedOrigin={lat:_asked.lat,lng:_asked.lng}; _lastAskedLabel=_asked.label; }
       else if(_looksLikeFollowUp(text) && _lastAskedOrigin){ _origin=_lastAskedOrigin; _askedLabel=_lastAskedLabel; }
       let _g={cat:_gCat, places:[], overpassDown:false};
-      try{ _g=await Promise.race([_fetchRealPlaces(text, _gCat, _origin), new Promise(r=>setTimeout(()=>r({cat:_gCat,places:[],overpassDown:true}),9000))]); }catch(e){}
+      try{ _g=await Promise.race([_fetchRealPlaces(text, _gCat, _origin), new Promise(r=>setTimeout(()=>r({cat:_gCat,places:[],overpassDown:true}),12000))]); }catch(e){}
       _lastGroundedPlaces=_g.places;
       groundingMsg={role:'system', content:_buildGroundingBlock(_g.cat, _g.places, _g.overpassDown, _askedLabel, _g.genericFallback)};
     }
