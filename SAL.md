@@ -3,7 +3,9 @@
 > **Prossima ripresa: teaser misterioso di condivisione POI (zona + immagine + invito a registrarsi), poi avanti col contratto. Collaudi manuali di Alessandro in attesa (checklist 04/07 + claim a pagamento + copilota foto).**
 > Checkpoint sessione: `57984f5`, tag `checkpoint-2026-07-04` (HEAD su origin/main). **Nessun lavoro non committato.**
 
-## Sessione 06/07/2026 — Ricerca avanzata, lente nera, teaser condivisione (v2.14 → v2.30)
+## Sessione 06/07/2026 — Ricerca avanzata, lente nera, teaser condivisione (v2.14 → v2.31)
+
+- **v2.31 filtri POI + compliance tappa**: chip filtro (categorie + tag) nella lista POI, tocco e vedo solo quelli, combinati con la ricerca. Tolta la tendina dal nome della tappa itinerario (regola tendine-solo-sull-indirizzo). Collaudo e2e ok. Live (v2.31).
 
 - **v2.30 Muro dei Sostenitori**: vetrina pubblica di chi ha un tier di sostegno, raggruppata per livello (Mecenate, Professionista Plus, Professionista, Influencer, Sostenitore) con le card nello stile del tier (avatar, nome, badge). Si apre dal popup livelli ("Vedi il Muro dei Sostenitori") con CTA "Unisciti a loro". Parte vuota finche non ci sono sostenitori; collaudato in browser assegnando 2 tier reali (Mecenate viola + Sostenitore blu, raggruppati giusti), poi tier rimessi a null. Live (v2.30).
 
