@@ -446,6 +446,11 @@ body.tab-active #mapQuickBtns{display:none}
 .poi-subtabs{display:flex;gap:4px;padding:8px;background:var(--card);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:5}
 .poi-subtab{flex:1;height:36px;border:none;background:transparent;border-radius:9px;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;font-family:inherit}
 .poi-subtab.active{background:var(--red);color:#fff}
+.poi-filter-chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:8px 10px 4px;background:var(--card)}
+.poi-filter-chips::-webkit-scrollbar{display:none}
+.pf-chip{flex-shrink:0;display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:999px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}
+.pf-chip.on{background:var(--red);color:#fff;border-color:var(--red)}
+.pf-chip i{font-size:12px}
 .poi-list-empty{text-align:center;padding:40px 20px;color:var(--muted);font-size:13px}
 .poi-search-wrap{position:relative;padding:10px 14px 4px;background:var(--card)}
 .poi-search{width:100%;border:1.5px solid var(--border);border-radius:12px;padding:9px 13px 9px 38px;font-size:13px;font-family:inherit;outline:none;color:var(--ink);background:var(--bg);box-sizing:border-box}
@@ -2655,6 +2660,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
     <button class="poi-subtab"        data-subtab="lists" onclick="setPoiSubtab('lists')"><i class="ph-duotone ph-list-bullets"></i> Liste</button>
   </div>
   <div class="poi-search-wrap"><i class="ph-duotone ph-magnifying-glass ps-ico"></i><input class="poi-search" id="poiSearchInput" type="text" placeholder="Cerca: nome, categoria, indirizzo, tag…" oninput="_poiSearch(this.value)"></div>
+  <div class="poi-filter-chips" id="poiFilterChips"></div>
   <div id="poi-list-area"></div>
 </div>
 
@@ -3014,14 +3020,9 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 
       <!-- Nome tappa + autocomplete Nominatim -->
       <div class="sec-lbl"><span data-t="stop_lbl_name">Nome della tappa</span><span class="req-badge">!</span></div>
-      <div class="autocomplete-wrap" style="margin-bottom:14px">
-        <input class="field-in" type="text" id="stopNameIn"
-          placeholder="es. Castello di Shkodër, Albania"
-          oninput="onStopNameInput(this.value)"
-          onfocus="onStopNameFocus()"
-          autocomplete="off" style="margin-bottom:0"/>
-        <div class="autocomplete-drop" id="stopAcDrop"></div>
-      </div>
+      <input class="field-in" type="text" id="stopNameIn"
+        placeholder="es. Castello di Shkodër"
+        autocomplete="off" style="margin-bottom:14px"/>
 
       <!-- Categoria -->
       <div class="sec-lbl" data-t="stop_lbl_cat">Categoria</div>
@@ -6171,7 +6172,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='2.30';
+const APP_VERSION='2.31';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 console.info('POI•LOVE v'+APP_VERSION);
 // Le rotte storiche pubblicate sono contenuto PUBBLICO: si caricano per tutti,
@@ -7078,14 +7079,65 @@ async function renderPoiLists(){
 function _openListFromRow(el){
   openListDetail(el.dataset.name, el.dataset.vis, el.dataset.color, el);
 }
+/* ── Filtri categoria/tag nella lista POI: tocco un chip, vedo solo quelli ── */
+let _poiActiveFilter=null;
+function _buildPoiFilters(items){
+  const box=document.getElementById('poiFilterChips'); if(!box) return;
+  if(!items||!items.length || (poiSubtab!=='mine'&&poiSubtab!=='loved'&&poiSubtab!=='near')){ box.innerHTML=''; box.style.display='none'; return; }
+  // raccogli categorie (etichetta sottocategoria se c'e) e i tag piu presenti
+  const cats=new Map(), tags=new Map();
+  items.forEach(p=>{
+    const cLabel = (p.subcategory && typeof catLabelByKey==='function' && catLabelByKey(p.subcategory)) || p.category || p.cat;
+    if(cLabel){ const k=String(cLabel); cats.set(k,(cats.get(k)||0)+1); }
+    (Array.isArray(p.tags)?p.tags:[]).forEach(tg=>{ if(tg){ tags.set(tg,(tags.get(tg)||0)+1); } });
+  });
+  const catChips=[...cats.entries()].sort((a,b)=>b[1]-a[1]).slice(0,8).map(e=>({term:e[0],ico:'ph-tag'}));
+  const tagChips=[...tags.entries()].sort((a,b)=>b[1]-a[1]).slice(0,10).map(e=>({term:e[0],ico:'ph-hash'}));
+  const all=[...catChips,...tagChips];
+  if(!all.length){ box.innerHTML=''; box.style.display='none'; return; }
+  box.style.display='flex';
+  const esc=x=>String(x||'').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+  box.innerHTML=all.map(c=>{
+    const on=_poiActiveFilter && _poiActiveFilter.toLowerCase()===c.term.toLowerCase();
+    return `<button type="button" class="pf-chip${on?' on':''}" data-term="${esc(c.term)}" onclick="_togglePoiFilter(this)"><i class="ph-duotone ${c.ico}"></i>${esc(c.term)}</button>`;
+  }).join('');
+}
+function _togglePoiFilter(btn){
+  const term=btn.dataset.term||'';
+  if(_poiActiveFilter && _poiActiveFilter.toLowerCase()===term.toLowerCase()){
+    _poiActiveFilter=null; // deseleziona
+  } else {
+    _poiActiveFilter=term;
+  }
+  document.querySelectorAll('#poiFilterChips .pf-chip').forEach(c=>c.classList.toggle('on', _poiActiveFilter && c.dataset.term.toLowerCase()===_poiActiveFilter.toLowerCase()));
+  _applyPoiFilters();
+}
+function _applyPoiFilters(){
+  const q=(document.getElementById('poiSearchInput')?.value||'').toLowerCase().trim();
+  const f=(_poiActiveFilter||'').toLowerCase();
+  const area=document.getElementById('poi-list-area'); if(!area) return;
+  let visible=0;
+  area.querySelectorAll('.poi-list-row').forEach(row=>{
+    const hay=(row.getAttribute('data-search')||row.textContent).toLowerCase();
+    const ok=(!q||hay.indexOf(q)>-1) && (!f||hay.indexOf(f)>-1);
+    row.style.display=ok?'':'none'; if(ok) visible++;
+  });
+  let none=document.getElementById('poiSearchNone');
+  if((q||f)&&visible===0){
+    if(!none){ none=document.createElement('div'); none.id='poiSearchNone'; none.className='poi-list-empty'; none.style.padding='24px 0'; area.appendChild(none); }
+    none.textContent=t('search_none','Nessun risultato'); none.style.display='';
+  } else if(none){ none.style.display='none'; }
+}
+
 // Ricerca interna nella lista POI (SPECS: obbligatoria, Loved diventa enorme): filtra le righe per nome/indirizzo
 function _poiSearch(q){
   q=(q||'').toLowerCase().trim();
   const area=document.getElementById('poi-list-area'); if(!area) return;
+  const f=(_poiActiveFilter||'').toLowerCase();
   let visible=0;
   area.querySelectorAll('.poi-list-row').forEach(row=>{
     const hay = (row.getAttribute('data-search')||row.textContent).toLowerCase();
-    const match = !q || hay.indexOf(q)>-1;
+    const match = (!q || hay.indexOf(q)>-1) && (!f || hay.indexOf(f)>-1);
     row.style.display = match ? '' : 'none';
     if(match) visible++;
   });
@@ -7108,7 +7160,7 @@ async function renderPoiTab(){
     if(currentUser && typeof sb !== 'undefined') {
       list.innerHTML = '<div class="poi-list-empty" style="padding:24px 0"><i class="ph-duotone ph-spinner" style="font-size:24px;animation:spin 1s linear infinite"></i></div>';
       const { data, error } = await sb.from('pois')
-        .select('id,name:title,description,lat,lng,category,love_count,photos,author_id,visibility,created_at')
+        .select('id,name:title,description,lat,lng,category,subcategory,tags,love_count,photos,author_id,visibility,created_at')
         .eq('author_id', currentUser.id)
         .order('created_at', { ascending: false });
       if(!error && Array.isArray(data)) items = data;
@@ -7156,6 +7208,7 @@ async function renderPoiTab(){
   // Memorizza index per accesso rapido nelle azioni (e clicabilità riga)
   // Salvo direttamente l'oggetto p in una mappa globale: _poiTabIndex[id] = p
   if(!window._poiTabIndex) window._poiTabIndex = {};
+  _buildPoiFilters(items);
   list.innerHTML = items.map((p,idx)=>{
     const key = p.id || `idx_${idx}`;
     window._poiTabIndex[key] = p;
@@ -12527,8 +12580,10 @@ function onStopNameFocus(){
       }).catch(()=>{});
   }
 }
-function onStopNameInput(val){
+function onStopNameInput(val){ /* tendina rimossa: il nome della tappa e' testo libero */ }
+function _onStopNameInput_deprecated(val){
   clearTimeout(stopAcTimer);
+  if(!document.getElementById('stopAcDrop')){return;}
   if(val.length<2){document.getElementById('stopAcDrop').classList.remove('open');return;}
   const lat=gpsPos?gpsPos.lat:CENTER[0],lng=gpsPos?gpsPos.lng:CENTER[1];
   stopAcTimer=setTimeout(()=>{
