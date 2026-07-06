@@ -34,15 +34,23 @@ Deno.serve(async (req: Request) => {
   if (req.method !== "POST") return json({ error: "method_not_allowed" }, 405);
 
   try {
+    // Client di servizio (rate limit + cache Places). Creato una volta e riusato.
+    // Bypassa la RLS: e' l'unico che tocca rl_hit e places_cache.
+    let svc: any = null;
+    if (SUPABASE_URL && SERVICE_ROLE_KEY) {
+      try {
+        svc = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
+          auth: { persistSession: false, autoRefreshToken: false },
+        });
+      } catch (_e) { svc = null; }
+    }
+
     // Rate limit per IP: la lente resta piena di POI Google per TUTTI (anche ospiti),
     // ma nessuno puo martellare l'endpoint e bruciare la quota Google. Fail-open:
     // se il limitatore e' giu, non blocchiamo la lente.
-    if (SUPABASE_URL && SERVICE_ROLE_KEY) {
+    if (svc) {
       const ip = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim() || "unknown";
       try {
-        const svc = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
-          auth: { persistSession: false, autoRefreshToken: false },
-        });
         const { data: allowed } = await svc.rpc("rl_hit", { p_key: "place-enrich:" + ip, p_max: 150, p_window_secs: 3600 });
         if (allowed === false) return json({ error: "rate_limited" }, 429);
       } catch (_e) { /* limitatore giu: non blocco la lente */ }
@@ -59,6 +67,25 @@ Deno.serve(async (req: Request) => {
     if (mode === "nearby") {
       if (lat == null || lng == null) return json({ error: "bad_request" }, 400);
       const lc = (language === "sq" || language === "en") ? language : "it";
+      const rad = Math.max(50, Math.min(1500, Number(radius) || 300));
+
+      // ── Cache condivisa (fail-open): stessa zona = stessa risposta, niente doppia
+      // spesa Google. Chiave: coordinate ~110m (3 decimali) + raggio bucket 100m + lingua.
+      const rlat = Number(lat).toFixed(3);
+      const rlng = Number(lng).toFixed(3);
+      const rbucket = Math.round(rad / 100) * 100;
+      const ckey = `nearby:${rlat}:${rlng}:${rbucket}:${lc}`;
+      const CACHE_TTL_MS = 7 * 24 * 3600 * 1000; // 7 giorni: rating/tipo sono stabili
+      if (svc) {
+        try {
+          const cutoff = new Date(Date.now() - CACHE_TTL_MS).toISOString();
+          const { data: hit } = await svc
+            .from("places_cache").select("payload")
+            .eq("key", ckey).gte("created_at", cutoff).maybeSingle();
+          if (hit?.payload) return json(hit.payload, 200); // HIT: zero chiamate Google
+        } catch (_e) { /* cache giu: proseguo su Google */ }
+      }
+
       const nb = {
         maxResultCount: 20,
         languageCode: lc,
@@ -66,7 +93,7 @@ Deno.serve(async (req: Request) => {
         locationRestriction: {
           circle: {
             center: { latitude: Number(lat), longitude: Number(lng) },
-            radius: Math.max(50, Math.min(1500, Number(radius) || 300)),
+            radius: rad,
           },
         },
       };
@@ -94,7 +121,14 @@ Deno.serve(async (req: Request) => {
       })).filter((p: any) => p.name && p.lat != null);
       // Prima i posti che contano (piu recensioni), gli sconosciuti in coda
       places.sort((a: any, b: any) => (b.reviews || 0) - (a.reviews || 0));
-      return json({ found: places.length > 0, places }, 200);
+      const payload = { found: places.length > 0, places };
+      // Salva in cache (fire-and-forget, fail-open). Solo risultati non vuoti.
+      if (svc && places.length > 0) {
+        try {
+          await svc.from("places_cache").upsert({ key: ckey, payload, created_at: new Date().toISOString() });
+        } catch (_e) { /* cache in scrittura giu: ignoro */ }
+      }
+      return json(payload, 200);
     }
 
     if (!name || lat == null || lng == null) return json({ error: "bad_request" }, 400);
