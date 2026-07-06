@@ -3988,7 +3988,7 @@ async function toggleFeatured(){
     tagEl.innerHTML+=` <span class="poi-flag flag-featured"><i class="ph-fill ph-star"></i> ${t('flag_featured','In evidenza')}</span>`;
   } else if(tagEl && !currentPOI.is_featured){ const f=tagEl.querySelector('.flag-featured'); if(f) f.remove(); }
   if(window._dbPOIs){ const it=window._dbPOIs.find(x=>x.id===currentPOI.id); if(it){ it.is_featured=currentPOI.is_featured; addDBMarker(it); } }
-  showToast(currentPOI.is_featured?t('feature_done','✓ Messo in evidenza'):t('feature_undone','Tolto dall evidenza')+' '+(r&&r.used!=null?('('+r.used+'/'+r.cap+')'):''));
+  showToast((currentPOI.is_featured?t('feature_done','✓ Messo in evidenza'):t('feature_undone','Tolto dall evidenza'))+(r&&r.used!=null?(' ('+r.used+'/'+r.cap+')'):''));
 }
 
 /* deleteCurrentPOI — mantenuta per retrocompatibilità, usa il nuovo confirm modal */
@@ -6245,7 +6245,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='2.37';
+const APP_VERSION='2.38';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 console.info('POI•LOVE v'+APP_VERSION);
 // Le rotte storiche pubblicate sono contenuto PUBBLICO: si caricano per tutti,
@@ -7305,7 +7305,8 @@ async function renderPoiTab(){
     const visLblT = vis==='private' ? t('vis_prv_lbl','Privato') : vis==='friends' ? t('vis_friends_lbl','Amici') : t('vis_pub_lbl','Pubblico');
 
     // Mega-ricerca: tutti i campi cercabili in un attributo (nome, categoria, indirizzo, citta, descrizione, tag)
-    const _searchHay = `${p.name||''} ${p.cat||p.category||''} ${p.address||''} ${p.city||''} ${p.description||''} ${(Array.isArray(p.tags)?p.tags.join(' '):(p.tags||''))}`.toLowerCase().replace(/"/g,'&quot;');
+    const _subLabel = (p.subcategory && typeof catLabelByKey==='function') ? catLabelByKey(p.subcategory) : '';
+    const _searchHay = `${p.name||''} ${p.cat||p.category||''} ${_subLabel} ${p.address||''} ${p.city||''} ${p.description||''} ${(Array.isArray(p.tags)?p.tags.join(' '):(p.tags||''))}`.toLowerCase().replace(/"/g,'&quot;');
 
     if(poiSubtab==='near'){
       // Lista vicini: click apre dettaglio, "Naviga" lancia maps esterne
@@ -10039,7 +10040,7 @@ function _resetCatPicker(){
 function _presetCatPicker(subKey, macro){
   _selCatKey=subKey||null; _selCatMacro=macro||null;
   const box=document.getElementById('catPicker'); if(!box) return;
-  const b= subKey ? box.querySelector('.cat-chip[data-key="'+subKey+'"]') : null;
+  const b= subKey ? box.querySelector('.cat-chip[data-key="'+CSS.escape(subKey)+'"]') : null;
   if(b){ _applyCatSel(b); }
   else if(macro){ // nessuna sottocategoria: tieni solo il macro per il salvataggio
     const lbl=document.getElementById('catPickedLbl'); if(lbl) lbl.textContent='';
