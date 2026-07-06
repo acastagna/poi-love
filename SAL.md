@@ -3,7 +3,9 @@
 > **Prossima ripresa: teaser misterioso di condivisione POI (zona + immagine + invito a registrarsi), poi avanti col contratto. Collaudi manuali di Alessandro in attesa (checklist 04/07 + claim a pagamento + copilota foto).**
 > Checkpoint sessione: `57984f5`, tag `checkpoint-2026-07-04` (HEAD su origin/main). **Nessun lavoro non committato.**
 
-## Sessione 06/07/2026 — Ricerca avanzata, lente nera, teaser condivisione (v2.14 → v2.19)
+## Sessione 06/07/2026 — Ricerca avanzata, lente nera, teaser condivisione (v2.14 → v2.20)
+
+- **v2.20 POI dentro le liste (e bug grosso trovato)**: la webapp interrogava la tabella `list_pois` che NON è mai esistita (quella vera si chiama `poi_lists`): per questo i conteggi delle liste erano sempre a zero e nessun POI si poteva collegare. Corretto il nome ovunque. Ora il dettaglio lista mostra i POI VERI (miniatura, nome, indirizzo), con: aggiunta dal picker dei propri POI, riordino con le frecce (persistito a DB, migrazione 022 con la policy UPDATE che mancava), rimozione, e tocco che apre il POI sulla mappa. I chip "Aggiungi a una lista" nel form di creazione ora salvano davvero il collegamento. Bonificati 3 duplicati di chiavi di traduzione. **Collaudo end-to-end VERO** con utente usa-e-getta: 2 POI + 1 lista creati, aggiunti dal picker (conteggio 0→1→2), riordino persistito dopo ricarica dal DB, rimozione (2→1), tocco che apre la scheda, conteggio card allineato, chip con id nel form. Utente e dati di prova eliminati. Live verificato (md5 identico, v2.20 nei footer).
 
 - **v2.19 landing personale del profilo**: chi apre `poilove.com?@nome` (o /@nome) da sloggato non vede piu il login nudo: vede la vetrina della persona a tutto schermo (copertina scelta come sfondo, avatar, nome, @handle, bio, numeri veri di POI pubblici e love, bottone "Entra in POI•LOVE" nelle 3 lingue). Dopo il login il profilo si apre da solo (handle in localStorage, regge il giro OAuth); da ospite pure, perche il profilo pubblico e visibile anche senza account. Collaudato in browser: vetrina con 5 POI e 1 love, CTA che scopre il login, ingresso ospite che apre il profilo giusto. Live verificato (md5 identico, v2.19 nei footer).
 
