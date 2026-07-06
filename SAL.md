@@ -3,7 +3,15 @@
 > **Prossima ripresa: teaser misterioso di condivisione POI (zona + immagine + invito a registrarsi), poi avanti col contratto. Collaudi manuali di Alessandro in attesa (checklist 04/07 + claim a pagamento + copilota foto).**
 > Checkpoint sessione: `57984f5`, tag `checkpoint-2026-07-04` (HEAD su origin/main). **Nessun lavoro non committato.**
 
-## Sessione 06/07/2026 — Ricerca avanzata, lente nera, teaser condivisione (v2.14 → v2.54)
+## Sessione 06/07/2026 — Ricerca avanzata, lente nera, teaser condivisione (v2.14 → v2.55)
+
+- **ILLI schede: qualità cucine + 4+altri + due distanze + icone da categoria (webapp v2.55 + place-enrich v20)**. Feedback founder su schermata (messicano "non trovo" ma ce ne sono 8; una risposta sola; icone dal nome; distanza ambigua). Fatto:
+  - **Query cucine migliore**: aggiunto `gq` (query Google in inglese) a ogni cucina — "mexican restaurant"/"vegan restaurant"/"sushi restaurant" trovano i posti VERI (prima "messicano" tornava Serendipity/Wild West a caso o nulla). Nuova categoria **vegano/vegetariano** (Fresh Garden, green & protein...). Aggiunta pesce.
+  - **4 risultati + "Ne vuoi altri? (+4)"**: `_renderPlaceCards` a batch (4 visibili, bottone rivela altri 4), `aiMoreResults`.
+  - **Due distanze**: `p.distGpsM` (da te, GPS) + `p.distCityM` (dal centro della città chiesta). `_distLine`: se lontano dalla città → "X dal centro di Tirana · Y da te"; se in zona → "Y da te · X dal centro"; se qui → "da te". (Il "da te" reale compare col GPS vero; nel test window.gpsPos non tocca la var di modulo.)
+  - **Icone dalla CATEGORIA/tipo, non dal nome**: `_iconForPlace` usa gType/typeLabel/cuisine/kind (+ `catIco` fallback per categoria), rimosso il nome. "Tony's Coffee Shop" (ristorante americano) ora ha la forchetta, non la tazzina. Ogni categoria ha la sua `ico`.
+  - **Voto allineato**: riga voto pulita (⭐ 4,7 · recensioni · €€), "Aperto ora" e distanza (con pin) su righe proprie.
+  - Collaudo e2e reale da loggato: "ristorante messicano a tirana" → Serendipity Tex-Mex ⭐4,7, French Tacos... 4 schede + "altri", icone giuste, voto+distanza allineati. Screenshot confermato. Deployato (v2.55).
 
 - **ILLI: distanza + orario + selettore paese (webapp v2.54 + place-enrich v20)**. Richieste founder: (a) "vicino a valona, max 30 km, aperto alle 23:00" → cerca entro 30km e solo chi è aperto a quell'ora, con intelligenza; (b) bottoni Italia/Albania + campo libero paese, ed è lì che ILLI cerca. Fatto:
   - **Distanza**: `_parseRadiusKm` ("a 30 km", "entro 20 km") → raggio di ricerca + filtro finale; alzati i tetti discover/fsq a 50km (edge) per coprire raggi larghi.
