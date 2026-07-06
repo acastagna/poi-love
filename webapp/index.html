@@ -889,10 +889,11 @@ body::after{content:'';position:fixed;inset:0;z-index:99999;pointer-events:none;
 .loc-minimap-fix:active{transform:scale(.95)}
 .loc-minimap-fix i{font-size:14px}
 .photo-slot{flex:1;aspect-ratio:1;border-radius:16px;background:#f5f0e8;border:1.5px dashed #C8BFB0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;font-size:20px;transition:all .2s;color:var(--muted);overflow:hidden;position:relative}
-/* Desktop: cornice 350×350 px */
+/* I 3 box foto sono FLUIDI: un terzo della spalla ciascuno, quadrati,
+   si adattano da soli quando il pannello cambia larghezza. Niente 350px fissi. */
 @media(min-width:480px){
-  .photo-slot{flex:0 0 350px;height:350px;border-radius:16px}
-  .photo-row{overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
+  .photo-slot{font-size:26px;border-radius:16px}
+  .photo-slot .slot-lbl{font-size:10px}
 }
 .photo-slot:active{border-color:var(--red);transform:scale(.97)}
 .photo-slot .slot-lbl{font-size:9px;font-weight:700;color:var(--muted)}
@@ -6027,7 +6028,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='2.21';
+const APP_VERSION='2.22';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 console.info('POI•LOVE v'+APP_VERSION);
 // Le rotte storiche pubblicate sono contenuto PUBBLICO: si caricano per tutti,
