@@ -18,6 +18,9 @@ const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 // Fonte recensioni AGGIUNTIVA (oltre Google): Foursquare Places. Chiave = SEGRETO Deno.env
 // (FOURSQUARE_KEY), mai nel repo/client. Se manca, la modalita fsq degrada a vuoto (fail-open).
 const FOURSQUARE_KEY = Deno.env.get("FOURSQUARE_KEY") ?? "";
+// Tetto mensile di chiamate GOOGLE (tutte le modalita insieme). Sotto 1000/mese si resta nel free tier = 0 spesa.
+// Le risposte servite da cache NON contano. Configurabile via env; oltre il tetto si degrada ai dati OSM.
+const MONTHLY_CAP = Number(Deno.env.get("GPLACES_MONTHLY_CAP") ?? "1000");
 
 const CORS: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
@@ -83,6 +86,17 @@ Deno.serve(async (req: Request) => {
         const { data: allowed } = await svc.rpc("rl_hit", { p_key: "place-enrich:" + ip, p_max: 150, p_window_secs: 3600 });
         if (allowed === false) return json({ error: "rate_limited" }, 429);
       } catch (_e) { /* limitatore giu: non blocco la lente */ }
+    }
+
+    // Tetto mensile Google: da chiamare SUBITO PRIMA di ogni fetch verso Google (mai sui cache-hit).
+    // Bucket per mese di calendario (come il reset del free tier). Torna true se siamo ancora dentro il tetto.
+    const ym = new Date().toISOString().slice(0, 7); // YYYY-MM
+    async function googleBudgetOk(): Promise<boolean> {
+      if (!svc) return true; // service role assente (raro in prod): non blocco
+      try {
+        const { data } = await svc.rpc("budget_hit", { p_bucket: "gplaces:" + ym, p_cap: MONTHLY_CAP });
+        return data !== false;
+      } catch (_e) { return true; } // errore transitorio: non spengo la lente
     }
 
     const { name, lat, lng, radius, mode, language } = await req.json();
@@ -168,6 +182,9 @@ Deno.serve(async (req: Request) => {
         } catch (_e) { /* cache giu: proseguo su Google */ }
       }
 
+      // Tetto mensile: oltre il free tier non chiamo Google, la lente resta coi dati OSM del client.
+      if (!(await googleBudgetOk())) return json({ found: false, places: [], budget: true }, 200);
+
       const nb = {
         maxResultCount: 20,
         languageCode: lc,
@@ -232,6 +249,8 @@ Deno.serve(async (req: Request) => {
           if (hit?.payload) return json(hit.payload, 200);
         } catch (_e) { /* cache giu */ }
       }
+      // Tetto mensile: oltre il free tier non chiamo Google, ILLI resta coi dati OSM.
+      if (!(await googleBudgetOk())) return json({ found: false, places: [], budget: true }, 200);
       const r = await fetch("https://places.googleapis.com/v1/places:searchText", {
         method: "POST",
         headers: {
@@ -268,6 +287,23 @@ Deno.serve(async (req: Request) => {
 
     if (!name || lat == null || lng == null) return json({ error: "bad_request" }, 400);
 
+    // ── Cache dell'ARRICCHIMENTO (prima mancava): stesso posto = stessa risposta per 7 giorni. Cosi i
+    // posti gia visti non ripagano Google ne consumano il tetto mensile. Chiave: nome + coordinate ~110m.
+    const elat = Number(lat).toFixed(3);
+    const elng = Number(lng).toFixed(3);
+    const ekey = `enrich:${String(name).toLowerCase().slice(0, 40)}:${elat}:${elng}`;
+    const E_TTL_MS = 7 * 24 * 3600 * 1000;
+    if (svc) {
+      try {
+        const cutoff = new Date(Date.now() - E_TTL_MS).toISOString();
+        const { data: hit } = await svc.from("places_cache").select("payload").eq("key", ekey).gte("created_at", cutoff).maybeSingle();
+        if (hit?.payload) return json(hit.payload, 200); // HIT: zero Google, zero quota
+      } catch (_e) { /* cache giu: proseguo su Google */ }
+    }
+
+    // Tetto mensile: oltre il free tier non chiamo Google, il posto resta coi soli dati OSM del client.
+    if (!(await googleBudgetOk())) return json({ found: false, budget: true }, 200);
+
     const body = {
       textQuery: String(name),
       maxResultCount: 1,
@@ -299,7 +335,7 @@ Deno.serve(async (req: Request) => {
     const p = data?.places?.[0];
     if (!p) return json({ found: false }, 200);
 
-    return json({
+    const payload = {
       found: true,
       name: p.displayName?.text || name,
       rating: p.rating ?? null,            // es. 4.6
@@ -316,7 +352,13 @@ Deno.serve(async (req: Request) => {
       typeLabel: p.primaryTypeDisplayName?.text ?? null, // tipo in chiaro (es. "Ristorante messicano")
       desc: p.editorialSummary?.text ?? null, // descrizione breve di Google, se presente
       reviewText: pickReviewText(p.reviews), // una recensione VERA (estratto), la descrizione che vuole il founder
-    }, 200);
+    };
+    // Salvo in cache (7gg): rating/prezzo/recensioni sono stabili; il piccolo scarto su "aperto ora" vale
+    // il risparmio enorme (il posto non ripaga Google ne consuma il tetto per una settimana).
+    if (svc) {
+      try { await svc.from("places_cache").upsert({ key: ekey, payload, created_at: new Date().toISOString() }); } catch (_e) { /* ignore */ }
+    }
+    return json(payload, 200);
   } catch (e) {
     return json({ error: "exception", detail: String(e) }, 200);
   }
