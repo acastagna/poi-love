@@ -6956,7 +6956,7 @@ let HISTORIC_ROUTES=[];
 async function loadHistoricRoutes(){
   try{
     const { data, error } = await sb.from('trips')
-      .select('id,name,badge,description,adopted_by,dedication,suggested_by,adopter:profiles!trips_adopted_by_fkey(username),suggester:profiles!trips_suggested_by_fkey(username,display_name),trip_stops(id,name,lat,lng,sort_order)')
+      .select('id,name,badge,description,route_line,adopted_by,dedication,suggested_by,adopter:profiles!trips_adopted_by_fkey(username),suggester:profiles!trips_suggested_by_fkey(username,display_name),trip_stops(id,name,lat,lng,sort_order)')
       .eq('is_historic',true).eq('is_published',true).limit(50);
     if(error||!data) return;
     HISTORIC_ROUTES=data.map(r=>({ ...r,
@@ -6965,21 +6965,45 @@ async function loadHistoricRoutes(){
     renderHistoricRoutesList();
   }catch(e){ console.warn('rotte storiche:',e); }
 }
+let _routeLayerToken=0;
 function _rebuildRouteLayer(){
   if(!routeLayer) return;
   routeLayer.clearLayers();
+  const token=++_routeLayerToken;
   HISTORIC_ROUTES.forEach(r=>{
     if(r.stops.length<2) return;
     const pts=r.stops.map(st=>[st.lat,st.lng]);
-    const line=L.polyline(pts,{color:'#7C3AED',weight:4,opacity:.8,dashArray:'10,7'});
-    line.bindPopup('<b>'+String(r.name).replace(/</g,'&lt;')+'</b>'+(r.badge?(' · '+String(r.badge).replace(/</g,'&lt;')):'')+(r.adopted_by&&r.adopter?('<br><span style="color:#D42B2B;font-size:11px">♥ '+t('route_adopted_by','Adottata da')+' @'+String(r.adopter.username).replace(/</g,'&lt;')+(r.dedication?': '+String(r.dedication).replace(/</g,'&lt;'):'')+'</span>'):''));
-    routeLayer.addLayer(line);
+    const popupHtml='<b>'+String(r.name).replace(/</g,'&lt;')+'</b>'+(r.badge?(' · '+String(r.badge).replace(/</g,'&lt;')):'')+(r.adopted_by&&r.adopter?('<br><span style="color:#D42B2B;font-size:11px">♥ '+t('route_adopted_by','Adottata da')+' @'+String(r.adopter.username).replace(/</g,'&lt;')+(r.dedication?': '+String(r.dedication).replace(/</g,'&lt;'):'')+'</span>'):'');
+    // tappe numerate (sempre)
     r.stops.forEach((st,i)=>{
       const mk=L.circleMarker([st.lat,st.lng],{radius:7,color:'#fff',weight:2,fillColor:'#7C3AED',fillOpacity:1});
       mk.bindTooltip((i+1)+'. '+st.name,{direction:'top',offset:[0,-6]});
       routeLayer.addLayer(mk);
     });
+    if(r.route_line){
+      // Linea DRITTA (ley line, es. Linea di San Michele): resta in linea d'aria
+      const line=L.polyline(pts,{color:'#7C3AED',weight:4,opacity:.85,dashArray:'10,7'});
+      line.bindPopup(popupHtml); routeLayer.addLayer(line);
+    } else {
+      // Segue la STRADA: linea provvisoria, poi sostituita dal percorso reale (OSRM)
+      const tmp=L.polyline(pts,{color:'#7C3AED',weight:3,opacity:.35,dashArray:'6,6'});
+      tmp.bindPopup(popupHtml); routeLayer.addLayer(tmp);
+      _drawRouteRoad(r, pts, tmp, token, popupHtml);
+    }
   });
+}
+async function _drawRouteRoad(r, pts, tmpLine, token, popupHtml){
+  try{
+    const coords=pts.map(p=>p[1]+','+p[0]).join(';');   // OSRM: lng,lat
+    const resp=await fetch('https://router.project-osrm.org/route/v1/driving/'+coords+'?overview=full&geometries=geojson',{signal:AbortSignal.timeout(9000)});
+    const d=await resp.json();
+    const route=d&&d.routes&&d.routes[0];
+    if(!route||!route.geometry||token!==_routeLayerToken||!routeLayer) return;   // layer ricostruito nel frattempo: scarto
+    if(tmpLine){ try{ routeLayer.removeLayer(tmpLine); }catch(_){} }
+    const latlngs=route.geometry.coordinates.map(c=>[c[1],c[0]]);
+    const line=L.polyline(latlngs,{color:'#7C3AED',weight:4,opacity:.85});
+    line.bindPopup(popupHtml); routeLayer.addLayer(line);
+  }catch(_){ /* OSRM giù: resta la linea provvisoria */ }
 }
 // Porta la mappa su una rotta: attiva il layer e inquadra le tappe
 function showRouteOnMap(routeId){
@@ -7510,7 +7534,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='2.86';
+const APP_VERSION='2.87';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
