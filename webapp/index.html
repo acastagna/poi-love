@@ -1593,6 +1593,16 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 .trip-detail-rename{background:none;border:none;cursor:pointer;color:var(--muted);font-size:15px;padding:4px 6px;border-radius:8px;flex-shrink:0}
 .trip-detail-rename:active{transform:scale(.9)}
 .trip-detail-hdr-title{cursor:pointer}
+.trip-desc-sec{padding:12px 14px 2px}
+.trip-desc-lbl{font-size:11px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.trip-desc-lbl>i{color:var(--red);font-size:13px}
+.trip-desc-wrap{position:relative}
+.trip-desc-in{width:100%;background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:11px 44px 11px 13px;font-size:14px;line-height:1.5;font-family:inherit;color:var(--text);outline:none;resize:vertical;min-height:74px;box-sizing:border-box;transition:border-color .2s}
+.trip-desc-in:focus{border-color:var(--blue)}
+.trip-desc-mic{position:absolute;right:8px;top:8px;width:30px;height:30px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg);color:var(--blue);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;transition:all .15s}
+.trip-desc-mic.recording{background:var(--red);border-color:var(--red);color:#fff;animation:pulse 1.2s infinite}
+.trip-desc-foot{display:flex;justify-content:flex-end;margin-top:3px}
+.trip-desc-cnt{font-size:10px;color:var(--muted)}
 .trip-detail-summary{display:flex;flex-wrap:wrap;gap:8px;padding:10px 14px 2px}
 .tds-item{flex:1 1 calc(50% - 4px);display:flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--border);border-radius:11px;padding:8px 9px;min-width:0}
 .tds-item>i{font-size:17px;color:var(--red);flex-shrink:0}
@@ -6057,7 +6067,7 @@ const T={
     trip_open_btn:'Apri',trip_change_cover:'Cambia copertina',trip_cover_saved:'Copertina aggiornata',trip_vis_comp:'Compagnia',trip_rename:'Rinomina itinerario',trip_renamed:'Nome aggiornato',trip_dates:'Partenza · Arrivo',trip_len:'Percorso',trip_stops_n:'Tappe',trip_cal_hint:'tocca inizio e fine',trip_route_pick:'Scegli il percorso',trip_route:'Percorso',trip_share_pub:'Metti l\'itinerario su Pubblico per condividerlo con un link',trip_share_txt:'un itinerario su POI•LOVE',trip_link_copied:'Link copiato',trip_dep:'Partenza',trip_arr:'Arrivo',trip_share_makepub:'Per condividere con un link, l\'itinerario deve essere Pubblico. Lo rendo pubblico ora?',save:'Salva',itin_cover_lbl:'Copertina',itin_cover_add:'Carica o scegli una foto',trip_close:'Chiudi',trip_calendar:'Calendario viaggio',trip_map:'Mappa itinerario',trip_stops:'Tappe pianificate',trip_add_stop:'Aggiungi tappa',
     /* Itinerari / Tappe — view, card, dettaglio, trip landing */
     itin_new:'Nuovo',itin_subtab_trips:'Itinerari',itin_subtab_lists:'Liste',itin_subtab_routes:'Rotte Storiche',itin_routes_title:'Rotte Storiche',itin_routes_desc:'Percorsi tematici che seguono la storia, la cultura e i racconti di un luogo. Presto potrai esplorarle e crearne di tue.',itin_routes_soon:'Presto disponibili',itin_search_ph:'Cerca destinazione… es. Sarajevo, Bosnia',itin_ai_sub:'Suggerisce, pianifica, aggiunge tappe',itin_sheet_sub:'Crea l\'itinerario, poi aggiungi tappe e condividilo',itin_dest_lbl:'Destinazione',itin_fallback_trip:'Viaggio',itin_n_stops:'{n} tappe',itin_addtrip_none:'Nessun itinerario ancora. Creane uno per aggiungere "{name}".',
-    trip_no_stops:'Nessuna tappa ancora, aggiungine una!',trip_status_suspended:'Sospesa',trip_status_done:'Completata',trip_status_planned:'Pianificata',trip_resume:'Riprendi',trip_suspend:'Sospendi',trip_edit:'Modifica',trip_delete:'Elimina',trip_vis_pub:'Pubblico',trip_vis_friends:'Amici',trip_vis_prv:'Privato',stop_note_ph:'Aggiungi note, promemoria, info pratiche…',stop_share_title:'Condividi o invita a questa tappa',stop_share_friend:'Condividi',stop_share_maps:'Apri in mappe',stop_share_warn_b:'Attenzione:',stop_share_warn:'se inviti qualcuno che non conosci personalmente, attiva la condivisione della posizione con una persona di fiducia prima di incontrarlo in un luogo fisico.',stop_share_copied:'Copiato: incollalo dove vuoi',trip_share_line:'Itinerario su POI•LOVE:',stop_f_name:'Cerca la tappa',stop_f_region:'Prefettura / regione / luogo',stop_f_region_ph:'Es. Tirana, Qark di Tirana',stop_f_date:'Data',stop_f_stay:'Rimanenza',stop_f_stay_ph:'Es. 2 notti',stop_f_img:'Immagine della tappa',stop_f_img_add:'Tocca per caricare',stop_f_note:'Note personali',stop_search_ph:'Cerca un posto: es. Mont Saint-Michel…',stop_n_of:'Tappa {n}/{tot}',stop_saved:'Tappa aggiornata',stop_save_edit:'Salva modifiche',
+    trip_no_stops:'Nessuna tappa ancora, aggiungine una!',trip_status_suspended:'Sospesa',trip_status_done:'Completata',trip_status_planned:'Pianificata',trip_resume:'Riprendi',trip_suspend:'Sospendi',trip_edit:'Modifica',trip_delete:'Elimina',trip_vis_pub:'Pubblico',trip_vis_friends:'Amici',trip_vis_prv:'Privato',stop_note_ph:'Aggiungi note, promemoria, info pratiche…',stop_share_title:'Condividi o invita a questa tappa',stop_share_friend:'Condividi',stop_share_maps:'Apri in mappe',stop_share_warn_b:'Attenzione:',stop_share_warn:'se inviti qualcuno che non conosci personalmente, attiva la condivisione della posizione con una persona di fiducia prima di incontrarlo in un luogo fisico.',stop_share_copied:'Copiato: incollalo dove vuoi',trip_share_line:'Itinerario su POI•LOVE:',stop_f_name:'Cerca la tappa',stop_f_region:'Prefettura / regione / luogo',stop_f_region_ph:'Es. Tirana, Qark di Tirana',stop_f_date:'Data',stop_f_stay:'Rimanenza',stop_f_stay_ph:'Es. 2 notti',stop_f_img:'Immagine della tappa',stop_f_img_add:'Tocca per caricare',stop_f_note:'Note personali',stop_search_ph:'Cerca un posto: es. Mont Saint-Michel…',stop_n_of:'Tappa {n}/{tot}',stop_saved:'Tappa aggiornata',stop_save_edit:'Salva modifiche',trip_desc_lbl:'Descrizione (accompagna il link)',trip_desc_ph:'Racconta l\'itinerario: cosa lo rende speciale, cosa vedrete, per chi è… Questo testo accompagna il link quando lo condividi.',trip_desc_saved:'Descrizione salvata',
     tlp_badge_dest:'Destinazione',tlp_stops_lbl:'Tappe del viaggio',tlp_poi_lbl:'POI•LOVE lungo la rotta',tlp_cta_text:'Vuoi seguire questo itinerario o pianificarne uno simile?',tlp_open_app:'Apri POI•LOVE',tlp_share:'Condividi',tlp_stops_unavail:'Tappe non ancora disponibili',
     /* Liste */
     list_sheet_title:'Nuova Lista',list_sheet_sub:'Crea una raccolta personale',list_name_lbl:'Nome della lista',itin_lists_empty:'Ancora nessuna lista. Tocca <strong>Nuovo</strong> per crearne una.',list_remove_from:'Rimuovi dalla lista',list_chip_none:'Nessuno',list_trip_none:'Nessun itinerario ancora, creane uno nella tab Itinerari',list_delete_confirm:'Eliminare "{name}"? L\'azione è irreversibile.',list_delete_ok:'Elimina',list_deleted:'🗑 Lista eliminata',
@@ -6158,7 +6168,7 @@ const T={
     trip_open_btn:'Hap',trip_change_cover:'Ndrysho kopertinën',trip_cover_saved:'Kopertina u përditësua',trip_vis_comp:'Shoqëria',trip_rename:'Riemërto itinerarin',trip_renamed:'Emri u përditësua',trip_dates:'Nisja · Mbërritja',trip_len:'Rruga',trip_stops_n:'Ndalesa',trip_cal_hint:'prek fillimin dhe fundin',trip_route_pick:'Zgjidh rrugën',trip_route:'Rruga',trip_share_pub:'Vendose itinerarin si Publik për ta ndarë me një link',trip_share_txt:'një itinerar në POI•LOVE',trip_link_copied:'Linku u kopjua',trip_dep:'Nisja',trip_arr:'Mbërritja',trip_share_makepub:'Për ta ndarë me një link, itinerari duhet të jetë Publik. Ta bëj publik tani?',save:'Ruaj',itin_cover_lbl:'Kopertina',itin_cover_add:'Ngarko ose zgjidh një foto',trip_close:'Mbyll',trip_calendar:'Kalendari i udhëtimit',trip_map:'Harta e itinerarit',trip_stops:'Stacionet e planifikuara',trip_add_stop:'Shto stacion',
     /* Itinerari / Tappe — view, card, dettaglio, trip landing */
     itin_new:'I ri',itin_subtab_trips:'Itinerare',itin_subtab_lists:'Lista',itin_subtab_routes:'Rrugët Historike',itin_routes_title:'Rrugët Historike',itin_routes_desc:'Itinerare tematike që ndjekin historinë, kulturën dhe tregimet e një vendi. Së shpejti do të mund t\'i eksplorosh dhe të krijosh të tuat.',itin_routes_soon:'Së shpejti',itin_search_ph:'Kërko destinacionin… p.sh. Sarajevë, Bosnjë',itin_ai_sub:'Sugjeron, planifikon, shton stacione',itin_sheet_sub:'Krijo itinerarin, pastaj shto stacione dhe ndaje',itin_dest_lbl:'Destinacioni',itin_fallback_trip:'Udhëtim',itin_n_stops:'{n} stacione',itin_addtrip_none:'Ende asnjë itinerar. Krijo një për të shtuar "{name}".',
-    trip_no_stops:'Ende asnjë stacion, shto një!',trip_status_suspended:'Pezulluar',trip_status_done:'Përfunduar',trip_status_planned:'Planifikuar',trip_resume:'Vazhdo',trip_suspend:'Pezullo',trip_edit:'Redakto',trip_delete:'Fshi',trip_vis_pub:'Publik',trip_vis_friends:'Miq',trip_vis_prv:'Privat',stop_note_ph:'Shto shënime, kujtesa, info praktike…',stop_share_title:'Ndaj ose fto dikë në këtë stacion',stop_share_friend:'Ndaj',stop_share_maps:'Hap në harta',stop_share_warn_b:'Kujdes:',stop_share_warn:'nëse fton dikë që nuk e njeh personalisht, aktivizo ndarjen e vendndodhjes me një person të besuar para se ta takosh në një vend fizik.',stop_share_copied:'U kopjua: ngjite ku të duash',trip_share_line:'Itinerari në POI•LOVE:',stop_f_name:'Kërko stacionin',stop_f_region:'Prefekturë / rajon / vend',stop_f_region_ph:'P.sh. Tiranë, Qarku i Tiranës',stop_f_date:'Data',stop_f_stay:'Qëndrimi',stop_f_stay_ph:'P.sh. 2 net',stop_f_img:'Fotoja e stacionit',stop_f_img_add:'Prek për të ngarkuar',stop_f_note:'Shënime personale',stop_search_ph:'Kërko një vend: p.sh. Mont Saint-Michel…',stop_n_of:'Stacioni {n}/{tot}',stop_saved:'Stacioni u përditësua',stop_save_edit:'Ruaj ndryshimet',
+    trip_no_stops:'Ende asnjë stacion, shto një!',trip_status_suspended:'Pezulluar',trip_status_done:'Përfunduar',trip_status_planned:'Planifikuar',trip_resume:'Vazhdo',trip_suspend:'Pezullo',trip_edit:'Redakto',trip_delete:'Fshi',trip_vis_pub:'Publik',trip_vis_friends:'Miq',trip_vis_prv:'Privat',stop_note_ph:'Shto shënime, kujtesa, info praktike…',stop_share_title:'Ndaj ose fto dikë në këtë stacion',stop_share_friend:'Ndaj',stop_share_maps:'Hap në harta',stop_share_warn_b:'Kujdes:',stop_share_warn:'nëse fton dikë që nuk e njeh personalisht, aktivizo ndarjen e vendndodhjes me një person të besuar para se ta takosh në një vend fizik.',stop_share_copied:'U kopjua: ngjite ku të duash',trip_share_line:'Itinerari në POI•LOVE:',stop_f_name:'Kërko stacionin',stop_f_region:'Prefekturë / rajon / vend',stop_f_region_ph:'P.sh. Tiranë, Qarku i Tiranës',stop_f_date:'Data',stop_f_stay:'Qëndrimi',stop_f_stay_ph:'P.sh. 2 net',stop_f_img:'Fotoja e stacionit',stop_f_img_add:'Prek për të ngarkuar',stop_f_note:'Shënime personale',stop_search_ph:'Kërko një vend: p.sh. Mont Saint-Michel…',stop_n_of:'Stacioni {n}/{tot}',stop_saved:'Stacioni u përditësua',stop_save_edit:'Ruaj ndryshimet',trip_desc_lbl:'Përshkrimi (shoqëron linkun)',trip_desc_ph:'Trego itinerarin: çfarë e bën të veçantë, çfarë do të shihni, për kë është… Ky tekst shoqëron linkun kur e ndan.',trip_desc_saved:'Përshkrimi u ruajt',
     tlp_badge_dest:'Destinacioni',tlp_stops_lbl:'Stacionet e udhëtimit',tlp_poi_lbl:'POI•LOVE përgjatë rrugës',tlp_cta_text:'Dëshiron ta ndjekësh këtë itinerar ose të planifikosh një të ngjashëm?',tlp_open_app:'Hap POI•LOVE',tlp_share:'Nda',tlp_stops_unavail:'Stacionet ende nuk janë të disponueshme',
     /* Liste */
     list_sheet_title:'Listë e re',list_sheet_sub:'Krijo një koleksion personal',list_name_lbl:'Emri i listës',itin_lists_empty:'Ende asnjë listë. Prek <strong>I ri</strong> për të krijuar një.',list_remove_from:'Hiq nga lista',list_chip_none:'Asnjë',list_trip_none:'Ende asnjë itinerar, krijo një te skeda Itinerare',list_delete_confirm:'Të fshihet "{name}"? Veprimi është i pakthyeshëm.',list_delete_ok:'Fshi',list_deleted:'🗑 Lista u fshi',
@@ -6259,7 +6269,7 @@ const T={
     trip_open_btn:'Open',trip_change_cover:'Change cover',trip_cover_saved:'Cover updated',trip_vis_comp:'Companion',trip_rename:'Rename itinerary',trip_renamed:'Name updated',trip_dates:'Departure · Arrival',trip_len:'Route',trip_stops_n:'Stops',trip_cal_hint:'tap start and end',trip_route_pick:'Choose the route',trip_route:'Route',trip_share_pub:'Set the itinerary to Public to share it with a link',trip_share_txt:'an itinerary on POI•LOVE',trip_link_copied:'Link copied',trip_dep:'Departure',trip_arr:'Arrival',trip_share_makepub:'To share with a link, the itinerary must be Public. Make it public now?',save:'Save',itin_cover_lbl:'Cover',itin_cover_add:'Upload or pick a photo',trip_close:'Close',trip_calendar:'Trip calendar',trip_map:'Itinerary map',trip_stops:'Planned stops',trip_add_stop:'Add stop',
     /* Itinerari / Tappe — view, card, detail, trip landing */
     itin_new:'New',itin_subtab_trips:'Itineraries',itin_subtab_lists:'Lists',itin_subtab_routes:'Historic Routes',itin_routes_title:'Historic Routes',itin_routes_desc:'Themed routes that follow the history, culture and stories of a place. Soon you will be able to explore them and create your own.',itin_routes_soon:'Coming soon',itin_search_ph:'Search a destination… e.g. Sarajevo, Bosnia',itin_ai_sub:'Suggests, plans, adds stops',itin_sheet_sub:'Create the itinerary, then add stops and share it',itin_dest_lbl:'Destination',itin_fallback_trip:'Trip',itin_n_stops:'{n} stops',itin_addtrip_none:'No itinerary yet. Create one to add "{name}".',
-    trip_no_stops:'No stops yet, add one!',trip_status_suspended:'Suspended',trip_status_done:'Completed',trip_status_planned:'Planned',trip_resume:'Resume',trip_suspend:'Suspend',trip_edit:'Edit',trip_delete:'Delete',trip_vis_pub:'Public',trip_vis_friends:'Friends',trip_vis_prv:'Private',stop_note_ph:'Add notes, reminders, practical info…',stop_share_title:'Share or invite to this stop',stop_share_friend:'Share',stop_share_maps:'Open in maps',stop_share_warn_b:'Warning:',stop_share_warn:'if you invite someone you do not know personally, turn on location sharing with a trusted person before meeting them at a physical place.',stop_share_copied:'Copied: paste it anywhere',trip_share_line:'Itinerary on POI•LOVE:',stop_f_name:'Search the stop',stop_f_region:'Prefecture / region / place',stop_f_region_ph:'E.g. Tirana, Tirana County',stop_f_date:'Date',stop_f_stay:'Stay',stop_f_stay_ph:'E.g. 2 nights',stop_f_img:'Stop image',stop_f_img_add:'Tap to upload',stop_f_note:'Personal notes',stop_search_ph:'Search a place: e.g. Mont Saint-Michel…',stop_n_of:'Stop {n}/{tot}',stop_saved:'Stop updated',stop_save_edit:'Save changes',
+    trip_no_stops:'No stops yet, add one!',trip_status_suspended:'Suspended',trip_status_done:'Completed',trip_status_planned:'Planned',trip_resume:'Resume',trip_suspend:'Suspend',trip_edit:'Edit',trip_delete:'Delete',trip_vis_pub:'Public',trip_vis_friends:'Friends',trip_vis_prv:'Private',stop_note_ph:'Add notes, reminders, practical info…',stop_share_title:'Share or invite to this stop',stop_share_friend:'Share',stop_share_maps:'Open in maps',stop_share_warn_b:'Warning:',stop_share_warn:'if you invite someone you do not know personally, turn on location sharing with a trusted person before meeting them at a physical place.',stop_share_copied:'Copied: paste it anywhere',trip_share_line:'Itinerary on POI•LOVE:',stop_f_name:'Search the stop',stop_f_region:'Prefecture / region / place',stop_f_region_ph:'E.g. Tirana, Tirana County',stop_f_date:'Date',stop_f_stay:'Stay',stop_f_stay_ph:'E.g. 2 nights',stop_f_img:'Stop image',stop_f_img_add:'Tap to upload',stop_f_note:'Personal notes',stop_search_ph:'Search a place: e.g. Mont Saint-Michel…',stop_n_of:'Stop {n}/{tot}',stop_saved:'Stop updated',stop_save_edit:'Save changes',trip_desc_lbl:'Description (goes with the link)',trip_desc_ph:'Tell the itinerary: what makes it special, what you will see, who it is for… This text goes with the link when you share it.',trip_desc_saved:'Description saved',
     tlp_badge_dest:'Destination',tlp_stops_lbl:'Trip stops',tlp_poi_lbl:'POI•LOVE along the route',tlp_cta_text:'Want to follow this itinerary or plan a similar one?',tlp_open_app:'Open POI•LOVE',tlp_share:'Share',tlp_stops_unavail:'Stops not available yet',
     /* Lists */
     list_sheet_title:'New List',list_sheet_sub:'Create a personal collection',list_name_lbl:'List name',itin_lists_empty:'No list yet. Tap <strong>New</strong> to create one.',list_remove_from:'Remove from list',list_chip_none:'None',list_trip_none:'No itinerary yet, create one in the Itineraries tab',list_delete_confirm:'Delete "{name}"? This action is irreversible.',list_delete_ok:'Delete',list_deleted:'🗑 List deleted',
@@ -7553,7 +7563,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='2.94';
+const APP_VERSION='2.95';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
@@ -12999,7 +13009,7 @@ async function syncTripsFromDB(){
   if(!currentUser?.id || !sb) return;
   try{
     const { data, error } = await sb.from('trips')
-      .select('id,name,badge,dates_label,cover_url,cal_year,cal_month,is_featured,visibility,start_date,end_date,trip_stops(id,name,stop_date_label,status,lat,lng,icon,icon_bg,icon_color,note,sort_order,stay_label,image_url,region)')
+      .select('id,name,badge,description,dates_label,cover_url,cal_year,cal_month,is_featured,visibility,start_date,end_date,trip_stops(id,name,stop_date_label,status,lat,lng,icon,icon_bg,icon_color,note,sort_order,stay_label,image_url,region)')
       .eq('owner_id', currentUser.id).order('created_at',{ascending:false});
     if(error || !data) return;
     // Preserva i trip ancora solo locali (senza dbId), poi rimpiazza il resto coi dati DB
@@ -13014,7 +13024,7 @@ async function syncTripsFromDB(){
         stay:s.stay_label||'', image:s.image_url||'', region:s.region||''
       }));
       TRIPS[t.id]={ id:t.id, dbId:t.id, name:t.name, badge:t.badge||'', dates:t.dates_label||'',
-        cover:t.cover_url||'', companions:[], stops, calYear:t.cal_year, calMonth:t.cal_month,
+        cover:t.cover_url||'', description:t.description||'', companions:[], stops, calYear:t.cal_year, calMonth:t.cal_month,
         visibility:t.visibility||'prv', startDate:t.start_date||'', endDate:t.end_date||'', isFeatured:!!t.is_featured };
     });
     if(typeof renderTripCards==='function') renderTripCards();
@@ -13149,6 +13159,15 @@ function openTripDetail(tripId){
         <button class="trip-detail-rename" onclick="renameTrip('${t.id}')" title="${window.t('trip_rename','Rinomina')}"><i class="ph-duotone ph-pencil-simple"></i></button>
         <button class="trip-detail-close" onclick="closeTripDetail()" aria-label="Chiudi"><i class="ph-duotone ph-x"></i></button>
       </div>
+      <!-- Descrizione REALE dell'itinerario: si scrive o si detta, accompagna il link di condivisione (con foto, date, tappe) -->
+      <div class="trip-desc-sec">
+        <div class="trip-desc-lbl"><i class="ph-duotone ph-text-align-left"></i> <span data-t="trip_desc_lbl">Descrizione (accompagna il link)</span></div>
+        <div class="trip-desc-wrap">
+          <textarea id="tripDescIn-${t.id}" class="trip-desc-in" maxlength="600" data-tp="trip_desc_ph" placeholder="Racconta l'itinerario: cosa lo rende speciale, cosa vedrete, per chi è… Questo testo accompagna il link quando lo condividi." oninput="_tripDescCount('${t.id}')" onblur="saveTripDesc('${t.id}')">${_escHtml(t.description||'')}</textarea>
+          <button class="trip-desc-mic" id="tripDescMic-${t.id}" onclick="toggleFieldDictation('tripDescIn-${t.id}','tripDescMic-${t.id}')" title="${window.t('field_dictate','Detta')}" aria-label="${window.t('field_dictate','Detta')}"><i class="ph-duotone ph-microphone"></i></button>
+        </div>
+        <div class="trip-desc-foot"><span class="trip-desc-cnt" id="tripDescCnt-${t.id}"></span></div>
+      </div>
       <div id="tripSummary-${t.id}">${_tripSummaryHTML(t)}</div>
       <div class="trip-vis-bar" id="tripVisBar-${t.id}">${_visBtnsHTML(t)}</div>
       <div class="trip-detail-section">
@@ -13167,6 +13186,7 @@ function openTripDetail(tripId){
   ov.classList.add('open');
   document.body.style.overflow='hidden';
   renderMiniCal(tripId);
+  _tripDescCount(tripId);
   setTimeout(()=>initItinMap(tripId),180);
 }
 function closeTripDetail(){
@@ -13233,8 +13253,24 @@ function _persistTripMeta(t, fields){
     if('visibility' in fields) db.visibility=fields.visibility;
     if('startDate' in fields) db.start_date=fields.startDate||null;
     if('endDate' in fields) db.end_date=fields.endDate||null;
+    if('description' in fields) db.description=fields.description||null;
     sb.from('trips').update(db).eq('id',t.dbId).eq('owner_id',currentUser.id).then(({error})=>{ if(error) console.warn('[trip meta]',error.message); });
   }
+}
+// Contatore caratteri della descrizione itinerario
+function _tripDescCount(tripId){
+  const el=document.getElementById('tripDescIn-'+tripId), c=document.getElementById('tripDescCnt-'+tripId);
+  if(el&&c){ const n=(el.value||'').length; c.textContent=n+'/600'; }
+}
+// Salva la descrizione REALE dell'itinerario (localStorage + DB trips.description). Accompagna il link di condivisione.
+function saveTripDesc(tripId){
+  const t=TRIPS[tripId]; if(!t) return;
+  const el=document.getElementById('tripDescIn-'+tripId); if(!el) return;
+  const desc=(el.value||'').trim();
+  if(desc===(t.description||'')) return;   // nessuna modifica
+  t.description=desc;
+  _persistTripMeta(t,{description:desc});
+  showToast(window.t('trip_desc_saved','Descrizione salvata'));
 }
 async function renameTrip(tripId){
   const t=TRIPS[tripId]; if(!t) return;
