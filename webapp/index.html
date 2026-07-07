@@ -1592,14 +1592,16 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 .trip-detail-rename{background:none;border:none;cursor:pointer;color:var(--muted);font-size:15px;padding:4px 6px;border-radius:8px;flex-shrink:0}
 .trip-detail-rename:active{transform:scale(.9)}
 .trip-detail-hdr-title{cursor:pointer}
-.trip-detail-summary{display:flex;gap:8px;padding:10px 14px 2px}
-.tds-item{flex:1;display:flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--border);border-radius:11px;padding:8px 9px;min-width:0}
+.trip-detail-summary{display:flex;flex-wrap:wrap;gap:8px;padding:10px 14px 2px}
+.tds-item{flex:1 1 calc(50% - 4px);display:flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--border);border-radius:11px;padding:8px 9px;min-width:0}
 .tds-item>i{font-size:17px;color:var(--red);flex-shrink:0}
 .tds-item>div{min-width:0}
 .tds-v{font-size:12.5px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tds-l{font-size:9px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:var(--muted);margin-top:1px}
 .tdh-hint{font-size:10px;font-weight:600;color:var(--muted);text-transform:none;letter-spacing:0}
 .trip-share-btn{margin-left:auto;height:26px;padding:0 10px;border-radius:13px;background:var(--red);border:none;color:#fff;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px}
+.trip-vis-btn.trip-vis-link{background:var(--red);border-color:var(--red);color:#fff}
+.trip-vis-btn.trip-vis-link:active{transform:scale(.96)}
 /* Trip body — compatto sotto cover quadrata */
 .trip-body{padding:10px 12px 12px;display:flex;flex-direction:column;gap:6px}
 .trip-name{font-size:13px;font-weight:900;color:var(--text);line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.5em}
@@ -6051,7 +6053,7 @@ const T={
     /* POI list actions */
     act_navigate:'Naviga verso',act_open_map:'Apri sulla mappa',act_share:'Condividi',act_visibility:'Visibilità',act_suggest_google:'Suggerisci a Google Maps',act_edit:'Modifica',act_delete:'Elimina',vis_pub_lbl:'Pubblico',vis_friends_lbl:'Amici',vis_prv_lbl:'Privato',vis_changed:'Visibilità',toast_link_copied:'🔗 Link copiato',toast_navigate_to:'🧭 Naviga verso',toast_google_opened:'📤 Aperto su Google Maps',toast_google_marked:'📤 Aperto su Google Maps · POI marcato come "suggerito"',delete_confirm:'Eliminare',delete_confirm_warn:'Questa azione non può essere annullata.',delete_done:'eliminato',delete_error:'Errore eliminazione:',vis_save_error:'Errore salvando visibilità',poi_not_found:'POI non trovato',edit_in_detail:'Tocca "Modifica" nel dettaglio',
     /* Itinerari overlay */
-    trip_open_btn:'Apri',trip_change_cover:'Cambia copertina',trip_cover_saved:'Copertina aggiornata',trip_vis_comp:'Compagnia',trip_rename:'Rinomina itinerario',trip_renamed:'Nome aggiornato',trip_dates:'Partenza · Arrivo',trip_len:'Percorso',trip_stops_n:'Tappe',trip_cal_hint:'tocca inizio e fine',trip_route_pick:'Scegli il percorso',trip_route:'Percorso',trip_share_pub:'Metti l\'itinerario su Pubblico per condividerlo con un link',trip_share_txt:'un itinerario su POI•LOVE',trip_link_copied:'Link copiato',save:'Salva',itin_cover_lbl:'Copertina',itin_cover_add:'Carica o scegli una foto',trip_close:'Chiudi',trip_calendar:'Calendario viaggio',trip_map:'Mappa itinerario',trip_stops:'Tappe pianificate',trip_add_stop:'Aggiungi tappa',
+    trip_open_btn:'Apri',trip_change_cover:'Cambia copertina',trip_cover_saved:'Copertina aggiornata',trip_vis_comp:'Compagnia',trip_rename:'Rinomina itinerario',trip_renamed:'Nome aggiornato',trip_dates:'Partenza · Arrivo',trip_len:'Percorso',trip_stops_n:'Tappe',trip_cal_hint:'tocca inizio e fine',trip_route_pick:'Scegli il percorso',trip_route:'Percorso',trip_share_pub:'Metti l\'itinerario su Pubblico per condividerlo con un link',trip_share_txt:'un itinerario su POI•LOVE',trip_link_copied:'Link copiato',trip_dep:'Partenza',trip_arr:'Arrivo',trip_share_makepub:'Per condividere con un link, l\'itinerario deve essere Pubblico. Lo rendo pubblico ora?',save:'Salva',itin_cover_lbl:'Copertina',itin_cover_add:'Carica o scegli una foto',trip_close:'Chiudi',trip_calendar:'Calendario viaggio',trip_map:'Mappa itinerario',trip_stops:'Tappe pianificate',trip_add_stop:'Aggiungi tappa',
     /* Itinerari / Tappe — view, card, dettaglio, trip landing */
     itin_new:'Nuovo',itin_subtab_trips:'Itinerari',itin_subtab_lists:'Liste',itin_subtab_routes:'Rotte Storiche',itin_routes_title:'Rotte Storiche',itin_routes_desc:'Percorsi tematici che seguono la storia, la cultura e i racconti di un luogo. Presto potrai esplorarle e crearne di tue.',itin_routes_soon:'Presto disponibili',itin_search_ph:'Cerca destinazione… es. Sarajevo, Bosnia',itin_ai_sub:'Suggerisce, pianifica, aggiunge tappe',itin_sheet_sub:'Crea l\'itinerario, poi aggiungi tappe e condividilo',itin_dest_lbl:'Destinazione',itin_fallback_trip:'Viaggio',itin_n_stops:'{n} tappe',itin_addtrip_none:'Nessun itinerario ancora. Creane uno per aggiungere "{name}".',
     trip_no_stops:'Nessuna tappa ancora, aggiungine una!',trip_status_suspended:'Sospesa',trip_status_done:'Completata',trip_status_planned:'Pianificata',trip_resume:'Riprendi',trip_suspend:'Sospendi',trip_edit:'Modifica',trip_delete:'Elimina',trip_vis_pub:'Pubblico',trip_vis_friends:'Amici',trip_vis_prv:'Privato',stop_note_ph:'Aggiungi note, promemoria, info pratiche…',
@@ -6152,7 +6154,7 @@ const T={
     /* POI list actions */
     act_navigate:'Navigo te',act_open_map:'Hap në hartë',act_share:'Nda',act_visibility:'Dukshmëria',act_suggest_google:'Sugjero te Google Maps',act_edit:'Redakto',act_delete:'Fshi',vis_pub_lbl:'Publik',vis_friends_lbl:'Miq',vis_prv_lbl:'Privat',vis_changed:'Dukshmëria',toast_link_copied:'🔗 Linku u kopjua',toast_navigate_to:'🧭 Navigo te',toast_google_opened:'📤 Hapur në Google Maps',toast_google_marked:'📤 Hapur në Google Maps · POI shënuar si "i sugjeruar"',delete_confirm:'Fshi',delete_confirm_warn:'Ky veprim nuk mund të zhbëhet.',delete_done:'u fshi',delete_error:'Gabim fshirjeje:',vis_save_error:'Gabim duke ruajtur dukshmërinë',poi_not_found:'POI nuk u gjet',edit_in_detail:'Prek "Redakto" në detaj',
     /* Itinerari overlay */
-    trip_open_btn:'Hap',trip_change_cover:'Ndrysho kopertinën',trip_cover_saved:'Kopertina u përditësua',trip_vis_comp:'Shoqëria',trip_rename:'Riemërto itinerarin',trip_renamed:'Emri u përditësua',trip_dates:'Nisja · Mbërritja',trip_len:'Rruga',trip_stops_n:'Ndalesa',trip_cal_hint:'prek fillimin dhe fundin',trip_route_pick:'Zgjidh rrugën',trip_route:'Rruga',trip_share_pub:'Vendose itinerarin si Publik për ta ndarë me një link',trip_share_txt:'një itinerar në POI•LOVE',trip_link_copied:'Linku u kopjua',save:'Ruaj',itin_cover_lbl:'Kopertina',itin_cover_add:'Ngarko ose zgjidh një foto',trip_close:'Mbyll',trip_calendar:'Kalendari i udhëtimit',trip_map:'Harta e itinerarit',trip_stops:'Stacionet e planifikuara',trip_add_stop:'Shto stacion',
+    trip_open_btn:'Hap',trip_change_cover:'Ndrysho kopertinën',trip_cover_saved:'Kopertina u përditësua',trip_vis_comp:'Shoqëria',trip_rename:'Riemërto itinerarin',trip_renamed:'Emri u përditësua',trip_dates:'Nisja · Mbërritja',trip_len:'Rruga',trip_stops_n:'Ndalesa',trip_cal_hint:'prek fillimin dhe fundin',trip_route_pick:'Zgjidh rrugën',trip_route:'Rruga',trip_share_pub:'Vendose itinerarin si Publik për ta ndarë me një link',trip_share_txt:'një itinerar në POI•LOVE',trip_link_copied:'Linku u kopjua',trip_dep:'Nisja',trip_arr:'Mbërritja',trip_share_makepub:'Për ta ndarë me një link, itinerari duhet të jetë Publik. Ta bëj publik tani?',save:'Ruaj',itin_cover_lbl:'Kopertina',itin_cover_add:'Ngarko ose zgjidh një foto',trip_close:'Mbyll',trip_calendar:'Kalendari i udhëtimit',trip_map:'Harta e itinerarit',trip_stops:'Stacionet e planifikuara',trip_add_stop:'Shto stacion',
     /* Itinerari / Tappe — view, card, dettaglio, trip landing */
     itin_new:'I ri',itin_subtab_trips:'Itinerare',itin_subtab_lists:'Lista',itin_subtab_routes:'Rrugët Historike',itin_routes_title:'Rrugët Historike',itin_routes_desc:'Itinerare tematike që ndjekin historinë, kulturën dhe tregimet e një vendi. Së shpejti do të mund t\'i eksplorosh dhe të krijosh të tuat.',itin_routes_soon:'Së shpejti',itin_search_ph:'Kërko destinacionin… p.sh. Sarajevë, Bosnjë',itin_ai_sub:'Sugjeron, planifikon, shton stacione',itin_sheet_sub:'Krijo itinerarin, pastaj shto stacione dhe ndaje',itin_dest_lbl:'Destinacioni',itin_fallback_trip:'Udhëtim',itin_n_stops:'{n} stacione',itin_addtrip_none:'Ende asnjë itinerar. Krijo një për të shtuar "{name}".',
     trip_no_stops:'Ende asnjë stacion, shto një!',trip_status_suspended:'Pezulluar',trip_status_done:'Përfunduar',trip_status_planned:'Planifikuar',trip_resume:'Vazhdo',trip_suspend:'Pezullo',trip_edit:'Redakto',trip_delete:'Fshi',trip_vis_pub:'Publik',trip_vis_friends:'Miq',trip_vis_prv:'Privat',stop_note_ph:'Shto shënime, kujtesa, info praktike…',
@@ -6253,7 +6255,7 @@ const T={
     /* POI list actions */
     act_navigate:'Navigate to',act_open_map:'Open on map',act_share:'Share',act_visibility:'Visibility',act_suggest_google:'Suggest to Google Maps',act_edit:'Edit',act_delete:'Delete',vis_pub_lbl:'Public',vis_friends_lbl:'Friends',vis_prv_lbl:'Private',vis_changed:'Visibility',toast_link_copied:'🔗 Link copied',toast_navigate_to:'🧭 Navigate to',toast_google_opened:'📤 Opened in Google Maps',toast_google_marked:'📤 Opened in Google Maps · POI marked as "suggested"',delete_confirm:'Delete',delete_confirm_warn:'This action cannot be undone.',delete_done:'deleted',delete_error:'Delete error:',vis_save_error:'Error saving visibility',poi_not_found:'POI not found',edit_in_detail:'Tap "Edit" in detail',
     /* Itinerari overlay */
-    trip_open_btn:'Open',trip_change_cover:'Change cover',trip_cover_saved:'Cover updated',trip_vis_comp:'Companion',trip_rename:'Rename itinerary',trip_renamed:'Name updated',trip_dates:'Departure · Arrival',trip_len:'Route',trip_stops_n:'Stops',trip_cal_hint:'tap start and end',trip_route_pick:'Choose the route',trip_route:'Route',trip_share_pub:'Set the itinerary to Public to share it with a link',trip_share_txt:'an itinerary on POI•LOVE',trip_link_copied:'Link copied',save:'Save',itin_cover_lbl:'Cover',itin_cover_add:'Upload or pick a photo',trip_close:'Close',trip_calendar:'Trip calendar',trip_map:'Itinerary map',trip_stops:'Planned stops',trip_add_stop:'Add stop',
+    trip_open_btn:'Open',trip_change_cover:'Change cover',trip_cover_saved:'Cover updated',trip_vis_comp:'Companion',trip_rename:'Rename itinerary',trip_renamed:'Name updated',trip_dates:'Departure · Arrival',trip_len:'Route',trip_stops_n:'Stops',trip_cal_hint:'tap start and end',trip_route_pick:'Choose the route',trip_route:'Route',trip_share_pub:'Set the itinerary to Public to share it with a link',trip_share_txt:'an itinerary on POI•LOVE',trip_link_copied:'Link copied',trip_dep:'Departure',trip_arr:'Arrival',trip_share_makepub:'To share with a link, the itinerary must be Public. Make it public now?',save:'Save',itin_cover_lbl:'Cover',itin_cover_add:'Upload or pick a photo',trip_close:'Close',trip_calendar:'Trip calendar',trip_map:'Itinerary map',trip_stops:'Planned stops',trip_add_stop:'Add stop',
     /* Itinerari / Tappe — view, card, detail, trip landing */
     itin_new:'New',itin_subtab_trips:'Itineraries',itin_subtab_lists:'Lists',itin_subtab_routes:'Historic Routes',itin_routes_title:'Historic Routes',itin_routes_desc:'Themed routes that follow the history, culture and stories of a place. Soon you will be able to explore them and create your own.',itin_routes_soon:'Coming soon',itin_search_ph:'Search a destination… e.g. Sarajevo, Bosnia',itin_ai_sub:'Suggests, plans, adds stops',itin_sheet_sub:'Create the itinerary, then add stops and share it',itin_dest_lbl:'Destination',itin_fallback_trip:'Trip',itin_n_stops:'{n} stops',itin_addtrip_none:'No itinerary yet. Create one to add "{name}".',
     trip_no_stops:'No stops yet, add one!',trip_status_suspended:'Suspended',trip_status_done:'Completed',trip_status_planned:'Planned',trip_resume:'Resume',trip_suspend:'Suspend',trip_edit:'Edit',trip_delete:'Delete',trip_vis_pub:'Public',trip_vis_friends:'Friends',trip_vis_prv:'Private',stop_note_ph:'Add notes, reminders, practical info…',
@@ -7550,7 +7552,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='2.91';
+const APP_VERSION='2.92';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
@@ -13147,7 +13149,7 @@ function openTripDetail(tripId){
         <button class="trip-detail-close" onclick="closeTripDetail()" aria-label="Chiudi"><i class="ph-duotone ph-x"></i></button>
       </div>
       <div id="tripSummary-${t.id}">${_tripSummaryHTML(t)}</div>
-      <div class="trip-vis-bar" id="tripVisBar-${t.id}">${_visBtnsHTML(t)}<button class="trip-share-btn" onclick="shareTripLink('${t.id}')"><i class="ph-duotone ph-share-network"></i> ${window.t('list_vis_link','Condividi')}</button></div>
+      <div class="trip-vis-bar" id="tripVisBar-${t.id}">${_visBtnsHTML(t)}</div>
       <div class="trip-detail-section">
         <div class="trip-detail-header">${window.t('trip_calendar','Periodo del viaggio')} <span class="tdh-hint">${window.t('trip_cal_hint','tocca inizio e fine')}</span></div>
         <div class="mini-cal" id="miniCal-${t.id}"></div>
@@ -13197,7 +13199,8 @@ function _tripSummaryHTML(t){
   const km=_routeLenKm(t);
   const nStops=(t.stops||[]).filter(s=>!s.suspended).length;
   const items=[
-    `<div class="tds-item"><i class="ph-duotone ph-calendar-check"></i><div><div class="tds-v">${dep||'—'}${arr?' → '+arr:''}</div><div class="tds-l">${window.t('trip_dates','Partenza · Arrivo')}</div></div></div>`,
+    `<div class="tds-item"><i class="ph-duotone ph-airplane-takeoff"></i><div><div class="tds-v">${dep||'—'}</div><div class="tds-l">${window.t('trip_dep','Partenza')}</div></div></div>`,
+    `<div class="tds-item"><i class="ph-duotone ph-airplane-landing"></i><div><div class="tds-v">${arr||'—'}</div><div class="tds-l">${window.t('trip_arr','Arrivo')}</div></div></div>`,
     `<div class="tds-item"><i class="ph-duotone ph-path"></i><div><div class="tds-v">${km>0?km.toFixed(1).replace('.',',')+' km':'—'}</div><div class="tds-l">${window.t('trip_len','Percorso')}</div></div></div>`,
     `<div class="tds-item"><i class="ph-duotone ph-map-pin"></i><div><div class="tds-v">${nStops}</div><div class="tds-l">${window.t('trip_stops_n','Tappe')}</div></div></div>`
   ];
@@ -13211,11 +13214,14 @@ function _visBtnsHTML(t){
     {k:'friends',ico:'ph-users',lbl:window.t('trip_vis_friends','Amici'),cls:'active-friends'},
     {k:'prv',ico:'ph-lock-simple',lbl:window.t('trip_vis_prv','Privato'),cls:'active-prv'}
   ];
-  return opts.map(o=>`<button class="trip-vis-btn${(t.visibility||'prv')===o.k?' '+o.cls:''}" onclick="setTripVis('${t.id}','${o.k}')"><i class="ph-duotone ${o.ico}"></i> ${o.lbl}</button>`).join('');
+  const btns=opts.map(o=>`<button class="trip-vis-btn${(t.visibility||'prv')===o.k?' '+o.cls:''}" onclick="setTripVis('${t.id}','${o.k}')"><i class="ph-duotone ${o.ico}"></i> ${o.lbl}</button>`).join('');
+  // Il Link è in linea con le 4 visibilità (stessa riga, stesso stile), sempre attivo.
+  const link=`<button class="trip-vis-btn trip-vis-link" onclick="shareTripLink('${t.id}')"><i class="ph-duotone ph-share-network"></i> ${window.t('list_vis_link','Link')}</button>`;
+  return btns+link;
 }
 function _renderVisBar(t){
   const bar=document.getElementById('tripVisBar-'+t.id); if(!bar) return;
-  bar.innerHTML=_visBtnsHTML(t)+`<button class="trip-share-btn" onclick="shareTripLink('${t.id}')"><i class="ph-duotone ph-share-network"></i> ${window.t('list_vis_link','Condividi')}</button>`;
+  bar.innerHTML=_visBtnsHTML(t);
 }
 // Persiste i metadati del viaggio (nome/visibilità/date) su localStorage + DB.
 function _persistTripMeta(t, fields){
@@ -13567,13 +13573,18 @@ function setTripVis(tripId,vis){
 }
 async function shareTripLink(tripId){
   const t=TRIPS[tripId]; if(!t)return;
-  // Il link pubblico con anteprima (OpenGraph) funziona solo se l'itinerario è Pubblico.
-  if(t.visibility!=='pub'){ showToast(window.t('trip_share_pub','Metti l\'itinerario su Pubblico per condividerlo con un link')); return; }
+  // Il link con anteprima funziona solo se l'itinerario è Pubblico: se non lo è, offro di renderlo pubblico ora.
+  if(t.visibility!=='pub'){
+    const ok=await uiConfirm(window.t('trip_share_makepub','Per condividere con un link, l\'itinerario deve essere Pubblico. Lo rendo pubblico ora?'), {okText:window.t('trip_vis_pub','Pubblico')});
+    if(!ok) return;
+    setTripVis(tripId,'pub');   // aggiorna i bottoni + salva su DB
+  }
   const id=t.dbId||t.id;
   const url='https://poilove.com/trip.php?id='+encodeURIComponent(id);
   const txt=(t.name||'Itinerario')+' · '+window.t('trip_share_txt','un itinerario su POI•LOVE');
-  try{ if(navigator.share){ await navigator.share({title:'POI•LOVE', text:txt, url}); return; } }catch(_){ return; }
-  try{ await navigator.clipboard.writeText(url); showToast(window.t('trip_link_copied','Link copiato')); }catch(_){ showToast(url); }
+  let shared=false;
+  try{ if(navigator.share){ await navigator.share({title:'POI•LOVE', text:txt, url}); shared=true; } }catch(_){ /* annullato o non riuscito: passo alla copia */ }
+  if(!shared){ try{ await navigator.clipboard.writeText(url); showToast(window.t('trip_link_copied','Link copiato: incollalo dove vuoi')); }catch(_){ showToast(url); } }
 }
 // Pool di cover per rotazione locale (source.unsplash.com è deprecato)
 const TRIP_COVERS={
