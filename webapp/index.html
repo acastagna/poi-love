@@ -1719,10 +1719,13 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
 .ai-place-rating .price{color:#16A34A;font-weight:800;letter-spacing:.5px}
 .ai-place-rating .open{color:#16A34A;font-weight:700}
 .ai-place-rating .closed{color:var(--red);font-weight:700}
-.ai-place-dist{font-size:12px;font-weight:700;color:var(--text);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ai-place-dist i{color:var(--red);font-size:12px;position:relative;top:1px;margin-right:3px}
-.ai-place-dist .ai-dist-me{color:var(--text)}
-.ai-place-dist .ai-dist-sub{color:var(--muted);font-weight:600}
+.ai-place-price{font-size:12px;font-weight:700;color:#0F7A3D;margin-top:5px;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.ai-place-price i{color:#16A34A;font-size:14px;flex-shrink:0}
+.ai-place-price b{font-weight:800;color:#0B5F30}
+.ai-place-dist{font-size:12px;font-weight:700;margin-top:5px;display:flex;flex-wrap:wrap;align-items:center;gap:2px 8px;line-height:1.4}
+.ai-place-dist>i{color:var(--red);font-size:12px;position:relative;top:1px;flex-shrink:0}
+.ai-place-dist .ai-dist-me{color:var(--red);font-weight:800;white-space:nowrap}
+.ai-place-dist .ai-dist-sub{color:var(--blue);font-weight:700;white-space:nowrap}
 .ai-more-btn{width:100%;margin-top:10px;padding:10px;border-radius:11px;border:1.5px dashed var(--red);background:rgba(212,43,43,.05);color:var(--red);font-family:inherit;font-size:13px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
 .ai-more-btn:active{transform:scale(.98)}
 .ai-place-why{font-size:11.5px;color:#7A6E58;background:#FBF7EF;border-radius:9px;padding:6px 9px;line-height:1.35;display:flex;align-items:flex-start;gap:6px}
@@ -7287,7 +7290,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='2.76';
+const APP_VERSION='2.77';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
@@ -13374,7 +13377,30 @@ function _googleMismatch(d, cat){
 const _ICON_BY_KIND={pizzeria:'ph-pizza',sushi:'ph-fish','bar o caffè':'ph-coffee',pub:'ph-beer-stein',gelateria:'ph-ice-cream',pasticceria:'ph-cake',panetteria:'ph-bread',ristorante:'ph-fork-knife','hotel o alloggio':'ph-bed',farmacia:'ph-first-aid',supermercato:'ph-shopping-cart',distributore:'ph-gas-pump',museo:'ph-bank',parco:'ph-tree',attrazione:'ph-camera'};
 // Icona dalla CATEGORIA / tipo reale del posto (Google primaryType/typeLabel, cucina, kind), MAI dal nome:
 // il nome inganna ("Coffee Shop" dentro un ristorante americano non e un bar). Fallback: icona della categoria cercata.
+// Mappa AUTOREVOLE: il primaryType di Google -> icona. Ha la precedenza sul testo libero,
+// cosi un "bar" ha SEMPRE il caffe e non l'icona di una cucina pescata dal nome o dai tag.
+const _ICON_BY_GTYPE={
+  bar:'ph-coffee', pub:'ph-beer-stein', wine_bar:'ph-wine', bar_and_grill:'ph-beer-stein',
+  cafe:'ph-coffee', coffee_shop:'ph-coffee', cafeteria:'ph-coffee', tea_house:'ph-coffee',
+  bakery:'ph-bread', sandwich_shop:'ph-bread', donut_shop:'ph-cake', dessert_shop:'ph-cake', dessert_restaurant:'ph-cake',
+  ice_cream_shop:'ph-ice-cream',
+  pizza_restaurant:'ph-pizza', hamburger_restaurant:'ph-hamburger', fast_food_restaurant:'ph-hamburger',
+  sushi_restaurant:'nigiri', japanese_restaurant:'nigiri', ramen_restaurant:'ph-bowl-food',
+  chinese_restaurant:'ph-bowl-food', thai_restaurant:'ph-bowl-food', vietnamese_restaurant:'ph-bowl-food',
+  indonesian_restaurant:'ph-bowl-food', asian_restaurant:'ph-bowl-food',
+  seafood_restaurant:'ph-fish', mexican_restaurant:'ph-pepper',
+  vegetarian_restaurant:'ph-plant', vegan_restaurant:'ph-plant',
+  italian_restaurant:'ph-fork-knife', restaurant:'ph-fork-knife', fine_dining_restaurant:'ph-fork-knife',
+  meal_takeaway:'ph-fork-knife', meal_delivery:'ph-fork-knife', steak_house:'ph-fork-knife',
+  hotel:'ph-bed', lodging:'ph-bed', guest_house:'ph-bed', hostel:'ph-bed', motel:'ph-bed', resort_hotel:'ph-bed',
+  pharmacy:'ph-first-aid', drugstore:'ph-first-aid', museum:'ph-bank', art_gallery:'ph-bank',
+  park:'ph-tree', national_park:'ph-tree', garden:'ph-tree',
+  supermarket:'ph-shopping-cart', grocery_store:'ph-shopping-cart', market:'ph-shopping-cart', convenience_store:'ph-shopping-cart',
+  night_club:'ph-martini', liquor_store:'ph-wine'
+};
 function _iconForPlace(p){
+  const gt=((p&&p.gType)||'').toLowerCase();
+  if(_ICON_BY_GTYPE[gt]) return _ICON_BY_GTYPE[gt];   // tipo Google = verita: vince sempre
   const t=(((p&&p.gType)||'')+' '+((p&&p.typeLabel)||'')+' '+((p&&p.cuisine)||'')+' '+((p&&p.kind)||'')).toLowerCase();
   if(/mexican|messican|taco|burrito|tex.?mex|latin/.test(t)) return 'ph-pepper';
   if(/pizza/.test(t)) return 'ph-pizza';
@@ -13407,6 +13433,9 @@ function _placeIcoHTML(p){
 // vera di Google, altrimenti la costruisce da tipo + cucina + caratteristiche reali.
 function _placeDesc(p){
   if(!p) return '';
+  // PRIORITA' del founder: una descrizione presa da una recensione VERA (non una parola secca).
+  // Se c'e' l'estratto di una recensione, e' quello il testo, tra virgolette come una citazione.
+  if(p.reviewText){ return '«'+String(p.reviewText).replace(/\s+/g,' ').trim()+'»'; }
   const parts=[];
   if(p.desc) parts.push(p.desc);   // descrizione vera di Google: la base del testo
   const ex=[];   // caratteristiche aggiuntive (mai il voto, gia mostrato sopra)
@@ -13423,6 +13452,24 @@ function _placeDesc(p){
 function _priceLabel(pl){
   return ({PRICE_LEVEL_INEXPENSIVE:'€',PRICE_LEVEL_MODERATE:'€€',PRICE_LEVEL_EXPENSIVE:'€€€',PRICE_LEVEL_VERY_EXPENSIVE:'€€€€'})[pl]||'';
 }
+// Codici valuta -> simbolo (per la spesa media reale di Google)
+const _CUR_SYM={EUR:'€',USD:'$',GBP:'£',ALL:'L',CHF:'CHF',JPY:'¥',RON:'lei'};
+// Spesa media CHIARA: prima la fascia reale in denaro (es. "10-20 €"), altrimenti il simbolo € con
+// l'etichetta in chiaro (es. "€€ · nella media"). Stringa vuota se Google non sa il prezzo.
+function _priceText(p){
+  if(!p) return '';
+  const pr=p.priceRange;
+  if(pr && (pr.start!=null || pr.end!=null)){
+    const cur=_CUR_SYM[pr.currency]||pr.currency||'€';
+    if(pr.start!=null && pr.end!=null && String(pr.start)!==String(pr.end)) return `${pr.start}-${pr.end} ${cur}`;
+    const v=(pr.start!=null?pr.start:pr.end);
+    return (pr.start!=null?`da ${v} ${cur}`:`fino a ${v} ${cur}`);
+  }
+  const sym=_priceLabel(p.priceLevel);
+  if(!sym) return '';
+  const lab=({'€':'economico','€€':'nella media','€€€':'fascia alta','€€€€':'lusso'})[sym]||'';
+  return lab?`${sym} · ${lab}`:sym;
+}
 // Arricchisce un posto con voto/recensioni/prezzo/stato da Google (Edge Function place-enrich, chiave server-side).
 // Degrada in silenzio: se manca la chiave o Google non risponde, il posto resta coi soli dati OSM.
 async function _enrichPlace(p, cat){
@@ -13435,7 +13482,7 @@ async function _enrichPlace(p, cat){
     const d=await r.json();
     if(d && d.found){
       if(_googleMismatch(d, cat)){ p.mismatch=true; return p; }   // match sbagliato (via, o gioielleria al posto della pizzeria): scarta
-      p.rating=d.rating; p.reviews=d.reviews; p.priceLevel=d.priceLevel; p.businessStatus=d.businessStatus; p.gType=d.primaryType; p.typeLabel=d.typeLabel; p.desc=d.desc;
+      p.rating=d.rating; p.reviews=d.reviews; p.priceLevel=d.priceLevel; p.priceRange=d.priceRange; p.businessStatus=d.businessStatus; p.gType=d.primaryType; p.typeLabel=d.typeLabel; p.desc=d.desc; p.reviewText=d.reviewText;
       if(d.openNow!=null) p.openNow=d.openNow;   // Google piu affidabile dell'orario OSM
       if(Array.isArray(d.hoursPeriods)) p.hoursPeriods=d.hoursPeriods;   // per "aperto alle 23:00"
     }
@@ -13864,7 +13911,9 @@ function _distLine(p){
   // Regola founder: SEMPRE su una riga sola. A sinistra "Xm da te", poi un ·, a destra "Ykm dal centro di <luogo>".
   const left  = (p.distGpsM!=null) ? `${_distFmt(p.distGpsM)} da te` : '';
   const right = (p.cityLabel && p.distCityM!=null) ? `${_distFmt(p.distCityM)} dal centro di ${esc(p.cityLabel)}` : '';
-  if(left && right) return `<span class="ai-dist-me">${left}</span><span class="ai-dist-sub"> · ${right}</span>`;
+  // Due chunk INTERI, ognuno leggibile per intero (mai tagliato), in due colori diversi: se non
+  // stanno su una riga il secondo va a capo tutto intero, mai spezzato a meta'.
+  if(left && right) return `<span class="ai-dist-me">${left}</span><span class="ai-dist-sub">${right}</span>`;
   if(left)  return `<span class="ai-dist-me">${left}</span>`;
   if(right) return `<span class="ai-dist-sub">${right}</span>`;
   const d=p.distM!=null?p.distM:p.distCityM;
@@ -13877,9 +13926,11 @@ function _renderOneCard(p){
   const icoHTML=_placeIcoHTML(p);
   const rb=[];
   if(typeof p.rating==='number') rb.push(`<span class="ai-r-star"><i class="ph-fill ph-star"></i> ${String(p.rating).replace('.',',')}</span>${p.reviews?`<span class="rev">${p.reviews} recensioni</span>`:''}`);
-  const price=_priceLabel(p.priceLevel); if(price) rb.push(`<span class="price">${price}</span>`);
   if(p.openNow===true) rb.push('<span class="open">Aperto ora</span>'); else if(p.openNow===false) rb.push('<span class="closed">Ora chiuso</span>');
   const ratingRow = rb.length ? `<div class="ai-place-rating">${rb.join('<span class="sep">·</span>')}</div>` : '';
+  // Spesa media, riga a se': CHIARA e con etichetta (richiesta founder), sotto aperto/chiuso.
+  const priceTxt=_priceText(p);
+  const priceRow = priceTxt ? `<div class="ai-place-price"><i class="ph-duotone ph-wallet"></i> Spesa media <b>${priceTxt.replace(/</g,'&lt;')}</b></div>` : '';
   const dl=_distLine(p);
   const distRow = dl ? `<div class="ai-place-dist"><i class="ph-fill ph-map-pin"></i> ${dl}</div>` : '';
   const badge=p.src==='POI•LOVE'?'<span class="ai-place-pill">POI•LOVE</span>':'';
@@ -13891,6 +13942,7 @@ function _renderOneCard(p){
           <div class="ai-place-name">${nm}${badge}</div>
           ${(p.typeLabel||p.kind)?`<div class="ai-place-sub">${(p.typeLabel||p.kind)}</div>`:''}
           ${ratingRow}
+          ${priceRow}
           ${distRow}
         </div>
       </div>

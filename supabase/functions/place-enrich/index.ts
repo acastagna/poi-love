@@ -32,6 +32,32 @@ function json(obj: unknown, status = 200): Response {
   });
 }
 
+// Sceglie una recensione VERA da mostrare come descrizione: la piu' rappresentativa e leggibile.
+// Google ritorna le reviews gia' ordinate per rilevanza: prendo la prima con testo sostanzioso
+// (>=40 caratteri, non una parola sola), la ripulisco e la taglio a ~220 caratteri su confine di parola.
+function pickReviewText(reviews: any[]): string | null {
+  if (!Array.isArray(reviews) || !reviews.length) return null;
+  const texts = reviews
+    .map((r: any) => String(r?.text?.text || r?.originalText?.text || "").replace(/\s+/g, " ").trim())
+    .filter((s: string) => s.length >= 40);
+  const chosen = texts[0] || null;
+  if (!chosen) return null;
+  if (chosen.length <= 220) return chosen;
+  const cut = chosen.slice(0, 220);
+  const sp = cut.lastIndexOf(" ");
+  return (sp > 120 ? cut.slice(0, sp) : cut).replace(/[\s,;:.!?-]+$/, "") + "…";
+}
+
+// Normalizza la fascia di prezzo REALE di Google (Money) in { start, end, currency } leggibile.
+function normPriceRange(pr: any): { start: string | null; end: string | null; currency: string | null } | null {
+  if (!pr) return null;
+  const s = pr?.startPrice?.units ?? null;
+  const e = pr?.endPrice?.units ?? null;
+  const cur = pr?.startPrice?.currencyCode || pr?.endPrice?.currencyCode || null;
+  if (s == null && e == null) return null;
+  return { start: s != null ? String(s) : null, end: e != null ? String(e) : null, currency: cur };
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
   if (req.method !== "POST") return json({ error: "method_not_allowed" }, 405);
@@ -260,7 +286,7 @@ Deno.serve(async (req: Request) => {
         "Content-Type": "application/json",
         "X-Goog-Api-Key": KEY,
         "X-Goog-FieldMask":
-          "places.displayName,places.rating,places.userRatingCount,places.priceLevel,places.businessStatus,places.currentOpeningHours.openNow,places.regularOpeningHours.periods,places.location,places.formattedAddress,places.primaryType,places.primaryTypeDisplayName,places.editorialSummary",
+          "places.displayName,places.rating,places.userRatingCount,places.priceLevel,places.priceRange,places.businessStatus,places.currentOpeningHours.openNow,places.regularOpeningHours.periods,places.location,places.formattedAddress,places.primaryType,places.primaryTypeDisplayName,places.editorialSummary,places.reviews",
       },
       body: JSON.stringify(body),
     });
@@ -280,6 +306,7 @@ Deno.serve(async (req: Request) => {
       reviews: p.userRatingCount ?? null,  // es. 980
       priceLevel: p.priceLevel ?? null,    // PRICE_LEVEL_INEXPENSIVE | MODERATE | EXPENSIVE | VERY_EXPENSIVE
       businessStatus: p.businessStatus ?? null, // OPERATIONAL | CLOSED_TEMPORARILY | CLOSED_PERMANENTLY
+      priceRange: normPriceRange(p.priceRange), // spesa media VERA: { start, end, currency } es. 10-20 EUR
       openNow: p.currentOpeningHours?.openNow ?? null,
       hoursPeriods: p.regularOpeningHours?.periods ?? null, // per "aperto alle 23:00": {open:{day,hour,minute},close:{...}}
       glat: p.location?.latitude ?? null,
@@ -288,6 +315,7 @@ Deno.serve(async (req: Request) => {
       primaryType: p.primaryType ?? null, // es. pizza_restaurant, restaurant, bar...
       typeLabel: p.primaryTypeDisplayName?.text ?? null, // tipo in chiaro (es. "Ristorante messicano")
       desc: p.editorialSummary?.text ?? null, // descrizione breve di Google, se presente
+      reviewText: pickReviewText(p.reviews), // una recensione VERA (estratto), la descrizione che vuole il founder
     }, 200);
   } catch (e) {
     return json({ error: "exception", detail: String(e) }, 200);
