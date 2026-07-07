@@ -4207,6 +4207,7 @@ async function loadSupportThread(){
   }catch(e){ console.warn('[support] load', e?.message||e); return; }
   _supportMsgs=rows;
   if(!rows.length){ if(host) host.remove(); return; }
+  const hadUnread=rows.some(m=>m.sender==='admin' && !m.read_at);
   if(!host){ host=document.createElement('div'); host.id='supportThread'; host.style.marginBottom='10px'; wrap.insertBefore(host, wrap.firstChild); }
   host.innerHTML =
     `<div class="support-divider"><i class="ph-duotone ph-shield-check"></i> ${window.t('support_team','Team POI•LOVE')}</div>`
@@ -4215,6 +4216,8 @@ async function loadSupportThread(){
          <input class="poiai-input" id="supportReplyIn" type="text" placeholder="${window.t('support_reply_ph','Rispondi al team…')}" onkeydown="if(event.key==='Enter')sendSupportReply()">
          <button class="poiai-send" onclick="sendSupportReply()"><i class="ph-duotone ph-paper-plane-tilt"></i></button>
        </div>`;
+  // Se ci sono messaggi NON letti dal team, porto la chat in cima così li vedi subito (prima restavano nascosti sopra).
+  if(hadUnread){ wrap.scrollTop=0; showToast('💬 '+window.t('support_new','Nuovo messaggio dal team POI•LOVE')); }
   await _markSupportRead();
   refreshSupportBadge();
 }
@@ -7742,7 +7745,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='3.00';
+const APP_VERSION='3.01';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
