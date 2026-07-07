@@ -7507,7 +7507,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='2.84';
+const APP_VERSION='2.85';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
@@ -13144,6 +13144,7 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&document.getElemen
 function _dFmt(d){ if(!d) return ''; const p=String(d).split('T')[0].split('-'); return p.length===3?`${p[2]}/${p[1]}/${p[0]}`:String(d); }
 function _dShort(d){ if(!d) return ''; const p=String(d).split('T')[0].split('-'); return p.length===3?`${p[2]}/${p[1]}`:String(d); }
 function _routeLenKm(t){
+  if(t && typeof t.roadKm==='number' && t.roadKm>0) return t.roadKm;   // lunghezza reale SU STRADA (OSRM)
   const pts=(t.stops||[]).filter(s=>!s.suspended && s.lat!=null && s.lng!=null);
   let km=0; for(let i=1;i<pts.length;i++) km+=haversineKm(pts[i-1].lat,pts[i-1].lng,pts[i].lat,pts[i].lng);
   return km;
@@ -13275,7 +13276,9 @@ function initItinMap(tripId){
   L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{maxZoom:18}).addTo(m);
   const pts=(t.stops||[]).filter(s=>s.lat!=null && s.lng!=null).map(s=>[Number(s.lat),Number(s.lng)]);
   if(pts.length){
-    if(pts.length>1) L.polyline(pts,{color:'#D42B2B',weight:4,opacity:.9,lineJoin:'round'}).addTo(m);
+    // Linea provvisoria (in linea d'aria), sostituita subito dal percorso SU STRADA appena OSRM risponde.
+    const straight = (pts.length>1) ? L.polyline(pts,{color:'#D42B2B',weight:3,opacity:.45,dashArray:'6 6',lineJoin:'round'}).addTo(m) : null;
+    if(pts.length>1) _loadRoadRoute(tripId, m, pts, straight);
     let k=0;
     t.stops.forEach((s)=>{
       if(s.lat==null||s.lng==null) return; k++;
@@ -13292,6 +13295,22 @@ function initItinMap(tripId){
   }
   setTimeout(()=>{ try{ m.invalidateSize(); }catch(_){} }, 120);
   itinMaps[tripId]=m;
+}
+// Percorso REALE SU STRADA (OSRM), non in linea d'aria. Async, fail-open: se OSRM è giù resta la linea tratteggiata.
+async function _loadRoadRoute(tripId, m, pts, straightLine){
+  try{
+    const coords=pts.map(p=>`${p[1]},${p[0]}`).join(';');   // OSRM vuole lng,lat
+    const r=await fetch(`https://router.project-osrm.org/route/v1/driving/${coords}?overview=full&geometries=geojson`, { signal:AbortSignal.timeout(9000) });
+    const d=await r.json();
+    const route=d&&d.routes&&d.routes[0];
+    if(!route||!route.geometry||!Array.isArray(route.geometry.coordinates)) return;
+    const latlngs=route.geometry.coordinates.map(c=>[c[1],c[0]]);
+    if(straightLine){ try{ m.removeLayer(straightLine); }catch(_){} }
+    L.polyline(latlngs,{color:'#D42B2B',weight:4,opacity:.9,lineJoin:'round'}).addTo(m);
+    try{ m.fitBounds(latlngs,{padding:[28,28],maxZoom:15}); }catch(_){}
+    const t=TRIPS[tripId];
+    if(t){ t.roadKm=(route.distance||0)/1000; const sum=document.getElementById('tripSummary-'+tripId); if(sum) sum.innerHTML=_tripSummaryHTML(t); }
+  }catch(_){ /* OSRM giù o timeout: resta la linea d'aria tratteggiata */ }
 }
 
 /* ── STOP ACTIONS ── */
