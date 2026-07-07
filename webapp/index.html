@@ -1586,6 +1586,17 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 .trip-vis-btn.active-pub{background:#DCFCE7;border-color:#16A34A;color:#16A34A}
 .trip-vis-btn.active-friends{background:#EBF2FC;border-color:var(--blue);color:var(--blue)}
 .trip-vis-btn.active-prv{background:#f5f0e8;border-color:#C8BFB0;color:var(--muted)}
+.trip-vis-btn.active-comp{background:#FFF1F1;border-color:var(--red);color:var(--red)}
+.trip-detail-rename{background:none;border:none;cursor:pointer;color:var(--muted);font-size:15px;padding:4px 6px;border-radius:8px;flex-shrink:0}
+.trip-detail-rename:active{transform:scale(.9)}
+.trip-detail-hdr-title{cursor:pointer}
+.trip-detail-summary{display:flex;gap:8px;padding:10px 14px 2px}
+.tds-item{flex:1;display:flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--border);border-radius:11px;padding:8px 9px;min-width:0}
+.tds-item>i{font-size:17px;color:var(--red);flex-shrink:0}
+.tds-item>div{min-width:0}
+.tds-v{font-size:12.5px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tds-l{font-size:9px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:var(--muted);margin-top:1px}
+.tdh-hint{font-size:10px;font-weight:600;color:var(--muted);text-transform:none;letter-spacing:0}
 .trip-share-btn{margin-left:auto;height:26px;padding:0 10px;border-radius:13px;background:var(--red);border:none;color:#fff;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px}
 /* Trip body — compatto sotto cover quadrata */
 .trip-body{padding:10px 12px 12px;display:flex;flex-direction:column;gap:6px}
@@ -1617,6 +1628,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 .trip-detail-header{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
 /* Mappa itinerario */
 .itin-map{height:200px;border-radius:12px;overflow:hidden;margin-bottom:14px;border:1px solid var(--border)}
+.itin-map.square{height:auto;aspect-ratio:1/1;max-height:420px}
 @media(min-width:600px){.itin-map{height:300px}}
 /* Timeline tappe */
 .stops-list{padding-bottom:8px}
@@ -1653,8 +1665,9 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 .cal-day-lbl{font-size:8px;color:var(--muted);font-weight:700;padding:3px 0}
 .cal-day{font-size:10px;padding:5px 2px;border-radius:6px;cursor:pointer;transition:background .12s;user-select:none}
 .cal-day:hover{background:#f5f0e8}
-.cal-day.trip-day{background:#EBF2FC;color:var(--blue);font-weight:700}
-.cal-day.today{background:var(--red);color:#fff;font-weight:900}
+.cal-day.trip-day{background:#FBD9D9;color:#B21E1E;font-weight:800;font-size:12px}
+.cal-day.trip-edge{background:var(--red);color:#fff;font-weight:900;font-size:13px;box-shadow:0 2px 8px rgba(212,43,43,.35)}
+.cal-day.today{outline:2px solid #111;outline-offset:-2px;font-weight:900}
 .cal-day.stop-day{background:#DCFCE7;color:#16A34A;font-weight:700}
 .cal-day.selecting{background:#FFF0F0;color:var(--red);font-weight:700}
 /* ILLI•AI Travel Advisor */
@@ -6009,7 +6022,7 @@ const T={
     /* POI list actions */
     act_navigate:'Naviga verso',act_open_map:'Apri sulla mappa',act_share:'Condividi',act_visibility:'Visibilità',act_suggest_google:'Suggerisci a Google Maps',act_edit:'Modifica',act_delete:'Elimina',vis_pub_lbl:'Pubblico',vis_friends_lbl:'Amici',vis_prv_lbl:'Privato',vis_changed:'Visibilità',toast_link_copied:'🔗 Link copiato',toast_navigate_to:'🧭 Naviga verso',toast_google_opened:'📤 Aperto su Google Maps',toast_google_marked:'📤 Aperto su Google Maps · POI marcato come "suggerito"',delete_confirm:'Eliminare',delete_confirm_warn:'Questa azione non può essere annullata.',delete_done:'eliminato',delete_error:'Errore eliminazione:',vis_save_error:'Errore salvando visibilità',poi_not_found:'POI non trovato',edit_in_detail:'Tocca "Modifica" nel dettaglio',
     /* Itinerari overlay */
-    trip_open_btn:'Apri',trip_change_cover:'Cambia copertina',trip_cover_saved:'Copertina aggiornata',itin_cover_lbl:'Copertina',itin_cover_add:'Carica o scegli una foto',trip_close:'Chiudi',trip_calendar:'Calendario viaggio',trip_map:'Mappa itinerario',trip_stops:'Tappe pianificate',trip_add_stop:'Aggiungi tappa',
+    trip_open_btn:'Apri',trip_change_cover:'Cambia copertina',trip_cover_saved:'Copertina aggiornata',trip_vis_comp:'Compagni',trip_rename:'Rinomina itinerario',trip_renamed:'Nome aggiornato',trip_dates:'Partenza · Arrivo',trip_len:'Percorso',trip_stops_n:'Tappe',trip_cal_hint:'tocca inizio e fine',save:'Salva',itin_cover_lbl:'Copertina',itin_cover_add:'Carica o scegli una foto',trip_close:'Chiudi',trip_calendar:'Calendario viaggio',trip_map:'Mappa itinerario',trip_stops:'Tappe pianificate',trip_add_stop:'Aggiungi tappa',
     /* Itinerari / Tappe — view, card, dettaglio, trip landing */
     itin_new:'Nuovo',itin_subtab_trips:'Itinerari',itin_subtab_lists:'Liste',itin_subtab_routes:'Rotte Storiche',itin_routes_title:'Rotte Storiche',itin_routes_desc:'Percorsi tematici che seguono la storia, la cultura e i racconti di un luogo. Presto potrai esplorarle e crearne di tue.',itin_routes_soon:'Presto disponibili',itin_search_ph:'Cerca destinazione… es. Sarajevo, Bosnia',itin_ai_sub:'Suggerisce, pianifica, aggiunge tappe',itin_sheet_sub:'Crea l\'itinerario, poi aggiungi tappe e condividilo',itin_dest_lbl:'Destinazione',itin_fallback_trip:'Viaggio',itin_n_stops:'{n} tappe',itin_addtrip_none:'Nessun itinerario ancora. Creane uno per aggiungere "{name}".',
     trip_no_stops:'Nessuna tappa ancora, aggiungine una!',trip_status_suspended:'Sospesa',trip_status_done:'Completata',trip_status_planned:'Pianificata',trip_resume:'Riprendi',trip_suspend:'Sospendi',trip_edit:'Modifica',trip_delete:'Elimina',trip_vis_pub:'Pubblico',trip_vis_friends:'Amici',trip_vis_prv:'Privato',stop_note_ph:'Aggiungi note, promemoria, info pratiche…',
@@ -6110,7 +6123,7 @@ const T={
     /* POI list actions */
     act_navigate:'Navigo te',act_open_map:'Hap në hartë',act_share:'Nda',act_visibility:'Dukshmëria',act_suggest_google:'Sugjero te Google Maps',act_edit:'Redakto',act_delete:'Fshi',vis_pub_lbl:'Publik',vis_friends_lbl:'Miq',vis_prv_lbl:'Privat',vis_changed:'Dukshmëria',toast_link_copied:'🔗 Linku u kopjua',toast_navigate_to:'🧭 Navigo te',toast_google_opened:'📤 Hapur në Google Maps',toast_google_marked:'📤 Hapur në Google Maps · POI shënuar si "i sugjeruar"',delete_confirm:'Fshi',delete_confirm_warn:'Ky veprim nuk mund të zhbëhet.',delete_done:'u fshi',delete_error:'Gabim fshirjeje:',vis_save_error:'Gabim duke ruajtur dukshmërinë',poi_not_found:'POI nuk u gjet',edit_in_detail:'Prek "Redakto" në detaj',
     /* Itinerari overlay */
-    trip_open_btn:'Hap',trip_change_cover:'Ndrysho kopertinën',trip_cover_saved:'Kopertina u përditësua',itin_cover_lbl:'Kopertina',itin_cover_add:'Ngarko ose zgjidh një foto',trip_close:'Mbyll',trip_calendar:'Kalendari i udhëtimit',trip_map:'Harta e itinerarit',trip_stops:'Stacionet e planifikuara',trip_add_stop:'Shto stacion',
+    trip_open_btn:'Hap',trip_change_cover:'Ndrysho kopertinën',trip_cover_saved:'Kopertina u përditësua',trip_vis_comp:'Shoqëri',trip_rename:'Riemërto itinerarin',trip_renamed:'Emri u përditësua',trip_dates:'Nisja · Mbërritja',trip_len:'Rruga',trip_stops_n:'Ndalesa',trip_cal_hint:'prek fillimin dhe fundin',save:'Ruaj',itin_cover_lbl:'Kopertina',itin_cover_add:'Ngarko ose zgjidh një foto',trip_close:'Mbyll',trip_calendar:'Kalendari i udhëtimit',trip_map:'Harta e itinerarit',trip_stops:'Stacionet e planifikuara',trip_add_stop:'Shto stacion',
     /* Itinerari / Tappe — view, card, dettaglio, trip landing */
     itin_new:'I ri',itin_subtab_trips:'Itinerare',itin_subtab_lists:'Lista',itin_subtab_routes:'Rrugët Historike',itin_routes_title:'Rrugët Historike',itin_routes_desc:'Itinerare tematike që ndjekin historinë, kulturën dhe tregimet e një vendi. Së shpejti do të mund t\'i eksplorosh dhe të krijosh të tuat.',itin_routes_soon:'Së shpejti',itin_search_ph:'Kërko destinacionin… p.sh. Sarajevë, Bosnjë',itin_ai_sub:'Sugjeron, planifikon, shton stacione',itin_sheet_sub:'Krijo itinerarin, pastaj shto stacione dhe ndaje',itin_dest_lbl:'Destinacioni',itin_fallback_trip:'Udhëtim',itin_n_stops:'{n} stacione',itin_addtrip_none:'Ende asnjë itinerar. Krijo një për të shtuar "{name}".',
     trip_no_stops:'Ende asnjë stacion, shto një!',trip_status_suspended:'Pezulluar',trip_status_done:'Përfunduar',trip_status_planned:'Planifikuar',trip_resume:'Vazhdo',trip_suspend:'Pezullo',trip_edit:'Redakto',trip_delete:'Fshi',trip_vis_pub:'Publik',trip_vis_friends:'Miq',trip_vis_prv:'Privat',stop_note_ph:'Shto shënime, kujtesa, info praktike…',
@@ -6211,7 +6224,7 @@ const T={
     /* POI list actions */
     act_navigate:'Navigate to',act_open_map:'Open on map',act_share:'Share',act_visibility:'Visibility',act_suggest_google:'Suggest to Google Maps',act_edit:'Edit',act_delete:'Delete',vis_pub_lbl:'Public',vis_friends_lbl:'Friends',vis_prv_lbl:'Private',vis_changed:'Visibility',toast_link_copied:'🔗 Link copied',toast_navigate_to:'🧭 Navigate to',toast_google_opened:'📤 Opened in Google Maps',toast_google_marked:'📤 Opened in Google Maps · POI marked as "suggested"',delete_confirm:'Delete',delete_confirm_warn:'This action cannot be undone.',delete_done:'deleted',delete_error:'Delete error:',vis_save_error:'Error saving visibility',poi_not_found:'POI not found',edit_in_detail:'Tap "Edit" in detail',
     /* Itinerari overlay */
-    trip_open_btn:'Open',trip_change_cover:'Change cover',trip_cover_saved:'Cover updated',itin_cover_lbl:'Cover',itin_cover_add:'Upload or pick a photo',trip_close:'Close',trip_calendar:'Trip calendar',trip_map:'Itinerary map',trip_stops:'Planned stops',trip_add_stop:'Add stop',
+    trip_open_btn:'Open',trip_change_cover:'Change cover',trip_cover_saved:'Cover updated',trip_vis_comp:'Companions',trip_rename:'Rename itinerary',trip_renamed:'Name updated',trip_dates:'Departure · Arrival',trip_len:'Route',trip_stops_n:'Stops',trip_cal_hint:'tap start and end',save:'Save',itin_cover_lbl:'Cover',itin_cover_add:'Upload or pick a photo',trip_close:'Close',trip_calendar:'Trip calendar',trip_map:'Itinerary map',trip_stops:'Planned stops',trip_add_stop:'Add stop',
     /* Itinerari / Tappe — view, card, detail, trip landing */
     itin_new:'New',itin_subtab_trips:'Itineraries',itin_subtab_lists:'Lists',itin_subtab_routes:'Historic Routes',itin_routes_title:'Historic Routes',itin_routes_desc:'Themed routes that follow the history, culture and stories of a place. Soon you will be able to explore them and create your own.',itin_routes_soon:'Coming soon',itin_search_ph:'Search a destination… e.g. Sarajevo, Bosnia',itin_ai_sub:'Suggests, plans, adds stops',itin_sheet_sub:'Create the itinerary, then add stops and share it',itin_dest_lbl:'Destination',itin_fallback_trip:'Trip',itin_n_stops:'{n} stops',itin_addtrip_none:'No itinerary yet. Create one to add "{name}".',
     trip_no_stops:'No stops yet, add one!',trip_status_suspended:'Suspended',trip_status_done:'Completed',trip_status_planned:'Planned',trip_resume:'Resume',trip_suspend:'Suspend',trip_edit:'Edit',trip_delete:'Delete',trip_vis_pub:'Public',trip_vis_friends:'Friends',trip_vis_prv:'Private',stop_note_ph:'Add notes, reminders, practical info…',
@@ -7484,7 +7497,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='2.82';
+const APP_VERSION='2.83';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
@@ -12930,7 +12943,7 @@ async function syncTripsFromDB(){
   if(!currentUser?.id || !sb) return;
   try{
     const { data, error } = await sb.from('trips')
-      .select('id,name,badge,dates_label,cover_url,cal_year,cal_month,is_featured,trip_stops(id,name,stop_date_label,status,lat,lng,icon,icon_bg,icon_color,note,sort_order)')
+      .select('id,name,badge,dates_label,cover_url,cal_year,cal_month,is_featured,visibility,start_date,end_date,trip_stops(id,name,stop_date_label,status,lat,lng,icon,icon_bg,icon_color,note,sort_order,stay_label,image_url,region)')
       .eq('owner_id', currentUser.id).order('created_at',{ascending:false});
     if(error || !data) return;
     // Preserva i trip ancora solo locali (senza dbId), poi rimpiazza il resto coi dati DB
@@ -12941,10 +12954,12 @@ async function syncTripsFromDB(){
       const stops=(t.trip_stops||[]).slice().sort((a,b)=>(a.sort_order||0)-(b.sort_order||0)).map(s=>({
         id:s.id, dbId:s.id, name:s.name, date:s.stop_date_label||'', status:s.status||'planned',
         suspended:s.status==='suspended', lat:s.lat, lng:s.lng,
-        icon:s.icon||'ph-duotone ph-map-pin', iconBg:s.icon_bg||'#285EA7', iconColor:s.icon_color||'#fff', note:s.note||''
+        icon:s.icon||'ph-duotone ph-map-pin', iconBg:s.icon_bg||'#285EA7', iconColor:s.icon_color||'#fff', note:s.note||'',
+        stay:s.stay_label||'', image:s.image_url||'', region:s.region||''
       }));
       TRIPS[t.id]={ id:t.id, dbId:t.id, name:t.name, badge:t.badge||'', dates:t.dates_label||'',
-        cover:t.cover_url||'', companions:[], stops, calYear:t.cal_year, calMonth:t.cal_month, visibility:'prv', isFeatured:!!t.is_featured };
+        cover:t.cover_url||'', companions:[], stops, calYear:t.cal_year, calMonth:t.cal_month,
+        visibility:t.visibility||'prv', startDate:t.start_date||'', endDate:t.end_date||'', isFeatured:!!t.is_featured };
     });
     if(typeof renderTripCards==='function') renderTripCards();
   }catch(e){ console.warn('syncTripsFromDB:', e); }
@@ -13073,20 +13088,17 @@ function openTripDetail(tripId){
         <button class="tdc-change" onclick="openTripCoverPicker('${t.id}')"><i class="ph-duotone ph-camera"></i> <span>${t.cover?window.t('trip_change_cover','Cambia copertina'):window.t('itin_cover_add','Carica o scegli una foto')}</span></button>
       </div>
       <div class="trip-detail-hdr">
-        <div class="trip-detail-hdr-title">${t.name}</div>
+        <div class="trip-detail-hdr-title" id="tripDetailName" onclick="renameTrip('${t.id}')">${_escHtml(t.name||'')}</div>
+        <button class="trip-detail-rename" onclick="renameTrip('${t.id}')" title="${window.t('trip_rename','Rinomina')}"><i class="ph-duotone ph-pencil-simple"></i></button>
         <button class="trip-detail-close" onclick="closeTripDetail()" aria-label="Chiudi"><i class="ph-duotone ph-x"></i></button>
       </div>
-      <div class="trip-vis-bar">
-        <button class="trip-vis-btn${t.visibility==='pub'?' active-pub':''}" onclick="setTripVis('${t.id}','pub')"><i class="ph-duotone ph-globe"></i> ${window.t('trip_vis_pub','Pubblico')}</button>
-        <button class="trip-vis-btn${t.visibility==='friends'?' active-friends':''}" onclick="setTripVis('${t.id}','friends')"><i class="ph-duotone ph-users"></i> ${window.t('trip_vis_friends','Amici')}</button>
-        <button class="trip-vis-btn${t.visibility==='prv'?' active-prv':''}" onclick="setTripVis('${t.id}','prv')"><i class="ph-duotone ph-lock-simple"></i> ${window.t('trip_vis_prv','Privato')}</button>
-        <button class="trip-share-btn" onclick="shareTripLink('${t.id}')"><i class="ph-duotone ph-share-network"></i> ${window.t('list_vis_link','Link')}</button>
-      </div>
+      <div id="tripSummary-${t.id}">${_tripSummaryHTML(t)}</div>
+      <div class="trip-vis-bar" id="tripVisBar-${t.id}">${_visBtnsHTML(t)}<button class="trip-share-btn" onclick="shareTripLink('${t.id}')"><i class="ph-duotone ph-share-network"></i> ${window.t('list_vis_link','Condividi')}</button></div>
       <div class="trip-detail-section">
-        <div class="trip-detail-header">${window.t('trip_calendar','Calendario viaggio')}</div>
+        <div class="trip-detail-header">${window.t('trip_calendar','Periodo del viaggio')} <span class="tdh-hint">${window.t('trip_cal_hint','tocca inizio e fine')}</span></div>
         <div class="mini-cal" id="miniCal-${t.id}"></div>
         <div class="trip-detail-header">${window.t('trip_map','Mappa itinerario')}</div>
-        <div class="itin-map" id="itin-map-${t.id}"></div>
+        <div class="itin-map square" id="itin-map-${t.id}"></div>
         <div class="trip-detail-header">${window.t('trip_stops','Tappe pianificate')}</div>
         <div class="stops-list" id="stops-${t.id}">${renderTripStopsHTML(t)}</div>
         <button class="itin-new-btn" style="width:100%;justify-content:center;margin:4px 0 16px;background:#f5f0e8;color:var(--blue);font-size:12px" onclick="addNewStop('${t.id}')">
@@ -13117,18 +13129,79 @@ function toggleTripDetail(tripId){ openTripDetail(tripId); }
 document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&document.getElementById('tripDetailOv')?.classList.contains('open'))closeTripDetail(); });
 
 /* ── MINI-CALENDAR ── */
+// ── Riepilogo in cima: date partenza/arrivo + lunghezza percorso + n. tappe ──
+function _dFmt(d){ if(!d) return ''; const p=String(d).split('T')[0].split('-'); return p.length===3?`${p[2]}/${p[1]}/${p[0]}`:String(d); }
+function _dShort(d){ if(!d) return ''; const p=String(d).split('T')[0].split('-'); return p.length===3?`${p[2]}/${p[1]}`:String(d); }
+function _routeLenKm(t){
+  const pts=(t.stops||[]).filter(s=>!s.suspended && s.lat!=null && s.lng!=null);
+  let km=0; for(let i=1;i<pts.length;i++) km+=haversineKm(pts[i-1].lat,pts[i-1].lng,pts[i].lat,pts[i].lng);
+  return km;
+}
+function _tripSummaryHTML(t){
+  const dep=_dShort(t.startDate), arr=_dShort(t.endDate);
+  const km=_routeLenKm(t);
+  const nStops=(t.stops||[]).filter(s=>!s.suspended).length;
+  const items=[
+    `<div class="tds-item"><i class="ph-duotone ph-calendar-check"></i><div><div class="tds-v">${dep||'—'}${arr?' → '+arr:''}</div><div class="tds-l">${window.t('trip_dates','Partenza · Arrivo')}</div></div></div>`,
+    `<div class="tds-item"><i class="ph-duotone ph-path"></i><div><div class="tds-v">${km>0?km.toFixed(1).replace('.',',')+' km':'—'}</div><div class="tds-l">${window.t('trip_len','Percorso')}</div></div></div>`,
+    `<div class="tds-item"><i class="ph-duotone ph-map-pin"></i><div><div class="tds-v">${nStops}</div><div class="tds-l">${window.t('trip_stops_n','Tappe')}</div></div></div>`
+  ];
+  return `<div class="trip-detail-summary">${items.join('')}</div>`;
+}
+// ── Visibilità: 4 opzioni (Pubblico · Compagni · Amici · Privato) ──
+function _visBtnsHTML(t){
+  const opts=[
+    {k:'pub',ico:'ph-globe',lbl:window.t('trip_vis_pub','Pubblico'),cls:'active-pub'},
+    {k:'companions',ico:'ph-users-three',lbl:window.t('trip_vis_comp','Compagni'),cls:'active-comp'},
+    {k:'friends',ico:'ph-users',lbl:window.t('trip_vis_friends','Amici'),cls:'active-friends'},
+    {k:'prv',ico:'ph-lock-simple',lbl:window.t('trip_vis_prv','Privato'),cls:'active-prv'}
+  ];
+  return opts.map(o=>`<button class="trip-vis-btn${(t.visibility||'prv')===o.k?' '+o.cls:''}" onclick="setTripVis('${t.id}','${o.k}')"><i class="ph-duotone ${o.ico}"></i> ${o.lbl}</button>`).join('');
+}
+function _renderVisBar(t){
+  const bar=document.getElementById('tripVisBar-'+t.id); if(!bar) return;
+  bar.innerHTML=_visBtnsHTML(t)+`<button class="trip-share-btn" onclick="shareTripLink('${t.id}')"><i class="ph-duotone ph-share-network"></i> ${window.t('list_vis_link','Condividi')}</button>`;
+}
+// Persiste i metadati del viaggio (nome/visibilità/date) su localStorage + DB.
+function _persistTripMeta(t, fields){
+  try{ const s=JSON.parse(localStorage.getItem('poi_trips')||'{}'); if(s[t.id]){ Object.assign(s[t.id], fields); localStorage.setItem('poi_trips', JSON.stringify(s)); } }catch(_){}
+  if(t.dbId && currentUser?.id && sb){
+    const db={updated_at:new Date().toISOString()};
+    if('name' in fields) db.name=fields.name;
+    if('visibility' in fields) db.visibility=fields.visibility;
+    if('startDate' in fields) db.start_date=fields.startDate||null;
+    if('endDate' in fields) db.end_date=fields.endDate||null;
+    sb.from('trips').update(db).eq('id',t.dbId).eq('owner_id',currentUser.id).then(({error})=>{ if(error) console.warn('[trip meta]',error.message); });
+  }
+}
+async function renameTrip(tripId){
+  const t=TRIPS[tripId]; if(!t) return;
+  const nn=await uiPrompt(window.t('trip_rename','Rinomina itinerario'), t.name||'', {okText:window.t('save','Salva')});
+  if(nn===null) return;
+  const name=nn.trim(); if(!name) return;
+  t.name=name;
+  const el=document.getElementById('tripDetailName'); if(el) el.textContent=name;
+  _persistTripMeta(t,{name});
+  if(typeof renderTripCards==='function') renderTripCards();
+  showToast(window.t('trip_renamed','Nome aggiornato'));
+}
 function renderMiniCal(tripId){
   const el=document.getElementById('miniCal-'+tripId);
   if(!el)return;
   const t=TRIPS[tripId];
-  const cs=CAL_STATE[tripId]||{year:t.calYear,month:t.calMonth};
-  const {year,month}=cs;
-  const MONTHS=['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
+  // Periodo dalle date REALI; se mancano, mese corrente. Niente più "undefined null".
+  const sd=t.startDate?new Date(String(t.startDate).split('T')[0]+'T00:00:00'):null;
+  const ed=t.endDate?new Date(String(t.endDate).split('T')[0]+'T00:00:00'):null;
+  const now=new Date();
+  if(!CAL_STATE[tripId]) CAL_STATE[tripId]={ year:(sd?sd.getFullYear():now.getFullYear()), month:(sd?sd.getMonth():now.getMonth()) };
+  const {year,month}=CAL_STATE[tripId];
+  const MONTHS=['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
   const DAYS=['L','M','M','G','V','S','D'];
   const firstDow=new Date(year,month,1).getDay();
   const offset=firstDow===0?6:firstDow-1;
   const daysInMonth=new Date(year,month+1,0).getDate();
   const today=new Date();
+  const sameDay=(a,b)=>a&&b&&a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate();
   let html=`
     <div class="mini-cal-header" style="margin-bottom:0;padding-bottom:8px">
       <button class="mini-cal-nav" onclick="calNav('${tripId}',-1)"><i class="ph-duotone ph-caret-left"></i></button>
@@ -13138,16 +13211,35 @@ function renderMiniCal(tripId){
     <div class="mini-cal-days">${DAYS.map(d=>`<div class="cal-day-lbl">${d}</div>`).join('')}`;
   for(let i=0;i<offset;i++)html+=`<div></div>`;
   for(let d=1;d<=daysInMonth;d++){
+    const cd=new Date(year,month,d);
     let cls='cal-day';
-    const isToday=today.getDate()===d&&today.getMonth()===month&&today.getFullYear()===year;
-    const inRange=d>=t.calStart&&d<=t.calEnd&&month===t.calMonth&&year===t.calYear;
-    if(isToday)cls+=' today';
-    else if(inRange)cls+=' trip-day';
-    if(inRange&&d===t.calStart)cls+=' stop-day';
-    html+=`<div class="${cls}" onclick="toggleCalDay('${tripId}',${year},${month},${d})">${d}</div>`;
+    const isToday=sameDay(cd,today);
+    const s0=sd?new Date(sd.getFullYear(),sd.getMonth(),sd.getDate()):null;
+    const e0=ed?new Date(ed.getFullYear(),ed.getMonth(),ed.getDate()):(s0);
+    const inRange = s0 && cd>=s0 && cd<=(e0||s0);
+    const isEdge = sameDay(cd,sd) || sameDay(cd,ed);
+    if(inRange) cls+=' trip-day';
+    if(isEdge) cls+=' trip-edge';
+    if(isToday) cls+=' today';
+    html+=`<div class="${cls}" onclick="pickTripDay('${tripId}',${year},${month},${d})">${d}</div>`;
   }
   html+='</div>';
   el.innerHTML=html;
+}
+// Selezione periodo: primo tocco = partenza, secondo = arrivo. Salva su DB.
+let _tripDayPick={};
+function pickTripDay(tripId,year,month,day){
+  const t=TRIPS[tripId]; if(!t)return;
+  const iso=`${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+  if(!_tripDayPick[tripId] || (t.startDate && t.endDate)){
+    _tripDayPick[tripId]=iso; t.startDate=iso; t.endDate='';
+  } else {
+    if(iso < t.startDate){ t.endDate=t.startDate; t.startDate=iso; } else { t.endDate=iso; }
+    _tripDayPick[tripId]=null;
+  }
+  _persistTripMeta(t,{startDate:t.startDate,endDate:t.endDate});
+  renderMiniCal(tripId);
+  const sum=document.getElementById('tripSummary-'+tripId); if(sum) sum.innerHTML=_tripSummaryHTML(t);
 }
 function calNav(tripId,dir){
   if(!CAL_STATE[tripId])CAL_STATE[tripId]={year:TRIPS[tripId].calYear,month:TRIPS[tripId].calMonth};
@@ -13166,25 +13258,28 @@ function toggleCalDay(tripId,year,month,day){
 function initItinMap(tripId){
   const el=document.getElementById('itin-map-'+tripId);
   if(!el||itinMaps[tripId])return;
-  const stopCoords={
-    trip1:[[41.3275,19.8189],[41.3400,19.8200],[41.3310,19.8240],[41.3269,19.8133],[41.3222,19.8091]],
-    trip2:[[43.8476,18.3564],[43.3438,17.8072],[42.4237,18.7710]]
-  };
-  const center=tripId==='trip1'?[41.33,19.82]:[43.2,18.5];
-  const m=L.map(el,{zoomControl:false,attributionControl:false,dragging:true,scrollWheelZoom:false,touchZoom:true});
+  const t=TRIPS[tripId]; if(!t) return;
+  // Mappa BLOCCATA (non si muove) con le coordinate REALI delle tappe. Niente più coordinate finte.
+  const m=L.map(el,{zoomControl:false,attributionControl:false,dragging:false,scrollWheelZoom:false,touchZoom:false,doubleClickZoom:false,boxZoom:false,keyboard:false,tap:false,inertia:false});
   L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{maxZoom:18}).addTo(m);
-  m.setView(center,tripId==='trip1'?13:7);
-  const sc=stopCoords[tripId]||[];
-  const t=TRIPS[tripId];
-  t.stops.forEach((s,i)=>{
-    if(!sc[i])return;
-    const bg=s.status==='done'?'#16A34A':s.suspended?'#F97316':'#D42B2B';
-    const mk=L.marker(sc[i],{
-      icon:L.divIcon({className:'',html:`<div style="width:26px;height:26px;border-radius:50%;background:${bg};border:3px solid #fff;box-shadow:0 3px 10px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:900;cursor:pointer">${i+1}</div>`,iconSize:[26,26],iconAnchor:[13,13]})
-    }).addTo(m);
-    mk.on('click',()=>openStopDetail(tripId,s.id));
-  });
-  if(sc.length>1){try{m.fitBounds(sc,{padding:[24,24],maxZoom:14});}catch(e){}}
+  const pts=(t.stops||[]).filter(s=>s.lat!=null && s.lng!=null).map(s=>[Number(s.lat),Number(s.lng)]);
+  if(pts.length){
+    if(pts.length>1) L.polyline(pts,{color:'#D42B2B',weight:4,opacity:.9,lineJoin:'round'}).addTo(m);
+    let k=0;
+    t.stops.forEach((s)=>{
+      if(s.lat==null||s.lng==null) return; k++;
+      const bg=s.suspended?'#F97316':s.status==='done'?'#16A34A':'#D42B2B';
+      const mk=L.marker([Number(s.lat),Number(s.lng)],{
+        icon:L.divIcon({className:'',html:`<div style="width:26px;height:26px;border-radius:50%;background:${bg};border:3px solid #fff;box-shadow:0 3px 10px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;font-weight:900;cursor:pointer">${k}</div>`,iconSize:[26,26],iconAnchor:[13,13]})
+      }).addTo(m);
+      mk.on('click',()=>openStopDetail(tripId,s.id));
+    });
+    if(pts.length>1){ try{ m.fitBounds(pts,{padding:[28,28],maxZoom:14}); }catch(e){ m.setView(pts[0],13); } }
+    else m.setView(pts[0],14);
+  } else {
+    m.setView([41.3275,19.8189],12);   // default Tirana quando le tappe non hanno coordinate
+  }
+  setTimeout(()=>{ try{ m.invalidateSize(); }catch(_){} }, 120);
   itinMaps[tripId]=m;
 }
 
@@ -13298,15 +13393,10 @@ function dragEnd(e){
 function setTripVis(tripId,vis){
   const t=TRIPS[tripId]; if(!t)return;
   t.visibility=vis;
-  const card=document.getElementById('tc-'+tripId); if(!card)return;
-  const btns=card.querySelectorAll('.trip-vis-btn');
-  const order=['pub','friends','prv'];
-  const cls=['active-pub','active-friends','active-prv'];
-  btns.forEach((btn,i)=>{cls.forEach(c=>btn.classList.remove(c));});
-  const idx=order.indexOf(vis);
-  if(btns[idx])btns[idx].classList.add(cls[idx]);
-  const lbl=vis==='pub'?'Pubblico':vis==='friends'?'Amici':'Privato';
-  showToast(`👁 Visibilità: ${lbl}`);
+  _renderVisBar(t);                 // aggiorna i 4 bottoni nel DETTAGLIO
+  _persistTripMeta(t,{visibility:vis});   // SALVA su DB (prima non salvava)
+  const lbl={pub:window.t('trip_vis_pub','Pubblico'),companions:window.t('trip_vis_comp','Compagni'),friends:window.t('trip_vis_friends','Amici'),prv:window.t('trip_vis_prv','Privato')}[vis]||vis;
+  showToast('👁 '+lbl);
 }
 function shareTripLink(tripId){
   const t=TRIPS[tripId]; if(!t)return;
