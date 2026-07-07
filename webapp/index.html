@@ -1652,7 +1652,6 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
 .pc-free.on{border-color:#285EA7;font-weight:700}
 .poiai-msgs{padding:12px 14px;min-height:100px;max-height:260px;overflow-y:auto;display:flex;flex-direction:column;gap:10px}
 .poiai-msg{max-width:90%}
-@keyframes illiFadeDown{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:translateY(0)}}
 /* ── Bacheca vocale compagnia ── */
 @keyframes cvPulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(212,43,43,.5)}50%{transform:scale(1.04);box-shadow:0 0 0 16px rgba(212,43,43,0)}}
 .cv-row{display:flex;align-items:center;gap:9px;padding:7px 10px;border-bottom:1px solid rgba(0,0,0,.06)}
@@ -1696,7 +1695,7 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
 .cvi-thumb>img{width:100%;height:100%;object-fit:cover;display:block}
 .cvi-av{position:absolute;top:4px;left:4px;width:22px;height:22px;border-radius:50%;border:2px solid #fff;object-fit:cover;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800}
 .cvi-date{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.62));color:#fff;font-size:9px;font-weight:700;padding:9px 4px 3px;text-align:center}
-.poiai-msg.ai{background:#EBF2FC;border-radius:0 12px 12px 12px;padding:10px 12px;font-size:12px;color:var(--text);line-height:1.6;animation:illiFadeDown 1000ms cubic-bezier(.22,.61,.36,1) both}
+.poiai-msg.ai{background:#EBF2FC;border-radius:0 12px 12px 12px;padding:10px 12px;font-size:12px;color:var(--text);line-height:1.6}
 .poiai-msg.user{background:linear-gradient(135deg,var(--red),#E05858);border-radius:12px 12px 0 12px;padding:10px 12px;font-size:12px;color:#fff;line-height:1.5;margin-left:auto}
 .poiai-place-chip{display:inline-flex;align-items:center;gap:5px;background:#DCFCE7;border:1px solid #16A34A;border-radius:8px;padding:4px 9px;font-size:10px;font-weight:700;color:#16A34A;cursor:pointer;margin-top:6px;margin-right:4px;transition:all .15s}
 .poiai-place-chip:active{transform:scale(.96)}
@@ -7288,7 +7287,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='2.75';
+const APP_VERSION='2.76';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
