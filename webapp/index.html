@@ -7552,7 +7552,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='2.92';
+const APP_VERSION='2.93';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
@@ -13486,7 +13486,8 @@ async function stopImageUpload(inp){
 }
 function closeStopDetail(){
   document.getElementById('stopDetailOv').classList.remove('open');
-  _curStopTrip=null; _curStopId=null; _stopImgTmp='';
+  _curStopTrip=null; _curStopId=null; _stopImgTmp=''; _stopEditPick=null;
+  const ed=document.getElementById('stopEditDrop'); if(ed){ ed.classList.remove('show'); ed.innerHTML=''; }
 }
 function saveStopDetail(){
   if(!_curStopTrip||!_curStopId)return;
@@ -13496,11 +13497,14 @@ function saveStopDetail(){
     const g=id=>{ const e=document.getElementById(id); return e?e.value.trim():''; };
     const nn=g('stopEditName'); if(nn) s.name=nn;
     s.region=g('stopEditRegion'); s.date=g('stopEditDate'); s.stay=g('stopEditStay');
+    // Se hai scelto il posto dalla ricerca, prende le COORDINATE vere (finisce sulla mappa e nel percorso).
+    if(_stopEditPick && _stopEditPick.name===s.name){ s.lat=_stopEditPick.lat; s.lng=_stopEditPick.lng; }
     s.image=_stopImgTmp||''; s.note=document.getElementById('stopDetailNote').value.trim();
     refreshStops(_curStopTrip);
+    refreshItinMap(_curStopTrip);   // coordinate/dati cambiati: mappa e percorso si aggiornano subito
     _persistTripStops(t);
-    // aggiorna riepilogo + mappa (se il nome/dati incidono)
     const sum=document.getElementById('tripSummary-'+_curStopTrip); if(sum) sum.innerHTML=_tripSummaryHTML(t);
+    _stopEditPick=null;
     showToast(window.t('stop_saved','Tappa aggiornata'));
   }
   closeStopDetail();
@@ -14776,10 +14780,11 @@ function onStopSearchInput(val){
   drop.classList.add('show');
   _stopSearchTimer=setTimeout(()=>runStopSearch(q), 300);
 }
-async function runStopSearch(q){
-  const drop=document.getElementById('stopSearchDrop'); if(!drop) return;
+async function runStopSearch(q, dropId, pickFn){
+  dropId=dropId||'stopSearchDrop'; pickFn=pickFn||'stopSearchPick';
+  const drop=document.getElementById(dropId); if(!drop) return;
   const token=++_stopSearchToken;
-  const tr=TRIPS[activeTripId];
+  const tr=TRIPS[activeTripId]||(typeof _curStopTrip!=='undefined'?TRIPS[_curStopTrip]:null);
   // Centro = baricentro delle tappe con coordinate (la zona del viaggio). Se non ce ne sono, un default largo.
   let cLat=41.33, cLng=19.82;
   if(tr){ const pc=(tr.stops||[]).filter(s=>s.lat!=null&&s.lng!=null); if(pc.length){ cLat=pc.reduce((a,s)=>a+Number(s.lat),0)/pc.length; cLng=pc.reduce((a,s)=>a+Number(s.lng),0)/pc.length; } }
@@ -14809,7 +14814,7 @@ async function runStopSearch(q){
   gPois=gPois.filter(p=>p&&p.name&&p.lat!=null&&!mNames.has(p.name.toLowerCase().trim())).slice(0,4);
   // ── render (stesso stile del cerca POI) ──
   const _pi=pl=>{ const ty=pl.type||'',c=pl.class||''; if(c==='amenity'||['restaurant','cafe','bar','fast_food'].includes(ty))return'ph-fork-knife'; if(['hotel','hostel','motel'].includes(ty))return'ph-bed'; if(c==='shop')return'ph-shopping-bag'; if(c==='tourism'||['museum','attraction'].includes(ty))return'ph-mountains'; return'ph-map-pin'; };
-  const item=(icoCls,extra,name,meta,lat,lng,region)=>`<div class="map-search-item" onclick="stopSearchPick('${_escArg(name)}',${Number(lat)},${Number(lng)},'${_escArg(region||'')}')">
+  const item=(icoCls,extra,name,meta,lat,lng,region)=>`<div class="map-search-item" onclick="${pickFn}('${_escArg(name)}',${Number(lat)},${Number(lng)},'${_escArg(region||'')}')">
       <div class="map-search-item-icon ${extra||''}"><i class="ph-duotone ${icoCls}"></i></div>
       <div class="map-search-item-text"><div class="map-search-item-name">${(name||'').replace(/</g,'&lt;')}</div><div class="map-search-item-meta">${(meta||'').replace(/</g,'&lt;')}</div></div>
     </div>`;
@@ -14837,6 +14842,24 @@ function stopSearchPick(name, lat, lng, region){
   _stopPick={ name, lat:Number(lat), lng:Number(lng), region:region||'' };
   const inp=document.getElementById('stopNameIn'); if(inp) inp.value=name;
   const drop=document.getElementById('stopSearchDrop'); if(drop){ drop.classList.remove('show'); drop.innerHTML=''; }
+}
+// Stessa ricerca anche nel modulo di MODIFICA tappa: il campo Nome trova posti veri e imposta le coordinate.
+let _stopEditSearchTimer=null, _stopEditPick=null;
+function onStopEditSearchInput(val){
+  _stopEditPick=null;
+  const drop=document.getElementById('stopEditDrop'); if(!drop) return;
+  clearTimeout(_stopEditSearchTimer);
+  const q=(val||'').trim();
+  if(q.length<2){ drop.classList.remove('show'); drop.innerHTML=''; return; }
+  drop.innerHTML='<div class="map-search-loading"><i class="ph-duotone ph-circle-notch" style="animation:spin 1s linear infinite;font-size:14px"></i>'+t('mt_searching','Cerco…')+'</div>';
+  drop.classList.add('show');
+  _stopEditSearchTimer=setTimeout(()=>runStopSearch(q,'stopEditDrop','stopEditSearchPick'), 300);
+}
+function stopEditSearchPick(name, lat, lng, region){
+  _stopEditPick={ name, lat:Number(lat), lng:Number(lng), region:region||'' };
+  const nEl=document.getElementById('stopEditName'); if(nEl) nEl.value=name;
+  const rEl=document.getElementById('stopEditRegion'); if(rEl && region) rEl.value=region;
+  const drop=document.getElementById('stopEditDrop'); if(drop){ drop.classList.remove('show'); drop.innerHTML=''; }
 }
 function _onStopNameInput_deprecated(val){
   clearTimeout(stopAcTimer);
@@ -15677,9 +15700,10 @@ async function confirmPhotoPicker(){
         <span class="se-num" id="stopEditNum"></span>
       </div>
       <div class="stop-edit-grid">
-        <div class="se-field se-full">
-          <label class="se-lbl"><i class="ph-duotone ph-textbox"></i> <span data-t="stop_f_name">Nome tappa</span></label>
-          <input id="stopEditName" class="se-in" type="text" maxlength="80" data-tp="stop_f_name_ph" placeholder="Nome preciso della tappa">
+        <div class="se-field se-full" style="position:relative">
+          <label class="se-lbl"><i class="ph-duotone ph-magnifying-glass"></i> <span data-t="stop_f_name">Cerca la tappa</span></label>
+          <input id="stopEditName" class="se-in" type="text" maxlength="80" data-tp="stop_search_ph" placeholder="Cerca un posto: es. Mont Saint-Michel…" autocomplete="off" oninput="onStopEditSearchInput(this.value)" onfocus="onStopEditSearchInput(this.value)">
+          <div class="map-search-drop" id="stopEditDrop"></div>
         </div>
         <div class="se-field se-full">
           <label class="se-lbl"><i class="ph-duotone ph-map-pin-area"></i> <span data-t="stop_f_region">Prefettura / regione / luogo</span></label>
