@@ -121,6 +121,10 @@ info@321.al · https://321.al
 |---|---|---|
 | Termini e Privacy online in 3 lingue | ✅ Fatto e live | 27/06 |
 | Testi legali allineati al codice reale (privacy+termini: media server, tag community, tracciamento categorie, cessione/reclamo POI, OAuth Facebook/Apple, tier Plus/Influencer; data 06/07) | ✅ Fatto e live | 06/07 |
+| Consenso GDPR/124-2024 vero: schermata one-time (Termini+Privacy+età≥16 obbligatori, GPS e foto opzionali separati), registrato in DB con IP/versione/timestamp (mig 046), età minima 16 secca, revocabile; sostituisce la frase passiva | ✅ Fatto e live (v2.57) | 07/07 |
+| Sistema notifiche: campanella con badge realtime + pannello lista + impostazioni per-tipo/per-canale (in-app/email; push "Presto"); trigger reali (follower, LOVE, nuovo POI di un seguito, invito/ingresso compagnia); mig 047, 3 lingue | ✅ Fatto e live (v2.58) | 07/07 |
+| Avviso "sei vicino a un luogo che ami" (geofence foreground, solo app aperta, gated dal consenso posizione); background reale rimandato all'app nativa (limite web iOS/Android) | ✅ Fatto e live (v2.59) | 07/07 |
+| Email notifiche (chiave AcumbaMail + edge worker) + trigger rotta pubblicata/adottata + push di sistema (service worker + VAPID + install iOS) | ⬜ Da fare | prossimi giri |
 | Validazione legale FINALE (legale): rimandata a dopo, non bloccante per il lancio (analisi testi gia fatta, testi allineati). Eda in pista quando sara il momento | 🕓 Rimandata (decisione 06/07) | dopo |
 | Collaudo finale di Alessandro (checklist 5 prove) | ⬜ In attesa | adesso |
 | Presentazione aggiornata su project.poilove.com (screenshot delle novità) | ⬜ Da fare | prima del lancio |
