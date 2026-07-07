@@ -2369,7 +2369,7 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
 <div id="consentOverlay" style="display:none;position:fixed;inset:0;z-index:9500;background:linear-gradient(160deg,#1a0a0a 0%,#2d1515 40%,#0f1e35 100%);align-items:center;justify-content:center;padding:24px 18px;overflow-y:auto">
   <div style="width:100%;max-width:440px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:22px;padding:26px 22px;backdrop-filter:blur(14px);box-shadow:0 20px 60px rgba(0,0,0,.4);margin:auto">
     <div style="text-align:center;margin-bottom:18px">
-      <i class="ph-duotone ph-heart" style="font-size:44px;color:#D42B2B"></i>
+      <img src="img/logo-completo.svg" onerror="this.onerror=null;this.src='https://poilove.com/img/logo-completo.svg'" alt="POI•LOVE" style="height:54px;width:auto;max-width:80%;margin:0 auto 4px;display:block">
       <h2 style="color:#fff;font-size:20px;font-weight:800;margin:8px 0 4px" data-t="cons_title">Un attimo prima di iniziare</h2>
       <p style="color:rgba(255,255,255,.6);font-size:13px;line-height:1.45;margin:0" data-t="cons_sub">Per usare POI•LOVE serve il tuo consenso. Puoi cambiare le scelte opzionali quando vuoi dal profilo.</p>
     </div>
@@ -6845,7 +6845,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='2.63';
+const APP_VERSION='2.64';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
