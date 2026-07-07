@@ -4037,7 +4037,25 @@ let _compRec=null, _compChunks=[], _compStream=null, _compRecStart=0, _compPlayi
 const _compSignedCache={};
 const _compRetried=new Set();
 
-async function openCompagniaDetail(id, name){
+// Recupera (o ricrea nel DB) l'id di una compagnia che in cache non ce l'ha: creazione DB fallita/offline.
+async function _resolveCompanionId(code, name){
+  if(!code || !currentUser?.id || !sb) return null;
+  try{
+    let { data } = await sb.from('companions').select('id').eq('code',code).eq('owner_id',currentUser.id).maybeSingle();
+    if(!data){
+      const loc=(_getCompagnie()||[]).find(x=>x.code===code)||{};
+      const ins=await sb.from('companions').insert({ owner_id:currentUser.id, code, name:name||loc.name||'Compagnia',
+        description:loc.desc||null, type:loc.type||'forever',
+        start_date:loc.startDate||null, start_time:loc.startTime||null, end_date:loc.endDate||null, end_time:loc.endTime||null
+      });
+      if(!ins.error){ const g=await sb.from('companions').select('id').eq('code',code).eq('owner_id',currentUser.id).maybeSingle(); if(!g.error) data=g.data; }
+    }
+    if(data && data.id){ _saveCompagnie((_getCompagnie()||[]).map(x=> x.code===code?{...x, id:data.id}:x)); return data.id; }
+  }catch(e){ console.warn('[comp] resolve id:', e && e.message || e); }
+  return null;
+}
+async function openCompagniaDetail(id, name, code){
+  if(!id && code){ id = await _resolveCompanionId(code, name); if(id && typeof renderCompanionsTab==='function') renderCompanionsTab(); }
   if(!id){ showToast(t('cv_no_id','Compagnia non ancora sincronizzata, riprova tra poco')); return; }
   _compDetail={ id, name:name||'' };
   _compReplyTo=null; compUpdateReplyBanner();
@@ -7136,7 +7154,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='2.69';
+const APP_VERSION='2.71';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
@@ -9840,17 +9858,21 @@ async function createCompagnia(){
   // Persistenza Supabase: crea la compagnia. L'id reale torna in cache per edit/delete/condivisione.
   if(currentUser?.id && sb){
     try{
-      const { data, error } = await sb.from('companions').insert({
+      // NB: insert().select() insieme FALLISCE la RLS su companions -> insert semplice, poi id via select separata.
+      const { error } = await sb.from('companions').insert({
         owner_id: currentUser.id, code, name, description: desc, type,
         start_date: startDate||null, start_time: startTime||null,
         end_date: endDate||null, end_time: endTime||null
-      }).select('id').single();
+      });
       if(error) throw error;
-      newComp.id = data.id;
-      _saveCompagnie(_getCompagnie().map(x=> x.code===code ? {...x, id:data.id} : x));
-      // Inviti email -> companion_members (status 'invited'); diventano 'joined' quando l'invitato usa il codice (RPC join_companion)
-      const emails = (invites||'').split(/[,;\s]+/).map(s=>s.trim()).filter(s=>s.includes('@'));
-      if(emails.length) await sb.from('companion_members').insert(emails.map(em=>({companion_id:data.id, email:em, status:'invited'})));
+      const { data: got } = await sb.from('companions').select('id').eq('code', code).eq('owner_id', currentUser.id).maybeSingle();
+      if(got && got.id){
+        newComp.id = got.id;
+        _saveCompagnie(_getCompagnie().map(x=> x.code===code ? {...x, id:got.id} : x));
+        // Inviti email -> companion_members (status 'invited'); diventano 'joined' col codice (RPC join_companion)
+        const emails = (invites||'').split(/[,;\s]+/).map(s=>s.trim()).filter(s=>s.includes('@'));
+        if(emails.length) await sb.from('companion_members').insert(emails.map(em=>({companion_id:got.id, email:em, status:'invited'})));
+      }
     }catch(e){ console.warn('createCompagnia DB:', e); }
   }
 
@@ -9943,7 +9965,7 @@ function renderCompanionsTab(){
       : `<button class="comp-act del-off" title="${t('comp_close_disabled_title','Disponibile solo quando rimangono in 2')}" disabled><i class="ph-duotone ph-trash"></i></button>`;
     const actionsRow = isMine ? `<div class="comp-actions">${actEdit}${actAdmin}${actDel}</div>
       ${!canClose?`<div class="comp-close-hint"><i class="ph-duotone ph-lock-simple"></i> ${t('comp_close_hint','Puoi chiudere il gruppo solo quando rimaste in 2: ora {n} {members}').replace('{n}', totalMembers).replace('{members}', memberWord)}</div>`:''}` : '';
-    return `<div class="comp-card" style="cursor:pointer" onclick="openCompagniaDetail('${c.id||''}','${_escArg(c.name||'')}')">
+    return `<div class="comp-card" style="cursor:pointer" onclick="openCompagniaDetail('${c.id||''}','${_escArg(c.name||'')}','${_escArg(c.code||'')}')">
       ${creatorRow}
       <div class="comp-row">
         <div class="comp-name">${c.name}</div>
@@ -9951,7 +9973,7 @@ function renderCompanionsTab(){
       </div>
       <div><span class="comp-code">${c.code}</span><span class="comp-meta">${statusTxt}</span></div>
       ${friends?`<div class="comp-friends">${friends}</div>`:''}
-      <button class="itin-new-btn" style="width:100%;justify-content:center;height:42px;margin-top:10px" onclick="event.stopPropagation();openCompagniaDetail('${c.id||''}','${_escArg(c.name||'')}')"><i class="ph-duotone ph-broadcast" style="font-size:15px"></i> ${t('cv_open','Bacheca vocale')}</button>
+      <button class="itin-new-btn" style="width:100%;justify-content:center;height:42px;margin-top:10px" onclick="event.stopPropagation();openCompagniaDetail('${c.id||''}','${_escArg(c.name||'')}','${_escArg(c.code||'')}')"><i class="ph-duotone ph-broadcast" style="font-size:15px"></i> ${t('cv_open','Bacheca vocale')}</button>
       ${actionsRow}
     </div>`;
   }).join('');
