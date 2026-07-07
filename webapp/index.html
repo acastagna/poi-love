@@ -7136,7 +7136,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='2.67';
+const APP_VERSION='2.68';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
@@ -9903,7 +9903,7 @@ function renderCompanionsTab(){
       const lbl = f.status==='traveling'?t('comp_friend_traveling','In viaggio'):f.status==='stopped'?t('comp_friend_stopped','Fermo'):t('comp_friend_offline','Offline');
       const initials = f.name.split(' ').map(s=>s[0]).join('').slice(0,2).toUpperCase();
       const safeName = f.name.replace(/'/g,"\\'").replace(/"/g,'&quot;');
-      return `<div class="friend-row" onclick="openPublicProfile('${safeName}','${f.status}','friend')">
+      return `<div class="friend-row" onclick="event.stopPropagation();openPublicProfile('${safeName}','${f.status}','friend')">
         <div class="friend-avatar">${initials}</div>
         <div class="friend-name">${f.name}</div>
         <span class="friend-status ${cls}"><span class="dot"></span>${lbl}</span>
@@ -9943,11 +9943,11 @@ function renderCompanionsTab(){
       : `<button class="comp-act del-off" title="${t('comp_close_disabled_title','Disponibile solo quando rimangono in 2')}" disabled><i class="ph-duotone ph-trash"></i></button>`;
     const actionsRow = isMine ? `<div class="comp-actions">${actEdit}${actAdmin}${actDel}</div>
       ${!canClose?`<div class="comp-close-hint"><i class="ph-duotone ph-lock-simple"></i> ${t('comp_close_hint','Puoi chiudere il gruppo solo quando rimaste in 2: ora {n} {members}').replace('{n}', totalMembers).replace('{members}', memberWord)}</div>`:''}` : '';
-    return `<div class="comp-card">
+    return `<div class="comp-card" style="cursor:pointer" onclick="openCompagniaDetail('${c.id||''}','${_escArg(c.name||'')}')">
       ${creatorRow}
       <div class="comp-row">
         <div class="comp-name">${c.name}</div>
-        <div class="comp-status" title="${statusTxt}">${statusEmoji}</div>
+        <div style="display:flex;align-items:center;gap:6px"><div class="comp-status" title="${statusTxt}">${statusEmoji}</div><i class="ph-bold ph-caret-right" style="color:var(--muted);font-size:15px"></i></div>
       </div>
       <div><span class="comp-code">${c.code}</span><span class="comp-meta">${statusTxt}</span></div>
       ${friends?`<div class="comp-friends">${friends}</div>`:''}
