@@ -3401,11 +3401,15 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
     </div>
     <div class="sh-body">
 
-      <!-- Nome tappa + autocomplete Nominatim -->
-      <div class="sec-lbl"><span data-t="stop_lbl_name">Nome della tappa</span><span class="req-badge">!</span></div>
-      <input class="field-in" type="text" id="stopNameIn"
-        placeholder="es. Castello di Shkodër"
-        autocomplete="off" style="margin-bottom:14px"/>
+      <!-- Nome tappa: RICERCA posti veri (come il cerca POI), centrata sulla zona dell'itinerario -->
+      <div class="sec-lbl"><span data-t="stop_lbl_name">Cerca la tappa</span><span class="req-badge">!</span></div>
+      <div style="position:relative;margin-bottom:14px">
+        <input class="field-in" type="text" id="stopNameIn"
+          placeholder="Cerca un posto: es. Castello di Shkodër, Colosseo…"
+          data-tp="stop_search_ph" autocomplete="off"
+          oninput="onStopSearchInput(this.value)" onfocus="onStopSearchInput(this.value)" style="margin-bottom:0"/>
+        <div class="map-search-drop" id="stopSearchDrop"></div>
+      </div>
 
       <!-- Categoria -->
       <div class="sec-lbl" data-t="stop_lbl_cat">Categoria</div>
@@ -7546,7 +7550,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='2.90';
+const APP_VERSION='2.91';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
@@ -14747,7 +14751,82 @@ function onStopNameFocus(){
       }).catch(()=>{});
   }
 }
-function onStopNameInput(val){ /* tendina rimossa: il nome della tappa e' testo libero */ }
+function onStopNameInput(val){ /* deprecato: ora la ricerca tappa e' onStopSearchInput */ }
+// ── RICERCA TAPPA: stesso stile e sorgenti del cerca POI (community + Google + Nominatim), ma centrata
+// sulla ZONA dell'itinerario, non su dove sei (stai progettando il viaggio). Il posto scelto entra con coordinate. ──
+let _stopSearchTimer=null, _stopSearchToken=0, _stopPick=null;
+function onStopSearchInput(val){
+  _stopPick=null;   // se ricomincia a scrivere, annullo la scelta precedente
+  const drop=document.getElementById('stopSearchDrop'); if(!drop) return;
+  clearTimeout(_stopSearchTimer);
+  const q=(val||'').trim();
+  if(q.length<2){ drop.classList.remove('show'); drop.innerHTML=''; return; }
+  drop.innerHTML='<div class="map-search-loading"><i class="ph-duotone ph-circle-notch" style="animation:spin 1s linear infinite;font-size:14px"></i>'+t('mt_searching','Cerco…')+'</div>';
+  drop.classList.add('show');
+  _stopSearchTimer=setTimeout(()=>runStopSearch(q), 300);
+}
+async function runStopSearch(q){
+  const drop=document.getElementById('stopSearchDrop'); if(!drop) return;
+  const token=++_stopSearchToken;
+  const tr=TRIPS[activeTripId];
+  // Centro = baricentro delle tappe con coordinate (la zona del viaggio). Se non ce ne sono, un default largo.
+  let cLat=41.33, cLng=19.82;
+  if(tr){ const pc=(tr.stops||[]).filter(s=>s.lat!=null&&s.lng!=null); if(pc.length){ cLat=pc.reduce((a,s)=>a+Number(s.lat),0)/pc.length; cLng=pc.reduce((a,s)=>a+Number(s.lng),0)/pc.length; } }
+  // 1. POI della community (match fuzzy, con coordinate)
+  const _hay=p=>((p&&p.name)||'')+' '+((p&&p.address)||'')+' '+((p&&p.category)||'')+' '+(Array.isArray(p&&p.tags)?p.tags.join(' '):'');
+  const matched=(window._dbPOIs||[]).map(p=>({p,score:(p&&p.name)?_fuzzyScore(q,_hay(p)):0}))
+    .filter(o=>o.score>=1.5 && o.p.lat!=null).sort((a,b)=>b.score-a.score).slice(0,4);
+  // 2. Google/Apple discover attorno alla zona dell'itinerario
+  const gP=(typeof _googleDiscover==='function')?_googleDiscover(q,cLat,cLng,30000):Promise.resolve([]);
+  // 3. Nominatim: per chi progetta (per nome), Albania + mondo
+  let places=[];
+  const nl=(typeof lang!=='undefined'?lang:'it');
+  try{
+    const [rAl,rW]=await Promise.all([
+      fetch(`https://nominatim.openstreetmap.org/search?format=json&namedetails=1&addressdetails=1&limit=6&countrycodes=al&q=${encodeURIComponent(q)}`,{headers:{'Accept-Language':nl}}),
+      fetch(`https://nominatim.openstreetmap.org/search?format=json&namedetails=1&addressdetails=1&limit=6&q=${encodeURIComponent(q)}`,{headers:{'Accept-Language':nl}})
+    ]);
+    if(token!==_stopSearchToken) return;
+    const seen=new Set();
+    for(const r of [rAl,rW]){ if(!r.ok) continue; const d=await r.json(); for(const pl of (d||[])){ const k=pl.osm_type+''+pl.osm_id; if(!seen.has(k)){ seen.add(k); places.push(pl); } } }
+    places=places.slice(0,6);
+  }catch(_){}
+  if(token!==_stopSearchToken) return;
+  let gPois=[]; try{ gPois=(await gP)||[]; }catch(_){}
+  if(token!==_stopSearchToken) return;
+  const mNames=new Set(matched.map(o=>((o.p&&o.p.name)||'').toLowerCase().trim()));
+  gPois=gPois.filter(p=>p&&p.name&&p.lat!=null&&!mNames.has(p.name.toLowerCase().trim())).slice(0,4);
+  // ── render (stesso stile del cerca POI) ──
+  const _pi=pl=>{ const ty=pl.type||'',c=pl.class||''; if(c==='amenity'||['restaurant','cafe','bar','fast_food'].includes(ty))return'ph-fork-knife'; if(['hotel','hostel','motel'].includes(ty))return'ph-bed'; if(c==='shop')return'ph-shopping-bag'; if(c==='tourism'||['museum','attraction'].includes(ty))return'ph-mountains'; return'ph-map-pin'; };
+  const item=(icoCls,extra,name,meta,lat,lng,region)=>`<div class="map-search-item" onclick="stopSearchPick('${_escArg(name)}',${Number(lat)},${Number(lng)},'${_escArg(region||'')}')">
+      <div class="map-search-item-icon ${extra||''}"><i class="ph-duotone ${icoCls}"></i></div>
+      <div class="map-search-item-text"><div class="map-search-item-name">${(name||'').replace(/</g,'&lt;')}</div><div class="map-search-item-meta">${(meta||'').replace(/</g,'&lt;')}</div></div>
+    </div>`;
+  let html='';
+  if(matched.length){
+    html+='<div class="map-search-section"><div class="map-search-section-lbl"><i class="ph-duotone ph-heart" style="color:var(--red);font-size:11px"></i> '+t('mt_your_pois','POI•LOVE')+'</div>';
+    matched.forEach(o=>{ const p=o.p; html+=item('ph-map-pin','',p.name,(p.address||p.category||''),p.lat,p.lng,(p.city||p.address||'')); });
+    html+='</div>';
+  }
+  if(gPois.length){
+    html+='<div class="map-search-section"><div class="map-search-section-lbl"><i class="ph-duotone ph-storefront" style="color:#1a73e8;font-size:11px"></i> '+t('mt_places_poi','Punti di interesse')+'</div>';
+    gPois.forEach(pl=>{ const meta=[(pl.typeLabel||pl.kind||''),(pl.rating?('⭐ '+String(pl.rating).replace('.',',')):'')].filter(Boolean).join(' · '); html+=item('ph-storefront','osm',pl.name,meta,pl.lat,pl.lng,(pl.typeLabel||'')); });
+    html+='</div>';
+  }
+  if(places.length){
+    html+='<div class="map-search-section"><div class="map-search-section-lbl"><i class="ph-duotone ph-map-trifold" style="color:var(--blue);font-size:11px"></i> '+t('mt_places','Luoghi')+'</div>';
+    places.forEach(pl=>{ const nm=(pl.namedetails&&pl.namedetails.name)||String(pl.display_name||'').split(',')[0]; const a=pl.address||{}; const reg=a.city||a.town||a.village||a.state||a.country||''; const meta=String(pl.display_name||'').split(',').slice(1,3).join(',').trim(); html+=item(_pi(pl),'osm',nm,meta,pl.lat,pl.lon,reg); });
+    html+='</div>';
+  }
+  if(!html) html='<div class="map-search-empty" style="padding:14px;text-align:center;color:var(--muted);font-size:12px">'+t('mt_no_results','Nessun risultato. Puoi aggiungerla lo stesso a mano.')+'</div>';
+  drop.innerHTML=html;
+}
+// Posto scelto dalla ricerca: riempio il nome e memorizzo le coordinate reali (finiranno sulla mappa e nel percorso).
+function stopSearchPick(name, lat, lng, region){
+  _stopPick={ name, lat:Number(lat), lng:Number(lng), region:region||'' };
+  const inp=document.getElementById('stopNameIn'); if(inp) inp.value=name;
+  const drop=document.getElementById('stopSearchDrop'); if(drop){ drop.classList.remove('show'); drop.innerHTML=''; }
+}
 function _onStopNameInput_deprecated(val){
   clearTimeout(stopAcTimer);
   if(!document.getElementById('stopAcDrop')){return;}
@@ -14848,14 +14927,18 @@ function saveStop(){
   const tripId=activeTripId; const t=TRIPS[tripId];
   if(!t){ showToast(lang==='it'?'Apri prima un itinerario':'Open an itinerary first'); return; }
   const catBtn=document.querySelector('#stopCatChips .chip.sel');
-  const region=catBtn?catBtn.textContent.trim():'';
+  let region=catBtn?catBtn.textContent.trim():'';
+  // Se la tappa è stata SCELTA dalla ricerca, entra con le sue coordinate REALI (così appare sulla mappa e nel percorso).
+  let lat=null, lng=null;
+  if(_stopPick && _stopPick.name===name){ lat=_stopPick.lat; lng=_stopPick.lng; if(_stopPick.region) region=_stopPick.region; }
   const id=(crypto.randomUUID?crypto.randomUUID():('s'+Date.now()+Math.round(Math.random()*1e6)));
   // Aggiunta REALE: la tappa entra nell'itinerario e viene salvata (prima era solo un toast finto)
-  t.stops.push({ id, name, date:'', status:'planned', suspended:false, lat:null, lng:null,
+  t.stops.push({ id, name, date:'', status:'planned', suspended:false, lat, lng,
     icon:'ph-duotone ph-map-pin', iconBg:'#285EA7', iconColor:'#fff', note:'', stay:'', image:'', region });
+  _stopPick=null;
   // Reset form
   if(nameEl) nameEl.value='';
-  const ac=document.getElementById('stopAcDrop'); if(ac) ac.classList.remove('open');
+  const sd=document.getElementById('stopSearchDrop'); if(sd){ sd.classList.remove('show'); sd.innerHTML=''; }
   document.querySelectorAll('#stopCatChips .chip.sel').forEach(c=>c.classList.remove('sel'));
   closeSheet('addStopOv','addStopBg','addStopSheet');
   refreshStops(tripId);
