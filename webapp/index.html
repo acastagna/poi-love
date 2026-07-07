@@ -774,6 +774,8 @@ body::after{content:'';position:fixed;inset:0;z-index:99999;pointer-events:none;
 
 /* ── SHEETS ── */
 .sheet-overlay{position:fixed;inset:0;z-index:400;pointer-events:none}
+/* La tappa da aggiungere apre sopra il popup itinerario (che è z-index 300), non sotto */
+#addStopOv{z-index:9350}
 .sheet-backdrop{position:absolute;inset:0;background:rgba(0,0,0,0);transition:background .35s;pointer-events:none}
 .sheet-backdrop.vis{background:rgba(0,0,0,.42);pointer-events:all}
 .sheet{position:absolute;bottom:0;left:0;right:0;background:var(--card);border-radius:24px 24px 0 0;padding:0 0 52px;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.72,0,1);pointer-events:none;max-height:94vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
@@ -1629,6 +1631,16 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 /* Mappa itinerario */
 .itin-map{height:200px;border-radius:12px;overflow:hidden;margin-bottom:14px;border:1px solid var(--border)}
 .itin-map.square{height:auto;aspect-ratio:1/1;max-height:420px}
+.route-chooser{margin:-6px 0 14px}
+.route-chooser:empty{display:none}
+.rc-lbl{font-size:10px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:5px;margin-bottom:6px}
+.rc-row{display:flex;gap:8px;overflow-x:auto}
+.rc-chip{flex:1;min-width:96px;border:1.5px solid var(--border);background:var(--card);border-radius:11px;padding:8px 10px;cursor:pointer;font-family:inherit;text-align:left;display:flex;flex-direction:column;gap:1px;transition:all .12s}
+.rc-chip b{font-size:12px;font-weight:800;color:var(--text)}
+.rc-chip span{font-size:11px;font-weight:700;color:var(--muted)}
+.rc-chip.on{border-color:var(--red);background:#FFF5F5}
+.rc-chip.on b{color:var(--red)}
+.rc-chip:active{transform:scale(.97)}
 .admin-dot{width:22px;height:22px;border-radius:50%;background:rgba(40,94,167,.22);display:flex;align-items:center;justify-content:center}
 .admin-dot span{width:12px;height:12px;border-radius:50%;background:#285EA7;border:2px solid #fff;box-shadow:0 0 0 0 rgba(40,94,167,.5);animation:adminPulse 1.6s infinite}
 @keyframes adminPulse{0%{box-shadow:0 0 0 0 rgba(40,94,167,.55)}70%{box-shadow:0 0 0 11px rgba(40,94,167,0)}100%{box-shadow:0 0 0 0 rgba(40,94,167,0)}}
@@ -6035,7 +6047,7 @@ const T={
     /* POI list actions */
     act_navigate:'Naviga verso',act_open_map:'Apri sulla mappa',act_share:'Condividi',act_visibility:'Visibilità',act_suggest_google:'Suggerisci a Google Maps',act_edit:'Modifica',act_delete:'Elimina',vis_pub_lbl:'Pubblico',vis_friends_lbl:'Amici',vis_prv_lbl:'Privato',vis_changed:'Visibilità',toast_link_copied:'🔗 Link copiato',toast_navigate_to:'🧭 Naviga verso',toast_google_opened:'📤 Aperto su Google Maps',toast_google_marked:'📤 Aperto su Google Maps · POI marcato come "suggerito"',delete_confirm:'Eliminare',delete_confirm_warn:'Questa azione non può essere annullata.',delete_done:'eliminato',delete_error:'Errore eliminazione:',vis_save_error:'Errore salvando visibilità',poi_not_found:'POI non trovato',edit_in_detail:'Tocca "Modifica" nel dettaglio',
     /* Itinerari overlay */
-    trip_open_btn:'Apri',trip_change_cover:'Cambia copertina',trip_cover_saved:'Copertina aggiornata',trip_vis_comp:'Compagnia',trip_rename:'Rinomina itinerario',trip_renamed:'Nome aggiornato',trip_dates:'Partenza · Arrivo',trip_len:'Percorso',trip_stops_n:'Tappe',trip_cal_hint:'tocca inizio e fine',save:'Salva',itin_cover_lbl:'Copertina',itin_cover_add:'Carica o scegli una foto',trip_close:'Chiudi',trip_calendar:'Calendario viaggio',trip_map:'Mappa itinerario',trip_stops:'Tappe pianificate',trip_add_stop:'Aggiungi tappa',
+    trip_open_btn:'Apri',trip_change_cover:'Cambia copertina',trip_cover_saved:'Copertina aggiornata',trip_vis_comp:'Compagnia',trip_rename:'Rinomina itinerario',trip_renamed:'Nome aggiornato',trip_dates:'Partenza · Arrivo',trip_len:'Percorso',trip_stops_n:'Tappe',trip_cal_hint:'tocca inizio e fine',trip_route_pick:'Scegli il percorso',trip_route:'Percorso',save:'Salva',itin_cover_lbl:'Copertina',itin_cover_add:'Carica o scegli una foto',trip_close:'Chiudi',trip_calendar:'Calendario viaggio',trip_map:'Mappa itinerario',trip_stops:'Tappe pianificate',trip_add_stop:'Aggiungi tappa',
     /* Itinerari / Tappe — view, card, dettaglio, trip landing */
     itin_new:'Nuovo',itin_subtab_trips:'Itinerari',itin_subtab_lists:'Liste',itin_subtab_routes:'Rotte Storiche',itin_routes_title:'Rotte Storiche',itin_routes_desc:'Percorsi tematici che seguono la storia, la cultura e i racconti di un luogo. Presto potrai esplorarle e crearne di tue.',itin_routes_soon:'Presto disponibili',itin_search_ph:'Cerca destinazione… es. Sarajevo, Bosnia',itin_ai_sub:'Suggerisce, pianifica, aggiunge tappe',itin_sheet_sub:'Crea l\'itinerario, poi aggiungi tappe e condividilo',itin_dest_lbl:'Destinazione',itin_fallback_trip:'Viaggio',itin_n_stops:'{n} tappe',itin_addtrip_none:'Nessun itinerario ancora. Creane uno per aggiungere "{name}".',
     trip_no_stops:'Nessuna tappa ancora, aggiungine una!',trip_status_suspended:'Sospesa',trip_status_done:'Completata',trip_status_planned:'Pianificata',trip_resume:'Riprendi',trip_suspend:'Sospendi',trip_edit:'Modifica',trip_delete:'Elimina',trip_vis_pub:'Pubblico',trip_vis_friends:'Amici',trip_vis_prv:'Privato',stop_note_ph:'Aggiungi note, promemoria, info pratiche…',
@@ -6136,7 +6148,7 @@ const T={
     /* POI list actions */
     act_navigate:'Navigo te',act_open_map:'Hap në hartë',act_share:'Nda',act_visibility:'Dukshmëria',act_suggest_google:'Sugjero te Google Maps',act_edit:'Redakto',act_delete:'Fshi',vis_pub_lbl:'Publik',vis_friends_lbl:'Miq',vis_prv_lbl:'Privat',vis_changed:'Dukshmëria',toast_link_copied:'🔗 Linku u kopjua',toast_navigate_to:'🧭 Navigo te',toast_google_opened:'📤 Hapur në Google Maps',toast_google_marked:'📤 Hapur në Google Maps · POI shënuar si "i sugjeruar"',delete_confirm:'Fshi',delete_confirm_warn:'Ky veprim nuk mund të zhbëhet.',delete_done:'u fshi',delete_error:'Gabim fshirjeje:',vis_save_error:'Gabim duke ruajtur dukshmërinë',poi_not_found:'POI nuk u gjet',edit_in_detail:'Prek "Redakto" në detaj',
     /* Itinerari overlay */
-    trip_open_btn:'Hap',trip_change_cover:'Ndrysho kopertinën',trip_cover_saved:'Kopertina u përditësua',trip_vis_comp:'Shoqëria',trip_rename:'Riemërto itinerarin',trip_renamed:'Emri u përditësua',trip_dates:'Nisja · Mbërritja',trip_len:'Rruga',trip_stops_n:'Ndalesa',trip_cal_hint:'prek fillimin dhe fundin',save:'Ruaj',itin_cover_lbl:'Kopertina',itin_cover_add:'Ngarko ose zgjidh një foto',trip_close:'Mbyll',trip_calendar:'Kalendari i udhëtimit',trip_map:'Harta e itinerarit',trip_stops:'Stacionet e planifikuara',trip_add_stop:'Shto stacion',
+    trip_open_btn:'Hap',trip_change_cover:'Ndrysho kopertinën',trip_cover_saved:'Kopertina u përditësua',trip_vis_comp:'Shoqëria',trip_rename:'Riemërto itinerarin',trip_renamed:'Emri u përditësua',trip_dates:'Nisja · Mbërritja',trip_len:'Rruga',trip_stops_n:'Ndalesa',trip_cal_hint:'prek fillimin dhe fundin',trip_route_pick:'Zgjidh rrugën',trip_route:'Rruga',save:'Ruaj',itin_cover_lbl:'Kopertina',itin_cover_add:'Ngarko ose zgjidh një foto',trip_close:'Mbyll',trip_calendar:'Kalendari i udhëtimit',trip_map:'Harta e itinerarit',trip_stops:'Stacionet e planifikuara',trip_add_stop:'Shto stacion',
     /* Itinerari / Tappe — view, card, dettaglio, trip landing */
     itin_new:'I ri',itin_subtab_trips:'Itinerare',itin_subtab_lists:'Lista',itin_subtab_routes:'Rrugët Historike',itin_routes_title:'Rrugët Historike',itin_routes_desc:'Itinerare tematike që ndjekin historinë, kulturën dhe tregimet e një vendi. Së shpejti do të mund t\'i eksplorosh dhe të krijosh të tuat.',itin_routes_soon:'Së shpejti',itin_search_ph:'Kërko destinacionin… p.sh. Sarajevë, Bosnjë',itin_ai_sub:'Sugjeron, planifikon, shton stacione',itin_sheet_sub:'Krijo itinerarin, pastaj shto stacione dhe ndaje',itin_dest_lbl:'Destinacioni',itin_fallback_trip:'Udhëtim',itin_n_stops:'{n} stacione',itin_addtrip_none:'Ende asnjë itinerar. Krijo një për të shtuar "{name}".',
     trip_no_stops:'Ende asnjë stacion, shto një!',trip_status_suspended:'Pezulluar',trip_status_done:'Përfunduar',trip_status_planned:'Planifikuar',trip_resume:'Vazhdo',trip_suspend:'Pezullo',trip_edit:'Redakto',trip_delete:'Fshi',trip_vis_pub:'Publik',trip_vis_friends:'Miq',trip_vis_prv:'Privat',stop_note_ph:'Shto shënime, kujtesa, info praktike…',
@@ -6237,7 +6249,7 @@ const T={
     /* POI list actions */
     act_navigate:'Navigate to',act_open_map:'Open on map',act_share:'Share',act_visibility:'Visibility',act_suggest_google:'Suggest to Google Maps',act_edit:'Edit',act_delete:'Delete',vis_pub_lbl:'Public',vis_friends_lbl:'Friends',vis_prv_lbl:'Private',vis_changed:'Visibility',toast_link_copied:'🔗 Link copied',toast_navigate_to:'🧭 Navigate to',toast_google_opened:'📤 Opened in Google Maps',toast_google_marked:'📤 Opened in Google Maps · POI marked as "suggested"',delete_confirm:'Delete',delete_confirm_warn:'This action cannot be undone.',delete_done:'deleted',delete_error:'Delete error:',vis_save_error:'Error saving visibility',poi_not_found:'POI not found',edit_in_detail:'Tap "Edit" in detail',
     /* Itinerari overlay */
-    trip_open_btn:'Open',trip_change_cover:'Change cover',trip_cover_saved:'Cover updated',trip_vis_comp:'Companion',trip_rename:'Rename itinerary',trip_renamed:'Name updated',trip_dates:'Departure · Arrival',trip_len:'Route',trip_stops_n:'Stops',trip_cal_hint:'tap start and end',save:'Save',itin_cover_lbl:'Cover',itin_cover_add:'Upload or pick a photo',trip_close:'Close',trip_calendar:'Trip calendar',trip_map:'Itinerary map',trip_stops:'Planned stops',trip_add_stop:'Add stop',
+    trip_open_btn:'Open',trip_change_cover:'Change cover',trip_cover_saved:'Cover updated',trip_vis_comp:'Companion',trip_rename:'Rename itinerary',trip_renamed:'Name updated',trip_dates:'Departure · Arrival',trip_len:'Route',trip_stops_n:'Stops',trip_cal_hint:'tap start and end',trip_route_pick:'Choose the route',trip_route:'Route',save:'Save',itin_cover_lbl:'Cover',itin_cover_add:'Upload or pick a photo',trip_close:'Close',trip_calendar:'Trip calendar',trip_map:'Itinerary map',trip_stops:'Planned stops',trip_add_stop:'Add stop',
     /* Itinerari / Tappe — view, card, detail, trip landing */
     itin_new:'New',itin_subtab_trips:'Itineraries',itin_subtab_lists:'Lists',itin_subtab_routes:'Historic Routes',itin_routes_title:'Historic Routes',itin_routes_desc:'Themed routes that follow the history, culture and stories of a place. Soon you will be able to explore them and create your own.',itin_routes_soon:'Coming soon',itin_search_ph:'Search a destination… e.g. Sarajevo, Bosnia',itin_ai_sub:'Suggests, plans, adds stops',itin_sheet_sub:'Create the itinerary, then add stops and share it',itin_dest_lbl:'Destination',itin_fallback_trip:'Trip',itin_n_stops:'{n} stops',itin_addtrip_none:'No itinerary yet. Create one to add "{name}".',
     trip_no_stops:'No stops yet, add one!',trip_status_suspended:'Suspended',trip_status_done:'Completed',trip_status_planned:'Planned',trip_resume:'Resume',trip_suspend:'Suspend',trip_edit:'Edit',trip_delete:'Delete',trip_vis_pub:'Public',trip_vis_friends:'Friends',trip_vis_prv:'Private',stop_note_ph:'Add notes, reminders, practical info…',
@@ -7534,7 +7546,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='2.87';
+const APP_VERSION='2.88';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
@@ -13137,6 +13149,7 @@ function openTripDetail(tripId){
         <div class="mini-cal" id="miniCal-${t.id}"></div>
         <div class="trip-detail-header">${window.t('trip_map','Mappa itinerario')}</div>
         <div class="itin-map square" id="itin-map-${t.id}"></div>
+        <div class="route-chooser" id="routeChooser-${t.id}"></div>
         <div class="trip-detail-header">${window.t('trip_stops','Tappe pianificate')}</div>
         <div class="stops-list" id="stops-${t.id}">${renderTripStopsHTML(t)}</div>
         <button class="itin-new-btn" style="width:100%;justify-content:center;margin:4px 0 16px;background:#f5f0e8;color:var(--blue);font-size:12px" onclick="addNewStop('${t.id}')">
@@ -13294,6 +13307,15 @@ function toggleCalDay(tripId,year,month,day){
 }
 
 /* ── ITIN MAP (Leaflet) ── */
+// Ridisegna la mappa dell'itinerario in TEMPO REALE quando cambiano le tappe (aggiungi/elimina/riordina/modifica).
+function refreshItinMap(tripId){
+  const m=itinMaps[tripId];
+  if(m){ try{ m.off(); m.remove(); }catch(_){} delete itinMaps[tripId]; }
+  const t=TRIPS[tripId]; if(t){ t._routeAlts=null; t._routeLayers=null; t.roadKm=null; }
+  const el=document.getElementById('itin-map-'+tripId);
+  if(el){ el.innerHTML=''; initItinMap(tripId); }
+  const rc=document.getElementById('routeChooser-'+tripId); if(rc) rc.innerHTML='';
+}
 function initItinMap(tripId){
   const el=document.getElementById('itin-map-'+tripId);
   if(!el||itinMaps[tripId])return;
@@ -13329,30 +13351,61 @@ function _nearestRouteIdx(latlngs, lat, lng){
   for(let i=0;i<latlngs.length;i++){ const a=latlngs[i][0]-lat, b=latlngs[i][1]-lng, d=a*a+b*b; if(d<bd){ bd=d; best=i; } }
   return best;
 }
-// Percorso REALE SU STRADA (OSRM), non in linea d'aria. Async, fail-open: se OSRM è giù resta la linea tratteggiata.
+// Percorso REALE SU STRADA (OSRM) con fino a 3 ALTERNATIVE. Async, fail-open: se OSRM è giù resta la linea tratteggiata.
 async function _loadRoadRoute(tripId, m, pts, straightLine){
   try{
     const coords=pts.map(p=>`${p[1]},${p[0]}`).join(';');   // OSRM vuole lng,lat
-    const r=await fetch(`https://router.project-osrm.org/route/v1/driving/${coords}?overview=full&geometries=geojson`, { signal:AbortSignal.timeout(9000) });
+    const r=await fetch(`https://router.project-osrm.org/route/v1/driving/${coords}?overview=full&geometries=geojson&alternatives=3`, { signal:AbortSignal.timeout(9000) });
     const d=await r.json();
-    const route=d&&d.routes&&d.routes[0];
-    if(!route||!route.geometry||!Array.isArray(route.geometry.coordinates)) return;
-    const latlngs=route.geometry.coordinates.map(c=>[c[1],c[0]]);
+    const routes=(d&&d.routes)||[];
+    if(!routes.length) return;
+    const t=TRIPS[tripId]; if(!t) return;
     if(straightLine){ try{ m.removeLayer(straightLine); }catch(_){} }
-    // Percorso: tutto ROSSO all'inizio; la parte GIÀ percorsa (dietro l'amministratore) diventa BLU.
-    // L'amministratore = chi possiede l'itinerario (l'utente stesso): uso la sua GPS reale, proiettata sul percorso.
-    let cut=0;
-    const hasPos=(typeof gpsPos!=='undefined' && gpsPos && gpsPos.lat!=null);
-    if(hasPos && latlngs.length>1) cut=_nearestRouteIdx(latlngs, gpsPos.lat, gpsPos.lng);
-    if(cut>0) L.polyline(latlngs.slice(0,cut+1),{color:'#285EA7',weight:5,opacity:.95,lineJoin:'round'}).addTo(m);  // percorso = blu
-    L.polyline(latlngs.slice(cut),{color:'#D42B2B',weight:5,opacity:.92,lineJoin:'round'}).addTo(m);                 // da percorrere = rosso
-    if(hasPos){
-      L.marker(latlngs[cut],{zIndexOffset:1000,icon:L.divIcon({className:'',html:'<div class="admin-dot"><span></span></div>',iconSize:[22,22],iconAnchor:[11,11]})}).addTo(m);
-    }
-    try{ m.fitBounds(latlngs,{padding:[28,28],maxZoom:15}); }catch(_){}
-    const t=TRIPS[tripId];
-    if(t){ t.roadKm=(route.distance||0)/1000; const sum=document.getElementById('tripSummary-'+tripId); if(sum) sum.innerHTML=_tripSummaryHTML(t); }
+    // Salvo le alternative (geometria + km + minuti) per lo switch ISTANTANEO senza rifare la chiamata.
+    t._routeAlts = routes.slice(0,3).map(rt=>({ latlngs: rt.geometry.coordinates.map(c=>[c[1],c[0]]), km:(rt.distance||0)/1000, min: Math.round((rt.duration||0)/60) }));
+    if(t.routeChoice==null || t.routeChoice>=t._routeAlts.length) t.routeChoice=0;
+    _drawItinRoutes(tripId, m);
+    _renderRouteChooser(tripId);
+    try{ m.fitBounds(t._routeAlts[t.routeChoice].latlngs,{padding:[28,28],maxZoom:15}); }catch(_){}
   }catch(_){ /* OSRM giù o timeout: resta la linea d'aria tratteggiata */ }
+}
+// Disegna: il percorso SCELTO pieno (rosso da fare / blu già percorso + pallino admin), gli altri SEMITRASPARENTI e cliccabili.
+function _drawItinRoutes(tripId, m){
+  const t=TRIPS[tripId]; if(!t||!t._routeAlts||!m) return;
+  (t._routeLayers||[]).forEach(l=>{ try{ m.removeLayer(l); }catch(_){} });
+  t._routeLayers=[];
+  const chosen=t.routeChoice||0;
+  // alternative NON scelte: grigie semitrasparenti, un tap le recupera
+  t._routeAlts.forEach((alt,i)=>{
+    if(i===chosen) return;
+    const ln=L.polyline(alt.latlngs,{color:'#8A8F98',weight:4,opacity:.35,lineJoin:'round'}).addTo(m);
+    ln.on('click',()=>selectItinRoute(tripId,i));
+    t._routeLayers.push(ln);
+  });
+  // scelto: rosso (da fare) / blu (già percorso) + pallino amministratore (GPS reale)
+  const latlngs=t._routeAlts[chosen].latlngs;
+  let cut=0; const hasPos=(typeof gpsPos!=='undefined' && gpsPos && gpsPos.lat!=null);
+  if(hasPos && latlngs.length>1) cut=_nearestRouteIdx(latlngs, gpsPos.lat, gpsPos.lng);
+  if(cut>0){ const bl=L.polyline(latlngs.slice(0,cut+1),{color:'#285EA7',weight:5,opacity:.95,lineJoin:'round'}).addTo(m); t._routeLayers.push(bl); }
+  const rd=L.polyline(latlngs.slice(cut),{color:'#D42B2B',weight:5,opacity:.92,lineJoin:'round'}).addTo(m); t._routeLayers.push(rd);
+  if(hasPos){ const dot=L.marker(latlngs[cut],{zIndexOffset:1000,icon:L.divIcon({className:'',html:'<div class="admin-dot"><span></span></div>',iconSize:[22,22],iconAnchor:[11,11]})}).addTo(m); t._routeLayers.push(dot); }
+  t.roadKm=t._routeAlts[chosen].km;
+  const sum=document.getElementById('tripSummary-'+tripId); if(sum) sum.innerHTML=_tripSummaryHTML(t);
+}
+// Bottoni SOTTO la mappa per scegliere il percorso. Gli altri restano semitrasparenti sulla mappa, sempre recuperabili.
+function _renderRouteChooser(tripId){
+  const box=document.getElementById('routeChooser-'+tripId); const t=TRIPS[tripId];
+  if(!box||!t||!t._routeAlts) return;
+  if(t._routeAlts.length<2){ box.innerHTML=''; return; }
+  box.innerHTML = `<div class="rc-lbl"><i class="ph-duotone ph-signpost"></i> ${window.t('trip_route_pick','Scegli il percorso')}</div><div class="rc-row">`+
+    t._routeAlts.map((alt,i)=>`<button class="rc-chip${i===(t.routeChoice||0)?' on':''}" onclick="selectItinRoute('${tripId}',${i})"><b>${window.t('trip_route','Percorso')} ${i+1}</b><span>${alt.km.toFixed(1).replace('.',',')} km${alt.min?' · '+alt.min+'′':''}</span></button>`).join('')+
+    `</div>`;
+}
+function selectItinRoute(tripId, idx){
+  const t=TRIPS[tripId], m=itinMaps[tripId]; if(!t||!m||!t._routeAlts||idx>=t._routeAlts.length) return;
+  t.routeChoice=idx;
+  _drawItinRoutes(tripId, m);
+  _renderRouteChooser(tripId);
 }
 
 /* ── STOP ACTIONS ── */
@@ -13364,7 +13417,9 @@ async function deleteStop(tripId,stopId){
   if(!await uiConfirm(`Eliminare "${name}"?`, {okText:'Elimina', danger:true}))return;
   t.stops.splice(idx,1);
   refreshStops(tripId);
+  refreshItinMap(tripId);   // il percorso sulla mappa si aggiorna subito
   _persistTripStops(t);
+  const sum=document.getElementById('tripSummary-'+tripId); if(sum) sum.innerHTML=_tripSummaryHTML(t);
   showToast(`🗑 "${name}" eliminata`);
 }
 function suspendStop(tripId,stopId){
@@ -13372,7 +13427,9 @@ function suspendStop(tripId,stopId){
   const s=t.stops.find(x=>x.id===stopId); if(!s)return;
   s.suspended=!s.suspended;
   refreshStops(tripId);
+  refreshItinMap(tripId);
   _persistTripStops(t);
+  const sum=document.getElementById('tripSummary-'+tripId); if(sum) sum.innerHTML=_tripSummaryHTML(t);
   showToast(s.suspended?'⏸ Tappa sospesa':'▶ Tappa ripristinata');
 }
 function editStop(tripId,stopId){openStopDetail(tripId,stopId);}
@@ -13456,6 +13513,9 @@ function addNewStop(tripId){
   activeTripId=tripId;
   closeFab();
   openSheet('addStopOv','addStopBg','addStopSheet');
+  // Il popup itinerario usa lo z-index auto-crescente (_zTop): porto la tappa SOPRA, altrimenti sparisce sotto.
+  const ov=document.getElementById('addStopOv');
+  if(ov){ window._zTop=(window._zTop||9400)+1; ov.style.zIndex=String(window._zTop); }
 }
 
 /* ── DRAG & DROP ── */
@@ -13479,7 +13539,9 @@ function dropStop(e,tripId,toIdx){
   const [moved]=t.stops.splice(dragSrcIdx,1);
   t.stops.splice(toIdx,0,moved);
   refreshStops(tripId);
+  refreshItinMap(tripId);
   _persistTripStops(t);
+  const sum=document.getElementById('tripSummary-'+tripId); if(sum) sum.innerHTML=_tripSummaryHTML(t);
   dragSrcTrip=null; dragSrcIdx=null;
   showToast('↕ Ordine tappe aggiornato');
 }
@@ -14770,16 +14832,29 @@ function removeStopTag(idx){
    SALVA TAPPA
 ══════════════════════════════════════════ */
 function saveStop(){
-  const name=(document.getElementById('stopNameIn')||{}).value?.trim()||'';
+  const nameEl=document.getElementById('stopNameIn');
+  const name=(nameEl&&nameEl.value||'').trim();
   if(!name){
     showToast(lang==='it'?'Inserisci il nome della tappa':lang==='sq'?'Fut emrin e stacionit':'Enter the stop name');
     return;
   }
+  const tripId=activeTripId; const t=TRIPS[tripId];
+  if(!t){ showToast(lang==='it'?'Apri prima un itinerario':'Open an itinerary first'); return; }
+  const catBtn=document.querySelector('#stopCatChips .chip.sel');
+  const region=catBtn?catBtn.textContent.trim():'';
+  const id=(crypto.randomUUID?crypto.randomUUID():('s'+Date.now()+Math.round(Math.random()*1e6)));
+  // Aggiunta REALE: la tappa entra nell'itinerario e viene salvata (prima era solo un toast finto)
+  t.stops.push({ id, name, date:'', status:'planned', suspended:false, lat:null, lng:null,
+    icon:'ph-duotone ph-map-pin', iconBg:'#285EA7', iconColor:'#fff', note:'', stay:'', image:'', region });
   // Reset form
-  document.getElementById('stopNameIn').value='';
-  document.getElementById('stopAcDrop').classList.remove('open');
+  if(nameEl) nameEl.value='';
+  const ac=document.getElementById('stopAcDrop'); if(ac) ac.classList.remove('open');
   document.querySelectorAll('#stopCatChips .chip.sel').forEach(c=>c.classList.remove('sel'));
   closeSheet('addStopOv','addStopBg','addStopSheet');
+  refreshStops(tripId);
+  refreshItinMap(tripId);
+  _persistTripStops(t);
+  const sum=document.getElementById('tripSummary-'+tripId); if(sum) sum.innerHTML=_tripSummaryHTML(t);
   showToast(`✓ ${lang==='it'?'Tappa aggiunta':lang==='sq'?'Stacioni shtuar':'Stop added'}: ${name}`);
 }
 
