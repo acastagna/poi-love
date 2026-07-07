@@ -1,9 +1,17 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
-> **Prossima ripresa: canale EMAIL delle notifiche (serve chiave AcumbaMail + edge worker) e trigger notifiche mancanti (rotta pubblicata/adottata dentro le RPC admin). Collaudi manuali di Alessandro in attesa (checklist 04/07 + claim a pagamento + copilota foto).**
-> Checkpoint sessione: tag `checkpoint-2026-07-07` (HEAD su origin/main, v2.59). **Nessun lavoro non committato.**
+> **Prossima ripresa: canale EMAIL delle notifiche (serve chiave AcumbaMail + edge worker) e trigger notifiche mancanti (rotta pubblicata/adottata dentro le RPC admin). Valutare voce iperrealistica (Google TTS) per ILLI, oggi la voce meccanica è disattivata. Collaudi manuali di Alessandro in attesa (checklist 04/07 + claim a pagamento + copilota foto).**
+> Checkpoint sessione: tag `checkpoint-2026-07-07-ui` (HEAD su origin/main, v2.62). **Nessun lavoro non committato.**
 
-## Sessione 07/07/2026 — Consensi GDPR, sistema notifiche, geofence foreground (v2.56 → v2.59)
+## Sessione 07/07/2026 — Consensi, notifiche, geofence + batch UI (v2.56 → v2.62)
+
+**Batch UI da feedback founder (screenshot ricerca), v2.60 → v2.62, tutto live e verificato:**
+- **v2.60**: (1) tolta la versione accanto al logo nella fascia nera, resta solo nella credit strip sotto; (2) distanza nelle card ILLI SEMPRE su una riga sola: "Xm da te · Ykm dal centro di <luogo>" (nowrap); (3) la risposta ILLI compare con fade dall'alto (1000ms); (4) **voce meccanica del browser DISATTIVATA** (founder: "una voce meccanica neanche per sbaglio"): speakText è no-op, tolto il bottone voce. Se in futuro si vuole la voce, serve Google TTS o simile (iperrealistica), non SpeechSynthesis.
+- **v2.61 — ricerca mappa multi-tipo**: prima usciva solo "Rotte Storiche". Ora fonde più fonti, ≥2 per tipo: POI•LOVE cerca anche i POI REALI della community (`window._dbPOIs`, si aprono col loro id), sezione "Punti di interesse" da place-enrich discover (Google/Apple-style, attorno al centro mappa, in parallelo), "Luoghi" Nominatim non filtra più via le città (Tirana esce come luogo), + Rotte + Indirizzi. Collaudo live: "ristorante" a Tirana → Odas Garden/La Gioia (Google) + Pomo d'oro/Valledoria (OSM).
+- **v2.62 — freccia "indietro" in alto a sinistra su ogni pagina**: funzione `_injectSheetBackButtons` aggiunge la freccia a OGNI testata sheet riusando la chiusura esistente (X spostata a destra); dettaglio POI con freccia flottante speculare a sinistra; pannello notifiche con freccia nell'header. Collaudo live: 7/7 sheet + dettaglio + notifiche, la freccia chiude davvero.
+- Nota item founder "il commento/recensione è utile": feedback positivo, le card ILLI già mostrano voto + n. recensioni + fascia prezzo + il "perché" del posto. Tenuto così.
+
+## Sessione 07/07/2026 (mattina) — Consensi GDPR, sistema notifiche, geofence foreground (v2.56 → v2.59)
 
 Il founder ha chiesto: cosa serve chiedere all'utente una volta sola (GPS, Termini, privacy/dati sensibili, camera/galleria/microfono, notifiche) e di organizzare tutte le notifiche attivabili/disattivabili. Prima ho aperto un lavoro strutturato (8 agenti) per verificare i fatti tecnici/legali senza andare a memoria. **Verità emerse (verificate in modo avversariale)**: sul WEB l'unico permesso "chiedi una volta e resta" è il GPS (su iPhone tende a richiederlo ogni sessione); camera/galleria = file-picker one-shot, NON esiste permesso "galleria completa" come nel nativo; microfono via SpeechRecognition; le notifiche PUSH oggi sono impossibili (serve un service worker, che non c'è) e su iPhone servono la PWA installata in Home (iOS 16.4+); il **geofence in background (avviso ad app chiusa) è impossibile su web** su iOS e Android → va sull'app nativa (Expo). Le tre feature "cuore" (avviso arrivo, condivisione posizione continua, album foto completo) sul web funzionano SOLO in foreground; il background reale è nativo. Consegnato in 3 checkpoint atomici, tutti verificati dal vivo, deployati e pushati:
 
