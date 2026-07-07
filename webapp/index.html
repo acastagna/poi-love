@@ -7546,7 +7546,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='2.89';
+const APP_VERSION='2.90';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
@@ -15309,7 +15309,7 @@ async function confirmPhotoPicker(){
       <div class="levels-sub" data-t="tier_levels_sub">Più sei attivo, più sali. Ogni azione e ogni condivisione ti fanno crescere.</div>
     </div>
     <div class="levels-body" id="levelsList"></div>
-    <button class="wall-cta" style="margin:4px 0 6px" onclick="closeLevels();openSupporterWall()"><i class="ph-fill ph-heart" style="margin-right:6px"></i> <span data-t="wall_open">Vedi il Muro dei Sostenitori</span></button>
+    <button class="wall-cta" style="margin:4px auto 6px;text-align:center" onclick="closeLevels();openSupporterWall()"><i class="ph-fill ph-heart" style="margin-right:6px"></i> <span data-t="wall_open">Vedi il Muro dei Sostenitori</span></button>
     <div class="levels-foot"><i class="ph-duotone ph-info"></i> <span data-t="tier_levels_foot">Punti per azione e vantaggi di ogni livello si imposteranno dal pannello admin.</span></div>
   </div>
 </div>
