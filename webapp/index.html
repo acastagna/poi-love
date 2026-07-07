@@ -744,10 +744,12 @@ body::after{content:'';position:fixed;inset:0;z-index:99999;pointer-events:none;
 .sheet{position:absolute;bottom:0;left:0;right:0;background:var(--card);border-radius:24px 24px 0 0;padding:0 0 52px;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.72,0,1);pointer-events:none;max-height:94vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .sheet.open{transform:translateY(0);pointer-events:all}
 .sh-handle{width:44px;height:5px;background:#C8BFB0;border-radius:3px;margin:14px auto 4px;cursor:grab;flex-shrink:0}
-.sh-head{display:flex;align-items:flex-start;justify-content:space-between;padding:14px 20px 0}
+.sh-head{display:flex;align-items:flex-start;gap:10px;padding:14px 20px 0}
+.sh-back{width:32px;height:32px;border-radius:16px;background:#ede7dc;border:none;cursor:pointer;font-size:18px;color:var(--muted);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;pointer-events:all;transition:transform .12s}
+.sh-back:active{transform:scale(.9)}
 .sh-title{font-size:19px;font-weight:800;color:var(--text);line-height:1.2}
 .sh-sub{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.4}
-.sh-close{width:32px;height:32px;border-radius:16px;background:#ede7dc;border:none;cursor:pointer;font-size:17px;color:var(--muted);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;pointer-events:all}
+.sh-close{width:32px;height:32px;border-radius:16px;background:#ede7dc;border:none;cursor:pointer;font-size:17px;color:var(--muted);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;margin-left:auto;pointer-events:all}
 #closeAddPoiBtn{background:#DAEEFF;color:#1A7FC1}
 .sh-body{padding:14px 20px 0}
 .sh-timer{display:flex;align-items:center;gap:5px;background:#FFF5F5;border:1px solid #F7C1C1;border-radius:20px;padding:5px 10px;font-size:12px;font-weight:700;color:var(--red);flex-shrink:0}
@@ -2420,6 +2422,7 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
   <div style="position:absolute;top:0;right:0;bottom:0;width:100%;max-width:420px;background:var(--bg,#EAE4D8);display:flex;flex-direction:column;box-shadow:-8px 0 40px rgba(0,0,0,.3)">
     <!-- header -->
     <div style="display:flex;align-items:center;gap:10px;padding:16px 16px 12px;border-bottom:1px solid rgba(0,0,0,.08)">
+      <button onclick="closeNotifications()" aria-label="Indietro" title="Indietro" style="background:none;border:none;cursor:pointer;color:var(--muted,#777);font-size:22px;padding:0;display:flex;align-items:center"><i class="ph-duotone ph-arrow-left"></i></button>
       <i class="ph-duotone ph-bell" style="font-size:22px;color:#D42B2B"></i>
       <b style="font-size:17px;flex:1" data-t="notif_title">Notifiche</b>
       <button onclick="markAllNotifRead()" title="Segna tutte lette" style="background:none;border:none;cursor:pointer;color:var(--muted,#777);font-size:20px"><i class="ph-duotone ph-checks"></i></button>
@@ -3257,6 +3260,7 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
 <div class="sheet-overlay" id="detailOv">
   <div class="sheet-backdrop" id="detailBg"></div>
   <!-- X chiusura — FUORI dalla card -->
+  <button class="pdm-close-outer" id="detailBackOuter" onclick="closeDetail()" title="Indietro" aria-label="Indietro"><i class="ph-duotone ph-arrow-left"></i></button>
   <button class="pdm-close-outer" id="detailCloseOuter" onclick="closeDetail()" title="Chiudi"><i class="ph-duotone ph-x"></i></button>
   <div class="sheet" id="detailSheet">
     <!-- 1. Foto -->
@@ -3916,6 +3920,20 @@ async function startGeofence(){
     ()=>{}, { enableHighAccuracy:false, maximumAge:20000, timeout:30000 });
 }
 function stopGeofence(){ if(_geoWatchId!==null){ try{navigator.geolocation.clearWatch(_geoWatchId);}catch(_){} _geoWatchId=null; } }
+
+// Freccia "indietro" in alto a sinistra su OGNI testata sheet (.sh-head): richiama la stessa
+// chiusura della X di quella sheet (riuso esatto, niente logica duplicata). Richiesta founder 07/07.
+function _injectSheetBackButtons(){
+  document.querySelectorAll('.sh-head').forEach(head=>{
+    if(head.querySelector('.sh-back')) return;                    // gia' aggiunta
+    const closeBtn=head.querySelector('.sh-close'); if(!closeBtn) return;
+    const back=document.createElement('button');
+    back.className='sh-back'; back.type='button'; back.setAttribute('aria-label','Indietro');
+    back.innerHTML='<i class="ph-duotone ph-arrow-left"></i>';
+    back.addEventListener('click',e=>{ e.preventDefault(); e.stopPropagation(); closeBtn.click(); });
+    head.insertBefore(back, head.firstChild);
+  });
+}
 
 /* ══════════════════════════════════════════
    DIAGNOSTICA CONNESSIONE — verifica Supabase, schema, storage
@@ -6814,8 +6832,9 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='2.61';
+const APP_VERSION='2.62';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
+try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
 // Le rotte storiche pubblicate sono contenuto PUBBLICO: si caricano per tutti,
 // loggati o no (piccolo ritardo per lasciar nascere mappa e client).
@@ -10143,6 +10162,14 @@ function positionDetailClose(){
   btn.style.left = (x - bw/2) + 'px';
   btn.style.top  = (y - bw/2) + 'px';
   btn.style.display = 'flex';
+  // Freccia "indietro" speculare, in alto a SINISTRA della card
+  const back = document.getElementById('detailBackOuter');
+  if(back){
+    const xl = Math.max(bw/2 + 6, r.left - bw/2 - gap);
+    back.style.left = (xl - bw/2) + 'px';
+    back.style.top  = (y - bw/2) + 'px';
+    back.style.display = 'flex';
+  }
 }
 
 function openDetail(idx){
@@ -10181,6 +10208,8 @@ function closeDetail(){
   closeSheet('detailOv','detailBg','detailSheet');
   const btn=document.getElementById('detailCloseOuter');
   if(btn) btn.style.display='none';
+  const back=document.getElementById('detailBackOuter');
+  if(back) back.style.display='none';
 }
 // ESC universale: chiude il primo sheet/popup/overlay aperto trovato
 document.addEventListener('keydown', e => {
