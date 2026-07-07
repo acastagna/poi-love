@@ -1884,6 +1884,16 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
 .stop-detail-status{display:inline-flex;align-items:center;gap:6px;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;margin-bottom:12px}
 .stop-detail-note{width:100%;background:#f5f0e8;border:1.5px solid #E0D8CC;border-radius:11px;padding:10px 12px;font-size:13px;font-family:inherit;color:var(--text);outline:none;resize:none;height:80px;transition:border-color .2s;margin-bottom:12px}
 .stop-detail-note:focus{border-color:var(--red)}
+.se-num{font-size:11px;font-weight:800;color:var(--muted);background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:3px 9px;white-space:nowrap}
+.stop-edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.se-field{min-width:0}
+.se-full{grid-column:1/-1}
+.se-lbl{font-size:10px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:5px;margin-bottom:5px}
+.se-in{width:100%;box-sizing:border-box;height:42px;border:1.5px solid #E0D8CC;border-radius:11px;padding:0 12px;font-size:14px;font-family:inherit;color:var(--text);background:var(--bg);outline:none}
+.se-in:focus{border-color:var(--red)}
+.se-img{width:100%;height:120px;border:1.5px dashed #E0D8CC;border-radius:12px;background:#f5f0e8;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;color:var(--muted);font-size:13px;font-weight:700}
+.se-img img{width:100%;height:100%;object-fit:cover}
+.se-img #stopEditImgPh{display:inline-flex;align-items:center;gap:6px}
 .stop-invite-section{background:#EBF2FC;border-radius:12px;padding:12px;margin-bottom:12px}
 .stop-invite-title{font-size:11px;font-weight:700;color:var(--blue);margin-bottom:6px;display:flex;align-items:center;gap:5px}
 .stop-invite-row{display:flex;gap:6px}
@@ -7497,7 +7507,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='2.83';
+const APP_VERSION='2.84';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
@@ -12979,7 +12989,8 @@ function _persistTripStops(trip){
         name: s.name, stop_date_label: s.date||null,
         status: s.suspended ? 'suspended' : (s.status==='done' ? 'done' : 'planned'),
         lat: s.lat??null, lng: s.lng??null, poi_id: s.poiId||s.poi_id||null,
-        icon: s.icon||null, icon_bg: s.iconBg||null, icon_color: s.iconColor||null, note: s.note||null, sort_order: i
+        icon: s.icon||null, icon_bg: s.iconBg||null, icon_color: s.iconColor||null, note: s.note||null, sort_order: i,
+        stay_label: s.stay||null, image_url: s.image||null, region: s.region||null
       }));
       const { error }=await sb.rpc('replace_trip_stops',{ p_trip_id: trip.dbId, p_stops: rows });
       if(error) throw error;
@@ -13309,31 +13320,57 @@ function editStop(tripId,stopId){openStopDetail(tripId,stopId);}
 let _curStopTrip=null, _curStopId=null;
 function openStopDetail(tripId,stopId){
   const t=TRIPS[tripId]; if(!t)return;
-  const s=t.stops.find(x=>x.id===stopId); if(!s)return;
+  const idx=t.stops.findIndex(x=>x.id===stopId);
+  const s=t.stops[idx]; if(!s)return;
   _curStopTrip=tripId; _curStopId=stopId;
-  document.getElementById('stopDetailTitle').textContent=s.name;
-  document.getElementById('stopDetailDate').textContent=s.date;
+  document.getElementById('stopDetailTitle').textContent=s.name||window.t('trip_edit','Modifica');
+  const numEl=document.getElementById('stopEditNum'); if(numEl) numEl.textContent=window.t('stop_n_of','Tappa {n}/{tot}').replace('{n}',idx+1).replace('{tot}',t.stops.length);
   const susp=s.suspended||s.status==='suspended';
   const statusEl=document.getElementById('stopDetailStatus');
   statusEl.innerHTML=susp?'<i class="ph-duotone ph-pause"></i> '+window.t('trip_status_suspended','Sospesa'):s.status==='done'?'<i class="ph-duotone ph-check"></i> '+window.t('trip_status_done','Completata'):'→ '+window.t('trip_status_planned','Pianificata');
   statusEl.style.background=susp?'#f5f0e8':s.status==='done'?'#DCFCE7':'#EBF2FC';
   statusEl.style.color=susp?'var(--muted)':s.status==='done'?'#16A34A':'var(--blue)';
+  // Popola i campi editabili
+  const V=(id,v)=>{ const e=document.getElementById(id); if(e) e.value=v||''; };
+  V('stopEditName', s.name); V('stopEditRegion', s.region); V('stopEditDate', s.date); V('stopEditStay', s.stay);
   document.getElementById('stopDetailNote').value=s.note||'';
+  _stopImgTmp = s.image||'';
+  _renderStopImg();
   document.getElementById('followerWarning').classList.remove('show');
   document.getElementById('stopDetailOv').classList.add('open');
 }
+let _stopImgTmp='';
+function _renderStopImg(){
+  const img=document.getElementById('stopEditImg'), ph=document.getElementById('stopEditImgPh');
+  if(!img||!ph) return;
+  if(_stopImgTmp){ img.src=_stopImgTmp; img.style.display='block'; ph.style.display='none'; }
+  else { img.style.display='none'; ph.style.display='inline-flex'; }
+}
+function stopPickImage(){ const inp=document.getElementById('stopImgInput'); if(inp){ inp.value=''; inp.click(); } }
+async function stopImageUpload(inp){
+  const f=inp.files&&inp.files[0]; if(!f) return;
+  if(!f.type.startsWith('image/')){ showToast(t('comp_av_invalid','Seleziona un\'immagine')); return; }
+  try{ const d=await compressToDataURL(f, 640, 0.82); if(d){ _stopImgTmp=d; _renderStopImg(); } }
+  catch(e){ showToast(t('cv_img_err','Caricamento foto fallito')); }
+}
 function closeStopDetail(){
   document.getElementById('stopDetailOv').classList.remove('open');
-  _curStopTrip=null; _curStopId=null;
+  _curStopTrip=null; _curStopId=null; _stopImgTmp='';
 }
 function saveStopDetail(){
   if(!_curStopTrip||!_curStopId)return;
   const t=TRIPS[_curStopTrip];
   const s=t?.stops.find(x=>x.id===_curStopId);
   if(s){
-    s.note=document.getElementById('stopDetailNote').value.trim();
+    const g=id=>{ const e=document.getElementById(id); return e?e.value.trim():''; };
+    const nn=g('stopEditName'); if(nn) s.name=nn;
+    s.region=g('stopEditRegion'); s.date=g('stopEditDate'); s.stay=g('stopEditStay');
+    s.image=_stopImgTmp||''; s.note=document.getElementById('stopDetailNote').value.trim();
+    refreshStops(_curStopTrip);
     _persistTripStops(t);
-    showToast(`✓ Modifiche salvate per "${s.name}"`);
+    // aggiorna riepilogo + mappa (se il nome/dati incidono)
+    const sum=document.getElementById('tripSummary-'+_curStopTrip); if(sum) sum.innerHTML=_tripSummaryHTML(t);
+    showToast(window.t('stop_saved','Tappa aggiornata'));
   }
   closeStopDetail();
 }
@@ -15398,10 +15435,37 @@ async function confirmPhotoPicker(){
       <button class="stop-detail-close" onclick="closeStopDetail()"><i class="ph-duotone ph-x"></i></button>
     </div>
     <div class="stop-detail-body">
-      <div class="stop-detail-status" id="stopDetailStatus"></div>
-      <div class="sec-lbl" style="margin-bottom:6px">Data prevista</div>
-      <div id="stopDetailDate" style="font-size:13px;color:var(--muted);margin-bottom:14px;font-weight:600"></div>
-      <div class="sec-lbl" style="margin-bottom:6px">Note personali</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <div class="stop-detail-status" id="stopDetailStatus"></div>
+        <span class="se-num" id="stopEditNum"></span>
+      </div>
+      <div class="stop-edit-grid">
+        <div class="se-field se-full">
+          <label class="se-lbl"><i class="ph-duotone ph-textbox"></i> <span data-t="stop_f_name">Nome tappa</span></label>
+          <input id="stopEditName" class="se-in" type="text" maxlength="80" data-tp="stop_f_name_ph" placeholder="Nome preciso della tappa">
+        </div>
+        <div class="se-field se-full">
+          <label class="se-lbl"><i class="ph-duotone ph-map-pin-area"></i> <span data-t="stop_f_region">Prefettura / regione / luogo</span></label>
+          <input id="stopEditRegion" class="se-in" type="text" maxlength="60" data-tp="stop_f_region_ph" placeholder="Es. Tirana, Qark di Tirana">
+        </div>
+        <div class="se-field">
+          <label class="se-lbl"><i class="ph-duotone ph-calendar-blank"></i> <span data-t="stop_f_date">Data</span></label>
+          <input id="stopEditDate" class="se-in" type="text" maxlength="24" data-tp="stop_f_date_ph" placeholder="Es. 12/08">
+        </div>
+        <div class="se-field">
+          <label class="se-lbl"><i class="ph-duotone ph-clock"></i> <span data-t="stop_f_stay">Rimanenza</span></label>
+          <input id="stopEditStay" class="se-in" type="text" maxlength="30" data-tp="stop_f_stay_ph" placeholder="Es. 2 notti">
+        </div>
+      </div>
+      <div class="se-field se-full" style="margin-bottom:12px">
+        <label class="se-lbl"><i class="ph-duotone ph-image"></i> <span data-t="stop_f_img">Immagine della tappa</span></label>
+        <div class="se-img" id="stopEditImgBox" onclick="stopPickImage()">
+          <img id="stopEditImg" src="" alt="">
+          <span id="stopEditImgPh"><i class="ph-duotone ph-image"></i> <span data-t="stop_f_img_add">Tocca per caricare</span></span>
+        </div>
+        <input type="file" id="stopImgInput" accept="image/*" style="display:none" onchange="stopImageUpload(this)">
+      </div>
+      <div class="sec-lbl" style="margin-bottom:6px" data-t="stop_f_note">Note personali</div>
       <textarea class="stop-detail-note" id="stopDetailNote" placeholder="Aggiungi note, promemoria, info pratiche…" data-tp="stop_note_ph"></textarea>
       <div class="stop-invite-section">
         <div class="stop-invite-title"><i class="ph-duotone ph-users-three" style="font-size:14px"></i> Invita qualcuno a questa tappa</div>
