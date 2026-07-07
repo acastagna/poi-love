@@ -9,6 +9,13 @@
 > **Stile: vietati i trattini lunghi (em dash). Usare virgole o due punti.**
 > Leggi `SPECS.md` e `POSTMORTEM.md` prima di toccare la webapp.
 
+> ⛔ **REGOLA DURA — MAI COSTRUIRE COSE FINTE.** Vietati mockup, dati hardcoded/di esempio,
+> azioni che mostrano solo un toast senza effetto reale, mappe/calendari/contatori con dati inventati,
+> salvataggi che non persistono davvero sul database. **Tutto deve essere reale, funzionante e verificato dal vivo.**
+> Unica eccezione: se Alessandro chiede esplicitamente un mockup. Se una parte è finta e non puoi renderla vera
+> subito, NON lasciarla passare in silenzio: dillo chiaramente. Trasformare una cosa finta in vera NON è una
+> "revisione" (una revisione migliora ciò che già funziona): chiamala col nome giusto. *(Regola aggiunta il 07/07/2026.)*
+
 ---
 
 ## 🟢 STATO AL 26/05/2026 — AI photo generation + Ownership guard + DB migrazione cover
