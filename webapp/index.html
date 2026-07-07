@@ -1636,7 +1636,8 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
 .pc-free.on{border-color:#285EA7;font-weight:700}
 .poiai-msgs{padding:12px 14px;min-height:100px;max-height:260px;overflow-y:auto;display:flex;flex-direction:column;gap:10px}
 .poiai-msg{max-width:90%}
-.poiai-msg.ai{background:#EBF2FC;border-radius:0 12px 12px 12px;padding:10px 12px;font-size:12px;color:var(--text);line-height:1.6}
+@keyframes illiFadeDown{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:translateY(0)}}
+.poiai-msg.ai{background:#EBF2FC;border-radius:0 12px 12px 12px;padding:10px 12px;font-size:12px;color:var(--text);line-height:1.6;animation:illiFadeDown 1000ms cubic-bezier(.22,.61,.36,1) both}
 .poiai-msg.user{background:linear-gradient(135deg,var(--red),#E05858);border-radius:12px 12px 0 12px;padding:10px 12px;font-size:12px;color:#fff;line-height:1.5;margin-left:auto}
 .poiai-place-chip{display:inline-flex;align-items:center;gap:5px;background:#DCFCE7;border:1px solid #16A34A;border-radius:8px;padding:4px 9px;font-size:10px;font-weight:700;color:#16A34A;cursor:pointer;margin-top:6px;margin-right:4px;transition:all .15s}
 .poiai-place-chip:active{transform:scale(.96)}
@@ -1660,8 +1661,9 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
 .ai-place-rating .price{color:#16A34A;font-weight:800;letter-spacing:.5px}
 .ai-place-rating .open{color:#16A34A;font-weight:700}
 .ai-place-rating .closed{color:var(--red);font-weight:700}
-.ai-place-dist{display:flex;align-items:baseline;gap:5px;font-size:12px;font-weight:700;color:var(--text);margin-top:4px}
-.ai-place-dist i{color:var(--red);font-size:12px;position:relative;top:1px}
+.ai-place-dist{font-size:12px;font-weight:700;color:var(--text);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ai-place-dist i{color:var(--red);font-size:12px;position:relative;top:1px;margin-right:3px}
+.ai-place-dist .ai-dist-me{color:var(--text)}
 .ai-place-dist .ai-dist-sub{color:var(--muted);font-weight:600}
 .ai-more-btn{width:100%;margin-top:10px;padding:10px;border-radius:11px;border:1.5px dashed var(--red);background:rgba(212,43,43,.05);color:var(--red);font-family:inherit;font-size:13px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
 .ai-more-btn:active{transform:scale(.98)}
@@ -1798,7 +1800,6 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
 <div id="brand-strip">
   <a class="bs-legal" href="https://poilove.com/terms" target="_blank" rel="noopener">Termini</a>
   <img src="img/logo-bianco.png" alt="POI•LOVE" onerror="this.outerHTML='<span style=\'color:#fff;font-weight:900;font-size:11px;letter-spacing:1px\'>POI&bull;LOVE</span>'">
-  <span class="app-ver" style="color:#fff;opacity:.5;font-size:9px;font-weight:800;letter-spacing:.5px"></span>
   <a class="bs-legal" href="https://poilove.com/privacy" target="_blank" rel="noopener">Privacy</a>
 </div>
 
@@ -2894,7 +2895,6 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
         <div class="poiai-sub" data-t="itin_ai_sub">Suggerisce, pianifica, aggiunge tappe</div>
       </div>
       <div class="poiai-badge">AI</div>
-      <button class="poiai-voice-btn" id="poiaiVoiceBtn" onclick="togglePoiAIVoice()" title="ILLI legge le risposte ad alta voce"><i class="ph-duotone ph-speaker-slash"></i></button>
     </div>
     <div class="poiai-country" id="poiaiCountry">
       <span class="pc-lbl" data-t="illi_search_in">Cerca in:</span>
@@ -6814,7 +6814,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='2.59';
+const APP_VERSION='2.60';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 console.info('POI•LOVE v'+APP_VERSION);
 // Le rotte storiche pubblicate sono contenuto PUBBLICO: si caricano per tutti,
@@ -13331,17 +13331,14 @@ let _aiBatches={}, _aiBatchSeq=0;
 function _distFmt(m){ return m==null?'':(m<1000?(Math.round(m)+' m'):((m/1000).toFixed(1).replace('.',',')+' km')); }
 function _distLine(p){
   const esc=s=>String(s||'').replace(/</g,'&lt;');
-  if(p.cityLabel){
-    const dc=_distFmt(p.distCityM), city=esc(p.cityLabel);
-    if(p.distGpsM!=null){
-      if(p.distGpsM>50000) return `${dc} dal centro di ${city}<span class="ai-dist-sub"> · ${_distFmt(p.distGpsM)} da te</span>`;  // lontano: utile la distanza dal centro
-      if(p.distGpsM>2000)  return `${_distFmt(p.distGpsM)} da te<span class="ai-dist-sub"> · ${dc} dal centro di ${city}</span>`;     // in zona
-      return `${_distFmt(p.distGpsM)} da te`;                                                                                        // molto vicino
-    }
-    return `${dc} dal centro di ${city}`;
-  }
+  // Regola founder: SEMPRE su una riga sola. A sinistra "Xm da te", poi un ·, a destra "Ykm dal centro di <luogo>".
+  const left  = (p.distGpsM!=null) ? `${_distFmt(p.distGpsM)} da te` : '';
+  const right = (p.cityLabel && p.distCityM!=null) ? `${_distFmt(p.distCityM)} dal centro di ${esc(p.cityLabel)}` : '';
+  if(left && right) return `<span class="ai-dist-me">${left}</span><span class="ai-dist-sub"> · ${right}</span>`;
+  if(left)  return `<span class="ai-dist-me">${left}</span>`;
+  if(right) return `<span class="ai-dist-sub">${right}</span>`;
   const d=p.distM!=null?p.distM:p.distCityM;
-  return d!=null?`${_distFmt(d)} da te`:'';
+  return d!=null?`<span class="ai-dist-me">${_distFmt(d)} da te</span>`:'';
 }
 function _renderOneCard(p){
   _gPlaces.push(p);
@@ -13594,15 +13591,9 @@ function toggleChatDictation(){
   _chatRecog=r;
   try{ r.start(); }catch(e){ _chatListening=false; if(btn)btn.classList.remove('is-listening'); _chatRecog=null; }
 }
-function speakText(text){
-  if(!window.speechSynthesis||!text)return;
-  window.speechSynthesis.cancel();
-  const utter=new SpeechSynthesisUtterance(text);
-  utter.lang=lang==='sq'?'sq-AL':lang==='en'?'en-US':'it-IT';
-  utter.rate=1.05;
-  utter.pitch=1;
-  window.speechSynthesis.speak(utter);
-}
+// Voce ILLI DISATTIVATA (decisione founder 07/07): la voce meccanica del browser (SpeechSynthesis)
+// non si usa. Nessuna lettura ad alta voce finche' non c'e' una voce iperrealistica (Google TTS o simile).
+function speakText(text){ /* no-op: niente voce meccanica */ }
 
 /* ══════════════════════════════════════════
    AI Place actions — Crea POI / Naviga / Aggiungi / Condividi
