@@ -249,6 +249,11 @@ html[data-theme="light"] .btn.gold{color:#fbf6ec}
 .btn.sm{padding:6px 10px;font-size:11.5px;border-radius:9px}
 .btn:disabled{opacity:.5;cursor:not-allowed}
 .btn-row{display:flex;gap:6px;flex-wrap:wrap}
+.msg-thread{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:11px;cursor:pointer;border:1px solid transparent;transition:background .12s}
+.msg-thread:hover{background:rgba(40,94,167,.06)}
+.msg-thread.on{background:rgba(40,94,167,.1);border-color:rgba(40,94,167,.3)}
+.msg-thread .av{width:34px;height:34px;flex:none;object-fit:cover}
+@media(max-width:720px){#msgLayout{grid-template-columns:1fr !important}}
 
 /* Input / form */
 .field{margin-bottom:13px}
@@ -466,6 +471,10 @@ html[data-theme="light"] .chip.green{color:#236b39}
       <span class="ic"><i class="ph-duotone ph-shield-check"></i></span><span class="label" data-t="nav_moderation">Moderazione</span>
       <span class="badge" id="badgeReports"></span>
     </div>
+    <div class="nav-item" data-sec="messages" onclick="openSection('messages')">
+      <span class="ic"><i class="ph-duotone ph-chats-circle"></i></span><span class="label" data-t="nav_messages">Messaggi</span>
+      <span class="badge" id="badgeMessages"></span>
+    </div>
     <div class="nav-item" data-sec="users" onclick="openSection('users')">
       <span class="ic"><i class="ph-duotone ph-user"></i></span><span class="label" data-t="nav_users">Utenti</span>
     </div>
@@ -563,6 +572,25 @@ html[data-theme="light"] .chip.green{color:#236b39}
       <div class="panel">
         <div class="card-h"><span class="ic"><i class="ph-duotone ph-shield-check"></i></span><span data-t="moderation_queue">Coda segnalazioni</span></div>
         <div id="modTable"></div>
+      </div>
+    </section>
+
+    <!-- 2b) MESSAGGI — chat team (admin) <-> cliente, compare in ILLI col tag "Umano" -->
+    <section class="section" id="sec-messages">
+      <div style="display:grid;grid-template-columns:300px 1fr;gap:16px;align-items:start" id="msgLayout">
+        <div class="panel" style="margin:0">
+          <div class="card-h"><span class="ic"><i class="ph-duotone ph-chats-circle"></i></span><span data-t="msg_threads">Conversazioni</span></div>
+          <div style="margin-bottom:10px"><button class="btn" onclick="startNewSupportThread()" style="width:100%"><i class="ph-duotone ph-plus"></i> <span data-t="msg_new">Scrivi a un utente</span></button></div>
+          <div id="msgThreads"></div>
+        </div>
+        <div class="panel" style="margin:0">
+          <div class="card-h"><span class="ic"><i class="ph-duotone ph-paper-plane-tilt"></i></span><span id="msgConvTitle" data-t="msg_pick">Scegli una conversazione</span></div>
+          <div id="msgConv" style="max-height:52vh;overflow-y:auto;margin-bottom:12px"></div>
+          <div id="msgComposer" style="display:none;gap:8px">
+            <textarea id="msgBody" rows="2" placeholder="Scrivi al cliente… (comparirà in ILLI col tag Umano)" data-tp="msg_body_ph" style="flex:1;resize:vertical;padding:10px 12px;border:1.5px solid var(--bd,#d9d2c4);border-radius:10px;font-family:inherit;font-size:14px;background:var(--card,#fff);color:inherit;box-sizing:border-box;width:100%"></textarea>
+            <button class="btn" onclick="sendAdminSupport()" style="align-self:flex-end;background:#285EA7;color:#fff;border-color:#285EA7"><i class="ph-duotone ph-paper-plane-tilt"></i> <span data-t="msg_send">Invia</span></button>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -871,6 +899,7 @@ const T = {
     sub_ailimits:'Quote e modelli AI per livello.', sub_copilot:'Assistente operativo con accesso ai dati.',
     sub_create:'Pubblica POI ufficiali e percorsi.', sub_audit:'Cronologia delle azioni amministrative.',
     role_admin:'Amministratore', logout:'Esci',
+    nav_messages:'Messaggi',a_message:'Messaggio',msg_threads:'Conversazioni',msg_new:'Scrivi a un utente',msg_pick:'Scegli una conversazione',msg_body_ph:'Scrivi al cliente… (comparirà in ILLI col tag Umano)',msg_send:'Invia',msg_empty:'Nessuna conversazione ancora.',msg_conv_empty:'Nessun messaggio: scrivi tu per primo.',msg_pick_first:'Scegli prima una conversazione',msg_sent:'Messaggio inviato',msg_ask_user:'Username utente (@handle):',msg_user_notfound:'Utente non trovato',
     kpi_users:'Utenti totali', kpi_pois:'POI totali', kpi_reports:'Segnalazioni aperte', kpi_new:'Nuovi utenti 7gg',
     latest_pois:'Ultimi POI', latest_users:'Ultimi iscritti',
     moderation_queue:'Coda segnalazioni', search:'Cerca',
@@ -970,6 +999,7 @@ const T = {
     sub_ailimits:'Kuotat dhe modelet AI sipas nivelit.', sub_copilot:'Asistent operativ me qasje në të dhëna.',
     sub_create:'Publiko POI zyrtarë dhe itinerare.', sub_audit:'Historiku i veprimeve administrative.',
     role_admin:'Administrator', logout:'Dil',
+    nav_messages:'Mesazhe',a_message:'Mesazh',msg_threads:'Bisedat',msg_new:'Shkruaj një përdoruesi',msg_pick:'Zgjidh një bisedë',msg_body_ph:'Shkruaj klientit… (shfaqet në ILLI me etiketën Njeri)',msg_send:'Dërgo',msg_empty:'Ende asnjë bisedë.',msg_conv_empty:'Asnjë mesazh: shkruaj i pari.',msg_pick_first:'Zgjidh më parë një bisedë',msg_sent:'Mesazhi u dërgua',msg_ask_user:'Username i përdoruesit (@handle):',msg_user_notfound:'Përdoruesi nuk u gjet',
     kpi_users:'Përdorues gjithsej', kpi_pois:'POI gjithsej', kpi_reports:'Raportime të hapura', kpi_new:'Përdorues të rinj 7d',
     latest_pois:'POI të fundit', latest_users:'Regjistrimet e fundit',
     moderation_queue:'Radha e raportimeve', search:'Kërko',
@@ -1065,6 +1095,7 @@ const T = {
     sub_ailimits:'AI quotas and models per tier.', sub_copilot:'Operational assistant with data access.',
     sub_create:'Publish official POIs and routes.', sub_audit:'History of admin actions.',
     role_admin:'Administrator', logout:'Sign out',
+    nav_messages:'Messages',a_message:'Message',msg_threads:'Conversations',msg_new:'Message a user',msg_pick:'Pick a conversation',msg_body_ph:'Write to the client… (appears in ILLI with the Human tag)',msg_send:'Send',msg_empty:'No conversations yet.',msg_conv_empty:'No messages: write first.',msg_pick_first:'Pick a conversation first',msg_sent:'Message sent',msg_ask_user:'User username (@handle):',msg_user_notfound:'User not found',
     kpi_users:'Total users', kpi_pois:'Total POIs', kpi_reports:'Open reports', kpi_new:'New users 7d',
     latest_pois:'Latest POIs', latest_users:'Latest signups',
     moderation_queue:'Reports queue', search:'Search',
@@ -1351,6 +1382,7 @@ function runSection(sec){
   switch(sec){
     case 'dashboard': loadDashboard(); break;
     case 'moderation': loadModeration(); break;
+    case 'messages': loadSupportThreads(); break;
     case 'users': loadUsers(); break;
     case 'ailimits': loadAiLimits(); break;
     case 'copilot': initCopilot(); break;
@@ -1562,6 +1594,84 @@ async function setReportStatus(id, status){
   }catch(e){ toast(t('error'),'err'); }
 }
 
+/* ═════════════════════════ 2b) MESSAGGI — chat team (admin) <-> cliente ═════════════════════════ */
+let _msgActiveUser=null, _msgActiveName='';
+function _msgTime(ts){ try{ return new Date(ts).toLocaleString(); }catch(e){ return ''; } }
+function refreshMessagesBadge(rows){
+  const b=document.getElementById('badgeMessages'); if(!b) return;
+  const n=(rows||[]).reduce((a,r)=>a+(r.unread_from_user||0),0);
+  b.textContent=n>0?String(n):''; b.style.display=n>0?'inline-flex':'none';
+}
+async function loadSupportThreads(){
+  const box=document.getElementById('msgThreads'); if(box) box.innerHTML='<div class="sm" style="padding:8px;opacity:.6">…</div>';
+  try{
+    const { data, error }=await sb.rpc('admin_support_threads');
+    if(error) throw error;
+    const rows=data||[];
+    if(!box) return;
+    refreshMessagesBadge(rows);
+    if(!rows.length){ box.innerHTML='<div class="sm" style="padding:8px;opacity:.7">'+t('msg_empty')+'</div>'; return; }
+    box.innerHTML='';
+    rows.forEach(r=>{
+      const item=el('div',{class:'msg-thread'+(_msgActiveUser===r.user_id?' on':''),onclick:()=>openSupportConv(r.user_id,r.username,r.avatar_url)});
+      const av=r.avatar_url?el('img',{class:'av round',src:r.avatar_url,alt:''}):el('div',{class:'av round',text:initials(r.username)});
+      const meta=el('div',{style:'min-width:0;flex:1'},[
+        el('div',{class:'ttl',text:'@'+(r.username||'utente')}),
+        el('div',{class:'sm',style:'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px',text:(r.last_body||'')})
+      ]);
+      item.appendChild(el('div',{style:'display:flex;align-items:center;gap:10px;min-width:0;flex:1'},[av,meta]));
+      if(r.unread_from_user>0) item.appendChild(el('span',{class:'chip red',text:String(r.unread_from_user)}));
+      box.appendChild(item);
+    });
+  }catch(e){ if(box) box.innerHTML='<div class="sm" style="padding:8px;opacity:.7">'+t('error')+'</div>'; }
+}
+async function openSupportConv(userId, username, avatar){
+  _msgActiveUser=userId; _msgActiveName=username||'utente';
+  const titleEl=document.getElementById('msgConvTitle'); if(titleEl) titleEl.textContent='@'+_msgActiveName;
+  const comp=document.getElementById('msgComposer'); if(comp) comp.style.display='flex';
+  const conv=document.getElementById('msgConv'); if(conv) conv.innerHTML='<div class="sm" style="padding:8px;opacity:.6">…</div>';
+  try{
+    const { data, error }=await sb.rpc('admin_list_support',{ p_user_id:userId });
+    if(error) throw error;
+    const rows=data||[];
+    conv.innerHTML = rows.length ? rows.map(m=>{
+      const mine=m.sender==='admin';
+      const body=String(m.body||'').replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c])).replace(/\n/g,'<br>');
+      return `<div style="display:flex;justify-content:${mine?'flex-end':'flex-start'};margin:5px 0"><div style="max-width:78%;padding:8px 11px;border-radius:12px;font-size:13px;line-height:1.5;background:${mine?'#285EA7':'#EFE9DC'};color:${mine?'#fff':'#241f18'}">${body}<div style="font-size:9px;opacity:.7;margin-top:3px;text-align:right">${_msgTime(m.created_at)}</div></div></div>`;
+    }).join('') : '<div class="sm" style="padding:8px;opacity:.7">'+t('msg_conv_empty')+'</div>';
+    conv.scrollTop=conv.scrollHeight;
+    await sb.rpc('admin_mark_support_read',{ p_user_id:userId });
+    loadSupportThreads();
+  }catch(e){ if(conv) conv.innerHTML='<div class="sm" style="padding:8px;opacity:.7">'+t('error')+'</div>'; }
+}
+async function sendAdminSupport(){
+  if(!_msgActiveUser){ toast(t('msg_pick_first'),'err'); return; }
+  const ta=document.getElementById('msgBody'); const body=(ta.value||'').trim();
+  if(!body) return;
+  try{
+    const { error }=await sb.rpc('admin_send_support_message',{ p_user_id:_msgActiveUser, p_body:body });
+    if(error) throw error;
+    ta.value='';
+    await openSupportConv(_msgActiveUser, _msgActiveName);
+    toast(t('msg_sent'),'ok');
+  }catch(e){ toast(t('error'),'err'); }
+}
+async function startSupportWith(userId, username, avatar){
+  openSection('messages');
+  await openSupportConv(userId, username, avatar);
+  const ta=document.getElementById('msgBody'); if(ta) ta.focus();
+}
+async function startNewSupportThread(){
+  const uname=(prompt(t('msg_ask_user'))||'').trim().replace(/^@/,'');
+  if(!uname) return;
+  try{
+    const { data, error }=await sb.from('profiles').select('id,username,avatar_url').ilike('username',uname).limit(1);
+    if(error) throw error;
+    if(!data || !data.length){ toast(t('msg_user_notfound'),'err'); return; }
+    openSupportConv(data[0].id, data[0].username, data[0].avatar_url);
+  }catch(e){ toast(t('error'),'err'); }
+}
+
 /* ═════════════════════════ 3) UTENTI ═════════════════════════ */
 async function loadUsers(){
   const box=document.getElementById('usersTable'); loadingBox(box);
@@ -1591,6 +1701,8 @@ async function loadUsers(){
         text: st==='active'? t('st_active') : (st==='suspended'? t('st_suspended') : t('st_banned'))});
 
       const actions=el('div',{class:'btn-row'});
+      actions.appendChild(el('button',{class:'btn sm',
+        onclick:()=>startSupportWith(u.id, u.username, u.avatar_url), text:t('a_message')}));
       if(st==='active'){
         actions.appendChild(el('button',{class:'btn sm gold',
           onclick:()=>moderateUser(u.id,'suspended','manual',plus7d()), text:t('a_suspend')}));
