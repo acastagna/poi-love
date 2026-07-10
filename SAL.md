@@ -1,7 +1,7 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
 > **Prossima ripresa: canale EMAIL delle notifiche (serve chiave AcumbaMail + edge worker) e trigger notifiche mancanti (rotta pubblicata/adottata dentro le RPC admin). Valutare voce iperrealistica (Google TTS) per ILLI, oggi la voce meccanica è disattivata. Collaudi manuali di Alessandro in attesa (checklist 04/07 + claim a pagamento + copilota foto).**
-> Checkpoint sessione: tag `checkpoint-2026-07-10-routes-poi` (HEAD su origin/main, v3.10). **Nessun lavoro non committato.**
+> Checkpoint sessione: tag `checkpoint-2026-07-10-custom-categories` (HEAD su origin/main, v3.12). **Nessun lavoro non committato.**
 
 ## Sessione 10/07/2026 — Scheda Crea POI: multi-categoria + itinerario + proponi rotta (v3.09 → v3.10)
 
@@ -12,6 +12,12 @@ Tutto live e verificato, checkpoint `checkpoint-2026-07-10-routes-poi` (HEAD su 
 - **Admin (panel.html)**: nuovo pannello **"POI proposti come tappa"** nella sezione Rotte (`loadProposedPois`). Ogni proposta: foto/nome/autore/coordinate + descrizione, link Google Maps, **"Aggiungi a una rotta"** (sceglie la rotta storica e inserisce la tappa collegata al `poi_id`) e **"Segna gestita"** (`admin_clear_poi_route_proposal`). Trilingue IT/SQ/EN.
 - **mig 065**: `pois.route_proposed` + `route_proposed_at` (+ indice parziale); RPC `propose_poi_as_route_stop` (solo autore) e `admin_clear_poi_route_proposal` (solo admin). Applicata e verificata; RPC registrate e protette (anon → "not your POI" / "not authorized").
 - **Restano su questo filone**: filtro/scoperta incrociata dei POI per categoria (l'array c'è, manca la UI di filtro); provare su telefono reale l'aggiunta di una tappa da un POI creato dal vivo.
+
+- **Categoria personalizzata REALE + pulizia finti nella scheda Crea POI (v3.11→v3.12, mig 066+067), tutto live e verificato.** Richiesta founder: le categorie le governa l'admin, un utente può avere UNA sola categoria personalizzata sua, appare all'admin che la approva subito, e a 20 usi diventa pubblica da sola. Fatto REALE (workflow ultracode: mappatura + design + implementazione + review avversariale a 13 agenti, 6 fix confermati e applicati):
+  - **mig 066**: la categoria custom vive dentro `poi_categories` con `owner_id` + `active=false` (la vede/usa solo il proprietario via RLS) + contatore `uses`. Indice unico parziale = "una sola non pubblica per utente". Trigger sui POI mantiene `uses` e a 20 POI che la usano la pubblica DA SOLA (verificato: 19→privata, 20→pubblica). RPC `request_custom_category` (crea/usa, blocca la seconda), `delete_my_custom_category`, `admin_approve_category` (pubblica in 1 click), `admin_reject_category`, `admin_list_custom_categories`. Webapp: "Altra categoria" reale (niente più localStorage finto), sezione "La mia categoria", usa/sostituisci. Admin: pannello con proprietario + barra usi/20 + Approva ora/Rifiuta (via il "Promuovi" cosmetico).
+  - **mig 067** (fix review): `request_custom_category` non riusa/espone più la pendente PRIVATA altrui (niente leak owner_id) ed è race-safe (collisione key → namespaced). Verificato: due utenti stesso termine → categorie separate e private.
+  - **Finti eliminati nella scheda**: (1) Visibilità Pubblico/Privato/Condividi ora SALVA davvero (prima sempre 'community' hardcoded), in creazione+modifica, con preset in modifica e reset a Pubblico su scheda nuova (fix major: un POI nuovo non eredita più "Privato"); (2) tolto il blocco tag-tappa morto (toast "memorizzato" che non salvava); (3) via il vecchio auto-promote a righe (aggirabile) e i commenti/i18n fuorvianti.
+  - **Ancora finto/cosmetico segnalato (NON toccato, da decidere con Alessandro)**: "Consiglia a Google Maps" (apre solo Google Maps, non "aggiunge un posto"); il link di condivisione statico placeholder (il sistema `?poi=`/`?at=` è reale, ma il testo iniziale mostra un `/p/` morto finché non si imposta la posizione).
 
 ## Sessione 07/07/2026 — Consensi, notifiche, geofence + batch UI (v2.56 → v2.62)
 
