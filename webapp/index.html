@@ -1578,14 +1578,15 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 .trip-card{border-radius:18px;overflow:hidden;background:var(--card);box-shadow:0 4px 20px rgba(0,0,0,.09);cursor:pointer;transition:transform .15s,box-shadow .15s;display:flex;flex-direction:column}
 .trip-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.14)}
 .trip-card:active{transform:translateY(0)}
-/* Swipe card itinerario: sx = elimina/archivia · dx = condividi/pubblico/ufficiale */
+/* Swipe card itinerario: sx = elimina/archivia · dx = condividi/pubblico/ufficiale.
+   Bottoni COMPATTI centrati (non strisce alte), la card si sposta solo in parte e resta afferrabile. */
 .trip-swipe{position:relative;overflow:hidden;border-radius:18px}
-.trip-swipe .tsw-actions{position:absolute;top:0;bottom:0;display:flex;align-items:stretch;z-index:0}
+.trip-swipe .tsw-actions{position:absolute;top:0;bottom:0;display:flex;align-items:center;gap:8px;padding:0 10px;z-index:0}
 .trip-swipe .tsw-right{right:0}
 .trip-swipe .tsw-left{left:0}
-.tsw-btn{width:76px;border:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;font-size:11px;font-weight:800;color:#fff;cursor:pointer;font-family:inherit;padding:0;line-height:1.15}
-.tsw-btn i{font-size:21px}
-.tsw-btn span{padding:0 3px;text-align:center}
+.tsw-btn{width:66px;height:68px;flex:none;border:none;border-radius:15px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:10px;font-weight:800;color:#fff;cursor:pointer;font-family:inherit;line-height:1.05;box-shadow:0 3px 10px rgba(0,0,0,.18)}
+.tsw-btn i{font-size:20px}
+.tsw-btn span{text-align:center;word-break:break-word;max-width:100%}
 .tsw-arch{background:#7d746a} .tsw-del{background:#D42B2B}
 .tsw-share{background:#F97316} .tsw-pub{background:#22C55E} .tsw-off{background:#7C3AED}
 .trip-swipe .trip-card{position:relative;z-index:1;will-change:transform;touch-action:pan-y}
@@ -7757,7 +7758,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='3.04';
+const APP_VERSION='3.05';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
@@ -13263,16 +13264,19 @@ function _attachTripSwipes(){
   document.querySelectorAll('.trip-swipe').forEach(sw=>{
     if(sw._swipeInit) return; sw._swipeInit=true;
     const card=sw.querySelector('.trip-card');
-    const rightW=152, leftW=228;   // larghezze pannelli (btn da 76px)
+    const pR=sw.querySelector('.tsw-right'), pL=sw.querySelector('.tsw-left');
+    // Larghezze REALI dei gruppi di bottoni (misurate), così la card si sposta solo quanto serve, mai tutta fuori.
+    const rW=()=>Math.min((pR?pR.offsetWidth:150), Math.round(card.offsetWidth*0.72));
+    const lW=()=>Math.min((pL?pL.offsetWidth:210), Math.round(card.offsetWidth*0.72));
     let startX=0,startY=0,curX=0,open=0,dragging=false,decided=false,horiz=false;
     const setX=x=>{ card.style.transform='translateX('+x+'px)'; };
     card.addEventListener('touchstart',e=>{ const p=e.touches[0]; startX=p.clientX; startY=p.clientY; dragging=true; decided=false; horiz=false; sw.classList.add('swiping'); },{passive:true});
     card.addEventListener('touchmove',e=>{ if(!dragging) return; const p=e.touches[0]; const dx=p.clientX-startX, dy=p.clientY-startY;
       if(!decided && (Math.abs(dx)>8||Math.abs(dy)>8)){ decided=true; horiz=Math.abs(dx)>Math.abs(dy); }
-      if(horiz){ e.preventDefault(); let x=Math.max(-rightW, Math.min(leftW, open+dx)); curX=x; setX(x); }
+      if(horiz){ e.preventDefault(); const x=Math.max(-rW(), Math.min(lW(), open+dx)); curX=x; setX(x); }
     },{passive:false});
     const end=()=>{ if(!dragging) return; dragging=false; sw.classList.remove('swiping');
-      open = (curX < -rightW*0.4) ? -rightW : (curX > leftW*0.4) ? leftW : 0;
+      open = (curX < -rW()*0.4) ? -rW() : (curX > lW()*0.4) ? lW() : 0;
       setX(open); };
     card.addEventListener('touchend',end); card.addEventListener('touchcancel',end);
     sw._isOpen=()=>open!==0; sw._close=()=>{ open=0; curX=0; setX(0); };
