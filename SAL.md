@@ -4,9 +4,18 @@
 > Checkpoint sessione: tag `checkpoint-2026-07-10-review-fixes` (HEAD su origin/main, v3.14). **Nessun lavoro non committato.**
 > Code-review completa (22 agenti) su tutta la sessione: 14 findings confermati, TUTTI corretti (mig 068 + v3.14), verificati sul live poilove.com. Aperto solo: nota OSM lato-client (funziona, gratis; hardening server-side con edge function OAuth = miglioria futura, non bloccante).
 
-## Sessione 10/07/2026 — Scheda Crea POI: multi-categoria + itinerario + proponi rotta (v3.09 → v3.10)
+## Sessione 10/07/2026 — Giornata piena: itinerari, categorie, rotte, pulizia finti (v3.02 → v3.14, mig 063-068)
 
-Tutto live e verificato, checkpoint `checkpoint-2026-07-10-routes-poi` (HEAD su origin/main, v3.10). Nessun lavoro non committato.
+Tutto live e verificato, checkpoint finale `checkpoint-2026-07-10-review-fixes` (HEAD su origin/main, **v3.14**). Nessun lavoro non committato. Riepilogo dell'intera giornata (18 commit, 6 migrazioni 063-068, 3 checkpoint):
+
+**Blocco 1 — Itinerari e admin (v3.02 → v3.08, mig 063):**
+- **v3.02**: le copertine degli itinerari usavano immagini AI inventate (digitando "Tirana" non usciva Tirana). Ora **foto reali** da Wikimedia Commons.
+- **v3.03**: creando un itinerario si perdevano le date e usciva un **duplicato** (chiave locale mai riconciliata). Corretto: date salvate alla creazione, niente più doppione.
+- **Admin editor tappe ridisegnato**: card grandi con trascina-per-riordinare, foto per tappa (ricerca Wikipedia), descrizione inline + AI, ordina con AI, duplica, sospendi/elimina. Stessa UI riusata sia per Rotte Storiche sia per Itinerari utente.
+- **v3.04 + mig 063 — gesti swipe sulle card itinerario**: dito a sinistra = Archivia/Elimina; dito a destra = Condividi/Pubblico/Proponi come ufficiale (RPC `propose_trip_official`). mig 063: `trips.archived` + `official_requested`. Rifiniture UI v3.05→v3.07 su richiesta founder (bottoni impilati in una colonna, stondature pulite, card quadrata + angoli tondi solo sul contenitore).
+- **v3.08 — riordino scheda Crea POI**: TAG in alto blu, fascia "Aggiungi a una lista" evidenziata, categorie sotto, il **+ rosso sparisce** quando la scheda è aperta.
+
+**Blocco 2 — Categorie, itinerario, rotte, pulizia finti (v3.09 → v3.14):**
 
 - **v3.09 + mig 064 — fino a 3 categorie (intreccio)**: nella scheda Crea POI un POI può avere fino a 3 categorie. Si scelgono dalla griglia e appena scelte la griglia si **compatta**, restano solo i chip scelti (con X per togliere) + "Aggiungi" finché sotto le 3; al terzo blocca e nasconde Aggiungi. Salvate come `pois.categories text[]` (mig 064, + indice GIN per la ricerca incrociata). La categoria/subcategoria primaria resta per l'icona del marker. Verificato dal vivo: 3 scelte, compattazione, array salvato, 4ª bloccata.
 - **v3.10 + mig 065 — tolte le rotte storiche FINTE, messe due funzioni reali**: il vecchio menu rotte (Via Egnatia/Serenissima/Terre Illiriche/Colonie Greche) era cosmetico e non salvava nulla. Sostituito con: (1) **"Aggiungi a un itinerario"** — chip con gli itinerari reali dell'utente (col conteggio tappe); alla creazione/modifica il POI diventa una **tappa vera** dell'itinerario scelto (trip_stops via `_persistTripStops`/replace_trip_stops); (2) **"Proponi come tappa di rotta storica"** — manda il POI all'admin (RPC `propose_poi_as_route_stop`, solo autore). Il **+ rosso** già spariva a scheda aperta (`body.sheet-open`).

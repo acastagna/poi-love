@@ -1,30 +1,30 @@
 {
   "_meta": {
-    "last_updated": "2026-05-08",
-    "version": "2.4",
-    "next_deadline": "2026-05-13",
-    "next_deadline_label": "🎤 Finestra presentazioni 13-17 Maggio — demo live + roadmap Tirana",
-    "presentation_window_start": "2026-05-13",
-    "presentation_window_end": "2026-05-17",
-    "launch_date": "Giugno 2026 (Tirana — lancio pubblico fisico)",
+    "last_updated": "2026-07-10",
+    "version": "3.14",
+    "next_deadline": "2026-07-14",
+    "next_deadline_label": "🎤 Finestra presentazioni 14-17 Luglio (mar-ven) — webapp v3.14 live e usabile end-to-end",
+    "presentation_window_start": "2026-07-14",
+    "presentation_window_end": "2026-07-17",
+    "launch_date": "17 agosto 2026 (lun) — Tirana, lancio pubblico",
     "launch_city": "Tirana"
   },
   "overview": {
-    "overall_pct": 75,
+    "overall_pct": 88,
     "weeks_to_launch": 5,
-    "db_tables": 12,
+    "db_tables": 42,
     "license": "MIT"
   },
   "areas": [
     { "id": "infra",   "pct": 100, "status": "done"    },
-    { "id": "app",     "pct": 75,  "status": "active"  },
-    { "id": "ux",      "pct": 65,  "status": "active"  },
-    { "id": "launch",  "pct": 40,  "status": "active"  }
+    { "id": "app",     "pct": 90,  "status": "active"  },
+    { "id": "ux",      "pct": 88,  "status": "active"  },
+    { "id": "launch",  "pct": 55,  "status": "active"  }
   ],
   "pie": [
-    { "id": "done",   "value": 60 },
-    { "id": "active", "value": 25 },
-    { "id": "todo",   "value": 15 }
+    { "id": "done",   "value": 80 },
+    { "id": "active", "value": 14 },
+    { "id": "todo",   "value": 6 }
   ],
   "tasks": [
     { "id": "t1",  "group": "done",   "pct": 100, "time_est": 8,  "status": "done"   },
@@ -33,60 +33,48 @@
     { "id": "t4",  "group": "done",   "pct": 100, "time_est": 2,  "status": "done"   },
     { "id": "t5",  "group": "done",   "pct": 100, "time_est": 12, "status": "done"   },
     { "id": "t6",  "group": "done",   "pct": 100, "time_est": 4,  "status": "done"   },
-    { "id": "t7",  "group": "sprint", "pct": 70,  "time_est": 3,  "status": "sprint" },
-    { "id": "t8",  "group": "sprint", "pct": 50,  "time_est": 6,  "status": "sprint" },
-    { "id": "t9",  "group": "next",   "pct": 0,   "time_est": 10, "status": "next"   },
-    { "id": "t10", "group": "next",   "pct": 0,   "time_est": 6,  "status": "next"   },
-    { "id": "t11", "group": "next",   "pct": 0,   "time_est": 6,  "status": "next"   },
-    { "id": "t12", "group": "future", "pct": 0,   "time_est": 3,  "status": "future" },
-    { "id": "t13", "group": "future", "pct": 0,   "time_est": 5,  "status": "future" },
-    { "id": "t14", "group": "future", "pct": 0,   "time_est": 4,  "status": "future" },
-    { "id": "t15", "group": "future", "pct": 0,   "time_est": 18, "status": "future", "label": "Itinerari di Viaggio — Migration 002 + UI + Geofencing + Compagni" }
+    { "id": "t7",  "group": "done",   "pct": 100, "time_est": 3,  "status": "done"   },
+    { "id": "t8",  "group": "next",   "pct": 15,  "time_est": 6,  "status": "next",   "label": "App mobile (Expo) — dopo il lancio: build su store" },
+    { "id": "t9",  "group": "done",   "pct": 100, "time_est": 10, "status": "done",   "label": "Admin desktop (admin.poilove.com): moderazione, categorie, rotte, itinerari" },
+    { "id": "t10", "group": "done",   "pct": 100, "time_est": 6,  "status": "done",   "label": "Tassonomia categorie: 3 livelli + categoria personalizzata reale" },
+    { "id": "t11", "group": "sprint", "pct": 60,  "time_est": 6,  "status": "sprint", "label": "Collaudo end-to-end su telefono reale (mic, geofence, creazione dal vivo)" },
+    { "id": "t12", "group": "sprint", "pct": 30,  "time_est": 3,  "status": "sprint", "label": "Seed di POI reali di Tirana con codice di rivendicazione" },
+    { "id": "t13", "group": "next",   "pct": 10,  "time_est": 5,  "status": "next",   "label": "Gamification punti/badge + 3 QR fisici (modello di business)" },
+    { "id": "t14", "group": "next",   "pct": 0,   "time_est": 4,  "status": "next",   "label": "Terms of Service + Privacy Policy (blocca store e alcuni OAuth)" },
+    { "id": "t15", "group": "done",   "pct": 100, "time_est": 18, "status": "done",   "label": "Itinerari di Viaggio: DB + UI + tappe + compagnie + bacheca vocale" }
   ],
   "changelog": [
     {
-      "date": "2026-05-08",
-      "note": "SESSIONE v2.4: Spostata presentazione da singolo giorno (10 Mag) a FINESTRA 13-17 Maggio (5 giorni, Mer-Dom) — meeting hand-picked distribuiti nei 5 giorni anziché concentrati. Sprint pre-finestra: 7 giorni (Ven 8 oggi → Gio 14). Deadline marker su Mer 13 (inizio finestra)."
+      "date": "2026-07-10",
+      "note": "SESSIONE v3.02→v3.14 (giornata piena, 18 commit, migrazioni 063-068): itinerari con date reali + gesti swipe (archivia/elimina/condividi/pubblico/proponi ufficiale) + copertine con foto reali Wikimedia; editor tappe admin ricco (trascina, AI ordina, foto, duplica). Categorie: fino a 3 per POI (intreccio) + categoria personalizzata REALE (una per utente, pubblica con 20 persone diverse o su approvazione admin immediata). Dalla scheda POI si propone un POI come tappa di rotta storica. Visibilità Pubblico/Privato/Condividi ora salva davvero. Tolto il finto 'Consiglia a Google Maps' (impossibile via API): al suo posto segnalazione REALE e gratis a OpenStreetMap. Code-review completa (22 agenti), 14 fix applicati e verificati sul live. Data presentazione confermata 14-17 luglio, lancio 17 agosto."
+    },
+    {
+      "date": "2026-07-07",
+      "note": "SESSIONE v2.56→v2.62: consensi GDPR (legge AL 124/2024) + microfono, notifiche in-app + geofence foreground (avviso quando ti avvicini a un luogo), ricerca mappa multi-tipo, freccia indietro su ogni schermata. Deploy split 1 MB (index.html + app.js) per il WAF."
+    },
+    {
+      "date": "2026-07-05",
+      "note": "SESSIONE v2.63→v2.84: BACHECA VOCALE delle compagnie (walkie-talkie premi-e-parla, audio + trascrizione Whisper, like/rispondi, @menzioni), immagini condivise, deviazioni votate. Dettaglio itinerario reso REALE (calendario vero, mappa vera bloccata, visibilità che salva, tappe complete)."
+    },
+    {
+      "date": "2026-06-30",
+      "note": "SESSIONE giugno: gamification (punti, badge, referral), compagnie di viaggio, tassonomia POI a 3 livelli, ILLI ancorata a luoghi reali (Overpass/OSM + DB, niente più posti inventati), sicurezza AI (login + limiti tier, chiave solo server-side), condivisione POI con gate auth."
+    },
+    {
+      "date": "2026-06-23",
+      "note": "REDESIGN 2026: da prototipo-vetrina a PRODOTTO REALE. project.poilove.com live, demo eliminato ovunque, i18n albanese-first, bucket foto Supabase, postmortem qualità (8 blocker + 14 major), visione prodotto in SPECS.md. Lancio spostato a 17 agosto (data Kairos)."
     },
     {
       "date": "2026-05-08",
-      "note": "SESSIONE v2.3: Riformulazione SAL — rimosso lancio digitale 1 Maggio, focus su Presentazione + Lancio Tirana Giugno. T7 Plesk Upload riconosciuto a 70% (server live, manca wire AddPOI demo). T8 Expo a 50% (scaffold 17 file pronto). Aree macro aggiornate: ux 25→65%, launch 35→40%, app 75%."
-    },
-    {
-      "date": "2026-05-07",
-      "note": "SESSIONE v2.2: Webapp HTML demo consolidata — index.html SPA 303KB con bottom nav, FAB AddPOI/AddStop/Compagnia, mappa Leaflet trilingue IT/SQ/EN, sheet system, demo mode, login Google + magic link. itinerari.html dettagliata con polyline numerata, mini calendario interattivo, GPS banner. POI-LOVE-SAL.html aggiornato a 90KB."
-    },
-    {
-      "date": "2026-04-26",
-      "note": "SESSIONE v2.1: Feature spec Itinerari di Viaggio — pianificazione pre-viaggio + mini calendario + piantina numerata + geofencing invito POI + compagni di viaggio pubblici. Migration 002 SQL scritta (itineraries, itinerary_stops, itinerary_interests + RLS). DB tabelle 9→12. Milestone: Atto I.5 post-presentazione."
-    },
-    {
-      "date": "2026-04-26",
-      "note": "SESSIONE v1.9: Expo app MVP scaffold completo — 17 file TypeScript. Root layout con AuthContext Supabase. Google OAuth login screen. react-native-maps PROVIDER_GOOGLE con stile warm-beige. AddPOISheet flusso < 90 sec. POIDetailCard con foto scroll horizontal. LoveButton animazione optimistic. POIMarker con badge love_count. MediaUpload JWT Bearer → media.poilove.com. Push GitHub: app/poi-love-app/ (17 file)."
-    },
-    {
-      "date": "2026-04-26",
-      "note": "SESSIONE v1.8: Media server PHP live su media.poilove.com — PHP 8.3.30, GD WebP, cURL 7.88, EXIF, storage poi/ scrivibile, Supabase connesso. GitHub Actions deploy SSH automatico (chiave ED25519, 5 secrets). .user.ini PHP-FPM upload 10M. Branded 403 page."
-    },
-    {
-      "date": "2026-04-26",
-      "note": "SESSIONE v1.7: GitHub push via API (token PAT) — migration 001, card-system.md, architecture.md, schema.sql v1.1. Migration applicata su Supabase (poi_visibility ENUM, card_generations, RLS). Fix funzioni DB senza search_path. Security Advisor: 0 errori. Infrastruttura 100%."
-    },
-    {
-      "date": "2026-04-25",
-      "note": "SESSIONE v1.6: Migration 001: poi_visibility ENUM + card_generations table + RLS. card-system.md spec completa (feed 4:5, stories 9:16, qr_strip, SHA-256, consent NFT/book). architecture.md aggiornato (9 tabelle)."
-    },
-    {
-      "date": "2026-04-24",
-      "note": "SESSIONE v1.4-1.5: Google OAuth attivo. Google Maps Platform configurata. SAL trilingue IT/SQ/EN. SAL-data.json creato come fonte di verità. Repository GitHub live con CI/CD. Schema Supabase 9 tabelle + RLS."
+      "note": "SESSIONE v2.4: presentazione a FINESTRA 13-17 Maggio (prima finestra), webapp HTML demo consolidata, 4 sotto-domini live (poilove.com, demo, sal, media)."
     }
   ],
   "next_session_priorities": [
-    "FINESTRA PRESENTAZIONI 13-17 MAGGIO: meeting hand-picked distribuiti nei 5 giorni — partner, investitori, alleati locali",
-    "Sprint pre-finestra (Ven 8 → Mar 12): wire AddPOI Plesk + slide demo + dry-run + dress rehearsal",
-    "T7 Plesk: wire AddPOI della demo HTML al endpoint upload.php (file picker → multipart POST con JWT Supabase) + scrittura riga in tabella media post-upload",
-    "T8 Expo: testare l'app scaffold su Expo Go device fisico — login Google + mappa base + AddPOI < 90s",
-    "Commit + push dei file untracked su GitHub acastagna/poi-love (index.html, itinerari.html, prototype, SAL, SAL-data.json)",
-    "Post-finestra (18 Mag → Giugno): iterazione su feedback partner, accordi locali Tirana, evento di lancio fisico Giugno"
+    "FINESTRA PRESENTAZIONI 14-17 LUGLIO (mar-ven): webapp v3.14 live e usabile end-to-end davanti a partner e investitori a Tirana",
+    "Collaudo su telefono reale: microfono/dettatura, geofence, creazione POI dal vivo, bacheca vocale",
+    "Seed di POI reali di Tirana con codice di rivendicazione (niente dati finti alla presentazione)",
+    "Gamification punti/badge + 3 QR fisici (universale, del locale, POIVOICE) = modello di business",
+    "Terms of Service + Privacy Policy prima del lancio e degli store",
+    "Post-presentazione → 17 agosto: rifinitura, hardening, avvio app mobile (Expo) per gli store dopo il lancio"
   ]
 }
