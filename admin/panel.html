@@ -787,6 +787,11 @@ html[data-theme="light"] .chip.green{color:#236b39}
         <div id="routeSuggTable"></div>
       </div>
       <div class="panel" style="margin-bottom:16px">
+        <div class="card-h"><span class="ic"><i class="ph-duotone ph-seal-check"></i></span><span data-t="ppoi_title">POI proposti come tappa</span></div>
+        <div class="sm" style="margin-bottom:10px" data-t="ppoi_help">Luoghi che gli utenti propongono come tappa di una rotta storica. Guardali su mappa, aggiungili a una rotta, poi segnali come gestiti.</div>
+        <div id="proposedPoisTable"></div>
+      </div>
+      <div class="panel" style="margin-bottom:16px">
         <div class="card-h"><span class="ic"><i class="ph-duotone ph-path"></i></span><span data-t="rt_new">Nuova rotta storica</span></div>
         <div class="row2">
           <div class="field"><label data-t="f_trip_name">Nome percorso</label><input id="rtName" placeholder="Es. Tirana Storica"></div>
@@ -1025,7 +1030,7 @@ const T = {
     chat_ph:'Scrivi al copilota…',
     chat_stale:'Risposta scartata: nel frattempo hai cambiato chat',
     rls_no_rows:'Nessuna modifica: permessi mancanti sul database (migrazione 015 non applicata?)',own_req_title:'Richieste di proprietà POI',own_req_empty:'Nessuna richiesta di proprietà in attesa',own_req_from:'Chiede',own_req_cede:'Cede',own_req_embed:'Copia codice embed',own_req_embed_copied:'Codice embed copiato',a_approve_transfer:'Approva e trasferisci',own_req_confirm:'Approvare? Il POI passerà al richiedente.',own_req_approved:'Proprietà trasferita',own_req_rejected:'Richiesta rifiutata',nav_routes:'Rotte Storiche',nav_itineraries:'Itinerari',sub_itineraries:'Gli itinerari di viaggio creati dagli utenti (diversi dalle rotte storiche). Puoi vederli, metterli in evidenza o rimuoverli.',itin_empty:'Nessun itinerario',itin_empty_h:'Compaiono qui quando gli utenti creano un viaggio.',itin_feat:'Metti in evidenza',itin_unfeat:'Togli evidenza',itin_feat_on:'In evidenza',itin_del_confirm:'Eliminare questo itinerario e tutte le sue tappe?',itin_vis_pub:'Pubblico',itin_vis_comp:'Compagnia',itin_vis_friends:'Amici',itin_vis_prv:'Privato',sub_routes:'Crea, pubblica e gestisci le rotte storiche ufficiali.',rt_new:'Nuova rotta storica',rt_create:'Crea rotta (bozza)',rt_list:'Rotte storiche',rt_empty:'Nessuna rotta storica',rt_empty_h:'Creane una qui sopra o falla proporre al copilota.',rt_published:'Pubblicata',rt_publish:'Pubblica',rt_unpublish:'Nascondi',rt_stops_btn:'Tappe',rt_mode_road:'Su strada',rt_mode_line:'Linea dritta',rt_mode_hint:'Su strada segue la mappa stradale; Linea dritta resta in linea d\'aria (per le ley line, es. San Michele).',rt_confirm_del:'Eliminare questa rotta e tutte le sue tappe?',
-    rsug_title:'Segnalazioni dalla community', rsug_help:'Rotte proposte dagli utenti. Valuta, poi "Crea rotta" (nasce bozza col credito al segnalatore già attaccato): rifinisci descrizione, immagine e tappe, e pubblica. Il segnalatore riceverà il ringraziamento pubblico.', rsug_empty:'Nessuna segnalazione in attesa', rsug_by:'da', rsug_anon:'un membro', rsug_create:'Crea rotta', rsug_dismiss:'Scarta', rsug_created:'Rotta bozza creata col credito. Rifiniscila e pubblicala.', rsug_dismiss_confirm:'Scartare questa segnalazione?',
+    rsug_title:'Segnalazioni dalla community', rsug_help:'Rotte proposte dagli utenti. Valuta, poi "Crea rotta" (nasce bozza col credito al segnalatore già attaccato): rifinisci descrizione, immagine e tappe, e pubblica. Il segnalatore riceverà il ringraziamento pubblico.', rsug_empty:'Nessuna segnalazione in attesa', rsug_by:'da', rsug_anon:'un membro', rsug_create:'Crea rotta', rsug_dismiss:'Scarta', rsug_created:'Rotta bozza creata col credito. Rifiniscila e pubblicala.', rsug_dismiss_confirm:'Scartare questa segnalazione?', ppoi_title:'POI proposti come tappa', ppoi_help:'Luoghi che gli utenti propongono come tappa di una rotta storica. Guardali su mappa, aggiungili a una rotta, poi segnali come gestiti.', ppoi_empty:'Nessun POI proposto in attesa', ppoi_add:'Aggiungi a una rotta', ppoi_map:'Mappa', ppoi_done:'Segna gestita', ppoi_done_confirm:'Segnare questa proposta come gestita?', ppoi_pick:'Scegli la rotta a cui aggiungere questa tappa:', ppoi_no_routes:'Nessuna rotta storica: creane una prima', ppoi_added:'Tappa aggiunta alla rotta', untitled_admin:'Senza nome',
     f_route_desc:'Descrizione', f_route_desc_ph:'Descrizione attinente che vedranno gli utenti', f_route_cover:'Immagine di copertina (URL https)', f_route_cover_err:'L\'immagine deve essere un URL https',
     f_coords:'Coordinate', f_address:'Indirizzo', f_city:'Città'
   },
@@ -1121,7 +1126,7 @@ const T = {
     chat_ph:'Shkruaji kopilotit…',
     chat_stale:'Përgjigjja u hodh poshtë: ndërkohë ke ndërruar bisedë',
     rls_no_rows:'Asnjë ndryshim: mungojnë lejet në databazë (migrimi 015 i paaplikuar?)',own_req_title:'Kërkesa pronësie POI',own_req_empty:'Asnjë kërkesë pronësie në pritje',own_req_from:'Kërkon',own_req_cede:'Cedon',own_req_embed:'Kopjo kodin embed',own_req_embed_copied:'Kodi embed u kopjua',a_approve_transfer:'Mirato dhe transfero',own_req_confirm:'Të miratohet? POI do t\'i kalojë kërkuesit.',own_req_approved:'Pronësia u transferua',own_req_rejected:'Kërkesa u refuzua',nav_routes:'Rrugët Historike',nav_itineraries:'Itineraret',sub_itineraries:'Itineraret e udhëtimit të krijuara nga përdoruesit (ndryshe nga rrugët historike). Mund t\'i shohësh, vësh në pah ose t\'i heqësh.',itin_empty:'Asnjë itinerar',itin_empty_h:'Shfaqen këtu kur përdoruesit krijojnë një udhëtim.',itin_feat:'Vër në pah',itin_unfeat:'Hiq nga pah',itin_feat_on:'Në pah',itin_del_confirm:'Të fshihet ky itinerar me të gjitha ndalesat?',itin_vis_pub:'Publik',itin_vis_comp:'Shoqëria',itin_vis_friends:'Miq',itin_vis_prv:'Privat',sub_routes:'Krijo, boto dhe menaxho rrugët historike zyrtare.',rt_new:'Rrugë e re historike',rt_create:'Krijo rrugën (draft)',rt_list:'Rrugët historike',rt_empty:'Asnjë rrugë historike',rt_empty_h:'Krijo një këtu sipër ose lëre kopilotin ta propozojë.',rt_published:'E botuar',rt_publish:'Boto',rt_unpublish:'Fshih',rt_stops_btn:'Ndalesat',rt_mode_road:'Në rrugë',rt_mode_line:'Vijë e drejtë',rt_mode_hint:'Në rrugë ndjek hartën rrugore; Vijë e drejtë mbetet ajrore (për ley line, p.sh. San Michele).',rt_confirm_del:'Të fshihet kjo rrugë me të gjitha ndalesat?',
-    rsug_title:'Sugjerime nga komuniteti', rsug_help:'Rrugë të propozuara nga përdoruesit. Vlerëso, pastaj "Krijo rrugën" (lind draft me kreditin e sugjeruesit të bashkangjitur): rifino përshkrimin, imazhin dhe ndalesat, dhe boto. Sugjeruesi do të marrë falënderimin publik.', rsug_empty:'Asnjë sugjerim në pritje', rsug_by:'nga', rsug_anon:'një anëtar', rsug_create:'Krijo rrugën', rsug_dismiss:'Hidhe', rsug_created:'Rruga draft u krijua me kreditin. Rifinoje dhe botoje.', rsug_dismiss_confirm:'Ta hedhësh këtë sugjerim?',
+    rsug_title:'Sugjerime nga komuniteti', rsug_help:'Rrugë të propozuara nga përdoruesit. Vlerëso, pastaj "Krijo rrugën" (lind draft me kreditin e sugjeruesit të bashkangjitur): rifino përshkrimin, imazhin dhe ndalesat, dhe boto. Sugjeruesi do të marrë falënderimin publik.', rsug_empty:'Asnjë sugjerim në pritje', rsug_by:'nga', rsug_anon:'një anëtar', rsug_create:'Krijo rrugën', rsug_dismiss:'Hidhe', rsug_created:'Rruga draft u krijua me kreditin. Rifinoje dhe botoje.', rsug_dismiss_confirm:'Ta hedhësh këtë sugjerim?', ppoi_title:'POI të propozuar si ndalesë', ppoi_help:'Vende që përdoruesit i propozojnë si ndalesë të një rruge historike. Shihi në hartë, shtoji te një rrugë, pastaj shënoji si të trajtuar.', ppoi_empty:'Asnjë POI i propozuar në pritje', ppoi_add:'Shto te një rrugë', ppoi_map:'Harta', ppoi_done:'Shëno si të trajtuar', ppoi_done_confirm:'Ta shënosh këtë propozim si të trajtuar?', ppoi_pick:'Zgjidh rrugën ku do të shtohet kjo ndalesë:', ppoi_no_routes:'Asnjë rrugë historike: krijo një më parë', ppoi_added:'Ndalesa u shtua te rruga', untitled_admin:'Pa emër',
     f_route_desc:'Përshkrimi', f_route_desc_ph:'Përshkrim i përshtatshëm që do shohin përdoruesit', f_route_cover:'Imazhi i kopertinës (URL https)', f_route_cover_err:'Imazhi duhet të jetë një URL https',
     f_coords:'Koordinatat', f_address:'Adresa', f_city:'Qyteti'
   },
@@ -1217,7 +1222,7 @@ const T = {
     chat_ph:'Write to the copilot…',
     chat_stale:'Reply discarded: you switched chat in the meantime',
     rls_no_rows:'No changes: missing database permissions (migration 015 not applied?)',own_req_title:'POI ownership requests',own_req_empty:'No pending ownership requests',own_req_from:'Requesting',own_req_cede:'Ceding',own_req_embed:'Copy embed code',own_req_embed_copied:'Embed code copied',a_approve_transfer:'Approve and transfer',own_req_confirm:'Approve? The POI will pass to the requester.',own_req_approved:'Ownership transferred',own_req_rejected:'Request rejected',nav_routes:'Historic Routes',nav_itineraries:'Itineraries',sub_itineraries:'Travel itineraries created by users (different from historic routes). You can view, feature or remove them.',itin_empty:'No itineraries',itin_empty_h:'They appear here when users create a trip.',itin_feat:'Feature',itin_unfeat:'Unfeature',itin_feat_on:'Featured',itin_del_confirm:'Delete this itinerary and all its stops?',itin_vis_pub:'Public',itin_vis_comp:'Companion',itin_vis_friends:'Friends',itin_vis_prv:'Private',sub_routes:'Create, publish and manage official historic routes.',rt_new:'New historic route',rt_create:'Create route (draft)',rt_list:'Historic routes',rt_empty:'No historic routes',rt_empty_h:'Create one above or have the copilot propose it.',rt_published:'Published',rt_publish:'Publish',rt_unpublish:'Hide',rt_stops_btn:'Stops',rt_mode_road:'On roads',rt_mode_line:'Straight line',rt_mode_hint:'On roads follows the street map; Straight line stays as a beeline (for ley lines, e.g. St. Michael).',rt_confirm_del:'Delete this route and all its stops?',
-    rsug_title:'Community suggestions', rsug_help:'Routes proposed by users. Review, then "Create route" (a draft is born with the suggester credit already attached): refine description, image and stops, then publish. The suggester gets a public thank-you.', rsug_empty:'No pending suggestions', rsug_by:'by', rsug_anon:'a member', rsug_create:'Create route', rsug_dismiss:'Dismiss', rsug_created:'Draft route created with the credit. Refine and publish it.', rsug_dismiss_confirm:'Dismiss this suggestion?',
+    rsug_title:'Community suggestions', rsug_help:'Routes proposed by users. Review, then "Create route" (a draft is born with the suggester credit already attached): refine description, image and stops, then publish. The suggester gets a public thank-you.', rsug_empty:'No pending suggestions', rsug_by:'by', rsug_anon:'a member', rsug_create:'Create route', rsug_dismiss:'Dismiss', rsug_created:'Draft route created with the credit. Refine and publish it.', rsug_dismiss_confirm:'Dismiss this suggestion?', ppoi_title:'POIs proposed as stops', ppoi_help:'Places users propose as a stop on a historic route. View them on the map, add them to a route, then mark as handled.', ppoi_empty:'No proposed POIs pending', ppoi_add:'Add to a route', ppoi_map:'Map', ppoi_done:'Mark handled', ppoi_done_confirm:'Mark this proposal as handled?', ppoi_pick:'Choose the route to add this stop to:', ppoi_no_routes:'No historic route yet: create one first', ppoi_added:'Stop added to the route', untitled_admin:'Untitled',
     f_route_desc:'Description', f_route_desc_ph:'A fitting description users will see', f_route_cover:'Cover image (https URL)', f_route_cover_err:'The image must be an https URL',
     f_coords:'Coordinates', f_address:'Address', f_city:'City'
   }
@@ -3024,6 +3029,69 @@ async function dismissRouteSuggestion(id){
   }catch(e){ toast(t('error'),'err'); }
 }
 
+/* ── POI proposti dagli utenti come tappa di rotta storica (webapp → scheda Crea POI) ── */
+async function loadProposedPois(){
+  const box=document.getElementById('proposedPoisTable'); if(!box) return; loadingBox(box);
+  try{
+    const { data, error } = await sb.from('pois')
+      .select('id,title,lat,lng,description,photos,cover_photo,category,subcategory,route_proposed_at,author:profiles!pois_author_id_fkey(username,display_name)')
+      .eq('route_proposed',true).order('route_proposed_at',{ascending:false}).limit(100);
+    if(error){ isBackendMissing(error)?backendOff(box):emptyBox(box,t('error'),null,'warning'); return; }
+    if(!data||!data.length){ emptyBox(box,t('ppoi_empty'),null,'seal-check'); return; }
+    box.textContent='';
+    data.forEach(p=>{
+      const who=(p.author&&(p.author.display_name||p.author.username))||t('rsug_anon');
+      const img=(Array.isArray(p.photos)&&p.photos[0])||p.cover_photo||'';
+      const thumb=img
+        ? el('div',{style:'width:52px;height:52px;border-radius:9px;flex-shrink:0;background-size:cover;background-position:center;background-image:url("'+img+'")'})
+        : el('div',{style:'width:52px;height:52px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--field-bg)'},[phIcon('map-pin')]);
+      const coords=p.lat!=null?(' · '+Number(p.lat).toFixed(4)+', '+Number(p.lng).toFixed(4)):'';
+      const info=el('div',{style:'flex:1;min-width:0'},[
+        el('div',{class:'ttl',text:p.title||t('untitled_admin','Senza nome')}),
+        el('div',{class:'sm',style:'opacity:.8',text:t('rsug_by')+' '+who+coords})
+      ]);
+      const head=el('div',{style:'display:flex;gap:10px;align-items:center'},[thumb,info]);
+      const desc=p.description?el('div',{class:'sm',style:'opacity:.85;margin:6px 0',text:(p.description.length>160?p.description.slice(0,160)+'…':p.description)}):null;
+      const acts=el('div',{class:'btn-row',style:'margin-top:6px'},[
+        el('button',{class:'btn sm gold',text:t('ppoi_add'),onclick:()=>_addProposedToRoute(p)}),
+        p.lat!=null?el('a',{class:'btn sm',href:'https://www.google.com/maps?q='+p.lat+','+p.lng,target:'_blank',rel:'noopener',text:t('ppoi_map')}):null,
+        el('button',{class:'btn sm',text:t('ppoi_done'),onclick:()=>_clearProposedPoi(p.id)})
+      ]);
+      box.appendChild(el('div',{style:'padding:11px 0;border-bottom:1px solid rgba(128,128,128,.15)'},[head,desc,acts]));
+    });
+  }catch(e){ emptyBox(box,t('error'),null,'warning'); }
+}
+async function _addProposedToRoute(p){
+  try{
+    const { data:routes, error } = await sb.from('trips').select('id,name,trip_stops(id)').eq('is_historic',true).order('created_at',{ascending:false}).limit(100);
+    if(error){ toast(error.message||t('error'),'err'); return; }
+    if(!routes||!routes.length){ toast(t('ppoi_no_routes'),'err'); return; }
+    const body=el('div');
+    body.appendChild(el('div',{class:'sm',style:'margin-bottom:8px',text:t('ppoi_pick')}));
+    routes.forEach(r=>{
+      const n=(r.trip_stops||[]).length;
+      body.appendChild(el('button',{class:'btn',style:'width:100%;justify-content:space-between;margin-bottom:6px',onclick:async()=>{
+        const img=(Array.isArray(p.photos)&&p.photos[0])||p.cover_photo||null;
+        const { error:e2 } = await sb.from('trip_stops').insert({ trip_id:r.id, name:(p.title||t('untitled_admin','Senza nome')).slice(0,120), lat:p.lat, lng:p.lng, image_url:img, note:p.description||null, sort_order:n, status:'planned', poi_id:p.id });
+        if(e2){ toast(e2.message||t('error'),'err'); return; }
+        await sb.rpc('admin_clear_poi_route_proposal',{ p_poi:p.id });
+        await logAudit('route_stop_from_poi','trip',r.id,{ poi:p.id, name:p.title });
+        toast(t('ppoi_added'),'ok','check');
+        closeModal(); loadProposedPois(); loadRoutesAdmin();
+      }},[ el('span',{text:r.name}), el('span',{class:'chip dim',text:n+' '+t('f_stops')}) ]));
+    });
+    openModal(t('ppoi_add'),'path',body,null);
+  }catch(e){ toast(t('error'),'err'); }
+}
+async function _clearProposedPoi(id){
+  if(!confirm(t('ppoi_done_confirm'))) return;
+  try{
+    const { error } = await sb.rpc('admin_clear_poi_route_proposal',{ p_poi:id });
+    if(error){ toast(error.message||t('error'),'err'); return; }
+    toast(t('saved'),'ok'); loadProposedPois();
+  }catch(e){ toast(t('error'),'err'); }
+}
+
 async function createHistoricRoute(){
   const name=(document.getElementById('rtName').value||'').trim();
   const badge=(document.getElementById('rtBadge').value||'').trim();
@@ -3246,6 +3314,7 @@ async function _aiStopDescInline(stop, descEl){
 }
 async function loadRoutesAdmin(){
   loadRouteSuggestions();
+  loadProposedPois();
   const box=document.getElementById('routesTable'); loadingBox(box);
   try{
     const { data, error } = await sb.from('trips')
