@@ -1579,14 +1579,15 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 .trip-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.14)}
 .trip-card:active{transform:translateY(0)}
 /* Swipe card itinerario: sx = elimina/archivia · dx = condividi/pubblico/ufficiale.
-   Bottoni COMPATTI centrati (non strisce alte), la card si sposta solo in parte e resta afferrabile. */
+   I bottoni stanno in UNA COLONNA, impilati (3 righe 33% oppure 2 righe 50%). La card scorre solo della larghezza colonna. */
 .trip-swipe{position:relative;overflow:hidden;border-radius:18px}
-.trip-swipe .tsw-actions{position:absolute;top:0;bottom:0;display:flex;align-items:center;gap:8px;padding:0 10px;z-index:0}
+.trip-swipe .tsw-actions{position:absolute;top:0;bottom:0;width:96px;display:flex;flex-direction:column;z-index:0;overflow:hidden}
 .trip-swipe .tsw-right{right:0}
 .trip-swipe .tsw-left{left:0}
-.tsw-btn{width:66px;height:68px;flex:none;border:none;border-radius:15px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:10px;font-weight:800;color:#fff;cursor:pointer;font-family:inherit;line-height:1.05;box-shadow:0 3px 10px rgba(0,0,0,.18)}
+.tsw-btn{flex:1;width:100%;min-height:0;border:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:11px;font-weight:800;color:#fff;cursor:pointer;font-family:inherit;line-height:1.1}
 .tsw-btn i{font-size:20px}
-.tsw-btn span{text-align:center;word-break:break-word;max-width:100%}
+.tsw-btn span{text-align:center;padding:0 3px}
+.tsw-btn+.tsw-btn{border-top:1px solid rgba(255,255,255,.28)}
 .tsw-arch{background:#7d746a} .tsw-del{background:#D42B2B}
 .tsw-share{background:#F97316} .tsw-pub{background:#22C55E} .tsw-off{background:#7C3AED}
 .trip-swipe .trip-card{position:relative;z-index:1;will-change:transform;touch-action:pan-y}
@@ -7758,7 +7759,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='3.05';
+const APP_VERSION='3.06';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
