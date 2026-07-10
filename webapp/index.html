@@ -4881,6 +4881,7 @@ function onAuthStateUpdate(event) {
     syncProfileFromAuth();
     loadPOIsFromDB();
     loadHistoricRoutes();
+    if(typeof loadPoiCategories==='function') loadPoiCategories(); // include la MIA categoria personalizzata (RLS)
     // Carica dati utente persistenti
     if(typeof loadMyLists==='function') loadMyLists();
     if(typeof syncCompagnieFromDB==='function') syncCompagnieFromDB();
@@ -7789,7 +7790,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='3.11';
+const APP_VERSION='3.12';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
@@ -10781,6 +10782,11 @@ function openAddPOI(){
   { const h=document.getElementById('ccPhotoHint'); if(h){ h.classList.remove('show','used'); } }
   showMiniMapPicker(); // mappa subito attiva: muovi e "Fissa il punto"
   if(typeof resetPoiRouteExtras==='function') resetPoiRouteExtras(); // itinerario + proponi: sempre puliti su nuova scheda
+  // Visibilità: sempre al default Pubblico su nuova scheda (in modifica, openEditPOI la sovrascrive dopo).
+  { const _vr=document.getElementById('poiVisRow');
+    if(_vr){ _vr.querySelectorAll('.vis-opt').forEach(o=>o.classList.remove('sel-pub','sel-prv','sel-share'));
+      const _o=_vr.querySelector('.vis-opt'); if(_o)_o.classList.add('sel-pub');
+      const _slr=document.getElementById('shareLinkRow'); if(_slr)_slr.classList.remove('show'); } }
   _autoNameSuggested=false;
   document.getElementById('locCoords').textContent=t('loc_not_set','Posizione non impostata');
   document.getElementById('locStreet').textContent='';
@@ -11845,12 +11851,12 @@ function _askUseOrReplaceCat(existing){
     const ov=document.createElement('div'); ov.className='micro-modal-ov'; ov.style.display='flex';
     const box=document.createElement('div'); box.className='micro-modal'; box.onclick=e=>e.stopPropagation();
     const ttl=document.createElement('div'); ttl.className='micro-modal-title';
-    ttl.innerHTML='<i class="ph-duotone ph-tag"></i> '+t('cat_one_only','Hai già la tua categoria: «'+_catLabel(existing)+'»'); box.appendChild(ttl);
+    ttl.innerHTML='<i class="ph-duotone ph-tag"></i> '+t('cat_one_only','Hai già la tua categoria personalizzata')+' «'+_catLabel(existing)+'»'; box.appendChild(ttl);
     const mk=(icon,label,val,bg)=>{ const b=document.createElement('button'); b.type='button'; b.className='micro-modal-opt';
       const ic=document.createElement('div'); ic.className='mmo-icon'; ic.style.cssText='background:'+(bg||'#F3F0EA')+';color:var(--red)'; ic.innerHTML='<i class="ph-duotone ph-'+icon+'"></i>';
       const tx=document.createElement('div'); tx.className='mmo-text'; tx.innerHTML='<strong>'+label+'</strong>';
       b.appendChild(ic); b.appendChild(tx); b.onclick=()=>{ document.body.removeChild(ov); resolve(val); }; return b; };
-    box.appendChild(mk('check-circle', t('cat_use','Usa «'+_catLabel(existing)+'»'), 'use'));
+    box.appendChild(mk('check-circle', t('cat_use','Usa la mia categoria')+' «'+_catLabel(existing)+'»', 'use'));
     box.appendChild(mk('pencil-simple', t('cat_replace','Sostituiscila con un\'altra'), 'replace'));
     const cancel=document.createElement('button'); cancel.className='micro-modal-cancel'; cancel.textContent=t('list_act_cancel','Annulla');
     cancel.onclick=()=>{ document.body.removeChild(ov); resolve(null); };
@@ -11881,11 +11887,11 @@ async function askOtherCategory(){
   const {data,error}=await sb.rpc('request_custom_category',{p_label:label,p_macro:macro});
   if(error){
     if(String(error.message||'').includes('CUSTOM_EXISTS')){
-      showToast(t('cat_one_only','Hai già la tua categoria: «'+(error.hint||'')+'». Aprila per usarla o sostituirla.'));
+      showToast(t('cat_one_only','Hai già la tua categoria personalizzata')+(error.hint?' «'+error.hint+'»':'')+'.');
     } else { showToast(t('error_generic','Qualcosa è andato storto, riprova')); }
     return;
   }
-  const row=data;
+  const row=Array.isArray(data)?data[0]:data;   // PostgREST: composite→oggetto, ma resto robusto a entrambi
   if(row&&row.key){ const i=_POI_CATS.findIndex(c=>c.key===row.key); if(i>=0)_POI_CATS[i]=row; else _POI_CATS.push(row); }
   buildCatPicker(); // ridisegna con la mia categoria, poi la seleziono
   const chip=box0&&box0.querySelector('.cat-chip[data-key="'+CSS.escape(row.key)+'"]'); if(chip) _applyCatSel(chip);
