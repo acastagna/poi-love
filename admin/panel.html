@@ -1229,7 +1229,7 @@ const T = {
 };
 let lang = localStorage.getItem('admin_lang') || (navigator.language||'it').slice(0,2);
 if(!T[lang]) lang='it';
-function t(k){ return (T[lang] && T[lang][k]) || (T.it[k]) || k; }
+function t(k,d){ return (T[lang] && T[lang][k]) || (T.it[k]) || d || k; }
 
 function setLang(l){
   if(!T[l]) return;
@@ -3053,7 +3053,9 @@ async function loadProposedPois(){
     box.textContent='';
     data.forEach(p=>{
       const who=(p.author&&(p.author.display_name||p.author.username))||t('rsug_anon');
-      const img=(Array.isArray(p.photos)&&p.photos[0])||p.cover_photo||'';
+      const _rawImg=(Array.isArray(p.photos)&&p.photos[0])||p.cover_photo||'';
+      // solo URL http(s), senza caratteri che possono rompere lo stile CSS (evita CSS injection dalla foto utente)
+      const img=/^https?:\/\//i.test(_rawImg)?encodeURI(_rawImg).replace(/["'()\\]/g,''):'';
       const thumb=img
         ? el('div',{style:'width:52px;height:52px;border-radius:9px;flex-shrink:0;background-size:cover;background-position:center;background-image:url("'+img+'")'})
         : el('div',{style:'width:52px;height:52px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--field-bg)'},[phIcon('map-pin')]);
@@ -3086,7 +3088,8 @@ async function _addProposedToRoute(p){
         const img=(Array.isArray(p.photos)&&p.photos[0])||p.cover_photo||null;
         const { error:e2 } = await sb.from('trip_stops').insert({ trip_id:r.id, name:(p.title||t('untitled_admin','Senza nome')).slice(0,120), lat:p.lat, lng:p.lng, image_url:img, note:p.description||null, sort_order:n, status:'planned', poi_id:p.id });
         if(e2){ toast(e2.message||t('error'),'err'); return; }
-        await sb.rpc('admin_clear_poi_route_proposal',{ p_poi:p.id });
+        const { error:e3 } = await sb.rpc('admin_clear_poi_route_proposal',{ p_poi:p.id });
+        if(e3){ toast(e3.message||t('error'),'err'); return; }
         await logAudit('route_stop_from_poi','trip',r.id,{ poi:p.id, name:p.title });
         toast(t('ppoi_added'),'ok','check');
         closeModal(); loadProposedPois(); loadRoutesAdmin();

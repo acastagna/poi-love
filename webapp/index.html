@@ -1060,7 +1060,7 @@ body::after{content:'';position:fixed;inset:0;z-index:99999;pointer-events:none;
 .discover-btn{width:100%;padding:11px;border-radius:11px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .15s;margin-bottom:7px}
 .discover-btn i{font-size:17px}
 .discover-btn.osm{background:#7EBC6F;border:1.5px solid #6AA85B;color:#fff}
-.discover-btn.osm.done{background:#DCFCE7;border-color:#22C55E;color:#166534}
+.discover-btn.osm.done{background:#DCFCE7;border-color:#22C55E;color:#166534;opacity:1;cursor:default}
 .discover-btn.gmaps{background:#fff;border:1.5px solid #E0D8CC;color:#5C4D3A}
 .discover-btn:active{transform:scale(.98)}
 .discover-btn:disabled{opacity:.6;cursor:default}
@@ -7445,7 +7445,10 @@ async function contributeToOSM(){
   const btn=document.getElementById('osmContribBtn');
   if(btn&&btn.classList.contains('done')) return;
   const cats=(typeof _selCats!=='undefined'&&_selCats.length)?_selCats.map(c=>c.label).filter(Boolean).join(', '):'';
-  const text=`POI•LOVE: «${name}»${cats?' — '+cats:''}\nSegnalato da un utente della community POI•LOVE (https://poilove.com). Da verificare e mappare. Grazie!`;
+  // Testo pulito e limitato (niente caratteri di controllo, cap a 400): è testo utente inviato a un servizio esterno.
+  const clean=s=>String(s||'').replace(/[ -]/g,' ').trim();
+  const text=(`POI•LOVE: «${clean(name).slice(0,80)}»${cats?' — '+clean(cats).slice(0,120):''}\n`+
+    'Segnalato da un utente della community POI•LOVE (https://poilove.com). Da verificare e mappare. Grazie!').slice(0,400);
   if(btn){ btn.disabled=true; }
   try{
     const url=`https://api.openstreetmap.org/api/0.6/notes.json?lat=${pos.lat}&lon=${pos.lng}&text=${encodeURIComponent(text)}`;
@@ -7453,7 +7456,7 @@ async function contributeToOSM(){
     if(!r.ok) throw new Error('HTTP '+r.status);
     const data=await r.json();
     const noteId=data&&data.properties&&data.properties.id;
-    if(btn){ btn.classList.add('done'); btn.innerHTML='<i class="ph-fill ph-check-circle"></i> '+t('discover_osm_done','Segnalato su OpenStreetMap'); }
+    if(btn){ btn.disabled=false; btn.classList.add('done'); btn.innerHTML='<i class="ph-fill ph-check-circle"></i> '+t('discover_osm_done','Segnalato su OpenStreetMap'); }
     showToast(t('discover_osm_ok','✓ Segnalato su OpenStreetMap: lo aggiungeranno i volontari.'));
     if(noteId){ /* nota reale creata, verificabile su openstreetmap.org/note/<id> */ }
   }catch(e){
@@ -7729,7 +7732,7 @@ function openPendingSharedPoi(){
   try{ localStorage.removeItem('pl_pending_poi'); }catch(_){}
   hidePoiTeaser();
   _deepLinkActive=true;   // il POI condiviso vince sul GPS anche dopo il giro OAuth (URL senza ?poi=)
-  sb.from('pois').select('id,name:title,description,lat,lng,category,love_count,photos,author_id,address,profiles(username,avatar_url)')
+  sb.from('pois').select('id,name:title,description,lat,lng,category,subcategory,categories,love_count,photos,author_id,address,profiles(username,avatar_url)')
     .eq('id',id).single().then(({data,error})=>{
       if(error||!data) return;
       if(map) map.setView([data.lat,data.lng],16);
@@ -7772,7 +7775,7 @@ function handleDeepLink(){
     // Cerca il POI più vicino a quelle coordinate nel DB
     if(sb){
       sb.from('pois')
-        .select('id,name:title,description,lat,lng,category,love_count,photos,author_id,address,profiles(username,avatar_url)')
+        .select('id,name:title,description,lat,lng,category,subcategory,categories,love_count,photos,author_id,address,profiles(username,avatar_url)')
         .eq('visibility','community')
         .limit(500)
         .then(({data})=>{
@@ -7803,7 +7806,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='3.13';
+const APP_VERSION='3.14';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
@@ -8824,7 +8827,7 @@ async function renderPoiTab(){
     if(currentUser && typeof sb !== 'undefined') {
       list.innerHTML = '<div class="poi-list-empty" style="padding:24px 0"><i class="ph-duotone ph-spinner" style="font-size:24px;animation:spin 1s linear infinite"></i></div>';
       const { data, error } = await sb.from('pois')
-        .select('id,name:title,description,lat,lng,category,subcategory,tags,love_count,photos,author_id,visibility,created_at')
+        .select('id,name:title,description,lat,lng,category,subcategory,categories,tags,love_count,photos,author_id,visibility,created_at')
         .eq('author_id', currentUser.id)
         .order('created_at', { ascending: false });
       if(!error && Array.isArray(data)) items = data;
@@ -10795,6 +10798,8 @@ function openAddPOI(){
   { const h=document.getElementById('ccPhotoHint'); if(h){ h.classList.remove('show','used'); } }
   showMiniMapPicker(); // mappa subito attiva: muovi e "Fissa il punto"
   if(typeof resetPoiRouteExtras==='function') resetPoiRouteExtras(); // itinerario + proponi: sempre puliti su nuova scheda
+  // Categorie: nuova scheda parte pulita (in modifica, editingPOIId è già impostato e _presetCatPicker sovrascrive dopo).
+  if(!(typeof editingPOIId!=='undefined'&&editingPOIId) && typeof _resetCatPicker==='function') _resetCatPicker();
   // Visibilità: sempre al default Pubblico su nuova scheda (in modifica, openEditPOI la sovrascrive dopo).
   { const _vr=document.getElementById('poiVisRow');
     if(_vr){ _vr.querySelectorAll('.vis-opt').forEach(o=>o.classList.remove('sel-pub','sel-prv','sel-share'));
@@ -11994,15 +11999,18 @@ async function applyPoiRouteExtras(poiId, poi, targetTrip, propose){
       const trip=TRIPS[targetTrip];
       if(trip){
         trip.stops=trip.stops||[];
-        trip.stops.push({
-          id:'stop-'+poiId, poiId:poiId, name:(poi&&poi.name)||t('untitled','Senza nome'),
-          date:'', status:'planned', suspended:false,
-          lat:(poi&&poi.lat)??null, lng:(poi&&poi.lng)??null,
-          icon:'ph-duotone ph-map-pin', iconBg:'#D42B2B', iconColor:'#fff', note:'',
-          stay:'', image:(poi&&poi.image)||'', region:''
-        });
-        if(typeof _persistTripStops==='function') _persistTripStops(trip);
-        if(typeof renderTripCards==='function') renderTripCards();
+        // Niente tappa doppia: se il POI è già una tappa di questo itinerario, non lo riaggiungo (evita anche id DOM in collisione).
+        if(!trip.stops.some(s=>(s.poiId||s.poi_id)===poiId)){
+          trip.stops.push({
+            id:'stop-'+poiId, poiId:poiId, name:(poi&&poi.name)||t('untitled','Senza nome'),
+            date:'', status:'planned', suspended:false,
+            lat:(poi&&poi.lat)??null, lng:(poi&&poi.lng)??null,
+            icon:'ph-duotone ph-map-pin', iconBg:'#D42B2B', iconColor:'#fff', note:'',
+            stay:'', image:(poi&&poi.image)||'', region:''
+          });
+          if(typeof _persistTripStops==='function') _persistTripStops(trip);
+          if(typeof renderTripCards==='function') renderTripCards();
+        }
       }
     }
     if(propose && sb && poiId){
@@ -12595,7 +12603,9 @@ async function savePOI(){
   const subcat=_selCatKey||null;
   const cats=_selCats.map(c=>c.key);
   // Visibilità REALE scelta nella scheda: Privato→private, Pubblico/Condividi→community.
-  const poiVis=(document.querySelector('#poiVisRow .vis-opt.sel-prv'))?'private':'community';
+  // In modifica, se il POI era 'suggested_google' e resta pubblico, non lo declasso (non perdo il marcatore).
+  const poiVis=(document.querySelector('#poiVisRow .vis-opt.sel-prv'))?'private'
+    :((editingPOIId&&currentPOI&&currentPOI.visibility==='suggested_google')?'suggested_google':'community');
   const tags=Array.from(document.querySelectorAll('#sheetTagsContainer .tag-chip-inline'))
     .map(el=>el.firstChild.textContent.trim().toLowerCase()).filter(Boolean).slice(0,10);
   const desc=(document.getElementById('storyIn')||{}).value||'';
@@ -14443,7 +14453,7 @@ async function _poilovePlaces(cat, lat, lng, radiusKm){
   const dLat=R/111, dLng=R/(111*Math.max(0.2,Math.cos(lat*Math.PI/180)));
   try{
     const {data,error}=await sb.from('pois')
-      .select('id,name:title,description,lat,lng,category,subcategory,tags,love_count,visibility,address')
+      .select('id,name:title,description,lat,lng,category,subcategory,categories,tags,love_count,visibility,address')
       .in('visibility',['community','suggested_google','official'])
       .gte('lat',lat-dLat).lte('lat',lat+dLat).gte('lng',lng-dLng).lte('lng',lng+dLng)
       .limit(80);
