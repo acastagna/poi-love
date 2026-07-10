@@ -1,7 +1,8 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
 > **Prossima ripresa: canale EMAIL delle notifiche (serve chiave AcumbaMail + edge worker) e trigger notifiche mancanti (rotta pubblicata/adottata dentro le RPC admin). Valutare voce iperrealistica (Google TTS) per ILLI, oggi la voce meccanica è disattivata. Collaudi manuali di Alessandro in attesa (checklist 04/07 + claim a pagamento + copilota foto).**
-> Checkpoint sessione: tag `checkpoint-2026-07-10-custom-categories` (HEAD su origin/main, v3.13). **Nessun lavoro non committato.**
+> Checkpoint sessione: tag `checkpoint-2026-07-10-review-fixes` (HEAD su origin/main, v3.14). **Nessun lavoro non committato.**
+> Code-review completa (22 agenti) su tutta la sessione: 14 findings confermati, TUTTI corretti (mig 068 + v3.14), verificati sul live poilove.com. Aperto solo: nota OSM lato-client (funziona, gratis; hardening server-side con edge function OAuth = miglioria futura, non bloccante).
 
 ## Sessione 10/07/2026 — Scheda Crea POI: multi-categoria + itinerario + proponi rotta (v3.09 → v3.10)
 
