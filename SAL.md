@@ -1,7 +1,17 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
 > **Prossima ripresa: canale EMAIL delle notifiche (serve chiave AcumbaMail + edge worker) e trigger notifiche mancanti (rotta pubblicata/adottata dentro le RPC admin). Valutare voce iperrealistica (Google TTS) per ILLI, oggi la voce meccanica è disattivata. Collaudi manuali di Alessandro in attesa (checklist 04/07 + claim a pagamento + copilota foto).**
-> Checkpoint sessione: tag `checkpoint-2026-07-07-ui` (HEAD su origin/main, v2.62). **Nessun lavoro non committato.**
+> Checkpoint sessione: tag `checkpoint-2026-07-10-routes-poi` (HEAD su origin/main, v3.10). **Nessun lavoro non committato.**
+
+## Sessione 10/07/2026 — Scheda Crea POI: multi-categoria + itinerario + proponi rotta (v3.09 → v3.10)
+
+Tutto live e verificato, checkpoint `checkpoint-2026-07-10-routes-poi` (HEAD su origin/main, v3.10). Nessun lavoro non committato.
+
+- **v3.09 + mig 064 — fino a 3 categorie (intreccio)**: nella scheda Crea POI un POI può avere fino a 3 categorie. Si scelgono dalla griglia e appena scelte la griglia si **compatta**, restano solo i chip scelti (con X per togliere) + "Aggiungi" finché sotto le 3; al terzo blocca e nasconde Aggiungi. Salvate come `pois.categories text[]` (mig 064, + indice GIN per la ricerca incrociata). La categoria/subcategoria primaria resta per l'icona del marker. Verificato dal vivo: 3 scelte, compattazione, array salvato, 4ª bloccata.
+- **v3.10 + mig 065 — tolte le rotte storiche FINTE, messe due funzioni reali**: il vecchio menu rotte (Via Egnatia/Serenissima/Terre Illiriche/Colonie Greche) era cosmetico e non salvava nulla. Sostituito con: (1) **"Aggiungi a un itinerario"** — chip con gli itinerari reali dell'utente (col conteggio tappe); alla creazione/modifica il POI diventa una **tappa vera** dell'itinerario scelto (trip_stops via `_persistTripStops`/replace_trip_stops); (2) **"Proponi come tappa di rotta storica"** — manda il POI all'admin (RPC `propose_poi_as_route_stop`, solo autore). Il **+ rosso** già spariva a scheda aperta (`body.sheet-open`).
+- **Admin (panel.html)**: nuovo pannello **"POI proposti come tappa"** nella sezione Rotte (`loadProposedPois`). Ogni proposta: foto/nome/autore/coordinate + descrizione, link Google Maps, **"Aggiungi a una rotta"** (sceglie la rotta storica e inserisce la tappa collegata al `poi_id`) e **"Segna gestita"** (`admin_clear_poi_route_proposal`). Trilingue IT/SQ/EN.
+- **mig 065**: `pois.route_proposed` + `route_proposed_at` (+ indice parziale); RPC `propose_poi_as_route_stop` (solo autore) e `admin_clear_poi_route_proposal` (solo admin). Applicata e verificata; RPC registrate e protette (anon → "not your POI" / "not authorized").
+- **Restano su questo filone**: filtro/scoperta incrociata dei POI per categoria (l'array c'è, manca la UI di filtro); provare su telefono reale l'aggiunta di una tappa da un POI creato dal vivo.
 
 ## Sessione 07/07/2026 — Consensi, notifiche, geofence + batch UI (v2.56 → v2.62)
 
