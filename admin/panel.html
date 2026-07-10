@@ -249,13 +249,25 @@ html[data-theme="light"] .btn.gold{color:#fbf6ec}
 .btn.sm{padding:6px 10px;font-size:11.5px;border-radius:9px}
 .btn:disabled{opacity:.5;cursor:not-allowed}
 .btn-row{display:flex;gap:6px;flex-wrap:wrap}
-/* Editor tappe rotta storica: foto + riordino + sospendi + copia + elimina */
-.rt-stop-edit{display:flex;align-items:center;gap:10px;padding:8px;border:1px solid var(--line);border-radius:11px;margin-bottom:7px}
-.rt-stop-edit.suspended{opacity:.55}
-.rt-stop-img{flex:none;width:46px;height:46px;border-radius:9px;border:1px dashed var(--line);background:#00000018 center/cover no-repeat;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;overflow:hidden}
-.rt-stop-nm{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.rt-stop-btns{display:flex;gap:3px;flex:none}
-.rt-add-stop{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;align-items:flex-start}
+/* Editor tappe (rotte storiche + itinerari): card grandi, trascinamento, foto, descrizione, azioni */
+.stop-ed-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:2px 0 10px}
+.stop-card{display:flex;gap:12px;padding:12px;border:1px solid var(--line);border-radius:14px;margin-bottom:10px;background:var(--glass-soft);transition:box-shadow .15s,border-color .15s,opacity .15s}
+.stop-card.suspended{opacity:.5}
+.stop-card.dragging{opacity:.4}
+.stop-card.drag-over{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold)}
+.stop-card-handle{cursor:grab;color:var(--muted);display:flex;align-items:center;font-size:20px;flex:none;padding:0 2px}
+.stop-card-handle:active{cursor:grabbing}
+.stop-card-photo{position:relative;flex:none;width:88px;height:88px;border-radius:12px;border:1px dashed var(--line);background:#00000018 center/cover no-repeat;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:24px;overflow:hidden}
+.stop-card-photo .cam{position:absolute;right:4px;bottom:4px;background:rgba(0,0,0,.55);color:#fff;border-radius:7px;font-size:11px;padding:2px 4px;display:flex}
+.stop-card-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.stop-card-title{font-size:15px;font-weight:800;line-height:1.2;color:var(--paper)}
+.stop-card-coord{font-size:11.5px;color:var(--muted)}
+.stop-card-desc{width:100%;min-height:40px;resize:vertical;padding:8px 10px;border:1px solid var(--line);border-radius:9px;font-family:inherit;font-size:12.5px;background:var(--field-bg);color:var(--paper);box-sizing:border-box}
+.stop-card-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px}
+.btn.xs{font-size:11px;padding:5px 9px;border-radius:8px;display:inline-flex;align-items:center;gap:4px}
+.btn.xs i{font-size:12px}
+.rt-add-stop{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;align-items:flex-start}
+@media(max-width:600px){.stop-card{flex-wrap:wrap}.stop-card-photo{width:64px;height:64px}}
 /* Riga tappa admin: ricerca luogo tipo Google + coordinate auto + descrizione AI */
 .stop-adm{border:1px solid var(--line);border-radius:12px;padding:11px;margin-bottom:10px;position:relative}
 .stop-adm-hd{display:flex;align-items:center;gap:8px;margin-bottom:7px}
@@ -925,7 +937,7 @@ const T = {
     sub_ailimits:'Quote e modelli AI per livello.', sub_copilot:'Assistente operativo con accesso ai dati.',
     sub_create:'Pubblica POI ufficiali e percorsi.', sub_audit:'Cronologia delle azioni amministrative.',
     role_admin:'Amministratore', logout:'Esci',
-    nav_messages:'Messaggi',a_message:'Messaggio',msg_threads:'Conversazioni',msg_new:'Scrivi a un utente',msg_pick:'Scegli una conversazione',msg_body_ph:'Scrivi al cliente… (comparirà in ILLI col tag Umano)',msg_send:'Invia',msg_empty:'Nessuna conversazione ancora.',msg_conv_empty:'Nessun messaggio: scrivi tu per primo.',msg_pick_first:'Scegli prima una conversazione',msg_sent:'Messaggio inviato',msg_ask_user:'Username utente (@handle):',msg_user_notfound:'Utente non trovato',searching:'Cerco…',search_none:'Nessun risultato',stop_search_ph:'Cerca il luogo: es. Sacra di San Michele, Berat…',stop_desc_ph:'Spiegazione della tappa (o generala con AI)',stop_ai_need:'Scegli prima il luogo',a_photo:'Foto tappa',a_find_photo:'Trova foto online',searching_photo:'Cerco la foto ufficiale…',photo_none:'Nessuna foto trovata online, caricala a mano',photo_found:'✓ Foto trovata e salvata',no_coords:'senza coordinate',move_up:'Su',move_down:'Giù',a_copy:'Copia',uploading:'Carico la foto…',rt_confirm_del_stop:'Eliminare questa tappa?',trip_status_suspended:'Sospesa',trip_resume:'Riprendi',trip_suspend:'Sospendi',
+    nav_messages:'Messaggi',a_message:'Messaggio',msg_threads:'Conversazioni',msg_new:'Scrivi a un utente',msg_pick:'Scegli una conversazione',msg_body_ph:'Scrivi al cliente… (comparirà in ILLI col tag Umano)',msg_send:'Invia',msg_empty:'Nessuna conversazione ancora.',msg_conv_empty:'Nessun messaggio: scrivi tu per primo.',msg_pick_first:'Scegli prima una conversazione',msg_sent:'Messaggio inviato',msg_ask_user:'Username utente (@handle):',msg_user_notfound:'Utente non trovato',searching:'Cerco…',search_none:'Nessun risultato',stop_search_ph:'Cerca il luogo: es. Sacra di San Michele, Berat…',stop_desc_ph:'Spiegazione della tappa (o generala con AI)',stop_ai_need:'Scegli prima il luogo',a_photo:'Foto tappa',a_find_photo:'Trova foto online',ai_order:'Ordina con AI',ai_ordering:'L\'AI sta ordinando le tappe…',ai_order_ok:'✓ Tappe riordinate dall\'AI (puoi ancora spostarle)',ai_order_fail:'L\'AI non è riuscita a ordinare, riprova',ai_order_few:'Servono almeno 3 tappe',rt_dup_confirm:'Duplicare questa rotta con tutte le tappe?',rt_dup_ok:'✓ Rotta duplicata (bozza)',drag_hint:'Trascina per riordinare',ai_writing:'L\'AI scrive la descrizione…',a_duplicate:'Duplica',searching_photo:'Cerco la foto ufficiale…',photo_none:'Nessuna foto trovata online, caricala a mano',photo_found:'✓ Foto trovata e salvata',no_coords:'senza coordinate',move_up:'Su',move_down:'Giù',a_copy:'Copia',uploading:'Carico la foto…',rt_confirm_del_stop:'Eliminare questa tappa?',trip_status_suspended:'Sospesa',trip_resume:'Riprendi',trip_suspend:'Sospendi',
     kpi_users:'Utenti totali', kpi_pois:'POI totali', kpi_reports:'Segnalazioni aperte', kpi_new:'Nuovi utenti 7gg',
     latest_pois:'Ultimi POI', latest_users:'Ultimi iscritti',
     moderation_queue:'Coda segnalazioni', search:'Cerca',
@@ -1025,7 +1037,7 @@ const T = {
     sub_ailimits:'Kuotat dhe modelet AI sipas nivelit.', sub_copilot:'Asistent operativ me qasje në të dhëna.',
     sub_create:'Publiko POI zyrtarë dhe itinerare.', sub_audit:'Historiku i veprimeve administrative.',
     role_admin:'Administrator', logout:'Dil',
-    nav_messages:'Mesazhe',a_message:'Mesazh',msg_threads:'Bisedat',msg_new:'Shkruaj një përdoruesi',msg_pick:'Zgjidh një bisedë',msg_body_ph:'Shkruaj klientit… (shfaqet në ILLI me etiketën Njeri)',msg_send:'Dërgo',msg_empty:'Ende asnjë bisedë.',msg_conv_empty:'Asnjë mesazh: shkruaj i pari.',msg_pick_first:'Zgjidh më parë një bisedë',msg_sent:'Mesazhi u dërgua',msg_ask_user:'Username i përdoruesit (@handle):',msg_user_notfound:'Përdoruesi nuk u gjet',searching:'Po kërkoj…',search_none:'Asnjë rezultat',stop_search_ph:'Kërko vendin: p.sh. Sacra di San Michele, Berat…',stop_desc_ph:'Shpjegimi i stacionit (ose gjeneroje me AI)',stop_ai_need:'Zgjidh më parë vendin',a_photo:'Foto e stacionit',a_find_photo:'Gjej foto online',searching_photo:'Po kërkoj foton zyrtare…',photo_none:'Asnjë foto online, ngarkoje me dorë',photo_found:'✓ Fotoja u gjet dhe u ruajt',no_coords:'pa koordinata',move_up:'Lart',move_down:'Poshtë',a_copy:'Kopjo',uploading:'Po ngarkoj foton…',rt_confirm_del_stop:'Të fshihet ky stacion?',trip_status_suspended:'Pezulluar',trip_resume:'Vazhdo',trip_suspend:'Pezullo',
+    nav_messages:'Mesazhe',a_message:'Mesazh',msg_threads:'Bisedat',msg_new:'Shkruaj një përdoruesi',msg_pick:'Zgjidh një bisedë',msg_body_ph:'Shkruaj klientit… (shfaqet në ILLI me etiketën Njeri)',msg_send:'Dërgo',msg_empty:'Ende asnjë bisedë.',msg_conv_empty:'Asnjë mesazh: shkruaj i pari.',msg_pick_first:'Zgjidh më parë një bisedë',msg_sent:'Mesazhi u dërgua',msg_ask_user:'Username i përdoruesit (@handle):',msg_user_notfound:'Përdoruesi nuk u gjet',searching:'Po kërkoj…',search_none:'Asnjë rezultat',stop_search_ph:'Kërko vendin: p.sh. Sacra di San Michele, Berat…',stop_desc_ph:'Shpjegimi i stacionit (ose gjeneroje me AI)',stop_ai_need:'Zgjidh më parë vendin',a_photo:'Foto e stacionit',a_find_photo:'Gjej foto online',ai_order:'Rendit me AI',ai_ordering:'AI po rendit stacionet…',ai_order_ok:'✓ Stacionet u rirenditën nga AI',ai_order_fail:'AI nuk arriti të renditë, riprovo',ai_order_few:'Duhen të paktën 3 stacione',rt_dup_confirm:'Të dyfishohet kjo rrugë me të gjitha stacionet?',rt_dup_ok:'✓ Rruga u dyfishua (draft)',drag_hint:'Tërhiq për të rirenditur',ai_writing:'AI po shkruan përshkrimin…',a_duplicate:'Dyfisho',searching_photo:'Po kërkoj foton zyrtare…',photo_none:'Asnjë foto online, ngarkoje me dorë',photo_found:'✓ Fotoja u gjet dhe u ruajt',no_coords:'pa koordinata',move_up:'Lart',move_down:'Poshtë',a_copy:'Kopjo',uploading:'Po ngarkoj foton…',rt_confirm_del_stop:'Të fshihet ky stacion?',trip_status_suspended:'Pezulluar',trip_resume:'Vazhdo',trip_suspend:'Pezullo',
     kpi_users:'Përdorues gjithsej', kpi_pois:'POI gjithsej', kpi_reports:'Raportime të hapura', kpi_new:'Përdorues të rinj 7d',
     latest_pois:'POI të fundit', latest_users:'Regjistrimet e fundit',
     moderation_queue:'Radha e raportimeve', search:'Kërko',
@@ -1121,7 +1133,7 @@ const T = {
     sub_ailimits:'AI quotas and models per tier.', sub_copilot:'Operational assistant with data access.',
     sub_create:'Publish official POIs and routes.', sub_audit:'History of admin actions.',
     role_admin:'Administrator', logout:'Sign out',
-    nav_messages:'Messages',a_message:'Message',msg_threads:'Conversations',msg_new:'Message a user',msg_pick:'Pick a conversation',msg_body_ph:'Write to the client… (appears in ILLI with the Human tag)',msg_send:'Send',msg_empty:'No conversations yet.',msg_conv_empty:'No messages: write first.',msg_pick_first:'Pick a conversation first',msg_sent:'Message sent',msg_ask_user:'User username (@handle):',msg_user_notfound:'User not found',searching:'Searching…',search_none:'No results',stop_search_ph:'Search the place: e.g. Sacra di San Michele, Berat…',stop_desc_ph:'Stop description (or generate with AI)',stop_ai_need:'Pick the place first',a_photo:'Stop photo',a_find_photo:'Find photo online',searching_photo:'Finding the official photo…',photo_none:'No photo found online, upload manually',photo_found:'✓ Photo found and saved',no_coords:'no coordinates',move_up:'Up',move_down:'Down',a_copy:'Copy',uploading:'Uploading photo…',rt_confirm_del_stop:'Delete this stop?',trip_status_suspended:'Suspended',trip_resume:'Resume',trip_suspend:'Suspend',
+    nav_messages:'Messages',a_message:'Message',msg_threads:'Conversations',msg_new:'Message a user',msg_pick:'Pick a conversation',msg_body_ph:'Write to the client… (appears in ILLI with the Human tag)',msg_send:'Send',msg_empty:'No conversations yet.',msg_conv_empty:'No messages: write first.',msg_pick_first:'Pick a conversation first',msg_sent:'Message sent',msg_ask_user:'User username (@handle):',msg_user_notfound:'User not found',searching:'Searching…',search_none:'No results',stop_search_ph:'Search the place: e.g. Sacra di San Michele, Berat…',stop_desc_ph:'Stop description (or generate with AI)',stop_ai_need:'Pick the place first',a_photo:'Stop photo',a_find_photo:'Find photo online',ai_order:'Order with AI',ai_ordering:'AI is ordering the stops…',ai_order_ok:'✓ Stops reordered by AI',ai_order_fail:'AI could not order, try again',ai_order_few:'At least 3 stops needed',rt_dup_confirm:'Duplicate this route with all stops?',rt_dup_ok:'✓ Route duplicated (draft)',drag_hint:'Drag to reorder',ai_writing:'AI is writing the description…',a_duplicate:'Duplicate',searching_photo:'Finding the official photo…',photo_none:'No photo found online, upload manually',photo_found:'✓ Photo found and saved',no_coords:'no coordinates',move_up:'Up',move_down:'Down',a_copy:'Copy',uploading:'Uploading photo…',rt_confirm_del_stop:'Delete this stop?',trip_status_suspended:'Suspended',trip_resume:'Resume',trip_suspend:'Suspend',
     kpi_users:'Total users', kpi_pois:'Total POIs', kpi_reports:'Open reports', kpi_new:'New users 7d',
     latest_pois:'Latest POIs', latest_users:'Latest signups',
     moderation_queue:'Reports queue', search:'Search',
@@ -3028,6 +3040,8 @@ async function createHistoricRoute(){
   }catch(e){ toast(t('error'),'err'); }
 }
 // Upload di una foto tappa sul media server (JWT admin). Ritorna l'URL o null.
+// Reload dell'editor tappe attivo (rotte storiche o itinerari): lo imposta _renderStopEditor.
+let _stopEditorReload = ()=>{ if(typeof loadRoutesAdmin==='function') loadRoutesAdmin(); };
 async function _adminUploadImage(file){
   try{
     const { data:{ session } } = await sb.auth.getSession();
@@ -3045,9 +3059,44 @@ function _pickStopImage(stopId){
     if(!url){ toast(t('photo_upload_err','Caricamento foto non riuscito'),'err'); return; }
     const { data, error }=await sb.from('trip_stops').update({ image_url:url }).eq('id',stopId).select('id');
     if(error||!data||!data.length){ toast(t('rls_no_rows','Nessuna riga aggiornata'),'err'); return; }
-    toast(t('saved'),'ok'); loadRoutesAdmin();
+    toast(t('saved'),'ok'); _stopEditorReload();
   };
   inp.click();
+}
+// Salva la descrizione (note) di una tappa al volo.
+async function _saveStopNote(stopId, val){
+  try{ await sb.from('trip_stops').update({ note:(val||'').trim()||null }).eq('id',stopId); }catch(e){}
+}
+// Ordina le tappe con l'AI (percorso geografico sensato). L'ordine proposto è modificabile.
+async function _aiOrderStops(tripId, stops){
+  const named=stops.filter(s=>s.name);
+  if(named.length<3){ toast(t('ai_order_few','Servono almeno 3 tappe'),'err'); return; }
+  toast(t('ai_ordering','L\'AI sta ordinando le tappe…'),null,'circle-notch');
+  const list=named.map((s,i)=>`${i}: ${s.name}${s.lat!=null?` (${s.lat},${s.lng})`:''}`).join('\n');
+  const reply=await _adminAskAI('Queste sono le tappe di un itinerario, con indice e coordinate. Riordinale nel percorso geografico più logico e scorrevole (vicine tra loro in sequenza). Rispondi SOLO con gli indici nel nuovo ordine, separati da virgola, es. "2,0,1,3". Tappe:\n'+list);
+  const order=(reply.match(/\d+/g)||[]).map(Number).filter(n=>n>=0&&n<named.length);
+  const uniq=[...new Set(order)];
+  if(uniq.length!==named.length){ toast(t('ai_order_fail','L\'AI non è riuscita a ordinare, riprova'),'err'); return; }
+  try{
+    for(let i=0;i<uniq.length;i++){ await sb.from('trip_stops').update({ sort_order:i }).eq('id',named[uniq[i]].id); }
+    toast(t('ai_order_ok','✓ Tappe riordinate dall\'AI (puoi ancora spostarle)'),'ok'); _stopEditorReload();
+  }catch(e){ toast(t('error'),'err'); }
+}
+// Duplica un'intera rotta storica con tutte le sue tappe (bozza).
+async function _duplicateRoute(routeId, name){
+  if(!confirm(t('rt_dup_confirm','Duplicare questa rotta con tutte le tappe?'))) return;
+  try{
+    const { data:orig, error:e0 }=await sb.from('trips').select('name,badge,description,cover_url,route_line').eq('id',routeId).single();
+    if(e0) throw e0;
+    const { data:nt, error:e1 }=await sb.from('trips').insert({ owner_id:ME.id, name:(orig.name||name||'Rotta')+' (copia)',
+      badge:orig.badge||null, description:orig.description||null, cover_url:orig.cover_url||null, route_line:!!orig.route_line,
+      is_historic:true, is_published:false }).select('id').single();
+    if(e1) throw e1;
+    const { data:src }=await sb.from('trip_stops').select('name,lat,lng,note,image_url,status,sort_order').eq('trip_id',routeId).order('sort_order');
+    if(src&&src.length){ await sb.from('trip_stops').insert(src.map((s,i)=>({ trip_id:nt.id, name:s.name, lat:s.lat, lng:s.lng, note:s.note, image_url:s.image_url, status:s.status||'planned', sort_order:i }))); }
+    await logAudit('route_duplicate','trip',nt.id,{ from:routeId });
+    toast(t('rt_dup_ok','✓ Rotta duplicata (bozza)'),'ok'); loadRoutesAdmin();
+  }catch(e){ toast((e&&e.message)||t('error'),'err'); }
 }
 // Cerca ONLINE la foto ufficiale/più bella della tappa: immagine principale di Wikipedia (IT poi EN),
 // fallback foto vicino alle coordinate (Wikimedia Commons geosearch). Ritorna un URL o null.
@@ -3109,8 +3158,91 @@ async function _routeStopOp(routeId, stops, idx, op){
       const { data, error }=await sb.from('trip_stops').delete().eq('id',s.id).select('id');
       if(error||!data||!data.length){ toast(t('error'),'err'); return; }
     }
-    toast(t('saved'),'ok'); loadRoutesAdmin();
+    toast(t('saved'),'ok'); _stopEditorReload();
   }catch(e){ toast((e&&e.message)||t('error'),'err'); }
+}
+// Riordino via TRASCINAMENTO: sposta la tappa da 'from' a 'to' e riscrive tutti i sort_order.
+let _dragStopFrom=null;
+async function _moveStopTo(tripId, stops, from, to){
+  if(from===to || from==null || to==null) return;
+  const arr=stops.slice(); const [m]=arr.splice(from,1); arr.splice(to,0,m);
+  try{
+    for(let i=0;i<arr.length;i++){ await sb.from('trip_stops').update({ sort_order:i }).eq('id',arr[i].id); }
+    toast(t('saved'),'ok'); _stopEditorReload();
+  }catch(e){ toast(t('error'),'err'); }
+}
+// ── EDITOR TAPPE riusabile (rotte storiche + itinerari): card grandi, trascinamento, foto, descrizione, azioni ──
+function _renderStopEditor(container, tripId, stops, reload){
+  _stopEditorReload = reload || (()=>{ if(typeof loadRoutesAdmin==='function') loadRoutesAdmin(); });
+  // Toolbar: ordina con AI
+  const bar=el('div',{class:'stop-ed-bar'});
+  bar.appendChild(el('button',{class:'btn sm',onclick:()=>_aiOrderStops(tripId,stops)}, [phIcon('sparkle'), document.createTextNode(' '+t('ai_order','Ordina con AI'))]));
+  bar.appendChild(el('span',{class:'sm',style:'opacity:.7',text:stops.length+' '+t('f_stops')}));
+  container.appendChild(bar);
+  // Card tappe
+  stops.forEach((st,idx)=>{
+    const susp=st.status==='suspended';
+    const card=el('div',{class:'stop-card'+(susp?' suspended':''),draggable:'true'});
+    card.dataset.idx=idx;
+    card.addEventListener('dragstart',e=>{ _dragStopFrom=idx; card.classList.add('dragging'); try{e.dataTransfer.effectAllowed='move';}catch(_){} });
+    card.addEventListener('dragend',()=>{ card.classList.remove('dragging'); document.querySelectorAll('.stop-card.drag-over').forEach(c=>c.classList.remove('drag-over')); });
+    card.addEventListener('dragover',e=>{ e.preventDefault(); card.classList.add('drag-over'); });
+    card.addEventListener('dragleave',()=>card.classList.remove('drag-over'));
+    card.addEventListener('drop',e=>{ e.preventDefault(); card.classList.remove('drag-over'); _moveStopTo(tripId,stops,_dragStopFrom,idx); });
+    // handle
+    const handle=el('div',{class:'stop-card-handle',title:t('drag_hint','Trascina per riordinare')}); handle.innerHTML='<i class="ph-duotone ph-dots-six-vertical"></i>';
+    // foto
+    const photo=el('button',{class:'stop-card-photo',title:t('a_photo','Foto tappa'),onclick:()=>_pickStopImage(st.id)});
+    if(st.image_url){ photo.style.backgroundImage="url('"+String(st.image_url).replace(/'/g,'%27')+"')"; }
+    else { photo.innerHTML='<i class="ph-duotone ph-image"></i>'; }
+    photo.appendChild(el('span',{class:'cam'},[phIcon('camera')]));
+    // corpo
+    const body=el('div',{class:'stop-card-body'});
+    body.appendChild(el('div',{class:'stop-card-title',text:(idx+1)+'. '+(st.name||'')}));
+    body.appendChild(el('div',{class:'stop-card-coord',text: st.lat!=null?('📍 '+Number(st.lat).toFixed(4)+', '+Number(st.lng).toFixed(4)):('⚠ '+t('no_coords','senza coordinate'))}));
+    const desc=el('textarea',{class:'stop-card-desc',placeholder:t('stop_desc_ph','Descrizione della tappa (o generala con AI)')}); desc.value=st.note||'';
+    desc.onblur=()=>_saveStopNote(st.id, desc.value);
+    body.appendChild(desc);
+    const acts=el('div',{class:'stop-card-actions'});
+    acts.appendChild(el('button',{class:'btn xs',onclick:async()=>{ if(await _findStopPhoto(st)) _stopEditorReload(); }},[phIcon('image-square'),document.createTextNode(' '+t('a_find_photo','Foto online'))]));
+    acts.appendChild(el('button',{class:'btn xs',onclick:()=>_aiStopDescInline(st,desc)},[phIcon('sparkle'),document.createTextNode(' AI')]));
+    acts.appendChild(el('button',{class:'btn xs'+(susp?' gold':''),onclick:()=>_routeStopOp(tripId,stops,idx,'suspend')},[phIcon(susp?'play':'pause'),document.createTextNode(' '+(susp?t('trip_resume','Riprendi'):t('trip_suspend','Sospendi')))]));
+    acts.appendChild(el('button',{class:'btn xs',onclick:()=>_routeStopOp(tripId,stops,idx,'copy')},[phIcon('copy'),document.createTextNode(' '+t('a_copy','Copia'))]));
+    acts.appendChild(el('button',{class:'btn xs red',onclick:()=>_routeStopOp(tripId,stops,idx,'delete')},[phIcon('trash'),document.createTextNode(' '+t('a_delete','Elimina'))]));
+    body.appendChild(acts);
+    card.appendChild(handle); card.appendChild(photo); card.appendChild(body);
+    container.appendChild(card);
+  });
+  // Aggiungi tappa: ricerca tipo Google (Photon) + coordinate auto + foto online automatica
+  const coordL=el('div',{class:'stop-adm-coord'});
+  const addWrap=el('div',{class:'rt-add-stop'});
+  const sWrap=el('div',{style:'position:relative;flex:1;min-width:160px'});
+  const inN=el('input',{placeholder:t('stop_search_ph','Cerca il luogo: es. Sacra di San Michele, Berat…'),autocomplete:'off',style:'width:100%'});
+  const drop=el('div',{class:'stop-ac-drop'});
+  sWrap.appendChild(inN); sWrap.appendChild(drop);
+  let pLat=null,pLng=null;
+  inN.oninput=()=>{ pLat=null;pLng=null;coordL.textContent=''; clearTimeout(_stopAcTimer); const q=inN.value.trim(); if(q.length<2){ drop.classList.remove('on'); return; } _stopAcTimer=setTimeout(()=>_stopAcSearch(q,drop,(nm,la,lo)=>{ inN.value=nm; pLat=la; pLng=lo; coordL.textContent='📍 '+la.toFixed(5)+', '+lo.toFixed(5); }),350); };
+  inN.onblur=()=>setTimeout(()=>drop.classList.remove('on'),200);
+  addWrap.appendChild(sWrap);
+  addWrap.appendChild(el('button',{class:'btn sm gold',text:t('add_stop','+ Aggiungi tappa'),onclick:async()=>{
+    const nm=(inN.value||'').trim(); if(!nm){ toast(t('fill_required'),'err'); return; }
+    const { data:ins, error }=await sb.from('trip_stops').insert({ trip_id:tripId, name:nm.slice(0,120), lat:pLat, lng:pLng, sort_order:stops.length, status:'planned' }).select('id,name,lat,lng').single();
+    if(error){ toast(error.message||t('error'),'err'); return; }
+    toast(t('saved'),'ok');
+    if(ins) await _findStopPhoto(ins);
+    _stopEditorReload();
+  }}));
+  container.appendChild(coordL); container.appendChild(addWrap);
+}
+// Genera la descrizione della tappa con AI, scrivendola nel textarea e salvandola.
+async function _aiStopDescInline(stop, descEl){
+  if(!stop.name){ toast(t('stop_ai_need','Scegli prima il luogo'),'err'); return; }
+  toast(t('ai_writing','L\'AI scrive la descrizione…'),null,'circle-notch');
+  const txt=await _adminAskAI('Scrivi in italiano una descrizione breve (max 3 frasi), concreta e non promozionale, della tappa "'+stop.name+'"'+(stop.lat!=null?(' (coordinate '+stop.lat+','+stop.lng+')'):'')+'. Solo la descrizione.');
+  if(!txt){ toast(t('error'),'err'); return; }
+  if(descEl) descEl.value=txt;
+  await _saveStopNote(stop.id, txt);
+  toast(t('saved'),'ok');
 }
 async function loadRoutesAdmin(){
   loadRouteSuggestions();
@@ -3133,51 +3265,8 @@ async function loadRoutesAdmin(){
         el('span',{class:'sm',text:stops.length+' '+t('f_stops')}),
         who?el('span',{class:'chip dim',text:'🙏 '+who}):null
       ]);
-      const stopsBox=el('div',{style:'display:none;margin:6px 0 10px'});
-      stops.forEach((st,idx)=>{
-        const susp=st.status==='suspended';
-        const row=el('div',{class:'rt-stop-edit'+(susp?' suspended':'')});
-        const imgBtn=el('button',{class:'rt-stop-img',title:t('a_photo','Foto tappa')});
-        if(st.image_url){ imgBtn.style.backgroundImage="url('"+String(st.image_url).replace(/'/g,'%27')+"')"; }
-        else { imgBtn.innerHTML='<i class="ph-duotone ph-image"></i>'; }
-        imgBtn.onclick=()=>_pickStopImage(st.id);
-        const info=el('div',{style:'flex:1;min-width:0'},[
-          el('div',{class:'rt-stop-nm',text:(idx+1)+'. '+st.name}),
-          el('div',{class:'sm',text:(st.lat!=null?('📍 '+Number(st.lat).toFixed(4)+', '+Number(st.lng).toFixed(4)):('⚠ '+t('no_coords','senza coordinate')))+(susp?(' · '+t('trip_status_suspended','Sospesa')):'')})
-        ]);
-        const btns=el('div',{class:'rt-stop-btns'},[
-          el('button',{class:'icon-btn',title:t('a_find_photo','Trova foto online'),onclick:async()=>{ if(await _findStopPhoto(st)) loadRoutesAdmin(); }}, phIcon('image-square')),
-          el('button',{class:'icon-btn',title:t('move_up','Su'),onclick:()=>_routeStopOp(r.id,stops,idx,'up')}, phIcon('arrow-up')),
-          el('button',{class:'icon-btn',title:t('move_down','Giù'),onclick:()=>_routeStopOp(r.id,stops,idx,'down')}, phIcon('arrow-down')),
-          el('button',{class:'icon-btn',title:susp?t('trip_resume','Riprendi'):t('trip_suspend','Sospendi'),onclick:()=>_routeStopOp(r.id,stops,idx,'suspend')}, phIcon(susp?'play':'pause')),
-          el('button',{class:'icon-btn',title:t('a_copy','Copia'),onclick:()=>_routeStopOp(r.id,stops,idx,'copy')}, phIcon('copy')),
-          el('button',{class:'icon-btn',title:t('a_delete'),onclick:()=>_routeStopOp(r.id,stops,idx,'delete')}, phIcon('trash'))
-        ]);
-        row.appendChild(imgBtn); row.appendChild(info); row.appendChild(btns);
-        stopsBox.appendChild(row);
-      });
-      // aggiunta tappa: RICERCA tipo Google (Photon, tollerante ai refusi) + coordinate auto
-      const coordL=el('div',{class:'stop-adm-coord'});
-      const addWrap=el('div',{class:'rt-add-stop'});
-      const sWrap=el('div',{style:'position:relative;flex:1;min-width:160px'});
-      const inN=el('input',{placeholder:t('stop_search_ph','Cerca il luogo: es. Sacra di San Michele, Berat…'),autocomplete:'off',style:'width:100%'});
-      const drop=el('div',{class:'stop-ac-drop'});
-      sWrap.appendChild(inN); sWrap.appendChild(drop);
-      let pLat=null,pLng=null;
-      inN.oninput=()=>{ pLat=null;pLng=null;coordL.textContent=''; clearTimeout(_stopAcTimer); const q=inN.value.trim(); if(q.length<2){ drop.classList.remove('on'); return; } _stopAcTimer=setTimeout(()=>_stopAcSearch(q,drop,(nm,la,lo)=>{ inN.value=nm; pLat=la; pLng=lo; coordL.textContent='📍 '+la.toFixed(5)+', '+lo.toFixed(5); }),350); };
-      inN.onblur=()=>setTimeout(()=>drop.classList.remove('on'),200);
-      addWrap.appendChild(sWrap);
-      addWrap.appendChild(el('button',{class:'btn sm',text:t('add_stop'),onclick:async()=>{
-        const nm=(inN.value||'').trim(); if(!nm){ toast(t('fill_required'),'err'); return; }
-        const { data:ins, error:e3 } = await sb.from('trip_stops').insert({ trip_id:r.id, name:nm.slice(0,120),
-          lat:pLat, lng:pLng, sort_order:stops.length, status:'planned' }).select('id,name,lat,lng').single();
-        if(e3){ toast(e3.message||t('error'),'err'); return; }
-        toast(t('saved'),'ok');
-        // Cerca automaticamente la foto ufficiale della nuova tappa
-        if(ins) await _findStopPhoto(ins);
-        loadRoutesAdmin();
-      }}));
-      stopsBox.appendChild(coordL); stopsBox.appendChild(addWrap);
+      const stopsBox=el('div',{class:'stop-editor',style:'display:none;margin:8px 0 12px'});
+      _renderStopEditor(stopsBox, r.id, stops, loadRoutesAdmin);
 
       const actions=el('div',{class:'btn-row'},[
         el('button',{class:'btn sm '+(r.is_published?'':'green'),text:r.is_published?t('rt_unpublish'):t('rt_publish'),onclick:async()=>{
@@ -3212,6 +3301,7 @@ async function loadRoutesAdmin(){
             toast(t('saved'),'ok'); loadRoutesAdmin(); return true;
           });
         }}),
+        el('button',{class:'btn sm',text:t('a_duplicate','Duplica'),onclick:()=>_duplicateRoute(r.id,r.name)}),
         el('button',{class:'btn sm red',text:t('a_delete'),onclick:async()=>{
           if(!confirm(t('rt_confirm_del'))) return;
           const { data:d6, error:e6 } = await sb.from('trips').delete().eq('id',r.id).select('id');
@@ -3230,7 +3320,7 @@ async function loadItinerariesAdmin(){
   const box=document.getElementById('itinTable'); loadingBox(box);
   try{
     const { data, error } = await sb.from('trips')
-      .select('id,name,badge,visibility,is_featured,start_date,end_date,created_at,owner:profiles!trips_owner_id_fkey(username),trip_stops(id,name,lat,lng,sort_order)')
+      .select('id,name,badge,visibility,is_featured,start_date,end_date,created_at,owner:profiles!trips_owner_id_fkey(username),trip_stops(id,name,lat,lng,sort_order,image_url,note,status)')
       .or('is_historic.is.null,is_historic.eq.false').order('created_at',{ascending:false}).limit(200);
     if(error){ isBackendMissing(error)?backendOff(box):emptyBox(box,t('error'),null,'warning'); return; }
     if(!data||!data.length){ emptyBox(box,t('itin_empty'),t('itin_empty_h'),'compass'); return; }
@@ -3247,13 +3337,8 @@ async function loadItinerariesAdmin(){
         r.is_featured?el('span',{class:'chip green',text:'★ '+t('itin_feat_on')}):null,
         (r.start_date||r.end_date)?el('span',{class:'sm',text:(r.start_date||'')+(r.end_date?' → '+r.end_date:'')}):null
       ]);
-      const stopsBox=el('div',{style:'display:none;margin:6px 0 10px'});
-      stops.forEach(st=>{
-        stopsBox.appendChild(el('div',{style:'display:flex;align-items:center;gap:8px;padding:4px 0;font-size:12.5px'},[
-          el('span',{class:'sm',text:(st.sort_order+1)+'.'}),
-          el('span',{style:'flex:1',text:(st.name||'')+(st.lat!=null?('  ('+Number(st.lat).toFixed(4)+', '+Number(st.lng).toFixed(4)+')'):'')})
-        ]));
-      });
+      const stopsBox=el('div',{class:'stop-editor',style:'display:none;margin:8px 0 12px'});
+      _renderStopEditor(stopsBox, r.id, stops, loadItinerariesAdmin);
       const actions=el('div',{class:'btn-row'},[
         el('button',{class:'btn sm',text:t('rt_stops_btn'),onclick:()=>{ stopsBox.style.display=stopsBox.style.display==='none'?'block':'none'; }}),
         el('button',{class:'btn sm '+(r.is_featured?'':'gold'),text:r.is_featured?t('itin_unfeat'):t('itin_feat'),onclick:async()=>{
