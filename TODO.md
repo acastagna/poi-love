@@ -1,5 +1,5 @@
 # TODO — POI•LOVE
-> Aggiornato: **05/07/2026** · L'INVENTARIO COMPLETO e ufficiale e' CONTRATTO.md (questo file e' la lista operativa) · Stato: review completa fatta, 51 fix deployati e verificati live (webapp+admin+2 edge+2 migrazioni), tag `checkpoint-2026-07-04`. Lancio pubblico **17/08**.
+> Aggiornato: **10/07/2026** · L'INVENTARIO COMPLETO e ufficiale e' CONTRATTO.md (questo file e' la lista operativa) · Stato: webapp **v3.14 live** — giornata 10/07 con itinerari (swipe, date, copertine reali), 3 categorie + categoria personalizzata REALE, proponi POI come tappa di rotta, visibilita' reale, OpenStreetMap al posto del finto Google, code-review 22 agenti + 14 fix (dettaglio in SAL.md, tag `checkpoint-2026-07-10-review-fixes`). Prossima scadenza **presentazioni 14-17 luglio (mar-ven)**, lancio pubblico **17/08**.
 > 🔒 Regola di ferro su TUTTO il nuovo: tre lingue perfette, ordine **SQ → IT → EN**, apertura automatica sulla lingua del device. Niente trattini lunghi. Chiavi/segreti solo server-side. **Ogni modifica chiude il giro: scrivi → valida → deploya → verifica live.**
 
 ---
