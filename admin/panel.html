@@ -817,8 +817,8 @@ html[data-theme="light"] .chip.green{color:#236b39}
     <!-- 8c) CATEGORIE (tassonomia data-driven) -->
     <section class="section" id="sec-categories">
       <div class="panel" style="margin-bottom:16px">
-        <div class="card-h"><span class="ic"><i class="ph-duotone ph-lightbulb"></i></span><span data-t="cat_req_title">Richieste dalla community</span></div>
-        <div class="sm" style="margin-bottom:10px" data-t="cat_req_help">Ogni volta che qualcuno non trova la categoria giusta lascia una traccia qui. Tu decidi cosa promuovere.</div>
+        <div class="card-h"><span class="ic"><i class="ph-duotone ph-lightbulb"></i></span><span data-t="cat_req_title">Categorie personalizzate proposte</span></div>
+        <div class="sm" style="margin-bottom:10px" data-t="cat_req_help">Ogni utente può proporre una sola categoria sua. La vedi qui con chi l'ha creata e quante volte è stata usata: diventa pubblica da sola a 20 usi, oppure la approvi tu subito.</div>
         <div id="catReqTable"></div>
       </div>
       <div class="panel" style="margin-bottom:16px">
@@ -967,8 +967,8 @@ const T = {
     tag_name_req:'Scrivi un tag', tag_rename_ask:'Nuovo nome per il tag "%s" (unisce se esiste già):',
     tag_renamed:'Rinominato su %n POI', tag_deleted:'Rimosso da %n POI',
     tag_del_confirm:'Eliminare il tag "%s" da tutti i POI?', tag_block_confirm:'Bloccare questo tag? Verrà rimosso dai POI e non sarà più suggerito.',
-    cat_req_title:'Richieste dalla community', cat_req_help:'Ogni volta che qualcuno non trova la categoria giusta lascia una traccia qui. Tu decidi cosa promuovere.',
-    cat_req_empty:'Nessuna richiesta in attesa', cat_req_promote:'Promuovi', cat_new_title:'Nuova categoria / modifica',
+    cat_req_title:'Categorie personalizzate proposte', cat_req_help:'Ogni utente può proporre una sola categoria sua. La vedi qui con chi l\'ha creata e quante volte è stata usata: diventa pubblica da sola a 20 usi, oppure la approvi tu subito.',
+    cat_req_empty:'Nessuna categoria proposta in attesa', cat_req_promote:'Promuovi', cat_new_title:'Nuova categoria / modifica', cat_approve_now:'Approva ora', cat_reject:'Rifiuta', cat_approved:'Categoria pubblicata', cat_reject_confirm:'Rifiutare e togliere questa categoria proposta?',
     cat_macro:'Macro (enum)', cat_icon:'Icona Phosphor', cat_color:'Colore', cat_sort:'Ordine', cat_save:'Salva categoria',
     cat_list_title:'Categorie attive e spente', cat_on:'Attiva', cat_off:'Spenta', cat_edit:'Modifica',
     cat_saved:'Categoria salvata', cat_key_req:'Key, macro e le 3 etichette sono obbligatorie',
@@ -1067,8 +1067,8 @@ const T = {
     tag_name_req:'Shkruaj një etiketë', tag_rename_ask:'Emër i ri për etiketën "%s" (bashkon nëse ekziston):',
     tag_renamed:'U riemërtua në %n POI', tag_deleted:'U hoq nga %n POI',
     tag_del_confirm:'Të fshihet etiketa "%s" nga të gjitha POI-t?', tag_block_confirm:'Ta bllokosh këtë etiketë? Do të hiqet nga POI-t dhe nuk do të sugjerohet më.',
-    cat_req_title:'Kërkesat nga komuniteti', cat_req_help:'Sa herë dikush nuk gjen kategorinë e duhur lë një gjurmë këtu. Ti vendos çfarë të promovosh.',
-    cat_req_empty:'Asnjë kërkesë në pritje', cat_req_promote:'Promovo', cat_new_title:'Kategori e re / ndrysho',
+    cat_req_title:'Kategori personale të propozuara', cat_req_help:'Çdo përdorues mund të propozojë vetëm një kategori të tijën. E sheh këtu me atë që e krijoi dhe sa herë është përdorur: bëhet publike vetë në 20 përdorime, ose e miraton ti menjëherë.',
+    cat_req_empty:'Asnjë kategori e propozuar në pritje', cat_req_promote:'Promovo', cat_new_title:'Kategori e re / ndrysho', cat_approve_now:'Mirato tani', cat_reject:'Refuzo', cat_approved:'Kategoria u publikua', cat_reject_confirm:'Ta refuzosh e ta heqësh këtë kategori të propozuar?',
     cat_macro:'Makro (enum)', cat_icon:'Ikona Phosphor', cat_color:'Ngjyra', cat_sort:'Renditja', cat_save:'Ruaj kategorinë',
     cat_list_title:'Kategoritë aktive dhe të fikura', cat_on:'Aktive', cat_off:'E fikur', cat_edit:'Ndrysho',
     cat_saved:'Kategoria u ruajt', cat_key_req:'Key, makro dhe 3 etiketat janë të detyrueshme',
@@ -1163,8 +1163,8 @@ const T = {
     tag_name_req:'Type a tag', tag_rename_ask:'New name for tag "%s" (merges if it already exists):',
     tag_renamed:'Renamed on %n POIs', tag_deleted:'Removed from %n POIs',
     tag_del_confirm:'Delete tag "%s" from all POIs?', tag_block_confirm:'Block this tag? It will be removed from POIs and no longer suggested.',
-    cat_req_title:'Community requests', cat_req_help:'Whenever someone cannot find the right category a trace lands here. You decide what to promote.',
-    cat_req_empty:'No pending requests', cat_req_promote:'Promote', cat_new_title:'New category / edit',
+    cat_req_title:'Proposed custom categories', cat_req_help:'Each user can propose a single category of their own. You see it here with who created it and how many times it was used: it goes public on its own at 20 uses, or you approve it instantly.',
+    cat_req_empty:'No proposed categories pending', cat_req_promote:'Promote', cat_new_title:'New category / edit', cat_approve_now:'Approve now', cat_reject:'Reject', cat_approved:'Category published', cat_reject_confirm:'Reject and remove this proposed category?',
     cat_macro:'Macro (enum)', cat_icon:'Phosphor icon', cat_color:'Color', cat_sort:'Sort', cat_save:'Save category',
     cat_list_title:'Active and disabled categories', cat_on:'Active', cat_off:'Off', cat_edit:'Edit',
     cat_saved:'Category saved', cat_key_req:'Key, macro and the 3 labels are required',
@@ -2514,28 +2514,31 @@ async function createTrip(){
 
 /* ═════════════════════════ 8c) CATEGORIE (tassonomia data-driven) ═════════════════════════ */
 async function loadCategoriesAdmin(){
-  // Richieste della community, raggruppate per termine
+  // Categorie personalizzate proposte dagli utenti (non ancora pubbliche): chi + usi verso 20 + approva/rifiuta.
   const rb=document.getElementById('catReqTable'); loadingBox(rb);
   try{
-    const { data, error } = await sb.from('category_requests')
-      .select('term,lang,source,created_at').order('created_at',{ascending:false}).limit(500);
+    const { data, error } = await sb.rpc('admin_list_custom_categories');
     if(error){ isBackendMissing(error)?backendOff(rb):emptyBox(rb,t('error'),null,'warning'); }
     else if(!data||!data.length){ emptyBox(rb,t('cat_req_empty'),null,'lightbulb'); }
     else{
-      const groups={};
-      data.forEach(r=>{
-        const k=String(r.term||'').trim().toLowerCase(); if(!k) return;
-        if(!groups[k]) groups[k]={term:r.term.trim(),count:0,langs:new Set()};
-        groups[k].count++; if(r.lang) groups[k].langs.add(r.lang);
-      });
       rb.textContent='';
-      Object.values(groups).sort((a,b)=>b.count-a.count).forEach(g=>{
-        rb.appendChild(el('div',{style:'display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid rgba(128,128,128,.15);flex-wrap:wrap'},[
-          el('span',{class:'ttl',style:'flex:1;min-width:120px',text:g.term}),
-          el('span',{class:'chip dim',text:'\u00d7'+g.count}),
-          g.langs.size?el('span',{class:'sm',text:[...g.langs].join(', ')}):null,
-          el('button',{class:'btn sm gold',text:t('cat_req_promote'),onclick:()=>promoteCatRequest(g.term)}),
-          el('button',{class:'icon-btn',title:t('a_delete'),onclick:()=>discardCatRequest(g.term)}, phIcon('trash'))
+      data.forEach(g=>{
+        const who=g.owner_username||t('rsug_anon');
+        const uses=g.uses||0; const pct=Math.min(100,Math.round(uses/20*100));
+        rb.appendChild(el('div',{style:'padding:9px 0;border-bottom:1px solid rgba(128,128,128,.15)'},[
+          el('div',{style:'display:flex;align-items:center;gap:8px;flex-wrap:wrap'},[
+            el('span',{class:'ttl',style:'flex:1;min-width:120px',text:g.label_it}),
+            g.macro?el('span',{class:'chip dim',text:g.macro}):null,
+            el('span',{class:'sm',text:t('rsug_by')+' '+who}),
+            el('span',{class:'chip '+(uses>=20?'green':'gold'),text:uses+'/20'})
+          ]),
+          el('div',{style:'height:5px;border-radius:3px;background:rgba(128,128,128,.15);margin:6px 0;overflow:hidden'},[
+            el('div',{style:'height:100%;width:'+pct+'%;background:'+(uses>=20?'#22C55E':'#B4823C')})
+          ]),
+          el('div',{class:'btn-row'},[
+            el('button',{class:'btn sm gold',text:t('cat_approve_now'),onclick:()=>approveCustomCat(g.key,g.label_it)}),
+            el('button',{class:'btn sm red',text:t('cat_reject'),onclick:()=>rejectCustomCat(g.key)})
+          ])
         ]));
       });
     }
@@ -2576,16 +2579,25 @@ function fillCatForm(c){
   document.getElementById('catSort').value=c.sort!=null?c.sort:99;
   document.getElementById('catKey').scrollIntoView({behavior:'smooth',block:'center'});
 }
-function promoteCatRequest(term){
-  // Prefill del form: l'admin rifinisce etichette, icona e colore, poi salva
-  const key=String(term||'').trim().toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'').slice(0,40);
-  fillCatForm({key, macro:'cultura', label_it:term.trim(), label_sq:term.trim(), label_en:term.trim(), icon:'map-pin', color:'#D42B2B', sort:99});
-  toast(t('cat_new_title'),'ok','pencil-simple');
+// Approva SUBITO: la categoria personalizzata dell'utente diventa pubblica (active=true) con un click.
+async function approveCustomCat(key,label){
+  try{
+    const { error } = await sb.rpc('admin_approve_category',{ p_key:key });
+    if(error){ toast(error.message||t('error'),'err'); return; }
+    await logAudit('category_approve','poi_category',key,{ label });
+    toast(t('cat_approved'),'ok','check');
+    loadCategoriesAdmin();
+  }catch(e){ toast(t('error'),'err'); }
 }
-async function discardCatRequest(term){
-  const { error } = await sb.from('category_requests').delete().ilike('term', String(term||'').trim());
-  if(error){ toast(error.message||t('error'),'err'); return; }
-  toast(t('saved'),'ok'); loadCategoriesAdmin();
+// Rifiuta: elimina la proposta (solo se ancora non pubblica).
+async function rejectCustomCat(key){
+  if(!confirm(t('cat_reject_confirm'))) return;
+  try{
+    const { error } = await sb.rpc('admin_reject_category',{ p_key:key });
+    if(error){ toast(error.message||t('error'),'err'); return; }
+    await logAudit('category_reject','poi_category',key,{});
+    toast(t('saved'),'ok'); loadCategoriesAdmin();
+  }catch(e){ toast(t('error'),'err'); }
 }
 async function saveCategory(){
   const key=(document.getElementById('catKey').value||'').trim().toLowerCase().replace(/[^a-z0-9_]+/g,'_').replace(/^_+|_+$/g,'');
