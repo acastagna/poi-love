@@ -7745,7 +7745,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='3.01';
+const APP_VERSION='3.02';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
@@ -15505,27 +15505,31 @@ function closePhotoPicker(){
   photoPickerSelected=null;
 }
 
-// Cerca/genera immagini con parole chiave via Flux (Pollinations), nessuna API key
-function searchUnsplash(){
-  const q=document.getElementById('photoPickerSearch')?.value?.trim();
-  if(!q){showToast('Inserisci un termine di ricerca');return;}
+// Cerca FOTO REALI del luogo su Wikimedia Commons (niente più immagini AI inventate).
+async function searchUnsplash(){
+  const q=(document.getElementById('photoPickerSearch')?.value||'').trim();
+  if(!q){ showToast(lang==='it'?'Scrivi un luogo, es. Tirana':'Type a place'); return; }
   const grid=document.getElementById('photoPickerGrid');
-  grid.innerHTML='<div class="photo-picker-loading"><i class="ph-duotone ph-spinner-gap" style="animation:spin 1s linear infinite;display:block;font-size:28px;margin-bottom:8px"></i>Cerco foto…</div>';
-  photoPickerSelected=null;
+  grid.innerHTML='<div class="photo-picker-loading"><i class="ph-duotone ph-spinner-gap" style="animation:spin 1s linear infinite;display:block;font-size:28px;margin-bottom:8px"></i>'+t('mt_searching','Cerco…')+'</div>';
+  photoPickerSelected=null; photoPickerUnsplashUrls=[];
   document.getElementById('photoPickerConfirm').classList.remove('show');
-  // Flux (Pollinations): keyword-based, gratuito, senza API key, CORS-safe per img tag (loremflickr era inaffidabile sotto carico)
-  const baseQ=encodeURIComponent(q.replace(/\s+/g,' '));
-  const seed=Date.now()%9000+1000;
-  photoPickerUnsplashUrls=Array.from({length:9},(_,i)=>`https://image.pollinations.ai/prompt/${baseQ}?width=400&height=400&nologo=true&seed=${seed+i}`);
-  grid.innerHTML=photoPickerUnsplashUrls.map((url,i)=>`
-    <div class="photo-picker-thumb" id="ppt-${i}" onclick="selectUnsplashPhoto(${i})">
-      <img src="${url}" alt="" loading="lazy"
-        onload="this.parentNode.querySelector('.ph-spinner')?.remove()"
-        onerror="this.src='https://picsum.photos/seed/${seed+i}/400/400';this.onerror=null">
-      <i class="ph-duotone ph-spinner-gap ph-spinner" style="position:absolute;inset:0;margin:auto;font-size:22px;color:var(--muted);animation:spin 1s linear infinite"></i>
-      <div class="unsplash-attr">AI · Flux</div>
-    </div>
-  `).join('');
+  try{
+    const url='https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch='+encodeURIComponent(q)+'&gsrnamespace=6&gsrlimit=18&prop=imageinfo&iiprop=url&iiurlwidth=1000&format=json&origin=*';
+    const r=await fetch(url); const j=await r.json();
+    const pages=(j&&j.query&&j.query.pages)||{};
+    const arr=Object.values(pages).sort((a,b)=>(a.index||99)-(b.index||99))
+      .map(p=>(p.imageinfo&&p.imageinfo[0])||null).filter(Boolean)
+      .filter(ii=>/\.(jpe?g|png|webp)$/i.test(ii.url||''))
+      .map(ii=>({ full:ii.thumburl||ii.url }))
+      .slice(0,15);
+    if(!arr.length){ grid.innerHTML='<div class="photo-picker-loading" style="padding:20px 14px;text-align:center;color:var(--muted)">'+(lang==='it'?'Nessuna foto reale trovata per questo luogo. Carica la tua foto qui sotto.':'No real photo found. Upload yours below.')+'</div>'; return; }
+    photoPickerUnsplashUrls=arr.map(a=>a.full);   // URL di foto REALI
+    grid.innerHTML=arr.map((a,i)=>`
+      <div class="photo-picker-thumb" id="ppt-${i}" onclick="selectUnsplashPhoto(${i})">
+        <img src="${a.full}" alt="" loading="lazy" onerror="this.parentNode.style.display='none'">
+        <div class="unsplash-attr">Wikimedia Commons</div>
+      </div>`).join('');
+  }catch(e){ grid.innerHTML='<div class="photo-picker-loading" style="color:var(--muted)">'+t('error_generic','Qualcosa è andato storto, riprova')+'</div>'; }
 }
 
 function selectUnsplashPhoto(idx){
