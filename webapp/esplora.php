@@ -31,6 +31,7 @@ if ($city !== '') $poiQ .= '&city=eq.' . rawurlencode($city);
 $qFilter = trim(preg_replace('/[^\p{L}\p{N} ]/u', ' ', $q));
 if ($q !== '' && $qFilter !== '') $poiQ .= '&or=(title.ilike.*' . rawurlencode($qFilter) . '*,city.ilike.*' . rawurlencode($qFilter) . '*,address.ilike.*' . rawurlencode($qFilter) . '*)';
 $pois = seo_get($poiQ);
+if (seo_upstream_down()) seo_send_503(); // outage Supabase → 503, non un hub finto-vuoto indicizzabile
 
 $routes = seo_get('trips?is_historic=eq.true&is_published=eq.true&select=id,name,badge,badge_official,badge_essential,cover_url,trip_stops(id)&order=updated_at.desc&limit=200');
 $trips  = seo_get('trips?is_historic=eq.false&visibility=eq.pub&select=id,name,cover_url,trip_stops(id)&order=updated_at.desc&limit=200');
@@ -60,6 +61,10 @@ $lede = str_replace(array('{N}','{R}','{T}','{K}'), array($nPlaces,$nRoutes,$nTr
 $desc = $lede; if (mb_strlen($desc) > 300) $desc = mb_substr($desc,0,297).'…';
 $ogimg = SEO_OG_FALLBACK;
 
+// robots: le pagine di ricerca interna (?q=) e quelle senza contenuto reale NON vanno indicizzate (no index bloat / soft-404)
+$hasContent = ($type === 'routes') ? (count($routes) > 0) : (($type === 'trips') ? (count($trips) > 0) : ($nPlaces > 0));
+$robots = ($q !== '' || !$hasContent) ? 'noindex,follow,max-image-preview:large' : 'index,follow,max-image-preview:large';
+
 // ── JSON-LD: CollectionPage + ItemList dei luoghi ──────────────────────────────
 $graph = seo_org_nodes();
 $graph[] = seo_breadcrumb(array(
@@ -84,7 +89,7 @@ function _catlabel_local($key, $lang, $catLabels) {
 <title><?php echo e($title); ?></title>
 <meta name="description" content="<?php echo e($desc); ?>">
 <?php echo seo_alternates($path, $params, $lang); ?>
-<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="robots" content="<?php echo $robots; ?>">
 <meta property="og:locale" content="<?php echo seo_locale($lang); ?>">
 <?php echo seo_og($title, $desc, $ogimg, $canonical, 'website'); ?>
 <link rel="icon" href="https://poilove.com/img/favicon.svg">

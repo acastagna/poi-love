@@ -20,6 +20,10 @@ $rows = $id ? seo_get('pois?id=eq.' . rawurlencode($id)
 $poi = count($rows) ? $rows[0] : null;
 $isPublic = ($poi !== null);
 
+// Upstream Supabase giù → 503 (Google ritenta senza deindicizzare); 0 righe/4xx → 404 pulito, non soft-404.
+if (seo_upstream_down()) seo_send_503();
+if (!$isPublic) http_response_code(404);
+
 // ── Etichette UI trilingui ─────────────────────────────────────────────────────
 $T = array(
   'it' => array('kick'=>'Luogo su POI•LOVE','addr'=>'Indirizzo','coords'=>'Coordinate','openmap'=>'Apri sulla mappa','directions'=>'Come arrivare','category'=>'Categoria','tags'=>'Tag','hearts'=>'cuori','nearby'=>'Luoghi vicini','faq'=>'Domande frequenti','updated'=>'Aggiornato il','cta'=>'Entra in POI•LOVE','foot'=>'La mappa comunitaria dei luoghi amati','home'=>'Home','notfound'=>'Luogo non trovato','notfound_sub'=>'Questo luogo non è pubblico o non esiste più. Scopri gli altri luoghi amati.'),
@@ -93,21 +97,22 @@ if ($poi && $lat !== null && $lng !== null) {
 $faq = array();
 if ($poi) {
   $addrTxt = trim(($poi['address'] ? $poi['address'] : '') . ($city ? (($poi['address'] ? ', ' : '') . $city) : '') . ($country ? (' (' . $country . ')') : ''));
+  $hasCoord = ($lat !== null && $lng !== null);       // coordinate solo se presenti (niente "Coordinate: , .")
   if ($lang === 'it') {
-    if ($addrTxt) $faq[] = array('q'=>"Dove si trova $name?", 'a'=>"$name si trova in $addrTxt. Coordinate: $lat, $lng.");
+    if ($addrTxt) $faq[] = array('q'=>"Dove si trova $name?", 'a'=>"$name si trova in $addrTxt." . ($hasCoord ? " Coordinate: $lat, $lng." : ''));
     if ($catLabel) $faq[] = array('q'=>"Che tipo di luogo è $name?", 'a'=>"È un $catLabel salvato dalla community POI•LOVE.");
     if ((int)$poi['love_count'] > 0) $faq[] = array('q'=>"Quante persone amano $name?", 'a'=>$poi['love_count']." persone hanno segnato $name tra i luoghi amati su POI•LOVE.");
-    else $faq[] = array('q'=>"Come arrivo a $name?", 'a'=>"Apri le indicazioni verso le coordinate $lat, $lng dalla mappa di POI•LOVE.");
+    elseif ($hasCoord) $faq[] = array('q'=>"Come arrivo a $name?", 'a'=>"Apri le indicazioni verso le coordinate $lat, $lng dalla mappa di POI•LOVE.");
   } elseif ($lang === 'sq') {
-    if ($addrTxt) $faq[] = array('q'=>"Ku ndodhet $name?", 'a'=>"$name ndodhet në $addrTxt. Koordinatat: $lat, $lng.");
+    if ($addrTxt) $faq[] = array('q'=>"Ku ndodhet $name?", 'a'=>"$name ndodhet në $addrTxt." . ($hasCoord ? " Koordinatat: $lat, $lng." : ''));
     if ($catLabel) $faq[] = array('q'=>"Çfarë lloj vendi është $name?", 'a'=>"Është një $catLabel i ruajtur nga komuniteti POI•LOVE.");
     if ((int)$poi['love_count'] > 0) $faq[] = array('q'=>"Sa persona e duan $name?", 'a'=>$poi['love_count']." persona e kanë shënuar $name mes vendeve të dashura në POI•LOVE.");
-    else $faq[] = array('q'=>"Si shkoj te $name?", 'a'=>"Hap udhëzimet drejt koordinatave $lat, $lng nga harta e POI•LOVE.");
+    elseif ($hasCoord) $faq[] = array('q'=>"Si shkoj te $name?", 'a'=>"Hap udhëzimet drejt koordinatave $lat, $lng nga harta e POI•LOVE.");
   } else {
-    if ($addrTxt) $faq[] = array('q'=>"Where is $name?", 'a'=>"$name is located at $addrTxt. Coordinates: $lat, $lng.");
+    if ($addrTxt) $faq[] = array('q'=>"Where is $name?", 'a'=>"$name is located at $addrTxt." . ($hasCoord ? " Coordinates: $lat, $lng." : ''));
     if ($catLabel) $faq[] = array('q'=>"What kind of place is $name?", 'a'=>"It's a $catLabel saved by the POI•LOVE community.");
     if ((int)$poi['love_count'] > 0) $faq[] = array('q'=>"How many people love $name?", 'a'=>$poi['love_count']." people have marked $name among beloved places on POI•LOVE.");
-    else $faq[] = array('q'=>"How do I get to $name?", 'a'=>"Open directions to coordinates $lat, $lng from the POI•LOVE map.");
+    elseif ($hasCoord) $faq[] = array('q'=>"How do I get to $name?", 'a'=>"Open directions to coordinates $lat, $lng from the POI•LOVE map.");
   }
 }
 
@@ -157,7 +162,7 @@ $placeOg = ($lat !== null) ? ('<meta property="place:location:latitude" content=
 <?php echo $geoMeta; ?>
 <meta property="og:locale" content="<?php echo seo_locale($lang); ?>">
 <meta property="og:locale:alternate" content="it_IT"><meta property="og:locale:alternate" content="sq_AL"><meta property="og:locale:alternate" content="en_US">
-<?php echo seo_og($title, $desc, $ogimg, $canonical, 'place'); ?><?php echo $placeOg; ?>
+<?php echo seo_og($title, $desc, seo_http_or($ogimg, SEO_OG_FALLBACK), $canonical, 'place'); ?><?php echo $placeOg; ?>
 <link rel="icon" href="https://poilove.com/img/favicon.svg">
 <?php echo seo_jsonld($graph); ?>
 <?php echo seo_css(); ?>

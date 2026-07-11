@@ -21,21 +21,29 @@ $isPublic = ($trip !== null);
 
 // ── Proxy immagine cover (per OpenGraph, anche da data-URL) ─────────────────────
 if (isset($_GET['img'])) {
-  if ($trip && !empty($trip['cover_url'])) {
-    $cov = $trip['cover_url'];
-    if (preg_match('#^data:(image/[a-zA-Z0-9.+\-]+);base64,(.*)$#s', $cov, $mm)) {
-      header('Content-Type: ' . $mm[1]); header('Cache-Control: public, max-age=86400');
-      echo base64_decode($mm[2]); exit;
-    }
-    if (preg_match('#^https?://#', $cov)) { header('Location: ' . $cov, true, 302); exit; }
+  $cov = ($trip && !empty($trip['cover_url'])) ? $trip['cover_url'] : '';
+  // data-URL: SOLO raster (mai svg → niente XSS eseguibile sull'origine), con nosniff e no-inline-script
+  if (preg_match('#^data:(image/(?:png|jpeg|jpg|webp|gif));base64,(.*)$#s', $cov, $mm)) {
+    header('Content-Type: ' . $mm[1]);
+    header('X-Content-Type-Options: nosniff');
+    header('Content-Disposition: inline; filename="cover"');
+    header('Cache-Control: public, max-age=86400');
+    echo base64_decode($mm[2]); exit;
+  }
+  // http(s): 302 SOLO verso host fidati (evita open-redirect/phishing sul dominio)
+  if (preg_match('#^https://#i', $cov) && seo_img_host_ok(parse_url($cov, PHP_URL_HOST))) {
+    header('Location: ' . $cov, true, 302); exit;
   }
   header('Location: ' . SEO_OG_FALLBACK, true, 302); exit;
 }
+// Upstream Supabase giù → 503 (Google ritenta senza deindicizzare)
+if (seo_upstream_down()) seo_send_503();
+if (!$isPublic) http_response_code(404);
 
 $T = array(
-  'it' => array('kick'=>'Itinerario su POI•LOVE','places'=>'luoghi','stops_title'=>'Le tappe','faq'=>'Domande frequenti','updated'=>'Aggiornato il','cta'=>'Entra in POI•LOVE','foot'=>'La mappa comunitaria dei luoghi amati','home'=>'Home','trips'=>'Itinerari','notfound'=>'Itinerario non trovato','notfound_sub'=>'Questo itinerario non è pubblico o non esiste più. Scopri gli altri itinerari.','dates'=>'Date'),
-  'sq' => array('kick'=>'Udhëtim në POI•LOVE','places'=>'vende','stops_title'=>'Ndalesat','faq'=>'Pyetje të shpeshta','updated'=>'Përditësuar më','cta'=>'Hyr në POI•LOVE','foot'=>'Harta e komunitetit e vendeve të dashura','home'=>'Home','trips'=>'Udhëtimet','notfound'=>'Udhëtimi nuk u gjet','notfound_sub'=>'Ky udhëtim nuk është publik ose nuk ekziston më. Zbulo udhëtimet e tjera.','dates'=>'Datat'),
-  'en' => array('kick'=>'Trip on POI•LOVE','places'=>'places','stops_title'=>'The stops','faq'=>'Frequently asked questions','updated'=>'Updated on','cta'=>'Enter POI•LOVE','foot'=>'The community map of beloved places','home'=>'Home','trips'=>'Trips','notfound'=>'Trip not found','notfound_sub'=>'This trip is not public or no longer exists. Discover other trips.','dates'=>'Dates'),
+  'it' => array('kick'=>'Itinerario su POI•LOVE','places'=>'luoghi','stops_title'=>'Le tappe','faq'=>'Domande frequenti','updated'=>'Aggiornato il','cta'=>'Entra in POI•LOVE','foot'=>'La mappa comunitaria dei luoghi amati','home'=>'Home','trips'=>'Itinerari','notfound'=>'Itinerario non trovato','notfound_sub'=>'Questo itinerario non è pubblico o non esiste più. Scopri gli altri itinerari.','dates'=>'Date','official'=>'Ufficiale','essential'=>'Indispensabile'),
+  'sq' => array('kick'=>'Udhëtim në POI•LOVE','places'=>'vende','stops_title'=>'Ndalesat','faq'=>'Pyetje të shpeshta','updated'=>'Përditësuar më','cta'=>'Hyr në POI•LOVE','foot'=>'Harta e komunitetit e vendeve të dashura','home'=>'Home','trips'=>'Udhëtimet','notfound'=>'Udhëtimi nuk u gjet','notfound_sub'=>'Ky udhëtim nuk është publik ose nuk ekziston më. Zbulo udhëtimet e tjera.','dates'=>'Datat','official'=>'Zyrtar','essential'=>'I domosdoshëm'),
+  'en' => array('kick'=>'Trip on POI•LOVE','places'=>'places','stops_title'=>'The stops','faq'=>'Frequently asked questions','updated'=>'Updated on','cta'=>'Enter POI•LOVE','foot'=>'The community map of beloved places','home'=>'Home','trips'=>'Trips','notfound'=>'Trip not found','notfound_sub'=>'This trip is not public or no longer exists. Discover other trips.','dates'=>'Dates','official'=>'Official','essential'=>'Essential'),
 );
 $L = $T[$lang];
 
@@ -167,6 +175,8 @@ $faqNode = seo_faq($faq); if ($faqNode) $graph[] = $faqNode;
         <p class="lead"><?php echo e($name . ' · ' . $nStops . ' ' . $L['places'] . ($dateRange ? (' · ' . $dateRange) : '')); ?></p>
         <?php if ($descRaw !== ''): ?><p class="desc"><?php echo nl2br(e($descRaw)); ?></p><?php endif; ?>
         <div class="chips">
+          <?php if (!empty($trip['badge_official'])): ?><span class="chip gold">★ <?php echo e($L['official']); ?></span><?php endif; ?>
+          <?php if (!empty($trip['badge_essential'])): ?><span class="chip purple">◆ <?php echo e($L['essential']); ?></span><?php endif; ?>
           <?php if ($dateRange): ?><span class="chip gold">📅 <?php echo e($dateRange); ?></span><?php endif; ?>
           <span class="chip">📍 <?php echo $nStops; ?> <?php echo e($L['places']); ?></span>
         </div>

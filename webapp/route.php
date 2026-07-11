@@ -19,6 +19,10 @@ $rows = $id ? seo_get('trips?id=eq.' . rawurlencode($id) . '&is_historic=eq.true
 $r = count($rows) ? $rows[0] : null;
 $isPublic = ($r !== null);
 
+// Upstream Supabase giù → 503 (Google ritenta senza deindicizzare); 0 righe/4xx → 404 pulito.
+if (seo_upstream_down()) seo_send_503();
+if (!$isPublic) http_response_code(404);
+
 $T = array(
   'it' => array('kick'=>'Rotta storica su POI•LOVE','official'=>'Ufficiale','essential'=>'Indispensabile','stops'=>'tappe','stops_title'=>'Le tappe','faq'=>'Domande frequenti','updated'=>'Aggiornato il','cta'=>'Entra in POI•LOVE','foot'=>'La mappa comunitaria dei luoghi amati','home'=>'Home','routes'=>'Rotte','notfound'=>'Rotta non trovata','notfound_sub'=>'Questa rotta non è pubblicata o non esiste più. Scopri le altre rotte storiche.'),
   'sq' => array('kick'=>'Rrugë historike në POI•LOVE','official'=>'Zyrtare','essential'=>'E domosdoshme','stops'=>'ndalesa','stops_title'=>'Ndalesat','faq'=>'Pyetje të shpeshta','updated'=>'Përditësuar më','cta'=>'Hyr në POI•LOVE','foot'=>'Harta e komunitetit e vendeve të dashura','home'=>'Home','routes'=>'Rrugët','notfound'=>'Rruga nuk u gjet','notfound_sub'=>'Kjo rrugë nuk është publike ose nuk ekziston më. Zbulo rrugët e tjera historike.'),
@@ -132,7 +136,7 @@ $faqNode = seo_faq($faq); if ($faqNode) $graph[] = $faqNode;
 <meta name="robots" content="<?php echo $isPublic ? 'index,follow,max-image-preview:large' : 'noindex,follow'; ?>">
 <meta property="og:locale" content="<?php echo seo_locale($lang); ?>">
 <meta property="og:locale:alternate" content="it_IT"><meta property="og:locale:alternate" content="sq_AL"><meta property="og:locale:alternate" content="en_US">
-<?php echo seo_og($title, $desc, $ogimg, $canonical, 'website'); ?>
+<?php echo seo_og($title, $desc, seo_http_or($ogimg, SEO_OG_FALLBACK), $canonical, 'website'); ?>
 <link rel="icon" href="https://poilove.com/img/favicon.svg">
 <?php echo seo_jsonld($graph); ?>
 <?php echo seo_css(); ?>

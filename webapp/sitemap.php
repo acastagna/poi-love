@@ -23,8 +23,9 @@ function xurl($path, $params, $lastmod, $img) {
   $out .= '<loc>' . e($mk('it')) . '</loc>';
   if ($lastmod) $out .= '<lastmod>' . e(gmdate('c', strtotime($lastmod))) . '</lastmod>';
   foreach ($langs as $lg) $out .= '<xhtml:link rel="alternate" hreflang="' . $lg . '" href="' . e($mk($lg)) . '"/>';
-  $out .= '<xhtml:link rel="alternate" hreflang="x-default" href="' . e(SEO_BASE . $path . '?' . http_build_query($params)) . '"/>';
-  if ($img) $out .= '<image:image><image:loc>' . e(seo_abs($img)) . '</image:loc></image:image>';
+  $out .= '<xhtml:link rel="alternate" hreflang="x-default" href="' . e($mk('it')) . '"/>'; // x-default = it canonico (self-canonical)
+  $abs = seo_abs($img);
+  if ($img && preg_match('#^https?://#i', $abs)) $out .= '<image:image><image:loc>' . e($abs) . '</image:loc></image:image>'; // mai data: URI nella sitemap immagini
   return $out . '</url>';
 }
 

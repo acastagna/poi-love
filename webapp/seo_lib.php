@@ -31,12 +31,36 @@ if (!defined('SEO_LIB')) {
       CURLOPT_CONNECTTIMEOUT => 4,
     ));
     $res = curl_exec($ch); // curl_close() non serve (no-op dal PHP 8.0, deprecato in 8.5): l'handle si libera da sé
+    $errno = curl_errno($ch);
+    $code = (int) curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+    // "upstream giù" = errore di rete/timeout o 5xx → la landing risponde 503 (Google ritenta, niente deindex).
+    // Un 4xx (es. id non-UUID) NON è un outage: si tratta come "nessun dato" → 404/notfound.
+    $GLOBALS['_seo_upstream_down'] = ($errno !== 0 || $code === 0 || $code >= 500);
     $arr = json_decode($res, true);
     if (!is_array($arr)) return array();
     // PostgREST ritorna una LISTA di righe su successo, un OGGETTO {code,message} su errore
     // (es. id non-UUID). Accettiamo solo le liste: così le pagine non trattano mai un errore come dati.
     if ($arr && array_keys($arr) !== range(0, count($arr) - 1)) return array();
     return $arr;
+  }
+  function seo_upstream_down() { return !empty($GLOBALS['_seo_upstream_down']); }
+
+  /** 503 pulito quando Supabase è irraggiungibile: Googlebot ritenta senza deindicizzare le pagine pubbliche. */
+  function seo_send_503() {
+    http_response_code(503); header('Retry-After: 120'); header('Content-Type: text/html; charset=UTF-8');
+    echo '<!doctype html><meta charset="utf-8"><title>POI•LOVE</title><p style="font-family:sans-serif;padding:40px">POI•LOVE · servizio temporaneamente non disponibile, riprova tra poco.</p>';
+    exit;
+  }
+  /** URL immagine sicuro per og:image: solo http(s), mai data: né host arbitrario → altrimenti fallback. */
+  function seo_http_or($url, $fallback) { return (is_string($url) && preg_match('#^https?://#i', $url)) ? $url : $fallback; }
+  /** Host ammesso per il 302 del proxy immagine (evita open-redirect/phishing sul dominio fidato). */
+  function seo_img_host_ok($host) {
+    $host = strtolower((string) $host);
+    if ($host === '') return false;
+    foreach (array('poilove.com','supabase.co','wikimedia.org','wikipedia.org','unsplash.com','pollinations.ai','githubusercontent.com') as $d) {
+      if ($host === $d || substr($host, -(strlen($d) + 1)) === '.' . $d) return true;
+    }
+    return false;
   }
 
   /** Escape HTML sicuro. */
@@ -70,8 +94,9 @@ if (!defined('SEO_LIB')) {
     foreach (array('it', 'sq', 'en') as $lg) {
       $out .= '<link rel="alternate" hreflang="' . $lg . '" href="' . e($mk($lg)) . '">' . "\n";
     }
-    // x-default = versione senza lang (italiano di default)
-    $out .= '<link rel="alternate" hreflang="x-default" href="' . e(SEO_BASE . $path . '?' . http_build_query($params)) . '">' . "\n";
+    // x-default = versione italiana canonica (self-canonical): evita che l'x-default punti a un URL
+    // che poi si canonicalizza altrove (antipattern che fa scartare l'annotazione a Google).
+    $out .= '<link rel="alternate" hreflang="x-default" href="' . e($mk('it')) . '">' . "\n";
     return $out;
   }
 
@@ -105,7 +130,8 @@ if (!defined('SEO_LIB')) {
   function seo_jsonld($graph) {
     $doc = array('@context' => 'https://schema.org', '@graph' => array_values(array_filter($graph)));
     return '<script type="application/ld+json">'
-      . json_encode($doc, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+      // JSON_HEX_TAG/AMP/APOS/QUOT: neutralizza </script> e rotture di contesto → niente XSS via campi DB (nomi tappe/note) nel @graph
+      . json_encode($doc, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT)
       . '</script>' . "\n";
   }
 

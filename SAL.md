@@ -1,7 +1,37 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
-> **Prossima ripresa: 2 passi che spettano ad Alessandro per accendere l'invio email — (1) mettere la chiave AcumbaMail come segreto `ACUMBA_KEY` nei Supabase Edge Secrets, (2) inserire gli ID dei pixel social nell'admin (scheda Media → Pixel) e configurare SPF/DKIM su poilove.com. Tutto il resto della Zona Media è già live. Restano aperti: trigger notifiche mancanti (rotta pubblicata/adottata dentro le RPC admin), voce iperrealistica ILLI, collaudi manuali di Alessandro (checklist 04/07 + claim a pagamento + copilota foto).**
-> Checkpoint sessione: tag `checkpoint-2026-07-11-media-full` (HEAD `34d906a` su origin/main, webapp v3.23). **Nessun lavoro non committato.**
+> **Prossima ripresa — passi che spettano ad Alessandro (tutto il codice è già live):** (1) chiave AcumbaMail come segreto `ACUMBA_KEY` nei Supabase Edge Secrets → accende l'invio email; (2) ID pixel social nell'admin (Media → Pixel) + SPF/DKIM su poilove.com; (3) inviare `sitemap.php` a Google Search Console + Bing Webmaster Tools (per l'indicizzazione SEO/AIO). Restano aperti: trigger notifiche mancanti, voce iperrealistica ILLI, collaudi manuali (checklist 04/07 + claim a pagamento + copilota foto).
+> Checkpoint sessione: tag da creare a fine giro (webapp **v3.24**, HEAD `f5e8724`+). Zona Media (v3.23) + strato SEO/GEO/AIO (v3.24) entrambi live.
+
+## Sessione 11/07/2026 (2ª parte) — Strato SEO/GEO/AIO + condivisione OpenGraph (webapp v3.24)
+
+Costruito lo strato di indicizzazione: la webapp è una SPA JS invisibile ai crawler, quindi le landing PHP server-rendered sono la superficie SEO/AIO del sito. Basato su una ricerca web (6 agenti, best-practice 2025-2026) + review avversariale. Tutto live e verificato su poilove.com.
+
+**Nuovi/potenziati file (in `webapp/`, deployati su httpdocs):**
+- `seo_lib.php`: libreria condivisa (fetch solo-pubblici via anon+RLS, hreflang reciproco it/sq/en + x-default, geo-meta, JSON-LD @graph, mappa categoria→@type schema.org, FAQ, CSS brand chiaro/scuro). `seo_get` ritorna solo liste (scarta gli oggetti-errore PostgREST).
+- `poi.php` (riscritto): Place/TouristAttraction + PostalAddress + GeoCoordinates + BreadcrumbList + FAQPage; corpo crawlable (indirizzo, coordinate, link mappa, foto, luoghi vicini, FAQ dai dati reali, data aggiornamento); niente aggregateRating (i love come `interactionStatistic`/LikeAction, non un rating finto); `noindex` se il POI non è pubblico.
+- `route.php` (riscritto): TouristTrip + itinerary ItemList di TouristAttraction; tappe crawlabili, badge reali Ufficiale/Indispensabile.
+- `trip.php` (riscritto): TouristTrip itinerario + proxy `?img=` per la cover (anche data-URL); FAQ dai dati.
+- `esplora.php` (nuovo): HUB directory dei luoghi/rotte pubblici per città e categoria, con link interni a ogni scheda (booster di crawl: tutto a 2-3 click) + JSON-LD CollectionPage/ItemList; filtri `?city=`/`?type=`, ricerca `?q=` (sanitizzata dai caratteri PostgREST).
+- `sitemap.php` (nuovo, servita application/xml): elenca solo contenuti pubblici, hreflang xhtml:link + x-default, image:image, lastmod reale da updated_at, niente priority/changefreq.
+- `robots.txt` (nuovo): permette Google/Bing + i bot AI di retrieval (OAI-SearchBot, PerplexityBot, Claude-SearchBot, ecc.) per farsi citare, blocca solo Bytespider, punta alla sitemap.
+- `llms.txt` (nuovo): vetrina machine-readable per i motori AI.
+
+**Condivisione (webapp index.html, v3.24):** i tasti Condividi dei POI puntano ora a `poi.php` (anteprima OG ricca); aggiunto il tasto Condividi nella scheda rotta → `route.php` (i18n it/sq/en); gli itinerari già usavano `trip.php`. QR e deep-link `?poi=` restano diretti all'app.
+
+**Verificato dal vivo:** version 3.24; robots/llms 200 text/plain; sitemap 200 application/xml (XML valido); poi.php JSON-LD ben formato (Restaurant+FAQPage), 3 lingue reali, canonical self + x-default; esplora conta i luoghi reali. Bug corretti in fase di test: seo_get sugli oggetti-errore, breadcrumb con livello città assente, deprecation curl_close, injection-hardening di `?q=`.
+
+**Resta ad Alessandro:** inviare `https://poilove.com/sitemap.php` a Google Search Console + Bing Webmaster Tools (ChatGPT Search usa l'indice Bing).
+
+---
+
+## Sessione 11/07/2026 (1ª parte) — ZONA MEDIA completa (webapp v3.23, edge send-email, mig 072)
+
+Costruita da zero la **Zona Media** dell'admin richiesta dal founder: template email, OpenGraph, deep-link tracciati, pixel social con manuale. Tutto reale e verificato dal vivo, checkpoint `checkpoint-2026-07-11-media-full` (HEAD `34d906a`, **v3.23**). Nessun lavoro non committato.
+
+**Cosa è ONLINE e funzionante ora:**
+- **Consenso marketing + pixel social**: l'overlay del consenso ha l'opt-in marketing separato (append-only, `CONSENT_VERSION` 2026-07-11). I pixel dei social si iniettano **solo dopo** il consenso marketing, leggendo gli ID dalla tabella `social_pixels` (8 network: Meta, GA4, Google Ads, TikTok, LinkedIn, Pinterest, Snap, X). Verificato dal vivo: senza consenso `fbq` non parte; con consenso parte e carica lo script Facebook con l'ID dal DB.
+- **Admin → sezione Media (4 schede, tutta nostra CSS, nessun popup di sistema):**
 
 ## Sessione 11/07/2026 — ZONA MEDIA completa (webapp v3.23, edge send-email, mig 072)
 
