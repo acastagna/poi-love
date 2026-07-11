@@ -1705,7 +1705,10 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 .trip-body{padding:10px 12px 12px;display:flex;flex-direction:column;gap:6px}
 .trip-name{font-size:13px;font-weight:900;color:var(--text);line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.5em}
 @media(min-width:768px){.trip-name{font-size:14px}}
-.trip-meta{display:flex;gap:8px;font-size:10px;color:var(--muted);flex-wrap:wrap}
+.trip-meta{display:flex;gap:4px 10px;font-size:10.5px;color:var(--muted);flex-wrap:wrap;align-items:center;margin-top:2px}
+.trip-meta .trip-meta-area{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* Descrizione sulla card: 2 righe, poi puntini */
+.trip-card-desc{font-size:11px;color:var(--muted);line-height:1.35;margin:3px 0 5px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .trip-meta span{display:flex;align-items:center;gap:3px}
 .trip-footer{display:flex;align-items:center;gap:6px;margin-top:2px}
 .trip-companions{display:flex}
@@ -1731,7 +1734,10 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 .trip-detail-header{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
 /* Mappa itinerario */
 .itin-map{height:200px;border-radius:12px;overflow:hidden;margin-bottom:14px;border:1px solid var(--border)}
-.itin-map.square{height:auto;aspect-ratio:1/1;max-height:420px}
+/* Sempre a tutta larghezza: quadrata solo su schermo stretto; su schermi larghi altezza fissa
+   (il vecchio max-height con aspect-ratio 1/1 si trasferiva alla LARGHEZZA e lasciava il vuoto a destra) */
+.itin-map.square{width:100%;height:auto;aspect-ratio:1/1}
+@media(min-width:520px){.itin-map.square{aspect-ratio:auto;height:340px}}
 .route-chooser{margin:-6px 0 14px}
 .route-chooser:empty{display:none}
 .rc-lbl{font-size:10px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:5px;margin-bottom:6px}
@@ -7816,7 +7822,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='3.16';
+const APP_VERSION='3.19';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
@@ -13637,9 +13643,12 @@ function renderTripCardHTML(t){
     </div>
     <div class="trip-body">
       <div class="trip-name">${t.name}</div>
+      ${t.description?`<div class="trip-card-desc">${_escHtml(t.description)}</div>`:''}
       <div class="trip-meta">
-        <span><i class="ph-duotone ph-map-pin"></i> <span id="stopcount-${t.id}">${t.stops.length}</span> ${window.t('itin_n_stops','{n} tappe').replace('{n}','').trim()}</span>
-        <span><i class="ph-duotone ph-users"></i> ${t.companions.length}</span>
+        <span><i class="ph-duotone ph-map-pin"></i> <span id="stopcount-${t.id}">${(t.stops||[]).length}</span> ${window.t('itin_n_stops','{n} tappe').replace('{n}','').trim()}</span>
+        ${(()=>{ const km=(typeof _routeLenKm==='function')?_routeLenKm(t):0; return km>0?`<span><i class="ph-duotone ph-path"></i> ${km.toFixed(1).replace('.',',')} km</span>`:''; })()}
+        ${(()=>{ const a=(typeof _tripAreaLabel==='function')?_tripAreaLabel(t):''; return a?`<span class="trip-meta-area"><i class="ph-duotone ph-map-trifold"></i> ${_escHtml(a)}</span>`:''; })()}
+        <span><i class="ph-duotone ph-users"></i> ${(t.companions||[]).length}</span>
       </div>
       <div class="trip-footer">
         <div class="trip-companions">${compsHtml}</div>
@@ -13743,6 +13752,7 @@ function closeTripDetail(){
   document.body.style.overflow='';
   // Cleanup mappa associata
   if(_activeTripDetailId&&itinMaps[_activeTripDetailId]){
+    try{ if(itinMaps[_activeTripDetailId].__ro) itinMaps[_activeTripDetailId].__ro.disconnect(); }catch(_){}
     try{itinMaps[_activeTripDetailId].remove();}catch(_){}
     delete itinMaps[_activeTripDetailId];
   }
@@ -13865,6 +13875,7 @@ function saveTripDesc(tripId, silent){
   if(desc===(t.description||'')){ if(silent&&s) s.textContent=''; return; }   // nessuna modifica
   t.description=desc;
   _persistTripMeta(t,{description:desc});
+  if(typeof renderTripCards==='function') renderTripCards();   // la card in lista mostra la descrizione: la aggiorno
   if(silent){ if(s){ s.textContent=window.t('trip_saved','salvato ✓'); s.className='trip-desc-status saved'; } }
   else { showToast(window.t('trip_desc_saved','Descrizione salvata')); }
 }
@@ -13964,7 +13975,14 @@ function refreshItinMap(tripId){
 }
 function initItinMap(tripId){
   const el=document.getElementById('itin-map-'+tripId);
-  if(!el||itinMaps[tripId])return;
+  if(!el)return;
+  if(itinMaps[tripId]){
+    if(itinMaps[tripId]._container===el) return;   // mappa già viva su QUESTO elemento
+    // DOM ricreato (riapertura senza chiusura): la vecchia mappa era legata all'elemento distrutto → riquadro vuoto. Ricreo.
+    try{ if(itinMaps[tripId].__ro) itinMaps[tripId].__ro.disconnect(); }catch(_){}
+    try{ itinMaps[tripId].remove(); }catch(_){}
+    delete itinMaps[tripId];
+  }
   const t=TRIPS[tripId]; if(!t) return;
   // Mappa BLOCCATA (non si muove) con le coordinate REALI delle tappe. Niente più coordinate finte.
   const m=L.map(el,{zoomControl:false,attributionControl:false,dragging:false,scrollWheelZoom:false,touchZoom:false,doubleClickZoom:false,boxZoom:false,keyboard:false,tap:false,inertia:false});
@@ -13988,7 +14006,13 @@ function initItinMap(tripId){
   } else {
     m.setView([41.3275,19.8189],12);   // default Tirana quando le tappe non hanno coordinate
   }
-  setTimeout(()=>{ try{ m.invalidateSize(); }catch(_){} }, 120);
+  // La scheda si apre con animazione: ricalcolo la misura e ri-inquadro quando il contenitore è assestato,
+  // e resto agganciato ai cambi di dimensione (rotazione telefono, resize) con un ResizeObserver.
+  const _refit=()=>{ try{ m.invalidateSize(); if(pts.length>1) m.fitBounds(pts,{padding:[28,28],maxZoom:14}); else if(pts.length===1) m.setView(pts[0],14); }catch(_){} };
+  setTimeout(_refit,120); setTimeout(_refit,500);
+  // A ogni cambio di dimensione del contenitore RI-INQUADRO il percorso (la mappa è bloccata: l'inquadratura
+  // giusta è sempre il percorso intero, quindi il refit è sempre corretto, mai invadente).
+  try{ const ro=new ResizeObserver(_refit); ro.observe(el); m.__ro=ro; }catch(_){}
   itinMaps[tripId]=m;
 }
 // Indice del vertice del percorso più vicino a una posizione (per capire dove si trova l'amministratore).
