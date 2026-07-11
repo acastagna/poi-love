@@ -1,5 +1,22 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
+## Sessione 12/07/2026 (notte) — Revisione pannello Admin: avvio (Fase 0)
+
+Base: `ORCHESTRAZIONE-ADMIN-POILOVE.md` (piano founder) + `ADMIN-STATO.md` (audit 11/07). Decisioni e tracker completo in **`ADMIN-DECISIONI.md`**.
+
+**Decisioni chiuse col founder:** moduli JS (componenti condivisi in `admin/js/`); ricerca immagini = Wikimedia+Openverse+Unsplash; generazione immagini AI = fal.ai; provider AI = Grok+OpenAI+Anthropic+Google Gemini+Mistral.
+
+**Risolto da solo (verificato sul DB live):** Compagnie esistono già (`companions`); pgvector da abilitare (solo postgis ora); libreria media = estendo tabella `media` esistente; **bug Messaggi T3**: a lettura statica il flusso è CORRETTO end-to-end (admin scrive, RLS utente legge, webapp ha la casella in ILLI•AI con realtime/badge/toast, `support_messages` è in realtime) → nessun guasto evidente, va riprodotto con un test (probabile invio a user_id diverso).
+
+**Fatto e LIVE/verificato stanotte:**
+- **A6 — Tema a 6 palette** (calda/neutra/fredda × chiaro/scuro): `admin/css/palette.css` (definizione unica) + `admin/js/theme.js` (controller modulare) + selettore a 3 pastiglie in barra. Il rosso brand resta costante (elimina/banna rossi); l'atmosfera la danno sfondo/bagliori/accento oro→pietra→acciaio. **+2 fix visivi**: topbar Dashboard padding (screenshot 1), contatore Tag leggibile anche sul chiaro (screenshot 2). Live su admin.poilove.com, verificato dal vivo con harness (6 combinazioni). Commit `8db4d1b`.
+- **A3 — Badge + assegnazione (lato DB)**: mig 073, colonne uniformi `badge_official/essential/tier` + `assigned_user_id` su pois/trips/companions + RPC `admin_set_badge_and_owner` (gate is_active_admin, audit, blindata). Verificato. Commit `d925a9f`. Resta il selettore UI da montare negli editor.
+
+**Prossimo (Fase 0/1):** selettore badge UI (`badge-picker.js`), A1 scheda POI riusabile, A2 scheda utente, A4/A5 immagini+libreria, poi T3 test, T1 dashboard, T9/T10. Nessun lavoro non committato.
+
+---
+
+
 > **Prossima ripresa — passi che spettano ad Alessandro (tutto il codice è già live):** (1) chiave AcumbaMail come segreto `ACUMBA_KEY` nei Supabase Edge Secrets → accende l'invio email; (2) ID pixel social nell'admin (Media → Pixel) + SPF/DKIM su poilove.com; (3) inviare `sitemap.php` a Google Search Console + Bing Webmaster Tools (per l'indicizzazione SEO/AIO). Restano aperti: trigger notifiche mancanti, voce iperrealistica ILLI, collaudi manuali (checklist 04/07 + claim a pagamento + copilota foto).
 > Checkpoint sessione: tag `checkpoint-2026-07-11-seo-aio` (HEAD `9f33cdf` su origin/main, webapp **v3.24**). Zona Media (v3.23) + strato SEO/GEO/AIO (v3.24) entrambi live. Review avversariale a 20 agenti: 10 findings confermati (1 XSS critico JSON-LD, 2 alti), TUTTI corretti e verificati dal vivo. **Nessun lavoro non committato.**
 
