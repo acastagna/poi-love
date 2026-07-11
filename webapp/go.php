@@ -26,7 +26,7 @@ curl_setopt_array($ch, array(
   CURLOPT_POSTFIELDS => json_encode(array('p_slug' => $slug, 'p_ua' => $ua, 'p_ref' => $ref)),
   CURLOPT_TIMEOUT => 6,
 ));
-$res = curl_exec($ch); curl_close($ch);
+$res = curl_exec($ch); // curl_close() non serve (no-op dal PHP 8.0, deprecato in 8.5)
 $target = json_decode($res, true); // la RPC ritorna direttamente il testo (URL) o null
 
 // Sicurezza: accetta solo URL http(s) assoluti (i target li imposta solo l'admin, ma doppio controllo)

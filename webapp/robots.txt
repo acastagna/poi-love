@@ -1,0 +1,50 @@
+# robots.txt — POI•LOVE (poilove.com)
+# Obiettivo: massima indicizzazione classica + citabilità nei motori AI.
+# Le landing pubbliche (poi.php, route.php, trip.php, esplora.php) sono la superficie indicizzabile
+# server-rendered; la webapp SPA resta per l'esperienza loggata.
+
+# --- Motori di ricerca classici ---
+User-agent: Googlebot
+Allow: /
+User-agent: Googlebot-Image
+Allow: /
+User-agent: Bingbot
+Allow: /
+User-agent: Applebot
+Allow: /
+
+# --- Retrieval / search bot AI (porta alle citazioni) ---
+User-agent: OAI-SearchBot
+Allow: /
+User-agent: ChatGPT-User
+Allow: /
+User-agent: Claude-SearchBot
+Allow: /
+User-agent: Claude-User
+Allow: /
+User-agent: PerplexityBot
+Allow: /
+User-agent: Perplexity-User
+Allow: /
+User-agent: Google-Extended
+Allow: /
+
+# --- Training bot AI (scelta pro-crescita: permessi) ---
+User-agent: GPTBot
+Allow: /
+User-agent: ClaudeBot
+Allow: /
+User-agent: anthropic-ai
+Allow: /
+User-agent: CCBot
+Allow: /
+
+# --- Scraper aggressivi senza valore di citazione ---
+User-agent: Bytespider
+Disallow: /
+
+# --- Default ---
+User-agent: *
+Allow: /
+
+Sitemap: https://poilove.com/sitemap.php

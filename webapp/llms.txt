@@ -1,0 +1,25 @@
+# POI•LOVE
+
+> POI•LOVE è un'app social di luoghi (points of interest): scopri, salva e condividi posti reali (locali, ristoranti, attrazioni, punti panoramici) con rotte storiche e itinerari creati dalla community. Copertura iniziale: Albania (Tirana) e Italia. Contenuti trilingue: italiano, albanese (sq), inglese.
+
+Ogni luogo pubblico ha nome, indirizzo, città, coordinate, categoria, foto reali della community e numero di "cuori". Le rotte storiche e gli itinerari collegano più luoghi in un percorso ordinato. I dati sono moderati prima della pubblicazione. Un'alternativa umana e culturale a Google Maps, framework open source Cultural Bridge OS.
+
+## Pagine principali
+
+- [Esplora luoghi](https://poilove.com/esplora.php?lang=it): directory dei luoghi pubblici per città e categoria
+- [Rotte storiche](https://poilove.com/esplora.php?type=routes&lang=it): percorsi tematici tra più luoghi
+- [Itinerari](https://poilove.com/esplora.php?type=trips&lang=it): itinerari pubblici della community
+- [Tirana](https://poilove.com/esplora.php?city=Tirana&lang=it): luoghi e locali a Tirana
+
+## Lingue
+
+- [Italiano](https://poilove.com/esplora.php?lang=it)
+- [Shqip](https://poilove.com/esplora.php?lang=sq)
+- [English](https://poilove.com/esplora.php?lang=en)
+
+## Struttura dei dati
+
+- Ogni luogo: `https://poilove.com/poi.php?id={id}` (JSON-LD schema.org Place/TouristAttraction)
+- Ogni rotta: `https://poilove.com/route.php?id={id}` (JSON-LD TouristTrip)
+- Ogni itinerario: `https://poilove.com/trip.php?id={id}` (JSON-LD TouristTrip)
+- Sitemap: https://poilove.com/sitemap.php
