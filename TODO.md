@@ -8,7 +8,11 @@
 
 - [ ] **Collaudo Alessandro NUOVO EDITOR POI ADMIN (10/07 sera)**: login su admin.poilove.com → POI → Modifica: foto (aggiungi URL/upload, principale, elimina), 3 categorie a chips, tag, indirizzo+geocodifica nei 2 sensi, coordinate, salva e verifica sul sito.
 - [ ] **CONTENUTO ROTTE (scoperta 10/07: nel DB ZERO rotte pubblicate)**: creare e pubblicare le prime rotte storiche vere (Via Egnatia, Riviera, ecc.) dall'admin; assegnare i badge Ufficiale/Indispensabile; il "Più votato" arriva dai salvataggi reali.
-- [ ] **Pagina rotte "meravigliosa" nella webapp** (richiesta 10/07): pagina ricca per ogni rotta con nozioni storiche, strumenti, foto, tappe navigabili. Blocco grande, da progettare.
+- [ ] **Pagina rotte "meravigliosa" nella webapp** (richiesta 10/07, rafforzata 11/07 notte): la rotta storica è IL prodotto editoriale: nozioni storiche, riferimenti, spiegazioni, foto, tappe navigabili, in futuro audiolibri (POI•VOICE). Blocco grande, primo della lista.
+- [ ] **Zona condivisione con OpenGraph/meta/SEO per ROTTE e ITINERARI** (11/07): nell'admin un pannello per generare il link di condivisione con anteprima OG (titolo, descrizione, immagine), tag e meta; trip.php già esiste per gli itinerari, va esteso/duplicato per le rotte (route.php) e collegato all'admin.
+- [ ] **Dashboard AI completa nell'admin** (11/07): configurare TUTTI i provider AI (OpenAI, Anthropic, altri) con miniguida passo-passo e link ufficiali per creare le chiavi; chiavi solo nei segreti Supabase. Estende il motore multi-provider già esistente (mig 044).
+- [ ] **Tema admin: chiaro/scuro + palette caldi/neutri/freddi** (11/07): selettore con 3 famiglie di colori oltre al chiaro/scuro.
+- [ ] **"Crea" admin come l'app** (11/07): il form Crea POI dell'admin deve avere gli stessi campi dell'app: immagini, GPS dalla foto (EXIF), indirizzo con geocodifica, categorie/tag. Riusare l'editor ricco appena fatto.
 - [ ] **Moderazione + vendita B2B liste** (direttiva 10/07): moderare/ufficializzare le liste col credito all'autore; pacchetti vendibili a catene bar/ristoranti. Da progettare con Alessandro.
 
 - [ ] **Collaudo di Alessandro (checklist in chat del 04/07)**: EXIF che compila i campi, salvataggio bloccato senza posizione, ILLI dal 2° messaggio in poi, copilota che crea POI completo (descrizione+indirizzo+coordinate), sezione "POI creati" nel pannello.
