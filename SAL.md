@@ -1,7 +1,7 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
 > **Prossima ripresa: canale EMAIL delle notifiche (serve chiave AcumbaMail + edge worker) e trigger notifiche mancanti (rotta pubblicata/adottata dentro le RPC admin). Valutare voce iperrealistica (Google TTS) per ILLI, oggi la voce meccanica è disattivata. Collaudi manuali di Alessandro in attesa (checklist 04/07 + claim a pagamento + copilota foto).**
-> Checkpoint sessione: tag `checkpoint-2026-07-10-review-fixes` (HEAD su origin/main, v3.14). **Nessun lavoro non committato.**
+> Checkpoint sessione: tag `checkpoint-2026-07-10-admin-rich` (HEAD su origin/main, v3.20). **Nessun lavoro non committato.**
 > Code-review completa (22 agenti) su tutta la sessione: 14 findings confermati, TUTTI corretti (mig 068 + v3.14), verificati sul live poilove.com. Aperto solo: nota OSM lato-client (funziona, gratis; hardening server-side con edge function OAuth = miglioria futura, non bloccante).
 
 ## Sessione 10/07/2026 — Giornata piena: itinerari, categorie, rotte, pulizia finti (v3.02 → v3.14, mig 063-068)
@@ -28,6 +28,14 @@ Tutto live e verificato, checkpoint finale `checkpoint-2026-07-10-review-fixes` 
   - **mig 067** (fix review): `request_custom_category` non riusa/espone più la pendente PRIVATA altrui (niente leak owner_id) ed è race-safe (collisione key → namespaced). Verificato: due utenti stesso termine → categorie separate e private.
   - **Finti eliminati nella scheda**: (1) Visibilità Pubblico/Privato/Condividi ora SALVA davvero (prima sempre 'community' hardcoded), in creazione+modifica, con preset in modifica e reset a Pubblico su scheda nuova (fix major: un POI nuovo non eredita più "Privato"); (2) tolto il blocco tag-tappa morto (toast "memorizzato" che non salvava); (3) via il vecchio auto-promote a righe (aggirabile) e i commenti/i18n fuorvianti.
   - **Risolto in v3.13**: tolto il finto "Consiglia a Google Maps" (impossibile: Google ha rimosso "Place Add" nel 2017, nessuna API per aggiungere posti; Foursquare solo legacy + a pagamento, scartato). Al suo posto **"Segnala su OpenStreetMap"** REALE e gratis: crea una Nota anonima via `api.openstreetmap.org` (CORS aperto, nessuna API key), verificata dal vivo dal browser (POST → nota creata). Più "Apri su Google Maps" onesto. Placeholder link condivisione reso onesto. Checkpoint `checkpoint-2026-07-10-custom-cat-final` → v3.13.
+
+**Blocco 3 (sera) — Scheda itinerario + admin ricco + badge rotte (v3.15 → v3.20, mig 069-070):**
+- **Scheda itinerario** (richieste founder): descrizione con AUTOSAVE immediato ('salvo…/salvato ✓'), frontalino sotto il titolo con tappe · km totali · area coinvolta (regioni tappe o centroide OSM), mappa a TUTTA larghezza (fix aspect-ratio che lasciava il vuoto a destra) con re-inquadramento automatico (ResizeObserver) e fix riapertura (mappa non resta più vuota). CARD in lista ricca: descrizione 2 righe + tappe/km/area.
+- **Direttiva business registrata** (memoria business-moderation-pipeline): il creato dagli utenti si modera → si ufficializza col credito → si VENDE alle catene. Admin SOLO desktop, mai al risparmio.
+- **Editor POI admin RICOSTRUITO** (prima: 5 campi): foto con miniature/principale/elimina/URL/upload reale, macro + 3 categorie a chips dalla tassonomia, tag, indirizzo preciso + città + geocodifica nei 2 sensi (Photon/Nominatim) + coordinate + apri su Maps, visibilità+approvato; righe tabella con miniatura, autore, conteggi. mig 069 (grant is_approved). DA COLLAUDARE col login MFA di Alessandro (il gate admin mi ferma, giusto così).
+- **Badge rotte** (mig 069+070): Ufficiale e Indispensabile = toggle admin con audit; Più votato = dai salvataggi REALI via RPC trip_save_counts (la RLS di trip_saves mostra solo i propri, un conteggio client sarebbe falso). Webapp: chips oro/viola/rosso + ♥ conteggio sulle card rotte, verificate dal vivo.
+- **SCOPERTA: nel DB ci sono ZERO rotte pubblicate.** "Le rotte non esistono" è vero alla lettera: il prossimo blocco è il CONTENUTO (prime rotte vere da admin) + la pagina rotte "meravigliosa" (nozioni, strumenti, foto). In TODO.
+
 
 ## Sessione 07/07/2026 — Consensi, notifiche, geofence + batch UI (v2.56 → v2.62)
 
