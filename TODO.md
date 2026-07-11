@@ -6,6 +6,11 @@
 
 ## ⚡ SUBITO (dalla sessione 04/07)
 
+- [ ] **Collaudo Alessandro NUOVO EDITOR POI ADMIN (10/07 sera)**: login su admin.poilove.com → POI → Modifica: foto (aggiungi URL/upload, principale, elimina), 3 categorie a chips, tag, indirizzo+geocodifica nei 2 sensi, coordinate, salva e verifica sul sito.
+- [ ] **CONTENUTO ROTTE (scoperta 10/07: nel DB ZERO rotte pubblicate)**: creare e pubblicare le prime rotte storiche vere (Via Egnatia, Riviera, ecc.) dall'admin; assegnare i badge Ufficiale/Indispensabile; il "Più votato" arriva dai salvataggi reali.
+- [ ] **Pagina rotte "meravigliosa" nella webapp** (richiesta 10/07): pagina ricca per ogni rotta con nozioni storiche, strumenti, foto, tappe navigabili. Blocco grande, da progettare.
+- [ ] **Moderazione + vendita B2B liste** (direttiva 10/07): moderare/ufficializzare le liste col credito all'autore; pacchetti vendibili a catene bar/ristoranti. Da progettare con Alessandro.
+
 - [ ] **Collaudo di Alessandro (checklist in chat del 04/07)**: EXIF che compila i campi, salvataggio bloccato senza posizione, ILLI dal 2° messaggio in poi, copilota che crea POI completo (descrizione+indirizzo+coordinate), sezione "POI creati" nel pannello.
 - [ ] **Claim proprietà POI a pagamento** (memoria `poi-ownership-and-media`): pulsante "reclama questo luogo" SOLO tier paganti → allarme in admin con embed code + nome richiedente + nome cedente. Tabella `poi_ownership_requests` + RLS + UI admin.
 - [ ] **Immagini licenziate del luogo** (Wikimedia Commons API, licenza CC + attribuzione) nel POI creato dal copilota e come proposta nella webapp.
