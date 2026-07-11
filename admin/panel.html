@@ -249,6 +249,18 @@ html[data-theme="light"] .btn.gold{color:#fbf6ec}
 .btn.sm{padding:6px 10px;font-size:11.5px;border-radius:9px}
 .btn:disabled{opacity:.5;cursor:not-allowed}
 .btn-row{display:flex;gap:6px;flex-wrap:wrap}
+/* Editor POI completo: foto, categorie a chips, thumbnail nelle righe */
+.poiph-strip{display:flex;gap:8px;flex-wrap:wrap}
+.poiph-th{width:86px;height:86px;border-radius:10px;background:var(--field-bg) center/cover no-repeat;border:1px solid var(--line);position:relative;overflow:hidden}
+.poiph-main{position:absolute;top:4px;left:4px;background:rgba(212,43,43,.92);color:#fff;font-size:8.5px;font-weight:800;padding:2px 6px;border-radius:6px;letter-spacing:.03em}
+.poiph-bar{position:absolute;right:3px;bottom:3px;display:flex;gap:3px}
+.poiph-act{width:24px;height:24px;border-radius:7px;border:none;background:rgba(0,0,0,.55);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px}
+.poiph-act.red{background:rgba(212,43,43,.85)}
+.poiph-cats{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.cat-mini{display:inline-flex;align-items:center;gap:4px;padding:5px 9px;border-radius:999px;border:1px solid var(--line);background:var(--field-bg);color:var(--paper);font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit}
+.cat-mini.on{color:#fff;border-color:transparent;background:#D42B2B}
+.poi-row-th{width:46px;height:46px;border-radius:9px;flex-shrink:0;background:var(--field-bg) center/cover no-repeat;border:1px solid var(--line)}
+.poi-row-th.empty{display:flex;align-items:center;justify-content:center;color:var(--muted)}
 /* Editor tappe (rotte storiche + itinerari): card grandi, trascinamento, foto, descrizione, azioni */
 .stop-ed-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:2px 0 10px}
 .stop-card{display:flex;gap:12px;padding:12px;border:1px solid var(--line);border-radius:14px;margin-bottom:10px;background:var(--glass-soft);transition:box-shadow .15s,border-color .15s,opacity .15s}
@@ -968,7 +980,7 @@ const T = {
     tag_renamed:'Rinominato su %n POI', tag_deleted:'Rimosso da %n POI',
     tag_del_confirm:'Eliminare il tag "%s" da tutti i POI?', tag_block_confirm:'Bloccare questo tag? Verrà rimosso dai POI e non sarà più suggerito.',
     cat_req_title:'Categorie personalizzate proposte', cat_req_help:'Ogni utente può proporre una sola categoria sua. La vedi qui con chi l\'ha creata e quante volte è stata usata: diventa pubblica da sola a 20 usi, oppure la approvi tu subito.',
-    cat_req_empty:'Nessuna categoria proposta in attesa', cat_new_title:'Nuova categoria / modifica', cat_approve_now:'Approva ora', cat_reject:'Rifiuta', cat_approved:'Categoria pubblicata', cat_reject_confirm:'Rifiutare e togliere questa categoria proposta?',
+    cat_req_empty:'Nessuna categoria proposta in attesa', cat_new_title:'Nuova categoria / modifica', cat_approve_now:'Approva ora', f_photos:'Foto del luogo', bdg_official:'Ufficiale', bdg_essential:'Indispensabile', bdg_top:'Più votato', bdg_official_hint:'Badge Ufficiale: curata e garantita da POI•LOVE', bdg_essential_hint:'Badge Indispensabile: da non perdere, scelta della redazione', poi_no_photos:'Nessuna foto: aggiungila da URL o carica un file', poi_ph_main:'PRINCIPALE', poi_ph_make_main:'Rendi principale', poi_ph_url_err:'Serve un URL https valido', poi_ph_upload:'Carica file', f_cats3:'Categorie (fino a 3, la prima è la principale)', f_tags:'Tag (Invio per aggiungere, max 10)', f_tag_ph:'aggiungi tag…', cat_max3_admin:'Massimo 3 categorie', tag_max10:'Massimo 10 tag', geo_from_addr:'Coordinate dall\'indirizzo', geo_from_coords:'Indirizzo dalle coordinate', geo_need_addr:'Scrivi prima indirizzo o città', geo_need_coords:'Servono lat e lng validi', geo_searching:'Cerco…', geo_not_found:'Non trovato, precisa l\'indirizzo', geo_done:'Compilato', photo_upload_err:'Caricamento foto non riuscito', cat_reject:'Rifiuta', cat_approved:'Categoria pubblicata', cat_reject_confirm:'Rifiutare e togliere questa categoria proposta?',
     cat_macro:'Macro (enum)', cat_icon:'Icona Phosphor', cat_color:'Colore', cat_sort:'Ordine', cat_save:'Salva categoria',
     cat_list_title:'Categorie attive e spente', cat_on:'Attiva', cat_off:'Spenta', cat_edit:'Modifica',
     cat_saved:'Categoria salvata', cat_key_req:'Key, macro e le 3 etichette sono obbligatorie',
@@ -1068,7 +1080,7 @@ const T = {
     tag_renamed:'U riemërtua në %n POI', tag_deleted:'U hoq nga %n POI',
     tag_del_confirm:'Të fshihet etiketa "%s" nga të gjitha POI-t?', tag_block_confirm:'Ta bllokosh këtë etiketë? Do të hiqet nga POI-t dhe nuk do të sugjerohet më.',
     cat_req_title:'Kategori personale të propozuara', cat_req_help:'Çdo përdorues mund të propozojë vetëm një kategori të tijën. E sheh këtu me atë që e krijoi dhe sa herë është përdorur: bëhet publike vetë në 20 përdorime, ose e miraton ti menjëherë.',
-    cat_req_empty:'Asnjë kategori e propozuar në pritje', cat_new_title:'Kategori e re / ndrysho', cat_approve_now:'Mirato tani', cat_reject:'Refuzo', cat_approved:'Kategoria u publikua', cat_reject_confirm:'Ta refuzosh e ta heqësh këtë kategori të propozuar?',
+    cat_req_empty:'Asnjë kategori e propozuar në pritje', cat_new_title:'Kategori e re / ndrysho', cat_approve_now:'Mirato tani', f_photos:'Fotot e vendit', bdg_official:'Zyrtare', bdg_essential:'E domosdoshme', bdg_top:'Më e votuara', bdg_official_hint:'Distinktivi Zyrtare: e kuruar dhe e garantuar nga POI•LOVE', bdg_essential_hint:'Distinktivi E domosdoshme: mos e humb, zgjedhja e redaksisë', poi_no_photos:'Asnjë foto: shtoje nga URL ose ngarko një skedar', poi_ph_main:'KRYESORE', poi_ph_make_main:'Bëje kryesore', poi_ph_url_err:'Duhet një URL https i vlefshëm', poi_ph_upload:'Ngarko skedar', f_cats3:'Kategoritë (deri në 3, e para është kryesorja)', f_tags:'Etiketat (Enter për të shtuar, max 10)', f_tag_ph:'shto etiketë…', cat_max3_admin:'Maksimumi 3 kategori', tag_max10:'Maksimumi 10 etiketa', geo_from_addr:'Koordinatat nga adresa', geo_from_coords:'Adresa nga koordinatat', geo_need_addr:'Shkruaj fillimisht adresën ose qytetin', geo_need_coords:'Duhen lat dhe lng të vlefshme', geo_searching:'Po kërkoj…', geo_not_found:'Nuk u gjet, saktëso adresën', geo_done:'U plotësua', photo_upload_err:'Ngarkimi i fotos dështoi', cat_reject:'Refuzo', cat_approved:'Kategoria u publikua', cat_reject_confirm:'Ta refuzosh e ta heqësh këtë kategori të propozuar?',
     cat_macro:'Makro (enum)', cat_icon:'Ikona Phosphor', cat_color:'Ngjyra', cat_sort:'Renditja', cat_save:'Ruaj kategorinë',
     cat_list_title:'Kategoritë aktive dhe të fikura', cat_on:'Aktive', cat_off:'E fikur', cat_edit:'Ndrysho',
     cat_saved:'Kategoria u ruajt', cat_key_req:'Key, makro dhe 3 etiketat janë të detyrueshme',
@@ -1164,7 +1176,7 @@ const T = {
     tag_renamed:'Renamed on %n POIs', tag_deleted:'Removed from %n POIs',
     tag_del_confirm:'Delete tag "%s" from all POIs?', tag_block_confirm:'Block this tag? It will be removed from POIs and no longer suggested.',
     cat_req_title:'Proposed custom categories', cat_req_help:'Each user can propose a single category of their own. You see it here with who created it and how many times it was used: it goes public on its own at 20 uses, or you approve it instantly.',
-    cat_req_empty:'No proposed categories pending', cat_new_title:'New category / edit', cat_approve_now:'Approve now', cat_reject:'Reject', cat_approved:'Category published', cat_reject_confirm:'Reject and remove this proposed category?',
+    cat_req_empty:'No proposed categories pending', cat_new_title:'New category / edit', cat_approve_now:'Approve now', f_photos:'Place photos', bdg_official:'Official', bdg_essential:'Essential', bdg_top:'Most voted', bdg_official_hint:'Official badge: curated and guaranteed by POI•LOVE', bdg_essential_hint:'Essential badge: not to be missed, editorial pick', poi_no_photos:'No photos yet: add by URL or upload a file', poi_ph_main:'MAIN', poi_ph_make_main:'Make main', poi_ph_url_err:'A valid https URL is required', poi_ph_upload:'Upload file', f_cats3:'Categories (up to 3, first is primary)', f_tags:'Tags (Enter to add, max 10)', f_tag_ph:'add tag…', cat_max3_admin:'Maximum 3 categories', tag_max10:'Maximum 10 tags', geo_from_addr:'Coordinates from address', geo_from_coords:'Address from coordinates', geo_need_addr:'Type an address or city first', geo_need_coords:'Valid lat and lng required', geo_searching:'Searching…', geo_not_found:'Not found, refine the address', geo_done:'Filled in', photo_upload_err:'Photo upload failed', cat_reject:'Reject', cat_approved:'Category published', cat_reject_confirm:'Reject and remove this proposed category?',
     cat_macro:'Macro (enum)', cat_icon:'Phosphor icon', cat_color:'Color', cat_sort:'Sort', cat_save:'Save category',
     cat_list_title:'Active and disabled categories', cat_on:'Active', cat_off:'Off', cat_edit:'Edit',
     cat_saved:'Category saved', cat_key_req:'Key, macro and the 3 labels are required',
@@ -2818,7 +2830,7 @@ async function loadPois(){
   const filter=document.getElementById('poiFilter').value||'all';
   try{
     let query=sb.from('pois')
-      .select('id,title,description,category,visibility,is_approved,created_via,lat,lng,address,city,love_count,created_at,removed_at,removed_reason')
+      .select('id,title,description,category,subcategory,categories,tags,photos,cover_photo,visibility,is_approved,created_via,lat,lng,address,city,country,love_count,created_at,removed_at,removed_reason,author:profiles!pois_author_id_fkey(username)')
       .order('created_at',{ascending:false}).limit(120);
     if(filter==='ai') query=query.eq('created_via','ai').is('removed_at',null);
     else if(filter==='official') query=query.eq('visibility','official').is('removed_at',null);
@@ -2864,9 +2876,20 @@ async function loadPois(){
       }
 
       const subtitle = p.address || p.city || (p.lat!=null? (Number(p.lat).toFixed(4)+', '+Number(p.lng).toFixed(4)) : '—');
+      const who=(p.author&&p.author.username)?('@'+p.author.username):'';
+      const rawTh=(Array.isArray(p.photos)&&p.photos[0])||p.cover_photo||'';
+      const thUrl=/^https?:\/\//i.test(rawTh)?encodeURI(rawTh).replace(/["'()\\]/g,''):'';
+      const thumb=thUrl
+        ? el('div',{class:'poi-row-th',style:'background-image:url("'+thUrl+'")'})
+        : el('div',{class:'poi-row-th empty'},phIcon('image'));
+      const nPh=(Array.isArray(p.photos)?p.photos.length:0);
+      const catsTxt=[p.category].concat(Array.isArray(p.categories)?p.categories:[]).filter(Boolean);
       tb.appendChild(el('tr',null,[
-        el('td',null,[ el('div',{class:'ttl',text:p.title||'—'}), el('div',{class:'sm',text:subtitle}) ]),
-        el('td',null, el('span',{class:'chip dim',text:p.category||'—'})),
+        el('td',null, el('div',{style:'display:flex;gap:9px;align-items:center'},[ thumb,
+          el('div',{style:'min-width:0'},[ el('div',{class:'ttl',text:p.title||'—'}),
+            el('div',{class:'sm',text:subtitle+(who?(' · '+who):'')}),
+            el('div',{class:'sm',style:'opacity:.7',text:nPh+' foto · '+(Array.isArray(p.tags)?p.tags.length:0)+' tag'}) ]) ])),
+        el('td',null, el('div',{class:'btn-row'}, [...new Set(catsTxt)].slice(0,3).map(c=>el('span',{class:'chip dim',text:c})))),
         el('td',null, stWrap),
         el('td',{text:fmtDate(p.created_at)}),
         el('td',null, actions)
@@ -2897,46 +2920,177 @@ function viewPoi(p){
   openModal(t('view_poi'), 'map-pin', body, null);
 }
 
-function editPoi(p){
+/* ── Editor POI COMPLETO (desktop): foto, 3 categorie, tag, indirizzo, geocodifica, coordinate ── */
+let _adminCatCache=null;   // tassonomia ricca da poi_categories (per le chips delle categorie)
+async function _adminCats(){
+  if(_adminCatCache) return _adminCatCache;
+  const { data } = await sb.from('poi_categories').select('key,macro,label_it,icon,color,active').order('sort');
+  _adminCatCache=(data||[]).filter(c=>c.active!==false);
+  return _adminCatCache;
+}
+async function editPoi(p){
   const f={};
   const body=el('div');
-  body.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_title')}), f.title=el('input',{value:p.title||''}) ]));
-  body.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_desc')}), f.description=el('textarea',{}, p.description||'') ]));
+  // stato locale dell'editor
+  const photos=Array.isArray(p.photos)?p.photos.slice():[];
+  let selCats=Array.isArray(p.categories)&&p.categories.length?p.categories.slice(0,3):(p.subcategory?[p.subcategory]:[]);
+  let tags=Array.isArray(p.tags)?p.tags.slice(0,10):[];
+  const allCats=await _adminCats();
 
+  // ── FOTO: strip con rimuovi + rendi principale, aggiungi da URL o upload ──
+  const phBox=el('div',{class:'poiph-strip'});
+  function drawPhotos(){
+    phBox.textContent='';
+    if(!photos.length) phBox.appendChild(el('div',{class:'sm',style:'opacity:.7',text:t('poi_no_photos')}));
+    photos.forEach((u,i)=>{
+      const ok=/^https?:\/\//i.test(u);
+      const th=el('div',{class:'poiph-th',title:u});
+      if(ok) th.style.backgroundImage='url("'+encodeURI(u).replace(/["'()\\]/g,'')+'")';
+      if(i===0) th.appendChild(el('span',{class:'poiph-main',text:t('poi_ph_main')}));
+      const bar=el('div',{class:'poiph-bar'});
+      if(i>0) bar.appendChild(el('button',{class:'poiph-act',title:t('poi_ph_make_main'),onclick:()=>{ photos.splice(0,0,photos.splice(i,1)[0]); drawPhotos(); }}, phIcon('star')));
+      bar.appendChild(el('button',{class:'poiph-act red',title:t('a_delete'),onclick:()=>{ photos.splice(i,1); drawPhotos(); }}, phIcon('trash')));
+      th.appendChild(bar);
+      phBox.appendChild(th);
+    });
+  }
+  drawPhotos();
+  const phAddRow=el('div',{class:'btn-row',style:'margin-top:6px'});
+  const phUrl=el('input',{placeholder:'https://… (URL foto)',style:'flex:1;min-width:180px'});
+  phAddRow.appendChild(phUrl);
+  phAddRow.appendChild(el('button',{class:'btn sm',onclick:()=>{ const u=(phUrl.value||'').trim(); if(!/^https?:\/\//i.test(u)){ toast(t('poi_ph_url_err'),'err'); return; } photos.push(u); phUrl.value=''; drawPhotos(); }},[phIcon('plus'),document.createTextNode(' URL')]));
+  phAddRow.appendChild(el('button',{class:'btn sm gold',onclick:()=>{
+    const inp=document.createElement('input'); inp.type='file'; inp.accept='image/*';
+    inp.onchange=async()=>{ const file=inp.files&&inp.files[0]; if(!file) return;
+      toast(t('uploading'),null,'circle-notch');
+      const url=await _adminUploadImage(file);
+      if(!url){ toast(t('photo_upload_err'),'err'); return; }
+      photos.push(url); drawPhotos(); toast(t('saved'),'ok');
+    };
+    inp.click();
+  }},[phIcon('upload-simple'),document.createTextNode(' '+t('poi_ph_upload'))]));
+  body.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_photos')}), phBox, phAddRow ]));
+
+  // ── TITOLO + DESCRIZIONE ──
+  body.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_title')}), f.title=el('input',{value:p.title||''}) ]));
+  body.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_desc')}), f.description=el('textarea',{rows:'3'}, p.description||'') ]));
+
+  // ── CATEGORIA MACRO + fino a 3 CATEGORIE (tassonomia ricca) ──
   const catSel=el('select');
-  const cats = (p.category && !POI_CATS.includes(p.category)) ? POI_CATS.concat([p.category]) : POI_CATS;
+  const cats=(p.category && !POI_CATS.includes(p.category)) ? POI_CATS.concat([p.category]) : POI_CATS;
   cats.forEach(c=> catSel.appendChild(el('option',{value:c}, c)) );
   if(p.category) catSel.value=p.category;
   f.category=catSel;
-  body.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_cat')}), catSel ]));
+  const catChips=el('div',{class:'poiph-cats'});
+  function drawCats(){
+    catChips.textContent='';
+    allCats.forEach(c=>{
+      const on=selCats.includes(c.key);
+      const chip=el('button',{class:'cat-mini'+(on?' on':''),onclick:()=>{
+        if(on){ selCats=selCats.filter(k=>k!==c.key); }
+        else { if(selCats.length>=3){ toast(t('cat_max3_admin'),'err'); return; } selCats.push(c.key); }
+        drawCats();
+      }},[ phIcon(c.icon||'tag'), document.createTextNode(' '+(c.label_it||c.key)) ]);
+      if(on) chip.style.background=c.color||'#D42B2B';
+      catChips.appendChild(chip);
+    });
+    // key custom non in tassonomia (es. categoria personale): la mostro comunque, rimovibile
+    selCats.filter(k=>!allCats.some(c=>c.key===k)).forEach(k=>{
+      catChips.appendChild(el('button',{class:'cat-mini on',style:'background:#64748B',onclick:()=>{ selCats=selCats.filter(x=>x!==k); drawCats(); }},[ phIcon('tag'), document.createTextNode(' '+k+' ×') ]));
+    });
+  }
+  drawCats();
+  const catRow=el('div',{class:'row2'});
+  catRow.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_cat')+' (macro)'}), catSel ]));
+  catRow.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_cats3')}), catChips ]));
+  body.appendChild(catRow);
 
-  const visSel=el('select');
-  POI_VIS.forEach(v=> visSel.appendChild(el('option',{value:v}, v)) );
-  if(p.visibility) visSel.value=p.visibility;
-  f.visibility=visSel;
-  body.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_vis')}), visSel ]));
+  // ── TAG (chips, max 10) ──
+  const tagBox=el('div',{class:'poiph-cats'});
+  const tagIn=el('input',{placeholder:t('f_tag_ph'),style:'max-width:200px'});
+  function drawTags(){
+    tagBox.textContent='';
+    tags.forEach((tg,i)=> tagBox.appendChild(el('button',{class:'cat-mini on',style:'background:#285EA7',title:t('a_delete'),onclick:()=>{ tags.splice(i,1); drawTags(); }},[ document.createTextNode('#'+tg+' ×') ])) );
+    tagBox.appendChild(tagIn);
+  }
+  tagIn.addEventListener('keydown',e=>{
+    if(e.key==='Enter'){ e.preventDefault(); const v=(tagIn.value||'').trim().toLowerCase().replace(/^#/,''); if(!v) return;
+      if(tags.length>=10){ toast(t('tag_max10'),'err'); return; }
+      if(!tags.includes(v)) tags.push(v); tagIn.value=''; drawTags(); tagIn.focus(); }
+  });
+  drawTags();
+  body.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_tags')}), tagBox ]));
 
-  const apprWrap=el('label',{style:'display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer'});
-  f.is_approved=el('input',{type:'checkbox'}); if(p.is_approved!==false) f.is_approved.checked=true;
-  apprWrap.appendChild(f.is_approved); apprWrap.appendChild(document.createTextNode(t('f_approved')));
-  body.appendChild(el('div',{class:'field'},[ apprWrap ]));
-
+  // ── INDIRIZZO PRECISO + CITTÀ + PAESE + COORDINATE + GEOCODIFICA (reali: Photon/Nominatim) ──
+  const addrRow=el('div',{class:'row2'});
+  addrRow.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_address')}), f.address=el('input',{value:p.address||''}) ]));
+  addrRow.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_city')}), f.city=el('input',{value:p.city||''}) ]));
+  body.appendChild(addrRow);
   const ll=el('div',{class:'row2'});
   ll.appendChild(el('div',{class:'field'},[ el('label',{text:'Lat'}), f.lat=el('input',{value:(p.lat!=null?p.lat:''),inputmode:'decimal'}) ]));
   ll.appendChild(el('div',{class:'field'},[ el('label',{text:'Lng'}), f.lng=el('input',{value:(p.lng!=null?p.lng:''),inputmode:'decimal'}) ]));
   body.appendChild(ll);
+  const geoRow=el('div',{class:'btn-row'});
+  geoRow.appendChild(el('button',{class:'btn sm',onclick:async()=>{
+    const q=(f.address.value+' '+f.city.value).trim(); if(!q){ toast(t('geo_need_addr'),'err'); return; }
+    toast(t('geo_searching'),null,'circle-notch');
+    try{
+      const r=await fetch('https://photon.komoot.io/api/?q='+encodeURIComponent(q)+'&limit=1&lang=it');
+      const d=await r.json(); const ft=d&&d.features&&d.features[0];
+      if(!ft){ toast(t('geo_not_found'),'err'); return; }
+      f.lng.value=ft.geometry.coordinates[0]; f.lat.value=ft.geometry.coordinates[1];
+      toast(t('geo_done'),'ok','check');
+    }catch(e){ toast(t('error'),'err'); }
+  }},[phIcon('crosshair'),document.createTextNode(' '+t('geo_from_addr'))]));
+  geoRow.appendChild(el('button',{class:'btn sm',onclick:async()=>{
+    const la=parseFloat(f.lat.value), ln=parseFloat(f.lng.value);
+    if(!Number.isFinite(la)||!Number.isFinite(ln)){ toast(t('geo_need_coords'),'err'); return; }
+    toast(t('geo_searching'),null,'circle-notch');
+    try{
+      const r=await fetch('https://nominatim.openstreetmap.org/reverse?lat='+la+'&lon='+ln+'&format=json&accept-language=it');
+      const d=await r.json(); const a=d.address||{};
+      const road=[a.road||a.pedestrian||a.square||'',a.house_number||''].join(' ').trim();
+      if(road) f.address.value=road;
+      f.city.value=a.city||a.town||a.village||a.municipality||f.city.value;
+      toast(t('geo_done'),'ok','check');
+    }catch(e){ toast(t('error'),'err'); }
+  }},[phIcon('map-pin'),document.createTextNode(' '+t('geo_from_coords'))]));
+  geoRow.appendChild(el('a',{class:'btn sm',href:'#',onclick:(e)=>{ e.preventDefault(); const la=parseFloat(f.lat.value),ln=parseFloat(f.lng.value); if(Number.isFinite(la)&&Number.isFinite(ln)) window.open('https://www.google.com/maps?q='+la+','+ln,'_blank','noopener'); }},[phIcon('arrow-square-out'),document.createTextNode(' '+t('open_in_maps'))]));
+  body.appendChild(el('div',{class:'field'},[ geoRow ]));
 
-  openModal(t('edit_poi'), 'pencil-simple-line', body, ()=>savePoi(p.id, f));
+  // ── VISIBILITÀ + APPROVATO ──
+  const visSel=el('select');
+  POI_VIS.forEach(v=> visSel.appendChild(el('option',{value:v}, v)) );
+  if(p.visibility) visSel.value=p.visibility;
+  f.visibility=visSel;
+  const apprWrap=el('label',{style:'display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer'});
+  f.is_approved=el('input',{type:'checkbox'}); if(p.is_approved!==false) f.is_approved.checked=true;
+  apprWrap.appendChild(f.is_approved); apprWrap.appendChild(document.createTextNode(t('f_approved')));
+  const visRow=el('div',{class:'row2'});
+  visRow.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_vis')}), visSel ]));
+  visRow.appendChild(el('div',{class:'field'},[ el('label',{text:' '}), apprWrap ]));
+  body.appendChild(visRow);
+
+  openModal(t('edit_poi'), 'pencil-simple-line', body, ()=>savePoi(p.id, f, {photos, selCats, tags}));
 }
 
-async function savePoi(id, f){
+async function savePoi(id, f, extra){
+  extra=extra||{};
+  const cats=(extra.selCats||[]).slice(0,3);
   const patch={
     title:(f.title.value||'').trim(),
     description:(f.description.value||'').trim(),
     category:f.category.value,
+    subcategory:cats[0]||null,                                  // la prima è la primaria (icona marker)
+    categories:cats,                                            // fino a 3 (intreccio)
+    tags:(extra.tags&&extra.tags.length)?extra.tags.slice(0,10):null,
+    photos:(extra.photos||[]).filter(u=>/^https?:\/\//i.test(u)),
+    address:(f.address&&f.address.value||'').trim()||null,
+    city:(f.city&&f.city.value||'').trim()||null,
     visibility:f.visibility.value,
     is_approved:!!f.is_approved.checked
   };
+  patch.cover_photo=patch.photos[0]||null;
   const lat=parseFloat(f.lat.value), lng=parseFloat(f.lng.value);
   if(Number.isFinite(lat)) patch.lat=lat;
   if(Number.isFinite(lng)) patch.lng=lng;
@@ -3333,20 +3487,36 @@ async function loadRoutesAdmin(){
   const box=document.getElementById('routesTable'); loadingBox(box);
   try{
     const { data, error } = await sb.from('trips')
-      .select('id,name,badge,description,cover_url,is_published,route_line,created_at,suggested_by,suggester:profiles!trips_suggested_by_fkey(username,display_name),trip_stops(id,name,lat,lng,sort_order,image_url,note,status)')
+      .select('id,name,badge,description,cover_url,is_published,route_line,badge_official,badge_essential,created_at,suggested_by,suggester:profiles!trips_suggested_by_fkey(username,display_name),trip_stops(id,name,lat,lng,sort_order,image_url,note,status)')
       .eq('is_historic',true).order('created_at',{ascending:false}).limit(100);
+    // Salvataggi REALI per rotta via RPC trip_save_counts (la RLS di trip_saves mostra solo i PROPRI:
+    // un conteggio lato client sarebbe falso). Alimenta il badge "Più votato".
+    let savesBy={};
+    try{
+      const ids=(data||[]).map(r=>r.id);
+      if(ids.length){
+        const { data:sv } = await sb.rpc('trip_save_counts',{ p_trips: ids });
+        (sv||[]).forEach(s=>{ savesBy[s.trip_id]=Number(s.n)||0; });
+      }
+    }catch(_){}
+    const topVotes=Math.max(0,...Object.values(savesBy));
     if(error){ isBackendMissing(error)?backendOff(box):emptyBox(box,t('error'),null,'warning'); return; }
     if(!data||!data.length){ emptyBox(box,t('rt_empty'),t('rt_empty_h'),'path'); return; }
     box.textContent='';
     data.forEach(r=>{
       const stops=(r.trip_stops||[]).sort((a,b)=>(a.sort_order||0)-(b.sort_order||0));
       const who=r.suggested_by&&r.suggester?(r.suggester.display_name||r.suggester.username||''):'';
+      const nSaves=savesBy[r.id]||0;
+      const isTop=topVotes>0 && nSaves===topVotes;
       const head=el('div',{style:'display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px'},[
         el('span',{class:'ttl',text:r.name}),
         r.badge?el('span',{class:'chip dim',text:r.badge}):null,
         r.cover_url?el('span',{class:'chip dim',text:'🖼'}):null,
         el('span',{class:'chip '+(r.is_published?'green':'gold'),text:r.is_published?t('rt_published'):t('st_draft')}),
-        el('span',{class:'sm',text:stops.length+' '+t('f_stops')}),
+        r.badge_official?el('span',{class:'chip',style:'background:#B4823C;color:#fff'},[phIcon('seal-check'),document.createTextNode(' '+t('bdg_official'))]):null,
+        r.badge_essential?el('span',{class:'chip',style:'background:#7C3AED;color:#fff'},[phIcon('star'),document.createTextNode(' '+t('bdg_essential'))]):null,
+        isTop?el('span',{class:'chip',style:'background:#D42B2B;color:#fff'},[phIcon('trophy'),document.createTextNode(' '+t('bdg_top'))]):null,
+        el('span',{class:'sm',text:stops.length+' '+t('f_stops')+' · ♥ '+nSaves}),
         who?el('span',{class:'chip dim',text:'🙏 '+who}):null
       ]);
       const stopsBox=el('div',{class:'stop-editor',style:'display:none;margin:8px 0 12px'});
@@ -3359,6 +3529,18 @@ async function loadRoutesAdmin(){
           await logAudit(r.is_published?'route_unpublish':'route_publish','trip',r.id,{ name:r.name });
           toast(t('saved'),'ok'); loadRoutesAdmin();
         }}),
+        el('button',{class:'btn sm'+(r.badge_official?' gold':''),title:t('bdg_official_hint'),onclick:async()=>{
+          const { data:db1, error:eb1 } = await sb.from('trips').update({ badge_official:!r.badge_official }).eq('id',r.id).select('id');
+          if(eb1||!db1||!db1.length){ toast(t('rls_no_rows'),'err'); return; }
+          await logAudit(r.badge_official?'route_badge_official_off':'route_badge_official_on','trip',r.id,{ name:r.name });
+          toast(t('saved'),'ok'); loadRoutesAdmin();
+        }},[phIcon('seal-check'),document.createTextNode(' '+t('bdg_official'))]),
+        el('button',{class:'btn sm'+(r.badge_essential?' gold':''),title:t('bdg_essential_hint'),onclick:async()=>{
+          const { data:db2, error:eb2 } = await sb.from('trips').update({ badge_essential:!r.badge_essential }).eq('id',r.id).select('id');
+          if(eb2||!db2||!db2.length){ toast(t('rls_no_rows'),'err'); return; }
+          await logAudit(r.badge_essential?'route_badge_essential_off':'route_badge_essential_on','trip',r.id,{ name:r.name });
+          toast(t('saved'),'ok'); loadRoutesAdmin();
+        }},[phIcon('star'),document.createTextNode(' '+t('bdg_essential'))]),
         el('button',{class:'btn sm',text:t('rt_stops_btn'),onclick:()=>{ stopsBox.style.display=stopsBox.style.display==='none'?'block':'none'; }}),
         el('button',{class:'btn sm',text:(r.route_line?'📐 ':'🛣 ')+(r.route_line?t('rt_mode_line'):t('rt_mode_road')),title:t('rt_mode_hint'),onclick:async()=>{
           const { data:dm, error:em } = await sb.from('trips').update({ route_line:!r.route_line }).eq('id',r.id).select('id');
