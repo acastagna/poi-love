@@ -1,8 +1,35 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
-> **Prossima ripresa: canale EMAIL delle notifiche (serve chiave AcumbaMail + edge worker) e trigger notifiche mancanti (rotta pubblicata/adottata dentro le RPC admin). Valutare voce iperrealistica (Google TTS) per ILLI, oggi la voce meccanica è disattivata. Collaudi manuali di Alessandro in attesa (checklist 04/07 + claim a pagamento + copilota foto).**
-> Checkpoint sessione: tag `checkpoint-2026-07-10-admin-rich` (HEAD su origin/main, v3.20). **Nessun lavoro non committato.**
-> Code-review completa (22 agenti) su tutta la sessione: 14 findings confermati, TUTTI corretti (mig 068 + v3.14), verificati sul live poilove.com. Aperto solo: nota OSM lato-client (funziona, gratis; hardening server-side con edge function OAuth = miglioria futura, non bloccante).
+> **Prossima ripresa: 2 passi che spettano ad Alessandro per accendere l'invio email — (1) mettere la chiave AcumbaMail come segreto `ACUMBA_KEY` nei Supabase Edge Secrets, (2) inserire gli ID dei pixel social nell'admin (scheda Media → Pixel) e configurare SPF/DKIM su poilove.com. Tutto il resto della Zona Media è già live. Restano aperti: trigger notifiche mancanti (rotta pubblicata/adottata dentro le RPC admin), voce iperrealistica ILLI, collaudi manuali di Alessandro (checklist 04/07 + claim a pagamento + copilota foto).**
+> Checkpoint sessione: tag `checkpoint-2026-07-11-media-full` (HEAD `34d906a` su origin/main, webapp v3.23). **Nessun lavoro non committato.**
+
+## Sessione 11/07/2026 — ZONA MEDIA completa (webapp v3.23, edge send-email, mig 072)
+
+Costruita da zero la **Zona Media** dell'admin richiesta dal founder: template email, OpenGraph, deep-link tracciati, pixel social con manuale. Tutto reale e verificato dal vivo, checkpoint `checkpoint-2026-07-11-media-full` (HEAD `34d906a`, **v3.23**). Nessun lavoro non committato.
+
+**Cosa è ONLINE e funzionante ora:**
+- **Consenso marketing + pixel social**: l'overlay del consenso ha l'opt-in marketing separato (append-only, `CONSENT_VERSION` 2026-07-11). I pixel dei social si iniettano **solo dopo** il consenso marketing, leggendo gli ID dalla tabella `social_pixels` (8 network: Meta, GA4, Google Ads, TikTok, LinkedIn, Pinterest, Snap, X). Verificato dal vivo: senza consenso `fbq` non parte; con consenso parte e carica lo script Facebook con l'ID dal DB.
+- **Admin → sezione Media (4 schede, tutta nostra CSS, nessun popup di sistema):**
+  - *Email*: impostazioni mittente (da `media_settings`) + CRUD template (invio/automatiche/invito) con editor e "Prova". Invio onesto: finché manca la chiave mostra "Motore email non configurato".
+  - *OpenGraph*: template per entità (poi/route/trip/profile) con titolo/descrizione/immagine e variabili `{name}`/`{desc}`/`{area}`/`{stops}`.
+  - *Deep-link*: costruttore con UTM, lista con conteggio clic, URL breve `poilove.com/go.php?s=<slug>`.
+  - *Pixel*: per ogni network campo ID + **mini-manuale "dove trovarlo"** + link diretto ufficiale, on/off.
+- **Landing OpenGraph reali (PHP, RLS anon, solo contenuti pubblici):** `webapp/poi.php` (POI community approvati) e `webapp/route.php` (rotte storiche pubblicate, con badge Ufficiale/Indispensabile/tappe). Prendono titolo/descrizione/immagine dai template `og_templates` configurati nell'admin. Verificato 200 + `og:title`.
+- **Redirect deep-link tracciato:** `webapp/go.php?s=<slug>` risolve via RPC `resolve_deep_link` (conta il clic), poi 302 alla destinazione con UTM. Nessun open-redirect (target lo imposta solo l'admin). Verificato dal vivo: 302 + Location + clic incrementato.
+- **Edge `send-email` (AcumbaMail):** deployata via Management API (status ACTIVE, `verify_jwt` true). Verifica utente + gate admin con service_role, legge il template, rende `{{var}}`, invia via AcumbaMail, logga in `email_sends`. Senza la chiave risponde onestamente `engine not configured` (nessun invio finto). Verificato dal vivo: 401 senza auth, "invalid auth" con sola anon key, admin-gate a valle.
+- **mig 072** applicata e verificata: 8 tabelle Zona Media (email_templates, email_campaigns, email_sends, og_templates, deep_links, deep_link_clicks, social_pixels, media_settings) + `record_consent` a 5 argomenti (aggiunge il consenso marketing), `my_consents` con `marketing_ok`, `set_optional_consent` allargata, RPC `resolve_deep_link`, seed `media_settings` email.
+- **Deep-link in-app**: la webapp ora apre `?trip=`/`?route=` direttamente nella scheda giusta (itinerario/rotta pubblici) invece di ignorarli.
+
+**Cosa manca (spetta ad Alessandro, non bloccante per il resto):**
+1. Segreto `ACUMBA_KEY` nei Supabase Edge Secrets → accende l'invio email vero.
+2. Inserire gli ID dei pixel social nell'admin (scheda Media → Pixel).
+3. SPF/DKIM su poilove.com per la deliverability delle email.
+4. (Opzionale) edge-worker cron per le email automatiche sugli eventi.
+
+---
+
+> Checkpoint precedente: tag `checkpoint-2026-07-10-admin-rich` (v3.20).
+> Code-review completa (22 agenti) su tutta la sessione 10/07: 14 findings confermati, TUTTI corretti (mig 068 + v3.14), verificati sul live poilove.com. Aperto solo: nota OSM lato-client (funziona, gratis; hardening server-side con edge function OAuth = miglioria futura, non bloccante).
 
 ## Sessione 10/07/2026 — Giornata piena: itinerari, categorie, rotte, pulizia finti (v3.02 → v3.14, mig 063-068)
 
