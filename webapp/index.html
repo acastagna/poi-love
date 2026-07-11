@@ -7832,10 +7832,46 @@ function openPendingSharedPoi(){
     });
 }
 
+// Carica un ITINERARIO pubblico condiviso e apre il suo dettaglio (deep-link ?trip=).
+async function _openSharedTrip(id){
+  try{
+    const { data, error } = await sb.from('trips')
+      .select('id,name,badge,description,dates_label,cover_url,start_date,end_date,visibility,trip_stops(id,name,stop_date_label,status,lat,lng,icon,icon_bg,icon_color,note,sort_order,stay_label,image_url,region)')
+      .eq('id', id).eq('visibility','pub').maybeSingle();
+    if(error || !data){ showToast(t('trip_shared_gone','Itinerario non disponibile')); return; }
+    const stops=(data.trip_stops||[]).slice().sort((a,b)=>(a.sort_order||0)-(b.sort_order||0)).map(s=>({
+      id:s.id,dbId:s.id,name:s.name,date:s.stop_date_label||'',status:s.status||'planned',suspended:s.status==='suspended',
+      lat:s.lat,lng:s.lng,icon:s.icon||'ph-duotone ph-map-pin',iconBg:s.icon_bg||'#285EA7',iconColor:s.icon_color||'#fff',
+      note:s.note||'',stay:s.stay_label||'',image:s.image_url||'',region:s.region||'' }));
+    TRIPS[data.id]={ id:data.id, dbId:data.id, name:data.name, badge:data.badge||'', dates:data.dates_label||'',
+      cover:data.cover_url||'', description:data.description||'', companions:[], stops,
+      visibility:data.visibility||'pub', startDate:data.start_date||'', endDate:data.end_date||'', _shared:true };
+    if(typeof openTripDetail==='function') openTripDetail(data.id);
+  }catch(e){ showToast(t('trip_shared_gone','Itinerario non disponibile')); }
+}
+// Carica una ROTTA storica pubblicata condivisa e apre il suo dettaglio (deep-link ?route=).
+async function _openSharedRoute(id){
+  try{
+    const { data, error } = await sb.from('trips')
+      .select('id,name,badge,description,cover_url,route_line,badge_official,badge_essential,trip_stops(id,name,lat,lng,sort_order)')
+      .eq('id', id).eq('is_historic',true).eq('is_published',true).maybeSingle();
+    if(error || !data){ showToast(t('route_shared_gone','Rotta non disponibile')); return; }
+    const rr={ ...data, stops:(data.trip_stops||[]).filter(st=>st.lat!=null&&st.lng!=null).sort((a,b)=>(a.sort_order||0)-(b.sort_order||0)) };
+    if(typeof HISTORIC_ROUTES!=='undefined'){ const i=HISTORIC_ROUTES.findIndex(x=>x.id===id); if(i>=0)HISTORIC_ROUTES[i]=rr; else HISTORIC_ROUTES.push(rr); }
+    if(typeof openRouteDetail==='function') openRouteDetail(id);
+  }catch(e){ showToast(t('route_shared_gone','Rotta non disponibile')); }
+}
 function handleDeepLink(){
   const params = new URLSearchParams(window.location.search);
   const poiId = params.get('poi');
   const at    = params.get('at');
+  const sharedTrip  = params.get('trip');
+  const sharedRoute = params.get('route');
+
+  // Link condiviso di un ITINERARIO pubblico (bottone di trip.php): lo carico dal DB e lo apro.
+  if(sharedTrip && sb){ _openSharedTrip(sharedTrip); return; }
+  // Link condiviso di una ROTTA storica pubblicata (bottone di route.php).
+  if(sharedRoute && sb){ _openSharedRoute(sharedRoute); return; }
 
   if(poiId && sb){
     // Da sloggato il payload contiene SOLO cio che il teaser mostra (niente nome,
@@ -7898,7 +7934,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='3.22';
+const APP_VERSION='3.23';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);

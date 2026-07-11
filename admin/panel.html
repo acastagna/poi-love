@@ -2937,7 +2937,7 @@ async function renderMediaDeep(){
   const list=el('div',{class:'panel'},[ el('div',{class:'card-h'},[ el('span',{class:'ic'},phIcon('list-bullets')), el('span',{text:t('media_deep_list','Link creati')}) ]) ]);
   if(!links.length) list.appendChild(el('div',{class:'sm',style:'opacity:.7',text:t('media_deep_none','Nessun link ancora.')}));
   links.forEach(l=>{
-    const short='https://poilove.com/go/'+l.slug;
+    const short='https://poilove.com/go.php?s='+l.slug;
     list.appendChild(el('div',{style:'display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:9px 0;border-bottom:1px solid rgba(128,128,128,.15)'},[
       el('div',{style:'flex:1;min-width:160px'},[ el('div',{class:'ttl',text:l.label||l.slug}), el('div',{class:'sm',style:'opacity:.8',text:short}) ]),
       el('span',{class:'chip dim',text:'👆 '+(l.clicks||0)}),
@@ -3036,6 +3036,7 @@ async function sendTestEmail(tp){
     const { data, error }=await sb.functions.invoke('send-email',{ body:{ to, template_key:tp.key, lang:tp.lang||'it', vars:{ name:'Prova', link:'https://poilove.com' } } });
     if(error) throw error;
     if(data&&data.ok){ toast(t('media_email_sent','✓ Email inviata'),'ok','check'); }
+    else if(data&&/not configured/i.test(data.error||'')){ toast(t('media_email_engine_off','Motore email non configurato: manca la chiave AcumbaMail nei Segreti Supabase'),'err'); }
     else { toast((data&&data.error)||t('media_email_engine_off','Motore email non configurato: manca la chiave AcumbaMail nei Segreti Supabase'),'err'); }
   }catch(e){ toast(t('media_email_engine_off','Motore email non configurato: manca la chiave AcumbaMail nei Segreti Supabase'),'err'); }
 }
