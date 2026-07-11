@@ -35,7 +35,7 @@ Legenda: ⬜ da fare · 🔨 in corso · ✅ fatto e verificato · ⏸️ in att
 - ✅ Scaffolding moduli JS avviato (`admin/css/`, `admin/js/` creati sul repo e sul server)
 - ⬜ A1 Scheda POI riusabile (crea+modifica, un solo componente)
 - ⬜ A2 Scheda Utente riusabile
-- ⬜ A3 Badge/assegnazione (migrazione + RPC + selettore)
+- 🔨 A3 Badge/assegnazione: **lato DB FATTO e verificato** (mig 073: colonne `badge_official/essential/tier` + `assigned_user_id` su pois/trips/companions; RPC `admin_set_badge_and_owner` gate is_active_admin + audit; anon→permesso negato). Resta il **selettore UI** (modulo `admin/js/badge-picker.js`) da montare negli editor A1/T8/T7 (verifica visiva bloccata da MFA, si fa con harness).
 - ⬜ A4 Elaboratore immagini + A5 Libreria media
 
 ### Fase 1 — Correzioni alto impatto
