@@ -1,0 +1,79 @@
+/*
+  © Alessandro Castagna — 321.al / EVOLAB
+  Tutti i diritti riservati. Uso non autorizzato vietato.
+  info@321.al · https://321.al
+
+  A6 — TEMA A 6 PALETTE. File UNICO di definizione (nessun colore hardcoded nelle sezioni).
+  Due dimensioni indipendenti:
+    data-theme   = dark | light   (superfici: definite in panel.html <style>)
+    data-palette = warm | neutral | cold   (atmosfera: sfondo, bagliori, accento oro)
+  Regola di gusto: il ROSSO brand (--red) resta costante in tutte le palette, così i pulsanti
+  di pericolo (elimina/banna) restano rossi e leggibili. La temperatura la danno lo sfondo,
+  i bagliori radiali e l'accento secondario --gold (oro caldo → pietra neutra → acciaio freddo).
+  6 combinazioni = 3 palette × 2 modi. Selezione persistita in localStorage 'admin_palette'.
+*/
+
+/* ══════════ DARK ══════════ */
+
+/* Calda (default): terra/oro — coincide con la base, resa esplicita per completezza */
+html[data-theme="dark"][data-palette="warm"]{
+  --gold:#E8B04B;
+  --bg-base:#0c0907;
+  --bg-glow-gold:rgba(232,176,75,.16);
+  --bg-glow-red:rgba(212,43,43,.12);
+}
+/* Neutra: grafite/sabbia desaturata, accento pietra */
+html[data-theme="dark"][data-palette="neutral"]{
+  --gold:#C7BCA6;
+  --bg-base:#0b0b0a;
+  --bg-glow-gold:rgba(199,188,166,.11);
+  --bg-glow-red:rgba(150,145,138,.07);
+  --line:rgba(240,238,232,.16);
+}
+/* Fredda: notte blu/acciaio, accento acqua */
+html[data-theme="dark"][data-palette="cold"]{
+  --gold:#79AECF;
+  --bg-base:#080a0d;
+  --bg-glow-gold:rgba(121,174,207,.14);
+  --bg-glow-red:rgba(70,110,150,.11);
+  --line:rgba(224,236,244,.16);
+}
+
+/* ══════════ LIGHT ══════════ */
+
+/* Calda (default light): crema/sabbia/oro */
+html[data-theme="light"][data-palette="warm"]{
+  --gold:#B8862F;
+  --bg-base:#efe7d8;
+  --bg-glow-gold:rgba(184,134,47,.14);
+  --bg-glow-red:rgba(193,42,42,.08);
+}
+/* Neutra: lino/pietra */
+html[data-theme="light"][data-palette="neutral"]{
+  --gold:#8C8168;
+  --bg-base:#eae7df;
+  --bg-glow-gold:rgba(140,129,104,.13);
+  --bg-glow-red:rgba(150,140,130,.06);
+  --line:rgba(58,52,40,.14);
+}
+/* Fredda: cielo/acciaio chiaro */
+html[data-theme="light"][data-palette="cold"]{
+  --gold:#3E7EA8;
+  --bg-base:#e6ebf0;
+  --bg-glow-gold:rgba(62,126,168,.13);
+  --bg-glow-red:rgba(40,94,167,.07);
+  --line:rgba(35,55,80,.14);
+}
+
+/* Transizione morbida quando si cambia palette (coerente con --theme-tr del tema) */
+html{transition:background var(--theme-tr,.5s ease)}
+
+/* ── Selettore palette (tre pastiglie con anteprima colore) ── */
+.pal-picker{display:inline-flex;gap:6px;align-items:center}
+.pal-dot{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid var(--line);
+  padding:0;position:relative;transition:transform .15s,border-color .15s;flex:none}
+.pal-dot:hover{transform:scale(1.12)}
+.pal-dot.on{border-color:var(--gold);box-shadow:0 0 0 2px var(--bg-base),0 0 0 3px var(--gold)}
+.pal-dot[data-pal="warm"]{background:linear-gradient(135deg,#E8B04B,#D42B2B)}
+.pal-dot[data-pal="neutral"]{background:linear-gradient(135deg,#C7BCA6,#8C8168)}
+.pal-dot[data-pal="cold"]{background:linear-gradient(135deg,#79AECF,#285EA7)}

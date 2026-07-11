@@ -15,10 +15,13 @@
 <!-- Tema: applicato PRIMA del paint per evitare flash. Default 'dark', persistito in localStorage 'admin_theme'. -->
 <script>
   (function(){
+    var d=document.documentElement;
     try{
-      var saved = localStorage.getItem('admin_theme');
-      document.documentElement.setAttribute('data-theme', (saved==='light'||saved==='dark') ? saved : 'dark');
-    }catch(e){ document.documentElement.setAttribute('data-theme','dark'); }
+      var t = localStorage.getItem('admin_theme');
+      d.setAttribute('data-theme', (t==='light'||t==='dark') ? t : 'dark');
+      var p = localStorage.getItem('admin_palette');
+      d.setAttribute('data-palette', (p==='warm'||p==='neutral'||p==='cold') ? p : 'warm');
+    }catch(e){ d.setAttribute('data-theme','dark'); d.setAttribute('data-palette','warm'); }
   })();
 </script>
 <style>
@@ -122,8 +125,8 @@ body{
   color:rgba(244,236,224,.72);font-size:13.5px;font-weight:600;border:1px solid transparent;
   transition:background .18s,color .18s,border-color .18s;user-select:none}
 .nav-item:hover{background:var(--glass-soft);color:var(--paper)}
-.nav-item.on{background:linear-gradient(135deg,rgba(232,176,75,.22),rgba(212,43,43,.12));
-  color:var(--paper);border-color:rgba(232,176,75,.4)}
+.nav-item.on{background:linear-gradient(135deg,color-mix(in srgb,var(--gold) 22%,transparent),color-mix(in srgb,var(--red) 12%,transparent));
+  color:var(--paper);border-color:color-mix(in srgb,var(--gold) 42%,transparent)}
 .nav-item .ic{font-size:16px;width:20px;text-align:center;line-height:1}
 .nav-item .badge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;font-weight:800;
   border-radius:10px;padding:1px 7px;min-width:18px;text-align:center;display:none}
@@ -143,9 +146,11 @@ body{
 
 /* Area contenuto */
 .content{padding:26px 30px 60px;min-width:0}
-.topbar{display:flex;align-items:center;gap:14px;margin-bottom:22px;position:sticky;top:0;z-index:30;padding:12px 0 12px;background:var(--bg-base);border-bottom:1px solid var(--line)}
+/* Barra sticky: sfondo esteso ai lati (margini negativi = padding di .content) così il contenuto
+   che scorre sotto non sbuca ai bordi, e respiro verticale corretto (fix screenshot 1). */
+.topbar{display:flex;align-items:center;gap:14px;margin:0 -30px 22px;position:sticky;top:0;z-index:30;padding:18px 30px 14px;background:var(--bg-base);border-bottom:1px solid var(--line)}
 .topbar h1{font-size:23px;font-weight:800;letter-spacing:.2px}
-.topbar .sub{font-size:12.5px;color:rgba(244,236,224,.55);margin-top:3px}
+.topbar .sub{font-size:12.5px;color:var(--muted);margin-top:3px}
 .topbar .right{margin-left:auto;display:flex;align-items:center;gap:10px}
 .langs{display:flex;gap:5px}
 .langs button{border:1px solid var(--line);background:transparent;color:rgba(244,236,224,.6);
@@ -232,7 +237,8 @@ td .sm{font-size:11px;color:rgba(244,236,224,.5)}
 .tier-select{background:var(--glass-soft,rgba(255,255,255,.06));color:inherit;border:1px solid rgba(128,128,128,.3);border-radius:9px;padding:5px 8px;font-size:12px;font-family:inherit;cursor:pointer;max-width:150px}
 html[data-theme="light"] .tier-select{background:#fff;color:var(--ink);border-color:rgba(0,0,0,.15)}
 .chip.red{color:var(--bad);border-color:rgba(255,180,180,.4);background:rgba(255,180,180,.1)}
-.chip.dim{color:rgba(244,236,224,.6)}
+/* dim = etichetta discreta ma LEGGIBILE (prima usava crema fisso, invisibile sul tema chiaro). */
+.chip.dim{color:var(--muted);background:var(--glass-soft)}
 
 /* Bottoni azione */
 .btn{border:1px solid var(--line);background:var(--glass-soft);color:var(--paper);border-radius:11px;
@@ -448,7 +454,7 @@ html[data-theme="light"] .prop-details pre{background:rgba(58,47,35,.07)}
   .kpis{grid-template-columns:1fr 1fr}
   .grid2{grid-template-columns:1fr}
   .row2,.row3{grid-template-columns:1fr}
-  .topbar{flex-wrap:wrap}
+  .topbar{flex-wrap:wrap;margin-left:-14px;margin-right:-14px;padding-left:14px;padding-right:14px}
 }
 @media(max-width:480px){.kpis{grid-template-columns:1fr}}
 
@@ -504,6 +510,9 @@ html[data-theme="light"] .chip.green{color:#236b39}
 .modal-h{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
 .modal-h .ttl{font-weight:800;font-size:16px;display:flex;align-items:center;gap:8px}
 </style>
+<!-- A6 — palette (dopo lo <style> inline così i suoi override vincono) + controller tema modulare -->
+<link rel="stylesheet" href="css/palette.css">
+<script src="js/theme.js"></script>
 </head>
 <body>
 <div class="grain"></div>
@@ -593,6 +602,8 @@ html[data-theme="light"] .chip.green{color:#236b39}
           <button data-l="sq" onclick="setLang('sq')">SQ</button>
           <button data-l="en" onclick="setLang('en')">EN</button>
         </div>
+        <!-- A6: selettore palette (Calda / Neutra / Fredda), popolato da AdminTheme.mountPicker -->
+        <div id="palPicker" class="pal-picker" aria-label="Palette colore"></div>
         <!-- Interruttore tema: sole quando sei al buio (per accendere la luce), luna quando sei alla luce -->
         <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()"
                 aria-label="Cambia tema chiaro/scuro" title="Tema chiaro/scuro">
@@ -1288,17 +1299,12 @@ function setLang(l){
 /* ─────────────────────────── Tema chiaro/scuro ───────────────────────────
    Default 'dark'. L'attributo è già impostato nel <head> prima del paint.
    toggleTheme() inverte e persiste in localStorage 'admin_theme'.        */
-function applyTheme(theme){
-  const th = (theme==='light') ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', th);
-  try{ localStorage.setItem('admin_theme', th); }catch(e){}
-  const btn=document.getElementById('themeToggle');
-  if(btn){ btn.setAttribute('aria-pressed', th==='light' ? 'true' : 'false'); }
-}
-function toggleTheme(){
-  const cur = document.documentElement.getAttribute('data-theme')==='light' ? 'light' : 'dark';
-  applyTheme(cur==='light' ? 'dark' : 'light');
-}
+// Tema e palette: la logica vive nel modulo condiviso js/theme.js (window.AdminTheme).
+// Manteniamo questi due nomi perché già richiamati in giro (onclick, boot).
+function applyTheme(theme){ if(window.AdminTheme) return window.AdminTheme.applyTheme(theme);
+  const th=(theme==='light')?'light':'dark'; document.documentElement.setAttribute('data-theme',th); }
+function toggleTheme(){ if(window.AdminTheme) return window.AdminTheme.toggleTheme();
+  const cur=document.documentElement.getAttribute('data-theme')==='light'?'light':'dark'; applyTheme(cur==='light'?'dark':'light'); }
 
 /* ─────────────────────────── Utility sicure ───────────────────────────
    Sanitizzazione: NON si usa mai innerHTML con dati grezzi.
@@ -1427,8 +1433,9 @@ async function gate(){
   const g=document.getElementById('gate'); g.style.opacity='0'; setTimeout(()=>g.remove(),360);
   document.getElementById('app').classList.add('ready');
   setLang(lang);
-  // allinea lo stato del bottone tema all'attributo già applicato nel <head>
-  applyTheme(document.documentElement.getAttribute('data-theme'));
+  // allinea tema+palette (già applicati pre-paint) e monta il selettore palette
+  if(window.AdminTheme){ window.AdminTheme.sync(); window.AdminTheme.mountPicker(document.getElementById('palPicker')); }
+  else applyTheme(document.documentElement.getAttribute('data-theme'));
   openSection('dashboard');
   refreshReportsBadge(); // badge segnalazioni in sidebar
 }
