@@ -1,7 +1,7 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
 > **Prossima ripresa — passi che spettano ad Alessandro (tutto il codice è già live):** (1) chiave AcumbaMail come segreto `ACUMBA_KEY` nei Supabase Edge Secrets → accende l'invio email; (2) ID pixel social nell'admin (Media → Pixel) + SPF/DKIM su poilove.com; (3) inviare `sitemap.php` a Google Search Console + Bing Webmaster Tools (per l'indicizzazione SEO/AIO). Restano aperti: trigger notifiche mancanti, voce iperrealistica ILLI, collaudi manuali (checklist 04/07 + claim a pagamento + copilota foto).
-> Checkpoint sessione: tag da creare a fine giro (webapp **v3.24**, HEAD `f5e8724`+). Zona Media (v3.23) + strato SEO/GEO/AIO (v3.24) entrambi live.
+> Checkpoint sessione: tag `checkpoint-2026-07-11-seo-aio` (HEAD `9f33cdf` su origin/main, webapp **v3.24**). Zona Media (v3.23) + strato SEO/GEO/AIO (v3.24) entrambi live. Review avversariale a 20 agenti: 10 findings confermati (1 XSS critico JSON-LD, 2 alti), TUTTI corretti e verificati dal vivo. **Nessun lavoro non committato.**
 
 ## Sessione 11/07/2026 (2ª parte) — Strato SEO/GEO/AIO + condivisione OpenGraph (webapp v3.24)
 
