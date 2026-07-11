@@ -561,6 +561,9 @@ html[data-theme="light"] .chip.green{color:#236b39}
     <div class="nav-item" data-sec="knowledge" onclick="openSection('knowledge')">
       <span class="ic"><i class="ph-duotone ph-brain"></i></span><span class="label" data-t="nav_knowledge">Knowledge ILLI</span>
     </div>
+    <div class="nav-item" data-sec="media" onclick="openSection('media')">
+      <span class="ic"><i class="ph-duotone ph-share-network"></i></span><span class="label" data-t="nav_media">Media</span>
+    </div>
     <div class="nav-item" data-sec="audit" onclick="openSection('audit')">
       <span class="ic"><i class="ph-duotone ph-scroll"></i></span><span class="label" data-t="nav_audit">Audit log</span>
     </div>
@@ -924,6 +927,20 @@ html[data-theme="light"] .chip.green{color:#236b39}
         <div id="auditTable"></div>
       </div>
     </section>
+
+    <!-- ═════════════════════ ZONA MEDIA (email, OpenGraph, deep link, pixel) ═════════════════════ -->
+    <section class="section" id="sec-media">
+      <div class="ai-modes" style="margin-bottom:16px">
+        <button class="ai-mode on" data-mtab="email"    onclick="setMediaTab('email')"><i class="ph-duotone ph-envelope-simple"></i> <span data-t="media_tab_email">Email</span></button>
+        <button class="ai-mode"    data-mtab="og"       onclick="setMediaTab('og')"><i class="ph-duotone ph-share-fat"></i> <span data-t="media_tab_og">OpenGraph</span></button>
+        <button class="ai-mode"    data-mtab="deeplink" onclick="setMediaTab('deeplink')"><i class="ph-duotone ph-link"></i> <span data-t="media_tab_deeplink">Deep link</span></button>
+        <button class="ai-mode"    data-mtab="pixel"    onclick="setMediaTab('pixel')"><i class="ph-duotone ph-chart-line-up"></i> <span data-t="media_tab_pixel">Pixel social</span></button>
+      </div>
+      <div id="mtab-email"    class="mtab"></div>
+      <div id="mtab-og"       class="mtab" style="display:none"></div>
+      <div id="mtab-deeplink" class="mtab" style="display:none"></div>
+      <div id="mtab-pixel"    class="mtab" style="display:none"></div>
+    </section>
   </main>
 </div>
 
@@ -956,7 +973,7 @@ let aiBusy = false;       // richiesta al copilota in volo: blocca invii concorr
 const T = {
   it:{
     nav_dashboard:'Dashboard', nav_moderation:'Moderazione', nav_users:'Utenti', nav_ailimits:'Limiti AI',
-    nav_copilot:'Copilota AI', nav_create:'Crea', nav_audit:'Audit log',
+    nav_copilot:'Copilota AI', nav_create:'Crea', nav_audit:'Audit log', nav_media:'Media', sub_media:'Email, OpenGraph, deep link dhe pixel social', media_tab_email:'Email', media_tab_og:'OpenGraph', media_tab_deeplink:'Deep link', media_tab_pixel:'Pixel social', nav_media:'Media', sub_media:'Email, OpenGraph, deep link e pixel social', media_tab_email:'Email', media_tab_og:'OpenGraph', media_tab_deeplink:'Deep link', media_tab_pixel:'Pixel social',
     sub_dashboard:'Panoramica della piattaforma in tempo reale.',
     sub_moderation:'Segnalazioni da rivedere.', sub_users:'Gestione profili e moderazione.',
     sub_ailimits:'Quote e modelli AI per livello.', sub_copilot:'Assistente operativo con accesso ai dati.',
@@ -1152,7 +1169,7 @@ const T = {
   },
   en:{
     nav_dashboard:'Dashboard', nav_moderation:'Moderation', nav_users:'Users', nav_ailimits:'AI limits',
-    nav_copilot:'AI copilot', nav_create:'Create', nav_audit:'Audit log',
+    nav_copilot:'AI copilot', nav_create:'Create', nav_audit:'Audit log', nav_media:'Media', sub_media:'Email, OpenGraph, deep links and social pixels', media_tab_email:'Email', media_tab_og:'OpenGraph', media_tab_deeplink:'Deep links', media_tab_pixel:'Social pixels',
     sub_dashboard:'Real-time overview of the platform.',
     sub_moderation:'Reports awaiting review.', sub_users:'Profile management and moderation.',
     sub_ailimits:'AI quotas and models per tier.', sub_copilot:'Operational assistant with data access.',
@@ -1423,9 +1440,9 @@ async function doLogout(){
 
 /* ─────────────────────────── Navigazione sezioni (lazy) ─────────────────────────── */
 const SUBKEY = { dashboard:'sub_dashboard', moderation:'sub_moderation', users:'sub_users',
-  ailimits:'sub_ailimits', copilot:'sub_copilot', create:'sub_create', pois:'sub_pois', routes:'sub_routes', audit:'sub_audit', categories:'sub_categories' , tags:'sub_tags', knowledge:'sub_knowledge' };
+  ailimits:'sub_ailimits', copilot:'sub_copilot', create:'sub_create', pois:'sub_pois', routes:'sub_routes', audit:'sub_audit', categories:'sub_categories' , tags:'sub_tags', knowledge:'sub_knowledge', media:'sub_media' };
 const TITLEKEY = { dashboard:'nav_dashboard', moderation:'nav_moderation', users:'nav_users',
-  ailimits:'nav_ailimits', copilot:'nav_copilot', create:'nav_create', pois:'nav_pois', routes:'nav_routes', itineraries:'nav_itineraries', categories:'nav_categories', tags:'nav_tags', knowledge:'nav_knowledge', audit:'nav_audit' };
+  ailimits:'nav_ailimits', copilot:'nav_copilot', create:'nav_create', pois:'nav_pois', routes:'nav_routes', itineraries:'nav_itineraries', categories:'nav_categories', tags:'nav_tags', knowledge:'nav_knowledge', audit:'nav_audit', media:'nav_media' };
 
 function updateHeader(sec){
   document.getElementById('secTitle').textContent = t(TITLEKEY[sec]);
@@ -1457,6 +1474,7 @@ function runSection(sec){
     case 'tags': loadTagsAdmin(); break;
     case 'knowledge': loadKnowledgeAdmin(); break;
     case 'audit': loadAudit(); break;
+    case 'media': initMedia(); break;
   }
 }
 
@@ -2806,6 +2824,220 @@ async function loadAudit(){
     table.appendChild(tb); wrap.appendChild(table);
     box.textContent=''; box.appendChild(wrap);
   }catch(e){ emptyBox(box,t('error'),null,'warning'); }
+}
+
+/* ═════════════════════════ ZONA MEDIA ═════════════════════════ */
+let _mediaLoaded=false;
+function setMediaTab(tab){
+  document.querySelectorAll('#sec-media .ai-mode').forEach(b=>b.classList.toggle('on', b.dataset.mtab===tab));
+  ['email','og','deeplink','pixel'].forEach(x=>{ const d=document.getElementById('mtab-'+x); if(d) d.style.display = (x===tab?'':'none'); });
+}
+async function initMedia(){
+  if(_mediaLoaded) return; _mediaLoaded=true;
+  renderMediaPixel(); renderMediaOg(); renderMediaDeep(); renderMediaEmail();
+}
+
+/* ── PIXEL SOCIAL: incolli l'ID, attivi, e c'è il manuale (dove trovarlo + link) ── */
+const PIXEL_NETS=[
+  {net:'meta', label:'Meta Pixel (Facebook/Instagram)', icon:'meta-logo', ex:'es. 1234567890', where:'Meta Events Manager → Origini dati → il tuo pixel → Impostazioni → Dataset/Pixel ID (numerico).', url:'https://business.facebook.com/events_manager2'},
+  {net:'ga4', label:'Google Analytics 4', icon:'google-logo', ex:'G-XXXXXXXXXX', where:'Google Analytics → Amministrazione → Flussi di dati → flusso web → ID misurazione (G-…).', url:'https://analytics.google.com/'},
+  {net:'google_ads', label:'Google Ads (conversioni)', icon:'google-logo', ex:'AW-XXXXXXXXX', where:'Google Ads → Obiettivi → Conversioni → azione → Configurazione tag → ID conversione (AW-…).', url:'https://ads.google.com/'},
+  {net:'tiktok', label:'TikTok Pixel', icon:'tiktok-logo', ex:'es. C4XXXXXXXXXXXX', where:'TikTok Ads Manager → Strumenti → Eventi → Eventi web → Gestisci → il tuo pixel → Pixel ID.', url:'https://ads.tiktok.com/'},
+  {net:'linkedin', label:'LinkedIn Insight Tag', icon:'linkedin-logo', ex:'es. 1234567 (Partner ID)', where:'LinkedIn Campaign Manager → Analizza → Insight Tag → Partner ID (numerico).', url:'https://www.linkedin.com/campaignmanager/'},
+  {net:'pinterest', label:'Pinterest Tag', icon:'pinterest-logo', ex:'es. 2613xxxxxxxxx', where:'Pinterest Ads → Conversioni → Tag manager → Tag ID.', url:'https://ads.pinterest.com/'},
+  {net:'snap', label:'Snapchat Pixel', icon:'snapchat-logo', ex:'es. UUID del pixel', where:'Snapchat Ads Manager → Events Manager → il tuo Pixel → Pixel ID.', url:'https://ads.snapchat.com/'},
+  {net:'x', label:'X (Twitter) Pixel', icon:'x-logo', ex:'es. o1abc', where:'X Ads → Strumenti → Monitoraggio conversioni → Pixel/Tag ID.', url:'https://ads.x.com/'}
+];
+async function renderMediaPixel(){
+  const box=document.getElementById('mtab-pixel'); box.textContent=''; loadingBox(box);
+  let saved={};
+  try{ const {data}=await sb.from('social_pixels').select('network,pixel_id,active'); (data||[]).forEach(r=>saved[r.network]=r); }catch(_){}
+  box.textContent='';
+  box.appendChild(el('div',{class:'panel',style:'margin-bottom:14px'},[
+    el('div',{class:'card-h'},[ el('span',{class:'ic'},phIcon('chart-line-up')), el('span',{text:t('media_pixel_title','Pixel social')}) ]),
+    el('div',{class:'sm',text:t('media_pixel_help','Incolla l\'ID di ogni rete che vuoi attivare. I pixel partono SOLO per gli utenti che hanno dato il consenso marketing (GDPR). Sotto ogni campo trovi dove prendere l\'ID e il link diretto.')})
+  ]));
+  PIXEL_NETS.forEach(n=>{
+    const cur=saved[n.net]||{};
+    const input=el('input',{value:cur.pixel_id||'',placeholder:n.ex,style:'flex:1;min-width:180px'});
+    const act=el('input',{type:'checkbox'}); if(cur.active) act.checked=true;
+    const actLbl=el('label',{style:'display:inline-flex;align-items:center;gap:6px;font-size:12px;cursor:pointer'},[act, document.createTextNode(t('media_pixel_active','Attivo'))]);
+    const card=el('div',{class:'panel',style:'margin-bottom:10px;padding:13px'},[
+      el('div',{style:'display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px'},[
+        el('span',{class:'ttl',style:'flex:1;min-width:140px',text:n.label}),
+        actLbl,
+        el('button',{class:'btn sm gold',text:t('save_btn','Salva'),onclick:async()=>{
+          const { error }=await sb.from('social_pixels').upsert({ network:n.net, pixel_id:(input.value||'').trim()||null, active:!!act.checked, updated_at:new Date().toISOString() },{onConflict:'network'}).select('network');
+          if(error){ toast(error.message||t('error'),'err'); return; }
+          await logAudit('pixel_save','social_pixel',n.net,{active:!!act.checked});
+          toast(t('saved'),'ok','check');
+        }})
+      ]),
+      el('div',{style:'display:flex;gap:8px;flex-wrap:wrap;align-items:center'},[ input ]),
+      el('div',{class:'sm',style:'margin-top:7px;opacity:.85',text:'📍 '+n.where}),
+      el('a',{class:'btn sm',href:n.url,target:'_blank',rel:'noopener',style:'margin-top:7px'},[phIcon('arrow-square-out'),document.createTextNode(' '+t('media_pixel_open','Apri la dashboard'))])
+    ]);
+    box.appendChild(card);
+  });
+}
+
+/* ── OPENGRAPH: template dell'anteprima social per entità (POI/rotta/itinerario/profilo) ── */
+const OG_ENTITIES=[{k:'trip',lbl:'Itinerario'},{k:'route',lbl:'Rotta storica'},{k:'poi',lbl:'POI'},{k:'profile',lbl:'Profilo'}];
+async function renderMediaOg(){
+  const box=document.getElementById('mtab-og'); box.textContent=''; loadingBox(box);
+  let saved={};
+  try{ const {data}=await sb.from('og_templates').select('*').eq('lang','it'); (data||[]).forEach(r=>saved[r.entity_type]=r); }catch(_){}
+  box.textContent='';
+  box.appendChild(el('div',{class:'panel',style:'margin-bottom:14px'},[
+    el('div',{class:'card-h'},[ el('span',{class:'ic'},phIcon('share-fat')), el('span',{text:t('media_og_title','Anteprima social (OpenGraph)')}) ]),
+    el('div',{class:'sm',text:t('media_og_help','Come appare il link quando viene condiviso. Variabili: {name} {desc} {area} {stops}. L\'immagine è la copertina dell\'entità; qui imposti solo un\'immagine di riserva.')})
+  ]));
+  OG_ENTITIES.forEach(e=>{
+    const cur=saved[e.k]||{};
+    const ti=el('input',{value:cur.title_tpl||'{name} · POI•LOVE'});
+    const de=el('textarea',{rows:'2'}, cur.desc_tpl||'{desc}');
+    const im=el('input',{value:cur.image_url||'',placeholder:'https://… (immagine di riserva)'});
+    box.appendChild(el('div',{class:'panel',style:'margin-bottom:10px;padding:13px'},[
+      el('div',{style:'display:flex;align-items:center;gap:8px;margin-bottom:8px'},[ el('span',{class:'ttl',style:'flex:1',text:e.lbl}),
+        el('button',{class:'btn sm gold',text:t('save_btn','Salva'),onclick:async()=>{
+          const { error }=await sb.from('og_templates').upsert({ entity_type:e.k, lang:'it', title_tpl:(ti.value||'').trim()||'{name} · POI•LOVE', desc_tpl:(de.value||'').trim()||'{desc}', image_url:(im.value||'').trim()||null, active:true, updated_at:new Date().toISOString() },{onConflict:'entity_type,lang'}).select('id');
+          if(error){ toast(error.message||t('error'),'err'); return; }
+          await logAudit('og_save','og_template',e.k,{}); toast(t('saved'),'ok','check');
+        }}) ]),
+      el('div',{class:'field'},[ el('label',{text:t('media_og_ftitle','Titolo')}), ti ]),
+      el('div',{class:'field'},[ el('label',{text:t('media_og_fdesc','Descrizione')}), de ]),
+      el('div',{class:'field'},[ el('label',{text:t('media_og_fimg','Immagine di riserva')}), im ])
+    ]));
+  });
+}
+
+/* ── DEEP LINK: builder con UTM + tracciamento clic ── */
+async function renderMediaDeep(){
+  const box=document.getElementById('mtab-deeplink'); box.textContent=''; loadingBox(box);
+  let links=[];
+  try{ const {data}=await sb.from('deep_links').select('*').order('created_at',{ascending:false}).limit(100); links=data||[]; }catch(_){}
+  box.textContent='';
+  const f={};
+  const form=el('div',{class:'panel',style:'margin-bottom:14px'},[
+    el('div',{class:'card-h'},[ el('span',{class:'ic'},phIcon('link')), el('span',{text:t('media_deep_title','Nuovo deep link')}) ]),
+    el('div',{class:'sm',style:'margin-bottom:8px',text:t('media_deep_help','Crea un link corto poilove.com/go/<slug> che rimanda a una pagina con i parametri UTM e conta i clic.')}),
+    el('div',{class:'row2'},[
+      el('div',{class:'field'},[ el('label',{text:t('media_deep_slug','Slug (link corto)')}), f.slug=el('input',{placeholder:'es. estate-tirana'}) ]),
+      el('div',{class:'field'},[ el('label',{text:t('media_deep_label','Etichetta')}), f.label=el('input',{placeholder:'es. Campagna estate'}) ])
+    ]),
+    el('div',{class:'field'},[ el('label',{text:t('media_deep_target','Destinazione (URL)')}), f.target=el('input',{value:'https://poilove.com/',placeholder:'https://poilove.com/?poi=…'}) ]),
+    el('div',{class:'row2'},[
+      el('div',{class:'field'},[ el('label',{text:'utm_source'}), f.src=el('input',{placeholder:'es. instagram'}) ]),
+      el('div',{class:'field'},[ el('label',{text:'utm_medium'}), f.med=el('input',{placeholder:'es. social'}) ])
+    ]),
+    el('div',{class:'field'},[ el('label',{text:'utm_campaign'}), f.camp=el('input',{placeholder:'es. lancio-agosto'}) ]),
+    el('div',{class:'btn-row'},[ el('button',{class:'btn gold',text:t('media_deep_create','Crea link'),onclick:()=>createDeepLink(f)}) ])
+  ]);
+  box.appendChild(form);
+  const list=el('div',{class:'panel'},[ el('div',{class:'card-h'},[ el('span',{class:'ic'},phIcon('list-bullets')), el('span',{text:t('media_deep_list','Link creati')}) ]) ]);
+  if(!links.length) list.appendChild(el('div',{class:'sm',style:'opacity:.7',text:t('media_deep_none','Nessun link ancora.')}));
+  links.forEach(l=>{
+    const short='https://poilove.com/go/'+l.slug;
+    list.appendChild(el('div',{style:'display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:9px 0;border-bottom:1px solid rgba(128,128,128,.15)'},[
+      el('div',{style:'flex:1;min-width:160px'},[ el('div',{class:'ttl',text:l.label||l.slug}), el('div',{class:'sm',style:'opacity:.8',text:short}) ]),
+      el('span',{class:'chip dim',text:'👆 '+(l.clicks||0)}),
+      el('button',{class:'btn sm',text:t('a_copy','Copia'),onclick:()=>{ navigator.clipboard&&navigator.clipboard.writeText(short); toast(t('copied','Copiato'),'ok'); }}),
+      el('button',{class:'btn sm red',text:t('a_delete'),onclick:async()=>{ if(!(await adminConfirm(t('media_deep_del','Eliminare questo link?')))) return; const {error}=await sb.from('deep_links').delete().eq('id',l.id).select('id'); if(error){toast(t('rls_no_rows'),'err');return;} toast(t('saved'),'ok'); renderMediaDeep(); }})
+    ]));
+  });
+  box.appendChild(list);
+}
+async function createDeepLink(f){
+  const slug=(f.slug.value||'').trim().toLowerCase().replace(/[^a-z0-9\-]+/g,'-').replace(/^-+|-+$/g,'');
+  const target=(f.target.value||'').trim();
+  if(!slug){ toast(t('media_deep_need_slug','Serve uno slug'),'err'); return; }
+  if(!/^https?:\/\//i.test(target)){ toast(t('media_deep_need_target','Destinazione URL non valida'),'err'); return; }
+  // aggiunge gli UTM al target
+  let url=target; const qs=[];
+  if(f.src.value.trim()) qs.push('utm_source='+encodeURIComponent(f.src.value.trim()));
+  if(f.med.value.trim()) qs.push('utm_medium='+encodeURIComponent(f.med.value.trim()));
+  if(f.camp.value.trim()) qs.push('utm_campaign='+encodeURIComponent(f.camp.value.trim()));
+  if(qs.length) url += (url.includes('?')?'&':'?')+qs.join('&');
+  const { error }=await sb.from('deep_links').insert({ slug, target_url:url, label:(f.label.value||'').trim()||null, utm_source:f.src.value.trim()||null, utm_medium:f.med.value.trim()||null, utm_campaign:f.camp.value.trim()||null, active:true }).select('id');
+  if(error){ toast(error.message||t('error'),'err'); return; }
+  await logAudit('deeplink_create','deep_link',slug,{}); toast(t('saved'),'ok','check'); renderMediaDeep();
+}
+
+/* ── EMAIL: impostazioni mittente + template (invii/automatiche/inviti) + invio di prova ── */
+async function renderMediaEmail(){
+  const box=document.getElementById('mtab-email'); box.textContent=''; loadingBox(box);
+  let settings={}, tpls=[];
+  try{ const {data}=await sb.from('media_settings').select('value').eq('key','email').maybeSingle(); settings=(data&&data.value)||{}; }catch(_){}
+  try{ const {data}=await sb.from('email_templates').select('*').order('kind').order('key'); tpls=data||[]; }catch(_){}
+  box.textContent='';
+  // Impostazioni mittente
+  const s={};
+  box.appendChild(el('div',{class:'panel',style:'margin-bottom:14px'},[
+    el('div',{class:'card-h'},[ el('span',{class:'ic'},phIcon('gear')), el('span',{text:t('media_email_settings','Impostazioni email')}) ]),
+    el('div',{class:'sm',style:'margin-bottom:8px',text:t('media_email_settings_help','Il motore è AcumbaMail: la chiave API va nei Segreti di Supabase (ACUMBA_KEY), MAI qui. Per non finire in spam serve SPF/DKIM sul dominio del mittente.')}),
+    el('div',{class:'row2'},[
+      el('div',{class:'field'},[ el('label',{text:t('media_email_from','Mittente')}), s.from=el('input',{value:settings.from||'no-reply@poilove.com'}) ]),
+      el('div',{class:'field'},[ el('label',{text:t('media_email_fromname','Nome mittente')}), s.from_name=el('input',{value:settings.from_name||'POI•LOVE'}) ])
+    ]),
+    el('div',{class:'row2'},[
+      el('div',{class:'field'},[ el('label',{text:t('media_email_replyto','Rispondi a')}), s.reply_to=el('input',{value:settings.reply_to||'info@321.al'}) ]),
+      el('div',{class:'field'},[ el('label',{text:t('media_email_provider','Provider')}), (()=>{ const sel=el('select'); ['acumbamail','brevo','smtp'].forEach(p=>sel.appendChild(el('option',{value:p},p))); sel.value=settings.provider||'acumbamail'; s.provider=sel; return sel; })() ])
+    ]),
+    el('div',{class:'btn-row'},[ el('button',{class:'btn gold',text:t('save_btn','Salva'),onclick:async()=>{
+      const val={ from:s.from.value.trim(), from_name:s.from_name.value.trim(), reply_to:s.reply_to.value.trim(), provider:s.provider.value };
+      const { error }=await sb.from('media_settings').upsert({ key:'email', value:val, updated_at:new Date().toISOString() },{onConflict:'key'}).select('key');
+      if(error){ toast(error.message||t('error'),'err'); return; }
+      await logAudit('email_settings','media_settings','email',{}); toast(t('saved'),'ok','check');
+    }}) ])
+  ]));
+  // Template
+  const tplPanel=el('div',{class:'panel',style:'margin-bottom:14px'},[
+    el('div',{class:'card-h'},[ el('span',{class:'ic'},phIcon('envelope-simple')), el('span',{text:t('media_email_templates','Template email')}),
+      el('button',{class:'btn sm gold',style:'margin-left:auto',text:t('media_email_new','Nuovo template'),onclick:()=>editEmailTemplate(null)}) ])
+  ]);
+  const KIND_LBL={send:t('media_email_kind_send','Da inviare'),auto:t('media_email_kind_auto','Automatica'),invite:t('media_email_kind_invite','Invito')};
+  if(!tpls.length) tplPanel.appendChild(el('div',{class:'sm',style:'opacity:.7',text:t('media_email_none','Nessun template. Creane uno per campagne, automatiche o inviti.')}));
+  tpls.forEach(tp=>{
+    tplPanel.appendChild(el('div',{style:'display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:9px 0;border-bottom:1px solid rgba(128,128,128,.15)'},[
+      el('div',{style:'flex:1;min-width:160px'},[ el('div',{class:'ttl',text:tp.subject||tp.key}), el('div',{class:'sm',style:'opacity:.8',text:tp.key+' · '+(tp.lang||'it')}) ]),
+      el('span',{class:'chip '+(tp.kind==='auto'?'gold':tp.kind==='invite'?'green':'dim'),text:KIND_LBL[tp.kind]||tp.kind}),
+      tp.active?null:el('span',{class:'chip dim',text:t('media_email_off','spento')}),
+      el('button',{class:'btn sm',text:t('media_email_test','Prova'),onclick:()=>sendTestEmail(tp)}),
+      el('button',{class:'btn sm gold',text:t('a_edit'),onclick:()=>editEmailTemplate(tp)}),
+      el('button',{class:'btn sm red',text:t('a_delete'),onclick:async()=>{ if(!(await adminConfirm(t('media_email_del','Eliminare questo template?')))) return; const {error}=await sb.from('email_templates').delete().eq('id',tp.id).select('id'); if(error){toast(t('rls_no_rows'),'err');return;} toast(t('saved'),'ok'); renderMediaEmail(); }})
+    ]));
+  });
+  box.appendChild(tplPanel);
+}
+function editEmailTemplate(tp){
+  const f={}; const body=el('div');
+  const kindSel=el('select'); [['send',t('media_email_kind_send','Da inviare')],['auto',t('media_email_kind_auto','Automatica')],['invite',t('media_email_kind_invite','Invito')]].forEach(k=>kindSel.appendChild(el('option',{value:k[0]},k[1]))); if(tp) kindSel.value=tp.kind; f.kind=kindSel;
+  const langSel=el('select'); ['it','sq','en'].forEach(l=>langSel.appendChild(el('option',{value:l},l))); if(tp) langSel.value=tp.lang||'it'; f.lang=langSel;
+  body.appendChild(el('div',{class:'row2'},[ el('div',{class:'field'},[el('label',{text:t('media_email_ekind','Tipo')}),kindSel]), el('div',{class:'field'},[el('label',{text:t('media_email_elang','Lingua')}),langSel]) ]));
+  body.appendChild(el('div',{class:'field'},[ el('label',{text:'Key'}), f.key=el('input',{value:(tp&&tp.key)||'',placeholder:'es. benvenuto'}) ]));
+  body.appendChild(el('div',{class:'field'},[ el('label',{text:t('media_email_esubj','Oggetto')}), f.subject=el('input',{value:(tp&&tp.subject)||''}) ]));
+  body.appendChild(el('div',{class:'field'},[ el('label',{text:t('media_email_ebody','Corpo (HTML). Variabili: {{name}} {{link}}')}), f.body=el('textarea',{rows:'8',style:'font-family:monospace;font-size:12px'}, (tp&&tp.body_html)||'<p>Ciao {{name}},</p>\n<p>…</p>\n<p><a href="{{link}}">Vai su POI•LOVE</a></p>') ]));
+  const actW=el('label',{style:'display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer'}); f.active=el('input',{type:'checkbox'}); if(!tp||tp.active!==false) f.active.checked=true; actW.appendChild(f.active); actW.appendChild(document.createTextNode(t('media_email_eactive','Attivo')));
+  body.appendChild(el('div',{class:'field'},[actW]));
+  openModal(tp?t('a_edit'):t('media_email_new','Nuovo template'),'envelope-simple',body,async()=>{
+    const key=(f.key.value||'').trim().toLowerCase().replace(/[^a-z0-9_]+/g,'_'); if(!key){ toast(t('need_title'),'err'); return false; }
+    const rec={ key, kind:f.kind.value, lang:f.lang.value, subject:(f.subject.value||'').trim(), body_html:f.body.value||'', active:!!f.active.checked, updated_at:new Date().toISOString() };
+    if(!rec.subject){ toast(t('media_email_needsubj','Serve l\'oggetto'),'err'); return false; }
+    const { error }=await sb.from('email_templates').upsert(rec,{onConflict:'key,lang'}).select('id');
+    if(error){ toast(error.message||t('error'),'err'); return false; }
+    await logAudit('email_template','email_template',key,{}); toast(t('saved'),'ok'); renderMediaEmail(); return true;
+  });
+}
+async function sendTestEmail(tp){
+  const to=await adminPrompt(t('media_email_test_to','Email di prova (a chi la mando?):'), ME&&ME.email||'');
+  if(!to||!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(to)){ if(to!==null) toast(t('media_email_bad_email','Email non valida'),'err'); return; }
+  toast(t('media_email_sending','Invio in corso…'),null,'circle-notch');
+  try{
+    const { data, error }=await sb.functions.invoke('send-email',{ body:{ to, template_key:tp.key, lang:tp.lang||'it', vars:{ name:'Prova', link:'https://poilove.com' } } });
+    if(error) throw error;
+    if(data&&data.ok){ toast(t('media_email_sent','✓ Email inviata'),'ok','check'); }
+    else { toast((data&&data.error)||t('media_email_engine_off','Motore email non configurato: manca la chiave AcumbaMail nei Segreti Supabase'),'err'); }
+  }catch(e){ toast(t('media_email_engine_off','Motore email non configurato: manca la chiave AcumbaMail nei Segreti Supabase'),'err'); }
 }
 
 // Scrittura best-effort su admin_audit_log dal client.
