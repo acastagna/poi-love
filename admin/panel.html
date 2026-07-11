@@ -249,6 +249,13 @@ html[data-theme="light"] .btn.gold{color:#fbf6ec}
 .btn.sm{padding:6px 10px;font-size:11.5px;border-radius:9px}
 .btn:disabled{opacity:.5;cursor:not-allowed}
 .btn-row{display:flex;gap:6px;flex-wrap:wrap}
+/* Dialoghi NOSTRI (sostituiscono alert/confirm/prompt del browser) */
+.adm-dlg-ov{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(2px)}
+.adm-dlg{width:100%;max-width:420px;background:var(--panel,#17130d);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 24px 70px rgba(0,0,0,.5)}
+.adm-dlg-msg{font-size:14px;line-height:1.5;color:var(--paper);white-space:pre-line}
+.adm-dlg-in{width:100%;margin-top:12px}
+/* Select NOSTRE: via l'aspetto di sistema, freccia disegnata da noi */
+select{appearance:none;-webkit-appearance:none;-moz-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' fill='none' stroke='%23b3a789' stroke-width='2' stroke-linecap='round'/></svg>");background-repeat:no-repeat;background-position:right 12px center;padding-right:34px;cursor:pointer}
 /* Editor POI completo: foto, categorie a chips, thumbnail nelle righe */
 .poiph-strip{display:flex;gap:8px;flex-wrap:wrap}
 .poiph-th{width:86px;height:86px;border-radius:10px;background:var(--field-bg) center/cover no-repeat;border:1px solid var(--line);position:relative;overflow:hidden}
@@ -837,11 +844,12 @@ html[data-theme="light"] .chip.green{color:#236b39}
         <div class="card-h"><span class="ic"><i class="ph-duotone ph-plus-circle"></i></span><span data-t="cat_new_title">Nuova categoria / modifica</span></div>
         <div class="row2">
           <div class="field"><label>Key</label><input id="catKey" placeholder="es. gelateria" autocomplete="off"></div>
-          <div class="field"><label data-t="cat_macro">Macro (enum)</label><select id="catMacro">
-            <option value="cibo">cibo</option><option value="lavoro">lavoro</option><option value="pernottare">pernottare</option>
-            <option value="natura">natura</option><option value="festa">festa</option><option value="cultura">cultura</option>
-            <option value="pratico">pratico</option><option value="benessere">benessere</option><option value="love">love</option>
-            <option value="audioguida">audioguida</option><option value="mappa">mappa</option><option value="open_source">open_source</option>
+          <div class="field"><label data-t="f_family">Famiglia genitore</label><select id="catMacro">
+            <option value="cibo">Cibo Normale</option><option value="cibo_gourmet">Cibo Gourmet</option><option value="fast_food">Fast Food</option>
+            <option value="lavoro">Lavoro</option><option value="pernottare">Dormire</option><option value="acquisti">Acquisti</option>
+            <option value="vacanze">Vacanze</option><option value="festa">Festa</option><option value="cultura">Cultura</option>
+            <option value="utilita">Utilità</option><option value="benessere">Benessere</option><option value="audioguida">Audioguida (POI•VOICE)</option>
+            <option value="altro">Altro</option>
           </select></div>
         </div>
         <div class="row2">
@@ -980,7 +988,7 @@ const T = {
     tag_renamed:'Rinominato su %n POI', tag_deleted:'Rimosso da %n POI',
     tag_del_confirm:'Eliminare il tag "%s" da tutti i POI?', tag_block_confirm:'Bloccare questo tag? Verrà rimosso dai POI e non sarà più suggerito.',
     cat_req_title:'Categorie personalizzate proposte', cat_req_help:'Ogni utente può proporre una sola categoria sua. La vedi qui con chi l\'ha creata e quante volte è stata usata: diventa pubblica da sola a 20 usi, oppure la approvi tu subito.',
-    cat_req_empty:'Nessuna categoria proposta in attesa', cat_new_title:'Nuova categoria / modifica', cat_approve_now:'Approva ora', f_photos:'Foto del luogo', bdg_official:'Ufficiale', bdg_essential:'Indispensabile', bdg_top:'Più votato', bdg_official_hint:'Badge Ufficiale: curata e garantita da POI•LOVE', bdg_essential_hint:'Badge Indispensabile: da non perdere, scelta della redazione', poi_no_photos:'Nessuna foto: aggiungila da URL o carica un file', poi_ph_main:'PRINCIPALE', poi_ph_make_main:'Rendi principale', poi_ph_url_err:'Serve un URL https valido', poi_ph_upload:'Carica file', f_cats3:'Categorie (fino a 3, la prima è la principale)', f_tags:'Tag (Invio per aggiungere, max 10)', f_tag_ph:'aggiungi tag…', cat_max3_admin:'Massimo 3 categorie', tag_max10:'Massimo 10 tag', geo_from_addr:'Coordinate dall\'indirizzo', geo_from_coords:'Indirizzo dalle coordinate', geo_need_addr:'Scrivi prima indirizzo o città', geo_need_coords:'Servono lat e lng validi', geo_searching:'Cerco…', geo_not_found:'Non trovato, precisa l\'indirizzo', geo_done:'Compilato', photo_upload_err:'Caricamento foto non riuscito', cat_reject:'Rifiuta', cat_approved:'Categoria pubblicata', cat_reject_confirm:'Rifiutare e togliere questa categoria proposta?',
+    cat_req_empty:'Nessuna categoria proposta in attesa', cat_new_title:'Nuova categoria / modifica', cat_approve_now:'Approva ora', f_photos:'Foto del luogo', ok_btn:'OK', f_family:'Famiglia genitore', bdg_official:'Ufficiale', bdg_essential:'Indispensabile', bdg_top:'Più votato', bdg_official_hint:'Badge Ufficiale: curata e garantita da POI•LOVE', bdg_essential_hint:'Badge Indispensabile: da non perdere, scelta della redazione', poi_no_photos:'Nessuna foto: aggiungila da URL o carica un file', poi_ph_main:'PRINCIPALE', poi_ph_make_main:'Rendi principale', poi_ph_url_err:'Serve un URL https valido', poi_ph_upload:'Carica file', f_cats3:'Categorie (fino a 3, la prima è la principale)', f_tags:'Tag (Invio per aggiungere, max 10)', f_tag_ph:'aggiungi tag…', cat_max3_admin:'Massimo 3 categorie', tag_max10:'Massimo 10 tag', geo_from_addr:'Coordinate dall\'indirizzo', geo_from_coords:'Indirizzo dalle coordinate', geo_need_addr:'Scrivi prima indirizzo o città', geo_need_coords:'Servono lat e lng validi', geo_searching:'Cerco…', geo_not_found:'Non trovato, precisa l\'indirizzo', geo_done:'Compilato', photo_upload_err:'Caricamento foto non riuscito', cat_reject:'Rifiuta', cat_approved:'Categoria pubblicata', cat_reject_confirm:'Rifiutare e togliere questa categoria proposta?',
     cat_macro:'Macro (enum)', cat_icon:'Icona Phosphor', cat_color:'Colore', cat_sort:'Ordine', cat_save:'Salva categoria',
     cat_list_title:'Categorie attive e spente', cat_on:'Attiva', cat_off:'Spenta', cat_edit:'Modifica',
     cat_saved:'Categoria salvata', cat_key_req:'Key, macro e le 3 etichette sono obbligatorie',
@@ -1080,7 +1088,7 @@ const T = {
     tag_renamed:'U riemërtua në %n POI', tag_deleted:'U hoq nga %n POI',
     tag_del_confirm:'Të fshihet etiketa "%s" nga të gjitha POI-t?', tag_block_confirm:'Ta bllokosh këtë etiketë? Do të hiqet nga POI-t dhe nuk do të sugjerohet më.',
     cat_req_title:'Kategori personale të propozuara', cat_req_help:'Çdo përdorues mund të propozojë vetëm një kategori të tijën. E sheh këtu me atë që e krijoi dhe sa herë është përdorur: bëhet publike vetë në 20 përdorime, ose e miraton ti menjëherë.',
-    cat_req_empty:'Asnjë kategori e propozuar në pritje', cat_new_title:'Kategori e re / ndrysho', cat_approve_now:'Mirato tani', f_photos:'Fotot e vendit', bdg_official:'Zyrtare', bdg_essential:'E domosdoshme', bdg_top:'Më e votuara', bdg_official_hint:'Distinktivi Zyrtare: e kuruar dhe e garantuar nga POI•LOVE', bdg_essential_hint:'Distinktivi E domosdoshme: mos e humb, zgjedhja e redaksisë', poi_no_photos:'Asnjë foto: shtoje nga URL ose ngarko një skedar', poi_ph_main:'KRYESORE', poi_ph_make_main:'Bëje kryesore', poi_ph_url_err:'Duhet një URL https i vlefshëm', poi_ph_upload:'Ngarko skedar', f_cats3:'Kategoritë (deri në 3, e para është kryesorja)', f_tags:'Etiketat (Enter për të shtuar, max 10)', f_tag_ph:'shto etiketë…', cat_max3_admin:'Maksimumi 3 kategori', tag_max10:'Maksimumi 10 etiketa', geo_from_addr:'Koordinatat nga adresa', geo_from_coords:'Adresa nga koordinatat', geo_need_addr:'Shkruaj fillimisht adresën ose qytetin', geo_need_coords:'Duhen lat dhe lng të vlefshme', geo_searching:'Po kërkoj…', geo_not_found:'Nuk u gjet, saktëso adresën', geo_done:'U plotësua', photo_upload_err:'Ngarkimi i fotos dështoi', cat_reject:'Refuzo', cat_approved:'Kategoria u publikua', cat_reject_confirm:'Ta refuzosh e ta heqësh këtë kategori të propozuar?',
+    cat_req_empty:'Asnjë kategori e propozuar në pritje', cat_new_title:'Kategori e re / ndrysho', cat_approve_now:'Mirato tani', f_photos:'Fotot e vendit', ok_btn:'OK', f_family:'Familja prind', bdg_official:'Zyrtare', bdg_essential:'E domosdoshme', bdg_top:'Më e votuara', bdg_official_hint:'Distinktivi Zyrtare: e kuruar dhe e garantuar nga POI•LOVE', bdg_essential_hint:'Distinktivi E domosdoshme: mos e humb, zgjedhja e redaksisë', poi_no_photos:'Asnjë foto: shtoje nga URL ose ngarko një skedar', poi_ph_main:'KRYESORE', poi_ph_make_main:'Bëje kryesore', poi_ph_url_err:'Duhet një URL https i vlefshëm', poi_ph_upload:'Ngarko skedar', f_cats3:'Kategoritë (deri në 3, e para është kryesorja)', f_tags:'Etiketat (Enter për të shtuar, max 10)', f_tag_ph:'shto etiketë…', cat_max3_admin:'Maksimumi 3 kategori', tag_max10:'Maksimumi 10 etiketa', geo_from_addr:'Koordinatat nga adresa', geo_from_coords:'Adresa nga koordinatat', geo_need_addr:'Shkruaj fillimisht adresën ose qytetin', geo_need_coords:'Duhen lat dhe lng të vlefshme', geo_searching:'Po kërkoj…', geo_not_found:'Nuk u gjet, saktëso adresën', geo_done:'U plotësua', photo_upload_err:'Ngarkimi i fotos dështoi', cat_reject:'Refuzo', cat_approved:'Kategoria u publikua', cat_reject_confirm:'Ta refuzosh e ta heqësh këtë kategori të propozuar?',
     cat_macro:'Makro (enum)', cat_icon:'Ikona Phosphor', cat_color:'Ngjyra', cat_sort:'Renditja', cat_save:'Ruaj kategorinë',
     cat_list_title:'Kategoritë aktive dhe të fikura', cat_on:'Aktive', cat_off:'E fikur', cat_edit:'Ndrysho',
     cat_saved:'Kategoria u ruajt', cat_key_req:'Key, makro dhe 3 etiketat janë të detyrueshme',
@@ -1176,7 +1184,7 @@ const T = {
     tag_renamed:'Renamed on %n POIs', tag_deleted:'Removed from %n POIs',
     tag_del_confirm:'Delete tag "%s" from all POIs?', tag_block_confirm:'Block this tag? It will be removed from POIs and no longer suggested.',
     cat_req_title:'Proposed custom categories', cat_req_help:'Each user can propose a single category of their own. You see it here with who created it and how many times it was used: it goes public on its own at 20 uses, or you approve it instantly.',
-    cat_req_empty:'No proposed categories pending', cat_new_title:'New category / edit', cat_approve_now:'Approve now', f_photos:'Place photos', bdg_official:'Official', bdg_essential:'Essential', bdg_top:'Most voted', bdg_official_hint:'Official badge: curated and guaranteed by POI•LOVE', bdg_essential_hint:'Essential badge: not to be missed, editorial pick', poi_no_photos:'No photos yet: add by URL or upload a file', poi_ph_main:'MAIN', poi_ph_make_main:'Make main', poi_ph_url_err:'A valid https URL is required', poi_ph_upload:'Upload file', f_cats3:'Categories (up to 3, first is primary)', f_tags:'Tags (Enter to add, max 10)', f_tag_ph:'add tag…', cat_max3_admin:'Maximum 3 categories', tag_max10:'Maximum 10 tags', geo_from_addr:'Coordinates from address', geo_from_coords:'Address from coordinates', geo_need_addr:'Type an address or city first', geo_need_coords:'Valid lat and lng required', geo_searching:'Searching…', geo_not_found:'Not found, refine the address', geo_done:'Filled in', photo_upload_err:'Photo upload failed', cat_reject:'Reject', cat_approved:'Category published', cat_reject_confirm:'Reject and remove this proposed category?',
+    cat_req_empty:'No proposed categories pending', cat_new_title:'New category / edit', cat_approve_now:'Approve now', f_photos:'Place photos', ok_btn:'OK', f_family:'Parent family', bdg_official:'Official', bdg_essential:'Essential', bdg_top:'Most voted', bdg_official_hint:'Official badge: curated and guaranteed by POI•LOVE', bdg_essential_hint:'Essential badge: not to be missed, editorial pick', poi_no_photos:'No photos yet: add by URL or upload a file', poi_ph_main:'MAIN', poi_ph_make_main:'Make main', poi_ph_url_err:'A valid https URL is required', poi_ph_upload:'Upload file', f_cats3:'Categories (up to 3, first is primary)', f_tags:'Tags (Enter to add, max 10)', f_tag_ph:'add tag…', cat_max3_admin:'Maximum 3 categories', tag_max10:'Maximum 10 tags', geo_from_addr:'Coordinates from address', geo_from_coords:'Address from coordinates', geo_need_addr:'Type an address or city first', geo_need_coords:'Valid lat and lng required', geo_searching:'Searching…', geo_not_found:'Not found, refine the address', geo_done:'Filled in', photo_upload_err:'Photo upload failed', cat_reject:'Reject', cat_approved:'Category published', cat_reject_confirm:'Reject and remove this proposed category?',
     cat_macro:'Macro (enum)', cat_icon:'Phosphor icon', cat_color:'Color', cat_sort:'Sort', cat_save:'Save category',
     cat_list_title:'Active and disabled categories', cat_on:'Active', cat_off:'Off', cat_edit:'Edit',
     cat_saved:'Category saved', cat_key_req:'Key, macro and the 3 labels are required',
@@ -1619,7 +1627,7 @@ async function loadModeration(){
         actions.appendChild(el('button',{class:'btn sm red',
           onclick:()=>moderateUser(r.target_id,'suspended','reports#'+r.id, plus7d()), text:t('a_suspend')}));
         actions.appendChild(el('button',{class:'btn sm red',
-          onclick:()=>{ if(confirm(t('confirm_ban'))) moderateUser(r.target_id,'banned','reports#'+r.id,null); }, text:t('a_ban')}));
+          onclick:async()=>{ if(await adminConfirm(t('confirm_ban'))) moderateUser(r.target_id,'banned','reports#'+r.id,null); }, text:t('a_ban')}));
       }
 
       tb.appendChild(el('tr',null,[
@@ -1717,7 +1725,7 @@ async function startSupportWith(userId, username, avatar){
   const ta=document.getElementById('msgBody'); if(ta) ta.focus();
 }
 async function startNewSupportThread(){
-  const uname=(prompt(t('msg_ask_user'))||'').trim().replace(/^@/,'');
+  const uname=((await adminPrompt(t('msg_ask_user')))||'').trim().replace(/^@/,'');
   if(!uname) return;
   try{
     const { data, error }=await sb.from('profiles').select('id,username,avatar_url').ilike('username',uname).limit(1);
@@ -1762,7 +1770,7 @@ async function loadUsers(){
         actions.appendChild(el('button',{class:'btn sm gold',
           onclick:()=>moderateUser(u.id,'suspended','manual',plus7d()), text:t('a_suspend')}));
         actions.appendChild(el('button',{class:'btn sm red',
-          onclick:()=>{ if(confirm(t('confirm_ban'))) moderateUser(u.id,'banned','manual',null); }, text:t('a_ban')}));
+          onclick:async()=>{ if(await adminConfirm(t('confirm_ban'))) moderateUser(u.id,'banned','manual',null); }, text:t('a_ban')}));
       } else {
         actions.appendChild(el('button',{class:'btn sm green',
           onclick:()=>moderateUser(u.id,'active','manual',null), text:t('a_reactivate')}));
@@ -2526,6 +2534,7 @@ async function createTrip(){
 
 /* ═════════════════════════ 8c) CATEGORIE (tassonomia data-driven) ═════════════════════════ */
 async function loadCategoriesAdmin(){
+  { const ms=document.getElementById('catMacro'); if(ms) _famSelectOptions(ms, ms.value||'cibo'); }
   // Categorie personalizzate proposte dagli utenti (non ancora pubbliche): chi + usi verso 20 + approva/rifiuta.
   const rb=document.getElementById('catReqTable'); loadingBox(rb);
   try{
@@ -2568,7 +2577,7 @@ async function loadCategoriesAdmin(){
       cb.appendChild(el('div',{style:'display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid rgba(128,128,128,.15);flex-wrap:wrap'},[
         ico,
         el('span',{class:'ttl',style:'min-width:110px',text:c.label_it}),
-        el('span',{class:'sm',style:'flex:1',text:c.key+' \u00b7 '+c.macro+' \u00b7 '+c.sort}),
+        el('span',{class:'sm',style:'flex:1',text:c.key+' \u00b7 '+_admFamLbl(c.macro)+' \u00b7 '+c.sort}),
         el('span',{class:'chip '+(c.active?'green':'dim'),text:c.active?t('cat_on'):t('cat_off')}),
         el('button',{class:'btn sm',text:t('cat_edit'),onclick:()=>fillCatForm(c)}),
         el('button',{class:'btn sm',text:c.active?t('cat_off'):t('cat_on'),onclick:async()=>{
@@ -2603,7 +2612,7 @@ async function approveCustomCat(key,label){
 }
 // Rifiuta: elimina la proposta (solo se ancora non pubblica).
 async function rejectCustomCat(key){
-  if(!confirm(t('cat_reject_confirm'))) return;
+  if(!(await adminConfirm(t('cat_reject_confirm')))) return;
   try{
     const { error } = await sb.rpc('admin_reject_category',{ p_key:key });
     if(error){ toast(error.message||t('error'),'err'); return; }
@@ -2688,7 +2697,7 @@ async function toggleBlockTag(tg,on){
   toast(t('saved'),'ok'); loadTagsAdmin();
 }
 async function renameTagAdmin(oldTag){
-  const nv=prompt(t('tag_rename_ask').replace('%s',oldTag), oldTag);
+  const nv=await adminPrompt(t('tag_rename_ask').replace('%s',oldTag), oldTag);
   if(nv===null) return;
   const nn=String(nv).trim().toLowerCase();
   if(!nn||nn===oldTag){ return; }
@@ -2697,7 +2706,7 @@ async function renameTagAdmin(oldTag){
   toast(t('tag_renamed').replace('%n',String(data??0)),'ok'); loadTagsAdmin();
 }
 async function deleteTagAdmin(tg){
-  if(!confirm(t('tag_del_confirm').replace('%s',tg))) return;
+  if(!(await adminConfirm(t('tag_del_confirm').replace('%s',tg)))) return;
   const { data, error } = await sb.rpc('admin_delete_tag',{p_tag:tg});
   if(error){ toast(error.message||t('error'),'err'); return; }
   toast(t('tag_deleted').replace('%n',String(data??0)),'ok'); loadTagsAdmin();
@@ -2815,7 +2824,34 @@ async function logAudit(action, targetType, targetId, meta){
 }
 
 /* ═════════════════════════ 7) POI CREATI — vedi / modifica / cancella ═════════════════════════ */
-const POI_CATS = ['cibo','lavoro','pernottare','natura','festa','cultura','pratico','benessere','love','audioguida','mappa','open_source'];
+const POI_CATS = ['cibo','cibo_gourmet','fast_food','lavoro','pernottare','acquisti','vacanze','festa','cultura','utilita','benessere','audioguida','altro','natura','pratico','love','mappa','open_source'];
+// FAMIGLIE GENITORE (founder 10/07): etichette tradotte + colore per tipologia. Gli enum storici confluiscono.
+const _ADM_FAMS={
+  cibo:{it:'Cibo Normale',sq:'Ushqim i zakonshëm',en:'Everyday Food',color:'#F97316'},
+  cibo_gourmet:{it:'Cibo Gourmet',sq:'Ushqim Gourmet',en:'Gourmet Food',color:'#8E1D2F'},
+  fast_food:{it:'Fast Food',sq:'Fast Food',en:'Fast Food',color:'#F6B10A'},
+  lavoro:{it:'Lavoro',sq:'Punë',en:'Work',color:'#4A6572'},
+  pernottare:{it:'Dormire',sq:'Fjetje',en:'Sleep',color:'#4F46E5'},
+  acquisti:{it:'Acquisti',sq:'Blerje',en:'Shopping',color:'#EC4899'},
+  vacanze:{it:'Vacanze',sq:'Pushime',en:'Holidays',color:'#14B8A6'},
+  festa:{it:'Festa',sq:'Festë',en:'Party',color:'#A855F7'},
+  cultura:{it:'Cultura',sq:'Kulturë',en:'Culture',color:'#2563EB'},
+  utilita:{it:'Utilità',sq:'Shërbime',en:'Utilities',color:'#6B7280'},
+  benessere:{it:'Benessere',sq:'Mirëqenie',en:'Wellness',color:'#22C55E'},
+  audioguida:{it:'Audioguida (POI•VOICE)',sq:'Audioguidë (POI•VOICE)',en:'Audio guide (POI•VOICE)',color:'#285EA7'},
+  altro:{it:'Altro',sq:'Tjetër',en:'Other',color:'#94A3B8'}
+};
+const _ADM_FAM_OF={natura:'vacanze',pratico:'utilita',mappa:'utilita',love:'altro',open_source:'altro'};
+function _admFamOf(m){ return _ADM_FAMS[m]?m:(_ADM_FAM_OF[m]||'altro'); }
+function _admFamLbl(m){ const f=_ADM_FAMS[_admFamOf(m)]; return (f&&(f[lang]||f.it))||m; }
+// Le select delle famiglie mostrano l'etichetta tradotta, mai l'enum crudo.
+function _famSelectOptions(sel, current){
+  sel.textContent='';
+  Object.keys(_ADM_FAMS).forEach(fid=>sel.appendChild(el('option',{value:fid}, _ADM_FAMS[fid][lang]||_ADM_FAMS[fid].it)));
+  // valore storico non-famiglia (es. natura): lo mostro mappato ma conservo il value reale
+  if(current && !_ADM_FAMS[current]){ sel.appendChild(el('option',{value:current}, _admFamLbl(current)+' ('+current+')')); }
+  if(current) sel.value=current;
+}
 const POI_VIS  = ['private','community','suggested_google','official'];
 let poiSearchTm = null;
 let poisSeq = 0; // token di generazione: vince l'ultima richiesta lanciata, non l'ultima che risolve
@@ -2944,8 +2980,9 @@ async function editPoi(p){
     if(!photos.length) phBox.appendChild(el('div',{class:'sm',style:'opacity:.7',text:t('poi_no_photos')}));
     photos.forEach((u,i)=>{
       const ok=/^https?:\/\//i.test(u);
-      const th=el('div',{class:'poiph-th',title:u});
+      const th=el('div',{class:'poiph-th',title:u,style:'cursor:zoom-in'});
       if(ok) th.style.backgroundImage='url("'+encodeURI(u).replace(/["'()\\]/g,'')+'")';
+      th.addEventListener('click',ev=>{ if(ev.target.closest('.poiph-act')) return; _photoLightbox(u); });
       if(i===0) th.appendChild(el('span',{class:'poiph-main',text:t('poi_ph_main')}));
       const bar=el('div',{class:'poiph-bar'});
       if(i>0) bar.appendChild(el('button',{class:'poiph-act',title:t('poi_ph_make_main'),onclick:()=>{ photos.splice(0,0,photos.splice(i,1)[0]); drawPhotos(); }}, phIcon('star')));
@@ -2977,9 +3014,7 @@ async function editPoi(p){
 
   // ── CATEGORIA MACRO + fino a 3 CATEGORIE (tassonomia ricca) ──
   const catSel=el('select');
-  const cats=(p.category && !POI_CATS.includes(p.category)) ? POI_CATS.concat([p.category]) : POI_CATS;
-  cats.forEach(c=> catSel.appendChild(el('option',{value:c}, c)) );
-  if(p.category) catSel.value=p.category;
+  _famSelectOptions(catSel, p.category||'cibo');
   f.category=catSel;
   const catChips=el('div',{class:'poiph-cats'});
   function drawCats(){
@@ -3001,7 +3036,7 @@ async function editPoi(p){
   }
   drawCats();
   const catRow=el('div',{class:'row2'});
-  catRow.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_cat')+' (macro)'}), catSel ]));
+  catRow.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_family','Famiglia genitore')}), catSel ]));
   catRow.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_cats3')}), catChips ]));
   body.appendChild(catRow);
 
@@ -3119,7 +3154,7 @@ async function approvePoi(id){
 // Soft-delete REVERSIBILE (regola: niente si cancella). Nasconde il POI al pubblico
 // salvando lo stato per il ripristino. La cancellazione vera è deletePoi (solo per rimossi).
 async function softDeletePoi(id, title){
-  const reason=prompt(t('remove_ask')+(title? '\n\n"'+title+'"' : ''), '');
+  const reason=await adminPrompt(t('remove_ask')+(title? '\n\n"'+title+'"' : ''), '');
   if(reason===null) return; // annullato
   try{
     const { data, error } = await sb.rpc('admin_soft_delete_poi',{p_id:id,p_reason:(reason||'').trim()||null});
@@ -3138,7 +3173,7 @@ async function restorePoi(id){
 }
 // Cancellazione DEFINITIVA (irreversibile): disponibile solo sui POI già rimossi.
 async function deletePoi(id, title){
-  if(!confirm(t('confirm_del_poi_hard')+(title? '\n\n"'+title+'"' : ''))) return;
+  if(!(await adminConfirm(t('confirm_del_poi_hard')+(title? '\n\n"'+title+'"' : '')))) return;
   try{
     const { data, error } = await sb.from('pois').delete().eq('id',id).select('id');
     if(error){ toast(isBackendMissing(error)?t('backend_off'):(error.message||t('error')),'err'); return; }
@@ -3187,7 +3222,7 @@ async function createRouteFromSuggestion(id){
   }catch(e){ toast(t('error'),'err'); }
 }
 async function dismissRouteSuggestion(id){
-  if(!confirm(t('rsug_dismiss_confirm'))) return;
+  if(!(await adminConfirm(t('rsug_dismiss_confirm')))) return;
   try{
     const { data, error } = await sb.rpc('admin_dismiss_route_suggestion',{ p_suggestion_id:id });
     if(error){ toast(error.message||t('error'),'err'); return; }
@@ -3253,7 +3288,7 @@ async function _addProposedToRoute(p){
   }catch(e){ toast(t('error'),'err'); }
 }
 async function _clearProposedPoi(id){
-  if(!confirm(t('ppoi_done_confirm'))) return;
+  if(!(await adminConfirm(t('ppoi_done_confirm')))) return;
   try{
     const { error } = await sb.rpc('admin_clear_poi_route_proposal',{ p_poi:id });
     if(error){ toast(error.message||t('error'),'err'); return; }
@@ -3321,7 +3356,7 @@ async function _aiOrderStops(tripId, stops){
 }
 // Duplica un'intera rotta storica con tutte le sue tappe (bozza).
 async function _duplicateRoute(routeId, name){
-  if(!confirm(t('rt_dup_confirm','Duplicare questa rotta con tutte le tappe?'))) return;
+  if(!(await adminConfirm(t('rt_dup_confirm','Duplicare questa rotta con tutte le tappe?')))) return;
   try{
     const { data:orig, error:e0 }=await sb.from('trips').select('name,badge,description,cover_url,route_line').eq('id',routeId).single();
     if(e0) throw e0;
@@ -3338,7 +3373,22 @@ async function _duplicateRoute(routeId, name){
 // Cerca ONLINE la foto ufficiale/più bella della tappa: immagine principale di Wikipedia (IT poi EN),
 // fallback foto vicino alle coordinate (Wikimedia Commons geosearch). Ritorna un URL o null.
 async function _findPlacePhoto(name, lat, lng){
-  const q=(name||'').trim(); if(!q) return null;
+  const q=(name||'').trim(); if(!q && (lat==null||lng==null)) return null;
+  // 1) COORDINATE prima di tutto: foto scattate DAVVERO in quel punto (Commons geosearch, 300m).
+  //    La ricerca per solo titolo dava immagini fuori tema; il luogo vero batte il nome.
+  if(lat!=null && lng!=null){
+    try{
+      const gu='https://commons.wikimedia.org/w/api.php?action=query&list=geosearch&gsradius=300&gscoord='+lat+'%7C'+lng+'&gslimit=8&gsnamespace=6&format=json&origin=*';
+      const r=await fetch(gu); const j=await r.json();
+      const files=((j&&j.query&&j.query.geosearch)||[]).filter(g=>/\.(jpe?g|png|webp)$/i.test(g.title||''));
+      if(files[0]&&files[0].title){
+        const iu='https://commons.wikimedia.org/w/api.php?action=query&titles='+encodeURIComponent(files[0].title)+'&prop=imageinfo&iiprop=url&iiurlwidth=1200&format=json&origin=*';
+        const r2=await fetch(iu); const j2=await r2.json(); const pg=(j2&&j2.query&&j2.query.pages)||{};
+        for(const k in pg){ const ii=pg[k].imageinfo&&pg[k].imageinfo[0]; if(ii) return ii.thumburl||ii.url; }
+      }
+    }catch(e){}
+  }
+  if(!q) return null;
   for(const wiki of ['it','en']){
     try{
       const u='https://'+wiki+'.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch='+encodeURIComponent(q)+'&gsrlimit=1&prop=pageimages&piprop=thumbnail%7Coriginal&pithumbsize=1200&format=json&origin=*';
@@ -3391,7 +3441,7 @@ async function _routeStopOp(routeId, stops, idx, op){
       const arr=stops.slice(); arr.splice(idx+1,0,{id:ins.id});
       for(let i=0;i<arr.length;i++){ await sb.from('trip_stops').update({ sort_order:i }).eq('id',arr[i].id); }
     } else if(op==='delete'){
-      if(!confirm(t('rt_confirm_del_stop','Eliminare questa tappa?'))) return;
+      if(!(await adminConfirm(t('rt_confirm_del_stop','Eliminare questa tappa?')))) return;
       const { data, error }=await sb.from('trip_stops').delete().eq('id',s.id).select('id');
       if(error||!data||!data.length){ toast(t('error'),'err'); return; }
     }
@@ -3569,7 +3619,7 @@ async function loadRoutesAdmin(){
         }}),
         el('button',{class:'btn sm',text:t('a_duplicate','Duplica'),onclick:()=>_duplicateRoute(r.id,r.name)}),
         el('button',{class:'btn sm red',text:t('a_delete'),onclick:async()=>{
-          if(!confirm(t('rt_confirm_del'))) return;
+          if(!(await adminConfirm(t('rt_confirm_del')))) return;
           const { data:d6, error:e6 } = await sb.from('trips').delete().eq('id',r.id).select('id');
           if(e6||!d6||!d6.length){ toast(t('rls_no_rows'),'err'); return; }
           await logAudit('route_delete','trip',r.id,{ name:r.name });
@@ -3608,7 +3658,7 @@ async function loadItinerariesAdmin(){
       _renderStopEditor(stopsBox, r.id, stops, loadItinerariesAdmin);
       const actions=el('div',{class:'btn-row'},[
         r.official_requested?el('button',{class:'btn sm gold',text:t('itin_make_official','Rendi ufficiale'),onclick:async()=>{
-          if(!confirm(t('itin_make_official_ask','Rendere questo itinerario una rotta ufficiale (bozza)? Verrà accreditato al proponente.'))) return;
+          if(!(await adminConfirm(t('itin_make_official_ask','Rendere questo itinerario una rotta ufficiale (bozza)? Verrà accreditato al proponente.')))) return;
           const { data:d,error:e } = await sb.from('trips').update({ is_historic:true, is_published:false, official_requested:false, suggested_by:r.owner_id||null }).eq('id',r.id).select('id');
           if(e||!d||!d.length){ toast((e&&e.message)||t('rls_no_rows'),'err'); return; }
           await logAudit('itin_make_official','trip',r.id,{ name:r.name });
@@ -3622,7 +3672,7 @@ async function loadItinerariesAdmin(){
           toast(t('saved'),'ok'); loadItinerariesAdmin();
         }}),
         el('button',{class:'btn sm red',text:t('a_delete'),onclick:async()=>{
-          if(!confirm(t('itin_del_confirm'))) return;
+          if(!(await adminConfirm(t('itin_del_confirm')))) return;
           const { data:d,error:e } = await sb.from('trips').delete().eq('id',r.id).select('id');
           if(e||!d||!d.length){ toast(t('rls_no_rows'),'err'); return; }
           await logAudit('itin_delete','trip',r.id,{ name:r.name });
@@ -3657,6 +3707,38 @@ function openModal(title, icon, bodyNode, onSave){
   document.body.appendChild(ov);
 }
 function closeModal(){ const m=document.getElementById('modalOv'); if(m) m.remove(); }
+/* ── Dialoghi NOSTRI (niente popup di sistema del browser: tutto dal nostro CSS) ── */
+function _adminDialog(msg, withInput, def){
+  return new Promise(resolve=>{
+    const ov=el('div',{class:'adm-dlg-ov'});
+    const card=el('div',{class:'adm-dlg'});
+    card.appendChild(el('div',{class:'adm-dlg-msg'},[document.createTextNode(String(msg||''))]));
+    let inp=null;
+    if(withInput){ inp=el('input',{class:'adm-dlg-in',value:def!=null?String(def):''}); card.appendChild(inp); }
+    const row=el('div',{class:'btn-row',style:'justify-content:flex-end;margin-top:14px'});
+    const done=v=>{ ov.remove(); resolve(v); };
+    row.appendChild(el('button',{class:'btn',onclick:()=>done(withInput?null:false),text:t('cancel_btn')}));
+    row.appendChild(el('button',{class:'btn gold',onclick:()=>done(withInput?inp.value:true),text:t('ok_btn','OK')}));
+    card.appendChild(row);
+    ov.appendChild(card);
+    ov.addEventListener('click',e=>{ if(e.target===ov) done(withInput?null:false); });
+    document.addEventListener('keydown',function esc(e){ if(e.key==='Escape'){ done(withInput?null:false); document.removeEventListener('keydown',esc);} });
+    document.body.appendChild(ov);
+    if(inp){ inp.focus(); inp.select(); inp.addEventListener('keydown',e=>{ if(e.key==='Enter') done(inp.value); }); }
+  });
+}
+function adminConfirm(msg){ return _adminDialog(msg,false); }
+function adminPrompt(msg,def){ return _adminDialog(msg,true,def); }
+// Anteprima GRANDE di una foto (per giudicarla davvero), nel nostro overlay.
+function _photoLightbox(url){
+  if(!/^https?:\/\//i.test(url)) return;
+  const ov=el('div',{class:'adm-dlg-ov',style:'cursor:zoom-out'});
+  const img=el('img',{src:url,style:'max-width:92vw;max-height:88vh;border-radius:14px;box-shadow:0 24px 70px rgba(0,0,0,.6)'});
+  ov.appendChild(img);
+  ov.addEventListener('click',()=>ov.remove());
+  document.addEventListener('keydown',function esc(e){ if(e.key==='Escape'){ ov.remove(); document.removeEventListener('keydown',esc);} });
+  document.body.appendChild(ov);
+}
 
 /* ─────────────── Storico chat del copilota: ricorda le conversazioni ─────────────── */
 let currentChatId=null;
@@ -3729,7 +3811,7 @@ function newChat(){
 }
 
 async function deleteChat(id){
-  if(!confirm(t('confirm_del_chat'))) return;
+  if(!(await adminConfirm(t('confirm_del_chat')))) return;
   try{
     const { error } = await sb.from('ai_chats').delete().eq('id',id);
     if(error){ toast(error.message||t('error'),'err'); return; }
