@@ -33,14 +33,12 @@
   function _srcPexels(term) { var k = KEYS().pexels; if (!k) return Promise.resolve([]); return fetch('https://api.pexels.com/v1/search?per_page=15&query=' + encodeURIComponent(term), { headers: { Authorization: k } }).then(function (r) { return r.json(); }).then(function (d) { return ((d && d.photos) || []).map(function (p) { return { url: p.src.large || p.src.original, thumb: p.src.medium || p.src.small, source: 'pexels' }; }); }).catch(function () { return []; }); }
   function _srcPixabay(term) { var k = KEYS().pixabay; if (!k) return Promise.resolve([]); return fetch('https://pixabay.com/api/?key=' + encodeURIComponent(k) + '&per_page=15&image_type=photo&q=' + encodeURIComponent(term)).then(function (r) { return r.json(); }).then(function (d) { return ((d && d.hits) || []).map(function (p) { return { url: p.largeImageURL || p.webformatURL, thumb: p.webformatURL || p.previewURL, source: 'pixabay' }; }); }).catch(function () { return []; }); }
   function _srcUnsplash(term) { var k = KEYS().unsplash; if (!k) return Promise.resolve([]); return fetch('https://api.unsplash.com/search/photos?per_page=15&query=' + encodeURIComponent(term) + '&client_id=' + encodeURIComponent(k)).then(function (r) { return r.json(); }).then(function (d) { return ((d && d.results) || []).map(function (p) { return { url: p.urls.regular, thumb: p.urls.small, source: 'unsplash' }; }); }).catch(function () { return []; }); }
+  // Ricerca via edge function image-search: le chiavi stanno SOLO sul server, non nel client admin.
   function searchAllImages(term) {
-    var lists$ = [_srcOpenverse(term), _srcWikimedia(term), _srcPexels(term), _srcPixabay(term), _srcUnsplash(term)];
-    return Promise.all(lists$).then(function (lists) {
-      var mixed = [], max = 0; lists.forEach(function (l) { if (l.length > max) max = l.length; });
-      for (var i = 0; i < max; i++) { lists.forEach(function (l) { if (l[i]) mixed.push(l[i]); }); }
-      var seen = {}, out = []; mixed.forEach(function (it) { if (it && it.url && !seen[it.url]) { seen[it.url] = 1; out.push(it); } });
-      return out;
-    });
+    var db = sb(); if (!db || !db.functions) return Promise.resolve([]);
+    return db.functions.invoke('image-search', { body: { q: term } }).then(function (r) {
+      return (r && r.data && r.data.results) || [];
+    }).catch(function () { return []; });
   }
 
   // Carica un file sul media server e lo registra in media_assets. Ritorna {url} o null.
