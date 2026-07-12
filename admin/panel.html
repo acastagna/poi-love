@@ -507,6 +507,8 @@ html[data-theme="light"] .chip.green{color:#236b39}
 .icon-btn:hover{color:var(--paper);background:var(--line)}
 .modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;z-index:600;padding:18px}
 .modal-card{max-width:540px;width:100%;max-height:90vh;overflow:auto}
+.modal-card.wide{max-width:720px}
+@media(min-width:900px){.modal-card.wide .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}}
 /* Zona Crea: quattro pulsantoni grandi */
 .create-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
 @media(max-width:1100px){.create-grid{grid-template-columns:repeat(2,1fr)}}
@@ -3281,6 +3283,11 @@ async function editPoi(p){
   let selCats=Array.isArray(p.categories)&&p.categories.length?p.categories.slice(0,3):(p.subcategory?[p.subcategory]:[]);
   let tags=Array.isArray(p.tags)?p.tags.slice(0,10):[];
   const allCats=await _adminCats();
+  // badge/tier/assegnazione correnti (in modifica, per non azzerarli al salvataggio)
+  if(p.id && p.badge_ids===undefined){
+    try{ const {data:bd}=await sb.from('pois').select('badge_ids,badge_tier,assigned_user_id').eq('id',p.id).single();
+      if(bd){ p.badge_ids=bd.badge_ids||[]; p.badge_tier=bd.badge_tier||''; p.assigned_user_id=bd.assigned_user_id||null; } }catch(e){}
+  }
 
   // ── FOTO: strip con rimuovi + rendi principale, aggiungi da URL o upload ──
   const phBox=el('div',{class:'poiph-strip'});
@@ -3417,7 +3424,17 @@ async function editPoi(p){
   visRow.appendChild(el('div',{class:'field'},[ el('label',{text:' '}), apprWrap ]));
   body.appendChild(visRow);
 
-  openModal(isNew?t('create_poi','Crea POI ufficiale'):t('edit_poi'), 'pencil-simple-line', body, ()=>savePoi(p.id, f, {photos, selCats, tags}));
+  // ── BADGE + ASSEGNAZIONE UTENTE (@handle) — come nell'app ──
+  const badgeBox=el('div',{style:'margin-top:6px'});
+  body.appendChild(badgeBox);
+  let badgePicker=null;
+  if(window.AdminBadge){
+    let assigned=null;
+    if(p.assigned_user_id){ try{ const {data:u}=await sb.from('profiles').select('id,username').eq('id',p.assigned_user_id).single(); if(u) assigned={id:u.id,username:u.username}; }catch(e){} }
+    badgePicker=window.AdminBadge.mount(badgeBox,{badge_ids:p.badge_ids||[],tier:p.badge_tier||'',assigned:assigned});
+  }
+
+  openModal(isNew?t('create_poi','Crea POI ufficiale'):t('edit_poi'), 'pencil-simple-line', body, ()=>savePoi(p.id, f, {photos, selCats, tags, badgePicker}), {wide:true});
 }
 
 async function savePoi(id, f, extra){
@@ -3455,6 +3472,8 @@ async function savePoi(id, f, extra){
     if(error){ toast(isBackendMissing(error)?t('backend_off'):(error.message||t('error')),'err'); return false; }
     if(!data || !data.length){ toast(t('rls_no_rows'),'err'); return false; }
     const newId = id || (data[0]&&data[0].id);
+    // badge + livello + assegnazione utente (@handle) — come nell'app
+    if(extra.badgePicker && newId){ try{ await extra.badgePicker.save('poi', newId); }catch(e){} }
     await logAudit(id?'poi_edit':'poi_create','poi',newId,{ title:patch.title });
     toast(t('saved'),'ok'); reloadPois(); loaded.dashboard=false; return true;
   }catch(e){ toast(t('error'),'err'); return false; }
@@ -4006,11 +4025,11 @@ async function loadItinerariesAdmin(){
 }
 
 /* Modal generico: titolo, icona, corpo (nodo DOM), onSave opzionale (true/Promise<true> per chiudere). */
-function openModal(title, icon, bodyNode, onSave){
+function openModal(title, icon, bodyNode, onSave, opts){
   closeModal();
   const ov=el('div',{class:'modal-ov', id:'modalOv'});
   ov.addEventListener('click',(e)=>{ if(e.target===ov) closeModal(); });
-  const card=el('div',{class:'panel modal-card'});
+  const card=el('div',{class:'panel modal-card'+((opts&&opts.wide)?' wide':'')});
   card.appendChild(el('div',{class:'modal-h'},[
     el('div',{class:'ttl'},[ phIcon(icon||'note'), document.createTextNode(title) ]),
     el('button',{class:'icon-btn', onclick:closeModal}, phIcon('x'))
