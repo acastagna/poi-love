@@ -108,7 +108,7 @@ body{
 
 /* ── Layout principale ── */
 .app{display:none;position:relative;z-index:1;min-height:100vh}
-.app.ready{display:grid;grid-template-columns:var(--sidebar-w) 1fr}
+.app.ready{display:grid;grid-template-columns:var(--sidebar-w) minmax(0,1fr)}
 
 /* Sidebar */
 .sidebar{
@@ -3300,9 +3300,6 @@ async function editPoi(p){
   }
   drawPhotos();
   const phAddRow=el('div',{class:'btn-row',style:'margin-top:6px'});
-  const phUrl=el('input',{placeholder:'https://… (URL foto)',style:'flex:1;min-width:180px'});
-  phAddRow.appendChild(phUrl);
-  phAddRow.appendChild(el('button',{class:'btn sm',onclick:()=>{ const u=(phUrl.value||'').trim(); if(!/^https?:\/\//i.test(u)){ toast(t('poi_ph_url_err'),'err'); return; } photos.push(u); phUrl.value=''; drawPhotos(); }},[phIcon('plus'),document.createTextNode(' URL')]));
   phAddRow.appendChild(el('button',{class:'btn sm gold',onclick:()=>{
     const inp=document.createElement('input'); inp.type='file'; inp.accept='image/*';
     inp.onchange=async()=>{ const file=inp.files&&inp.files[0]; if(!file) return;
@@ -3633,7 +3630,9 @@ async function _adminUploadImage(file){
   try{
     const { data:{ session } } = await sb.auth.getSession();
     const jwt=session&&session.access_token; if(!jwt) return null;
-    const fd=new FormData(); fd.append('poi_id','route-'+Date.now()); fd.append('photos[]', file, 'stop.jpg');
+    // upload.php pretende un UUID v4 come poi_id: usiamo un UUID vero (prima era 'route-'+timestamp → rifiutato)
+    const uid=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():('xxxxxxxx-xxxx-4xxx-8xxx-xxxxxxxxxxxx'.replace(/x/g,()=>Math.floor(Math.random()*16).toString(16)));
+    const fd=new FormData(); fd.append('poi_id',uid); fd.append('photos[]', file, 'photo.jpg');
     const res=await fetch(MEDIA_SERVER_URL+'/upload.php',{ method:'POST', headers:{'Authorization':'Bearer '+jwt}, body:fd });
     const j=await res.json().catch(()=>({})); return (j && j.ok && Array.isArray(j.urls) && j.urls[0]) || null;
   }catch(e){ return null; }
