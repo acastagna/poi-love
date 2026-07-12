@@ -517,6 +517,7 @@ html[data-theme="light"] .chip.green{color:#236b39}
 <script src="js/badge-picker.js"></script>
 <script src="js/user-card.js"></script>
 <script src="js/poi-card.js"></script>
+<script src="js/badge-admin.js"></script>
 </head>
 <body>
 <div class="grain"></div>
@@ -570,6 +571,9 @@ html[data-theme="light"] .chip.green{color:#236b39}
     </div>
     <div class="nav-item" data-sec="tags" onclick="openSection('tags')">
       <span class="ic"><i class="ph-duotone ph-tag"></i></span><span class="label" data-t="nav_tags">Tag</span>
+    </div>
+    <div class="nav-item" data-sec="badges" onclick="openSection('badges')">
+      <span class="ic"><i class="ph-duotone ph-seal-check"></i></span><span class="label" data-t="nav_badges">Badge</span>
     </div>
     <div class="nav-item" data-sec="knowledge" onclick="openSection('knowledge')">
       <span class="ic"><i class="ph-duotone ph-brain"></i></span><span class="label" data-t="nav_knowledge">Knowledge ILLI</span>
@@ -912,6 +916,11 @@ html[data-theme="light"] .chip.green{color:#236b39}
       </div>
     </section>
 
+    <!-- 8c-ter) BADGE (personalizzabili come le categorie) -->
+    <section class="section" id="sec-badges">
+      <div id="badgesBox"></div>
+    </section>
+
     <!-- 8d) KNOWLEDGE ILLI -->
     <section class="section" id="sec-knowledge">
       <div class="panel" style="margin-bottom:16px">
@@ -1013,6 +1022,7 @@ const T = {
     audit_title:'Registro azioni (ultimi 50)',
     nav_categories:'Categorie', sub_categories:'Tassonomia data-driven: cura le categorie e promuovi le richieste della community.',
     nav_tags:'Tag', sub_tags:'Cura i tag liberi della community: evidenzia, rinomina, unisci, elimina o blocca.',
+    nav_badges:'Badge', sub_badges:'Crea e personalizza i badge (icona, colore, testo, livello utente). Poi scegli quali applicare a POI, rotte, itinerari e compagnie.',
     tag_add_title:'Evidenzia un tag', tag_help:'I tag sono liberi e li scrivono gli utenti. Qui li organizzi: evidenziane alcuni (appaiono sempre nei suggerimenti), rinominali o uniscili, elimina o blocca quelli sbagliati.',
     tag_name:'Tag', tag_feature:'Evidenzia', tag_unfeature:'Togli evidenza', tag_block:'Blocca', tag_unblock:'Sblocca',
     tag_list_title:'Tag della community', tag_refresh:'Aggiorna', tag_empty:'Ancora nessun tag',
@@ -1113,6 +1123,7 @@ const T = {
     audit_title:'Regjistri i veprimeve (50 të fundit)',
     nav_categories:'Kategoritë', sub_categories:'Taksonomia data-driven: kuro kategoritë dhe promovo kërkesat e komunitetit.',
     nav_tags:'Etiketa', sub_tags:'Kuro etiketat e lira të komunitetit: thekso, riemërto, bashko, fshi ose blloko.',
+    nav_badges:'Stema', sub_badges:'Krijo dhe personalizo stemat (ikonë, ngjyrë, tekst, niveli i përdoruesit). Pastaj zgjidh cilat t\'i vësh te POI-t, rrugët, udhëtimet dhe shoqëritë.',
     tag_add_title:'Thekso një etiketë', tag_help:'Etiketat janë të lira dhe i shkruajnë përdoruesit. Këtu i organizon: thekso disa (shfaqen gjithmonë te sugjerimet), riemërto ose bashko, fshi apo blloko ato të gabuara.',
     tag_name:'Etiketë', tag_feature:'Thekso', tag_unfeature:'Hiq theksimin', tag_block:'Blloko', tag_unblock:'Zhblloko',
     tag_list_title:'Etiketat e komunitetit', tag_refresh:'Rifresko', tag_empty:'Ende asnjë etiketë',
@@ -1209,6 +1220,7 @@ const T = {
     audit_title:'Action log (last 50)',
     nav_categories:'Categories', sub_categories:'Data-driven taxonomy: curate categories and promote community requests.',
     nav_tags:'Tags', sub_tags:'Curate the community free tags: feature, rename, merge, delete or block.',
+    nav_badges:'Badges', sub_badges:'Create and customize badges (icon, color, text, user level). Then choose which to apply to POIs, routes, trips and companies.',
     tag_add_title:'Feature a tag', tag_help:'Tags are free and written by users. Here you organize them: feature some (always shown in suggestions), rename or merge, delete or block the wrong ones.',
     tag_name:'Tag', tag_feature:'Feature', tag_unfeature:'Unfeature', tag_block:'Block', tag_unblock:'Unblock',
     tag_list_title:'Community tags', tag_refresh:'Refresh', tag_empty:'No tags yet',
@@ -1452,9 +1464,9 @@ async function doLogout(){
 
 /* ─────────────────────────── Navigazione sezioni (lazy) ─────────────────────────── */
 const SUBKEY = { dashboard:'sub_dashboard', moderation:'sub_moderation', users:'sub_users',
-  ailimits:'sub_ailimits', copilot:'sub_copilot', create:'sub_create', pois:'sub_pois', routes:'sub_routes', audit:'sub_audit', categories:'sub_categories' , tags:'sub_tags', knowledge:'sub_knowledge', media:'sub_media' };
+  ailimits:'sub_ailimits', copilot:'sub_copilot', create:'sub_create', pois:'sub_pois', routes:'sub_routes', audit:'sub_audit', categories:'sub_categories' , tags:'sub_tags', badges:'sub_badges', knowledge:'sub_knowledge', media:'sub_media' };
 const TITLEKEY = { dashboard:'nav_dashboard', moderation:'nav_moderation', users:'nav_users',
-  ailimits:'nav_ailimits', copilot:'nav_copilot', create:'nav_create', pois:'nav_pois', routes:'nav_routes', itineraries:'nav_itineraries', categories:'nav_categories', tags:'nav_tags', knowledge:'nav_knowledge', audit:'nav_audit', media:'nav_media' };
+  ailimits:'nav_ailimits', copilot:'nav_copilot', create:'nav_create', pois:'nav_pois', routes:'nav_routes', itineraries:'nav_itineraries', categories:'nav_categories', tags:'nav_tags', badges:'nav_badges', knowledge:'nav_knowledge', audit:'nav_audit', media:'nav_media' };
 
 function updateHeader(sec){
   document.getElementById('secTitle').textContent = t(TITLEKEY[sec]);
@@ -1484,6 +1496,7 @@ function runSection(sec){
     case 'itineraries': loadItinerariesAdmin(); break;
     case 'categories': loadCategoriesAdmin(); break;
     case 'tags': loadTagsAdmin(); break;
+    case 'badges': if(window.BadgeAdmin) window.BadgeAdmin.load(document.getElementById('badgesBox')); break;
     case 'knowledge': loadKnowledgeAdmin(); break;
     case 'audit': loadAudit(); break;
     case 'media': initMedia(); break;
@@ -1519,7 +1532,7 @@ async function loadLatestPois(){
   const box=document.getElementById('latestPois'); skeletons(box,5);
   try{
     const { data, error } = await sb.from('pois')
-      .select('id,title,description,category,subcategory,categories,tags,photos,cover_photo,address,city,country,lat,lng,love_count,visibility,is_approved,created_via,removed_at,badge_official,badge_essential,badge_tier,created_at,author:profiles!pois_author_id_fkey(username)')
+      .select('id,title,description,category,subcategory,categories,tags,photos,cover_photo,address,city,country,lat,lng,love_count,visibility,is_approved,created_via,removed_at,badge_official,badge_essential,badge_tier,badge_ids,created_at,author:profiles!pois_author_id_fkey(username)')
       .order('created_at',{ascending:false}).limit(6);
     if(error){ isBackendMissing(error)?backendOff(box):emptyBox(box,t('error'),null,'warning'); return; }
     if(!data || !data.length){ emptyBox(box,'—',null,'map-pin'); return; }
@@ -3112,7 +3125,7 @@ async function loadPois(){
   const filter=document.getElementById('poiFilter').value||'all';
   try{
     let query=sb.from('pois')
-      .select('id,title,description,category,subcategory,categories,tags,photos,cover_photo,visibility,is_approved,created_via,lat,lng,address,city,country,love_count,created_at,removed_at,removed_reason,badge_official,badge_essential,badge_tier,author:profiles!pois_author_id_fkey(username)')
+      .select('id,title,description,category,subcategory,categories,tags,photos,cover_photo,visibility,is_approved,created_via,lat,lng,address,city,country,love_count,created_at,removed_at,removed_reason,badge_official,badge_essential,badge_tier,badge_ids,author:profiles!pois_author_id_fkey(username)')
       .order('created_at',{ascending:false}).limit(120);
     if(filter==='ai') query=query.eq('created_via','ai').is('removed_at',null);
     else if(filter==='official') query=query.eq('visibility','official').is('removed_at',null);

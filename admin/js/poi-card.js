@@ -104,7 +104,7 @@
     if (window.AdminBadge) {
       var bpBox = h('div', null);
       admin.appendChild(bpBox);
-      var picker = window.AdminBadge.mount(bpBox, { official: !!p.badge_official, essential: !!p.badge_essential, tier: p.badge_tier || '', assigned: null });
+      var picker = window.AdminBadge.mount(bpBox, { badge_ids: Array.isArray(p.badge_ids) ? p.badge_ids : [], tier: p.badge_tier || '', assigned: null });
       admin.appendChild(h('div', { style: 'margin-top:8px' }, h('button', {
         class: 'apc-btn', text: 'Salva badge e assegnazione', onclick: function (e) {
           var btn = e.currentTarget; btn.disabled = true; btn.textContent = 'Salvo…';
