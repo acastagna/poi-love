@@ -5289,6 +5289,16 @@ function openDBDetail(p) {
   else if(p.is_featured) _badge=` <span class="poi-flag flag-featured"><i class="ph-fill ph-star"></i> ${t('flag_featured','In evidenza')}</span>`;
   else if(_authorTier==='professionista_plus'||_authorTier==='influencer'||_authorTier==='mecenate') _badge=` <span class="poi-flag flag-suggested"><i class="ph-fill ph-hand-pointing"></i> ${t('flag_suggested','Suggerito')}</span>`;
   tag.innerHTML = `<i class="ph-duotone ph-tag"></i> ${_catTxt}`+_badge;
+  // Badge personalizzati assegnati dall'admin (tabella badges via badge_ids). Fetch mirato sul singolo POI.
+  (function(){
+    if(!p.id || !sb) return;
+    const inject=(ids)=>{ if(!ids||!ids.length||!window.BADGES) return;
+      const extra=ids.map(id=>{ const b=window.BADGES[id]; return b?` <span class="poi-flag" style="background:${b.color};color:${b.text_color||'#fff'};border:none"><i class="ph-fill ph-${b.icon||'seal-check'}"></i> ${String(b.name).replace(/</g,'&lt;')}</span>`:''; }).join('');
+      if(extra) tag.innerHTML += extra;
+    };
+    if(Array.isArray(p.badge_ids)) { inject(p.badge_ids); return; }
+    sb.from('pois').select('badge_ids').eq('id',p.id).maybeSingle().then(r=>{ inject(r&&r.data&&r.data.badge_ids); }).catch(()=>{});
+  })();
   // Hero: titolo grande (renderer dedicato: mantiene la matita del proprietario)
   const _dn=document.getElementById('detailName');
   if(_dn.childNodes.length&&_dn.childNodes[0].nodeType===3){ _dn.childNodes[0].nodeValue=p.name||p.title||'—'; }
@@ -7947,7 +7957,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='3.25';
+const APP_VERSION='3.26';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
@@ -7971,7 +7981,7 @@ document.addEventListener('visibilitychange',()=>{ if(!document.hidden) _checkFo
 // Le rotte storiche pubblicate sono contenuto PUBBLICO: si caricano per tutti,
 // loggati o no (piccolo ritardo per lasciar nascere mappa e client).
 setTimeout(()=>{ try{ loadHistoricRoutes(); }catch(e){} }, 900);
-setTimeout(()=>{ try{ loadPoiCategories(); }catch(e){} }, 700);
+setTimeout(()=>{ try{ loadPoiCategories(); }catch(e){} try{ loadBadges(); }catch(e){} }, 700);
 setTimeout(()=>{ try{ loadIlliKnowledge(); }catch(e){} }, 750);
 // PRECARICA la lente: l'overlay viene reso invisibile ma presente per un attimo,
 // il magnifier si inizializza e scarica le prime tile. Alla prima apertura: istantanea.
@@ -11892,6 +11902,16 @@ async function loadPoiCategories(){
       .select('key,macro,label_it,label_sq,label_en,icon,color,sort,active,owner_id').order('sort');
     if(error||!data||!data.length) return;
     _POI_CATS=data; buildCatPicker();
+  }catch(_){}
+}
+// Badge personalizzati (definiti nel pannello admin, tabella badges). Mappa id → {name,icon,color}.
+let _BADGES={};
+async function loadBadges(){
+  if(!sb) return;
+  try{
+    const {data,error}=await sb.from('badges').select('id,name,icon,color,text_color,active').eq('active',true);
+    if(error||!data) return;
+    _BADGES={}; data.forEach(b=>{ _BADGES[b.id]=b; }); window.BADGES=_BADGES;
   }catch(_){}
 }
 function _catLabel(c){ return (lang==='sq'?c.label_sq:lang==='en'?c.label_en:c.label_it)||c.label_it; }

@@ -86,20 +86,43 @@
     var cover = h('div', { class: 'uc-cover' });
     var closeBtn = h('button', { class: 'uc-close', text: '×', title: 'Chiudi', onclick: close });
     var avatar = img(u.avatar_url) ? h('img', { class: 'uc-avatar', src: u.avatar_url, alt: '' }) : h('div', { class: 'uc-avatar', text: initials(u.username) });
-    // Cambia foto (admin): chiede l'URL e salva via RPC admin_set_user_avatar
+    // Cambia AVATAR (admin): via Media Manager (Carica o Libreria), salva con admin_set_user_avatar
     function changeAvatar() {
-      var p = window.adminPrompt ? window.adminPrompt('URL della nuova foto profilo (lascia vuoto per togliere):', u.avatar_url || '') : Promise.resolve(window.prompt('URL foto', u.avatar_url || ''));
+      if (window.POIMedia && window.POIMedia.pick) {
+        window.POIMedia.pick({ kind: 'avatar', onPick: function (url) {
+          if (!url) return; var db = sb(); if (!db) return;
+          db.rpc('admin_set_user_avatar', { p_user: u.id, p_url: url }).then(function (r) {
+            if (r.error) { if (window.toast) window.toast(r.error.message || 'Errore', 'err'); return; }
+            if (window.toast) window.toast('Foto aggiornata', 'ok');
+            u.avatar_url = url; close(); open(u);
+          });
+        }});
+        return;
+      }
+      var p = window.adminPrompt ? window.adminPrompt('URL della nuova foto profilo:', u.avatar_url || '') : Promise.resolve(window.prompt('URL foto', u.avatar_url || ''));
       Promise.resolve(p).then(function (val) {
         if (val === null || val === undefined) return;
-        var url = ('' + val).trim();
-        var db = sb(); if (!db) return;
+        var url = ('' + val).trim(); var db = sb(); if (!db) return;
         db.rpc('admin_set_user_avatar', { p_user: u.id, p_url: url || null }).then(function (r) {
           if (r.error) { if (window.toast) window.toast(r.error.message || 'Errore', 'err'); return; }
           if (window.toast) window.toast('Foto aggiornata', 'ok');
-          u.avatar_url = url || null; close(); open(u); // ridisegna la scheda con la nuova foto
+          u.avatar_url = url || null; close(); open(u);
         });
       });
     }
+    // Cambia COPERTINA (admin): via Media Manager, salva con admin_set_user_cover
+    function changeCover() {
+      if (!(window.POIMedia && window.POIMedia.pick)) { if (window.toast) window.toast('Media manager non disponibile', 'err'); return; }
+      window.POIMedia.pick({ kind: 'cover', onPick: function (url) {
+        if (!url) return; var db = sb(); if (!db) return;
+        db.rpc('admin_set_user_cover', { p_user: u.id, p_url: url }).then(function (r) {
+          if (r.error) { if (window.toast) window.toast(r.error.message || 'Errore', 'err'); return; }
+          if (window.toast) window.toast('Copertina aggiornata', 'ok');
+          close(); open(u);
+        });
+      }});
+    }
+    cover.appendChild(h('button', { class: 'uc-cam', title: 'Cambia copertina', style: 'position:absolute;top:8px;right:8px;left:auto', onclick: changeCover }, h('i', { class: 'ph-duotone ph-image' })));
     var avatarWrap = h('div', { class: 'uc-avatar-wrap' }, [avatar, h('button', { class: 'uc-cam', title: 'Cambia foto', onclick: changeAvatar }, h('i', { class: 'ph-duotone ph-camera' }))]);
 
     var badges = h('div', { class: 'uc-badges' }, [
