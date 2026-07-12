@@ -18,6 +18,31 @@
   }
   function toast(m, k) { if (window.toast) window.toast(m, k); }
 
+  // ── RICERCA IMMAGINI MULTI-SORGENTE ──
+  // Chiavi API (gratuite) delle sorgenti commerciali. Vanno riempite in window.POIMEDIA_KEYS
+  // (chiavi client pubbliche, non segreti di servizio). Senza chiave, la sorgente è semplicemente saltata.
+  function KEYS() { return window.POIMEDIA_KEYS || {}; }
+  function _srcOpenverse(term) { // no key: aggrega StockSnap, Wikimedia, Flickr, rawpixel, nappy…
+    return fetch('https://api.openverse.org/v1/images/?q=' + encodeURIComponent(term) + '&page_size=20&license_type=commercial')
+      .then(function (r) { return r.json(); }).then(function (d) { return ((d && d.results) || []).map(function (it) { return { url: it.url, thumb: it.thumbnail || it.url, source: it.source || 'openverse' }; }); }).catch(function () { return []; });
+  }
+  function _srcWikimedia(term) { // no key: foto reali dei luoghi da Wikimedia Commons
+    return fetch('https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch=' + encodeURIComponent(term) + '&gsrnamespace=6&gsrlimit=15&prop=imageinfo&iiprop=url&iiurlwidth=500&format=json&origin=*')
+      .then(function (r) { return r.json(); }).then(function (d) { var pg = (d && d.query && d.query.pages) || {}; return Object.keys(pg).map(function (k) { var ii = pg[k].imageinfo && pg[k].imageinfo[0]; if (!ii) return null; var u = ii.url || ''; if (!/\.(jpe?g|png|webp)$/i.test(u)) return null; return { url: u, thumb: ii.thumburl || u, source: 'wikipedia' }; }).filter(Boolean); }).catch(function () { return []; });
+  }
+  function _srcPexels(term) { var k = KEYS().pexels; if (!k) return Promise.resolve([]); return fetch('https://api.pexels.com/v1/search?per_page=15&query=' + encodeURIComponent(term), { headers: { Authorization: k } }).then(function (r) { return r.json(); }).then(function (d) { return ((d && d.photos) || []).map(function (p) { return { url: p.src.large || p.src.original, thumb: p.src.medium || p.src.small, source: 'pexels' }; }); }).catch(function () { return []; }); }
+  function _srcPixabay(term) { var k = KEYS().pixabay; if (!k) return Promise.resolve([]); return fetch('https://pixabay.com/api/?key=' + encodeURIComponent(k) + '&per_page=15&image_type=photo&q=' + encodeURIComponent(term)).then(function (r) { return r.json(); }).then(function (d) { return ((d && d.hits) || []).map(function (p) { return { url: p.largeImageURL || p.webformatURL, thumb: p.webformatURL || p.previewURL, source: 'pixabay' }; }); }).catch(function () { return []; }); }
+  function _srcUnsplash(term) { var k = KEYS().unsplash; if (!k) return Promise.resolve([]); return fetch('https://api.unsplash.com/search/photos?per_page=15&query=' + encodeURIComponent(term) + '&client_id=' + encodeURIComponent(k)).then(function (r) { return r.json(); }).then(function (d) { return ((d && d.results) || []).map(function (p) { return { url: p.urls.regular, thumb: p.urls.small, source: 'unsplash' }; }); }).catch(function () { return []; }); }
+  function searchAllImages(term) {
+    var lists$ = [_srcOpenverse(term), _srcWikimedia(term), _srcPexels(term), _srcPixabay(term), _srcUnsplash(term)];
+    return Promise.all(lists$).then(function (lists) {
+      var mixed = [], max = 0; lists.forEach(function (l) { if (l.length > max) max = l.length; });
+      for (var i = 0; i < max; i++) { lists.forEach(function (l) { if (l[i]) mixed.push(l[i]); }); }
+      var seen = {}, out = []; mixed.forEach(function (it) { if (it && it.url && !seen[it.url]) { seen[it.url] = 1; out.push(it); } });
+      return out;
+    });
+  }
+
   // Carica un file sul media server e lo registra in media_assets. Ritorna {url} o null.
   function upload(file, opts) {
     var db = sb(); if (!db) return Promise.resolve(null);
@@ -52,7 +77,8 @@
       + '.mm-thumb{aspect-ratio:1;border-radius:10px;overflow:hidden;cursor:pointer;border:2px solid transparent;background:#222}.mm-thumb:hover{border-color:var(--gold,#E8B04B)}.mm-thumb img{width:100%;height:100%;object-fit:cover}'
       + '.mm-empty{color:var(--muted,#999);font-size:13px;text-align:center;padding:20px}'
       + '.mm-searchrow{display:flex;gap:8px;align-items:center}'
-      + '.mm-search{flex:1;padding:9px 12px;border:1px solid var(--line,#333);border-radius:10px;background:var(--field-bg,#111);color:var(--paper,#eee);font-family:inherit;font-size:13.5px;box-sizing:border-box}';
+      + '.mm-search{flex:1;padding:9px 12px;border:1px solid var(--line,#333);border-radius:10px;background:var(--field-bg,#111);color:var(--paper,#eee);font-family:inherit;font-size:13.5px;box-sizing:border-box}'
+      + '.mm-thumb{position:relative}.mm-src{position:absolute;bottom:4px;left:4px;background:rgba(0,0,0,.62);color:#fff;font-size:8px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;padding:2px 5px;border-radius:5px;pointer-events:none}';
     var st = document.createElement('style'); st.id = 'mm-styles'; st.textContent = css; document.head.appendChild(st);
   }
 
@@ -126,15 +152,14 @@
       body.innerHTML = '';
       var q = h('input', { class: 'mm-search', type: 'text', placeholder: 'Cerca: es. ristorante Tirana, spiaggia, hotel…' });
       var aiBtn = h('button', { class: 'mm-tab', text: '✨ Genera con AI' });
-      var hint = h('div', { class: 'mm-empty', text: 'Scrivi e premi Invio: foto reali e libere. Oppure generane una con l\'AI.' });
+      var hint = h('div', { class: 'mm-empty', text: 'Scrivi una cosa o un luogo e premi Invio: cerca su più sorgenti (Wikipedia, StockSnap, Flickr, Unsplash, Pexels, Pixabay se attive) e le mescola. Oppure generane una con l\'AI.' });
       var grid = h('div', { class: 'mm-grid', style: 'margin-top:10px' });
       function runSearch() {
-        var term = (q.value || '').trim(); if (!term) return; grid.innerHTML = ''; hint.textContent = 'Cerco…';
-        fetch('https://api.openverse.org/v1/images/?q=' + encodeURIComponent(term) + '&page_size=20&license_type=commercial')
-          .then(function (r) { return r.json(); }).then(function (d) {
-            var rows = (d && d.results) || []; grid.innerHTML = ''; hint.textContent = rows.length ? '' : 'Nessun risultato: prova a generarla con l\'AI.';
-            rows.forEach(function (it) { var u = it.url; if (!u) return; grid.appendChild(h('div', { class: 'mm-thumb', onclick: function () { done(u); } }, h('img', { src: u, alt: '', loading: 'lazy', onerror: function () { this.parentNode.style.display = 'none'; } }))); });
-          }).catch(function () { hint.textContent = 'Ricerca non riuscita, riprova.'; });
+        var term = (q.value || '').trim(); if (!term) return; grid.innerHTML = ''; hint.textContent = 'Cerco su più sorgenti…';
+        searchAllImages(term).then(function (out) {
+          grid.innerHTML = ''; hint.textContent = out.length ? '' : 'Nessun risultato: prova a generarla con l\'AI.';
+          out.forEach(function (it) { grid.appendChild(h('div', { class: 'mm-thumb', onclick: function () { done(it.url); } }, [h('img', { src: it.thumb || it.url, alt: '', loading: 'lazy', onerror: function () { this.parentNode.style.display = 'none'; } }), h('span', { class: 'mm-src', text: it.source })])); });
+        }).catch(function () { hint.textContent = 'Ricerca non riuscita, riprova.'; });
       }
       function runAI() {
         var term = (q.value || '').trim(); if (!term) { hint.textContent = 'Scrivi prima cosa vuoi generare.'; return; }
