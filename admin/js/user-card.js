@@ -122,7 +122,7 @@
         });
       }});
     }
-    cover.appendChild(h('button', { class: 'uc-cam', title: 'Cambia copertina', style: 'position:absolute;top:8px;right:8px;left:auto', onclick: changeCover }, h('i', { class: 'ph-duotone ph-image' })));
+    cover.appendChild(h('button', { class: 'uc-cam', title: 'Cambia copertina', style: 'position:absolute;top:8px;left:8px;right:auto', onclick: changeCover }, h('i', { class: 'ph-duotone ph-image' })));
     var avatarWrap = h('div', { class: 'uc-avatar-wrap' }, [avatar, h('button', { class: 'uc-cam', title: 'Cambia foto', onclick: changeAvatar }, h('i', { class: 'ph-duotone ph-camera' }))]);
 
     var badges = h('div', { class: 'uc-badges' }, [
