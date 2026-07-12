@@ -558,7 +558,7 @@ html[data-theme="light"] .chip.green{color:#236b39}
 <link rel="stylesheet" href="css/poi-card.css">
 <script src="js/theme.js?v=326"></script>
 <script src="js/badge-picker.js?v=326"></script>
-<script src="js/user-card.js?v=327"></script>
+<script src="js/user-card.js?v=328"></script>
 <script src="js/poi-card.js?v=326"></script>
 <script src="https://unpkg.com/exifr@7.1.3/dist/lite.umd.js" onerror="(function(){var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/exifr@7.1.3/dist/lite.umd.js';document.head.appendChild(s);})()"></script>
 <script src="js/color-picker.js?v=326"></script>
@@ -639,7 +639,7 @@ html[data-theme="light"] .chip.green{color:#236b39}
       <div class="ava" id="meAva">A</div>
       <div class="meta">
         <div class="nm" id="meName">admin</div>
-        <div class="rl" data-t="role_admin">Amministratore</div>
+        <div class="rl" id="meRole">Amministratore</div>
       </div>
     </div>
     <button class="s-logout" onclick="doLogout()" data-t="logout">Esci</button>
@@ -1435,7 +1435,7 @@ async function gate(){
   if(!session || !session.user){ location.href='/index.html'; return; }
   SESSION = session;
   const { data, error } = await sb.from('profiles')
-    .select('id,username,avatar_url,is_admin,moderation_status,special_tier')
+    .select('id,username,avatar_url,is_admin,moderation_status,special_tier,admin_role')
     .eq('id', session.user.id).single();
   if(error || !data || data.is_admin!==true || data.moderation_status!=='active'){
     // non admin oppure profilo sospeso: fuori
@@ -1461,6 +1461,15 @@ async function gate(){
     return;
   }
   ME = data;
+  // ── RUOLO: super admin (accesso totale) vs moderatore (solo moderazione) ──
+  window.IS_SUPER = (ME.admin_role === 'super');
+  { const rl=document.getElementById('meRole'); if(rl){ rl.textContent = IS_SUPER ? t('role_super','Super admin') : t('role_moderator','Moderatore'); rl.style.color = IS_SUPER ? '' : 'var(--gold)'; } }
+  if(!IS_SUPER){
+    // il moderatore vede solo le sezioni di moderazione; le altre spariscono dal menu
+    const MOD_ALLOWED=['dashboard','moderation','messages','users','pois','itineraries','media'];
+    document.querySelectorAll('.nav-item[data-sec]').forEach(n=>{ if(MOD_ALLOWED.indexOf(n.dataset.sec)<0) n.style.display='none'; });
+    document.body.classList.add('role-moderator');
+  }
   // popola intestazione utente
   document.getElementById('meName').textContent = ME.username || 'admin';
   const ava=document.getElementById('meAva');
@@ -1496,6 +1505,8 @@ function updateHeader(sec){
   document.getElementById('secSub').textContent   = t(SUBKEY[sec]);
 }
 function openSection(sec){
+  // Moderatore: solo sezioni di moderazione (blocco anche se forzato via JS/URL)
+  if(window.IS_SUPER===false && ['dashboard','moderation','messages','users','pois','itineraries','media'].indexOf(sec)<0){ sec='dashboard'; }
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('on', n.dataset.sec===sec));
   document.querySelectorAll('.section').forEach(s=>s.classList.toggle('on', s.id==='sec-'+sec));
   updateHeader(sec);
@@ -1853,7 +1864,7 @@ async function loadUsers(){
   const q=(document.getElementById('userSearch').value||'').trim();
   try{
     let query=sb.from('profiles')
-      .select('id,username,avatar_url,special_tier,moderation_status,moderation_reason,points,created_at')
+      .select('id,username,avatar_url,special_tier,moderation_status,moderation_reason,points,created_at,is_admin,admin_role')
       .order('created_at',{ascending:false}).limit(60);
     if(q) query=query.ilike('username','%'+q+'%');
     const { data, error } = await query;

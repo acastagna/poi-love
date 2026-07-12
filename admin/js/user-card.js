@@ -154,8 +154,28 @@
     // ── azioni admin ──
     var actions = h('div', { class: 'uc-actions' });
     actions.appendChild(h('button', { class: 'uc-btn', text: t('a_message', 'Messaggia'), onclick: function () { if (window.startSupportWith) { close(); window.startSupportWith(u.id, u.username, u.avatar_url); } } }));
-    var tierNode = (typeof window.tierSelect === 'function') ? window.tierSelect(u.id, u.special_tier) : null;
+    // Tier a pagamento: solo il super admin
+    var tierNode = (window.IS_SUPER !== false && typeof window.tierSelect === 'function') ? window.tierSelect(u.id, u.special_tier) : null;
     if (tierNode) actions.appendChild(tierNode);
+    // Ruolo pannello (Utente / Moderatore / Super): solo il super può assegnarlo
+    if (window.IS_SUPER !== false) {
+      var curRole = u.admin_role || (u.is_admin ? 'super' : 'none');
+      var roleRow = h('div', { style: 'display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px;width:100%' });
+      roleRow.appendChild(h('span', { style: 'font-size:11.5px;font-weight:700;color:var(--muted,#999);width:100%;margin-bottom:2px', text: t('uc_role', 'Ruolo pannello') }));
+      [['none', t('role_user', 'Utente')], ['moderator', t('role_moderator', 'Moderatore')], ['super', t('role_super', 'Super')]].forEach(function (r) {
+        var on = curRole === r[0];
+        var b = h('button', { class: 'uc-btn' + (on ? ' gold' : ''), text: r[1], onclick: function () {
+          var db = sb(); if (!db) return;
+          db.rpc('admin_set_role', { p_user: u.id, p_role: r[0] }).then(function (res) {
+            if (res.error) { if (window.toast) window.toast(res.error.message || 'Errore', 'err'); return; }
+            if (window.toast) window.toast(t('uc_role_saved', 'Ruolo aggiornato'), 'ok');
+            u.admin_role = (r[0] === 'none' ? null : r[0]); u.is_admin = (r[0] !== 'none'); close(); open(u);
+          });
+        } });
+        roleRow.appendChild(b);
+      });
+      actions.appendChild(roleRow);
+    }
     if (stt === 'active') {
       actions.appendChild(h('button', { class: 'uc-btn gold', text: t('a_suspend', 'Sospendi'), onclick: function () { if (window.moderateUser) { window.moderateUser(u.id, 'suspended', 'from_card', new Date(Date.now() + 7 * 864e5).toISOString()); close(); } } }));
       actions.appendChild(h('button', { class: 'uc-btn red', text: t('a_ban', 'Banna'), onclick: function () { if (window.adminConfirm) window.adminConfirm(t('confirm_ban', 'Bannare definitivamente questo utente?')).then(function (ok) { if (ok && window.moderateUser) { window.moderateUser(u.id, 'banned', 'from_card', null); close(); } }); } }));
