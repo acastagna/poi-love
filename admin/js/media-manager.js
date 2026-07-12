@@ -50,7 +50,9 @@
       + '.mm-drop i{font-size:34px;display:block;margin-bottom:8px;color:var(--gold,#E8B04B)}'
       + '.mm-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}@media(max-width:560px){.mm-grid{grid-template-columns:repeat(3,1fr)}}'
       + '.mm-thumb{aspect-ratio:1;border-radius:10px;overflow:hidden;cursor:pointer;border:2px solid transparent;background:#222}.mm-thumb:hover{border-color:var(--gold,#E8B04B)}.mm-thumb img{width:100%;height:100%;object-fit:cover}'
-      + '.mm-empty{color:var(--muted,#999);font-size:13px;text-align:center;padding:20px}';
+      + '.mm-empty{color:var(--muted,#999);font-size:13px;text-align:center;padding:20px}'
+      + '.mm-searchrow{display:flex;gap:8px;align-items:center}'
+      + '.mm-search{flex:1;padding:9px 12px;border:1px solid var(--line,#333);border-radius:10px;background:var(--field-bg,#111);color:var(--paper,#eee);font-family:inherit;font-size:13.5px;box-sizing:border-box}';
     var st = document.createElement('style'); st.id = 'mm-styles'; st.textContent = css; document.head.appendChild(st);
   }
 
@@ -62,11 +64,23 @@
     function done(url) { close(); onPick(url); }
 
     var body = h('div', { class: 'mm-body' });
-    var tabCarica = h('button', { class: 'mm-tab on', text: 'Carica' });
-    var tabLib = h('button', { class: 'mm-tab', text: 'Libreria' });
+    var tabCarica = h('button', { class: 'mm-tab', text: 'Carica' });
+    var tabMedia = h('button', { class: 'mm-tab', text: 'Media POI•LOVE' });
+    var tabOnline = h('button', { class: 'mm-tab', text: 'Cerca online' });
+    function setTab(t) { [tabCarica, tabMedia, tabOnline].forEach(function (b) { b.classList.remove('on'); }); t.classList.add('on'); }
 
+    function pickGrid(items) {
+      // items: array di {url, thumb}
+      body.innerHTML = '';
+      if (!items.length) { body.innerHTML = '<div class="mm-empty">Nessuna immagine.</div>'; return; }
+      var grid = h('div', { class: 'mm-grid' });
+      items.forEach(function (it) { grid.appendChild(h('div', { class: 'mm-thumb', onclick: function () { done(it.url); } }, h('img', { src: it.thumb || it.url, alt: '', loading: 'lazy' }))); });
+      body.appendChild(grid);
+    }
+
+    // 1) CARICA dal computer
     function showCarica() {
-      tabCarica.classList.add('on'); tabLib.classList.remove('on');
+      setTab(tabCarica);
       body.innerHTML = '';
       var drop = h('div', { class: 'mm-drop' }, [h('i', { class: 'ph-duotone ph-upload-simple' }), h('div', { text: 'Trascina qui una foto o clicca per sceglierla' })]);
       var inp = h('input', { type: 'file', accept: 'image/*', style: 'display:none' });
@@ -78,32 +92,66 @@
       drop.addEventListener('drop', function (e) { e.preventDefault(); drop.classList.remove('over'); go(e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]); });
       body.appendChild(drop); body.appendChild(inp);
     }
-    function showLib() {
-      tabLib.classList.add('on'); tabCarica.classList.remove('on');
-      body.innerHTML = '<div class="mm-empty">Carico la libreria…</div>';
+
+    // 2) MEDIA POI•LOVE: le immagini VERE del frontend (foto dei POI) + inventario media_assets
+    function showMedia() {
+      setTab(tabMedia);
+      body.innerHTML = '<div class="mm-empty">Carico le immagini di POI•LOVE…</div>';
       var db = sb(); if (!db) { body.innerHTML = '<div class="mm-empty">Non disponibile</div>'; return; }
-      var q = db.from('media_assets').select('url,kind,created_at').order('created_at', { ascending: false }).limit(60);
-      if (opts.kind) q = q.eq('kind', opts.kind);
-      q.then(function (r) {
-        var rows = (r && r.data) || [];
-        if (!rows.length) { body.innerHTML = '<div class="mm-empty">Ancora nessuna immagine nella libreria. Carica la prima dalla scheda Carica.</div>'; return; }
-        body.innerHTML = '';
-        var grid = h('div', { class: 'mm-grid' });
-        rows.forEach(function (m) { grid.appendChild(h('div', { class: 'mm-thumb', onclick: function () { done(m.url); } }, h('img', { src: m.url, alt: '', loading: 'lazy' }))); });
-        body.appendChild(grid);
-      });
+      Promise.all([
+        db.from('pois').select('photos').not('photos', 'is', null).order('created_at', { ascending: false }).limit(90),
+        db.from('media_assets').select('url').order('created_at', { ascending: false }).limit(40)
+      ]).then(function (res) {
+        var seen = {}, items = [];
+        function add(u) { if (u && /^https?:\/\//.test(u) && !seen[u]) { seen[u] = 1; items.push({ url: u }); } }
+        ((res[0] && res[0].data) || []).forEach(function (r) { (r.photos || []).forEach(add); });
+        ((res[1] && res[1].data) || []).forEach(function (r) { add(r.url); });
+        if (!items.length) { body.innerHTML = '<div class="mm-empty">Ancora nessuna immagine sul frontend. Caricane una dalla scheda Carica o cercala online.</div>'; return; }
+        pickGrid(items.slice(0, 150));
+      }).catch(function () { body.innerHTML = '<div class="mm-empty">Errore nel caricare i media</div>'; });
     }
+
+    // 3) CERCA ONLINE: foto reali libere (Openverse: Unsplash/Flickr/Wikimedia) + genera con AI (Pollinations)
+    function showOnline() {
+      setTab(tabOnline);
+      body.innerHTML = '';
+      var q = h('input', { class: 'mm-search', type: 'text', placeholder: 'Cerca: es. ristorante Tirana, spiaggia, hotel…' });
+      var aiBtn = h('button', { class: 'mm-tab', text: '✨ Genera con AI' });
+      var hint = h('div', { class: 'mm-empty', text: 'Scrivi e premi Invio: foto reali e libere. Oppure generane una con l\'AI.' });
+      var grid = h('div', { class: 'mm-grid', style: 'margin-top:10px' });
+      function runSearch() {
+        var term = (q.value || '').trim(); if (!term) return; grid.innerHTML = ''; hint.textContent = 'Cerco…';
+        fetch('https://api.openverse.org/v1/images/?q=' + encodeURIComponent(term) + '&page_size=20&license_type=commercial')
+          .then(function (r) { return r.json(); }).then(function (d) {
+            var rows = (d && d.results) || []; grid.innerHTML = ''; hint.textContent = rows.length ? '' : 'Nessun risultato: prova a generarla con l\'AI.';
+            rows.forEach(function (it) { var u = it.url; if (!u) return; grid.appendChild(h('div', { class: 'mm-thumb', onclick: function () { done(u); } }, h('img', { src: u, alt: '', loading: 'lazy', onerror: function () { this.parentNode.style.display = 'none'; } }))); });
+          }).catch(function () { hint.textContent = 'Ricerca non riuscita, riprova.'; });
+      }
+      function runAI() {
+        var term = (q.value || '').trim(); if (!term) { hint.textContent = 'Scrivi prima cosa vuoi generare.'; return; }
+        grid.innerHTML = ''; hint.textContent = 'L\'AI sta dipingendo alcune varianti…';
+        var base = Date.now();
+        for (var i = 0; i < 6; i++) { (function (seed) { var u = 'https://image.pollinations.ai/prompt/' + encodeURIComponent(term) + '?width=800&height=600&nologo=true&seed=' + seed; grid.appendChild(h('div', { class: 'mm-thumb', onclick: function () { done(u); } }, h('img', { src: u, alt: '', loading: 'lazy' }))); })(base + i * 911); }
+      }
+      q.addEventListener('keydown', function (e) { if (e.key === 'Enter') runSearch(); });
+      aiBtn.addEventListener('click', runAI);
+      body.appendChild(h('div', { class: 'mm-searchrow' }, [q, aiBtn]));
+      body.appendChild(hint); body.appendChild(grid);
+      setTimeout(function () { q.focus(); }, 30);
+    }
+
     tabCarica.addEventListener('click', showCarica);
-    tabLib.addEventListener('click', showLib);
+    tabMedia.addEventListener('click', showMedia);
+    tabOnline.addEventListener('click', showOnline);
 
     var mod = h('div', { class: 'mm-mod' }, [
       h('div', { class: 'mm-head' }, [h('h3', { text: 'Scegli un\'immagine' }), h('button', { class: 'mm-x', text: '×', onclick: close })]),
-      h('div', { class: 'mm-tabs' }, [tabCarica, tabLib]),
+      h('div', { class: 'mm-tabs' }, [tabCarica, tabMedia, tabOnline]),
       body
     ]);
     var ovl = h('div', { class: 'mm-ovl', id: 'mm-ovl', onclick: function (e) { if (e.target === ovl) close(); } }, [mod]);
     document.body.appendChild(ovl);
-    showCarica();
+    showMedia(); // apre direttamente sui media reali di POI•LOVE
   }
 
   window.POIMedia = { upload: upload, pick: pick };

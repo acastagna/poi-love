@@ -518,7 +518,17 @@ html[data-theme="light"] .chip.green{color:#236b39}
 .poied-top .poiph-th{width:120px;height:88px}
 .poied-full{display:flex;flex-direction:column;gap:14px;margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}
 .poied-full .row2{grid-template-columns:260px 1fr;align-items:start}
-@media(max-width:820px){.poied-grid{grid-template-columns:1fr;gap:14px}.poied-full .row2{grid-template-columns:1fr}}
+.poied-slots{display:flex;gap:10px}
+.poied-slot{flex:1;aspect-ratio:1;max-width:150px;border-radius:14px;border:1.5px dashed var(--line);background:#00000022 center/cover no-repeat;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;overflow:hidden;transition:border-color .15s,transform .1s}
+.poied-slot:hover{border-color:var(--gold)}.poied-slot:active{transform:scale(.97)}
+.poied-slot.has{border-style:solid;border-color:#1E7F52}
+.poied-slot-plus{display:flex;flex-direction:column;align-items:center;gap:5px;color:var(--muted);font-size:28px}
+.poied-slot-plus span{font-size:10px;font-weight:800;letter-spacing:.3px}
+.poied-slot-lbl{position:absolute;top:6px;left:6px;background:rgba(0,0,0,.6);color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:6px}
+.poied-slot-x{position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,.6);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px}
+.poied-full .badge-picker{display:grid;grid-template-columns:1fr 1fr;gap:10px 22px;align-items:start}
+.poied-full .badge-picker .bp-title,.poied-full .badge-picker .bp-row{grid-column:1/-1}
+@media(max-width:820px){.poied-grid{grid-template-columns:1fr;gap:14px}.poied-full .row2{grid-template-columns:1fr}.poied-full .badge-picker{grid-template-columns:1fr}}
 /* Zona Crea: quattro pulsantoni grandi */
 .create-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
 @media(max-width:1100px){.create-grid{grid-template-columns:repeat(2,1fr)}}
@@ -544,7 +554,7 @@ html[data-theme="light"] .chip.green{color:#236b39}
 <script src="js/user-card.js?v=327"></script>
 <script src="js/poi-card.js?v=326"></script>
 <script src="js/color-picker.js?v=326"></script>
-<script src="js/media-manager.js?v=326"></script>
+<script src="js/media-manager.js?v=329"></script>
 <script src="js/image-editor.js?v=326"></script>
 <script src="js/poi-frontend.js?v=327"></script>
 <script src="js/badge-admin.js?v=326"></script>
@@ -3358,32 +3368,14 @@ async function editPoi(p){
       if(bd){ p.badge_ids=bd.badge_ids||[]; p.badge_tier=bd.badge_tier||''; p.assigned_user_id=bd.assigned_user_id||null; } }catch(e){}
   }
 
-  // ── FOTO: strip con rimuovi + rendi principale, aggiungi da URL o upload ──
-  const phBox=el('div',{class:'poiph-strip'});
-  function drawPhotos(){
-    phBox.textContent='';
-    if(!photos.length) phBox.appendChild(el('div',{class:'sm',style:'opacity:.7',text:t('poi_no_photos')}));
-    photos.forEach((u,i)=>{
-      const ok=/^https?:\/\//i.test(u);
-      const th=el('div',{class:'poiph-th',title:u,style:'cursor:zoom-in'});
-      if(ok) th.style.backgroundImage='url("'+encodeURI(u).replace(/["'()\\]/g,'')+'")';
-      th.addEventListener('click',ev=>{ if(ev.target.closest('.poiph-act')) return; _photoLightbox(u); });
-      if(i===0) th.appendChild(el('span',{class:'poiph-main',text:t('poi_ph_main')}));
-      const bar=el('div',{class:'poiph-bar'});
-      if(i>0) bar.appendChild(el('button',{class:'poiph-act',title:t('poi_ph_make_main'),onclick:()=>{ photos.splice(0,0,photos.splice(i,1)[0]); drawPhotos(); }}, phIcon('star')));
-      bar.appendChild(el('button',{class:'poiph-act red',title:t('a_delete'),onclick:()=>{ photos.splice(i,1); drawPhotos(); }}, phIcon('trash')));
-      th.appendChild(bar);
-      phBox.appendChild(th);
-    });
-  }
-  drawPhotos();
-  const phAddRow=el('div',{class:'btn-row',style:'margin-top:6px'});
-  phAddRow.appendChild(el('button',{class:'btn sm gold',onclick:()=>{
+  // ── FOTO: 3 slot "+" come nel frontend (Principale / Foto 2 / Foto 3), si riempiono da soli ──
+  const phSlots=el('div',{class:'poied-slots'});
+  const SLOT_LBL=[t('poi_ph_main','PRINCIPALE'), t('f_photo2','Foto 2'), t('f_photo3','Foto 3')];
+  function _addPhoto(){
     if(window.POIMedia&&window.POIMedia.pick){
       window.POIMedia.pick({kind:'poi',onPick:url=>{ if(url){ photos.push(url); drawPhotos(); toast(t('saved'),'ok'); } }});
       return;
     }
-    // fallback: upload diretto
     const inp=document.createElement('input'); inp.type='file'; inp.accept='image/*';
     inp.onchange=async()=>{ const file=inp.files&&inp.files[0]; if(!file) return;
       toast(t('uploading'),null,'circle-notch');
@@ -3392,8 +3384,26 @@ async function editPoi(p){
       photos.push(url); drawPhotos(); toast(t('saved'),'ok');
     };
     inp.click();
-  }},[phIcon('images'),document.createTextNode(' '+t('poi_ph_upload'))]));
-  _top.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_photos')}), phBox, phAddRow ]));
+  }
+  function drawPhotos(){
+    phSlots.textContent='';
+    for(let i=0;i<3;i++){
+      const u=photos[i];
+      const slot=el('div',{class:'poied-slot'+(u?' has':'')});
+      if(u){
+        slot.style.backgroundImage='url("'+encodeURI(u).replace(/["'()\\]/g,'')+'")';
+        slot.appendChild(el('span',{class:'poied-slot-lbl',text:SLOT_LBL[i]}));
+        slot.appendChild(el('button',{class:'poied-slot-x',title:t('a_delete'),onclick:(e)=>{ e.stopPropagation(); photos.splice(i,1); drawPhotos(); }},[phIcon('x')]));
+        slot.addEventListener('click',ev=>{ if(ev.target.closest('.poied-slot-x')) return; _photoLightbox(u); });
+      } else {
+        slot.appendChild(el('div',{class:'poied-slot-plus'},[phIcon('plus'), el('span',{text:SLOT_LBL[i]})]));
+        slot.addEventListener('click',_addPhoto);
+      }
+      phSlots.appendChild(slot);
+    }
+  }
+  drawPhotos();
+  _top.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_photos')}), phSlots ]));
 
   // ── TITOLO + DESCRIZIONE ──
   _colL.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_title')}), f.title=el('input',{value:p.title||''}) ]));
