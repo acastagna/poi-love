@@ -514,6 +514,7 @@ html[data-theme="light"] .chip.green{color:#236b39}
 <link rel="stylesheet" href="css/palette.css">
 <script src="js/theme.js"></script>
 <script src="js/badge-picker.js"></script>
+<script src="js/user-card.js"></script>
 </head>
 <body>
 <div class="grain"></div>
@@ -1543,7 +1544,7 @@ async function loadLatestUsers(){
       const av = u.avatar_url
         ? el('img',{class:'av round',src:u.avatar_url,alt:''})
         : el('div',{class:'av round',text:initials(u.username)});
-      box.appendChild(el('div',{class:'mini-row'},[
+      box.appendChild(el('div',{class:'mini-row',style:'cursor:pointer',title:t('open_card','Apri scheda'),onclick:()=>{ if(window.AdminUserCard) AdminUserCard.open(u); }},[
         av,
         el('div',{class:'tt'},[
           el('div',{class:'nm',text:'@'+(u.username||'utente')}),
@@ -1803,7 +1804,7 @@ async function loadUsers(){
       }
 
       tb.appendChild(el('tr',null,[
-        el('td',null, el('div',{style:'display:flex;align-items:center;gap:10px'},[
+        el('td',null, el('div',{style:'display:flex;align-items:center;gap:10px;cursor:pointer',title:t('open_card','Apri scheda'),onclick:()=>{ if(window.AdminUserCard) AdminUserCard.open(u); }},[
           av, el('div',null,[ el('div',{class:'ttl',text:'@'+(u.username||'utente')}),
             el('div',{class:'sm',text:(u.points!=null?(u.points+' pt · '):'')+fmtDate(u.created_at)}) ])
         ])),
