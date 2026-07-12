@@ -3293,7 +3293,7 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
       <div class="poiai-msg ai">Ciao! Sono <strong>ILLI•AI</strong>, la mascot di POI•LOVE, il tuo cuore-amico per scoprire luoghi e capire l'app. Posso suggerirti tappe, ristoranti, esperienze culturali, oppure aiutarti a usare POI•LOVE (POI, itinerari, compagni di viaggio). Da dove iniziamo? <i class="ph-duotone ph-heart"></i></div>
     </div>
     <div class="poiai-input-bar">
-      <input class="poiai-input" id="poiaiInput" type="text"
+      <input class="poiai-input" id="poiaiInput" type="text" autocomplete="off" autocorrect="off" autocapitalize="sentences"
         placeholder="es. Dove mangiare a Tirana con vista? · Come si crea un itinerario?"
         onkeydown="if(event.key==='Enter')sendPoiAIMsg()"/>
       <button class="poiai-send" onclick="sendPoiAIMsg()"><i class="ph-duotone ph-paper-plane-tilt"></i></button>
@@ -4362,7 +4362,7 @@ async function loadSupportThread(){
     `<div class="support-divider"><i class="ph-duotone ph-shield-check"></i> ${window.t('support_team','Team POI•LOVE')}</div>`
     + rows.map(_renderSupportMsg).join('')
     + `<div class="poiai-input-bar" style="padding:6px 0 2px;margin-top:4px">
-         <input class="poiai-input" id="supportReplyIn" type="text" placeholder="${window.t('support_reply_ph','Rispondi al team…')}" onkeydown="if(event.key==='Enter')sendSupportReply()">
+         <input class="poiai-input" id="supportReplyIn" type="text" autocomplete="off" autocorrect="off" autocapitalize="sentences" placeholder="${window.t('support_reply_ph','Rispondi al team…')}" onkeydown="if(event.key==='Enter')sendSupportReply()">
          <button class="poiai-send" onclick="sendSupportReply()"><i class="ph-duotone ph-paper-plane-tilt"></i></button>
        </div>`;
   // Se ci sono messaggi NON letti dal team, porto la chat in cima così li vedi subito (prima restavano nascosti sopra).
@@ -7977,7 +7977,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='3.27';
+const APP_VERSION='3.28';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
@@ -16759,6 +16759,20 @@ async function confirmPhotoPicker(){
       setTimeout(function(){ try{ el.scrollIntoView({block:'center',behavior:'smooth'}); }catch(_){}}, 320);
     }
   });
+})();
+/* Togli l'AutoFill iOS ("Inserisci info") dai campi di testo dell'app, così la tastiera è più pulita.
+   Non tocca login/email/password (che vogliono l'autofill) né i campi che hanno già un autocomplete. */
+(function(){
+  function patch(el){
+    if(!el || el.__acPatched || !el.tagName) return;
+    var t=el.tagName.toLowerCase(); if(t!=='textarea' && t!=='input') return;
+    if(t==='input'){ var ty=(el.getAttribute('type')||'text').toLowerCase(); if(['email','password','tel','url','search','number','date'].indexOf(ty)>=0) return; }
+    if(el.getAttribute('autocomplete')) return;
+    el.__acPatched=1; el.setAttribute('autocomplete','off'); if(!el.getAttribute('autocapitalize')) el.setAttribute('autocapitalize','sentences');
+  }
+  function scan(root){ try{ if(root.querySelectorAll) root.querySelectorAll('input,textarea').forEach(patch); }catch(_){} }
+  scan(document);
+  try{ new MutationObserver(function(muts){ muts.forEach(function(m){ (m.addedNodes||[]).forEach(function(n){ if(n.nodeType===1){ patch(n); scan(n); } }); }); }).observe(document.body,{childList:true,subtree:true}); }catch(_){}
 })();
 </script>
 </body>
