@@ -532,6 +532,7 @@ html[data-theme="light"] .chip.green{color:#236b39}
 <script src="js/user-card.js"></script>
 <script src="js/poi-card.js"></script>
 <script src="js/color-picker.js"></script>
+<script src="js/media-manager.js"></script>
 <script src="js/badge-admin.js"></script>
 </head>
 <body>
@@ -1052,7 +1053,7 @@ const T = {
     tag_renamed:'Rinominato su %n POI', tag_deleted:'Rimosso da %n POI',
     tag_del_confirm:'Eliminare il tag "%s" da tutti i POI?', tag_block_confirm:'Bloccare questo tag? Verrà rimosso dai POI e non sarà più suggerito.',
     cat_req_title:'Categorie personalizzate proposte', cat_req_help:'Ogni utente può proporre una sola categoria sua. La vedi qui con chi l\'ha creata e quante volte è stata usata: diventa pubblica da sola a 20 usi, oppure la approvi tu subito.',
-    cat_req_empty:'Nessuna categoria proposta in attesa', cat_new_title:'Nuova categoria / modifica', cat_approve_now:'Approva ora', f_photos:'Foto del luogo', ok_btn:'OK', f_family:'Famiglia genitore', bdg_official:'Ufficiale', bdg_essential:'Indispensabile', bdg_top:'Più votato', bdg_official_hint:'Badge Ufficiale: curata e garantita da POI•LOVE', bdg_essential_hint:'Badge Indispensabile: da non perdere, scelta della redazione', poi_no_photos:'Nessuna foto: aggiungila da URL o carica un file', poi_ph_main:'PRINCIPALE', poi_ph_make_main:'Rendi principale', poi_ph_url_err:'Serve un URL https valido', poi_ph_upload:'Carica file', f_cats3:'Categorie (fino a 3, la prima è la principale)', f_tags:'Tag (Invio per aggiungere, max 10)', f_tag_ph:'aggiungi tag…', cat_max3_admin:'Massimo 3 categorie', tag_max10:'Massimo 10 tag', geo_from_addr:'Coordinate dall\'indirizzo', geo_from_coords:'Indirizzo dalle coordinate', geo_need_addr:'Scrivi prima indirizzo o città', geo_need_coords:'Servono lat e lng validi', geo_searching:'Cerco…', geo_not_found:'Non trovato, precisa l\'indirizzo', geo_done:'Compilato', photo_upload_err:'Caricamento foto non riuscito', cat_reject:'Rifiuta', cat_approved:'Categoria pubblicata', cat_reject_confirm:'Rifiutare e togliere questa categoria proposta?',
+    cat_req_empty:'Nessuna categoria proposta in attesa', cat_new_title:'Nuova categoria / modifica', cat_approve_now:'Approva ora', f_photos:'Foto del luogo', ok_btn:'OK', f_family:'Famiglia genitore', bdg_official:'Ufficiale', bdg_essential:'Indispensabile', bdg_top:'Più votato', bdg_official_hint:'Badge Ufficiale: curata e garantita da POI•LOVE', bdg_essential_hint:'Badge Indispensabile: da non perdere, scelta della redazione', poi_no_photos:'Nessuna foto: caricala o scegli dai media', poi_ph_main:'PRINCIPALE', poi_ph_make_main:'Rendi principale', poi_ph_url_err:'Serve un URL https valido', poi_ph_upload:'Aggiungi foto', f_cats3:'Categorie (fino a 3, la prima è la principale)', f_tags:'Tag (Invio per aggiungere, max 10)', f_tag_ph:'aggiungi tag…', cat_max3_admin:'Massimo 3 categorie', tag_max10:'Massimo 10 tag', geo_from_addr:'Coordinate dall\'indirizzo', geo_from_coords:'Indirizzo dalle coordinate', geo_need_addr:'Scrivi prima indirizzo o città', geo_need_coords:'Servono lat e lng validi', geo_searching:'Cerco…', geo_not_found:'Non trovato, precisa l\'indirizzo', geo_done:'Compilato', photo_upload_err:'Caricamento foto non riuscito', cat_reject:'Rifiuta', cat_approved:'Categoria pubblicata', cat_reject_confirm:'Rifiutare e togliere questa categoria proposta?',
     cat_macro:'Macro (enum)', cat_icon:'Icona Phosphor', cat_color:'Colore', cat_sort:'Ordine', cat_save:'Salva categoria',
     cat_list_title:'Categorie attive e spente', cat_on:'Attiva', cat_off:'Spenta', cat_edit:'Modifica',
     cat_saved:'Categoria salvata', cat_key_req:'Key, macro e le 3 etichette sono obbligatorie',
@@ -3302,6 +3303,11 @@ async function editPoi(p){
   drawPhotos();
   const phAddRow=el('div',{class:'btn-row',style:'margin-top:6px'});
   phAddRow.appendChild(el('button',{class:'btn sm gold',onclick:()=>{
+    if(window.POIMedia&&window.POIMedia.pick){
+      window.POIMedia.pick({kind:'poi',onPick:url=>{ if(url){ photos.push(url); drawPhotos(); toast(t('saved'),'ok'); } }});
+      return;
+    }
+    // fallback: upload diretto
     const inp=document.createElement('input'); inp.type='file'; inp.accept='image/*';
     inp.onchange=async()=>{ const file=inp.files&&inp.files[0]; if(!file) return;
       toast(t('uploading'),null,'circle-notch');
@@ -3310,7 +3316,7 @@ async function editPoi(p){
       photos.push(url); drawPhotos(); toast(t('saved'),'ok');
     };
     inp.click();
-  }},[phIcon('upload-simple'),document.createTextNode(' '+t('poi_ph_upload'))]));
+  }},[phIcon('images'),document.createTextNode(' '+t('poi_ph_upload'))]));
   body.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_photos')}), phBox, phAddRow ]));
 
   // ── TITOLO + DESCRIZIONE ──
