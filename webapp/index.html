@@ -4622,7 +4622,32 @@ async function loadCompImages(){
 }
 function compPickImage(){
   if(currentUser && !_photoConsent){ showToast(t('cv_photo_needed','Attiva il consenso foto per caricare immagini')); requestMicConsent(); return; }
-  const inp=document.getElementById('compImgInput'); if(inp){ inp.value=''; inp.click(); }
+  // scelta: carica dal telefono (fotocamera/galleria) oppure cerca stock
+  const ov=document.createElement('div'); ov.style.cssText='position:fixed;inset:0;z-index:2100;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center';
+  const bs='display:flex;align-items:center;gap:10px;width:100%;padding:14px;border:none;border-radius:12px;background:var(--bg,#f5f0e8);color:var(--text);font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:10px';
+  ov.innerHTML='<div style="background:var(--card);border-radius:18px 18px 0 0;width:100%;max-width:480px;padding:14px 16px 26px">'
+    +'<div style="width:38px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 14px"></div>'
+    +'<button id="_cpUp" style="'+bs+'"><i class="ph-duotone ph-camera" style="font-size:20px;color:var(--red)"></i> '+t('cv_upload_device','Fotocamera o galleria')+'</button>'
+    +'<button id="_cpStock" style="'+bs+'"><i class="ph-duotone ph-images" style="font-size:20px;color:var(--blue)"></i> '+t('stock_btn','Cerca stock')+'</button></div>';
+  document.body.appendChild(ov);
+  const close=()=>ov.remove(); ov.addEventListener('click',e=>{ if(e.target===ov) close(); });
+  ov.querySelector('#_cpUp').onclick=()=>{ close(); const inp=document.getElementById('compImgInput'); if(inp){ inp.value=''; inp.click(); } };
+  ov.querySelector('#_cpStock').onclick=()=>{ close(); openStockSearch({onPick:_compAddStock}); };
+}
+// Aggiunge alla compagnia un'immagine STOCK: la scarica e la carica nel bucket (stesso flusso delle foto caricate).
+async function _compAddStock(url){
+  if(!url||!_compDetail||!currentUser) return;
+  showToast(t('uploading','Carico la foto…'));
+  try{
+    const resp=await fetch(url); if(!resp.ok) throw new Error('fetch'); const blob=await resp.blob();
+    const file=new File([blob],'stock.jpg',{type:blob.type||'image/jpeg'});
+    const wblob=(typeof compressToWebP==='function')?await compressToWebP(file,1400,0.82):file;
+    const id=(crypto.randomUUID?crypto.randomUUID():('i'+Date.now()+Math.round(Math.random()*1e6)));
+    const path=`${_compDetail.id}/${id}.webp`;
+    const up=await sb.storage.from('companion_photos').upload(path,wblob,{contentType:'image/webp',upsert:false}); if(up.error) throw up.error;
+    const ins=await sb.from('companion_images').insert({ id, companion_id:_compDetail.id, author_id:currentUser.id, image_path:path }); if(ins.error) throw ins.error;
+    loadCompImages(); showToast(t('cv_img_added','Foto aggiunta'));
+  }catch(e){ showToast(t('cv_img_err','Caricamento foto fallito (immagine protetta): prova un\'altra')); }
 }
 async function compUploadImage(input){
   const file=input.files&&input.files[0]; if(!file||!_compDetail||!currentUser) return;
@@ -7980,7 +8005,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='3.30';
+const APP_VERSION='3.31';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
@@ -16167,20 +16192,15 @@ async function searchUnsplash(){
   photoPickerSelected=null; photoPickerUnsplashUrls=[];
   document.getElementById('photoPickerConfirm').classList.remove('show');
   try{
-    const url='https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch='+encodeURIComponent(q)+'&gsrnamespace=6&gsrlimit=18&prop=imageinfo&iiprop=url&iiurlwidth=1000&format=json&origin=*';
-    const r=await fetch(url); const j=await r.json();
-    const pages=(j&&j.query&&j.query.pages)||{};
-    const arr=Object.values(pages).sort((a,b)=>(a.index||99)-(b.index||99))
-      .map(p=>(p.imageinfo&&p.imageinfo[0])||null).filter(Boolean)
-      .filter(ii=>/\.(jpe?g|png|webp)$/i.test(ii.url||''))
-      .map(ii=>({ full:ii.thumburl||ii.url }))
-      .slice(0,15);
-    if(!arr.length){ grid.innerHTML='<div class="photo-picker-loading" style="padding:20px 14px;text-align:center;color:var(--muted)">'+(lang==='it'?'Nessuna foto reale trovata per questo luogo. Carica la tua foto qui sotto.':'No real photo found. Upload yours below.')+'</div>'; return; }
-    photoPickerUnsplashUrls=arr.map(a=>a.full);   // URL di foto REALI
-    grid.innerHTML=arr.map((a,i)=>`
+    // Multi-sorgente via edge function image-search (Unsplash/Pexels/Pixabay/Wikipedia/StockSnap/Flickr, chiavi sul server)
+    const { data }=await sb.functions.invoke('image-search',{body:{q:q}});
+    const res=(data&&data.results)||[];
+    if(!res.length){ grid.innerHTML='<div class="photo-picker-loading" style="padding:20px 14px;text-align:center;color:var(--muted)">'+(lang==='it'?'Nessuna foto trovata. Carica la tua foto qui sotto.':'No photo found. Upload yours below.')+'</div>'; return; }
+    photoPickerUnsplashUrls=res.map(a=>a.url);   // URL pieni (la thumb è solo l'anteprima)
+    grid.innerHTML=res.map((a,i)=>`
       <div class="photo-picker-thumb" id="ppt-${i}" onclick="selectUnsplashPhoto(${i})">
-        <img src="${a.full}" alt="" loading="lazy" onerror="this.parentNode.style.display='none'">
-        <div class="unsplash-attr">Wikimedia Commons</div>
+        <img src="${a.thumb||a.url}" alt="" loading="lazy" onerror="this.parentNode.style.display='none'">
+        <div class="unsplash-attr">${a.source}</div>
       </div>`).join('');
   }catch(e){ grid.innerHTML='<div class="photo-picker-loading" style="color:var(--muted)">'+t('error_generic','Qualcosa è andato storto, riprova')+'</div>'; }
 }
