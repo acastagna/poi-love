@@ -1,0 +1,68 @@
+/*
+  © Alessandro Castagna — 321.al / EVOLAB
+  Tutti i diritti riservati. Uso non autorizzato vietato.
+  info@321.al · https://321.al
+
+  A1 — Scheda POI dell'admin IDENTICA a quella dell'app (webapp): foto, fascia rossa col titolo,
+  indirizzo + coordinate, descrizione, cuori, autore. Colori fissi = quelli dell'app (design chiaro),
+  così è uguale a come la vede l'utente da smartphone. Le classi sono scopate sotto .apc.
+*/
+.apc-ov{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(3px);z-index:720;display:flex;justify-content:flex-end;opacity:0;transition:opacity .2s}
+.apc-ov.on{opacity:1}
+.apc-drawer{width:min(430px,100%);height:100%;overflow:auto;background:#EAE4D8;box-shadow:-8px 0 40px rgba(0,0,0,.35);transform:translateX(28px);transition:transform .22s cubic-bezier(.2,.8,.2,1)}
+.apc-ov.on .apc-drawer{transform:none}
+.apc-close{position:sticky;top:0;z-index:5;display:flex;justify-content:flex-end;padding:10px 12px 0}
+.apc-close button{width:34px;height:34px;border-radius:50%;background:#fff;border:none;cursor:pointer;font-size:18px;color:#444;box-shadow:0 2px 14px rgba(0,0,0,.26)}
+
+/* La card, come nell'app */
+.apc{--red:#D42B2B;--blue:#285EA7;--card:#FDFAF5;--text:#1C1C1C;--muted:#6B6B6B;--border:rgba(0,0,0,.09);--orange:#F97316;
+  background:var(--card);border-radius:26px;overflow:hidden;margin:6px 14px 20px;box-shadow:0 18px 50px rgba(40,30,10,.18);color:var(--text)}
+
+/* Foto strip (1/2/3 slot come nell'app) */
+.apc .pdm-photos{display:flex;gap:3px;background:#1c1c1e;position:relative}
+.apc .pdm-photos.n0{height:56px;background:var(--card)}
+.apc .pdm-photo-slot{overflow:hidden;position:relative;background:#111}
+.apc .pdm-photos.n1 .pdm-photo-slot{flex:0 0 100%;aspect-ratio:16/9}
+.apc .pdm-photos.n2 .pdm-photo-slot{flex:0 0 calc(50% - 2px);aspect-ratio:1}
+.apc .pdm-photos.n3 .pdm-photo-slot{flex:0 0 calc(33.333% - 2px);aspect-ratio:1}
+.apc .pdm-photo-slot img{width:100%;height:100%;object-fit:cover;display:block}
+.apc .pdm-photo-counter{position:absolute;bottom:8px;right:10px;background:rgba(0,0,0,.52);color:#fff;font-size:9px;font-weight:800;padding:3px 8px;border-radius:10px}
+
+/* Stato (bozza/pubblicato/ufficiale) sopra la card */
+.apc-state{display:flex;flex-wrap:wrap;gap:6px;padding:12px 16px 0}
+.apc-chip{font-size:10px;font-weight:800;padding:3px 10px;border-radius:20px}
+.apc-chip.green{background:#E7F6EC;color:#1a7f3c}.apc-chip.gold{background:#FCEFCF;color:#8a6516}
+.apc-chip.dim{background:#EFEAE0;color:#6B6B6B}.apc-chip.red{background:#FBE3E3;color:#b3261e}
+
+/* Sezione bianca: indirizzo + coordinate */
+.apc .pdm-white-section{padding:14px 18px 12px;background:var(--card)}
+.apc .pdm-meta-row{display:flex;align-items:flex-start;gap:9px;font-size:12.5px;color:var(--muted);margin-bottom:7px;line-height:1.5}
+.apc .pdm-meta-row i{font-size:15px;flex-shrink:0;color:var(--red)}
+.apc .pdm-meta-row.coords{font-family:monospace;font-size:11px}
+.apc .pdm-meta-row.coords i{color:var(--muted)}
+.apc .pdm-meta-row a{color:var(--blue);text-decoration:none;font-weight:700}
+
+/* Fascia rossa: titolo + tag + descrizione (come nell'app) */
+.apc .pdm-hero{background:var(--red);padding:18px 18px 16px}
+.apc .pdm-hero-title{font-size:26px;font-weight:900;color:#fff;line-height:1.15;margin:0 0 12px;letter-spacing:-.4px;text-shadow:0 1px 4px rgba(0,0,0,.18)}
+.apc .pdm-hero-tags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px}
+.apc .pdm-hero-tag{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.4);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:800;color:#fff}
+.apc .pdm-hero-desc{font-size:14px;line-height:1.55;color:rgba(255,255,255,.95);margin:0}
+.apc .pdm-hero-desc.empty{opacity:.6;font-style:italic}
+
+/* Love + autore */
+.apc .pdm-love-row{padding:14px 18px;display:flex;align-items:center;gap:8px;background:var(--card);justify-content:center;font-weight:800;color:var(--red);font-size:15px;border-top:1px solid var(--border)}
+.apc .pdm-author{display:flex;align-items:center;gap:12px;padding:14px 18px 18px;background:var(--card);border-top:1px solid var(--border)}
+.apc .pdm-author-avatar{width:42px;height:42px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid var(--border);background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800}
+.apc .pdm-author-avatar img{width:100%;height:100%;object-fit:cover}
+.apc .pdm-author-name{font-weight:800;font-size:14px;color:var(--text)}
+.apc .pdm-author-meta{font-size:11px;color:var(--muted)}
+
+/* Azioni admin (barra sotto la card) */
+.apc-admin{margin:0 14px 24px}
+.apc-admin-lbl{font-size:11px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:#8a8172;margin:4px 4px 8px}
+.apc-actions{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.apc-btn{border:1px solid rgba(0,0,0,.12);background:#fff;color:#241f18;border-radius:11px;padding:9px 13px;font-size:12.5px;font-weight:700;font-family:inherit;cursor:pointer}
+.apc-btn.blue{background:#285EA7;color:#fff;border-color:#285EA7}
+.apc-btn.green{background:#1a7f3c;color:#fff;border-color:#1a7f3c}
+.apc-btn.red{background:#D42B2B;color:#fff;border-color:#D42B2B}

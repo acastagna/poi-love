@@ -512,9 +512,11 @@ html[data-theme="light"] .chip.green{color:#236b39}
 </style>
 <!-- A6 — palette (dopo lo <style> inline così i suoi override vincono) + controller tema modulare -->
 <link rel="stylesheet" href="css/palette.css">
+<link rel="stylesheet" href="css/poi-card.css">
 <script src="js/theme.js"></script>
 <script src="js/badge-picker.js"></script>
 <script src="js/user-card.js"></script>
+<script src="js/poi-card.js"></script>
 </head>
 <body>
 <div class="grain"></div>
@@ -1516,12 +1518,13 @@ async function loadLatestPois(){
   const box=document.getElementById('latestPois'); skeletons(box,5);
   try{
     const { data, error } = await sb.from('pois')
-      .select('id,title,category,love_count,created_at').order('created_at',{ascending:false}).limit(6);
+      .select('id,title,description,category,subcategory,categories,tags,photos,cover_photo,address,city,country,lat,lng,love_count,visibility,is_approved,created_via,removed_at,badge_official,badge_essential,badge_tier,created_at,author:profiles!pois_author_id_fkey(username)')
+      .order('created_at',{ascending:false}).limit(6);
     if(error){ isBackendMissing(error)?backendOff(box):emptyBox(box,t('error'),null,'warning'); return; }
     if(!data || !data.length){ emptyBox(box,'—',null,'map-pin'); return; }
     box.textContent='';
     data.forEach(p=>{
-      box.appendChild(el('div',{class:'mini-row'},[
+      box.appendChild(el('div',{class:'mini-row',style:'cursor:pointer',title:t('open_card','Apri scheda'),onclick:()=>{ if(window.AdminPoiCard) AdminPoiCard.open(p); }},[
         el('div',{class:'av'}, phIcon('map-pin')),
         el('div',{class:'tt'},[
           el('div',{class:'nm',text:p.title||'POI'}),
@@ -3108,7 +3111,7 @@ async function loadPois(){
   const filter=document.getElementById('poiFilter').value||'all';
   try{
     let query=sb.from('pois')
-      .select('id,title,description,category,subcategory,categories,tags,photos,cover_photo,visibility,is_approved,created_via,lat,lng,address,city,country,love_count,created_at,removed_at,removed_reason,author:profiles!pois_author_id_fkey(username)')
+      .select('id,title,description,category,subcategory,categories,tags,photos,cover_photo,visibility,is_approved,created_via,lat,lng,address,city,country,love_count,created_at,removed_at,removed_reason,badge_official,badge_essential,badge_tier,author:profiles!pois_author_id_fkey(username)')
       .order('created_at',{ascending:false}).limit(120);
     if(filter==='ai') query=query.eq('created_via','ai').is('removed_at',null);
     else if(filter==='official') query=query.eq('visibility','official').is('removed_at',null);
@@ -3163,7 +3166,7 @@ async function loadPois(){
       const nPh=(Array.isArray(p.photos)?p.photos.length:0);
       const catsTxt=[p.category].concat(Array.isArray(p.categories)?p.categories:[]).filter(Boolean);
       tb.appendChild(el('tr',null,[
-        el('td',null, el('div',{style:'display:flex;gap:9px;align-items:center'},[ thumb,
+        el('td',null, el('div',{style:'display:flex;gap:9px;align-items:center;cursor:pointer',title:t('open_card','Apri scheda'),onclick:()=>{ if(window.AdminPoiCard) AdminPoiCard.open(p); }},[ thumb,
           el('div',{style:'min-width:0'},[ el('div',{class:'ttl',text:p.title||'—'}),
             el('div',{class:'sm',text:subtitle+(who?(' · '+who):'')}),
             el('div',{class:'sm',style:'opacity:.7',text:nPh+' foto · '+(Array.isArray(p.tags)?p.tags.length:0)+' tag'}) ]) ])),
