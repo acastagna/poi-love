@@ -1970,6 +1970,9 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
 .poiai-input-bar{display:flex;gap:8px;padding:10px 14px;border-top:1px solid var(--border);background:#fafaf8}
 .poiai-input{flex:1;background:#f5f0e8;border:1.5px solid transparent;border-radius:20px;padding:9px 14px;font-size:12px;font-family:inherit;outline:none;color:var(--text);transition:border-color .2s}
 .poiai-input:focus{border-color:var(--blue)}
+/* Campo scrittura = contenteditable (niente barra iOS "Inserisci info"): placeholder + crescita controllata */
+.poiai-input[contenteditable]{white-space:pre-wrap;word-break:break-word;overflow-y:auto;max-height:96px;min-height:19px;line-height:1.35;-webkit-user-modify:read-write-plaintext-only;cursor:text}
+.poiai-input[contenteditable]:empty:before{content:attr(data-ph);color:var(--muted);pointer-events:none}
 .poiai-send{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--red),#E05858);border:none;color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 3px 10px rgba(212,43,43,.35);transition:transform .15s}
 .poiai-send:active{transform:scale(.92)}
 .poiai-mic{width:36px;height:36px;border-radius:50%;background:#ece6da;border:1.5px solid var(--border);color:var(--text);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
@@ -3293,9 +3296,9 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
       <div class="poiai-msg ai">Ciao! Sono <strong>ILLI•AI</strong>, la mascot di POI•LOVE, il tuo cuore-amico per scoprire luoghi e capire l'app. Posso suggerirti tappe, ristoranti, esperienze culturali, oppure aiutarti a usare POI•LOVE (POI, itinerari, compagni di viaggio). Da dove iniziamo? <i class="ph-duotone ph-heart"></i></div>
     </div>
     <div class="poiai-input-bar">
-      <input class="poiai-input" id="poiaiInput" type="text" autocomplete="off" autocorrect="off" autocapitalize="sentences"
-        placeholder="es. Dove mangiare a Tirana con vista? · Come si crea un itinerario?"
-        onkeydown="if(event.key==='Enter')sendPoiAIMsg()"/>
+      <div class="poiai-input" id="poiaiInput" contenteditable="true" autocapitalize="sentences"
+        data-ph="es. Dove mangiare a Tirana con vista? · Come si crea un itinerario?"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendPoiAIMsg();}"></div>
       <button class="poiai-send" onclick="sendPoiAIMsg()"><i class="ph-duotone ph-paper-plane-tilt"></i></button>
       <button class="poiai-mic" id="poiaiMicBtn" onclick="toggleChatDictation()" title="Detta il messaggio"><i class="ph-duotone ph-microphone"></i></button>
     </div>
@@ -4362,7 +4365,7 @@ async function loadSupportThread(){
     `<div class="support-divider"><i class="ph-duotone ph-shield-check"></i> ${window.t('support_team','Team POI•LOVE')}</div>`
     + rows.map(_renderSupportMsg).join('')
     + `<div class="poiai-input-bar" style="padding:6px 0 2px;margin-top:4px">
-         <input class="poiai-input" id="supportReplyIn" type="text" autocomplete="off" autocorrect="off" autocapitalize="sentences" placeholder="${window.t('support_reply_ph','Rispondi al team…')}" onkeydown="if(event.key==='Enter')sendSupportReply()">
+         <div class="poiai-input" id="supportReplyIn" contenteditable="true" autocapitalize="sentences" data-ph="${window.t('support_reply_ph','Rispondi al team…')}" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendSupportReply();}"></div>
          <button class="poiai-send" onclick="sendSupportReply()"><i class="ph-duotone ph-paper-plane-tilt"></i></button>
        </div>`;
   // Se ci sono messaggi NON letti dal team, porto la chat in cima così li vedi subito (prima restavano nascosti sopra).
@@ -4377,8 +4380,8 @@ async function _markSupportRead(){
 }
 async function sendSupportReply(){
   const inp=document.getElementById('supportReplyIn'); if(!inp) return;
-  const body=(inp.value||'').trim(); if(!body || !(currentUser?.id && sb)) return;
-  inp.value='';
+  const body=_ceGet(inp).trim(); if(!body || !(currentUser?.id && sb)) return;
+  _ceSet(inp,'');
   try{
     const { error }=await sb.from('support_messages').insert({ user_id:currentUser.id, sender:'user', body:body.slice(0,4000) });
     if(error) throw error;
@@ -7231,7 +7234,7 @@ function lensCreatePOI(){
 }
 function lensNavigate(){ if(!_lensLL) return; const nm=document.getElementById('lensTitle').textContent||''; const ll=_lensLL; closeLens(); if(typeof openNavPicker==='function') openNavPicker(ll.lat,ll.lng,nm); }
 function lensAdd(){ showToast(t('soon','Presto disponibile')); }
-function lensAskAI(){ const nm=document.getElementById('lensTitle').textContent||''; closeLens(); if(typeof openIlliAI==='function') openIlliAI(); const inp=document.getElementById('poiaiInput'); if(inp){ inp.value=t('lens_ask_prefix','Raccontami qualcosa su ')+nm; } }
+function lensAskAI(){ const nm=document.getElementById('lensTitle').textContent||''; closeLens(); if(typeof openIlliAI==='function') openIlliAI(); const inp=document.getElementById('poiaiInput'); if(inp){ _ceSet(inp, t('lens_ask_prefix','Raccontami qualcosa su ')+nm); } }
 function lensShare(){ if(!_lensLL) return; const nm=document.getElementById('lensTitle').textContent||'Questo punto'; const url='https://poilove.com/?at='+_lensLL.lat+','+_lensLL.lng; openShareSheet({ title: nm, url }); }
 
 function setMapType(type,btn){
@@ -7977,7 +7980,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='3.28';
+const APP_VERSION='3.29';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
@@ -9855,7 +9858,7 @@ function createHistoricRouteWithAI(){
   setTimeout(()=>{
     const input = document.getElementById('poiaiInput');
     if(input){
-      input.value = `Aiutami a creare una nuova rotta storica che includa "${_mapPopupCtx.name}" (coordinate ${(+_mapPopupCtx.lat).toFixed(5)}, ${(+_mapPopupCtx.lng).toFixed(5)}). Suggeriscimi nome, periodo storico, altre tappe coerenti e una breve storia narrativa.`;
+      _ceSet(input, `Aiutami a creare una nuova rotta storica che includa "${_mapPopupCtx.name}" (coordinate ${(+_mapPopupCtx.lat).toFixed(5)}, ${(+_mapPopupCtx.lng).toFixed(5)}). Suggeriscimi nome, periodo storico, altre tappe coerenti e una breve storia narrativa.`);
       if(typeof sendPoiAIMsg==='function') sendPoiAIMsg();
     }
   }, 350);
@@ -9879,7 +9882,7 @@ function askIlliAbout(){
   setTimeout(()=>{
     const input = document.getElementById('poiaiInput');
     if(input){
-      input.value = `Raccontami "${name}" (coordinate ${(+lat).toFixed(5)}, ${(+lng).toFixed(5)}). Cosa c'è in questo luogo? Storia, perché è interessante, cosa offre e cosa fare nelle vicinanze.`;
+      _ceSet(input, `Raccontami "${name}" (coordinate ${(+lat).toFixed(5)}, ${(+lng).toFixed(5)}). Cosa c'è in questo luogo? Storia, perché è interessante, cosa offre e cosa fare nelle vicinanze.`);
       if(typeof sendPoiAIMsg==='function') sendPoiAIMsg();
     }
   }, 350);
@@ -15511,15 +15514,18 @@ RICERCA POSTI (ferreo, non negoziabile):
 STILE: prosa breve e calda (max 4 frasi), concreta. MAI emoji, MAI asterischi o cancelletti markdown (niente **grassetto**, niente #titoli), MAI sigle tipo "R1/R2", MAI parole in inglese. Quando suggerisci posti reali, l'app mostra gia da sola le schede cliccabili sotto la tua risposta: tu di' solo, a parole, quale conviene e perche. Rispondi sempre in ${langLabel}.`.trim();
 }
 
+// Leggi/scrivi un campo che può essere <input>/<textarea> o un div contenteditable.
+function _ceGet(el){ if(!el) return ''; return (el.isContentEditable) ? (el.innerText||el.textContent||'').replace(/ /g,' ') : (el.value||''); }
+function _ceSet(el,v){ if(!el) return; if(el.isContentEditable) el.textContent=(v==null?'':String(v)); else el.value=(v==null?'':v); }
 async function sendPoiAIMsg(){
   const input=document.getElementById('poiaiInput');
   const msgs=document.getElementById('poiaiMsgs');
-  const text=input.value.trim();
+  const text=_ceGet(input).trim();
   if(!text)return;
 
   // insertAdjacentHTML (non innerHTML+=): non ricrea i nodi esistenti, cosi' il fade non si riavvia sui messaggi vecchi.
   msgs.insertAdjacentHTML('beforeend', `<div class="poiai-msg user">${text.replace(/</g,'&lt;')}</div>`);
-  input.value='';
+  _ceSet(input,'');
   msgs.scrollTop=msgs.scrollHeight;
 
   const loadId='pai-load-'+Date.now();
@@ -15643,7 +15649,7 @@ function toggleChatDictation(){
   if(currentUser && !_micConsent){ showToast(t('cons_mic_needed','Attiva il consenso microfono per usare la dettatura')); requestMicConsent(); return; }
   if(_chatListening){ try{ _chatRecog&&_chatRecog.stop(); }catch(e){} if(!_chatRecog){ _chatListening=false; if(btn)btn.classList.remove('is-listening'); } return; }
   const input=document.getElementById('poiaiInput');
-  _chatBaseText=input.value||'';
+  _chatBaseText=_ceGet(input);
   const r=new SR();
   r.lang=lang==='sq'?'sq-AL':lang==='en'?'en-US':'it-IT';
   r.continuous=false; r.interimResults=true; r.maxAlternatives=1;
@@ -15652,8 +15658,8 @@ function toggleChatDictation(){
     let interim='',fin='';
     for(let i=e.resultIndex;i<e.results.length;i++){ const res=e.results[i]; if(res.isFinal) fin+=res[0].transcript; else interim+=res[0].transcript; }
     const sep=(_chatBaseText && !/\s$/.test(_chatBaseText))?' ':'';
-    input.value=_chatBaseText+sep+(fin||interim).trim();
-    if(fin) _chatBaseText=input.value;
+    _ceSet(input,_chatBaseText+sep+(fin||interim).trim());
+    if(fin) _chatBaseText=_ceGet(input);
   };
   r.onerror=ev=>{
     if(ev.error==='not-allowed'||ev.error==='service-not-allowed') showToast(t('mic_denied','Microfono bloccato: abilita il permesso nelle impostazioni'));
