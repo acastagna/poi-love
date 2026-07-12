@@ -536,6 +536,7 @@ html[data-theme="light"] .chip.green{color:#236b39}
 <script src="js/color-picker.js?v=326"></script>
 <script src="js/media-manager.js?v=326"></script>
 <script src="js/image-editor.js?v=326"></script>
+<script src="js/poi-frontend.js?v=326"></script>
 <script src="js/badge-admin.js?v=326"></script>
 </head>
 <body>
@@ -1568,7 +1569,7 @@ async function loadLatestPois(){
     if(!data || !data.length){ emptyBox(box,'—',null,'map-pin'); return; }
     box.textContent='';
     data.forEach(p=>{
-      box.appendChild(el('div',{class:'mini-row',style:'cursor:pointer',title:t('open_card','Apri scheda'),onclick:()=>editPoi(p)},[
+      box.appendChild(el('div',{class:'mini-row',style:'cursor:pointer',title:t('open_card','Apri scheda'),onclick:()=>PoiFrontend.open(p)},[
         el('div',{class:'av'}, phIcon('map-pin')),
         el('div',{class:'tt'},[
           el('div',{class:'nm',text:p.title||'POI'}),
@@ -3281,7 +3282,7 @@ async function loadPois(){
       const nPh=(Array.isArray(p.photos)?p.photos.length:0);
       const catsTxt=[p.category].concat(Array.isArray(p.categories)?p.categories:[]).filter(Boolean);
       tb.appendChild(el('tr',null,[
-        el('td',null, el('div',{style:'display:flex;gap:9px;align-items:center;cursor:pointer',title:t('open_card','Apri scheda'),onclick:()=>editPoi(p)},[ thumb,
+        el('td',null, el('div',{style:'display:flex;gap:9px;align-items:center;cursor:pointer',title:t('open_card','Apri scheda'),onclick:()=>PoiFrontend.open(p)},[ thumb,
           el('div',{style:'min-width:0'},[ el('div',{class:'ttl',text:p.title||'—'}),
             el('div',{class:'sm',text:subtitle+(who?(' · '+who):'')}),
             el('div',{class:'sm',style:'opacity:.7',text:nPh+' foto · '+(Array.isArray(p.tags)?p.tags.length:0)+' tag'}) ]) ])),
