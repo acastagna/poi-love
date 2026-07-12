@@ -1484,6 +1484,7 @@ async function gate(){
   else applyTheme(document.documentElement.getAttribute('data-theme'));
   openSection('dashboard');
   refreshReportsBadge(); // badge segnalazioni in sidebar
+  loadSupportThreads(true); _startSupportLive(); // messaggi utenti: pallino + realtime attivi ovunque, non solo in Messaggi
 }
 
 async function doLogout(){
@@ -1771,7 +1772,10 @@ function _startSupportLive(){
         .on('postgres_changes',{event:'INSERT',schema:'public',table:'support_messages'}, p=>{
           const row=p&&p.new;
           loadSupportThreads(true);
-          if(row && row.sender==='user' && row.user_id===_msgActiveUser){ openSupportConv(_msgActiveUser,_msgActiveName); }
+          if(row && row.sender==='user'){
+            if(row.user_id===_msgActiveUser){ openSupportConv(_msgActiveUser,_msgActiveName); }
+            else { const onMsg=document.getElementById('sec-messages'); if(!(onMsg&&onMsg.classList.contains('on'))) toast(t('msg_new_from_user','Nuovo messaggio da un utente'),null,'chat-circle'); }
+          }
         }).subscribe();
     }catch(e){}
   }
