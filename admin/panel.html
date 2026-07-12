@@ -975,6 +975,7 @@ const MEDIA_SERVER_URL = 'https://media.poilove.com';   // upload foto tappe (JW
 
 // Un solo client per tutta la pagina
 const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON) : null;
+window.sb = sb; // esposto ai moduli condivisi (user-card, poi-card, badge-picker) che girano in scope separato
 
 // Stato globale leggero
 let ME = null;            // record profiles dell'admin loggato
