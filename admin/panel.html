@@ -535,6 +535,7 @@ html[data-theme="light"] .chip.green{color:#236b39}
 <script src="js/poi-card.js?v=326"></script>
 <script src="js/color-picker.js?v=326"></script>
 <script src="js/media-manager.js?v=326"></script>
+<script src="js/image-editor.js?v=326"></script>
 <script src="js/badge-admin.js?v=326"></script>
 </head>
 <body>
@@ -3709,17 +3710,52 @@ async function _adminUploadImage(file){
     const j=await res.json().catch(()=>({})); return (j && j.ok && Array.isArray(j.urls) && j.urls[0]) || null;
   }catch(e){ return null; }
 }
-function _pickStopImage(stopId){
+// Salva l'immagine di una tappa e ricarica l'editor.
+async function _saveStopImage(stopId, url){
+  const { data, error }=await sb.from('trip_stops').update({ image_url:url||null }).eq('id',stopId).select('id');
+  if(error||!data||!data.length){ toast(t('rls_no_rows','Nessuna riga aggiornata'),'err'); return false; }
+  toast(t('saved'),'ok'); _stopEditorReload(); return true;
+}
+// Scegli una nuova immagine per la tappa (Carica o Libreria) e salvala.
+function _changeStopImage(stopId){
+  if(window.POIMedia&&window.POIMedia.pick){ window.POIMedia.pick({kind:'stop',onPick:url=>{ if(url) _saveStopImage(stopId,url); }}); return; }
   const inp=document.createElement('input'); inp.type='file'; inp.accept='image/*';
   inp.onchange=async()=>{ const f=inp.files&&inp.files[0]; if(!f) return;
     toast(t('uploading','Carico la foto…'),null,'circle-notch');
-    const url=await _adminUploadImage(f);
-    if(!url){ toast(t('photo_upload_err','Caricamento foto non riuscito'),'err'); return; }
-    const { data, error }=await sb.from('trip_stops').update({ image_url:url }).eq('id',stopId).select('id');
-    if(error||!data||!data.length){ toast(t('rls_no_rows','Nessuna riga aggiornata'),'err'); return; }
-    toast(t('saved'),'ok'); _stopEditorReload();
+    const url=await _adminUploadImage(f); if(!url){ toast(t('photo_upload_err','Caricamento foto non riuscito'),'err'); return; }
+    _saveStopImage(stopId,url);
   };
   inp.click();
+}
+// Apri l'editor immagini sulla foto della tappa: modifica → upload → salva.
+function _editStopImage(stopId, url){
+  if(!url){ _changeStopImage(stopId); return; }
+  if(!(window.POIImageEditor&&window.POIImageEditor.open)){ _changeStopImage(stopId); return; }
+  window.POIImageEditor.open(url,{ onSave: async (blob)=>{
+    if(!blob) return; toast(t('uploading','Carico la foto…'),null,'circle-notch');
+    const file=new File([blob],'stop.jpg',{type:'image/jpeg'});
+    let up=null;
+    if(window.POIMedia&&window.POIMedia.upload){ const r=await window.POIMedia.upload(file,{kind:'stop'}); up=r&&r.url; }
+    else up=await _adminUploadImage(file);
+    if(!up){ toast(t('photo_upload_err','Caricamento foto non riuscito'),'err'); return; }
+    _saveStopImage(stopId, up);
+  }});
+}
+// Menu foto tappa: se c'è già un'immagine → Ingrandisci / Modifica / Cambia / Rimuovi; se no → scegli.
+function _pickStopImage(stopId, url){
+  url=url||'';
+  if(!url){ _changeStopImage(stopId); return; }
+  const body=el('div',{style:'display:flex;flex-direction:column;gap:8px'});
+  const mk=(icon,label,fn,cls)=>{ const b=el('button',{class:'btn '+(cls||''),style:'justify-content:flex-start;width:100%',onclick:()=>{ closeModal(); fn(); }},[phIcon(icon),document.createTextNode(' '+label)]); return b; };
+  const prev=el('div',{style:'width:100%;aspect-ratio:16/9;border-radius:12px;background:#000 center/cover no-repeat;margin-bottom:4px;cursor:zoom-in'});
+  prev.style.backgroundImage="url('"+String(url).replace(/'/g,'%27')+"')";
+  prev.onclick=()=>{ closeModal(); _photoLightbox(url); };
+  body.appendChild(prev);
+  body.appendChild(mk('magnifying-glass-plus', t('a_enlarge','Ingrandisci'), ()=>_photoLightbox(url), 'sm'));
+  body.appendChild(mk('pencil-simple', t('a_edit_image','Modifica immagine'), ()=>_editStopImage(stopId,url), 'sm gold'));
+  body.appendChild(mk('image', t('a_change_image','Cambia immagine'), ()=>_changeStopImage(stopId), 'sm'));
+  body.appendChild(mk('trash', t('a_remove_image','Rimuovi immagine'), ()=>_saveStopImage(stopId,null), 'sm red'));
+  openModal(t('a_photo','Foto tappa'),'image',body,null);
 }
 // Salva la descrizione (note) di una tappa al volo.
 async function _saveStopNote(stopId, val){
@@ -3865,7 +3901,7 @@ function _renderStopEditor(container, tripId, stops, reload){
     // handle
     const handle=el('div',{class:'stop-card-handle',title:t('drag_hint','Trascina per riordinare')}); handle.innerHTML='<i class="ph-duotone ph-dots-six-vertical"></i>';
     // foto
-    const photo=el('button',{class:'stop-card-photo',title:t('a_photo','Foto tappa'),onclick:()=>_pickStopImage(st.id)});
+    const photo=el('button',{class:'stop-card-photo',title:t('a_photo','Foto tappa'),onclick:()=>_pickStopImage(st.id, st.image_url||'')});
     if(st.image_url){ photo.style.backgroundImage="url('"+String(st.image_url).replace(/'/g,'%27')+"')"; }
     else { photo.innerHTML='<i class="ph-duotone ph-image"></i>'; }
     photo.appendChild(el('span',{class:'cam'},[phIcon('camera')]));
