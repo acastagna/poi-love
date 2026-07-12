@@ -975,12 +975,14 @@ html[data-theme="light"] .chip.green{color:#236b39}
     <!-- ═════════════════════ ZONA MEDIA (email, OpenGraph, deep link, pixel) ═════════════════════ -->
     <section class="section" id="sec-media">
       <div class="ai-modes" style="margin-bottom:16px">
-        <button class="ai-mode on" data-mtab="email"    onclick="setMediaTab('email')"><i class="ph-duotone ph-envelope-simple"></i> <span data-t="media_tab_email">Email</span></button>
+        <button class="ai-mode on" data-mtab="immagini" onclick="setMediaTab('immagini')"><i class="ph-duotone ph-images-square"></i> <span data-t="media_tab_images">Immagini</span></button>
+        <button class="ai-mode"    data-mtab="email"    onclick="setMediaTab('email')"><i class="ph-duotone ph-envelope-simple"></i> <span data-t="media_tab_email">Email</span></button>
         <button class="ai-mode"    data-mtab="og"       onclick="setMediaTab('og')"><i class="ph-duotone ph-share-fat"></i> <span data-t="media_tab_og">OpenGraph</span></button>
         <button class="ai-mode"    data-mtab="deeplink" onclick="setMediaTab('deeplink')"><i class="ph-duotone ph-link"></i> <span data-t="media_tab_deeplink">Deep link</span></button>
         <button class="ai-mode"    data-mtab="pixel"    onclick="setMediaTab('pixel')"><i class="ph-duotone ph-chart-line-up"></i> <span data-t="media_tab_pixel">Pixel social</span></button>
       </div>
-      <div id="mtab-email"    class="mtab"></div>
+      <div id="mtab-immagini" class="mtab"></div>
+      <div id="mtab-email"    class="mtab" style="display:none"></div>
       <div id="mtab-og"       class="mtab" style="display:none"></div>
       <div id="mtab-deeplink" class="mtab" style="display:none"></div>
       <div id="mtab-pixel"    class="mtab" style="display:none"></div>
@@ -1018,7 +1020,7 @@ let aiBusy = false;       // richiesta al copilota in volo: blocca invii concorr
 const T = {
   it:{
     nav_dashboard:'Dashboard', nav_moderation:'Moderazione', nav_users:'Utenti', nav_ailimits:'Limiti AI',
-    nav_copilot:'Copilota AI', nav_create:'Crea', nav_audit:'Audit log', nav_media:'Media', sub_media:'Email, OpenGraph, deep link dhe pixel social', media_tab_email:'Email', media_tab_og:'OpenGraph', media_tab_deeplink:'Deep link', media_tab_pixel:'Pixel social', nav_media:'Media', sub_media:'Email, OpenGraph, deep link e pixel social', media_tab_email:'Email', media_tab_og:'OpenGraph', media_tab_deeplink:'Deep link', media_tab_pixel:'Pixel social',
+    nav_copilot:'Copilota AI', nav_create:'Crea', nav_audit:'Audit log', nav_media:'Media', sub_media:'Email, OpenGraph, deep link dhe pixel social', media_tab_images:'Immagini', media_tab_email:'Email', media_tab_og:'OpenGraph', media_tab_deeplink:'Deep link', media_tab_pixel:'Pixel social', nav_media:'Media', sub_media:'Immagini degli utenti, email, OpenGraph, deep link e pixel social', media_tab_images:'Immagini', media_tab_email:'Email', media_tab_og:'OpenGraph', media_tab_deeplink:'Deep link', media_tab_pixel:'Pixel social',
     sub_dashboard:'Panoramica della piattaforma in tempo reale.',
     sub_moderation:'Segnalazioni da rivedere.', sub_users:'Gestione profili e moderazione.',
     sub_ailimits:'Quote e modelli AI per livello.', sub_copilot:'Assistente operativo con accesso ai dati.',
@@ -1216,7 +1218,7 @@ const T = {
   },
   en:{
     nav_dashboard:'Dashboard', nav_moderation:'Moderation', nav_users:'Users', nav_ailimits:'AI limits',
-    nav_copilot:'AI copilot', nav_create:'Create', nav_audit:'Audit log', nav_media:'Media', sub_media:'Email, OpenGraph, deep links and social pixels', media_tab_email:'Email', media_tab_og:'OpenGraph', media_tab_deeplink:'Deep links', media_tab_pixel:'Social pixels',
+    nav_copilot:'AI copilot', nav_create:'Create', nav_audit:'Audit log', nav_media:'Media', sub_media:'Email, OpenGraph, deep links and social pixels', media_tab_images:'Immagini', media_tab_email:'Email', media_tab_og:'OpenGraph', media_tab_deeplink:'Deep links', media_tab_pixel:'Social pixels',
     sub_dashboard:'Real-time overview of the platform.',
     sub_moderation:'Reports awaiting review.', sub_users:'Profile management and moderation.',
     sub_ailimits:'AI quotas and models per tier.', sub_copilot:'Operational assistant with data access.',
@@ -2962,11 +2964,78 @@ async function loadAudit(){
 let _mediaLoaded=false;
 function setMediaTab(tab){
   document.querySelectorAll('#sec-media .ai-mode').forEach(b=>b.classList.toggle('on', b.dataset.mtab===tab));
-  ['email','og','deeplink','pixel'].forEach(x=>{ const d=document.getElementById('mtab-'+x); if(d) d.style.display = (x===tab?'':'none'); });
+  ['immagini','email','og','deeplink','pixel'].forEach(x=>{ const d=document.getElementById('mtab-'+x); if(d) d.style.display = (x===tab?'':'none'); });
+  if(tab==='immagini') renderMediaImages();
 }
 async function initMedia(){
   if(_mediaLoaded) return; _mediaLoaded=true;
-  renderMediaPixel(); renderMediaOg(); renderMediaDeep(); renderMediaEmail();
+  renderMediaImages(); renderMediaPixel(); renderMediaOg(); renderMediaDeep(); renderMediaEmail();
+}
+/* ── IMMAGINI: galleria di moderazione di TUTTO il materiale visivo caricato dagli utenti ──
+   Aggrega foto dei POI, avatar, copertine, foto delle tappe. Ingrandisci + rimuovi (moderazione). */
+let _mediaImgFilter='all';
+async function renderMediaImages(){
+  const box=document.getElementById('mtab-immagini'); if(!box) return;
+  box.innerHTML='';
+  const bar=el('div',{class:'btn-row',style:'margin-bottom:12px;flex-wrap:wrap'});
+  [['all','Tutte','stack'],['poi','POI','map-pin'],['avatar','Avatar','user-circle'],['cover','Copertine','image'],['stop','Tappe','path']].forEach(([k,lbl,ic])=>{
+    bar.appendChild(el('button',{class:'btn sm'+(_mediaImgFilter===k?' gold':''),onclick:()=>{ _mediaImgFilter=k; renderMediaImages(); }},[phIcon(ic),document.createTextNode(' '+lbl)]));
+  });
+  box.appendChild(bar);
+  const info=el('div',{class:'sm',style:'margin-bottom:10px;opacity:.8',text:t('media_img_hint','Tutto il materiale visivo caricato dagli utenti. Ingrandisci o rimuovi ciò che non va (moderazione reale).')});
+  box.appendChild(info);
+  const grid=el('div',{style:'display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px'});
+  box.appendChild(grid);
+  grid.innerHTML='<div class="sm" style="opacity:.6;grid-column:1/-1">…</div>';
+  try{
+    const items=[];
+    const f=_mediaImgFilter;
+    if(f==='all'||f==='poi'){
+      const {data}=await sb.from('pois').select('id,title,photos').not('photos','is',null).order('created_at',{ascending:false}).limit(120);
+      (data||[]).forEach(p=>(p.photos||[]).forEach((u,i)=>{ if(/^https?:\/\//.test(u)) items.push({url:u,kind:'poi',label:p.title||'POI',entity:'pois',id:p.id,idx:i,arr:'photos'}); }));
+    }
+    if(f==='all'||f==='avatar'){
+      const {data}=await sb.from('profiles').select('id,username,avatar_url').not('avatar_url','is',null).limit(120);
+      (data||[]).forEach(u=>{ if(/^https?:\/\//.test(u.avatar_url)) items.push({url:u.avatar_url,kind:'avatar',label:'@'+(u.username||'utente'),entity:'profiles',id:u.id,field:'avatar_url'}); });
+    }
+    if(f==='all'||f==='cover'){
+      const {data}=await sb.from('profiles').select('id,username,cover_url,cover_type').eq('cover_type','image').limit(120);
+      (data||[]).forEach(u=>{ if(u.cover_url&&/^https?:\/\//.test(u.cover_url)) items.push({url:u.cover_url,kind:'cover',label:'@'+(u.username||'utente'),entity:'profiles',id:u.id,field:'cover_url'}); });
+    }
+    if(f==='all'||f==='stop'){
+      const {data}=await sb.from('trip_stops').select('id,name,image_url').not('image_url','is',null).limit(120);
+      (data||[]).forEach(s=>{ if(/^https?:\/\//.test(s.image_url)) items.push({url:s.image_url,kind:'stop',label:s.name||'Tappa',entity:'trip_stops',id:s.id,field:'image_url'}); });
+    }
+    grid.innerHTML='';
+    if(!items.length){ grid.innerHTML='<div class="sm" style="opacity:.6;grid-column:1/-1">Nessuna immagine.</div>'; return; }
+    items.forEach(it=>{
+      const cell=el('div',{style:'position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#111;aspect-ratio:1'});
+      const img=el('div',{style:'position:absolute;inset:0;background:#1a1a1a center/cover no-repeat;cursor:zoom-in'}); img.style.backgroundImage="url('"+String(it.url).replace(/'/g,'%27')+"')";
+      img.addEventListener('click',()=>_photoLightbox(it.url));
+      const tag=el('span',{style:'position:absolute;top:6px;left:6px;background:rgba(0,0,0,.6);color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:6px',text:it.kind.toUpperCase()});
+      const lbl=el('span',{style:'position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.75));color:#fff;font-size:10px;padding:14px 8px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis',text:it.label});
+      const del=el('button',{class:'btn sm red',style:'position:absolute;top:6px;right:6px;padding:4px 7px;font-size:10px',title:t('media_img_remove','Rimuovi'),onclick:async(e)=>{ e.stopPropagation(); if(!(await adminConfirm(t('media_img_confirm','Rimuovere questa immagine? Sparisce dal contenuto dell\'utente.')))) return; await _removeMediaImage(it); }},[phIcon('trash')]);
+      cell.appendChild(img); cell.appendChild(tag); cell.appendChild(lbl); cell.appendChild(del);
+      grid.appendChild(cell);
+    });
+  }catch(e){ grid.innerHTML='<div class="sm" style="opacity:.6;grid-column:1/-1">Errore nel caricare le immagini.</div>'; }
+}
+// Rimuove un'immagine dalla sua origine (moderazione reale).
+async function _removeMediaImage(it){
+  try{
+    if(it.entity==='pois' && it.arr==='photos'){
+      const {data:p}=await sb.from('pois').select('photos').eq('id',it.id).single();
+      const arr=(p&&p.photos||[]).filter(u=>u!==it.url);
+      const {error}=await sb.from('pois').update({photos:arr, cover_photo:arr[0]||null}).eq('id',it.id).select('id');
+      if(error) throw error;
+    } else if(it.field){
+      const patch={}; patch[it.field]=null; if(it.field==='cover_url') patch.cover_type='gradient';
+      const {error}=await sb.from(it.entity).update(patch).eq('id',it.id).select('id');
+      if(error) throw error;
+    }
+    await logAudit('media_remove_image',it.entity,it.id,{kind:it.kind});
+    toast(t('saved','Rimossa'),'ok'); renderMediaImages();
+  }catch(e){ toast(t('rls_no_rows','Rimozione non riuscita'),'err'); }
 }
 
 /* ── PIXEL SOCIAL: incolli l'ID, attivi, e c'è il manuale (dove trovarlo + link) ── */
