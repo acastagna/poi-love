@@ -65,7 +65,9 @@
       b.setAttribute('data-ic', ic); iconRow.appendChild(b);
     });
     function markIcon() { iconRow.querySelectorAll('.ba-ico').forEach(function (e) { e.classList.toggle('on', e.getAttribute('data-ic') === f.icon.value); }); }
-    f.color = h('input', { type: 'color', value: '#B4823C', oninput: refreshPreview });
+    // fondo: color picker EvoLab con GRADIENTE (valore = hex o linear-gradient(...))
+    f.color = h('input', { type: 'text', 'data-cp': '1', 'data-cp-gradient': '1', value: '#B4823C', oninput: refreshPreview });
+    // testo/icona: tinta singola
     f.text = h('input', { type: 'color', value: '#FFFFFF', oninput: refreshPreview });
     f.tier = h('select', { class: 'tier-select' }); TIERS.forEach(function (t) { f.tier.appendChild(h('option', { value: t[0], text: t[1] })); });
     f.active = h('input', { type: 'checkbox', checked: 'checked', style: 'width:auto' });
@@ -102,6 +104,8 @@
     function fillForm(b) {
       editingId = b.id; f.name.value = b.name || ''; f.icon.value = b.icon || 'seal-check';
       f.color.value = b.color || '#B4823C'; f.text.value = b.text_color || '#FFFFFF'; f.tier.value = b.tier || ''; f.active.checked = b.active !== false;
+      // aggiorna i trigger del color picker (leggono via evento input)
+      f.color.dispatchEvent(new Event('input', { bubbles: true })); f.text.dispatchEvent(new Event('input', { bubbles: true }));
       document.getElementById('baFormTitle').textContent = 'Modifica badge'; cancelBtn.style.display = ''; markIcon(); refreshPreview();
       form.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
