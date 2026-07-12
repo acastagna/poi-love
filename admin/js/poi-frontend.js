@@ -23,8 +23,13 @@
     if (document.getElementById('pf-styles')) return;
     // CSS presa dal frontend (pdm-*) + wrapper modale. I colori seguono il brand.
     var css = ''
-      + '.pf-ovl{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(5px);z-index:930;display:flex;align-items:flex-start;justify-content:center;padding:24px 16px;overflow:auto}'
-      + '.pf-card{width:440px;max-width:100%;background:#EAE4D8;border-radius:26px;overflow:hidden;box-shadow:0 24px 70px rgba(0,0,0,.5);position:relative}'
+      + '.pf-ovl{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(5px);z-index:930;display:flex;align-items:center;justify-content:center;padding:24px 16px;overflow:auto}'
+      + '.pf-card{width:440px;max-width:100%;margin:auto;background:#EAE4D8;border-radius:26px;overflow:hidden;box-shadow:0 24px 70px rgba(0,0,0,.5);position:relative}'
+      + '.pf-pen{background:rgba(255,255,255,.18);border:none;border-radius:7px;color:#fff;width:26px;height:26px;cursor:pointer;margin-left:8px;vertical-align:middle;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}'
+      + '.pf-edit-in,.pf-edit-ta{width:100%;border:none;border-radius:9px;padding:8px 11px;font-family:inherit;font-size:14px;background:rgba(255,255,255,.96);color:#222;box-sizing:border-box}'
+      + '.pf-edit-ta{min-height:70px;resize:vertical;font-size:13.5px;line-height:1.45}'
+      + '.pf-edit-row{display:flex;gap:6px;margin-top:6px}'
+      + '.pf-mini{border:none;border-radius:8px;padding:7px 13px;cursor:pointer;font-family:inherit;font-size:13px;background:rgba(255,255,255,.22);color:#fff;display:inline-flex;align-items:center;gap:5px}.pf-mini.gold{background:#E8B04B;color:#161310;font-weight:800}'
       + '.pf-x{position:absolute;top:12px;right:12px;z-index:6;width:34px;height:34px;border-radius:50%;background:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:#444;box-shadow:0 2px 14px rgba(0,0,0,.26)}'
       + '.pf-photos{display:flex;gap:3px;background:#1c1c1e;position:relative}'
       + '.pf-slot{background:#2a2a2c center/cover no-repeat;position:relative}'
@@ -81,6 +86,25 @@
     return p.subcategory || p.category || 'Luogo';
   }
 
+  function _o(k, v) { var o = {}; o[k] = v; return o; }
+  // Campo correggibile sul posto: mostra il testo con una matita; alla matita diventa editabile e salva.
+  function renderEditable(host, value, multiline, onSave) {
+    host.innerHTML = '';
+    var span = h('span', { text: value || (multiline ? '(aggiungi una descrizione)' : '—') });
+    var pen = h('button', { class: 'pf-pen', html: '<i class="ph-duotone ph-pencil-simple"></i>', title: 'Correggi' });
+    host.appendChild(span); host.appendChild(pen);
+    pen.addEventListener('click', function () {
+      host.innerHTML = '';
+      var inp = multiline ? h('textarea', { class: 'pf-edit-ta' }) : h('input', { class: 'pf-edit-in', type: 'text' });
+      inp.value = value || '';
+      var save = h('button', { class: 'pf-mini gold', html: '<i class="ph-duotone ph-check"></i> Salva' });
+      var cancel = h('button', { class: 'pf-mini', html: 'Annulla' });
+      host.appendChild(inp); host.appendChild(h('div', { class: 'pf-edit-row' }, [save, cancel])); inp.focus();
+      cancel.addEventListener('click', function () { renderEditable(host, value, multiline, onSave); });
+      save.addEventListener('click', function () { var v = (inp.value || '').trim(); save.disabled = true; Promise.resolve(onSave(v)).then(function (ok) { if (ok !== false) { value = v; } renderEditable(host, value, multiline, onSave); }); });
+    });
+  }
+
   function open(poi) {
     ensureStyles();
     var db = sb(); var id = poi && poi.id;
@@ -128,11 +152,17 @@
       var b = _badges && _badges[id]; if (!b) return;
       tags.appendChild(h('span', { class: 'pf-tag badge', html: '<i class="ph-fill ph-' + (b.icon || 'seal-check') + '"></i> ' + String(b.name).replace(/</g, '&lt;'), style: 'background:' + b.color + ';color:' + (b.text_color || '#fff') }));
     });
-    var hero = h('div', { class: 'pf-hero' }, [
-      h('h2', { class: 'pf-title', text: p.title || p.name || '—' }),
-      tags,
-      p.description ? h('p', { class: 'pf-desc', text: p.description }) : null
-    ]);
+    // titolo e descrizione CORREGGIBILI sul posto (matita → editabile → salva)
+    function saveField(field, val) {
+      var db = sb(); if (!db || !p.id) return Promise.resolve(false);
+      return db.from('pois').update(_o(field, val || null)).eq('id', p.id).select('id').then(function (r) {
+        if (r.error || !r.data || !r.data.length) { toast((r.error && r.error.message) || 'Nessuna riga aggiornata', 'err'); return false; }
+        p[field] = val; toast('Corretto', 'ok'); if (window.reloadPois) window.reloadPois(); return true;
+      }).catch(function () { toast('Errore', 'err'); return false; });
+    }
+    var titleEl = h('h2', { class: 'pf-title' }); renderEditable(titleEl, p.title || p.name || '', false, function (v) { return saveField('title', v); });
+    var descEl = h('p', { class: 'pf-desc' }); renderEditable(descEl, p.description || '', true, function (v) { return saveField('description', v); });
+    var hero = h('div', { class: 'pf-hero' }, [titleEl, tags, descEl]);
 
     // ── AUTORE + love ──
     var authorName = (p.profiles && p.profiles.username) || p._author_username || 'Anonimo';
