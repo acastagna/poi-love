@@ -507,8 +507,18 @@ html[data-theme="light"] .chip.green{color:#236b39}
 .icon-btn:hover{color:var(--paper);background:var(--line)}
 .modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;z-index:600;padding:18px}
 .modal-card{max-width:540px;width:100%;max-height:90vh;overflow:auto}
-.modal-card.wide{max-width:720px}
-@media(min-width:900px){.modal-card.wide .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}}
+.modal-card.wide{max-width:980px}
+/* Editor POI a due colonne, largo e ordinato (non più una lista lunga e stretta) */
+.poied-top{margin-bottom:16px}
+.poied-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.poied-col{display:flex;flex-direction:column;gap:13px;min-width:0}
+.poied-col>.field{margin:0}
+.poied-col .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.poied-top .poiph-strip{gap:8px}
+.poied-top .poiph-th{width:120px;height:88px}
+.poied-full{display:flex;flex-direction:column;gap:14px;margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}
+.poied-full .row2{grid-template-columns:260px 1fr;align-items:start}
+@media(max-width:820px){.poied-grid{grid-template-columns:1fr;gap:14px}.poied-full .row2{grid-template-columns:1fr}}
 /* Zona Crea: quattro pulsantoni grandi */
 .create-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
 @media(max-width:1100px){.create-grid{grid-template-columns:repeat(2,1fr)}}
@@ -3329,7 +3339,14 @@ async function editPoi(p){
   p = p || {};
   const isNew = !p.id;   // POI vuoto → modalità CREA (stesso editor ricco, niente form separato)
   const f={};
-  const body=el('div');
+  const body=el('div',{class:'poied'});
+  const _top=el('div',{class:'poied-top'});   // foto a larghezza piena in alto
+  const _colL=el('div',{class:'poied-col'});  // identità: titolo, descrizione
+  const _colR=el('div',{class:'poied-col'});  // posizione + visibilità
+  const _full=el('div',{class:'poied-full'}); // categorie, tag, badge a tutta larghezza
+  body.appendChild(_top);
+  body.appendChild(el('div',{class:'poied-grid'},[_colL,_colR]));
+  body.appendChild(_full);
   // stato locale dell'editor
   const photos=Array.isArray(p.photos)?p.photos.slice():[];
   let selCats=Array.isArray(p.categories)&&p.categories.length?p.categories.slice(0,3):(p.subcategory?[p.subcategory]:[]);
@@ -3376,11 +3393,11 @@ async function editPoi(p){
     };
     inp.click();
   }},[phIcon('images'),document.createTextNode(' '+t('poi_ph_upload'))]));
-  body.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_photos')}), phBox, phAddRow ]));
+  _top.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_photos')}), phBox, phAddRow ]));
 
   // ── TITOLO + DESCRIZIONE ──
-  body.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_title')}), f.title=el('input',{value:p.title||''}) ]));
-  body.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_desc')}), f.description=el('textarea',{rows:'3'}, p.description||'') ]));
+  _colL.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_title')}), f.title=el('input',{value:p.title||''}) ]));
+  _colL.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_desc')}), f.description=el('textarea',{rows:'3'}, p.description||'') ]));
 
   // ── CATEGORIA MACRO + fino a 3 CATEGORIE (tassonomia ricca) ──
   const catSel=el('select');
@@ -3408,7 +3425,7 @@ async function editPoi(p){
   const catRow=el('div',{class:'row2'});
   catRow.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_family','Famiglia genitore')}), catSel ]));
   catRow.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_cats3')}), catChips ]));
-  body.appendChild(catRow);
+  _full.appendChild(catRow);
 
   // ── TAG (chips, max 10) ──
   const tagBox=el('div',{class:'poiph-cats'});
@@ -3424,17 +3441,17 @@ async function editPoi(p){
       if(!tags.includes(v)) tags.push(v); tagIn.value=''; drawTags(); tagIn.focus(); }
   });
   drawTags();
-  body.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_tags')}), tagBox ]));
+  _full.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_tags')}), tagBox ]));
 
   // ── INDIRIZZO PRECISO + CITTÀ + PAESE + COORDINATE + GEOCODIFICA (reali: Photon/Nominatim) ──
   const addrRow=el('div',{class:'row2'});
   addrRow.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_address')}), f.address=el('input',{value:p.address||''}) ]));
   addrRow.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_city')}), f.city=el('input',{value:p.city||''}) ]));
-  body.appendChild(addrRow);
+  _colR.appendChild(addrRow);
   const ll=el('div',{class:'row2'});
   ll.appendChild(el('div',{class:'field'},[ el('label',{text:'Lat'}), f.lat=el('input',{value:(p.lat!=null?p.lat:''),inputmode:'decimal'}) ]));
   ll.appendChild(el('div',{class:'field'},[ el('label',{text:'Lng'}), f.lng=el('input',{value:(p.lng!=null?p.lng:''),inputmode:'decimal'}) ]));
-  body.appendChild(ll);
+  _colR.appendChild(ll);
   const geoRow=el('div',{class:'btn-row'});
   geoRow.appendChild(el('button',{class:'btn sm',onclick:async()=>{
     const q=(f.address.value+' '+f.city.value).trim(); if(!q){ toast(t('geo_need_addr'),'err'); return; }
@@ -3461,7 +3478,7 @@ async function editPoi(p){
     }catch(e){ toast(t('error'),'err'); }
   }},[phIcon('map-pin'),document.createTextNode(' '+t('geo_from_coords'))]));
   geoRow.appendChild(el('a',{class:'btn sm',href:'#',onclick:(e)=>{ e.preventDefault(); const la=parseFloat(f.lat.value),ln=parseFloat(f.lng.value); if(Number.isFinite(la)&&Number.isFinite(ln)) window.open('https://www.google.com/maps?q='+la+','+ln,'_blank','noopener'); }},[phIcon('arrow-square-out'),document.createTextNode(' '+t('open_in_maps'))]));
-  body.appendChild(el('div',{class:'field'},[ geoRow ]));
+  _colR.appendChild(el('div',{class:'field'},[ geoRow ]));
 
   // ── VISIBILITÀ + APPROVATO ──
   const visSel=el('select');
@@ -3474,11 +3491,11 @@ async function editPoi(p){
   const visRow=el('div',{class:'row2'});
   visRow.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_vis')}), visSel ]));
   visRow.appendChild(el('div',{class:'field'},[ el('label',{text:' '}), apprWrap ]));
-  body.appendChild(visRow);
+  _colR.appendChild(visRow);
 
   // ── BADGE + ASSEGNAZIONE UTENTE (@handle) — come nell'app ──
   const badgeBox=el('div',{style:'margin-top:6px'});
-  body.appendChild(badgeBox);
+  _full.appendChild(badgeBox);
   let badgePicker=null;
   if(window.AdminBadge){
     let assigned=null;
