@@ -518,6 +518,8 @@ html[data-theme="light"] .chip.green{color:#236b39}
 .poied-top .poiph-th{width:120px;height:88px}
 .poied-full{display:flex;flex-direction:column;gap:14px;margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}
 .poied-full .row2{grid-template-columns:260px 1fr;align-items:start}
+.btn.recording{background:var(--red,#D42B2B)!important;color:#fff!important;border-color:var(--red,#D42B2B)!important;animation:admPulse 1s ease-in-out infinite}
+@keyframes admPulse{0%,100%{box-shadow:0 0 0 0 rgba(212,43,43,.5)}50%{box-shadow:0 0 0 6px rgba(212,43,43,0)}}
 .poied-slots{display:flex;gap:10px}
 .poied-slot{flex:1;aspect-ratio:1;max-width:150px;border-radius:14px;border:1.5px dashed var(--line);background:#00000022 center/cover no-repeat;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;overflow:hidden;transition:border-color .15s,transform .1s}
 .poied-slot:hover{border-color:var(--gold)}.poied-slot:active{transform:scale(.97)}
@@ -797,49 +799,7 @@ html[data-theme="light"] .chip.green{color:#236b39}
         <button class="create-big" onclick="openCreateItinerary()"><i class="ph-duotone ph-compass"></i><b>Crea Itinerario</b><small>Viaggio pubblico con tappe</small></button>
         <button class="create-big" onclick="openCreateCompanion()"><i class="ph-duotone ph-users-three"></i><b>Crea Compagnia</b><small>Gruppo di viaggio</small></button>
       </div>
-      <div class="grid2" id="createForms" style="display:none;margin-top:16px">
-        <!-- POI ufficiale (form base storico: la creazione ricca ora è dal pulsante Crea POI) -->
-        <div class="panel">
-          <div class="card-h"><span class="ic"><i class="ph-duotone ph-map-pin-plus"></i></span><span data-t="create_poi">Crea POI ufficiale</span></div>
-          <div class="field"><label data-t="f_name">Nome</label><input id="poiName" placeholder="Es. Castello di Rozafa"></div>
-          <div class="field"><label data-t="f_desc">Descrizione</label><textarea id="poiDesc" placeholder="Una breve descrizione del luogo…"></textarea></div>
-          <div class="row2">
-            <div class="field"><label data-t="f_cat">Categoria</label>
-              <!-- Valori = enum reale poi_category del DB (12 categorie) -->
-              <select id="poiCat">
-                <option value="cibo">Cibo</option>
-                <option value="lavoro">Lavoro</option>
-                <option value="pernottare">Pernottare</option>
-                <option value="natura">Natura</option>
-                <option value="festa">Festa</option>
-                <option value="cultura">Cultura</option>
-                <option value="pratico">Pratico</option>
-                <option value="benessere">Benessere</option>
-                <option value="love">Love</option>
-                <option value="audioguida">Audioguida</option>
-                <option value="mappa">Mappa</option>
-                <option value="open_source">Open source</option>
-              </select>
-            </div>
-            <div class="field"><label data-t="f_vis">Visibilità</label>
-              <select id="poiVis">
-                <option value="community">Community</option>
-                <option value="suggested_google">Suggerito</option>
-                <option value="private">Privato</option>
-                <option value="official" data-t="st_official">Ufficiale</option>
-              </select>
-            </div>
-          </div>
-          <div class="row2">
-            <div class="field"><label>Lat</label><input id="poiLat" placeholder="41.3275" inputmode="decimal"></div>
-            <div class="field"><label>Lng</label><input id="poiLng" placeholder="19.8187" inputmode="decimal"></div>
-          </div>
-          <div class="btn-row">
-            <button class="btn" onclick="useMyLocation()" data-t="use_map">Usa la mia posizione</button>
-            <button class="btn gold" onclick="createPoi()" data-t="create_btn">Crea POI</button>
-          </div>
-        </div>
-
+      <div id="createForms" style="display:none;margin-top:16px;max-width:680px">
         <!-- Percorso -->
         <div class="panel">
           <div class="card-h"><span class="ic"><i class="ph-duotone ph-map-trifold"></i></span><span data-t="create_trip">Crea percorso</span></div>
@@ -2569,6 +2529,20 @@ async function _adminAskAI(prompt){
     const data=await res.json(); return (data.reply||'').trim();
   }catch(e){ return ''; }
 }
+// Dettatura vocale su un campo (input/textarea) via SpeechRecognition del browser.
+let _admRec=null, _admRecBtn=null;
+function _admDictate(target, btn){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){ toast(t('mic_unsupported','Dettatura vocale non supportata su questo browser'),'err'); return; }
+  if(_admRec){ try{ _admRec.stop(); }catch(e){} return; }
+  const base=target.value||'';
+  const r=new SR(); r.lang=(lang==='sq'?'sq-AL':lang==='en'?'en-US':'it-IT'); r.continuous=false; r.interimResults=true; r.maxAlternatives=1;
+  r.onstart=()=>{ _admRecBtn=btn; if(btn) btn.classList.add('recording'); };
+  r.onresult=e=>{ let interim='',fin=''; for(let i=e.resultIndex;i<e.results.length;i++){ const res=e.results[i]; if(res.isFinal) fin+=res[0].transcript; else interim+=res[0].transcript; } const sep=(base && !/\s$/.test(base))?' ':''; let v=base+sep+(fin||interim).trim(); const mx=parseInt(target.getAttribute('maxlength')||'0',10); if(mx>0) v=v.substring(0,mx); target.value=v; };
+  r.onerror=ev=>{ if(ev.error==='not-allowed'||ev.error==='service-not-allowed') toast(t('mic_denied','Microfono bloccato: abilita il permesso'),'err'); else if(ev.error==='no-speech') toast(t('mic_nospeech','Non ho sentito nulla, riprova'),'err'); else if(ev.error!=='aborted') toast(t('mic_error','Errore dettatura'),'err'); if(_admRecBtn)_admRecBtn.classList.remove('recording'); _admRec=null; };
+  r.onend=()=>{ if(_admRecBtn)_admRecBtn.classList.remove('recording'); _admRec=null; };
+  _admRec=r; try{ r.start(); }catch(e){ _admRec=null; }
+}
 function addStopRow(){
   const box=document.getElementById('stopsList');
   const idx=box.querySelectorAll('.stop-adm').length+1;
@@ -3411,9 +3385,30 @@ async function editPoi(p){
   drawPhotos();
   _top.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_photos')}), phSlots ]));
 
-  // ── TITOLO + DESCRIZIONE ──
-  _colL.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_title')}), f.title=el('input',{value:p.title||''}) ]));
-  _colL.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_desc')}), f.description=el('textarea',{rows:'3'}, p.description||'') ]));
+  // ── TITOLO (con dettatura) + DESCRIZIONE (dettatura + AI accorcia/allunga/approfondisci) ──
+  f.title=el('input',{value:p.title||''});
+  const titleMic=el('button',{class:'btn sm',type:'button',title:t('field_dictate','Detta'),onclick:()=>_admDictate(f.title,titleMic)},[phIcon('microphone')]);
+  _colL.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_title')}), el('div',{style:'display:flex;gap:6px'},[f.title, titleMic]) ]));
+
+  f.description=el('textarea',{rows:'4'}, p.description||'');
+  const descMic=el('button',{class:'btn sm',type:'button',onclick:()=>_admDictate(f.description,descMic)},[phIcon('microphone'),document.createTextNode(' '+t('field_dictate','Detta'))]);
+  const descAiRow=el('div',{style:'display:none;gap:6px;flex-wrap:wrap;margin-top:6px'});
+  [['accorcia',t('ai_shorter','Accorcia'),'Riscrivi questa descrizione più corta e incisiva. Rispondi SOLO col testo, stessa lingua.'],
+   ['allunga',t('ai_longer','Allunga'),'Espandi questa descrizione con dettagli utili e concreti. Rispondi SOLO col testo, stessa lingua.'],
+   ['approfondisci',t('ai_deeper','Approfondisci'),'Approfondisci questa descrizione aggiungendo contesto storico/culturale REALE e pertinente. Rispondi SOLO col testo, stessa lingua.'],
+   ['migliora',t('ai_improve','Migliora'),'Migliora forma e chiarezza, tono caldo e invitante. Rispondi SOLO col testo, stessa lingua.']
+  ].forEach(([k,lbl,pr])=>{
+    descAiRow.appendChild(el('button',{class:'btn sm',type:'button',onclick:async()=>{
+      const cur=(f.description.value||'').trim();
+      const base = cur || ('Luogo: "'+(f.title.value||'questo posto')+'". Scrivi una breve descrizione invitante.');
+      toast(t('ai_writing','L\'AI sta scrivendo…'),null,'circle-notch');
+      const reply=await _adminAskAI(pr+'\n\nTesto:\n'+base);
+      if(reply){ f.description.value=reply; toast(t('saved','Fatto'),'ok'); } else toast(t('backend_off','AI non disponibile'),'err');
+    }},lbl));
+  });
+  const descAi=el('button',{class:'btn sm gold',type:'button',onclick:()=>{ descAiRow.style.display=descAiRow.style.display==='none'?'flex':'none'; }},[phIcon('sparkle'),document.createTextNode(' AI')]);
+  const descBar=el('div',{class:'btn-row',style:'margin-top:6px'},[descMic, descAi]);
+  _colL.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_desc')}), f.description, descBar, descAiRow ]));
 
   // ── CATEGORIA MACRO + fino a 3 CATEGORIE (tassonomia ricca) ──
   const catSel=el('select');
