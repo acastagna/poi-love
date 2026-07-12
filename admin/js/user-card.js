@@ -36,7 +36,9 @@
       + '.uc-cover{position:relative;height:120px;background:linear-gradient(135deg,#D42B2B,#7C3AED)}'
       + '.uc-cover img{width:100%;height:100%;object-fit:cover}'
       + '.uc-close{position:absolute;top:10px;right:12px;width:34px;height:34px;border-radius:50%;background:#fff;border:none;cursor:pointer;font-size:18px;color:#444;box-shadow:0 2px 14px rgba(0,0,0,.26)}'
-      + '.uc-avatar{width:78px;height:78px;border-radius:50%;border:4px solid #FDFAF5;object-fit:cover;background:#D42B2B;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:28px;margin:-42px 0 0 20px;position:relative;box-shadow:0 6px 18px rgba(0,0,0,.2)}'
+      + '.uc-avatar{width:78px;height:78px;border-radius:50%;border:4px solid #FDFAF5;object-fit:cover;background:#D42B2B;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:28px;box-shadow:0 6px 18px rgba(0,0,0,.2)}'
+      + '.uc-avatar-wrap{position:relative;display:block;width:78px;margin:-42px 0 0 20px}'
+      + '.uc-cam{position:absolute;right:-3px;bottom:-3px;width:28px;height:28px;border-radius:50%;background:#285EA7;color:#fff;border:2px solid #FDFAF5;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px}'
       + '.uc-head{padding:8px 20px 0}'
       + '.uc-nm{font-size:21px;font-weight:900;line-height:1.1}'
       + '.uc-handle{font-size:13px;color:var(--muted);margin-top:1px}'
@@ -84,6 +86,21 @@
     var cover = h('div', { class: 'uc-cover' });
     var closeBtn = h('button', { class: 'uc-close', text: '×', title: 'Chiudi', onclick: close });
     var avatar = img(u.avatar_url) ? h('img', { class: 'uc-avatar', src: u.avatar_url, alt: '' }) : h('div', { class: 'uc-avatar', text: initials(u.username) });
+    // Cambia foto (admin): chiede l'URL e salva via RPC admin_set_user_avatar
+    function changeAvatar() {
+      var p = window.adminPrompt ? window.adminPrompt('URL della nuova foto profilo (lascia vuoto per togliere):', u.avatar_url || '') : Promise.resolve(window.prompt('URL foto', u.avatar_url || ''));
+      Promise.resolve(p).then(function (val) {
+        if (val === null || val === undefined) return;
+        var url = ('' + val).trim();
+        var db = sb(); if (!db) return;
+        db.rpc('admin_set_user_avatar', { p_user: u.id, p_url: url || null }).then(function (r) {
+          if (r.error) { if (window.toast) window.toast(r.error.message || 'Errore', 'err'); return; }
+          if (window.toast) window.toast('Foto aggiornata', 'ok');
+          u.avatar_url = url || null; close(); open(u); // ridisegna la scheda con la nuova foto
+        });
+      });
+    }
+    var avatarWrap = h('div', { class: 'uc-avatar-wrap' }, [avatar, h('button', { class: 'uc-cam', title: 'Cambia foto', onclick: changeAvatar }, h('i', { class: 'ph-duotone ph-camera' }))]);
 
     var badges = h('div', { class: 'uc-badges' }, [
       statusChip(stt),
@@ -125,7 +142,7 @@
     var admin = h('div', { class: 'uc-admin' }, [h('div', { class: 'uc-sec', style: 'margin:0 0 8px', text: t('c_actions', 'Azioni amministratore') }), actions]);
 
     var drawer = h('div', { class: 'uc-drawer' }, [
-      h('div', null, [cover, closeBtn, avatar]),
+      h('div', null, [cover, closeBtn, avatarWrap]),
       head, stats, bioEl, poiSec, poiList, admin
     ]);
     var ov = h('div', { class: 'uc-ov', id: 'uc-ov', onclick: function (e) { if (e.target === ov) close(); } }, [drawer]);
