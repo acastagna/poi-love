@@ -152,7 +152,7 @@
         rows.forEach(function (p) {
           var th = img((p.photos && p.photos[0]) || p.cover_photo);
           var thumb = th ? h('img', { class: 'uc-poi-th', src: th, alt: '' }) : h('div', { class: 'uc-poi-th' }, h('i', { class: 'ph-duotone ph-map-pin' }));
-          poiList.appendChild(h('div', { class: 'uc-poi-row', onclick: function () { if (window.AdminPoiCard) AdminPoiCard.open(p); } }, [
+          poiList.appendChild(h('div', { class: 'uc-poi-row', onclick: function () { if (window.editPoi) { close(); window.editPoi(p); } } }, [
             thumb, h('div', { class: 'uc-poi-nm', text: p.title || '—' }),
             h('div', { class: 'uc-poi-love' }, [h('i', { class: 'ph-duotone ph-heart' }), document.createTextNode(' ' + (p.love_count || 0))])
           ]));

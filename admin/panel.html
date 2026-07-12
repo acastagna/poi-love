@@ -507,6 +507,20 @@ html[data-theme="light"] .chip.green{color:#236b39}
 .icon-btn:hover{color:var(--paper);background:var(--line)}
 .modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;z-index:600;padding:18px}
 .modal-card{max-width:540px;width:100%;max-height:90vh;overflow:auto}
+/* Zona Crea: quattro pulsantoni grandi */
+.create-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+@media(max-width:1100px){.create-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.create-grid{grid-template-columns:1fr}}
+.create-big{display:flex;flex-direction:column;align-items:flex-start;gap:7px;text-align:left;padding:22px 20px;border-radius:18px;border:1px solid var(--line);background:linear-gradient(135deg,color-mix(in srgb,var(--gold) 15%,transparent),color-mix(in srgb,var(--red) 8%,transparent));color:var(--paper);cursor:pointer;font-family:inherit;transition:transform .15s,border-color .15s;min-height:132px}
+.create-big:hover{transform:translateY(-3px);border-color:var(--gold)}
+.create-big i{font-size:30px;color:var(--gold)}
+.create-big b{font-size:17px;font-weight:900}
+.create-big small{font-size:12px;color:var(--muted);line-height:1.4}
+/* Categorie e Tag su TRE colonne (responsive): ogni voce diventa una card nella griglia */
+#catTable,#tagTable{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;align-items:start}
+@media(max-width:1100px){#catTable,#tagTable{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:680px){#catTable,#tagTable{grid-template-columns:minmax(0,1fr)}}
+#catTable>*,#tagTable>*{border:1px solid var(--line)!important;border-bottom:1px solid var(--line)!important;border-radius:12px;padding:11px 12px!important;background:var(--glass-soft);margin:0!important;min-width:0}
 .modal-h{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
 .modal-h .ttl{font-weight:800;font-size:16px;display:flex;align-items:center;gap:8px}
 </style>
@@ -741,8 +755,14 @@ html[data-theme="light"] .chip.green{color:#236b39}
 
     <!-- 6) CREA CONTENUTI -->
     <section class="section" id="sec-create">
-      <div class="grid2">
-        <!-- POI ufficiale -->
+      <div class="create-grid">
+        <button class="create-big" onclick="editPoi({})"><i class="ph-duotone ph-map-pin-plus"></i><b>Crea POI</b><small>Luogo ufficiale: foto, categorie, tag, posizione, badge</small></button>
+        <button class="create-big" onclick="document.getElementById('createForms').style.display='grid';document.getElementById('createForms').scrollIntoView({behavior:'smooth',block:'start'})"><i class="ph-duotone ph-path"></i><b>Crea Percorso Storico</b><small>Rotta con tappe, badge e narrazione</small></button>
+        <button class="create-big" onclick="openCreateItinerary()"><i class="ph-duotone ph-compass"></i><b>Crea Itinerario</b><small>Viaggio pubblico con tappe</small></button>
+        <button class="create-big" onclick="openCreateCompanion()"><i class="ph-duotone ph-users-three"></i><b>Crea Compagnia</b><small>Gruppo di viaggio</small></button>
+      </div>
+      <div class="grid2" id="createForms" style="display:none;margin-top:16px">
+        <!-- POI ufficiale (form base storico: la creazione ricca ora è dal pulsante Crea POI) -->
         <div class="panel">
           <div class="card-h"><span class="ic"><i class="ph-duotone ph-map-pin-plus"></i></span><span data-t="create_poi">Crea POI ufficiale</span></div>
           <div class="field"><label data-t="f_name">Nome</label><input id="poiName" placeholder="Es. Castello di Rozafa"></div>
@@ -1538,7 +1558,7 @@ async function loadLatestPois(){
     if(!data || !data.length){ emptyBox(box,'—',null,'map-pin'); return; }
     box.textContent='';
     data.forEach(p=>{
-      box.appendChild(el('div',{class:'mini-row',style:'cursor:pointer',title:t('open_card','Apri scheda'),onclick:()=>{ if(window.AdminPoiCard) AdminPoiCard.open(p); }},[
+      box.appendChild(el('div',{class:'mini-row',style:'cursor:pointer',title:t('open_card','Apri scheda'),onclick:()=>editPoi(p)},[
         el('div',{class:'av'}, phIcon('map-pin')),
         el('div',{class:'tt'},[
           el('div',{class:'nm',text:p.title||'POI'}),
@@ -2512,6 +2532,32 @@ function useMyLocation(){
   );
 }
 // Crea un POI ufficiale (author_id = admin)
+// Crea Itinerario (viaggio pubblico, non storico) — reale, insert su trips
+function openCreateItinerary(){
+  const f={}; const body=el('div');
+  body.appendChild(el('div',{class:'field'},[el('label',{text:t('f_trip_name','Nome itinerario')}), f.name=el('input',{placeholder:'Es. Tirana in un giorno',autocomplete:'off'})]));
+  body.appendChild(el('div',{class:'field'},[el('label',{text:t('f_desc','Descrizione')}), f.desc=el('textarea',{rows:'3',placeholder:'Di cosa parla…'})]));
+  body.appendChild(el('div',{class:'sm',style:'opacity:.7',text:'Creato pubblico. Le tappe le aggiungi poi dalla sezione Itinerari.'}));
+  openModal(t('create_itin','Crea Itinerario'),'compass',body, async ()=>{
+    const name=(f.name.value||'').trim(); if(!name){ toast(t('fill_required','Compila il nome'),'err'); return false; }
+    const { data, error } = await sb.from('trips').insert({ owner_id:ME.id, name:name.slice(0,120), description:(f.desc.value||'').trim().slice(0,1500)||null, visibility:'pub', is_historic:false }).select('id');
+    if(error||!data||!data.length){ toast((error&&error.message)||t('rls_no_rows'),'err'); return false; }
+    await logAudit('itin_create','trip',data[0].id,{ name }); toast(t('saved'),'ok'); loaded.itineraries=false; return true;
+  });
+}
+// Crea Compagnia — reale, insert su companions (con codice invito univoco)
+function openCreateCompanion(){
+  const f={}; const body=el('div');
+  body.appendChild(el('div',{class:'field'},[el('label',{text:'Nome compagnia'}), f.name=el('input',{placeholder:'Es. Amici di Tirana',autocomplete:'off'})]));
+  body.appendChild(el('div',{class:'field'},[el('label',{text:t('f_desc','Descrizione')}), f.desc=el('textarea',{rows:'3',placeholder:'Chi siete…'})]));
+  openModal('Crea Compagnia','users-three',body, async ()=>{
+    const name=(f.name.value||'').trim(); if(!name){ toast(t('fill_required','Compila il nome'),'err'); return false; }
+    const code=Array.from({length:6},()=>'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[Math.floor(Math.random()*32)]).join('');
+    const { data, error } = await sb.from('companions').insert({ owner_id:ME.id, name:name.slice(0,80), description:(f.desc.value||'').trim().slice(0,500)||null, code, type:'forever' }).select('id');
+    if(error||!data||!data.length){ toast((error&&error.message)||t('rls_no_rows'),'err'); return false; }
+    await logAudit('companion_create','companion',data[0].id,{ name }); toast(t('saved'),'ok'); return true;
+  });
+}
 async function createPoi(){
   const name=(document.getElementById('poiName').value||'').trim();
   const lat=parseFloat(document.getElementById('poiLat').value);
@@ -3180,7 +3226,7 @@ async function loadPois(){
       const nPh=(Array.isArray(p.photos)?p.photos.length:0);
       const catsTxt=[p.category].concat(Array.isArray(p.categories)?p.categories:[]).filter(Boolean);
       tb.appendChild(el('tr',null,[
-        el('td',null, el('div',{style:'display:flex;gap:9px;align-items:center;cursor:pointer',title:t('open_card','Apri scheda'),onclick:()=>{ if(window.AdminPoiCard) AdminPoiCard.open(p); }},[ thumb,
+        el('td',null, el('div',{style:'display:flex;gap:9px;align-items:center;cursor:pointer',title:t('open_card','Apri scheda'),onclick:()=>editPoi(p)},[ thumb,
           el('div',{style:'min-width:0'},[ el('div',{class:'ttl',text:p.title||'—'}),
             el('div',{class:'sm',text:subtitle+(who?(' · '+who):'')}),
             el('div',{class:'sm',style:'opacity:.7',text:nPh+' foto · '+(Array.isArray(p.tags)?p.tags.length:0)+' tag'}) ]) ])),
@@ -3224,6 +3270,8 @@ async function _adminCats(){
   return _adminCatCache;
 }
 async function editPoi(p){
+  p = p || {};
+  const isNew = !p.id;   // POI vuoto → modalità CREA (stesso editor ricco, niente form separato)
   const f={};
   const body=el('div');
   // stato locale dell'editor
@@ -3365,7 +3413,7 @@ async function editPoi(p){
   visRow.appendChild(el('div',{class:'field'},[ el('label',{text:' '}), apprWrap ]));
   body.appendChild(visRow);
 
-  openModal(t('edit_poi'), 'pencil-simple-line', body, ()=>savePoi(p.id, f, {photos, selCats, tags}));
+  openModal(isNew?t('create_poi','Crea POI ufficiale'):t('edit_poi'), 'pencil-simple-line', body, ()=>savePoi(p.id, f, {photos, selCats, tags}));
 }
 
 async function savePoi(id, f, extra){
@@ -3390,13 +3438,21 @@ async function savePoi(id, f, extra){
   if(Number.isFinite(lng)) patch.lng=lng;
   if(!patch.title){ toast(t('need_title'),'err'); return false; }
   try{
-    // .select('id'): senza, PostgREST risponde 204 anche a 0 righe toccate (RLS)
-    // e il pannello mostrerebbe un falso successo con il DB immutato.
-    const { data, error } = await sb.from('pois').update(patch).eq('id',id).select('id');
+    let data, error;
+    if(id){
+      // MODIFICA. .select('id'): senza, PostgREST risponde 204 anche a 0 righe (RLS) → falso successo.
+      ({ data, error } = await sb.from('pois').update(patch).eq('id',id).select('id'));
+    } else {
+      // CREA: nuovo POI ufficiale dell'admin (autore = admin corrente). Servono le coordinate.
+      if(patch.lat==null || patch.lng==null){ toast(t('fill_required','Compila i campi obbligatori (anche la posizione)'),'err'); return false; }
+      patch.author_id = ME.id;
+      ({ data, error } = await sb.from('pois').insert(patch).select('id'));
+    }
     if(error){ toast(isBackendMissing(error)?t('backend_off'):(error.message||t('error')),'err'); return false; }
     if(!data || !data.length){ toast(t('rls_no_rows'),'err'); return false; }
-    await logAudit('poi_edit','poi',id,{ title:patch.title });
-    toast(t('saved'),'ok'); reloadPois(); return true;
+    const newId = id || (data[0]&&data[0].id);
+    await logAudit(id?'poi_edit':'poi_create','poi',newId,{ title:patch.title });
+    toast(t('saved'),'ok'); reloadPois(); loaded.dashboard=false; return true;
   }catch(e){ toast(t('error'),'err'); return false; }
 }
 
