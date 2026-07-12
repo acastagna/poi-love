@@ -1514,7 +1514,7 @@ function runSection(sec){
   switch(sec){
     case 'dashboard': loadDashboard(); break;
     case 'moderation': loadModeration(); break;
-    case 'messages': loadSupportThreads(); break;
+    case 'messages': loadSupportThreads(); _startSupportLive(); break;
     case 'users': loadUsers(); break;
     case 'ailimits': loadAiLimits(); break;
     case 'copilot': initCopilot(); break;
@@ -1737,15 +1737,15 @@ function refreshMessagesBadge(rows){
   const n=(rows||[]).reduce((a,r)=>a+(r.unread_from_user||0),0);
   b.textContent=n>0?String(n):''; b.style.display=n>0?'inline-flex':'none';
 }
-async function loadSupportThreads(){
-  const box=document.getElementById('msgThreads'); if(box) box.innerHTML='<div class="sm" style="padding:8px;opacity:.6">…</div>';
+async function loadSupportThreads(silent){
+  const box=document.getElementById('msgThreads'); if(box && !silent) box.innerHTML='<div class="sm" style="padding:8px;opacity:.6">…</div>';
   try{
     const { data, error }=await sb.rpc('admin_support_threads');
     if(error) throw error;
     const rows=data||[];
-    if(!box) return;
+    if(!box) return rows;
     refreshMessagesBadge(rows);
-    if(!rows.length){ box.innerHTML='<div class="sm" style="padding:8px;opacity:.7">'+t('msg_empty')+'</div>'; return; }
+    if(!rows.length){ box.innerHTML='<div class="sm" style="padding:8px;opacity:.7">'+t('msg_empty')+'</div>'; return rows; }
     box.innerHTML='';
     rows.forEach(r=>{
       const item=el('div',{class:'msg-thread'+(_msgActiveUser===r.user_id?' on':''),onclick:()=>openSupportConv(r.user_id,r.username,r.avatar_url)});
@@ -1758,7 +1758,30 @@ async function loadSupportThreads(){
       if(r.unread_from_user>0) item.appendChild(el('span',{class:'chip red',text:String(r.unread_from_user)}));
       box.appendChild(item);
     });
-  }catch(e){ if(box) box.innerHTML='<div class="sm" style="padding:8px;opacity:.7">'+t('error')+'</div>'; }
+    return rows;
+  }catch(e){ if(box && !silent) box.innerHTML='<div class="sm" style="padding:8px;opacity:.7">'+t('error')+'</div>'; return []; }
+}
+// LIVE: le risposte degli utenti compaiono da sole (realtime) + polling di sicurezza ogni 15s.
+let _supportChan=null, _supportPoll=null;
+function _startSupportLive(){
+  if(!_supportChan && sb.channel){
+    try{
+      _supportChan=sb.channel('admin-support-rt')
+        .on('postgres_changes',{event:'INSERT',schema:'public',table:'support_messages'}, p=>{
+          const row=p&&p.new;
+          loadSupportThreads(true);
+          if(row && row.sender==='user' && row.user_id===_msgActiveUser){ openSupportConv(_msgActiveUser,_msgActiveName); }
+        }).subscribe();
+    }catch(e){}
+  }
+  if(!_supportPoll){
+    _supportPoll=setInterval(async()=>{
+      const sec=document.getElementById('sec-messages');
+      if(!sec || !sec.classList.contains('on')) return;   // solo mentre la sezione Messaggi è aperta
+      const rows=await loadSupportThreads(true);
+      if(_msgActiveUser){ const th=(rows||[]).find(r=>r.user_id===_msgActiveUser); if(th && th.unread_from_user>0) openSupportConv(_msgActiveUser,_msgActiveName); }
+    },15000);
+  }
 }
 async function openSupportConv(userId, username, avatar){
   _msgActiveUser=userId; _msgActiveName=username||'utente';
