@@ -36,8 +36,10 @@
       + '.ba-color-row{display:flex;gap:14px;flex-wrap:wrap}'
       + '.ba-color-row input[type=color]{width:52px;height:40px;border:1px solid var(--line);border-radius:10px;background:none;cursor:pointer;padding:2px}'
       + '.ba-prev{display:flex;align-items:center;gap:10px;padding:14px;border:1px dashed var(--line);border-radius:12px;background:var(--glass-soft);margin-top:6px}'
-      + '.ba-list-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}'
-      + '.ba-list-row:last-child{border-bottom:none}';
+      + '#baList{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;align-items:start}'
+      + '@media(max-width:1100px){#baList{grid-template-columns:repeat(2,minmax(0,1fr))}}'
+      + '@media(max-width:680px){#baList{grid-template-columns:minmax(0,1fr)}}'
+      + '.ba-list-row{display:flex;align-items:center;gap:10px;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:var(--glass-soft);flex-wrap:wrap;min-width:0}';
     var st = document.createElement('style'); st.id = 'ba-styles'; st.textContent = css; document.head.appendChild(st);
   }
 
@@ -127,11 +129,16 @@
           var chip = h('span', { class: 'ba-badge', style: 'background:' + b.color + ';color:' + (b.text_color || '#fff') }, [h('i', { class: 'ph-duotone ph-' + (b.icon || 'seal-check') }), document.createTextNode(' ' + b.name)]);
           var meta = h('span', { class: 'sm' }, (b.tier ? ('livello: ' + b.tier) : 'nessun livello') + (b.active === false ? ' · spento' : ''));
           var edit = h('button', { class: 'btn sm', text: 'Modifica', onclick: function () { fillForm(b); } });
+          // Sospendi / Riattiva: spegne il badge (active=false) senza cancellarlo. Riusa admin_upsert_badge.
+          var susp = h('button', { class: 'btn sm' + (b.active === false ? ' green' : ' gold'), text: b.active === false ? 'Riattiva' : 'Sospendi', onclick: function () {
+            db.rpc('admin_upsert_badge', { p_id: b.id, p_name: b.name, p_icon: b.icon, p_color: b.color, p_text_color: b.text_color || '#FFFFFF', p_tier: b.tier || null, p_active: b.active === false, p_sort: b.sort || 100, p_key: b.key || null })
+              .then(function (rr) { if (rr.error) toast(rr.error.message, 'err'); else { toast(b.active === false ? 'Riattivato' : 'Sospeso', 'ok'); renderList(); } });
+          } });
           var del = h('button', { class: 'btn sm red', text: 'Elimina', onclick: function () {
             var go = window.adminConfirm ? window.adminConfirm('Eliminare il badge "' + b.name + '"? Verrà tolto da tutti i contenuti.') : Promise.resolve(confirm('Eliminare?'));
             go.then(function (ok) { if (!ok) return; db.rpc('admin_delete_badge', { p_id: b.id }).then(function (rr) { if (rr.error) toast(rr.error.message, 'err'); else { toast('Badge eliminato', 'ok'); renderList(); } }); });
           } });
-          el.appendChild(h('div', { class: 'ba-list-row' }, [chip, meta, h('span', { style: 'flex:1' }), edit, del]));
+          el.appendChild(h('div', { class: 'ba-list-row' }, [chip, meta, h('span', { style: 'flex:1' }), edit, susp, del]));
         });
       });
     }
