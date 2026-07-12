@@ -867,6 +867,10 @@ html[data-theme="light"] .chip.green{color:#236b39}
       <div class="panel">
         <div class="card-h"><span class="ic"><i class="ph-duotone ph-navigation-arrow"></i></span><span data-t="nav_itineraries">Itinerari</span></div>
         <div class="sm" style="margin-bottom:10px" data-t="sub_itineraries">Gli itinerari di viaggio creati dagli utenti (diversi dalle rotte storiche). Puoi vederli, metterli in evidenza o rimuoverli.</div>
+        <div class="btn-row" style="margin-bottom:12px">
+          <button class="btn sm gold" id="itinTabActive" onclick="_setItinView(false)"><i class="ph-duotone ph-list-checks"></i> <span data-t="itin_view_active">Attivi</span></button>
+          <button class="btn sm" id="itinTabArchived" onclick="_setItinView(true)"><i class="ph-duotone ph-archive-box"></i> <span data-t="itin_view_archived">Archiviati</span></button>
+        </div>
         <div id="itinTable"></div>
       </div>
     </section>
@@ -4104,15 +4108,23 @@ async function loadRoutesAdmin(){
 }
 
 /* ═════════════════════ 8b-bis) ITINERARI (viaggi utente) ═════════════════════ */
+let _itinShowArchived=false;
+function _setItinView(arch){ _itinShowArchived=!!arch;
+  const a=document.getElementById('itinTabActive'), b=document.getElementById('itinTabArchived');
+  if(a) a.className='btn sm'+(arch?'':' gold'); if(b) b.className='btn sm'+(arch?' gold':'');
+  loadItinerariesAdmin();
+}
 async function loadItinerariesAdmin(){
   const box=document.getElementById('itinTable'); loadingBox(box);
   try{
     const { data, error } = await sb.from('trips')
-      .select('id,name,badge,visibility,is_featured,official_requested,owner_id,start_date,end_date,created_at,owner:profiles!trips_owner_id_fkey(username),trip_stops(id,name,lat,lng,sort_order,image_url,note,status)')
-      .or('is_historic.is.null,is_historic.eq.false').order('official_requested',{ascending:false}).order('created_at',{ascending:false}).limit(200);
+      .select('id,name,badge,visibility,is_featured,official_requested,owner_id,start_date,end_date,created_at,archived,owner:profiles!trips_owner_id_fkey(username),trip_stops(id,name,lat,lng,sort_order,image_url,note,status)')
+      .or('is_historic.is.null,is_historic.eq.false').order('official_requested',{ascending:false}).order('created_at',{ascending:false}).limit(300);
     if(error){ isBackendMissing(error)?backendOff(box):emptyBox(box,t('error'),null,'warning'); return; }
-    if(!data||!data.length){ emptyBox(box,t('itin_empty'),t('itin_empty_h'),'compass'); return; }
+    const all=data||[]; const rows=all.filter(r=> (!!r.archived)===_itinShowArchived );
+    if(!rows.length){ emptyBox(box, _itinShowArchived?t('itin_arch_none','Nessun itinerario archiviato'):t('itin_empty'), _itinShowArchived?'':t('itin_empty_h'),'compass'); return; }
     box.textContent='';
+    data.length=0; Array.prototype.push.apply(data, rows);
     const visLbl=v=>({pub:t('itin_vis_pub'),companions:t('itin_vis_comp'),friends:t('itin_vis_friends'),prv:t('itin_vis_prv')}[v]||t('itin_vis_prv'));
     data.forEach(r=>{
       const stops=(r.trip_stops||[]).sort((a,b)=>(a.sort_order||0)-(b.sort_order||0));
@@ -4129,6 +4141,12 @@ async function loadItinerariesAdmin(){
       const stopsBox=el('div',{class:'stop-editor',style:'display:none;margin:8px 0 12px'});
       _renderStopEditor(stopsBox, r.id, stops, loadItinerariesAdmin);
       const actions=el('div',{class:'btn-row'},[
+        r.archived?el('button',{class:'btn sm green',text:t('itin_restore','Riesuma'),onclick:async()=>{
+          const { data:d,error:e } = await sb.from('trips').update({ archived:false }).eq('id',r.id).select('id');
+          if(e||!d||!d.length){ toast((e&&e.message)||t('rls_no_rows'),'err'); return; }
+          await logAudit('itin_restore','trip',r.id,{ name:r.name });
+          toast(t('itin_restored','✓ Itinerario riesumato'),'ok'); loadItinerariesAdmin();
+        }}):null,
         r.official_requested?el('button',{class:'btn sm gold',text:t('itin_make_official','Rendi ufficiale'),onclick:async()=>{
           if(!(await adminConfirm(t('itin_make_official_ask','Rendere questo itinerario una rotta ufficiale (bozza)? Verrà accreditato al proponente.')))) return;
           const { data:d,error:e } = await sb.from('trips').update({ is_historic:true, is_published:false, official_requested:false, suggested_by:r.owner_id||null }).eq('id',r.id).select('id');
