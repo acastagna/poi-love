@@ -1616,6 +1616,17 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 .itin-ac-drop.open{display:block}
 /* Trip cards — griglia quadrata responsive (2 col mobile / 3 col desktop) */
 .itin-cards{padding:0 20px 20px;display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+#itinArchivedWrap{padding:0 20px 24px}
+#itinArchivedBtn{display:flex;align-items:center;gap:9px;width:100%;padding:12px 14px;background:var(--card);border:1.5px solid var(--border);border-radius:14px;cursor:pointer;font-family:inherit;color:var(--text);font-size:13.5px;font-weight:700}
+#itinArchivedBtn i{font-size:18px;color:var(--muted)}
+#itinArchivedBtn:active{transform:scale(.98)}
+.itin-arch-empty{padding:16px;text-align:center;color:var(--muted);font-size:13px}
+.itin-arch-item{display:flex;align-items:center;gap:10px;padding:11px 13px;background:var(--card);border:1px solid var(--border);border-radius:12px;margin-top:8px}
+.itin-arch-info{flex:1;min-width:0;display:flex;flex-direction:column}
+.itin-arch-info b{font-size:13.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.itin-arch-info span{font-size:11px;color:var(--muted)}
+.itin-arch-restore{flex:none;display:flex;align-items:center;gap:5px;padding:8px 12px;border-radius:10px;border:1.5px solid var(--green,#059669);background:transparent;color:var(--green,#059669);font-size:12px;font-weight:800;cursor:pointer;font-family:inherit}
+.itin-arch-restore:active{transform:scale(.96)}
 @media(min-width:768px){.itin-cards{grid-template-columns:repeat(3,1fr);gap:16px}}
 @media(min-width:1200px){.itin-cards{grid-template-columns:repeat(4,1fr)}}
 .trip-feat-badge{position:absolute;top:8px;right:8px;background:rgba(212,43,43,.92);color:#fff;font-size:9.5px;font-weight:800;padding:3px 8px;border-radius:8px;display:inline-flex;align-items:center;gap:3px;z-index:2}
@@ -3222,6 +3233,15 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
       <div class="itin-ac-drop" id="itinAcDrop"></div>
     </div>
     <div class="itin-cards" id="itinCards"></div>
+    <!-- Archiviati: pulsante che rilegge dal DB gli itinerari archiviati e permette di riesumarli -->
+    <div id="itinArchivedWrap" style="margin-top:8px">
+      <button id="itinArchivedBtn" onclick="toggleArchivedTrips()">
+        <i class="ph-duotone ph-archive-box"></i>
+        <span data-t="itin_archived_btn">Itinerari archiviati</span>
+        <i class="ph-duotone ph-caret-down" id="itinArchivedCaret" style="margin-left:auto"></i>
+      </button>
+      <div id="itinArchived" hidden></div>
+    </div>
   </div>
 
   <!-- AREA: Rotte Storiche -->
@@ -7957,7 +7977,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='3.26';
+const APP_VERSION='3.27';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
@@ -13676,6 +13696,38 @@ async function archiveTrip(id){
   try{ const s=JSON.parse(localStorage.getItem('poi_trips')||'{}'); delete s[id]; localStorage.setItem('poi_trips',JSON.stringify(s)); }catch(_){}
   delete TRIPS[id];
   renderTripCards(); showToast(window.t('trip_archived','Itinerario archiviato'));
+}
+/* ── Itinerari ARCHIVIATI: pulsante che li rilegge dal DB e li riesuma ── */
+let _archivedOpen=false;
+async function toggleArchivedTrips(){
+  const box=document.getElementById('itinArchived'); const caret=document.getElementById('itinArchivedCaret'); if(!box) return;
+  _archivedOpen=!_archivedOpen;
+  if(caret) caret.className='ph-duotone ph-caret-'+(_archivedOpen?'up':'down');
+  if(!_archivedOpen){ box.hidden=true; return; }
+  box.hidden=false;
+  if(!(currentUser?.id && sb)){ box.innerHTML='<div class="itin-arch-empty">'+window.t('itin_arch_login','Accedi per vedere gli itinerari archiviati.')+'</div>'; return; }
+  box.innerHTML='<div class="itin-arch-empty"><i class="ph-duotone ph-circle-notch" style="animation:spin 1s linear infinite"></i> '+window.t('notif_loading','Carico…')+'</div>';
+  try{
+    const { data, error }=await sb.from('trips').select('id,name,dates_label,cover_url').eq('owner_id',currentUser.id).eq('archived',true).order('created_at',{ascending:false});
+    if(error) throw error;
+    const rows=data||[];
+    if(!rows.length){ box.innerHTML='<div class="itin-arch-empty">'+window.t('itin_arch_none','Nessun itinerario archiviato.')+'</div>'; return; }
+    box.innerHTML=rows.map(r=>`<div class="itin-arch-item">
+        <div class="itin-arch-info"><b>${(r.name||window.t('untitled','Senza nome')).replace(/</g,'&lt;')}</b>${r.dates_label?`<span>${String(r.dates_label).replace(/</g,'&lt;')}</span>`:''}</div>
+        <button class="itin-arch-restore" onclick="restoreTrip('${r.id}')"><i class="ph-duotone ph-arrow-counter-clockwise"></i> ${window.t('itin_restore','Riesuma')}</button>
+      </div>`).join('');
+  }catch(e){ box.innerHTML='<div class="itin-arch-empty">'+window.t('error_generic','Qualcosa è andato storto, riprova')+'</div>'; }
+}
+async function restoreTrip(dbId){
+  if(!(currentUser?.id && sb)) return;
+  try{
+    const { error }=await sb.from('trips').update({archived:false}).eq('id',dbId).eq('owner_id',currentUser.id);
+    if(error) throw error;
+    showToast(window.t('itin_restored','✓ Itinerario riesumato'));
+    if(typeof syncTripsFromDB==='function'){ await syncTripsFromDB(); }
+    renderTripCards();
+    _archivedOpen=false; toggleArchivedTrips(); // riapre e ricarica la lista archiviati (senza quello riesumato)
+  }catch(e){ showToast(window.t('error_generic','Qualcosa è andato storto, riprova')); }
 }
 function makeTripPublic(id){
   _closeTripSwipe(id);
