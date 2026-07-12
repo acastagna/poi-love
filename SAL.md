@@ -1,5 +1,19 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
+## Sessione 12/07/2026 (seguito lungo) — Immagini multi-sorgente, tastiera, ruoli
+
+Tutto verificato DAL VIVO. Webapp fino a v3.31; edge `image-search` ACTIVE.
+
+- **Scheda POI admin = frontend** + affidamento utente/ILLI + correzione inline + editor largo 2 colonne + foto 3 slot "+" + mic + AI (accorcia/allunga/approfondisci) + posizione solo via GPS-foto (EXIF) o ricerca indirizzo intelligente. Sezione Crea ripulita (rimosso form POI ridondante).
+- **Media Manager** (admin): sezione Immagini di moderazione (POI/avatar/cover/tappe, ingrandisci+rimuovi) + Cerca online multi-sorgente.
+- **Ricerca immagini MULTI-SORGENTE via edge `image-search`** (chiavi Unsplash/Pexels/Pixabay come segreti server + Openverse/Wikimedia): usata da admin E frontend, mescolata e con etichetta fonte. Chiavi tolte dal client (media-keys.js eliminato). Stock nel frontend su tappe, cover itinerario, compagnia; NIENTE stock sui POI.
+- **Messaggi**: realtime dal login (mig 077).
+- **Tastiera iOS**: campo chat ILLI + "Rispondi al team" convertiti a contenteditable → sparisce l'intera barra "Inserisci info" (v3.29).
+- **Itinerari archiviati**: riesumazione lato ADMIN (Attivi/Archiviati + Riesuma).
+- **RUOLI super vs moderatore** (mig 079-080): `admin_role`, `is_super_admin`, `admin_set_role` super-gated, `is_admin` cambiabile solo via role_op; moderatore vede solo le sezioni di moderazione; controllo Ruolo + tier solo per il super.
+- Da Alessandro: chiavi immagini fornite (in segreti edge). Restano aperti: email drag-and-drop, gestione itinerari "intelligente", (opz.) gating server di TUTTE le RPC config al super.
+
+
 ## Sessione 12/07/2026 (notte, seguito) — Rifiniture admin + fix messaggi + editor immagini
 
 Tutto verificato DAL VIVO sul pannello del founder (Chrome connesso) e sull'app.
