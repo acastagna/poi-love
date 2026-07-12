@@ -61,7 +61,7 @@
   function pick(opts) {
     opts = opts || {}; ensureStyles();
     var onPick = opts.onPick || function () {};
-    function done(url) { close(); onPick(url); }
+    function done(url, meta) { close(); onPick(url, meta || {}); }
 
     var body = h('div', { class: 'mm-body' });
     var tabCarica = h('button', { class: 'mm-tab', text: 'Carica' });
@@ -84,7 +84,16 @@
       body.innerHTML = '';
       var drop = h('div', { class: 'mm-drop' }, [h('i', { class: 'ph-duotone ph-upload-simple' }), h('div', { text: 'Trascina qui una foto o clicca per sceglierla' })]);
       var inp = h('input', { type: 'file', accept: 'image/*', style: 'display:none' });
-      function go(file) { if (!file) return; drop.innerHTML = '<i class="ph-duotone ph-circle-notch"></i><div>Carico…</div>'; upload(file, { kind: opts.kind }).then(function (r) { if (r && r.url) done(r.url); else { toast('Caricamento non riuscito', 'err'); showCarica(); } }); }
+      function go(file) {
+        if (!file) return; drop.innerHTML = '<i class="ph-duotone ph-circle-notch"></i><div>Carico…</div>';
+        // leggo i dati geografici (GPS EXIF) del file, se presenti, PRIMA della compressione server (che li toglie)
+        var gpsP = (typeof exifr !== 'undefined' && exifr.gps) ? exifr.gps(file).catch(function () { return null; }) : Promise.resolve(null);
+        Promise.all([upload(file, { kind: opts.kind }), gpsP]).then(function (arr) {
+          var r = arr[0], gps = arr[1]; var meta = {};
+          if (gps && gps.latitude != null) meta.gps = { lat: gps.latitude, lng: gps.longitude };
+          if (r && r.url) done(r.url, meta); else { toast('Caricamento non riuscito', 'err'); showCarica(); }
+        });
+      }
       drop.addEventListener('click', function () { inp.click(); });
       inp.addEventListener('change', function () { go(inp.files && inp.files[0]); });
       drop.addEventListener('dragover', function (e) { e.preventDefault(); drop.classList.add('over'); });
