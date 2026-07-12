@@ -7980,7 +7980,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='3.29';
+const APP_VERSION='3.30';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
@@ -14376,6 +14376,44 @@ async function stopImageUpload(inp){
   try{ const d=await compressToDataURL(f, 640, 0.82); if(d){ _stopImgTmp=d; _renderStopImg(); } }
   catch(e){ showToast(t('cv_img_err','Caricamento foto fallito')); }
 }
+// Ricerca STOCK multi-sorgente (via edge function image-search: le chiavi restano sul server). onPick(url).
+let _stockStyled=false;
+function openStockSearch(opts){
+  opts=opts||{}; const onPick=opts.onPick||function(){};
+  if(!_stockStyled){ _stockStyled=true; const st=document.createElement('style'); st.textContent=
+     '.sk-ov{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:2000;display:flex;align-items:center;justify-content:center;padding:16px}'
+    +'.sk-mod{width:560px;max-width:100%;max-height:88vh;display:flex;flex-direction:column;background:var(--card);border-radius:18px;overflow:hidden;color:var(--text);box-shadow:0 24px 70px rgba(0,0,0,.4)}'
+    +'.sk-hd{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--border)}.sk-hd b{flex:1;font-size:15px}.sk-hd>button{background:none;border:none;font-size:22px;color:var(--muted);cursor:pointer}'
+    +'.sk-srow{display:flex;gap:8px;padding:12px 16px}.sk-in{flex:1;padding:10px 13px;border:1.5px solid var(--border);border-radius:12px;background:var(--bg,#fff);color:var(--text);font-family:inherit;font-size:14px}.sk-go{padding:10px 16px;border:none;border-radius:12px;background:var(--red);color:#fff;font-weight:700;cursor:pointer;font-family:inherit}'
+    +'.sk-body{padding:0 16px 16px;overflow:auto}.sk-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}'
+    +'.sk-th{position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;cursor:pointer;background:#222;border:2px solid transparent}.sk-th:active{border-color:var(--red)}.sk-th img{width:100%;height:100%;object-fit:cover}'
+    +'.sk-src{position:absolute;bottom:3px;left:3px;background:rgba(0,0,0,.62);color:#fff;font-size:8px;font-weight:800;text-transform:uppercase;padding:2px 5px;border-radius:4px}.sk-empty{text-align:center;color:var(--muted);font-size:13px;padding:20px}';
+    document.head.appendChild(st); }
+  const ov=document.createElement('div'); ov.className='sk-ov';
+  ov.innerHTML='<div class="sk-mod"><div class="sk-hd"><i class="ph-duotone ph-images"></i><b>'+t('stock_title','Cerca una foto (stock)')+'</b><button aria-label="chiudi">&times;</button></div>'
+    +'<div class="sk-srow"><input class="sk-in" type="text" autocomplete="off" placeholder="'+t('stock_ph','Cerca: un luogo o una cosa, es. spiaggia, hotel…')+'"><button class="sk-go">'+t('search_tap','Cerca')+'</button></div>'
+    +'<div class="sk-body"><div class="sk-empty">'+t('stock_hint','Scrivi e cerca: foto reali da più sorgenti (Unsplash, Pexels, Pixabay, Wikipedia, StockSnap…).')+'</div></div></div>';
+  document.body.appendChild(ov);
+  const inp=ov.querySelector('.sk-in'), go=ov.querySelector('.sk-go'), body=ov.querySelector('.sk-body'), x=ov.querySelector('.sk-hd>button');
+  function close(){ ov.remove(); }
+  x.onclick=close; ov.addEventListener('click',function(e){ if(e.target===ov) close(); });
+  async function run(){
+    const q=(inp.value||'').trim(); if(!q) return;
+    body.innerHTML='<div class="sk-empty"><i class="ph-duotone ph-circle-notch" style="animation:spin 1s linear infinite;font-size:20px"></i></div>';
+    try{
+      const { data, error }=await sb.functions.invoke('image-search',{body:{q:q}});
+      const res=(data&&data.results)||[];
+      if(error||!res.length){ body.innerHTML='<div class="sk-empty">'+t('search_none','Nessun risultato')+'</div>'; return; }
+      const grid=document.createElement('div'); grid.className='sk-grid';
+      res.forEach(function(it){ const th=document.createElement('div'); th.className='sk-th';
+        th.innerHTML='<img src="'+it.thumb+'" loading="lazy" onerror="this.parentNode.style.display=\'none\'"><span class="sk-src">'+it.source+'</span>';
+        th.onclick=function(){ close(); onPick(it.url); }; grid.appendChild(th); });
+      body.innerHTML=''; body.appendChild(grid);
+    }catch(e){ body.innerHTML='<div class="sk-empty">'+t('error_generic','Qualcosa è andato storto, riprova')+'</div>'; }
+  }
+  go.onclick=run; inp.addEventListener('keydown',function(e){ if(e.key==='Enter') run(); });
+  setTimeout(function(){ inp.focus(); },50);
+}
 // Trova la foto VERA del luogo per la tappa: prima le foto geolocalizzate (Wikimedia Commons, 300m
 // dalle coordinate), poi Wikipedia per titolo. Mai immagini a caso da stock generici.
 async function stopFindPlacePhoto(){
@@ -16697,6 +16735,7 @@ async function confirmPhotoPicker(){
           <span id="stopEditImgPh"><i class="ph-duotone ph-image"></i> <span data-t="stop_f_img_add">Tocca per caricare</span></span>
         </div>
         <button type="button" class="se-findphoto" onclick="stopFindPlacePhoto()"><i class="ph-duotone ph-magnifying-glass"></i> <span data-t="stop_find_photo">Trova la foto del luogo</span></button>
+        <button type="button" class="se-findphoto" onclick="openStockSearch({onPick:function(u){ _stopImgTmp=u; _renderStopImg(); showToast(t('photo_found','✓ Foto scelta')); }})"><i class="ph-duotone ph-images"></i> <span data-t="stock_btn">Cerca stock</span></button>
         <input type="file" id="stopImgInput" accept="image/*" style="display:none" onchange="stopImageUpload(this)">
       </div>
       <div class="sec-lbl" style="margin-bottom:6px" data-t="stop_f_note">Note personali</div>
