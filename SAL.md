@@ -1,5 +1,19 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
+## Sessione 12/07/2026 (notte, seguito) — Rifiniture admin + fix messaggi + editor immagini
+
+Tutto verificato DAL VIVO sul pannello del founder (Chrome connesso) e sull'app.
+
+- **FIX MESSAGGI (bug reale del founder):** le risposte degli utenti arrivavano nel DB ma il pannello non le mostrava (nessun realtime/polling) e mancava la policy SELECT admin. Aggiunta migrazione 077 (`sm_admin_select`) + canale realtime su `support_messages` + polling 15s. Verificato: risposta utente comparsa DA SOLA in ~2s. Commit `66f49a3`.
+- **Color picker EvoLab + Gradiente** per i badge e per il colore delle Categorie (Tinta/Gradiente, 2 stop + angolo). `admin/js/color-picker.js`. Commit `96c3a78`.
+- **Media Manager** (`admin/js/media-manager.js`, mig 076 `media_assets`): scelta immagini via Carica o Libreria, mai URL. Collegato all'editor POI. Commit `5fa4094`.
+- **Editor POI largo "come l'app"** + sezione BADGE E ASSEGNAZIONE (@handle). `openModal({wide})`. Commit `0183401`.
+- **Messaggi**: destinatario a tendina in alto + Invio per inviare. Commit `33e652c`.
+- **App (v3.26)**: tastiera smartphone (foglio sopra la tastiera, `visualViewport`) + **badge personalizzati mostrati nel dettaglio POI** (`loadBadges`/`window.BADGES`). Commit `5d32778`, `5beea23`.
+- **Scheda utente**: cambia AVATAR e COPERTINA dal Media Manager (mig 078 `admin_set_user_cover`). Commit `5beea23`, `2d36622`.
+- **Cache-busting** `?v=` sui 7 moduli JS admin (il server non manda Cache-Control sui .js). Commit `2d36622`.
+- **Immagini tappe**: menu Ingrandisci/Modifica/Cambia/Rimuovi + **editor immagini reale** (ruota, zoom, ritaglia, esporta JPEG). `admin/js/image-editor.js`. Commit `45d4cb9`.
+
 ## Sessione 12/07/2026 (notte) — Revisione pannello Admin: avvio (Fase 0)
 
 Base: `ORCHESTRAZIONE-ADMIN-POILOVE.md` (piano founder) + `ADMIN-STATO.md` (audit 11/07). Decisioni e tracker completo in **`ADMIN-DECISIONI.md`**.
