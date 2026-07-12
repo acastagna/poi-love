@@ -47,3 +47,6 @@ Thumbs.db
 
 # Supabase CLI: file locali temporanei (non committare)
 supabase/.temp/
+
+# Chiavi client ricerca immagini (mai su repo pubblico)
+admin/js/media-keys.js
