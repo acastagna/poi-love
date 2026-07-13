@@ -1,5 +1,16 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
+## Sessione 13/07/2026 — Loghi ufficiali nei template + ILLI trasparente
+
+Tutto verificato DAL VIVO (mail: HTML dal DB; landing: screenshot su lp.php).
+
+- **Logo steso ufficiale pubblicato**: `img/logo-steso.png` + `.svg` (dal `logo-completo.svg` fornito da Alessandro) e `img/logo-poivoice.png` + `.svg` (POI•VOICE, pronto per le audioletture). Nomi nuovi, a prova di cache.
+- **4 template mail** (benvenuto, novita, invito-amico, evento-invito): il vecchio logo quadrato `logo-email.png` sostituito col logo steso orizzontale (180px) in fondo su fondo bianco. Verificato l'HTML reso di tutti e 4.
+- **5 landing** (condividi-poi/itinerario/rotta, invito-community, evento-poilove): aggiunto il logo steso SVG trasparente, centrato, sotto la card e sopra il footer. Verificato live su `lp.php?s=invito-community`.
+- **ILLI trasparente**: le due immagini originali fornite (500 e 1000px, fondo trasparente) pubblicate COSÌ COME SONO su `img/illi-trasparente-500.png` e `-1000.png`, nessuna trasformazione. Nei template resta la versione fondo scuro approvata.
+- **Documenti del founder committati**: `GO-LIVE-PREMORTEM-POSTMORTEM.md` e `ORCHESTRAZIONE-ADMIN-POILOVE.md` (12/07), tracce per go-live e revisione admin: sono la base dei prossimi giri.
+- Resta aperto: sottodominio builder.321.al (serve OK esplicito per crearlo su Plesk).
+
 ## Sessione 12/07/2026 (seguito lungo) — Immagini multi-sorgente, tastiera, ruoli
 
 Tutto verificato DAL VIVO. Webapp fino a v3.31; edge `image-search` ACTIVE.
