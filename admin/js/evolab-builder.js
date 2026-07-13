@@ -112,7 +112,7 @@
       + '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:' + st.bg + ';padding:26px 0;"><tr><td align="center">'
       + '<table role="presentation" width="' + parseInt(st.width, 10) + '" cellpadding="0" cellspacing="0" style="width:' + parseInt(st.width, 10) + 'px;max-width:100%;background:#ffffff;border-radius:14px;overflow:hidden;border:1px solid #e6e6e6;">'
       + rowsHtml
-      + '<tr><td style="padding:16px 26px;border-top:1px solid #eee;font:400 12px Arial,Helvetica,sans-serif;color:#999;">' + esc(footer).replace(/•/g, '&bull;') + '</td></tr>'
+      + '<tr><td align="center" style="padding:16px 26px;border-top:1px solid #eee;font:400 12px Arial,Helvetica,sans-serif;color:#999;text-align:center;">' + esc(footer).replace(/•/g, '&bull;') + '</td></tr>'
       + '</table></td></tr></table></body></html>';
   }
   function renderText(doc) {

@@ -26,7 +26,7 @@
       title: 'Landing Builder',
       saveLabel: 'Salva la landing',
       doc: lp.design || null,
-      brand: { accent: '#D42B2B', footer: 'POI•LOVE · 321.al / EVOLAB', name: 'POI•LOVE', linkBase: 'https://poilove.com/', title: lp.title || '' },
+      brand: { accent: '#D42B2B', footer: 'Ingegnerizzazione di Alessandro Castagna · 321.AL / EVOLAB • Tirana', name: 'POI•LOVE', linkBase: 'https://poilove.com/', title: lp.title || '' },
       pickImage: function (cb) { if (window.POIMedia && window.POIMedia.pick) window.POIMedia.pick({ kind: 'og', onPick: cb }); else cb(null); },
       headFields: [
         { key: 'slug', label: 'indirizzo (es. lancio-tirana)', value: lp.slug || '', width: '190px' },
@@ -39,7 +39,7 @@
         var slug = (vals.slug || '').trim().toLowerCase().replace(/[^a-z0-9\-]/g, '-').replace(/\-+/g, '-').replace(/^\-|\-$/g, '');
         if (slug.length < 2) { toast('Dai un indirizzo alla landing (es. lancio-tirana)', 'err'); return false; }
         // il titolo entra nella pagina resa
-        html = (window.EvolabBuilder).renderPage(doc, { accent: '#D42B2B', footer: 'POI•LOVE · 321.al / EVOLAB', name: 'POI•LOVE', linkBase: 'https://poilove.com/', title: (vals.title || slug) });
+        html = (window.EvolabBuilder).renderPage(doc, { accent: '#D42B2B', footer: 'Ingegnerizzazione di Alessandro Castagna · 321.AL / EVOLAB • Tirana', name: 'POI•LOVE', linkBase: 'https://poilove.com/', title: (vals.title || slug) });
         var rec = { slug: slug, title: (vals.title || '').trim() || slug, template_for: vals.template_for || 'libera', design: doc, html: html, updated_at: new Date().toISOString() };
         if (!lp.id && window.ME) rec.created_by = window.ME.id;
         var q = lp.id ? db.from('landing_pages').update(rec).eq('id', lp.id).select('id')

@@ -9,6 +9,7 @@ Tutto verificato DAL VIVO (mail: HTML dal DB; landing: screenshot su lp.php).
 - **5 landing** (condividi-poi/itinerario/rotta, invito-community, evento-poilove): aggiunto il logo steso SVG trasparente, centrato, sotto la card e sopra il footer. Verificato live su `lp.php?s=invito-community`.
 - **ILLI trasparente**: le due immagini originali fornite (500 e 1000px, fondo trasparente) pubblicate COSÌ COME SONO su `img/illi-trasparente-500.png` e `-1000.png`, nessuna trasformazione. Nei template resta la versione fondo scuro approvata.
 - **Documenti del founder committati**: `GO-LIVE-PREMORTEM-POSTMORTEM.md` e `ORCHESTRAZIONE-ADMIN-POILOVE.md` (12/07), tracce per go-live e revisione admin: sono la base dei prossimi giri.
+- **Firma nei template (richiesta 13/07)**: in fondo a TUTTE le landing e mail ora ci sono i due loghi piccoli affiancati (POI•LOVE + POI•VOICE) e sotto la riga "Ingegnerizzazione di Alessandro Castagna · 321.AL / EVOLAB • Tirana". Motore: footer email centrato (miglioria sincronizzata su POI•LOVE, Top Market e builder standalone). Verificato live: landing screenshot + mail resa. Moduli admin a v340.
 - Resta aperto: sottodominio builder.321.al (serve OK esplicito per crearlo su Plesk).
 
 ## Sessione 12/07/2026 (seguito lungo) — Immagini multi-sorgente, tastiera, ruoli
