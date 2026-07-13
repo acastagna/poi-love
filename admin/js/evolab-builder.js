@@ -73,6 +73,10 @@
       if (!/^\{\{.+\}\}$/.test(url) && !/^https?:\/\//i.test(url)) url = (brand && brand.linkBase) || 'https://321.al/';
       return tdOpen + 'padding:12px 0;"><a href="' + esc(url) + '" style="display:inline-block;background:' + accent + ';color:#fff;text-decoration:none;font:700 15px Arial,Helvetica,sans-serif;padding:12px 28px;border-radius:' + (b.st && b.st.radius != null && b.st.radius !== '' ? parseInt(b.st.radius, 10) : 8) + 'px;">' + esc(b.testo || 'Apri') + '</a></td></tr>';
     }
+    if (t === 'mascotte') {
+      var msz = parseInt(b.size, 10) || 140;
+      return tdOpen + 'padding:10px 0;"><img src="' + esc(b.img) + '" width="' + msz + '" height="' + msz + '" alt="' + esc((brand && brand.name) || 'Mascotte') + '" style="display:inline-block;width:' + msz + 'px;height:' + msz + 'px;border-radius:50%;border:0;"></td></tr>';
+    }
     if (t === 'video') { // in email: pulsante-link al video (le email non riproducono video)
       var vu = String(b.url || '').trim(); if (!/^https?:\/\//i.test(vu)) return '';
       return tdOpen + 'padding:12px 0;"><a href="' + esc(vu) + '" style="display:inline-block;background:' + accent + ';color:#fff;text-decoration:none;font:700 15px Arial,Helvetica,sans-serif;padding:12px 28px;border-radius:8px;">&#9658; ' + esc(b.testo || 'Guarda il video') + '</a></td></tr>';
@@ -137,6 +141,11 @@
       var url = String(b.url || '').trim();
       if (!/^\{\{.+\}\}$/.test(url) && !/^https?:\/\//i.test(url) && url.charAt(0) !== '#') url = (brand && brand.linkBase) || 'https://321.al/';
       return '<div style="text-align:' + al + ';padding:12px 0;"><a href="' + esc(url) + '" style="display:inline-block;background:' + accent + ';color:#fff;text-decoration:none;font-weight:800;font-size:16px;padding:14px 34px;border-radius:' + (b.st && b.st.radius != null && b.st.radius !== '' ? parseInt(b.st.radius, 10) : 12) + 'px;box-shadow:0 6px 18px -6px ' + accent + '99;">' + esc(b.testo || 'Apri') + '</a></div>';
+    }
+    if (t === 'mascotte') {
+      var ps = parseInt(b.size, 10) || 200;
+      return '<style>@keyframes eb-illi-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}</style>'
+        + '<div style="text-align:' + al + ';padding:10px 0;' + bst + '"><div style="display:inline-flex;align-items:center;justify-content:center;width:' + ps + 'px;height:' + ps + 'px;border-radius:50%;overflow:hidden;background:linear-gradient(135deg,' + accent + '1f,' + accent + '0a);box-shadow:0 24px 70px -12px ' + accent + '59, inset 0 0 0 1px ' + accent + '1a;border:4px solid #fff;animation:eb-illi-float 4s ease-in-out infinite;"><img src="' + esc(b.img) + '" alt="' + esc((brand && brand.name) || 'Mascotte') + '" style="width:86%;height:86%;object-fit:contain;"></div></div>';
     }
     if (t === 'video') {
       var em = ytEmbed(b.url);
@@ -286,11 +295,12 @@
       { t: 'titolo', lab: 'Titolo', ic: 'ph-text-h-one' },
       { t: 'testo', lab: 'Testo', ic: 'ph-text-align-left' },
       { t: 'pulsante', lab: 'Pulsante', ic: 'ph-cursor-click' },
+      { t: 'mascotte', lab: 'Mascotte', ic: 'ph-smiley' },
       { t: 'sep', lab: 'Separatore', ic: 'ph-minus' },
       { t: 'spazio', lab: 'Spazio', ic: 'ph-arrows-out-line-vertical' },
       { t: 'video', lab: 'Video', ic: 'ph-youtube-logo' }
     ];
-    if (mode === 'email') MODS = MODS.slice(0, 6); // niente video-embed nelle email (diventa link): lo si aggiunge dalla pagina
+    if (mode === 'email') MODS = MODS.filter(function (m) { return m.t !== 'video'; }); // niente video-embed nelle email
     var sel = null, selCol = null, selRow = null, tab = 'moduli', dragMod = null, dragBlk = null;
 
     var canvas = h('div');
@@ -324,6 +334,7 @@
       if (tipo === 'testo') return { tipo: 'testo', testo: mode === 'page' ? 'Racconta qui la tua offerta.' : ('Scrivi qui. Segnaposto: ' + PH + '.'), align: 'left', size: 'normale', st: {} };
       if (tipo === 'pulsante') return { tipo: 'pulsante', testo: 'Scopri di più', url: (opts.defaults && opts.defaults.buttonUrl) || (mode === 'page' ? ((brand.linkBase || 'https://321.al/')) : '{{link}}'), align: 'center', st: {} };
       if (tipo === 'spazio') return { tipo: 'spazio', h: 20, st: {} };
+      if (tipo === 'mascotte') return { tipo: 'mascotte', img: (brand.mascot || 'https://poilove.com/img/illi-ai.png'), size: mode === 'page' ? 200 : 140, align: 'center', st: {} };
       if (tipo === 'video') return { tipo: 'video', testo: 'Guarda il video', url: '', st: {} };
       return { tipo: 'sep', st: {} };
     }
@@ -342,6 +353,10 @@
       }
       blk(tg.r, tg.c).push(nuovoMod(tipo));
       selCol = tg; render();
+    }
+    function pickImage2(b) {
+      if (typeof opts.pickImage === 'function') { opts.pickImage(function (url) { if (url) { b.img = url; render(); } }); return; }
+      var u = prompt('URL immagine'); if (u) { b.img = u; render(); }
     }
     function pickImage(b) {
       if (typeof opts.pickImage === 'function') { opts.pickImage(function (url) { if (url) { b.url = url; render(); } }); return; }
@@ -376,6 +391,13 @@
         }
       } else if (b.tipo === 'spazio') {
         el2 = h('div', { class: 'eb-space-prev' }); el2.style.height = (b.h || 20) + 'px';
+      } else if (b.tipo === 'mascotte') {
+        el2 = h('div'); el2.style.textAlign = b.align || 'center'; el2.style.padding = '10px 0';
+        var mc = h('div'); var msz2 = (b.size || 160);
+        mc.style.cssText = 'display:inline-flex;align-items:center;justify-content:center;width:' + msz2 + 'px;height:' + msz2 + 'px;border-radius:50%;overflow:hidden;background:linear-gradient(135deg,rgba(212,43,43,.12),rgba(212,43,43,.04));border:4px solid #fff;box-shadow:0 14px 40px -10px rgba(212,43,43,.35);animation:eb-illi-float 4s ease-in-out infinite';
+        mc.appendChild(h('img', { src: b.img || '', alt: '', style: 'width:86%;height:86%;object-fit:contain' }));
+        el2.appendChild(mc);
+        if (!document.getElementById('eb-float-kf')) { var kf = document.createElement('style'); kf.id = 'eb-float-kf'; kf.textContent = '@keyframes eb-illi-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}'; document.head.appendChild(kf); }
       } else if (b.tipo === 'video') {
         el2 = h('div', { class: 'eb-video-prev', html: '<i class="ph-fill ph-play-circle" style="font-size:34px"></i><span>' + esc(b.url ? 'Video: ' + b.url.slice(0, 42) : 'Incolla il link YouTube nelle impostazioni') + '</span>' });
       } else { el2 = h('div', { class: 'eb-hr-prev' }); }
@@ -552,6 +574,11 @@
         }
         else if (b.tipo === 'pulsante') { sideBody.appendChild(ctrlText(b, 'url', 'Link del pulsante', '{{link}} oppure https://...')); sideBody.appendChild(ctrlAlign(b)); }
         else if (b.tipo === 'spazio') { sideBody.appendChild(ctrlRange(b, 'h', 'Altezza', 4, 120)); }
+        else if (b.tipo === 'mascotte') {
+          sideBody.appendChild(ctrlAlign(b)); sideBody.appendChild(ctrlRange(b, 'size', 'Grandezza', 80, 320, 10));
+          var mchg = field('Immagine mascotte'); var mcb = h('button', { type: 'button', class: 'eb-add', text: 'Cambia immagine' });
+          mcb.addEventListener('click', function () { pickImage2(b); }); mchg.appendChild(mcb); sideBody.appendChild(mchg);
+        }
         else if (b.tipo === 'video') { sideBody.appendChild(ctrlText(b, 'url', 'Link YouTube o file .mp4', 'https://youtube.com/watch?v=…')); sideBody.appendChild(ctrlText(b, 'testo', 'Etichetta (usata nelle email)', 'Guarda il video')); }
         if (b.tipo !== 'sep' && b.tipo !== 'spazio') styleSection(sideBody, b.st, false);
         return;

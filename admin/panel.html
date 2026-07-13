@@ -563,7 +563,7 @@ html[data-theme="light"] .chip.green{color:#236b39}
 <script src="https://unpkg.com/exifr@7.1.3/dist/lite.umd.js" onerror="(function(){var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/exifr@7.1.3/dist/lite.umd.js';document.head.appendChild(s);})()"></script>
 <script src="js/color-picker.js?v=326"></script>
 <script src="js/media-manager.js?v=332"></script>
-<script src="js/evolab-builder.js?v=335"></script>
+<script src="js/evolab-builder.js?v=336"></script>
 <script src="js/mail-builder.js?v=334"></script>
 <script src="js/landing-admin.js?v=334"></script>
 <script src="js/image-editor.js?v=326"></script>
@@ -3874,6 +3874,14 @@ async function createHistoricRoute(){
 // Upload di una foto tappa sul media server (JWT admin). Ritorna l'URL o null.
 // Reload dell'editor tappe attivo (rotte storiche o itinerari): lo imposta _renderStopEditor.
 let _stopEditorReload = ()=>{ if(typeof loadRoutesAdmin==='function') loadRoutesAdmin(); };
+// Ricarica SOLO l'editor tappe (il riquadro resta APERTO: si fanno più modifiche di fila senza richiudere)
+async function _reloadStopsBox(box, tripId){
+  try{
+    const { data } = await sb.from('trip_stops').select('id,name,lat,lng,sort_order,image_url,note,status').eq('trip_id',tripId).order('sort_order');
+    box.textContent=''; box.style.display='block';
+    _renderStopEditor(box, tripId, data||[], ()=>_reloadStopsBox(box, tripId));
+  }catch(e){}
+}
 async function _adminUploadImage(file){
   try{
     const { data:{ session } } = await sb.auth.getSession();
@@ -4167,7 +4175,7 @@ async function loadRoutesAdmin(){
         who?el('span',{class:'chip dim',text:'🙏 '+who}):null
       ]);
       const stopsBox=el('div',{class:'stop-editor',style:'display:none;margin:8px 0 12px'});
-      _renderStopEditor(stopsBox, r.id, stops, loadRoutesAdmin);
+      _renderStopEditor(stopsBox, r.id, stops, ()=>_reloadStopsBox(stopsBox, r.id));
 
       const actions=el('div',{class:'btn-row'},[
         el('button',{class:'btn sm '+(r.is_published?'':'green'),text:r.is_published?t('rt_unpublish'):t('rt_publish'),onclick:async()=>{
@@ -4260,7 +4268,7 @@ async function loadItinerariesAdmin(){
         (r.start_date||r.end_date)?el('span',{class:'sm',text:(r.start_date||'')+(r.end_date?' → '+r.end_date:'')}):null
       ]);
       const stopsBox=el('div',{class:'stop-editor',style:'display:none;margin:8px 0 12px'});
-      _renderStopEditor(stopsBox, r.id, stops, loadItinerariesAdmin);
+      _renderStopEditor(stopsBox, r.id, stops, ()=>_reloadStopsBox(stopsBox, r.id));
       const actions=el('div',{class:'btn-row'},[
         r.archived?el('button',{class:'btn sm green',text:t('itin_restore','Riesuma'),onclick:async()=>{
           const { data:d,error:e } = await sb.from('trips').update({ archived:false }).eq('id',r.id).select('id');
