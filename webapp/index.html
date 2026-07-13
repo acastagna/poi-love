@@ -8011,7 +8011,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='3.34';
+const APP_VERSION='3.35';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
@@ -13171,9 +13171,9 @@ function _referralUrl(){
 // Testi di invito nella lingua dell'app (SQ/IT/EN)
 function _referralTexts(){
   const T3={
-    it:{subj:'Ti aspetto su POI•LOVE', body:'Ciao!\n\nHo scoperto POI•LOVE, la mappa dei luoghi del cuore: posti veri, amati dalle persone, non scelti da un algoritmo.\n\nUnisciti a me qui:\n{URL}\n\nA presto su POI•LOVE!', social:'Scopri POI•LOVE, la mappa dei luoghi del cuore. Unisciti a me!'},
-    sq:{subj:'Të pres në POI•LOVE', body:'Përshëndetje!\n\nZbulova POI•LOVE, hartën e vendeve të zemrës: vende të vërteta, të dashura nga njerëzit, jo të zgjedhura nga një algoritëm.\n\nBashkohu me mua këtu:\n{URL}\n\nShihemi në POI•LOVE!', social:'Zbulo POI•LOVE, hartën e vendeve të zemrës. Bashkohu me mua!'},
-    en:{subj:'Join me on POI•LOVE', body:'Hi!\n\nI discovered POI•LOVE, the map of the places of the heart: real places, loved by people, not picked by an algorithm.\n\nJoin me here:\n{URL}\n\nSee you on POI•LOVE!', social:'Discover POI•LOVE, the map of the places of the heart. Join me!'}
+    it:{subj:'Ti aspetto su POI•LOVE', body:'Ciao!\n\nTi invito su POI•LOVE, la mappa dei luoghi del cuore: posti veri, amati dalle persone, non scelti da un algoritmo.\n\nApri il mio invito personale qui:\n{URL}\n\nA presto su POI•LOVE!', social:'Scopri POI•LOVE, la mappa dei luoghi del cuore. Apri il mio invito!'},
+    sq:{subj:'Të pres në POI•LOVE', body:'Përshëndetje!\n\nTë ftoj në POI•LOVE, hartën e vendeve të zemrës: vende të vërteta, të dashura nga njerëzit, jo të zgjedhura nga një algoritëm.\n\nHap ftesën time personale këtu:\n{URL}\n\nShihemi në POI•LOVE!', social:'Zbulo POI•LOVE, hartën e vendeve të zemrës. Hap ftesën time!'},
+    en:{subj:'Join me on POI•LOVE', body:'Hi!\n\nI am inviting you to POI•LOVE, the map of the places of the heart: real places, loved by people, not picked by an algorithm.\n\nOpen my personal invite here:\n{URL}\n\nSee you on POI•LOVE!', social:'Discover POI•LOVE, the map of the places of the heart. Open my invite!'}
   };
   const p=T3[lang]||T3.it;
   return {subj:p.subj, body:p.body.replace('{URL}',_referralUrl()), social:p.social};
