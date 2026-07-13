@@ -31,7 +31,7 @@
       headFields: [
         { key: 'slug', label: 'indirizzo (es. lancio-tirana)', value: lp.slug || '', width: '190px' },
         { key: 'title', label: 'Titolo della pagina', value: lp.title || '' },
-        { key: 'template_for', type: 'select', value: lp.template_for || 'libera', options: [['libera', 'Uso: pagina libera'], ['poi', 'Uso: condivisione POI'], ['trip', 'Uso: condivisione itinerario'], ['route', 'Uso: condivisione rotta'], ['evento', 'Uso: evento/lancio'], ['invito', 'Uso: invito community (Diffondi)']] }
+        { key: 'template_for', type: 'select', value: lp.template_for || 'libera', options: [['libera', 'Uso: pagina libera'], ['poi', 'Uso: condivisione POI'], ['trip', 'Uso: condivisione itinerario'], ['route', 'Uso: condivisione rotta'], ['evento', 'Uso: evento/lancio'], ['invito', 'Uso: invito community (Diffondi)'], ['compagnia', 'Uso: invito compagnia ({{codice}})']] }
       ],
       placeholders: '{{titolo}} {{descrizione}} {{foto}} {{mittente}} {{link}}',
       onSave: function (doc, html, text, vals) {
@@ -69,7 +69,7 @@
         h('div', { class: 'ttl', text: lp.title || lp.slug }),
         h('div', { class: 'sm', style: 'opacity:.8', text: '/lp.php?s=' + lp.slug })
       ]));
-      var USO = { libera: 'Libera', poi: 'POI', trip: 'Itinerario', route: 'Rotta', evento: 'Evento', invito: 'Invito' };
+      var USO = { libera: 'Libera', poi: 'POI', trip: 'Itinerario', route: 'Rotta', evento: 'Evento', invito: 'Invito', compagnia: 'Compagnia' };
       row.appendChild(h('span', { class: 'chip gold', text: 'Uso: ' + (USO[lp.template_for] || 'Libera') }));
       row.appendChild(h('span', { class: 'chip ' + (lp.published ? 'green' : 'dim'), text: lp.published ? 'Pubblicata' : 'Bozza' }));
       if (lp.published) row.appendChild(h('a', { class: 'btn sm', href: BASE + encodeURIComponent(lp.slug), target: '_blank', rel: 'noopener', html: '<i class="ph-duotone ph-arrow-square-out"></i> Apri' }));

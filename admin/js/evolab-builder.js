@@ -60,14 +60,22 @@
   }
 
   /* ══ RENDER EMAIL (tabelle + stili inline, responsive @520px) ══ */
-  function moduloEmail(b, accent, brand) {
+  /* Tavolozza email: chiara (default) o scura (settings.theme='scura') */
+  function emailPalette(st) {
+    var dark = st && st.theme === 'scura';
+    return dark
+      ? { dark: true, bg: '#161110', card: '#221b19', line: '#3a2f28', ink: '#f3ece6', text: '#d8d0c8', muted: '#a99f97' }
+      : { dark: false, bg: (st && st.bg) || '#f4f4f5', card: '#ffffff', line: '#e6e6e6', ink: '#1a1a1a', text: '#333333', muted: '#999999' };
+  }
+  function moduloEmail(b, accent, brand, P) {
+    P = P || emailPalette(null);
     var t = b.tipo || '', al = b.align || 'left', bst = stCss(b.st, true);
     var tdOpen = '<tr><td align="' + al + '" style="' + bst;
-    if (t === 'sep') return '<tr><td style="padding:8px 0;' + bst + '"><hr style="border:0;border-top:1px solid #e6e6e6;margin:0;"></td></tr>';
+    if (t === 'sep') return '<tr><td style="padding:8px 0;' + bst + '"><hr style="border:0;border-top:1px solid ' + P.line + ';margin:0;"></td></tr>';
     if (t === 'spazio') { var hh = parseInt(b.h, 10) || 20; return '<tr><td style="height:' + hh + 'px;line-height:' + hh + 'px;font-size:0;">&nbsp;</td></tr>'; }
     if (t === 'immagine') return tdOpen + 'padding:6px 0;"><img src="' + esc(b.url) + '" width="' + (parseInt(b.w, 10) || 200) + '" alt="' + esc((b.alt || '').trim() || (brand && brand.name) || 'EVOLAB') + '" style="display:inline-block;max-width:100%;height:auto;border:0;' + (b.st && b.st.radius ? 'border-radius:' + parseInt(b.st.radius, 10) + 'px;' : '') + '"></td></tr>';
-    if (t === 'titolo') { var s1 = (b.size === 'grande') ? '25px' : '20px'; return tdOpen + 'padding:8px 0 3px;font:700 ' + s1 + '/1.3 Arial,Helvetica,sans-serif;color:' + (b.st && b.st.color || '#1a1a1a') + ';">' + esc(b.testo) + '</td></tr>'; }
-    if (t === 'testo') { var s2 = (b.size === 'grande') ? '17px' : '15px'; return tdOpen + 'padding:5px 0;font:400 ' + s2 + '/1.65 Arial,Helvetica,sans-serif;color:' + (b.st && b.st.color || '#333') + ';">' + esc(b.testo).replace(/\n/g, '<br>') + '</td></tr>'; }
+    if (t === 'titolo') { var s1 = (b.size === 'grande') ? '25px' : '20px'; return tdOpen + 'padding:8px 0 3px;font:700 ' + s1 + '/1.3 Arial,Helvetica,sans-serif;color:' + (b.st && b.st.color || P.ink) + ';">' + esc(b.testo) + '</td></tr>'; }
+    if (t === 'testo') { var s2 = (b.size === 'grande') ? '17px' : '15px'; return tdOpen + 'padding:5px 0;font:400 ' + s2 + '/1.65 Arial,Helvetica,sans-serif;color:' + (b.st && b.st.color || P.text) + ';">' + esc(b.testo).replace(/\n/g, '<br>') + '</td></tr>'; }
     if (t === 'pulsante') {
       var url = String(b.url || '').trim();
       if (!/^\{\{.+\}\}$/.test(url) && !/^https?:\/\//i.test(url)) url = (brand && brand.linkBase) || 'https://321.al/';
@@ -87,6 +95,7 @@
     doc = normDoc(JSON.parse(JSON.stringify(doc || {})), 'email');
     brand = brand || {};
     var st = doc.settings, accent = st.accent, rowsHtml = '';
+    var P = emailPalette(st);
     doc.rows.forEach(function (row) {
       var cols = row.cols, tot = 0;
       cols.forEach(function (c) { tot += parseInt(c.w, 10) || 0; });
@@ -97,7 +106,7 @@
       cols.forEach(function (c) {
         var pct = Math.round(((parseInt(c.w, 10) || (12 / cols.length)) / tot) * 100) + '%';
         var mods = '';
-        c.blocks.forEach(function (b) { mods += moduloEmail(b, accent, brand); });
+        c.blocks.forEach(function (b) { mods += moduloEmail(b, accent, brand, P); });
         var cpad = (c.st && c.st.pad != null && c.st.pad !== '') ? (parseInt(c.st.pad, 10) + 'px') : '6px 12px';
         cells += '<td' + (keep ? '' : ' class="eb-col"') + ' width="' + pct + '" valign="top" style="padding:' + cpad + ';' + (c.st && c.st.bg ? 'background:' + c.st.bg + ';' : '') + (c.st && c.st.radius ? 'border-radius:' + parseInt(c.st.radius, 10) + 'px;' : '') + '">'
           + '<table role="presentation" width="100%" cellpadding="0" cellspacing="0">' + mods + '</table></td>';
@@ -110,14 +119,15 @@
     var footer = brand.footer || 'EVOLAB · 321.al';
     /* footer multi-riga: le righe separate da \n sono divise da una linea sottilissima */
     var footHtml = String(footer).split(/\n+/).map(function (l) { return esc(l).replace(/•/g, '&bull;'); })
-      .join('<div style="border-top:1px solid #e6e6e6;width:150px;margin:7px auto;height:0;font-size:0;line-height:0;">&nbsp;</div>');
+      .join('<div style="border-top:1px solid ' + P.line + ';width:150px;margin:7px auto;height:0;font-size:0;line-height:0;">&nbsp;</div>');
     return '<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+      + (P.dark ? '<meta name="color-scheme" content="dark"><meta name="supported-color-schemes" content="dark">' : '')
       + '<style>@media (max-width:520px){.eb-col{display:block!important;width:100%!important;}}</style></head>'
-      + '<body style="margin:0;padding:0;background:' + st.bg + ';">'
-      + '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:' + st.bg + ';padding:26px 0;"><tr><td align="center">'
-      + '<table role="presentation" width="' + parseInt(st.width, 10) + '" cellpadding="0" cellspacing="0" style="width:' + parseInt(st.width, 10) + 'px;max-width:100%;background:#ffffff;border-radius:14px;overflow:hidden;border:1px solid #e6e6e6;">'
+      + '<body style="margin:0;padding:0;background:' + P.bg + ';">'
+      + '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:' + P.bg + ';padding:26px 0;"><tr><td align="center">'
+      + '<table role="presentation" width="' + parseInt(st.width, 10) + '" cellpadding="0" cellspacing="0" style="width:' + parseInt(st.width, 10) + 'px;max-width:100%;background:' + P.card + ';border-radius:14px;overflow:hidden;border:1px solid ' + P.line + ';">'
       + rowsHtml
-      + '<tr><td align="center" style="padding:16px 26px;border-top:1px solid #eee;font:400 12px Arial,Helvetica,sans-serif;color:#999;text-align:center;">' + footHtml + '</td></tr>'
+      + '<tr><td align="center" style="padding:16px 26px;border-top:1px solid ' + P.line + ';font:400 12px Arial,Helvetica,sans-serif;color:' + P.muted + ';text-align:center;">' + footHtml + '</td></tr>'
       + '</table></td></tr></table></body></html>';
   }
   function renderText(doc) {
@@ -646,6 +656,15 @@
       }
       // GENERALI
       sideBody.appendChild(h('p', { class: 'eb-tit', text: 'Impostazioni generali' }));
+      if (mode === 'email') {
+        var thw = field('Tema della mail'), thg = h('div', { class: 'eb-seg' });
+        [['chiara', 'Chiara'], ['scura', 'Scura']].forEach(function (p) {
+          var tb = h('button', { type: 'button', class: 'eb-seg-b' + ((doc.settings.theme || 'chiara') === p[0] ? ' on' : ''), text: p[1] });
+          tb.addEventListener('click', function () { doc.settings.theme = p[0]; render(); });
+          thg.appendChild(tb);
+        });
+        thw.appendChild(thg); sideBody.appendChild(thw);
+      }
       sideBody.appendChild(ctrlColorNul(doc.settings, 'bg', 'Sfondo ' + (mode === 'page' ? 'della pagina' : 'della mail')));
       sideBody.appendChild(ctrlColorNul(doc.settings, 'accent', 'Colore pulsanti'));
       sideBody.appendChild(ctrlRange(doc.settings, 'width', 'Larghezza contenuto', mode === 'page' ? 640 : 480, mode === 'page' ? 1280 : 700, 10));

@@ -10,7 +10,9 @@
  * {{mittente}} {{link}}. Il link porta nell'app con &ref=<mittente>: chi entra da lì
  * fa scattare il referral della community (claim_referral al login).
  *
- * URL: /lp.php?s=<slug>[&poi=<uuid>|&trip=<uuid>|&route=<uuid>][&ref=<handle>]
+ * URL: /lp.php?s=<slug>[&poi=<uuid>|&trip=<uuid>|&route=<uuid>|&join=<codice>][&ref=<handle>]
+ * Uso 'compagnia': &join=<codice> compila {{codice}} e il link porta l'invitato
+ * direttamente nel flusso di adesione (?join=CODICE, gestito dall'app al login).
  */
 require __DIR__ . '/seo_lib.php';
 
@@ -35,7 +37,11 @@ if (!preg_match('/^[A-Za-z0-9_.\-]{1,60}$/', $ref)) { $ref = ''; }
 
 /* ── dati dell'azione (POI / itinerario / rotta) ── */
 $uuid = '/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i';
-$titolo = ''; $descr = ''; $foto = ''; $link = 'https://poilove.com/';
+$titolo = ''; $descr = ''; $foto = ''; $link = 'https://poilove.com/'; $codice = '';
+if ($tfor === 'compagnia' && isset($_GET['join']) && preg_match('/^[A-Za-z0-9]{4,12}$/', (string) $_GET['join'])) {
+  $codice = strtoupper((string) $_GET['join']);
+  $link = 'https://poilove.com/?join=' . rawurlencode($codice);
+}
 if ($tfor === 'poi' && isset($_GET['poi']) && preg_match($uuid, (string) $_GET['poi'])) {
   $pid = (string) $_GET['poi'];
   $p = seo_get('pois?id=eq.' . $pid . '&select=id,title,description,cover_photo,photos&limit=1');
@@ -66,6 +72,7 @@ $map = [
   '{{foto}}'        => $e($foto),       // usato come src di un modulo immagine
   '{{mittente}}'    => $ref !== '' ? $e('@' . $ref) : 'POI&bull;LOVE', // neutro: la frase intorno cambia lingua da sola
   '{{link}}'        => $e($link),
+  '{{codice}}'      => $e($codice),
 ];
 $html = strtr($html, $map);
 

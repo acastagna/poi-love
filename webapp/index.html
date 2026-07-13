@@ -4707,11 +4707,10 @@ async function loadCompHeader(){
 }
 async function compInviteCode(code){
   if(!code) return;
-  const url='https://poilove.com/?join='+code;
+  // Landing brandizzata col codice compilato ({{codice}}), altrimenti il link diretto ?join=; foglio proprietario
+  const url=_lpUrl('compagnia',{join:code})||('https://poilove.com/?join='+code);
   const txt=t('cv_invite_txt','Unisciti alla mia compagnia su POI•LOVE col codice {code}: {url}').replace('{code}',code).replace('{url}',url);
-  try{ if(navigator.share){ await navigator.share({title:'POI•LOVE', text:txt, url}); return; } }catch(_){ return; }
-  try{ await navigator.clipboard.writeText(code); }catch(_){}
-  showToast(t('cv_code_copied','Codice copiato: dallo agli amici per farli entrare'));
+  openShareSheet({ title:'POI•LOVE', url, text:txt });
 }
 
 
@@ -7487,8 +7486,9 @@ function closeRouteDetail(){ const ov=document.getElementById('routeDetailOv'); 
 function shareRoute(routeId){
   const r=(typeof HISTORIC_ROUTES!=='undefined'&&HISTORIC_ROUTES.find(x=>x.id===routeId))||TRIPS[routeId];
   if(!r) return;
-  const base=(r.is_historic!==false)?'route.php':'trip.php';
-  const url='https://poilove.com/'+base+'?id='+encodeURIComponent(r.dbId||r.id);
+  const isH=(r.is_historic!==false), rid=r.dbId||r.id;
+  const url=(isH?_lpUrl('route',{route:rid}):_lpUrl('trip',{trip:rid}))
+    || ('https://poilove.com/'+(isH?'route.php':'trip.php')+'?id='+encodeURIComponent(rid));
   openShareSheet({ title:(r.name||'POI•LOVE'), url, text:(r.name||'')+' · '+t('route_share_txt','una rotta storica su POI•LOVE') });
 }
 function _escAttr(s){ return String(s||'').replace(/'/g,'%27').replace(/"/g,'%22'); }
@@ -8011,7 +8011,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='3.35';
+const APP_VERSION='3.36';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
@@ -9170,10 +9170,9 @@ function navigateToPoi(lat, lng, name){
 async function sharePoiByKey(key){
   const p = _poiFromKey(key);
   if(!p) return;
-  const url = p.id
-    ? `https://poilove.com/poi.php?id=${p.id}`
-    : `https://www.google.com/maps?q=${p.lat},${p.lng}`;
-  const text = `${p.name} — ${p.address||''}`;
+  const url = (p.id && _lpUrl('poi',{poi:p.id}))
+    || (p.id ? `https://poilove.com/poi.php?id=${p.id}` : `https://www.google.com/maps?q=${p.lat},${p.lng}`);
+  const text = `${p.name}${p.address?(' — '+p.address):''}`;
   openShareSheet({ title: p.name, url, text, community: !!p.id });
 }
 
@@ -10764,7 +10763,7 @@ async function createCompagnia(){
     const recipients = invites.split(/[,;\s]+/).map(s=>s.trim()).filter(s=>s.includes('@'));
     if(recipients.length){
       const senderName = currentUser?.user_metadata?.full_name || currentUser?.user_metadata?.name || 'Un amico';
-      const joinUrl = `https://poilove.com/?join=${code}`;
+      const joinUrl = _lpUrl('compagnia',{join:code}) || `https://poilove.com/?join=${code}`;
       const subject = t('comp_invite_subject','{sender} ti ha invitato a unirti a "{name}" su POI•LOVE').replace('{sender}', senderName).replace('{name}', name);
       const inviteLine = t('comp_invite_line','{sender} ti invita a unirti a "{name}": {type}.').replace('{sender}', senderName).replace('{name}', name).replace('{type}', typeLabel);
       const body = `${t('comp_invite_hello','Ciao!')}\n\n${inviteLine}\n`+
@@ -11614,7 +11613,9 @@ function openShareSheet(opts){
   opts=opts||{};
   const url=opts.url||location.href;
   const title=opts.title||'POI•LOVE';
-  _shareCtx={ title, url, text: opts.text || (title+' — '+url), community: !!opts.community };
+  // Il link deve SEMPRE viaggiare col testo (WhatsApp/X/email usano solo il testo)
+  const text=opts.text ? (String(opts.text).indexOf(url)>=0 ? opts.text : opts.text+'\n'+url) : (title+' — '+url);
+  _shareCtx={ title, url, text, community: !!opts.community };
   // La sezione Follower/Amici ha senso solo per i POI della community
   document.querySelectorAll('#sharePoiDisambigOv .share-community-only')
     .forEach(el=>{ el.style.display=_shareCtx.community?'':'none'; });
@@ -11623,8 +11624,10 @@ function openShareSheet(opts){
 /* ── Disambiguation: Condividi il POI del dettaglio ── */
 function openPoiShareDisambig(){
   if(!currentPOI) return;
-  const url=currentPOI.id?('https://poilove.com/poi.php?id='+currentPOI.id):('https://poilove.com/?at='+currentPOI.lat+','+currentPOI.lng);
-  openShareSheet({ title: currentPOI.name||'POI•LOVE', url, text:(currentPOI.name||'')+' — '+(currentPOI.address||url), community:true });
+  // Landing brandizzata quando il modello è pubblicato, altrimenti la pagina OG diretta
+  const url=(currentPOI.id&&_lpUrl('poi',{poi:currentPOI.id}))
+    || (currentPOI.id?('https://poilove.com/poi.php?id='+currentPOI.id):('https://poilove.com/?at='+currentPOI.lat+','+currentPOI.lng));
+  openShareSheet({ title: currentPOI.name||'POI•LOVE', url, text:(currentPOI.name||'')+(currentPOI.address?(' — '+currentPOI.address):''), community:true });
 }
 function closeSharePoiDisambig(){
   document.getElementById('sharePoiDisambigOv').classList.remove('open');
@@ -11992,16 +11995,13 @@ async function loadLevelThresholds(){
 async function loadCommTemplates(){
   if(!sb) return;
   try{
-    if(!window._lpPoiSlug){
-      const {data}=await sb.from('landing_pages').select('slug,template_for').eq('published',true).eq('template_for','poi').limit(1);
-      if(data&&data[0]) window._lpPoiSlug=data[0].slug;
-    }
-  }catch(_){}
-  try{
-    if(!window._lpInviteSlug){
-      const {data}=await sb.from('landing_pages').select('slug,template_for').eq('published',true).eq('template_for','invito').limit(1);
-      if(data&&data[0]) window._lpInviteSlug=data[0].slug;
-    }
+    // Un solo giro: le landing modello pubblicate per OGNI azione di condivisione
+    const {data}=await sb.from('landing_pages').select('slug,template_for').eq('published',true).in('template_for',['poi','trip','route','invito','compagnia']);
+    const m=window._lpSlugs||{};
+    (data||[]).forEach(r=>{ if(!m[r.template_for]) m[r.template_for]=r.slug; });
+    window._lpSlugs=m;
+    window._lpPoiSlug=m.poi||window._lpPoiSlug;
+    window._lpInviteSlug=m.invito||window._lpInviteSlug;
   }catch(_){}
   try{
     if(!window._myHandle && currentUser&&currentUser.id){
@@ -12009,6 +12009,15 @@ async function loadCommTemplates(){
       if(u&&u.username) window._myHandle=u.username;
     }
   }catch(_){}
+}
+// Link alla landing brandizzata per un'azione (lingua automatica, chiaro/scuro, referral del mittente).
+// Ritorna null se il modello non è pubblicato: chi chiama tiene il suo link diretto di riserva.
+function _lpUrl(kind, qs){
+  const s=(window._lpSlugs||{})[kind]; if(!s) return null;
+  let u='https://poilove.com/lp.php?s='+encodeURIComponent(s);
+  for(const k in (qs||{})) u+='&'+k+'='+encodeURIComponent(qs[k]);
+  if(window._myHandle) u+='&ref='+encodeURIComponent(window._myHandle);
+  return u;
 }
 function _catLabel(c){ return (lang==='sq'?c.label_sq:lang==='en'?c.label_en:c.label_it)||c.label_it; }
 // Etichetta da key: se non è in tassonomia (slug custom non ancora sincronizzato) mostra comunque un testo leggibile.
@@ -13211,7 +13220,7 @@ function shareReferralVia(platform){
     telegram:'https://t.me/share/url?url='+url+'&text='+text,
     facebook:'https://www.facebook.com/sharer/sharer.php?u='+url,
     linkedin:'https://www.linkedin.com/sharing/share-offsite/?url='+url,
-    x:'https://twitter.com/intent/tweet?text='+text+'&url='+url
+    x:'https://x.com/intent/tweet?text='+text+'&url='+url
   };
   if(links[platform]){ window.open(links[platform],'_blank','noopener'); _awardShare('profile'); }
 }
@@ -14586,17 +14595,15 @@ async function shareStop(type){
   const mapsUrl=hasCoord?`https://www.google.com/maps?q=${s.lat},${s.lng}`:`https://www.google.com/maps/search/${encodeURIComponent(s.name+' '+(s.region||''))}`;
   // type 'mappa' = apri direttamente la posizione nelle mappe
   if(type==='mappa'){ window.open(mapsUrl,'_blank','noopener'); return; }
-  // type 'amico' = condividi la tappa (posizione reale + eventuale link itinerario pubblico)
-  const tripUrl=(t&&t.visibility==='pub')?('https://poilove.com/trip.php?id='+encodeURIComponent(t.dbId||t.id)):'';
+  // type 'amico' = condividi la tappa (posizione reale + eventuale landing itinerario pubblico), foglio proprietario
+  const tid=t?(t.dbId||t.id):null;
+  const tripUrl=(t&&t.visibility==='pub')?(_lpUrl('trip',{trip:tid})||('https://poilove.com/trip.php?id='+encodeURIComponent(tid))):'';
   const lines=[`📍 ${s.name}`]; if(s.region) lines.push(s.region);
   if(s.date) lines.push(window.t('stop_f_date','Data')+': '+_fmtStopDate(s.date));
   lines.push(mapsUrl); if(tripUrl) lines.push(window.t('trip_share_line','Itinerario su POI•LOVE:')+' '+tripUrl);
   const text=lines.join('\n');
   const title=`${s.name} · POI•LOVE`;
-  try{
-    if(navigator.share){ await navigator.share({ title, text, url: tripUrl||mapsUrl }); }
-    else { await navigator.clipboard.writeText(text); showToast(window.t('stop_share_copied','Copiato: incollalo dove vuoi')); }
-  }catch(e){ /* utente ha annullato lo share: nessun errore */ }
+  openShareSheet({ title, url: tripUrl||mapsUrl, text });
 }
 function refreshStops(tripId){
   const el=document.getElementById('stops-'+tripId);
@@ -14681,11 +14688,10 @@ async function shareTripLink(tripId){
     setTripVis(tripId,'pub');   // aggiorna i bottoni + salva su DB
   }
   const id=t.dbId||t.id;
-  const url='https://poilove.com/trip.php?id='+encodeURIComponent(id);
+  // Landing brandizzata quando pubblicata, altrimenti la pagina OG diretta; sempre il foglio proprietario
+  const url=_lpUrl('trip',{trip:id})||('https://poilove.com/trip.php?id='+encodeURIComponent(id));
   const txt=(t.name||'Itinerario')+' · '+window.t('trip_share_txt','un itinerario su POI•LOVE');
-  let shared=false;
-  try{ if(navigator.share){ await navigator.share({title:'POI•LOVE', text:txt, url}); shared=true; } }catch(_){ /* annullato o non riuscito: passo alla copia */ }
-  if(!shared){ try{ await navigator.clipboard.writeText(url); showToast(window.t('trip_link_copied','Link copiato: incollalo dove vuoi')); }catch(_){ showToast(url); } }
+  openShareSheet({ title:(t.name||'POI•LOVE'), url, text:txt });
 }
 // Pool di cover per rotazione locale (source.unsplash.com è deprecato)
 const TRIP_COVERS={
