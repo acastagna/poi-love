@@ -67,8 +67,15 @@ Deno.serve(async (req: Request) => {
   let subject = String(payload.subject || "");
   let html = String(payload.html || "");
   if (payload.template_key) {
-    const { data: tpl } = await svc.from("email_templates")
-      .select("subject,body_html").eq("key", payload.template_key).eq("lang", payload.lang || "it").maybeSingle();
+    // lingua richiesta (sq/it/en), con ripiego sull'italiano se il template in quella lingua non esiste
+    const wantLang = String(payload.lang || "it").toLowerCase();
+    let { data: tpl } = await svc.from("email_templates")
+      .select("subject,body_html").eq("key", payload.template_key).eq("lang", wantLang).eq("active", true).maybeSingle();
+    if (!tpl && wantLang !== "it") {
+      const fb = await svc.from("email_templates")
+        .select("subject,body_html").eq("key", payload.template_key).eq("lang", "it").eq("active", true).maybeSingle();
+      tpl = fb.data;
+    }
     if (!tpl) return json({ ok: false, error: "template not found" }, 404);
     subject = render(tpl.subject, vars);
     html = render(tpl.body_html, vars);

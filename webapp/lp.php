@@ -64,7 +64,7 @@ $map = [
   '{{titolo}}'      => $e($titolo),
   '{{descrizione}}' => $e($descr),
   '{{foto}}'        => $e($foto),       // usato come src di un modulo immagine
-  '{{mittente}}'    => $ref !== '' ? $e('@' . $ref) : $e('un amico di POI•LOVE'),
+  '{{mittente}}'    => $ref !== '' ? $e('@' . $ref) : 'POI&bull;LOVE', // neutro: la frase intorno cambia lingua da sola
   '{{link}}'        => $e($link),
 ];
 $html = strtr($html, $map);
