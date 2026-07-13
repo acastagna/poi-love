@@ -8011,7 +8011,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='3.33';
+const APP_VERSION='3.34';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
@@ -11998,6 +11998,12 @@ async function loadCommTemplates(){
     }
   }catch(_){}
   try{
+    if(!window._lpInviteSlug){
+      const {data}=await sb.from('landing_pages').select('slug,template_for').eq('published',true).eq('template_for','invito').limit(1);
+      if(data&&data[0]) window._lpInviteSlug=data[0].slug;
+    }
+  }catch(_){}
+  try{
     if(!window._myHandle && currentUser&&currentUser.id){
       const {data:u}=await sb.from('profiles').select('username').eq('id',currentUser.id).maybeSingle();
       if(u&&u.username) window._myHandle=u.username;
@@ -13156,7 +13162,22 @@ function copyMyProfileLink(){
 // ══ REFERRAL — "Diffondi POI•LOVE": popup proprietario con codice invito, email, social ══
 // Il link porta ?ref=handle; col backend i punti verranno accreditati a iscrizione confermata.
 function _referralHandle(){ return getVanityHandle(currentUser)||'tu'; }
-function _referralUrl(){ return 'https://poilove.com/?ref='+encodeURIComponent(_referralHandle()); }
+function _referralUrl(){
+  // Se esiste la landing modello "invito" (pannello admin), l'invito porta LÌ:
+  // pagina brandizzata, lingua automatica, chiaro/scuro, referral del mittente.
+  if(window._lpInviteSlug) return 'https://poilove.com/lp.php?s='+encodeURIComponent(window._lpInviteSlug)+'&ref='+encodeURIComponent(_referralHandle());
+  return 'https://poilove.com/?ref='+encodeURIComponent(_referralHandle());
+}
+// Testi di invito nella lingua dell'app (SQ/IT/EN)
+function _referralTexts(){
+  const T3={
+    it:{subj:'Ti aspetto su POI•LOVE', body:'Ciao!\n\nHo scoperto POI•LOVE, la mappa dei luoghi del cuore: posti veri, amati dalle persone, non scelti da un algoritmo.\n\nUnisciti a me qui:\n{URL}\n\nA presto su POI•LOVE!', social:'Scopri POI•LOVE, la mappa dei luoghi del cuore. Unisciti a me!'},
+    sq:{subj:'Të pres në POI•LOVE', body:'Përshëndetje!\n\nZbulova POI•LOVE, hartën e vendeve të zemrës: vende të vërteta, të dashura nga njerëzit, jo të zgjedhura nga një algoritëm.\n\nBashkohu me mua këtu:\n{URL}\n\nShihemi në POI•LOVE!', social:'Zbulo POI•LOVE, hartën e vendeve të zemrës. Bashkohu me mua!'},
+    en:{subj:'Join me on POI•LOVE', body:'Hi!\n\nI discovered POI•LOVE, the map of the places of the heart: real places, loved by people, not picked by an algorithm.\n\nJoin me here:\n{URL}\n\nSee you on POI•LOVE!', social:'Discover POI•LOVE, the map of the places of the heart. Join me!'}
+  };
+  const p=T3[lang]||T3.it;
+  return {subj:p.subj, body:p.body.replace('{URL}',_referralUrl()), social:p.social};
+}
 function shareReferral(){
   const code=document.getElementById('referralCode');
   if(code) code.textContent='@'+_referralHandle();
@@ -13172,16 +13193,19 @@ function copyReferralCode(){
 async function sendReferralEmail(){
   const inp=document.getElementById('referralEmail'); const to=(inp?.value||'').trim();
   if(!to || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(to)){ showToast('Inserisci una email valida'); inp?.focus(); return; }
-  // Per ora apre il client email (testo). Col backend partirà una mail HTML curata col template dedicato.
-  const subj=encodeURIComponent('Ti aspetto su POI•LOVE');
-  const body=encodeURIComponent('Ciao!\n\nHo scoperto POI•LOVE, la mappa dei luoghi del cuore: posti veri, amati dalle persone, non scelti da un algoritmo.\n\nUnisciti a me qui:\n'+_referralUrl()+'\n\nA presto su POI•LOVE!');
+  // Apre il client email dell'utente: il testo è nella lingua dell'app e il link
+  // porta alla LANDING brandizzata (lingua automatica + referral). La mail HTML
+  // dal server (template invito-amico) partirà quando il motore email sarà attivo.
+  const rt=_referralTexts();
+  const subj=encodeURIComponent(rt.subj);
+  const body=encodeURIComponent(rt.body);
   await _awardShare('profile');   // accredito il punto PRIMA di lasciare la pagina col mailto
   showToast('Apertura email per '+to);
   window.location.href='mailto:'+encodeURIComponent(to)+'?subject='+subj+'&body='+body;
 }
 function shareReferralVia(platform){
   const url=encodeURIComponent(_referralUrl());
-  const text=encodeURIComponent('Scopri POI•LOVE, la mappa dei luoghi del cuore. Unisciti a me!');
+  const text=encodeURIComponent(_referralTexts().social);
   const links={
     whatsapp:'https://wa.me/?text='+text+'%20'+url,
     telegram:'https://t.me/share/url?url='+url+'&text='+text,
