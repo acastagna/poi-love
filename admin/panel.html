@@ -563,7 +563,9 @@ html[data-theme="light"] .chip.green{color:#236b39}
 <script src="https://unpkg.com/exifr@7.1.3/dist/lite.umd.js" onerror="(function(){var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/exifr@7.1.3/dist/lite.umd.js';document.head.appendChild(s);})()"></script>
 <script src="js/color-picker.js?v=326"></script>
 <script src="js/media-manager.js?v=332"></script>
-<script src="js/mail-builder.js?v=333"></script>
+<script src="js/evolab-builder.js?v=334"></script>
+<script src="js/mail-builder.js?v=334"></script>
+<script src="js/landing-admin.js?v=334"></script>
 <script src="js/image-editor.js?v=326"></script>
 <script src="js/poi-frontend.js?v=327"></script>
 <script src="js/badge-admin.js?v=326"></script>
@@ -629,6 +631,9 @@ html[data-theme="light"] .chip.green{color:#236b39}
     </div>
     <div class="nav-item" data-sec="media" onclick="openSection('media')">
       <span class="ic"><i class="ph-duotone ph-share-network"></i></span><span class="label" data-t="nav_media">Media</span>
+    </div>
+    <div class="nav-item" data-sec="landing" onclick="openSection('landing')">
+      <span class="ic"><i class="ph-duotone ph-browser"></i></span><span class="label" data-t="nav_landing">Landing</span>
     </div>
     <div class="nav-item" data-sec="audit" onclick="openSection('audit')">
       <span class="ic"><i class="ph-duotone ph-scroll"></i></span><span class="label" data-t="nav_audit">Audit log</span>
@@ -988,6 +993,17 @@ html[data-theme="light"] .chip.green{color:#236b39}
       <div id="mtab-deeplink" class="mtab" style="display:none"></div>
       <div id="mtab-pixel"    class="mtab" style="display:none"></div>
     </section>
+
+    <!-- ═════════════════════ LANDING PAGE BUILDER (motore unico EvolabBuilder) ═════════════════════ -->
+    <section class="section" id="sec-landing">
+      <div class="panel">
+        <div class="card-h"><span class="ic"><i class="ph-duotone ph-browser"></i></span><span data-t="nav_landing">Landing</span>
+          <button class="btn sm gold" style="margin-left:auto" onclick="LandingAdmin.openBuilder(null)"><i class="ph-duotone ph-plus"></i> <span data-t="landing_new">Nuova landing</span></button>
+        </div>
+        <div class="sm" style="margin-bottom:10px" data-t="sub_landing">Pagine di atterraggio costruite col builder (righe, colonne, moduli). Le pubblicate vanno online su poilove.com/lp.php?s=indirizzo.</div>
+        <div id="landingTable"></div>
+      </div>
+    </section>
   </main>
 </div>
 
@@ -1021,7 +1037,7 @@ let aiBusy = false;       // richiesta al copilota in volo: blocca invii concorr
 const T = {
   it:{
     nav_dashboard:'Dashboard', nav_moderation:'Moderazione', nav_users:'Utenti', nav_ailimits:'Limiti AI',
-    nav_copilot:'Copilota AI', nav_create:'Crea', nav_audit:'Audit log', nav_media:'Media', sub_media:'Email, OpenGraph, deep link dhe pixel social', media_tab_images:'Immagini', media_tab_email:'Email', media_tab_og:'OpenGraph', media_tab_deeplink:'Deep link', media_tab_pixel:'Pixel social', nav_media:'Media', sub_media:'Immagini degli utenti, email, OpenGraph, deep link e pixel social', media_tab_images:'Immagini', media_tab_email:'Email', media_tab_og:'OpenGraph', media_tab_deeplink:'Deep link', media_tab_pixel:'Pixel social',
+    nav_copilot:'Copilota AI', nav_create:'Crea', nav_audit:'Audit log', nav_media:'Media', sub_media:'Email, OpenGraph, deep link dhe pixel social', nav_landing:'Landing', sub_landing:'Faqe uljeje te ndertuara me builder.', landing_new:'Landing e re', media_tab_images:'Immagini', media_tab_email:'Email', media_tab_og:'OpenGraph', media_tab_deeplink:'Deep link', media_tab_pixel:'Pixel social', nav_media:'Media', sub_media:'Immagini degli utenti, email, OpenGraph, deep link e pixel social', nav_landing:'Landing', sub_landing:'Pagine di atterraggio costruite col builder. Le pubblicate vanno online su poilove.com.', landing_new:'Nuova landing', media_tab_images:'Immagini', media_tab_email:'Email', media_tab_og:'OpenGraph', media_tab_deeplink:'Deep link', media_tab_pixel:'Pixel social',
     sub_dashboard:'Panoramica della piattaforma in tempo reale.',
     sub_moderation:'Segnalazioni da rivedere.', sub_users:'Gestione profili e moderazione.',
     sub_ailimits:'Quote e modelli AI per livello.', sub_copilot:'Assistente operativo con accesso ai dati.',
@@ -1219,7 +1235,7 @@ const T = {
   },
   en:{
     nav_dashboard:'Dashboard', nav_moderation:'Moderation', nav_users:'Users', nav_ailimits:'AI limits',
-    nav_copilot:'AI copilot', nav_create:'Create', nav_audit:'Audit log', nav_media:'Media', sub_media:'Email, OpenGraph, deep links and social pixels', media_tab_images:'Immagini', media_tab_email:'Email', media_tab_og:'OpenGraph', media_tab_deeplink:'Deep links', media_tab_pixel:'Social pixels',
+    nav_copilot:'AI copilot', nav_create:'Create', nav_audit:'Audit log', nav_media:'Media', sub_media:'Email, OpenGraph, deep links and social pixels', nav_landing:'Landing', sub_landing:'Landing pages built with the builder. Published ones go live on poilove.com.', landing_new:'New landing', media_tab_images:'Immagini', media_tab_email:'Email', media_tab_og:'OpenGraph', media_tab_deeplink:'Deep links', media_tab_pixel:'Social pixels',
     sub_dashboard:'Real-time overview of the platform.',
     sub_moderation:'Reports awaiting review.', sub_users:'Profile management and moderation.',
     sub_ailimits:'AI quotas and models per tier.', sub_copilot:'Operational assistant with data access.',
@@ -1499,7 +1515,7 @@ async function doLogout(){
 const SUBKEY = { dashboard:'sub_dashboard', moderation:'sub_moderation', users:'sub_users',
   ailimits:'sub_ailimits', copilot:'sub_copilot', create:'sub_create', pois:'sub_pois', routes:'sub_routes', audit:'sub_audit', categories:'sub_categories' , tags:'sub_tags', badges:'sub_badges', knowledge:'sub_knowledge', media:'sub_media' };
 const TITLEKEY = { dashboard:'nav_dashboard', moderation:'nav_moderation', users:'nav_users',
-  ailimits:'nav_ailimits', copilot:'nav_copilot', create:'nav_create', pois:'nav_pois', routes:'nav_routes', itineraries:'nav_itineraries', categories:'nav_categories', tags:'nav_tags', badges:'nav_badges', knowledge:'nav_knowledge', audit:'nav_audit', media:'nav_media' };
+  ailimits:'nav_ailimits', copilot:'nav_copilot', create:'nav_create', pois:'nav_pois', routes:'nav_routes', itineraries:'nav_itineraries', categories:'nav_categories', tags:'nav_tags', badges:'nav_badges', knowledge:'nav_knowledge', audit:'nav_audit', media:'nav_media', landing:'nav_landing' };
 
 function updateHeader(sec){
   document.getElementById('secTitle').textContent = t(TITLEKEY[sec]);
@@ -1535,6 +1551,7 @@ function runSection(sec){
     case 'knowledge': loadKnowledgeAdmin(); break;
     case 'audit': loadAudit(); break;
     case 'media': initMedia(); break;
+    case 'landing': if(window.LandingAdmin) LandingAdmin.load(); break;
   }
 }
 
