@@ -55,7 +55,7 @@
     if (!doc.settings.width) doc.settings.width = (mode === 'page' ? 960 : 600);
     if (!doc.settings.bg) doc.settings.bg = (mode === 'page' ? '#EAE4D8' : '#f4f4f5');
     if (!Array.isArray(doc.rows)) doc.rows = [];
-    doc.rows.forEach(function (r) { if (!r.st) r.st = {}; if (!Array.isArray(r.cols)) r.cols = [{ blocks: [], w: 12 }]; r.cols.forEach(function (c) { if (!c.st) c.st = {}; if (!Array.isArray(c.blocks)) c.blocks = []; c.blocks.forEach(function (b) { if (!b.st) b.st = {}; }); }); });
+    doc.rows.forEach(function (r) { if (!r.st) r.st = {}; if (r.bg && !r.st.bg) { r.st.bg = r.bg; } if (!Array.isArray(r.cols)) r.cols = [{ blocks: [], w: 12 }]; r.cols.forEach(function (c) { if (!c.st) c.st = {}; if (!Array.isArray(c.blocks)) c.blocks = []; c.blocks.forEach(function (b) { if (!b.st) b.st = {}; }); }); });
     return doc;
   }
 
@@ -322,7 +322,7 @@
       if (tipo === 'immagine') return { tipo: 'immagine', url: '', w: mode === 'page' ? 420 : 200, alt: '', align: 'center', st: {} };
       if (tipo === 'titolo') return { tipo: 'titolo', testo: 'Nuovo titolo', align: mode === 'page' ? 'center' : 'left', size: 'grande', st: {} };
       if (tipo === 'testo') return { tipo: 'testo', testo: mode === 'page' ? 'Racconta qui la tua offerta.' : ('Scrivi qui. Segnaposto: ' + PH + '.'), align: 'left', size: 'normale', st: {} };
-      if (tipo === 'pulsante') return { tipo: 'pulsante', testo: 'Scopri di più', url: mode === 'page' ? ((brand.linkBase || 'https://321.al/')) : '{{link}}', align: 'center', st: {} };
+      if (tipo === 'pulsante') return { tipo: 'pulsante', testo: 'Scopri di più', url: (opts.defaults && opts.defaults.buttonUrl) || (mode === 'page' ? ((brand.linkBase || 'https://321.al/')) : '{{link}}'), align: 'center', st: {} };
       if (tipo === 'spazio') return { tipo: 'spazio', h: 20, st: {} };
       if (tipo === 'video') return { tipo: 'video', testo: 'Guarda il video', url: '', st: {} };
       return { tipo: 'sep', st: {} };
