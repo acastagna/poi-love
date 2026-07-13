@@ -20,6 +20,7 @@ Tutto verificato DAL VIVO (mail: HTML dal DB; landing: screenshot su lp.php).
 - **Mail scura**: il motore ha il tema email Chiara/Scura (impostazioni generali del Mail Builder, engine v344); la mail invito-amico (3 lingue) ora è SCURA coi nuovi loghi trasparenti `logo-steso-alpha.png` / `logo-poivoice-alpha.png` (fondo bianco tolto matematicamente). Le altre mail restano chiare. Verificata live con screenshot.
 - Nota itinerari: la landing mostra i dati solo se l'itinerario è pubblico (RLS corretta); l'app rende pubblico l'itinerario prima di condividere, con conferma. Nessun itinerario pubblico esiste ancora nel DB.
 - DA FARE quando arriva ACUMBA_KEY: canale email del foglio → invio della MAIL brandizzata dal server (oggi apre il client di posta con testo+link landing); serve allargare send-email ai non-admin SOLO per i template di invito, con tetto giornaliero.
+- **Teaser POI allineato alla regola "storia visibile, punto protetto" (deciso col founder 13/07)**: da sloggato il POI condiviso ora mostra nome vero, foto in chiaro (niente blur) e zona; lat/lng restano FUORI anche dalla risposta di rete. Testi nuovi in 3 lingue: "Entra gratis e aprilo sulla mappa", "punto esatto, navigazione e love si sbloccano dopo l'accesso" (v3.37). Verificato live da ospite con POI reale.
 - Resta aperto: sottodominio builder.321.al (serve OK esplicito per crearlo su Plesk).
 
 ## Sessione 12/07/2026 (seguito lungo) — Immagini multi-sorgente, tastiera, ruoli
