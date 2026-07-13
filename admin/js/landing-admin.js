@@ -30,15 +30,17 @@
       pickImage: function (cb) { if (window.POIMedia && window.POIMedia.pick) window.POIMedia.pick({ kind: 'og', onPick: cb }); else cb(null); },
       headFields: [
         { key: 'slug', label: 'indirizzo (es. lancio-tirana)', value: lp.slug || '', width: '190px' },
-        { key: 'title', label: 'Titolo della pagina', value: lp.title || '' }
+        { key: 'title', label: 'Titolo della pagina', value: lp.title || '' },
+        { key: 'template_for', type: 'select', value: lp.template_for || 'libera', options: [['libera', 'Uso: pagina libera'], ['poi', 'Uso: condivisione POI'], ['trip', 'Uso: condivisione itinerario'], ['route', 'Uso: condivisione rotta'], ['evento', 'Uso: evento/lancio']] }
       ],
+      placeholders: '{{titolo}} {{descrizione}} {{foto}} {{mittente}} {{link}}',
       onSave: function (doc, html, text, vals) {
         var db = sb(); if (!db) return false;
         var slug = (vals.slug || '').trim().toLowerCase().replace(/[^a-z0-9\-]/g, '-').replace(/\-+/g, '-').replace(/^\-|\-$/g, '');
         if (slug.length < 2) { toast('Dai un indirizzo alla landing (es. lancio-tirana)', 'err'); return false; }
         // il titolo entra nella pagina resa
         html = (window.EvolabBuilder).renderPage(doc, { accent: '#D42B2B', footer: 'POI•LOVE · 321.al / EVOLAB', name: 'POI•LOVE', linkBase: 'https://poilove.com/', title: (vals.title || slug) });
-        var rec = { slug: slug, title: (vals.title || '').trim() || slug, design: doc, html: html, updated_at: new Date().toISOString() };
+        var rec = { slug: slug, title: (vals.title || '').trim() || slug, template_for: vals.template_for || 'libera', design: doc, html: html, updated_at: new Date().toISOString() };
         if (!lp.id && window.ME) rec.created_by = window.ME.id;
         var q = lp.id ? db.from('landing_pages').update(rec).eq('id', lp.id).select('id')
                       : db.from('landing_pages').insert(rec).select('id');
@@ -67,6 +69,8 @@
         h('div', { class: 'ttl', text: lp.title || lp.slug }),
         h('div', { class: 'sm', style: 'opacity:.8', text: '/lp.php?s=' + lp.slug })
       ]));
+      var USO = { libera: 'Libera', poi: 'POI', trip: 'Itinerario', route: 'Rotta', evento: 'Evento' };
+      row.appendChild(h('span', { class: 'chip gold', text: 'Uso: ' + (USO[lp.template_for] || 'Libera') }));
       row.appendChild(h('span', { class: 'chip ' + (lp.published ? 'green' : 'dim'), text: lp.published ? 'Pubblicata' : 'Bozza' }));
       if (lp.published) row.appendChild(h('a', { class: 'btn sm', href: BASE + encodeURIComponent(lp.slug), target: '_blank', rel: 'noopener', html: '<i class="ph-duotone ph-arrow-square-out"></i> Apri' }));
       row.appendChild(h('button', { class: 'btn sm ' + (lp.published ? '' : 'green'), text: lp.published ? 'Metti in bozza' : 'Pubblica', onclick: async function () {

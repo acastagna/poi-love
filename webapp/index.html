@@ -7653,9 +7653,15 @@ function onNameInput(_val){
 function updateShareLink(lat, lng, poiId=null){
   // Se abbiamo l'ID DB usiamo ?poi=id (link stabile, usa il record)
   // Altrimenti ?at=lat,lng (coordine, per POI non ancora salvati)
-  const link = poiId
-    ? `https://poilove.com/poi.php?id=${poiId}`
-    : `https://poilove.com?at=${lat.toFixed(5)},${lng.toFixed(5)}`;
+  let link;
+  if(poiId && window._lpPoiSlug){
+    // Modello landing per i POI (pannello admin): condivisione autocompilata + referral del mittente
+    link='https://poilove.com/lp.php?s='+encodeURIComponent(window._lpPoiSlug)+'&poi='+poiId+(window._myHandle?('&ref='+encodeURIComponent(window._myHandle)):'');
+  } else {
+    link = poiId
+      ? `https://poilove.com/poi.php?id=${poiId}`
+      : `https://poilove.com?at=${lat.toFixed(5)},${lng.toFixed(5)}`;
+  }
   const txtA = document.getElementById('shareLinkTxt');
   const txtB = document.getElementById('detailShareLinkTxt');
   if(txtA) txtA.textContent = link;
@@ -8005,7 +8011,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='3.31';
+const APP_VERSION='3.32';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
@@ -8029,7 +8035,8 @@ document.addEventListener('visibilitychange',()=>{ if(!document.hidden) _checkFo
 // Le rotte storiche pubblicate sono contenuto PUBBLICO: si caricano per tutti,
 // loggati o no (piccolo ritardo per lasciar nascere mappa e client).
 setTimeout(()=>{ try{ loadHistoricRoutes(); }catch(e){} }, 900);
-setTimeout(()=>{ try{ loadPoiCategories(); }catch(e){} try{ loadBadges(); }catch(e){} }, 700);
+setTimeout(()=>{ try{ loadPoiCategories(); }catch(e){} try{ loadBadges(); }catch(e){} try{ loadLevelThresholds(); }catch(e){} try{ loadCommTemplates(); }catch(e){} }, 700);
+setTimeout(()=>{ try{ loadCommTemplates(); }catch(e){} }, 5000); // ritenta a login avvenuto (per l'handle del referral)
 setTimeout(()=>{ try{ loadIlliKnowledge(); }catch(e){} }, 750);
 // PRECARICA la lente: l'overlay viene reso invisibile ma presente per un attimo,
 // il magnifier si inizializza e scarica le prime tile. Alla prima apertura: istantanea.
@@ -11960,6 +11967,41 @@ async function loadBadges(){
     const {data,error}=await sb.from('badges').select('id,name,icon,color,text_color,active').eq('active',true);
     if(error||!data) return;
     _BADGES={}; data.forEach(b=>{ _BADGES[b.id]=b; }); window.BADGES=_BADGES;
+  }catch(_){}
+}
+// Soglie dei livelli REGOLABILI dal pannello admin (Punti): gamification_config.level_thresholds.
+async function loadLevelThresholds(){
+  if(!sb) return;
+  try{
+    const {data}=await sb.from('gamification_config').select('value').eq('key','level_thresholds').maybeSingle();
+    const th=data&&data.value; if(!th||typeof th!=='object') return;
+    const pairs=Object.entries(th).map(([label,min])=>({label,min:parseInt(min,10)||0})).sort((a,b)=>a.min-b.min);
+    if(!pairs.length) return;
+    pairs.forEach((p,i)=>{
+      const b=BADGES.find(x=>(x.label||'').toLowerCase()===p.label.toLowerCase());
+      const max=(i<pairs.length-1)?(pairs[i+1].min-1):Infinity;
+      if(b){ b.min=p.min; b.max=max; }
+      else BADGES.push({min:p.min,max:max,key:'tier_lvl_custom_'+i,label:p.label,icon:'ph-fill ph-star',dark:'#B45309',style:'background:rgba(245,158,11,.2);color:#FDE68A;border-color:rgba(245,158,11,.35)'});
+    });
+    BADGES.sort((a,b)=>a.min-b.min);
+    if(typeof renderBadge==='function' && typeof currentPoints!=='undefined') renderBadge(currentPoints);
+  }catch(_){}
+}
+// Landing di comunicazione (pannello admin, Landing e Mail): se esiste il modello per i POI,
+// la condivisione usa la landing autocompilata (+ referral del mittente = punti community).
+async function loadCommTemplates(){
+  if(!sb) return;
+  try{
+    if(!window._lpPoiSlug){
+      const {data}=await sb.from('landing_pages').select('slug,template_for').eq('published',true).eq('template_for','poi').limit(1);
+      if(data&&data[0]) window._lpPoiSlug=data[0].slug;
+    }
+  }catch(_){}
+  try{
+    if(!window._myHandle && currentUser&&currentUser.id){
+      const {data:u}=await sb.from('profiles').select('username').eq('id',currentUser.id).maybeSingle();
+      if(u&&u.username) window._myHandle=u.username;
+    }
   }catch(_){}
 }
 function _catLabel(c){ return (lang==='sq'?c.label_sq:lang==='en'?c.label_en:c.label_it)||c.label_it; }

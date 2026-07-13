@@ -633,7 +633,10 @@ html[data-theme="light"] .chip.green{color:#236b39}
       <span class="ic"><i class="ph-duotone ph-share-network"></i></span><span class="label" data-t="nav_media">Media</span>
     </div>
     <div class="nav-item" data-sec="landing" onclick="openSection('landing')">
-      <span class="ic"><i class="ph-duotone ph-browser"></i></span><span class="label" data-t="nav_landing">Landing</span>
+      <span class="ic"><i class="ph-duotone ph-megaphone"></i></span><span class="label" data-t="nav_landing">Landing e Mail</span>
+    </div>
+    <div class="nav-item" data-sec="punti" onclick="openSection('punti')">
+      <span class="ic"><i class="ph-duotone ph-coins"></i></span><span class="label" data-t="nav_punti">Punti</span>
     </div>
     <div class="nav-item" data-sec="audit" onclick="openSection('audit')">
       <span class="ic"><i class="ph-duotone ph-scroll"></i></span><span class="label" data-t="nav_audit">Audit log</span>
@@ -982,27 +985,39 @@ html[data-theme="light"] .chip.green{color:#236b39}
     <section class="section" id="sec-media">
       <div class="ai-modes" style="margin-bottom:16px">
         <button class="ai-mode on" data-mtab="immagini" onclick="setMediaTab('immagini')"><i class="ph-duotone ph-images-square"></i> <span data-t="media_tab_images">Immagini</span></button>
-        <button class="ai-mode"    data-mtab="email"    onclick="setMediaTab('email')"><i class="ph-duotone ph-envelope-simple"></i> <span data-t="media_tab_email">Email</span></button>
         <button class="ai-mode"    data-mtab="og"       onclick="setMediaTab('og')"><i class="ph-duotone ph-share-fat"></i> <span data-t="media_tab_og">OpenGraph</span></button>
         <button class="ai-mode"    data-mtab="deeplink" onclick="setMediaTab('deeplink')"><i class="ph-duotone ph-link"></i> <span data-t="media_tab_deeplink">Deep link</span></button>
         <button class="ai-mode"    data-mtab="pixel"    onclick="setMediaTab('pixel')"><i class="ph-duotone ph-chart-line-up"></i> <span data-t="media_tab_pixel">Pixel social</span></button>
       </div>
       <div id="mtab-immagini" class="mtab"></div>
-      <div id="mtab-email"    class="mtab" style="display:none"></div>
       <div id="mtab-og"       class="mtab" style="display:none"></div>
       <div id="mtab-deeplink" class="mtab" style="display:none"></div>
       <div id="mtab-pixel"    class="mtab" style="display:none"></div>
     </section>
 
-    <!-- ═════════════════════ LANDING PAGE BUILDER (motore unico EvolabBuilder) ═════════════════════ -->
+    <!-- ═════════════ LANDING E MAIL: un solo strumento di comunicazione (motore unico EvolabBuilder) ═════════════ -->
     <section class="section" id="sec-landing">
-      <div class="panel">
-        <div class="card-h"><span class="ic"><i class="ph-duotone ph-browser"></i></span><span data-t="nav_landing">Landing</span>
-          <button class="btn sm gold" style="margin-left:auto" onclick="LandingAdmin.openBuilder(null)"><i class="ph-duotone ph-plus"></i> <span data-t="landing_new">Nuova landing</span></button>
-        </div>
-        <div class="sm" style="margin-bottom:10px" data-t="sub_landing">Pagine di atterraggio costruite col builder (righe, colonne, moduli). Le pubblicate vanno online su poilove.com/lp.php?s=indirizzo.</div>
-        <div id="landingTable"></div>
+      <div class="ai-modes" style="margin-bottom:16px">
+        <button class="ai-mode on" data-lmtab="landing" onclick="setLmTab('landing')"><i class="ph-duotone ph-browser"></i> <span data-t="lm_tab_landing">Landing</span></button>
+        <button class="ai-mode" data-lmtab="mail" onclick="setLmTab('mail')"><i class="ph-duotone ph-envelope-simple"></i> <span data-t="lm_tab_mail">Mail</span></button>
       </div>
+      <div id="lmtab-landing">
+        <div class="panel">
+          <div class="card-h"><span class="ic"><i class="ph-duotone ph-browser"></i></span><span data-t="lm_tab_landing">Landing</span>
+            <button class="btn sm gold" style="margin-left:auto" onclick="LandingAdmin.openBuilder(null)"><i class="ph-duotone ph-plus"></i> <span data-t="landing_new">Nuova landing</span></button>
+          </div>
+          <div class="sm" style="margin-bottom:10px" data-t="sub_landing">Strumenti di comunicazione, non pagine fini a se stesse: una landing per condividere un POI, un itinerario, una rotta, un evento. I campi {{...}} si riempiono da soli dall'azione (POI, mittente, referral).</div>
+          <div id="landingTable"></div>
+        </div>
+      </div>
+      <div id="lmtab-mail" style="display:none">
+        <div id="mtab-email" class="mtab"></div>
+      </div>
+    </section>
+
+    <!-- ═════════════════════ PUNTI: azioni e livelli regolabili (gamification) ═════════════════════ -->
+    <section class="section" id="sec-punti">
+      <div id="puntiBox"></div>
     </section>
   </main>
 </div>
@@ -1037,7 +1052,7 @@ let aiBusy = false;       // richiesta al copilota in volo: blocca invii concorr
 const T = {
   it:{
     nav_dashboard:'Dashboard', nav_moderation:'Moderazione', nav_users:'Utenti', nav_ailimits:'Limiti AI',
-    nav_copilot:'Copilota AI', nav_create:'Crea', nav_audit:'Audit log', nav_media:'Media', sub_media:'Email, OpenGraph, deep link dhe pixel social', nav_landing:'Landing', sub_landing:'Faqe uljeje te ndertuara me builder.', landing_new:'Landing e re', media_tab_images:'Immagini', media_tab_email:'Email', media_tab_og:'OpenGraph', media_tab_deeplink:'Deep link', media_tab_pixel:'Pixel social', nav_media:'Media', sub_media:'Immagini degli utenti, email, OpenGraph, deep link e pixel social', nav_landing:'Landing', sub_landing:'Pagine di atterraggio costruite col builder. Le pubblicate vanno online su poilove.com.', landing_new:'Nuova landing', media_tab_images:'Immagini', media_tab_email:'Email', media_tab_og:'OpenGraph', media_tab_deeplink:'Deep link', media_tab_pixel:'Pixel social',
+    nav_copilot:'Copilota AI', nav_create:'Crea', nav_audit:'Audit log', nav_media:'Media', sub_media:'Email, OpenGraph, deep link dhe pixel social', nav_landing:'Landing dhe Mail', lm_tab_landing:'Landing', lm_tab_mail:'Mail', sub_landing:'Mjete komunikimi te lidhura me veprimet.', landing_new:'Landing e re', nav_punti:'Pike', sub_punti:'Pike per veprim dhe pragjet e niveleve.', media_tab_images:'Immagini', media_tab_email:'Email', media_tab_og:'OpenGraph', media_tab_deeplink:'Deep link', media_tab_pixel:'Pixel social', nav_media:'Media', sub_media:'Immagini degli utenti, email, OpenGraph, deep link e pixel social', nav_landing:'Landing e Mail', lm_tab_landing:'Landing', lm_tab_mail:'Mail', sub_landing:'Strumenti di comunicazione legati alle azioni: POI, itinerari, rotte, eventi.', landing_new:'Nuova landing', nav_punti:'Punti', sub_punti:'Punti per azione e soglie dei livelli: regolali da qui, l\'app li usa subito.', media_tab_images:'Immagini', media_tab_email:'Email', media_tab_og:'OpenGraph', media_tab_deeplink:'Deep link', media_tab_pixel:'Pixel social',
     sub_dashboard:'Panoramica della piattaforma in tempo reale.',
     sub_moderation:'Segnalazioni da rivedere.', sub_users:'Gestione profili e moderazione.',
     sub_ailimits:'Quote e modelli AI per livello.', sub_copilot:'Assistente operativo con accesso ai dati.',
@@ -1235,7 +1250,7 @@ const T = {
   },
   en:{
     nav_dashboard:'Dashboard', nav_moderation:'Moderation', nav_users:'Users', nav_ailimits:'AI limits',
-    nav_copilot:'AI copilot', nav_create:'Create', nav_audit:'Audit log', nav_media:'Media', sub_media:'Email, OpenGraph, deep links and social pixels', nav_landing:'Landing', sub_landing:'Landing pages built with the builder. Published ones go live on poilove.com.', landing_new:'New landing', media_tab_images:'Immagini', media_tab_email:'Email', media_tab_og:'OpenGraph', media_tab_deeplink:'Deep links', media_tab_pixel:'Social pixels',
+    nav_copilot:'AI copilot', nav_create:'Create', nav_audit:'Audit log', nav_media:'Media', sub_media:'Email, OpenGraph, deep links and social pixels', nav_landing:'Landing & Mail', lm_tab_landing:'Landing', lm_tab_mail:'Mail', sub_landing:'Communication tools tied to actions: POIs, itineraries, routes, events.', landing_new:'New landing', nav_punti:'Points', sub_punti:'Points per action and level thresholds.', media_tab_images:'Immagini', media_tab_email:'Email', media_tab_og:'OpenGraph', media_tab_deeplink:'Deep links', media_tab_pixel:'Social pixels',
     sub_dashboard:'Real-time overview of the platform.',
     sub_moderation:'Reports awaiting review.', sub_users:'Profile management and moderation.',
     sub_ailimits:'AI quotas and models per tier.', sub_copilot:'Operational assistant with data access.',
@@ -1515,7 +1530,7 @@ async function doLogout(){
 const SUBKEY = { dashboard:'sub_dashboard', moderation:'sub_moderation', users:'sub_users',
   ailimits:'sub_ailimits', copilot:'sub_copilot', create:'sub_create', pois:'sub_pois', routes:'sub_routes', audit:'sub_audit', categories:'sub_categories' , tags:'sub_tags', badges:'sub_badges', knowledge:'sub_knowledge', media:'sub_media' };
 const TITLEKEY = { dashboard:'nav_dashboard', moderation:'nav_moderation', users:'nav_users',
-  ailimits:'nav_ailimits', copilot:'nav_copilot', create:'nav_create', pois:'nav_pois', routes:'nav_routes', itineraries:'nav_itineraries', categories:'nav_categories', tags:'nav_tags', badges:'nav_badges', knowledge:'nav_knowledge', audit:'nav_audit', media:'nav_media', landing:'nav_landing' };
+  ailimits:'nav_ailimits', copilot:'nav_copilot', create:'nav_create', pois:'nav_pois', routes:'nav_routes', itineraries:'nav_itineraries', categories:'nav_categories', tags:'nav_tags', badges:'nav_badges', knowledge:'nav_knowledge', audit:'nav_audit', media:'nav_media', landing:'nav_landing', punti:'nav_punti' };
 
 function updateHeader(sec){
   document.getElementById('secTitle').textContent = t(TITLEKEY[sec]);
@@ -1530,6 +1545,11 @@ function openSection(sec){
   runSection(sec);
   // su mobile riporta in cima
   window.scrollTo({top:0,behavior:'smooth'});
+}
+function setLmTab(tab){
+  document.querySelectorAll('#sec-landing .ai-mode').forEach(b=>b.classList.toggle('on', b.dataset.lmtab===tab));
+  document.getElementById('lmtab-landing').style.display = tab==='landing' ? '' : 'none';
+  document.getElementById('lmtab-mail').style.display = tab==='mail' ? '' : 'none';
 }
 function runSection(sec){
   if(loaded[sec]) return;
@@ -1551,7 +1571,8 @@ function runSection(sec){
     case 'knowledge': loadKnowledgeAdmin(); break;
     case 'audit': loadAudit(); break;
     case 'media': initMedia(); break;
-    case 'landing': if(window.LandingAdmin) LandingAdmin.load(); break;
+    case 'landing': if(window.LandingAdmin) LandingAdmin.load(); renderMediaEmail(); break;
+    case 'punti': loadPunti(); break;
   }
 }
 
@@ -2993,12 +3014,12 @@ async function loadAudit(){
 let _mediaLoaded=false;
 function setMediaTab(tab){
   document.querySelectorAll('#sec-media .ai-mode').forEach(b=>b.classList.toggle('on', b.dataset.mtab===tab));
-  ['immagini','email','og','deeplink','pixel'].forEach(x=>{ const d=document.getElementById('mtab-'+x); if(d) d.style.display = (x===tab?'':'none'); });
+  ['immagini','og','deeplink','pixel'].forEach(x=>{ const d=document.getElementById('mtab-'+x); if(d) d.style.display = (x===tab?'':'none'); });
   if(tab==='immagini') renderMediaImages();
 }
 async function initMedia(){
   if(_mediaLoaded) return; _mediaLoaded=true;
-  renderMediaImages(); renderMediaPixel(); renderMediaOg(); renderMediaDeep(); renderMediaEmail();
+  renderMediaImages(); renderMediaPixel(); renderMediaOg(); renderMediaDeep();
 }
 /* ── IMMAGINI: galleria di moderazione di TUTTO il materiale visivo caricato dagli utenti ──
    Aggrega foto dei POI, avatar, copertine, foto delle tappe. Ingrandisci + rimuovi (moderazione). */
@@ -4271,6 +4292,83 @@ async function loadItinerariesAdmin(){
       ]);
       box.appendChild(el('div',{class:'panel',style:'margin-bottom:10px;padding:14px'},[head,stopsBox,actions]));
     });
+  }catch(e){ emptyBox(box,t('error'),null,'warning'); }
+}
+
+/* ═════════════════════ PUNTI: punti per azione + soglie livelli (gamification_config) ═════════════════════ */
+const PUNTI_AZIONI_LBL={ create_poi:'Crea un POI', love_given:'Love dato', love_received:'Love ricevuto', share:'Condivisione',
+  create_list:'Crea una lista', create_route:'Crea una rotta', make_route_public:'Rotta resa pubblica', referral_confirmed:'Referral confermato' };
+async function loadPunti(){
+  const box=document.getElementById('puntiBox'); if(!box) return; loadingBox(box);
+  try{
+    const { data, error } = await sb.from('gamification_config').select('key,value').in('key',['points_per_action','level_thresholds']);
+    if(error){ isBackendMissing(error)?backendOff(box):emptyBox(box,t('error'),null,'warning'); return; }
+    const ppa=((data||[]).find(r=>r.key==='points_per_action')||{}).value||{};
+    const lvl=((data||[]).find(r=>r.key==='level_thresholds')||{}).value||{};
+    box.textContent='';
+
+    // ── Punti per azione ──
+    const pIn={};
+    const pPanel=el('div',{class:'panel',style:'margin-bottom:14px'},[
+      el('div',{class:'card-h'},[ el('span',{class:'ic'},phIcon('coins')), el('span',{text:t('punti_azioni','Punti per azione')}) ]),
+      el('div',{class:'sm',style:'margin-bottom:10px',text:t('punti_azioni_help','Quanti punti guadagna un utente per ogni azione. Il server li usa subito (award_points legge questa tabella).')})
+    ]);
+    const grid=el('div',{style:'display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px'});
+    Object.keys(ppa).forEach(k=>{
+      const w=el('div',{class:'field',style:'margin:0'});
+      w.appendChild(el('label',{text:(PUNTI_AZIONI_LBL[k]||k)+' ('+k+')'}));
+      pIn[k]=el('input',{type:'number',min:'0',step:'1',value:String(parseInt(ppa[k],10)||0)});
+      w.appendChild(pIn[k]); grid.appendChild(w);
+    });
+    pPanel.appendChild(grid);
+    pPanel.appendChild(el('div',{class:'btn-row',style:'margin-top:12px'},[
+      el('button',{class:'btn gold',text:t('save_btn','Salva'),onclick:async()=>{
+        const val={}; Object.keys(pIn).forEach(k=>{ val[k]=Math.max(0,parseInt(pIn[k].value,10)||0); });
+        const { data:d, error:e } = await sb.from('gamification_config').update({ value:val, updated_by:ME.id, updated_at:new Date().toISOString() }).eq('key','points_per_action').select('key');
+        if(e||!d||!d.length){ toast((e&&e.message)||t('rls_no_rows'),'err'); return; }
+        await logAudit('punti_azioni','gamification','points_per_action',val);
+        toast(t('saved'),'ok','check');
+      }})
+    ]));
+    box.appendChild(pPanel);
+
+    // ── Soglie livelli ──
+    const rows=Object.entries(lvl).map(([name,min])=>({name,min:parseInt(min,10)||0})).sort((a,b)=>a.min-b.min);
+    const lPanel=el('div',{class:'panel'},[
+      el('div',{class:'card-h'},[ el('span',{class:'ic'},phIcon('ranking')), el('span',{text:t('punti_livelli','Livelli (soglie punti)')}) ]),
+      el('div',{class:'sm',style:'margin-bottom:10px',text:t('punti_livelli_help','Da quanti punti parte ogni livello (Amatore, Viaggiatore, ...). L\'app li legge da qui: cambi la soglia e vale per tutti.')})
+    ]);
+    const lBox=el('div');
+    function drawLvls(){
+      lBox.textContent='';
+      rows.sort((a,b)=>a.min-b.min).forEach((r,i)=>{
+        const line=el('div',{style:'display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap'});
+        const nameIn=el('input',{value:r.name,style:'flex:1;min-width:130px'}); nameIn.addEventListener('input',()=>{ r.name=nameIn.value; });
+        const minIn=el('input',{type:'number',min:'0',step:'1',value:String(r.min),style:'width:130px'}); minIn.addEventListener('input',()=>{ r.min=parseInt(minIn.value,10)||0; });
+        line.appendChild(el('span',{class:'chip dim',text:'Lv.'+(i+1)}));
+        line.appendChild(nameIn);
+        line.appendChild(el('span',{class:'sm',text:t('punti_da','da punti:')}));
+        line.appendChild(minIn);
+        line.appendChild(el('button',{class:'btn sm red',title:t('a_delete'),onclick:()=>{ rows.splice(rows.indexOf(r),1); drawLvls(); }},[phIcon('trash')]));
+        lBox.appendChild(line);
+      });
+    }
+    drawLvls();
+    lPanel.appendChild(lBox);
+    lPanel.appendChild(el('div',{class:'btn-row',style:'margin-top:10px'},[
+      el('button',{class:'btn sm',onclick:()=>{ rows.push({name:'Nuovo livello',min:(rows.length?rows[rows.length-1].min*2||1000:0)}); drawLvls(); }},[phIcon('plus'),document.createTextNode(' '+t('punti_add_lvl','Aggiungi livello'))]),
+      el('button',{class:'btn gold',text:t('save_btn','Salva'),onclick:async()=>{
+        if(!rows.length){ toast(t('punti_min_one','Serve almeno un livello'),'err'); return; }
+        const val={}; let bad=false;
+        rows.forEach(r=>{ const n=(r.name||'').trim(); if(!n) bad=true; val[n]=Math.max(0,parseInt(r.min,10)||0); });
+        if(bad){ toast(t('punti_names','Ogni livello deve avere un nome'),'err'); return; }
+        const { data:d, error:e } = await sb.from('gamification_config').update({ value:val, updated_by:ME.id, updated_at:new Date().toISOString() }).eq('key','level_thresholds').select('key');
+        if(e||!d||!d.length){ toast((e&&e.message)||t('rls_no_rows'),'err'); return; }
+        await logAudit('punti_livelli','gamification','level_thresholds',val);
+        toast(t('saved'),'ok','check');
+      }})
+    ]));
+    box.appendChild(lPanel);
   }catch(e){ emptyBox(box,t('error'),null,'warning'); }
 }
 
