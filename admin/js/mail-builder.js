@@ -21,7 +21,7 @@
       title: 'Mail Builder',
       saveLabel: 'Salva il modello',
       doc: tpl.design || null,
-      brand: { accent: '#D42B2B', footer: 'Ingegnerizzazione di Alessandro Castagna · 321.AL / EVOLAB • Tirana', name: 'POI•LOVE', linkBase: 'https://poilove.com/' },
+      brand: { accent: '#D42B2B', footer: 'Inxhinieruar nga Alessandro Castagna · 321.AL / EVOLAB • Tiranë\nIngegnerizzazione di Alessandro Castagna · 321.AL / EVOLAB • Tirana', name: 'POI•LOVE', linkBase: 'https://poilove.com/' },
       placeholders: '{{nome}} {{email}} {{link}}',
       pickImage: function (cb) { if (window.POIMedia && window.POIMedia.pick) window.POIMedia.pick({ kind: 'og', onPick: cb }); else cb(null); },
       headFields: [
@@ -37,7 +37,7 @@
         var rec = {
           key: key, lang: vals.lang, kind: vals.kind,
           subject: (vals.subject || '').trim() || key,
-          body_html: html, body_text: text + '\n\nPOI•LOVE\nIngegnerizzazione di Alessandro Castagna · 321.AL / EVOLAB • Tirana',
+          body_html: html, body_text: text + '\n\nPOI•LOVE\nInxhinieruar nga Alessandro Castagna · 321.AL / EVOLAB • Tiranë\nIngegnerizzazione di Alessandro Castagna · 321.AL / EVOLAB • Tirana',
           design: doc, active: true, updated_at: new Date().toISOString()
         };
         var q = tpl.id ? db.from('email_templates').update(rec).eq('id', tpl.id).select('id')

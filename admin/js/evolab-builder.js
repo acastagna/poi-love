@@ -106,13 +106,16 @@
       if (row.st && row.st.mb) rowsHtml += '<tr><td style="height:' + parseInt(row.st.mb, 10) + 'px;font-size:0;">&nbsp;</td></tr>';
     });
     var footer = brand.footer || 'EVOLAB · 321.al';
+    /* footer multi-riga: le righe separate da \n sono divise da una linea sottilissima */
+    var footHtml = String(footer).split(/\n+/).map(function (l) { return esc(l).replace(/•/g, '&bull;'); })
+      .join('<div style="border-top:1px solid #e6e6e6;width:150px;margin:7px auto;height:0;font-size:0;line-height:0;">&nbsp;</div>');
     return '<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
       + '<style>@media (max-width:520px){.eb-col{display:block!important;width:100%!important;}}</style></head>'
       + '<body style="margin:0;padding:0;background:' + st.bg + ';">'
       + '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:' + st.bg + ';padding:26px 0;"><tr><td align="center">'
       + '<table role="presentation" width="' + parseInt(st.width, 10) + '" cellpadding="0" cellspacing="0" style="width:' + parseInt(st.width, 10) + 'px;max-width:100%;background:#ffffff;border-radius:14px;overflow:hidden;border:1px solid #e6e6e6;">'
       + rowsHtml
-      + '<tr><td align="center" style="padding:16px 26px;border-top:1px solid #eee;font:400 12px Arial,Helvetica,sans-serif;color:#999;text-align:center;">' + esc(footer).replace(/•/g, '&bull;') + '</td></tr>'
+      + '<tr><td align="center" style="padding:16px 26px;border-top:1px solid #eee;font:400 12px Arial,Helvetica,sans-serif;color:#999;text-align:center;">' + footHtml + '</td></tr>'
       + '</table></td></tr></table></body></html>';
   }
   function renderText(doc) {
@@ -182,7 +185,9 @@
       + '@media(max-width:640px){.ebp-col{flex:0 0 100%!important;max-width:100%!important}}</style></head>'
       + '<body style="background:' + st.bg + ';">'
       + '<main style="max-width:' + parseInt(st.width, 10) + 'px;margin:0 auto;padding:24px 14px;">' + rowsHtml
-      + '<footer style="padding:22px 8px;font-size:12px;color:rgba(0,0,0,.45);text-align:center;">' + esc(footer) + '</footer>'
+      + '<footer style="padding:22px 8px;font-size:12px;color:rgba(0,0,0,.45);text-align:center;">'
+      + String(footer).split(/\n+/).map(esc).join('<span style="display:block;border-top:1px solid rgba(0,0,0,.12);width:150px;margin:7px auto;"></span>')
+      + '</footer>'
       + '</main></body></html>';
   }
 
@@ -470,7 +475,12 @@
         rEl.appendChild(cwrap);
         paper.appendChild(rEl);
       });
-      paper.appendChild(h('div', { class: 'eb-foot-prev', text: brand.footer || 'EVOLAB · 321.al' }));
+      var fprev = h('div', { class: 'eb-foot-prev' });
+      String(brand.footer || 'EVOLAB · 321.al').split(/\n+/).forEach(function (l, fi) {
+        if (fi) fprev.appendChild(h('div', { style: 'border-top:1px solid rgba(0,0,0,.12);width:150px;margin:6px auto;' }));
+        fprev.appendChild(h('div', { text: l }));
+      });
+      paper.appendChild(fprev);
       pageBg.appendChild(paper);
       canvas.appendChild(pageBg);
       renderSide();
