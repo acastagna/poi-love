@@ -334,7 +334,7 @@
       if (tipo === 'testo') return { tipo: 'testo', testo: mode === 'page' ? 'Racconta qui la tua offerta.' : ('Scrivi qui. Segnaposto: ' + PH + '.'), align: 'left', size: 'normale', st: {} };
       if (tipo === 'pulsante') return { tipo: 'pulsante', testo: 'Scopri di più', url: (opts.defaults && opts.defaults.buttonUrl) || (mode === 'page' ? ((brand.linkBase || 'https://321.al/')) : '{{link}}'), align: 'center', st: {} };
       if (tipo === 'spazio') return { tipo: 'spazio', h: 20, st: {} };
-      if (tipo === 'mascotte') return { tipo: 'mascotte', img: (brand.mascot || 'https://poilove.com/img/illi-medaglione.png'), size: mode === 'page' ? 200 : 140, align: 'center', st: {} };
+      if (tipo === 'mascotte') return { tipo: 'mascotte', img: (brand.mascot || 'https://poilove.com/img/illi-tonda.png'), size: mode === 'page' ? 200 : 140, align: 'center', st: {} };
       if (tipo === 'video') return { tipo: 'video', testo: 'Guarda il video', url: '', st: {} };
       return { tipo: 'sep', st: {} };
     }
