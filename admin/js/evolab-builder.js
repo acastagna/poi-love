@@ -92,12 +92,14 @@
       cols.forEach(function (c) { tot += parseInt(c.w, 10) || 0; });
       if (tot < 1) tot = 12;
       var cells = '';
+      // noStack: colonne affiancate anche sul telefono (niente classe eb-col = niente impilamento)
+      var keep = row.st && row.st.noStack;
       cols.forEach(function (c) {
         var pct = Math.round(((parseInt(c.w, 10) || (12 / cols.length)) / tot) * 100) + '%';
         var mods = '';
         c.blocks.forEach(function (b) { mods += moduloEmail(b, accent, brand); });
         var cpad = (c.st && c.st.pad != null && c.st.pad !== '') ? (parseInt(c.st.pad, 10) + 'px') : '6px 12px';
-        cells += '<td class="eb-col" width="' + pct + '" valign="top" style="padding:' + cpad + ';' + (c.st && c.st.bg ? 'background:' + c.st.bg + ';' : '') + (c.st && c.st.radius ? 'border-radius:' + parseInt(c.st.radius, 10) + 'px;' : '') + '">'
+        cells += '<td' + (keep ? '' : ' class="eb-col"') + ' width="' + pct + '" valign="top" style="padding:' + cpad + ';' + (c.st && c.st.bg ? 'background:' + c.st.bg + ';' : '') + (c.st && c.st.radius ? 'border-radius:' + parseInt(c.st.radius, 10) + 'px;' : '') + '">'
           + '<table role="presentation" width="100%" cellpadding="0" cellspacing="0">' + mods + '</table></td>';
       });
       if (row.st && row.st.mt) rowsHtml += '<tr><td style="height:' + parseInt(row.st.mt, 10) + 'px;font-size:0;">&nbsp;</td></tr>';
@@ -188,7 +190,7 @@
         cells += '<div class="ebp-col" style="flex:0 0 ' + pct + '%;max-width:' + pct + '%;box-sizing:border-box;padding:' + cpad + ';' + (c.st && c.st.bg ? 'background:' + pgSurf(c.st.bg) + ';' : '') + (c.st && c.st.radius ? 'border-radius:' + parseInt(c.st.radius, 10) + 'px;' : '') + '">' + mods + '</div>';
       });
       var rpad = (row.st && row.st.pad != null && row.st.pad !== '') ? (parseInt(row.st.pad, 10) + 'px') : '10px 14px';
-      rowsHtml += '<section class="ebp-row" style="' + (row.st && row.st.mt ? 'margin-top:' + parseInt(row.st.mt, 10) + 'px;' : '') + (row.st && row.st.mb ? 'margin-bottom:' + parseInt(row.st.mb, 10) + 'px;' : '') + 'padding:' + rpad + ';' + (row.st && row.st.bg ? 'background:' + pgSurf(row.st.bg) + ';' : '') + (row.st && row.st.radius ? 'border-radius:' + parseInt(row.st.radius, 10) + 'px;' : '') + '"><div class="ebp-cols" style="display:flex;flex-wrap:wrap;align-items:flex-start;">' + cells + '</div></section>';
+      rowsHtml += '<section class="ebp-row' + (row.st && row.st.noStack ? ' ebp-nostack' : '') + '" style="' + (row.st && row.st.mt ? 'margin-top:' + parseInt(row.st.mt, 10) + 'px;' : '') + (row.st && row.st.mb ? 'margin-bottom:' + parseInt(row.st.mb, 10) + 'px;' : '') + 'padding:' + rpad + ';' + (row.st && row.st.bg ? 'background:' + pgSurf(row.st.bg) + ';' : '') + (row.st && row.st.radius ? 'border-radius:' + parseInt(row.st.radius, 10) + 'px;' : '') + '"><div class="ebp-cols" style="display:flex;flex-wrap:wrap;align-items:flex-start;">' + cells + '</div></section>';
     });
     var footer = brand.footer || 'EVOLAB · 321.al';
     var title = esc(brand.title || brand.name || 'Landing');
@@ -201,7 +203,7 @@
       + ':root{--ebp-bg:' + st.bg + ';--ebp-surface:#ffffff;--ebp-ink:#1a1a1a;--ebp-text:#333333;--ebp-muted:rgba(0,0,0,.45);--ebp-line:rgba(0,0,0,.12)}'
       + '@media(prefers-color-scheme:dark){:root{--ebp-bg:#161110;--ebp-surface:#221b19;--ebp-ink:#f3ece6;--ebp-text:#d8d0c8;--ebp-muted:rgba(255,255,255,.5);--ebp-line:rgba(255,255,255,.16)}}'
       + '[data-eb-lang]{display:none}html[data-lang="sq"] [data-eb-lang="sq"],html[data-lang="it"] [data-eb-lang="it"],html[data-lang="en"] [data-eb-lang="en"]{display:block}'
-      + '@media(max-width:640px){.ebp-col{flex:0 0 100%!important;max-width:100%!important}}</style></head>'
+      + '@media(max-width:640px){.ebp-row:not(.ebp-nostack) .ebp-col{flex:0 0 100%!important;max-width:100%!important}}</style></head>'
       + '<body style="background:var(--ebp-bg);">'
       + '<main style="max-width:' + parseInt(st.width, 10) + 'px;margin:0 auto;padding:24px 14px;">' + rowsHtml
       + '<footer style="padding:22px 8px;font-size:12px;color:var(--ebp-muted);text-align:center;">'
@@ -599,6 +601,15 @@
           var w3 = field('Larghezza colonna centrale (le laterali si adattano)');
           var s3 = h('input', { type: 'range', class: 'eb-set-rng', min: '2', max: '8', step: '2', value: String(rw.cols[1].w || 4) });
           s3.addEventListener('input', function () { regolaLarghezza(rr, parseInt(s3.value, 10)); }); w3.appendChild(s3); sideBody.appendChild(w3);
+        }
+        if (rw.cols.length > 1) {
+          var nsw = field('Sul telefono');
+          var nsl = h('label', { style: 'display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;' });
+          var nsc = h('input', { type: 'checkbox' });
+          nsc.checked = !!(rw.st && rw.st.noStack);
+          nsc.addEventListener('change', function () { rw.st = rw.st || {}; if (nsc.checked) rw.st.noStack = true; else delete rw.st.noStack; render(); });
+          nsl.appendChild(nsc); nsl.appendChild(document.createTextNode('Colonne affiancate (non impilare)'));
+          nsw.appendChild(nsl); sideBody.appendChild(nsw);
         }
         styleSection(sideBody, rw.st, true);
         return;
