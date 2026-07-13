@@ -26,6 +26,12 @@
 
 ---
 
+## 🧭 AL RITORNO (dopo le presentazioni 14-17/07)
+
+- [ ] **Paesi di lavoro nel profilo** (direttiva 13/07): l'utente vede TUTTO il mondo, ma proposte e ricerche del sistema (ILLI, geocoding, ripieghi, viste iniziali) avvengono solo nei paesi scelti nel profilo (uno, due, quanti vuole; "Tutto il mondo" = pulsanti nascosti, comportamento attuale). Il "vicino a me" fisico via GPS resta fisico. Risolve il "cade su Zugliano". **Piano operativo completo in `ORCHESTRAZIONE-PAESI-PROFILO.md`** (ricognizione punto per punto già fatta il 13/07): migrazione `profiles.work_countries`, UI profilo con pulsanti paese, filtro nel grounding ILLI, priorità geocoding generalizzata, ripiego per-paese quando il GPS è fuori zona, 3 lingue. Mezza giornata con collaudo live.
+
+---
+
 ## 🔥 PROSSIMI GRANDI PEZZI (in ordine)
 
 > Roba grossa che tocca DB, generazione pagine o integrazioni esterne: si fa lucidi, un mattone alla volta, con verifica live.
