@@ -64,7 +64,7 @@
   function emailPalette(st) {
     var dark = st && st.theme === 'scura';
     return dark
-      ? { dark: true, bg: '#161110', card: '#221b19', line: '#3a2f28', ink: '#f3ece6', text: '#d8d0c8', muted: '#a99f97' }
+      ? { dark: true, bg: (st && st.bg) || '#161110', card: '#221b19', line: '#3a2f28', ink: '#f3ece6', text: '#d8d0c8', muted: '#a99f97' }
       : { dark: false, bg: (st && st.bg) || '#f4f4f5', card: '#ffffff', line: '#e6e6e6', ink: '#1a1a1a', text: '#333333', muted: '#999999' };
   }
   function moduloEmail(b, accent, brand, P) {
@@ -659,7 +659,7 @@
       if (mode === 'email') {
         var thw = field('Tema della mail'), thg = h('div', { class: 'eb-seg' });
         [['chiara', 'Chiara'], ['scura', 'Scura']].forEach(function (p) {
-          var tb = h('button', { type: 'button', class: 'eb-seg-b' + ((doc.settings.theme || 'chiara') === p[0] ? ' on' : ''), text: p[1] });
+          var tb = h('button', { type: 'button', class: 'eb-seg-b wide' + ((doc.settings.theme || 'chiara') === p[0] ? ' on' : ''), text: p[1] });
           tb.addEventListener('click', function () { doc.settings.theme = p[0]; render(); });
           thg.appendChild(tb);
         });

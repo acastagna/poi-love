@@ -38,7 +38,10 @@ if (!preg_match('/^[A-Za-z0-9_.\-]{1,60}$/', $ref)) { $ref = ''; }
 /* ── dati dell'azione (POI / itinerario / rotta) ── */
 $uuid = '/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i';
 $titolo = ''; $descr = ''; $foto = ''; $link = 'https://poilove.com/'; $codice = '';
-if ($tfor === 'compagnia' && isset($_GET['join']) && preg_match('/^[A-Za-z0-9]{4,12}$/', (string) $_GET['join'])) {
+if ($tfor === 'compagnia') {
+  // Senza un codice valido la pagina non ha senso: mostrerebbe "Codice:" vuoto e un
+  // bottone che porta a nulla. Meglio un 404 onesto che una pagina morta.
+  if (!isset($_GET['join']) || !preg_match('/^[A-Za-z0-9]{4,12}$/', (string) $_GET['join'])) { lp_404(); }
   $codice = strtoupper((string) $_GET['join']);
   $link = 'https://poilove.com/?join=' . rawurlencode($codice);
 }

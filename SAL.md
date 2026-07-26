@@ -21,6 +21,19 @@ Tutto verificato DAL VIVO (mail: HTML dal DB; landing: screenshot su lp.php).
 - Nota itinerari: la landing mostra i dati solo se l'itinerario è pubblico (RLS corretta); l'app rende pubblico l'itinerario prima di condividere, con conferma. Nessun itinerario pubblico esiste ancora nel DB.
 - DA FARE quando arriva ACUMBA_KEY: canale email del foglio → invio della MAIL brandizzata dal server (oggi apre il client di posta con testo+link landing); serve allargare send-email ai non-admin SOLO per i template di invito, con tetto giornaliero.
 - **Teaser POI allineato alla regola "storia visibile, punto protetto" (deciso col founder 13/07)**: da sloggato il POI condiviso ora mostra nome vero, foto in chiaro (niente blur) e zona; lat/lng restano FUORI anche dalla risposta di rete. Testi nuovi in 3 lingue: "Entra gratis e aprilo sulla mappa", "punto esatto, navigazione e love si sbloccano dopo l'accesso" (v3.37). Verificato live da ospite con POI reale.
+- **Revisione avversariale 13/07 (sera) e correzioni, v3.39**: passata di review su tutto il lavoro della giornata, 15 rilievi, 11 corretti e verificati dal vivo.
+  - **CRITICO (regressione mia di oggi)**: il foglio di condivisione veniva richiamato anche da dentro la scheda ROTTA (z-index 9600) e COMPAGNIA (9100), ma il gestore di sovrapposizione partiva da 9400: il foglio finiva sotto e sembrava che il tasto non funzionasse (condivisione rotta e invito compagnia MUTI). Base portata a 10000 + regola dedicata sul foglio. Verificato con prova visiva sopra una scheda simulata a 9600.
+  - Referral: i link condivisi usavano `_myHandle` (valorizzato solo dopo il giro di loadCommTemplates) e spesso partivano SENZA `&ref=`, perdendo i punti. Ora fonte unica `_myRefHandle()` disponibile subito dopo il login; unificati i tre costruttori di link (updateShareLink e _referralUrl ora passano da `_lpUrl`).
+  - `_lpUrl` rifiuta identificativi non validi (itinerario mai salvato, codice compagnia malformato): si torna al link diretto invece di spedire una landing che non riesce a compilarsi.
+  - Landing: query con ordine per data (con due modelli pubblicati per lo stesso uso vinceva uno a caso) e guardia contro il doppio caricamento.
+  - Copia link: aggiunto ripiego per browser senza clipboard API (prima non copiava e non diceva nulla); `noopener` su tutte le aperture social; mailto senza scheda vuota residua.
+  - Tre lingue: titolo del foglio, voce "Amici" e toast "POI non trovato" erano solo in italiano proprio ora che il foglio e universale.
+  - Teaser: lucchetto spostato in angolo (30px) perche al centro copriva la foto che la nuova regola vuole mostrare; commento e testi di ripiego allineati alla regola nuova.
+  - lp.php: landing compagnia senza codice valido ora da 404 onesto invece di una pagina con "Codice:" vuoto.
+  - Motore builder v345: in tema scuro lo sfondo scelto veniva ignorato (controllo che non faceva nulla); bottoni Chiara/Scura con padding corretto.
+  - Trattini lunghi (em dash) eliminati da 3 testi condivisi: violavano la regola di progetto e finivano nei messaggi WhatsApp/email degli utenti.
+  - **Verificato NON reale** il sospetto di fuga privacy sui POI condivisi: le policy del database bloccano davvero i POI privati agli sloggati (provato dal vivo). Nota: i POI `suggested_google` sono leggibili da tutti per scelta di design (sono luoghi pubblici suggeriti), come gia avviene sulle pagine SEO.
+  - Restano segnalati e NON risolti (scelta consapevole): "Condividi con follower/amici" e ancora un segnaposto ("prossimamente"), da non mostrare in demo.
 - Resta aperto: sottodominio builder.321.al (serve OK esplicito per crearlo su Plesk).
 
 ## Sessione 12/07/2026 (seguito lungo) — Immagini multi-sorgente, tastiera, ruoli
