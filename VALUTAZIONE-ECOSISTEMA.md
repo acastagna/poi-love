@@ -1,5 +1,5 @@
 # VALUTAZIONE. Da progetto scritto da un'AI a ecosistema modificabile
-Ecosistema 321 / EvoLab. Redatto il 13/07/2026 su richiesta del founder.
+Ecosistema 321 / EvoLab. Redatto il 26/07/2026 su richiesta del founder.
 Base: analisi automatica del codice a 6 squadre (monolite, configurazione, admin, dati/operativita, Themeli) con numeri **misurati** sul sorgente vivo e riverificati a campione.
 
 ---
@@ -39,7 +39,7 @@ Il lato admin sta molto meglio: 12 moduli JS separati, tutti isolati, il 41% del
 
 1. **Collisione silenziosa di nomi.** 739 funzioni in un unico spazio: se tu (o un'AI) aggiungi una funzione con un nome gia usato, la vecchia sparisce **senza nessun errore**. E gia successo 2 volte.
 2. **Nessun interruttore.** Se il giorno del lancio ILLI o i vocali danno problemi, l'unica leva e modificare il codice e rifare il deploy. In un momento di panico e la leva sbagliata.
-3. **Nessuna rete di sicurezza.** Zero test: un difetto arriva in produzione e lo scopre un utente. Il contatore dei luoghi negli itinerari era rotto da oltre un mese e nessuno se n'era accorto (corretto il 13/07).
+3. **Nessuna rete di sicurezza.** Zero test: un difetto arriva in produzione e lo scopre un utente. Il contatore dei luoghi negli itinerari era rotto da oltre un mese e nessuno se n'era accorto (corretto il 26/07).
 4. **Cambiare una parola** significa aprire un file da 1,16 MB e trovare la riga giusta fra 16.973. E esattamente il motivo per cui oggi devi chiamare un'AI per ogni modifica.
 5. **I tetti di spesa AI** vivono nei segreti delle edge function, fuori dal pannello: le tabelle che contano l'uso esistono ma nessuna schermata le legge.
 

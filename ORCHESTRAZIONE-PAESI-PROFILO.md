@@ -1,6 +1,6 @@
 # ORCHESTRAZIONE. Paesi di lavoro nel profilo
-Ecosistema 321 / EvoLab. Redatto il 13/07/2026. Destinatario: Claude Code (esecuzione al ritorno dalle presentazioni 14-17/07).
-Base: direttiva del founder del 13/07 + ricognizione completa del codice fatta lo stesso giorno (6 agenti, ~50 punti, righe verificate una a una sul sorgente vivo).
+Ecosistema 321 / EvoLab. Redatto il 26/07/2026. Destinatario: Claude Code (esecuzione al ritorno dalle presentazioni 14-17/07).
+Base: direttiva del founder del 26/07 + ricognizione completa del codice fatta lo stesso giorno (6 agenti, ~50 punti, righe verificate una a una sul sorgente vivo).
 
 **La regola in una frase: l'utente vede tutto il mondo, ma le proposte e le ricerche del sistema per lui avvengono solo nei paesi scelti nel profilo.**
 

@@ -3771,7 +3771,7 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
       <div class="mmo-text"><strong>Itinerario</strong><span>Aggiungi a un viaggio o percorso</span></div>
       <i class="ph-duotone ph-caret-right mmo-arrow"></i>
     </button>
-    <!-- RIMOSSE 13/07/2026 (regola: mai cose finte). Queste tre voci mostravano solo
+    <!-- RIMOSSE 26/07/2026 (regola: mai cose finte). Queste tre voci mostravano solo
          "prossimamente" senza fare nulla. Restano qui, disattivate, come traccia di
          cosa costruire: Compagnia = aggiungere il POI alla lista collegata alla
          compagnia (lists.companion_id); Rotta Storica = riusare la proposta di tappa
@@ -4593,7 +4593,7 @@ async function loadCompItineraries(){
     if(!lists||!lists.length || !_compDetail || _compDetail.id!==cid) return;
     let counts={}; const ids=lists.map(l=>l.id);
     // La tabella si chiama poi_lists (non list_pois): col nome sbagliato la query falliva
-    // in silenzio e il contatore mostrava sempre 0 luoghi. Corretto il 13/07/2026.
+    // in silenzio e il contatore mostrava sempre 0 luoghi. Corretto il 26/07/2026.
     if(ids.length){ const { data:lp } = await sb.from('poi_lists').select('list_id').in('list_id',ids); (lp||[]).forEach(r=>{ counts[r.list_id]=(counts[r.list_id]||0)+1; }); }
     box.innerHTML=`<div style="display:flex;gap:8px;overflow-x:auto;padding:8px 12px;border-bottom:1px solid rgba(0,0,0,.06);align-items:center">
       <span style="font-size:10px;font-weight:800;letter-spacing:.4px;color:var(--muted);text-transform:uppercase;flex-shrink:0"><i class="ph-duotone ph-path"></i> ${t('cv_itins','Itinerari')}</span>
@@ -7846,7 +7846,7 @@ function openPendingSharedProfile(){
 
 /* ══════════════════════════════════════════
    TEASER POI CONDIVISO — gate di registrazione
-   Regola (13/07/2026): la STORIA si vede (nome vero, foto in chiaro, categoria e zona),
+   Regola (26/07/2026): la STORIA si vede (nome vero, foto in chiaro, categoria e zona),
    il PUNTO ESATTO e le azioni no. Le coordinate non escono nemmeno dalla risposta di
    rete per chi non e loggato. L'id resta in localStorage: dopo il login
    (anche con il giro OAuth che perde i parametri URL) il POI si apre da solo.
@@ -11594,7 +11594,7 @@ function openPoiAddDisambig(){
 function closeAddPoiDisambig(){
   document.getElementById('addPoiDisambigOv').classList.remove('open');
 }
-// (funzione rimossa il 13/07/2026: mostrava solo "prossimamente". Quando la si costruisce
+// (funzione rimossa il 26/07/2026: mostrava solo "prossimamente". Quando la si costruisce
 //  davvero, deve aggiungere il POI alla lista collegata alla compagnia: lists.companion_id.)
 
 // Aggiunge il POI all'itinerario (dal disambiguation modal)
