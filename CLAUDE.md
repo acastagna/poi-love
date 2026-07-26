@@ -199,7 +199,8 @@ Sempre **2 click** in sequenza: Estrai (git pull) + Implementa (rsync to docroot
 **Setup secrets GitHub** (già configurati, non toccare):
 - DEPLOY_SECRET, PLESK_HOST, PLESK_USER, PLESK_SSH_KEY, PLESK_PORT, PLESK_PATH, PLESK_WEB_PATH
 
-**Path locale (mac)**: `/Users/alessandrocastagna/AI (produzione)/POI•LOVE/POI•LOVE/`
+**Path locale (mac)**: `/Users/alessandrocastagna/AI (produzione)/• POI•LOVE/`
+*(spostato il 26/07/2026 da `POI•LOVE/POI•LOVE/`: ora è una cartella singola come gli altri progetti)*
 
 **Repository GitHub**: https://github.com/acastagna/poi-love (public, MIT)
 

@@ -4,7 +4,7 @@
 
 # SPEC DI BUILD — Admin POI•LOVE fedele all'app
 
-File cardine: `/Users/alessandrocastagna/AI (produzione)/POI•LOVE/POI•LOVE/admin/panel.html` (4142 righe) + `admin/js/*.js`. Sorgente app da cui copiare markup/CSS/logica: `webapp/index.html` (16.669 righe). Endpoint upload: `https://media.poilove.com/upload.php` (Bearer JWT). Regola ferrea: mai URL a mano, foto solo via upload/media manager, tutto persistito su Supabase, verificato dal vivo.
+File cardine: `/Users/alessandrocastagna/AI (produzione)/• POI•LOVE/admin/panel.html` (4142 righe) + `admin/js/*.js`. Sorgente app da cui copiare markup/CSS/logica: `webapp/index.html` (16.669 righe). Endpoint upload: `https://media.poilove.com/upload.php` (Bearer JWT). Regola ferrea: mai URL a mano, foto solo via upload/media manager, tutto persistito su Supabase, verificato dal vivo.
 
 ---
 

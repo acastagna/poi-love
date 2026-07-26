@@ -4,7 +4,7 @@
     {
       "name": "sal-preview",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8766", "--directory", "/Users/alessandrocastagna/AI (produzione)/POI•LOVE/POI•LOVE"],
+      "runtimeArgs": ["-m", "http.server", "8766", "--directory", "/Users/alessandrocastagna/AI (produzione)/• POI•LOVE"],
       "port": 8766
     }
   ]
