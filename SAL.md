@@ -1,5 +1,84 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
+## Sessione 26/07/2026 — Trasloco cartella, dossier commerciale (riservato), Scheda Professionale su project.poilove.com
+
+Sessione di riordino e di documentazione commerciale. Nessuna modifica alla webapp.
+
+### Trasloco del progetto e riparazione dei riferimenti
+
+Il progetto è passato da `AI (produzione)/POI•LOVE/POI•LOVE/` a `AI (produzione)/• POI•LOVE/`, cartella singola come gli altri progetti della root.
+
+- **Memoria del progetto recuperata.** Claude indicizza la memoria in base al path: col cambio di cartella le **59 schede** (regole, feedback, decisioni: `regola_mai_finto`, `feedback_no_emdash`, `regole_di_ferro`, `user_profile`) puntavano alla vecchia posizione e la cartella nuova era vuota. Copiate al posto giusto, originale lasciato intatto.
+- **Path corretti**: `.claude/launch.json` (server di anteprima verso una cartella inesistente), `CLAUDE.md` riga 202, `ADMIN-BUILD-SPEC.md` riga 7, più la root `AI (produzione)/CLAUDE.md` (tabella progetti, mappa struttura, regola 4, path memoria) e i permessi `git -C` in `.claude/settings.local.json` di root.
+- **50 autorizzazioni recuperate** dal vecchio wrapper e unite a `.claude/settings.local.json` del progetto: senza, Claude avrebbe richiesto conferma per ogni comando già approvato in mesi di lavoro.
+- **Verifiche**: `git fsck` pulito, remote `acastagna/poi-love` intatto, 254 file tracciati. I workflow GitHub Actions usano solo path relativi al repo, non toccati.
+- I due file TopMarket rimasti nel wrapper (`topmarket-servizi.html`, `topmarket-setup-costi.html`) verificati come unici (nessuna collisione di nome, nessun duplicato MD5 fra i 12 HTML di `Projects/TopMarket`) e spostati in `Projects/TopMarket/`. Wrapper vuoto archiviato in `_archivio/POI-LOVE-wrapper-2026-07-26`.
+
+### Dossier commerciale (RISERVATO, fuori da questo repo)
+
+La cartella riservata locale è stata riorganizzata e ampliata: ai documenti di prodotto già esistenti
+si aggiungono sei documenti nuovi (posizionamento, target, scelta dei nomi, modello di business,
+piano di marketing) e una presentazione trilingue.
+
+**Contenuti volutamente NON riportati qui**: nomi commerciali, listini, cifre, scenari di ricavo e
+piano di marketing vivono SOLO nella cartella riservata. Questo file è tracciato e il repository
+`poi-love` su GitHub è **pubblico**: vedi la regola in `CLAUDE.md`.
+
+**⚠️ Cartella riservata**: esclusa in `.gitignore`, verificato con `git check-ignore`.
+
+### Scheda Professionale in project.poilove.com
+
+Nuova sezione `#professionale` in `web/index.html`, inserita fra POILOVE e POIVOICE, con voce di menu dedicata.
+
+Contenuto: i tre problemi di un bar a Tirana, i tre blocchi (menù multilingua, galleria estesa, recensioni in aquile) più il canale WhatsApp, i quattro piani con la licenza annuale, il voto in aquile con la ragione legale per cui l'aquila è disegnata da noi e non è quella di Stato, la distinzione fra love e recensione, cosa il prodotto non è.
+
+Verificato dal vivo: sezione alta 2318 px, 8 card, 9 passi, **44 chiavi i18n tradotte in tutte e tre le lingue, zero mancanti** in IT, EN e SQ. Sintassi JS controllata come da convenzione (l'unico blocco che node rifiuta è il JSON-LD schema.org, pre-esistente e valido come JSON).
+
+**Deployato** su richiesta di Alessandro come **`https://project.poilove.com/stay.html`** (path nuovo, ack esplicito in chat), non su `index.html`: la versione nuova è online e l'attuale home resta intatta finché non si decide di promuoverla. Dry-run prima, rsync di un solo file, nessun `--delete`. Verificato live: stay.html HTTP 200 · 655.514 byte con la sezione `#professionale` e la voce di menu presenti; index.html invariato a 632.780 byte.
+
+Listino sulla pagina pubblica: scelta di Alessandro di mostrare le cifre, che nella documentazione di prodotto sono ancora indicate come da confermare.
+
+Pubblicata anche la presentazione dei due progetti su project.poilove.com (URL nella cartella riservata). Scelta consapevole di Alessandro dopo la segnalazione che contiene scenari di ricavo e piano di marketing: vedi ALLERTA in cima a questo file.
+
+### ILLI nella presentazione, e panorama albanese (primo confronto con la concorrenza)
+
+- **ILLI nell'hero di `il secondo progetto.html`**, con didascalia tradotta in tre lingue. Su richiesta di Alessandro l'immagine non è stata toccata: `Illi500tras.png` incorporata byte per byte, MD5 `09cf5103…` identico prima e dopo, verificato anche sulla copia online. Nessun ridimensionamento, nessuna ricompressione.
+- **`07-panorama-albanese.md`**, documento nuovo, e sezione corrispondente in fondo alla presentazione. Premessa importante: **quell'analisi non era mai stata fatta.** Nel progetto la parola "concorrenti" compariva due volte, una come affermazione senza fonte in SAL e una nel senso di utenti simultanei. Ricognizione svolta il 26/07/2026 con fonti citate.
+
+**Ricognizione sulla concorrenza albanese**: fatta e archiviata nella cartella riservata (`06-concorrenza-albania.md`). Non riportata qui: il repository e pubblico.
+
+
+Altri fatti verificati e pubblicati, tutti datati: Tirana Map and Walks fermo all'aggiornamento del 16/12/2017 con una sola valutazione; l'app Into Albania non più reperibile in cinque negozi App Store; delle cinque startup turistiche censite da Invest in Albania nel maggio 2016, Sotours e ShareAlbania senza più record DNS e Tung.al irraggiungibile. Nessun fornitore di concierge per hotel con sede in Albania è emerso dalla ricerca.
+
+**Come è stato scritto sulla pagina pubblica**: con i nomi, ma **solo fatti verificabili con la data del controllo**. Nessun giudizio su qualità o interfaccia, con un riquadro che lo dichiara apertamente, perché nessuno di quei prodotti è stato provato. Segnalato anche che Visit Tirana è verosimilmente legata al Comune, quindi possibile interlocutore istituzionale e non bersaglio.
+
+### Modello a tre sponsor: eliminato ovunque
+
+Alessandro ha rilevato che su `stay.html` convivevano **due modelli di business in contraddizione**: la vecchia sezione Economia (tre main sponsor da 3.000 €, "coprono interamente tutto, autosufficiente a costo zero dal mese 9") e la nuova Scheda Professionale (licenza annuale pagata dal locale). Un investitore che legge "siamo gia autosufficienti con gli sponsor" e poi "vendiamo licenze ai locali" trova due promesse che si tolgono forza a vicenda.
+
+Direttiva: **quella fase non esiste più, i tre sponsor spariscono da ogni MD e da ogni pagina.** Censimento e rimozione completi:
+
+- `web/index.html`: eliminata l'intera sezione `#economia` (le tre card sponsor e l'evidenza "9.000 €/anno"), la voce di menu Economia, il blocco CSS `.sp*`, il simbolo `ico-sponsor` e la sua icona nella galleria Brand, le chiavi `eye_eco`, `eco_title`, `eco_body`, `sp_title`, `sp1-3`, `sp_period`, `sp_b1-4`, `sp_hl` in **tutti e tre** i dizionari.
+- Riscritte le voci di timeline dei mesi 06 e 09, che parlavano di "avvio ricerca sponsor" e "presentazione ai tre main sponsor": ora sono conquista della zona pilota col piano Zero e conversione dei primi locali alla Scheda Professionale. In tre lingue.
+- Riscritto il passo 6 del circolo virtuoso: "nuovi sponsor e partner" è diventato "nuovi locali e partner". In tre lingue.
+- `TIMELINE.md`: la riga di crescita non cita più gli sponsor.
+- `webapp/admin.html`: tolto il riferimento "coincide con l'arrivo dei 3 sponsor (mese 9)" dalla nota sul piano Supabase.
+
+Verificato dal vivo: **zero occorrenze di "sponsor" in tutto il progetto** e zero nel testo reso della pagina in IT, EN e SQ. Nessuna chiave i18n orfana introdotta (`brand_all_icons`, `eye_vis`, `vis_title`, `vis_body`, `brand_icon` risultano già così in HEAD, pre-esistenti). Sintassi JS controllata, bilanciamento `div` identico a HEAD.
+
+Ripubblicato `stay.html`: 649.340 byte, zero "sponsor", sezione `#economia` assente, `#professionale` presente. `index.html` sempre intatto a 632.780 byte.
+
+### Da confermare
+
+1. Nel documento di target del secondo prodotto ho letto "le 4 iniziali" come le quattro categorie di ricettività da cui si parte, le stesse già approvate nella tassonomia. Se l'intenzione era un'altra, si corregge solo quel documento.
+2. Prezzi del secondo prodotto: proposta costruita per coerenza, nessuna ricerca di mercato fatta (dettagli nella cartella riservata).
+3. Costo reale del canale WhatsApp, mai stimato: può cambiare la marginalità di un piano intero.
+4. Disponibilità del dominio e ricerca di anteriorità sul marchio del secondo prodotto (classi 35 e 43, Albania e UE).
+5. Chi esegue le visite ai locali a Tirana: e il vincolo piu stretto (dettagli nella cartella riservata).
+6. Nota di servizio: la sezione qui sotto è datata 26/07/2026 ma il suo contenuto descrive la giornata del 13/07 (cita "richiesta 13/07"). Data da correggere, non l'ho toccata per non riscrivere lo storico.
+
+---
+
 ## Sessione 26/07/2026 — Loghi ufficiali nei template + ILLI trasparente
 
 Tutto verificato DAL VIVO (mail: HTML dal DB; landing: screenshot su lp.php).

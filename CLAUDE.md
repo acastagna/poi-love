@@ -305,8 +305,8 @@ poi-love/                       ← cartella singola (dal 26/07/2026, prima era 
 └── LICENSE                     ← MIT
 ```
 
-**Cartella riservata locale** (mai su GitHub, il repo è PUBBLICO): `• DOSSIER POI•LOVE + MIKOO/`
-contiene modello di business, listini e piano di marketing. È esclusa in `.gitignore` riga 30.
+**Cartella riservata locale** (mai su GitHub, il repo è PUBBLICO): la cartella `• DOSSIER …/`
+contiene modello di business, listini, nomi commerciali e piano di marketing. È esclusa in `.gitignore`.
 **Mai scrivere prezzi, listini o il nome del secondo progetto nei file tracciati** (SAL, TODO, CLAUDE).
 
 ---

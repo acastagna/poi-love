@@ -61,7 +61,7 @@ Il grosso delle Fasi 1-3 è realizzato e online su poilove.com. In sintesi, ciò
 ## Fase 5 · post-lancio (da settembre)
 - [ ] App mobile sugli store (App Store, Play Store)
 - [ ] POIVOICE: audio-guide AI dei luoghi
-- [ ] Crescita: sponsor, QR nei locali, gamification stagionale e per zona
+- [ ] Crescita: Scheda Professionale ai locali, QR nei locali, gamification stagionale e per zona
 - [ ] Scala: AI in tiering, storage su Cloudflare R2 oltre i 10k utenti
 
 ---
