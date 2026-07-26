@@ -18,7 +18,15 @@
 
 ---
 
-## 🟢 STATO AL 26/05/2026 — AI photo generation + Ownership guard + DB migrazione cover
+## 🟢 STATO — dove leggerlo
+
+**Lo stato aggiornato del progetto sta in `SAL.md`** (in cima, sessione più recente) e le cose da fare in `TODO.md`.
+Questo file contiene istruzioni, regole e architettura: NON è il diario di stato.
+*(La vecchia istantanea del 26/05/2026 è stata rimossa il 26/07/2026: era ferma a due mesi prima e fuorviava.)*
+
+<details><summary>Istantanea storica del 26/05/2026 (per memoria, non aggiornata)</summary>
+
+### STATO AL 26/05/2026 — AI photo generation + Ownership guard + DB migrazione cover
 
 **HEAD GitHub `main`**: `0b3b64f`
 **Ultimo commit**: `0b3b64f feat(demo): AI photo generation su POI senza foto — Pollinations.ai Flux`
@@ -65,6 +73,8 @@
 - Usare scrittura SSH su `/var/www/vhosts/poilove.com/`
 
 ---
+
+</details>
 
 ## 🚨 INCIDENT REPORT — 10/05/2026 · cancellati 740 file in produzione
 
@@ -269,24 +279,35 @@ Founder e direttore creativo: **Alessandro Castagna** (it@altrostile.app) — op
 
 ## Struttura del repository
 
+> ⚠️ **ATTENZIONE, errore corretto il 26/07/2026**: questa sezione diceva che `web/index.html`
+> era "tutta l'app SPA". È FALSO e ha fatto sbagliare più sessioni. **L'app vera è `webapp/`**.
+> `web/` è solo la presentazione marketing. Misurato: `web/index.html` 1.795 righe,
+> `webapp/index.html` 16.975 righe.
+
 ```
-poi-love/
-├── web/                        ← App web PWA (file principale)
-│   ├── index.html              ← UNICO FILE — tutta l'app SPA (5000+ righe)
-│   ├── itinerari.html          ← pagina itinerari separata
-│   ├── manifest.json           ← PWA manifest
-│   ├── .htaccess               ← routing SPA su Apache/Plesk
-│   └── SAL-data.json           ← stato avanzamento lavori (aggiornare a fine sessione)
-├── docs/                       ← documentazione tecnica
-│   ├── architecture.md
-│   └── card-system.md
-├── .github/
-│   └── workflows/
-│       └── deploy-web.yml      ← GitHub Actions → deploy SSH su Plesk (poilove.com)
-├── CLAUDE.md                   ← questo file
-├── README.md                   ← trilingue IT/SQ/EN
+poi-love/                       ← cartella singola (dal 26/07/2026, prima era annidata)
+├── webapp/            4,0 MB   ← ⭐ L'APP VERA (poilove.com): SPA vanilla JS
+│   ├── index.html              ←    ~17.000 righe, tutta l'app in un file
+│   ├── lp.php                  ←    landing di comunicazione (modelli dell'admin)
+│   ├── poi.php trip.php route.php esplora.php sitemap.php  ← pagine SEO server-rendered
+│   └── img/                    ←    asset dell'app (mascotte ILLI, loghi, OpenGraph)
+├── web/               2,0 MB   ← presentazione marketing (project.poilove.com)
+├── admin/             556 KB   ← pannello amministrativo (admin.poilove.com)
+│   ├── panel.html              ←    4.500 righe
+│   └── js/                     ←    12 moduli separati (evolab-builder, media-manager, …)
+├── sal/               320 KB   ← SAL pubblico (sal.poilove.com)
+├── plesk-media-server/ 84 KB   ← media server PHP (media.poilove.com)
+├── supabase/          604 KB   ← migrazioni SQL + funzioni edge (fonte di verità del DB)
+├── poi-love-app/      216 KB   ← app mobile Expo (React Native, non ancora rilasciata)
+├── scripts/                    ← deploy_split.js (divide l'app per il limite 1 MB del WAF)
+├── docs/ database/ plesk-deploy/  ← materiale storico, da verificare se ancora serve
+├── CLAUDE.md  SAL.md  TODO.md  TIMELINE.md  CONTRATTO.md  README.md
 └── LICENSE                     ← MIT
 ```
+
+**Cartella riservata locale** (mai su GitHub, il repo è PUBBLICO): `• DOSSIER POI•LOVE + MIKOO/`
+contiene modello di business, listini e piano di marketing. È esclusa in `.gitignore` riga 30.
+**Mai scrivere prezzi, listini o il nome del secondo progetto nei file tracciati** (SAL, TODO, CLAUDE).
 
 ---
 

@@ -1,12 +1,12 @@
 # TIMELINE · POI•LOVE
-> Roadmap totale dal redesign al lancio e oltre. Aggiornato: 10/07/2026 (webapp v3.14 live).
+> Roadmap totale dal redesign al lancio e oltre. Aggiornato: 26/07/2026 (webapp v3.41 live).
 > Stile: niente trattini lunghi (em dash).
 
 ## 🎯 Milestone fisse
 | Data | Evento | Stato |
 |---|---|---|
-| **14 / 17 luglio 2026** (mar → ven) | Finestra presentazioni, Tirana | 🟡 in rifinitura, webapp v3.14 live e usabile |
-| **17 agosto 2026 (lun)** | LANCIO PUBBLICO, Tirana (data Kairos 74/100) | 🔴 in preparazione |
+| **14 / 17 luglio 2026** (mar → ven) | Finestra presentazioni, Tirana | ✅ passata |
+| **17 agosto 2026 (lun)** | LANCIO PUBBLICO, Tirana (data Kairos 74/100) | 🔴 mancano 22 giorni (al 26/07) |
 
 ---
 
