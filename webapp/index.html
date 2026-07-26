@@ -4592,7 +4592,9 @@ async function loadCompItineraries(){
     const { data:lists } = await sb.from('lists').select('id,name').eq('companion_id',cid).order('created_at',{ascending:false}).limit(20);
     if(!lists||!lists.length || !_compDetail || _compDetail.id!==cid) return;
     let counts={}; const ids=lists.map(l=>l.id);
-    if(ids.length){ const { data:lp } = await sb.from('list_pois').select('list_id').in('list_id',ids); (lp||[]).forEach(r=>{ counts[r.list_id]=(counts[r.list_id]||0)+1; }); }
+    // La tabella si chiama poi_lists (non list_pois): col nome sbagliato la query falliva
+    // in silenzio e il contatore mostrava sempre 0 luoghi. Corretto il 13/07/2026.
+    if(ids.length){ const { data:lp } = await sb.from('poi_lists').select('list_id').in('list_id',ids); (lp||[]).forEach(r=>{ counts[r.list_id]=(counts[r.list_id]||0)+1; }); }
     box.innerHTML=`<div style="display:flex;gap:8px;overflow-x:auto;padding:8px 12px;border-bottom:1px solid rgba(0,0,0,.06);align-items:center">
       <span style="font-size:10px;font-weight:800;letter-spacing:.4px;color:var(--muted);text-transform:uppercase;flex-shrink:0"><i class="ph-duotone ph-path"></i> ${t('cv_itins','Itinerari')}</span>
       ${lists.map(l=>`<button onclick="compOpenItin()" style="flex-shrink:0;display:flex;align-items:center;gap:6px;background:rgba(212,43,43,.08);border:1px solid rgba(212,43,43,.15);border-radius:20px;padding:6px 12px;cursor:pointer;font-size:12px;font-weight:700;color:var(--text);font-family:inherit"><i class="ph-duotone ph-map-trifold" style="color:#D42B2B"></i>${_escHtml(l.name||t('cv_itin_untitled','Senza nome'))} <span style="color:var(--muted);font-weight:600">${counts[l.id]||0}</span></button>`).join('')}
@@ -8015,7 +8017,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='3.40';
+const APP_VERSION='3.41';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
