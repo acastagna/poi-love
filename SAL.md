@@ -34,6 +34,10 @@ Tutto verificato DAL VIVO (mail: HTML dal DB; landing: screenshot su lp.php).
   - Trattini lunghi (em dash) eliminati da 3 testi condivisi: violavano la regola di progetto e finivano nei messaggi WhatsApp/email degli utenti.
   - **Verificato NON reale** il sospetto di fuga privacy sui POI condivisi: le policy del database bloccano davvero i POI privati agli sloggati (provato dal vivo). Nota: i POI `suggested_google` sono leggibili da tutti per scelta di design (sono luoghi pubblici suggeriti), come gia avviene sulle pagine SEO.
   - Restano segnalati e NON risolti (scelta consapevole): "Condividi con follower/amici" e ancora un segnaposto ("prossimamente"), da non mostrare in demo.
+- **Fine dei segnaposto (v3.40, mig 086)**: chiuse in modo LOGICO le voci che mostravano solo "prossimamente" (violavano la regola di ferro).
+  - **Condividi con follower / amici: ora e REALE.** Nuova RPC `share_poi_with_audience` (SECURITY DEFINER, eseguibile solo da utenti autenticati) che accoda notifiche vere ai follower o ai soli reciproci, rispettando le preferenze notifiche di ciascuno, con tetto giornaliero anti abuso. Il collaudo sul database ha trovato un mio errore (si poteva notificare un POI privato, che il destinatario non avrebbe potuto vedere): corretto, ora si condividono solo POI davvero visibili e approvati. Verificato: POI community ok, POI privato anche se proprio RIFIUTATO.
+  - **Rotte storiche, tasto "+"**: apriva un "presto disponibili"; ora apre il modulo REALE di proposta rotta all'amministrazione (esisteva gia ed era solo scollegato).
+  - **Menu "Aggiungi a…"**: aveva 4 voci di cui 3 finte (Compagnia, Rotta Storica, Categoria). Rimosse dall'interfaccia (restano commentate nel codice con la traccia di cosa costruire); il tasto Aggiungi ora va dritto all'itinerario, unica destinazione vera.
 - Resta aperto: sottodominio builder.321.al (serve OK esplicito per crearlo su Plesk).
 
 ## Sessione 12/07/2026 (seguito lungo) — Immagini multi-sorgente, tastiera, ruoli

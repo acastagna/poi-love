@@ -28,6 +28,7 @@
 
 ## 🧭 AL RITORNO (dopo le presentazioni 14-17/07)
 
+- [ ] **Rendere reali le 3 voci rimosse dal menu "Aggiungi a…"** (13/07): **Compagnia** = aggiungere il POI alla lista collegata alla compagnia (`lists.companion_id`), serve un selettore delle compagnie; **Rotta Storica** = riusare la proposta di tappa gia esistente nel form POI; **Categoria** = collegare al piano tassonomia. Il markup e commentato in `webapp/index.html` (menu `addPoiDisambigOv`) e si riattiva SOLO quando l'azione e vera.
 - [ ] **Paesi di lavoro nel profilo** (direttiva 13/07): l'utente vede TUTTO il mondo, ma proposte e ricerche del sistema (ILLI, geocoding, ripieghi, viste iniziali) avvengono solo nei paesi scelti nel profilo (uno, due, quanti vuole; "Tutto il mondo" = pulsanti nascosti, comportamento attuale). Il "vicino a me" fisico via GPS resta fisico. Risolve il "cade su Zugliano". **Piano operativo completo in `ORCHESTRAZIONE-PAESI-PROFILO.md`** (ricognizione punto per punto già fatta il 13/07): migrazione `profiles.work_countries`, UI profilo con pulsanti paese, filtro nel grounding ILLI, priorità geocoding generalizzata, ripiego per-paese quando il GPS è fuori zona, 3 lingue. Mezza giornata con collaudo live.
 
 ---
