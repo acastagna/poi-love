@@ -26,6 +26,21 @@
 
 ---
 
+## 🗺 SUBITO DOPO IL TRASLOCO (dal 18/08) — MAPPA E POI
+
+Deciso il 15/08: il trasloco viene prima, i difetti si sistemano sulla macchina nuova, una volta sola.
+
+- [ ] **I POI NON SI VEDONO SULLA MAPPA** (segnalato 15/08). Prima capire se e il codice o i permessi
+      del database: se e il database, il trasloco NON lo risolve (il database non si sposta).
+- [ ] **Marcatori per proprieta, specifica del founder (15/08):**
+      - **I miei POI: ROSSI.** Devono essere perfetti, sono il riferimento.
+      - **POI di chi seguo: VERDI.**
+      - **POI di tutti gli altri: semitrasparenti, ma DEVONO ESSERCI.** Marcatore piccolo e titolo breve.
+        Oggi mancano del tutto: e il difetto piu visibile dell'app.
+- [ ] Verificare che la resa regga con molti POI insieme (leggibilita e prestazioni).
+
+---
+
 ## 🧭 AL RITORNO (dopo le presentazioni 14-17/07)
 
 - [ ] **Ecosistema modificabile a mano** (direttiva 26/07, piano completo in `VALUTAZIONE-ECOSISTEMA.md`): pulizia 2h (2 funzioni morte, 2 gemelle, controlli automatici al deploy) → MOSSA 1 spezzare index.html in html/css/js (4h) → MOSSA 2 traduzioni in it.js/sq.js/en.js (1g) → MOSSA 3 tabella `app_config` + sezione pannello per interruttori e parametri (1g). Poi: rotte utente dal localStorage a `user_routes` (tabella gia esistente dalla mig 010), split di app.js nei 15-20 file gia disegnati dai banner, e su Themeli SOLO il registro rilasci come primo aggancio.
