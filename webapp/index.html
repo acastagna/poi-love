@@ -5274,7 +5274,7 @@ async function loadPOIsFromDB() {
   // NB: la colonna nel DB è 'title' (non 'name') → alias inline title→name
   const { data, error } = await sb
     .from('pois')
-    .select('id,name:title,description,lat,lng,category,subcategory,categories,tags,visibility,is_featured,love_count,photos,author_id,profiles(username,avatar_url,special_tier)')
+    .select('id,name:title,description,lat,lng,category,subcategory,categories,tags,visibility,is_featured,love_count,photos,author_id,profiles!pois_author_id_fkey(username,avatar_url,special_tier)')
     .order('love_count', { ascending: false })
     .limit(200);
   if (error) { console.warn('loadPOIs:', error.message); if(window._resolvePoisLoaded) window._resolvePoisLoaded(); return; }
@@ -7905,7 +7905,7 @@ function openPendingSharedPoi(){
   try{ localStorage.removeItem('pl_pending_poi'); }catch(_){}
   hidePoiTeaser();
   _deepLinkActive=true;   // il POI condiviso vince sul GPS anche dopo il giro OAuth (URL senza ?poi=)
-  sb.from('pois').select('id,name:title,description,lat,lng,category,subcategory,categories,love_count,photos,author_id,address,profiles(username,avatar_url)')
+  sb.from('pois').select('id,name:title,description,lat,lng,category,subcategory,categories,love_count,photos,author_id,address,profiles!pois_author_id_fkey(username,avatar_url)')
     .eq('id',id).single().then(({data,error})=>{
       if(error||!data) return;
       if(map) map.setView([data.lat,data.lng],16);
@@ -7986,7 +7986,7 @@ function handleDeepLink(){
     // Cerca il POI più vicino a quelle coordinate nel DB
     if(sb){
       sb.from('pois')
-        .select('id,name:title,description,lat,lng,category,subcategory,categories,love_count,photos,author_id,address,profiles(username,avatar_url)')
+        .select('id,name:title,description,lat,lng,category,subcategory,categories,love_count,photos,author_id,address,profiles!pois_author_id_fkey(username,avatar_url)')
         .eq('visibility','community')
         .limit(500)
         .then(({data})=>{
@@ -8017,7 +8017,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='3.41';
+const APP_VERSION='3.42';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
