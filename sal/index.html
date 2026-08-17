@@ -418,7 +418,7 @@ body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); 
       <button class="lang-btn" data-lang="sq" title="Shqip" onclick="switchLang('sq')">🇦🇱</button>
       <button class="lang-btn" data-lang="en" title="English" onclick="switchLang('en')">🇬🇧</button>
     </div>
-    <span class="hdr-date" data-t="updated_date">Aggiornato: 8 Maggio 2026</span>
+    <span class="hdr-date" data-t="updated_date">Aggiornato: 17 Agosto 2026</span>
     <div class="status-pill"><div class="sdot"></div><span data-t="status_pill">MVP in sviluppo</span></div>
   </div>
 </header>
@@ -427,7 +427,7 @@ body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); 
 <div class="hero">
   <div class="hero-text">
     <h1><span class="h1-main">POI•LOVE</span><span class="h1-sub" data-t="hero_sub">Stato del Progetto</span></h1>
-    <p data-t="hero_desc">Mappa comunitaria dei luoghi amati. Prima istanza: Albania · Tirana. Lancio previsto giugno 2026. Framework open source Cultural Bridge OS — Licenza MIT.</p>
+    <p data-t="hero_desc">Mappa comunitaria dei luoghi amati. Prima istanza: Albania · Tirana. Lancio tecnico 17 agosto 2026. Framework open source Cultural Bridge OS — Licenza MIT.</p>
   </div>
   <div class="kpis">
     <a class="kpi kpi-link" href="velocita.html" title="Misure reali del 17/08/2026">
@@ -435,7 +435,7 @@ body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); 
       <div class="kpi-l" data-t="kpi_speed">Test velocit&agrave;</div>
     </a>
     <div class="kpi"><div class="kpi-v">75%</div><div class="kpi-l" data-t="kpi_done">Completamento</div></div>
-    <div class="kpi"><div class="kpi-v">5</div><div class="kpi-l" data-t="kpi_weeks">Settimane al lancio</div></div>
+    <div class="kpi"><div class="kpi-v">17.08</div><div class="kpi-l" data-t="kpi_weeks">Lancio tecnico</div></div>
     <div class="kpi"><div class="kpi-v">12</div><div class="kpi-l" data-t="kpi_tables">Tabelle database</div></div>
     <div class="kpi"><div class="kpi-v">MIT</div><div class="kpi-l" data-t="kpi_license">Licenza</div></div>
   </div>
@@ -754,7 +754,7 @@ body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); 
     </div>
     <div class="sp-dl-card sp-dl-launch">
       <div class="sp-dl-lbl" data-t="deadline_tirana_lbl">🚀 Lancio Tirana</div>
-      <div class="sp-dl-date" data-t="deadline_tirana_date">Giugno 2026</div>
+      <div class="sp-dl-date" data-t="deadline_tirana_date">17 Agosto 2026</div>
     </div>
   </div>
   <!-- griglia auto-scroll + drag manuale: 27 Apr → 17 Mag (21 giorni) — pausa al hover -->
@@ -824,7 +824,7 @@ body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); 
       <div class="ms-status" style="color:var(--green)"><i class="ph ph-check-circle"></i> <span data-t="ms1_status">Rilasciato</span></div>
     </div>
     <div class="ms-card" style="border-top:3px solid var(--red)">
-      <div class="ms-date" data-t="ms2_date">🎯 Giugno 2026</div>
+      <div class="ms-date" data-t="ms2_date">🎯 17 Agosto 2026</div>
       <div class="ms-ttl" data-t="ms2_title">MVP App iOS + Android</div>
       <div class="ms-desc" data-t="ms2_desc">Lancio pubblico a Tirana. Mappa, inserimento POI, liste, sistema LOVE.</div>
       <div class="ms-status" style="color:var(--red)"><i class="ph ph-lightning"></i> <span data-t="ms2_status">In sviluppo</span></div>
@@ -1071,10 +1071,10 @@ function rebuildPieLegend() {
 
 const T = {
   it: {
-    sal_badge:'SAL — Stato Avanzamento Lavori', updated_date:'Aggiornato: 8 Maggio 2026',
+    sal_badge:'SAL — Stato Avanzamento Lavori', updated_date:'Aggiornato: 17 Agosto 2026',
     status_pill:'MVP in sviluppo', hero_sub:'Stato del Progetto',
-    hero_desc:'Mappa comunitaria dei luoghi amati. Prima istanza: Albania · Tirana. Lancio previsto giugno 2026. Framework open source Cultural Bridge OS — Licenza MIT.',
-    kpi_speed:'Test velocità', kpi_done:'Completamento', kpi_weeks:'Settimane al lancio', kpi_tables:'Tabelle database', kpi_license:'Licenza',
+    hero_desc:'Mappa comunitaria dei luoghi amati. Prima istanza: Albania · Tirana. Lancio tecnico 17 agosto 2026. Framework open source Cultural Bridge OS — Licenza MIT.',
+    kpi_speed:'Test velocità', kpi_done:'Completamento', kpi_weeks:'Lancio tecnico', kpi_tables:'Tabelle database', kpi_license:'Licenza',
     area_title:'Avanzamento per Area', area_sub:'Stato corrente delle 4 macro-aree di progetto',
     lbl_done:'✓ Completata', lbl_active:'↗ In corso', lbl_todo:'○ Da avviare', lbl_critical:'⚡ Critico',
     area1:'Infrastruttura & Backend', area2:'App Mobile iOS/Android', area3:'UX/UI & Contenuti', area4:'Lancio & Distribuzione',
@@ -1099,8 +1099,8 @@ const T = {
     t13_name:'App Store + Google Play — Submission', t13_sub:'Screenshot, descrizioni, review Apple 1-3gg, Google 2-7gg', t13_phase:'Lancio', t13_time_m:'~5h — futuro',
     t14_name:'Campagna Lancio — Hacker News, Reddit, Twitter', t14_sub:'Show HN post, r/opensource, thread Twitter founder story', t14_phase:'Marketing', t14_time_m:'~4h — futuro',
     done_lbl:'completato', badge_done:'Fatto', badge_sprint:'Sprint', badge_next:'Prossimo', badge_future:'Futuro',
-    deadline_anthropic_lbl:'🎤 Finestra Presentazioni', deadline_anthropic_date:'13-17 Maggio 2026',
-    deadline_tirana_lbl:'🚀 Lancio Tirana', deadline_tirana_date:'Giugno 2026',
+    deadline_anthropic_lbl:'✓ Presentazioni', deadline_anthropic_date:'13-17 Maggio 2026 · fatte',
+    deadline_tirana_lbl:'🚀 Lancio Tecnico', deadline_tirana_date:'17 Agosto 2026',
     browser_banner:'📱 Per la migliore esperienza, apri in <strong>Safari</strong> o <strong>Chrome</strong>',
     sprint_title:'Sprint Pre-Presentazione', sprint_sub:'Cosa serve entro Mercoledì 13 Maggio (apertura finestra)',
     day_today:'Oggi', day_fri:'Sab', day_sat:'Dom', day_sun:'Lun', day_mon:'Mar', day_tue:'Mer', day_wed:'Gio',
@@ -1108,7 +1108,7 @@ const T = {
     day4_task:'Refining + audience', day5_task:'Dress rehearsal', day6_task:'🎤 Apertura finestra', day7_task:'🎤 Presentazione 2/5',
     ms_title:'Milestone di Progetto', ms_sub:'Roadmap dal lancio di Tirana alla scalabilità globale',
     ms1_date:'✓ Completata', ms1_title:'Prototipo Web + Infrastruttura', ms1_desc:'Demo live, database Supabase, autenticazione Google, API Maps configurate.', ms1_status:'Rilasciato',
-    ms2_date:'🎯 Giugno 2026', ms2_title:'MVP App iOS + Android', ms2_desc:'Lancio pubblico a Tirana. Mappa, inserimento POI, liste, sistema LOVE.', ms2_status:'In sviluppo',
+    ms2_date:'🎯 17 Agosto 2026', ms2_title:'MVP App iOS + Android', ms2_desc:'Lancio pubblico a Tirana. Mappa, inserimento POI, liste, sistema LOVE.', ms2_status:'In sviluppo',
     ms3_title:'POI•VOICE — Audio Guide AI', ms3_desc:'Guide audio generate da Claude. Pipeline AI proprietaria. Nessun servizio terzo.', ms3_status:'Pianificata',
     ms4_title:'Il Libro dei Luoghi', ms4_desc:'Pubblicazione fisica dei luoghi più amati dalla community. Primo stream di ricavi.', ms4_status:'Roadmap',
     stack_title:'Stack Tecnologico', stack_sub:'Ogni componente del sistema e il suo stato attuale',
@@ -1140,10 +1140,10 @@ const T = {
     open_link:'Apri →', link_demo:'Demo Live', footer_copy:'SAL — Documento per investitori e partner',
   },
   en: {
-    sal_badge:'Project Status Report', updated_date:'Updated: May 8, 2026',
+    sal_badge:'Project Status Report', updated_date:'Updated: August 17, 2026',
     status_pill:'MVP in development', hero_sub:'Project Status',
-    hero_desc:'Community map of beloved places. First instance: Albania · Tirana. Launch planned June 2026. Open source framework Cultural Bridge OS — MIT License.',
-    kpi_speed:'Speed test', kpi_done:'Completion', kpi_weeks:'Weeks to launch', kpi_tables:'Database tables', kpi_license:'License',
+    hero_desc:'Community map of beloved places. First instance: Albania · Tirana. Technical launch August 17, 2026. Open source framework Cultural Bridge OS — MIT License.',
+    kpi_speed:'Speed test', kpi_done:'Completion', kpi_weeks:'Technical launch', kpi_tables:'Database tables', kpi_license:'License',
     area_title:'Progress by Area', area_sub:'Current status of the 4 main project areas',
     lbl_done:'✓ Completed', lbl_active:'↗ In progress', lbl_todo:'○ Not started', lbl_critical:'⚡ Critical',
     area1:'Infrastructure & Backend', area2:'Mobile App iOS/Android', area3:'UX/UI & Content', area4:'Launch & Distribution',
@@ -1168,8 +1168,8 @@ const T = {
     t13_name:'App Store + Google Play — Submission', t13_sub:'Screenshots, descriptions, Apple review 1-3d, Google 2-7d', t13_phase:'Launch', t13_time_m:'~5h — future',
     t14_name:'Launch Campaign — Hacker News, Reddit, Twitter', t14_sub:'Show HN post, r/opensource, Twitter founder story thread', t14_phase:'Marketing', t14_time_m:'~4h — future',
     done_lbl:'done', badge_done:'Done', badge_sprint:'Sprint', badge_next:'Next', badge_future:'Future',
-    deadline_anthropic_lbl:'🎤 Presentation Window', deadline_anthropic_date:'May 13-17, 2026',
-    deadline_tirana_lbl:'🚀 Tirana Launch', deadline_tirana_date:'June 2026',
+    deadline_anthropic_lbl:'✓ Presentations', deadline_anthropic_date:'May 13-17, 2026 · done',
+    deadline_tirana_lbl:'🚀 Technical Launch', deadline_tirana_date:'August 17, 2026',
     browser_banner:'📱 For the best experience, open in <strong>Safari</strong> or <strong>Chrome</strong>',
     sprint_title:'Pre-Presentation Sprint', sprint_sub:'Goals for Wednesday May 13 (window opens)',
     day_today:'Today', day_fri:'Sat', day_sat:'Sun', day_sun:'Mon', day_mon:'Tue', day_tue:'Wed', day_wed:'Thu',
@@ -1177,7 +1177,7 @@ const T = {
     day4_task:'Refining + audience', day5_task:'Dress rehearsal', day6_task:'🎤 Window opens', day7_task:'🎤 Presentation 2/5',
     ms_title:'Project Milestones', ms_sub:'Roadmap from Tirana launch to global scale',
     ms1_date:'✓ Completed', ms1_title:'Web Prototype + Infrastructure', ms1_desc:'Live demo, Supabase database, Google auth, Maps APIs configured.', ms1_status:'Released',
-    ms2_date:'🎯 June 2026', ms2_title:'MVP App iOS + Android', ms2_desc:'Public launch in Tirana. Map, POI entry, lists, LOVE system.', ms2_status:'In development',
+    ms2_date:'🎯 August 17, 2026', ms2_title:'MVP App iOS + Android', ms2_desc:'Public launch in Tirana. Map, POI entry, lists, LOVE system.', ms2_status:'In development',
     ms3_title:'POI•VOICE — AI Audio Guides', ms3_desc:'Audio guides generated by Claude. Proprietary AI pipeline. No third-party services.', ms3_status:'Planned',
     ms4_title:'Il Libro dei Luoghi', ms4_desc:'Physical book of the most loved places from the community. First revenue stream.', ms4_status:'Roadmap',
     stack_title:'Technology Stack', stack_sub:'Every system component and its current status',
@@ -1209,10 +1209,10 @@ const T = {
     open_link:'Open →', link_demo:'Live Demo', footer_copy:'Status Report — For investors and partners',
   },
   sq: {
-    sal_badge:'Raport i Progresit të Projektit', updated_date:'Përditësuar: 8 Maj 2026',
+    sal_badge:'Raport i Progresit të Projektit', updated_date:'Përditësuar: 17 Gusht 2026',
     status_pill:'MVP në zhvillim', hero_sub:'Gjendja e Projektit',
-    hero_desc:'Hartë komunitare e vendeve të dashura. Rasti i parë: Shqipëri · Tiranë. Lansim i planifikuar qershor 2026. Kornizë me burim të hapur Cultural Bridge OS — Licencë MIT.',
-    kpi_speed:'Test shpejtësie', kpi_done:'Përfundim', kpi_weeks:'Javë deri lansim', kpi_tables:'Tabela DB', kpi_license:'Licencë',
+    hero_desc:'Hartë komunitare e vendeve të dashura. Rasti i parë: Shqipëri · Tiranë. Lansim teknik 17 gusht 2026. Kornizë me burim të hapur Cultural Bridge OS — Licencë MIT.',
+    kpi_speed:'Test shpejtësie', kpi_done:'Përfundim', kpi_weeks:'Lansim teknik', kpi_tables:'Tabela DB', kpi_license:'Licencë',
     area_title:'Progres sipas Zonës', area_sub:'Gjendja aktuale e 4 zonave kryesore të projektit',
     lbl_done:'✓ Përfunduar', lbl_active:'↗ Në progres', lbl_todo:'○ Nuk ka filluar', lbl_critical:'⚡ Kritike',
     area1:'Infrastrukturë & Backend', area2:'App Mobile iOS/Android', area3:'UX/UI & Përmbajtje', area4:'Lansim & Shpërndarje',
