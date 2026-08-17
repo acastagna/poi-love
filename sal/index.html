@@ -384,13 +384,17 @@ body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); 
   }
 }
 
-/* Pulsante alla pagina delle misure di velocita (17/08/2026) */
-.speed-btn{display:inline-flex;align-items:center;gap:6px;background:var(--red);color:#fff;
- text-decoration:none;border-radius:99px;padding:7px 15px;font-size:12.5px;font-weight:700;
- white-space:nowrap;transition:transform .15s,box-shadow .15s;box-shadow:0 2px 7px rgba(212,43,43,.28)}
-.speed-btn:hover{transform:translateY(-1px);box-shadow:0 4px 13px rgba(212,43,43,.38)}
-.speed-btn svg{flex-shrink:0}
-@media(max-width:640px){.speed-btn span{display:none}.speed-btn{padding:7px 10px}}
+/* Riquadro-pulsante "Test velocita" tra i KPI (17/08/2026).
+   Vive dentro la fascia rossa: testo BIANCO, mai rosso su rosso. */
+.kpi-link{text-decoration:none;cursor:pointer;position:relative;display:block;
+ background:#1C1C1C;border:1.5px solid #1C1C1C;
+ transition:background .18s,transform .18s,box-shadow .18s;box-shadow:0 3px 10px rgba(0,0,0,.22)}
+.kpi-link:hover{background:#000;transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.32)}
+.kpi-link .kpi-v,.kpi-link .kpi-l{color:#fff}
+.kpi-link .kpi-v{line-height:1;display:flex;align-items:center;justify-content:center}
+.kpi-link .kpi-l{font-weight:700;opacity:1}
+.kpi-link::after{content:'\2192';position:absolute;top:8px;right:10px;font-size:13px;color:#fff;opacity:.7}
+.kpi-link:hover::after{opacity:1}
 </style>
 </head>
 <body>
@@ -415,10 +419,6 @@ body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); 
       <button class="lang-btn" data-lang="en" title="English" onclick="switchLang('en')">🇬🇧</button>
     </div>
     <span class="hdr-date" data-t="updated_date">Aggiornato: 8 Maggio 2026</span>
-    <a href="velocita.html" class="speed-btn" title="Misure di velocità del 17/08/2026">
-      <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M13 2 4.5 13.5H11l-1 8.5 8.5-11.5H12z"/></svg>
-      <span>Quanto &egrave; veloce</span>
-    </a>
     <div class="status-pill"><div class="sdot"></div><span data-t="status_pill">MVP in sviluppo</span></div>
   </div>
 </header>
@@ -430,6 +430,10 @@ body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); 
     <p data-t="hero_desc">Mappa comunitaria dei luoghi amati. Prima istanza: Albania · Tirana. Lancio previsto giugno 2026. Framework open source Cultural Bridge OS — Licenza MIT.</p>
   </div>
   <div class="kpis">
+    <a class="kpi kpi-link" href="velocita.html" title="Misure reali del 17/08/2026">
+      <div class="kpi-v"><svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor" aria-hidden="true"><path d="M13 2 4.5 13.5H11l-1 8.5 8.5-11.5H12z"/></svg></div>
+      <div class="kpi-l" data-t="kpi_speed">Test velocit&agrave;</div>
+    </a>
     <div class="kpi"><div class="kpi-v">75%</div><div class="kpi-l" data-t="kpi_done">Completamento</div></div>
     <div class="kpi"><div class="kpi-v">5</div><div class="kpi-l" data-t="kpi_weeks">Settimane al lancio</div></div>
     <div class="kpi"><div class="kpi-v">12</div><div class="kpi-l" data-t="kpi_tables">Tabelle database</div></div>
@@ -1070,7 +1074,7 @@ const T = {
     sal_badge:'SAL — Stato Avanzamento Lavori', updated_date:'Aggiornato: 8 Maggio 2026',
     status_pill:'MVP in sviluppo', hero_sub:'Stato del Progetto',
     hero_desc:'Mappa comunitaria dei luoghi amati. Prima istanza: Albania · Tirana. Lancio previsto giugno 2026. Framework open source Cultural Bridge OS — Licenza MIT.',
-    kpi_done:'Completamento', kpi_weeks:'Settimane al lancio', kpi_tables:'Tabelle database', kpi_license:'Licenza',
+    kpi_speed:'Test velocità', kpi_done:'Completamento', kpi_weeks:'Settimane al lancio', kpi_tables:'Tabelle database', kpi_license:'Licenza',
     area_title:'Avanzamento per Area', area_sub:'Stato corrente delle 4 macro-aree di progetto',
     lbl_done:'✓ Completata', lbl_active:'↗ In corso', lbl_todo:'○ Da avviare', lbl_critical:'⚡ Critico',
     area1:'Infrastruttura & Backend', area2:'App Mobile iOS/Android', area3:'UX/UI & Contenuti', area4:'Lancio & Distribuzione',
@@ -1139,7 +1143,7 @@ const T = {
     sal_badge:'Project Status Report', updated_date:'Updated: May 8, 2026',
     status_pill:'MVP in development', hero_sub:'Project Status',
     hero_desc:'Community map of beloved places. First instance: Albania · Tirana. Launch planned June 2026. Open source framework Cultural Bridge OS — MIT License.',
-    kpi_done:'Completion', kpi_weeks:'Weeks to launch', kpi_tables:'Database tables', kpi_license:'License',
+    kpi_speed:'Speed test', kpi_done:'Completion', kpi_weeks:'Weeks to launch', kpi_tables:'Database tables', kpi_license:'License',
     area_title:'Progress by Area', area_sub:'Current status of the 4 main project areas',
     lbl_done:'✓ Completed', lbl_active:'↗ In progress', lbl_todo:'○ Not started', lbl_critical:'⚡ Critical',
     area1:'Infrastructure & Backend', area2:'Mobile App iOS/Android', area3:'UX/UI & Content', area4:'Launch & Distribution',
@@ -1208,7 +1212,7 @@ const T = {
     sal_badge:'Raport i Progresit të Projektit', updated_date:'Përditësuar: 8 Maj 2026',
     status_pill:'MVP në zhvillim', hero_sub:'Gjendja e Projektit',
     hero_desc:'Hartë komunitare e vendeve të dashura. Rasti i parë: Shqipëri · Tiranë. Lansim i planifikuar qershor 2026. Kornizë me burim të hapur Cultural Bridge OS — Licencë MIT.',
-    kpi_done:'Përfundim', kpi_weeks:'Javë deri lansim', kpi_tables:'Tabela DB', kpi_license:'Licencë',
+    kpi_speed:'Test shpejtësie', kpi_done:'Përfundim', kpi_weeks:'Javë deri lansim', kpi_tables:'Tabela DB', kpi_license:'Licencë',
     area_title:'Progres sipas Zonës', area_sub:'Gjendja aktuale e 4 zonave kryesore të projektit',
     lbl_done:'✓ Përfunduar', lbl_active:'↗ Në progres', lbl_todo:'○ Nuk ka filluar', lbl_critical:'⚡ Kritike',
     area1:'Infrastrukturë & Backend', area2:'App Mobile iOS/Android', area3:'UX/UI & Përmbajtje', area4:'Lansim & Shpërndarje',
