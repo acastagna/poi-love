@@ -16,32 +16,155 @@
     "license": "MIT"
   },
   "areas": [
-    { "id": "infra",   "pct": 100, "status": "done"    },
-    { "id": "app",     "pct": 90,  "status": "active"  },
-    { "id": "ux",      "pct": 88,  "status": "active"  },
-    { "id": "launch",  "pct": 55,  "status": "active"  }
+    {
+      "id": "infra",
+      "pct": 100,
+      "status": "done"
+    },
+    {
+      "id": "app",
+      "pct": 90,
+      "status": "active"
+    },
+    {
+      "id": "ux",
+      "pct": 88,
+      "status": "active"
+    },
+    {
+      "id": "launch",
+      "pct": 55,
+      "status": "active"
+    }
   ],
   "pie": [
-    { "id": "done",   "value": 80 },
-    { "id": "active", "value": 14 },
-    { "id": "todo",   "value": 6 }
+    {
+      "id": "done",
+      "value": 80
+    },
+    {
+      "id": "active",
+      "value": 14
+    },
+    {
+      "id": "todo",
+      "value": 6
+    }
   ],
   "tasks": [
-    { "id": "t1",  "group": "done",   "pct": 100, "time_est": 8,  "status": "done"   },
-    { "id": "t2",  "group": "done",   "pct": 100, "time_est": 6,  "status": "done"   },
-    { "id": "t3",  "group": "done",   "pct": 100, "time_est": 2,  "status": "done"   },
-    { "id": "t4",  "group": "done",   "pct": 100, "time_est": 2,  "status": "done"   },
-    { "id": "t5",  "group": "done",   "pct": 100, "time_est": 12, "status": "done"   },
-    { "id": "t6",  "group": "done",   "pct": 100, "time_est": 4,  "status": "done"   },
-    { "id": "t7",  "group": "done",   "pct": 100, "time_est": 3,  "status": "done"   },
-    { "id": "t8",  "group": "next",   "pct": 15,  "time_est": 6,  "status": "next",   "label": "App mobile (Expo) — dopo il lancio: build su store" },
-    { "id": "t9",  "group": "done",   "pct": 100, "time_est": 10, "status": "done",   "label": "Admin desktop (admin.poilove.com): moderazione, categorie, rotte, itinerari" },
-    { "id": "t10", "group": "done",   "pct": 100, "time_est": 6,  "status": "done",   "label": "Tassonomia categorie: 3 livelli + categoria personalizzata reale" },
-    { "id": "t11", "group": "sprint", "pct": 60,  "time_est": 6,  "status": "sprint", "label": "Collaudo end-to-end su telefono reale (mic, geofence, creazione dal vivo)" },
-    { "id": "t12", "group": "sprint", "pct": 30,  "time_est": 3,  "status": "sprint", "label": "Seed di POI reali di Tirana con codice di rivendicazione" },
-    { "id": "t13", "group": "next",   "pct": 10,  "time_est": 5,  "status": "next",   "label": "Gamification punti/badge + 3 QR fisici (modello di business)" },
-    { "id": "t14", "group": "next",   "pct": 0,   "time_est": 4,  "status": "next",   "label": "Terms of Service + Privacy Policy (blocca store e alcuni OAuth)" },
-    { "id": "t15", "group": "done",   "pct": 100, "time_est": 18, "status": "done",   "label": "Itinerari di Viaggio: DB + UI + tappe + compagnie + bacheca vocale" }
+    {
+      "id": "t1",
+      "group": "done",
+      "pct": 100,
+      "time_est": 8,
+      "status": "done"
+    },
+    {
+      "id": "t2",
+      "group": "done",
+      "pct": 100,
+      "time_est": 6,
+      "status": "done"
+    },
+    {
+      "id": "t3",
+      "group": "done",
+      "pct": 100,
+      "time_est": 2,
+      "status": "done"
+    },
+    {
+      "id": "t4",
+      "group": "done",
+      "pct": 100,
+      "time_est": 2,
+      "status": "done"
+    },
+    {
+      "id": "t5",
+      "group": "done",
+      "pct": 100,
+      "time_est": 12,
+      "status": "done"
+    },
+    {
+      "id": "t6",
+      "group": "done",
+      "pct": 100,
+      "time_est": 4,
+      "status": "done"
+    },
+    {
+      "id": "t7",
+      "group": "done",
+      "pct": 100,
+      "time_est": 3,
+      "status": "done"
+    },
+    {
+      "id": "t8",
+      "group": "next",
+      "pct": 15,
+      "time_est": 6,
+      "status": "next",
+      "label": "App mobile (Expo) — dopo il lancio: build su store"
+    },
+    {
+      "id": "t9",
+      "group": "done",
+      "pct": 100,
+      "time_est": 10,
+      "status": "done",
+      "label": "Admin desktop (admin.poilove.com): moderazione, categorie, rotte, itinerari"
+    },
+    {
+      "id": "t10",
+      "group": "done",
+      "pct": 100,
+      "time_est": 6,
+      "status": "done",
+      "label": "Tassonomia categorie: 3 livelli + categoria personalizzata reale"
+    },
+    {
+      "id": "t11",
+      "group": "sprint",
+      "pct": 60,
+      "time_est": 6,
+      "status": "sprint",
+      "label": "Collaudo end-to-end su telefono reale (mic, geofence, creazione dal vivo)"
+    },
+    {
+      "id": "t12",
+      "group": "sprint",
+      "pct": 30,
+      "time_est": 3,
+      "status": "sprint",
+      "label": "Seed di POI reali di Tirana con codice di rivendicazione"
+    },
+    {
+      "id": "t13",
+      "group": "next",
+      "pct": 10,
+      "time_est": 5,
+      "status": "next",
+      "label": "Gamification punti/badge + 3 QR fisici (modello di business)"
+    },
+    {
+      "id": "t14",
+      "group": "next",
+      "pct": 0,
+      "time_est": 4,
+      "status": "next",
+      "label": "Terms of Service + Privacy Policy (blocca store e alcuni OAuth)"
+    },
+    {
+      "id": "t15",
+      "group": "done",
+      "pct": 100,
+      "time_est": 18,
+      "status": "done",
+      "label": "Itinerari di Viaggio: DB + UI + tappe + compagnie + bacheca vocale"
+    }
   ],
   "changelog": [
     {
