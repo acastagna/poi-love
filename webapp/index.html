@@ -8017,7 +8017,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='3.43';
+const APP_VERSION='3.44';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
@@ -15549,6 +15549,13 @@ function _trCuisine(c){
 }
 function _buildGroundingBlock(cat, places, overpassDown, cityLabel, genericFallback, correctedFrom, wantedTime, radiusKm){
   const city=cityLabel||_gpsCity||'questa zona';
+  // Nome breve del luogo (solo il comune, senza provincia e stato) in MAIUSCOLO:
+  // serve a ILLI per aprire la risposta dicendo DOVE sei, non un generico "vicino a te".
+  const cityShort=String(city).split(',')[0].trim().toUpperCase();
+  const hasCity=city!=='questa zona'&&cityShort.length>1;
+  const apertura=hasCity
+    ? `- APERTURA OBBLIGATORIA: la PRIMA frase deve nominare il luogo dove si trova l'utente, in MAIUSCOLO e in grassetto con i doppi asterischi, esattamente in questa forma: "Vicino a **${cityShort}**, puoi visitare ...". Mai aprire con "Vicino a te" senza il nome del luogo.\n`
+    : `- APERTURA: non conosci il nome del luogo, quindi apri con "Qui vicino puoi visitare ...". Non inventare un nome di citta.\n`;
   const corr=correctedFrom?`NOTA: l'utente ha scritto "${correctedFrom}" ma intende ${city}. INIZIA la risposta facendoglielo notare con garbo (es. "Immagino tu intenda ${city}...") e poi prosegui normalmente.\n`:'';
   const _hm=wantedTime?(String(wantedTime.h).padStart(2,'0')+':'+String(wantedTime.mi||0).padStart(2,'0')):'';
   const timeNote=wantedTime?`VINCOLO ORARIO: l'utente vuole per le ${_hm}. Proponi PRIMA i posti segnati "aperto alle ${_hm}". Se un posto e "CHIUSO alle ${_hm}" NON proporlo come aperto; puoi menzionarlo solo dicendo che a quell'ora e chiuso. Se nessuno risulta aperto a ${_hm}, dillo con onesta.\n`:'';
@@ -15587,8 +15594,8 @@ ${lista}
 REGOLE FERREE:
 - Suggerisci SOLO posti presenti in questa lista, col loro NOME ESATTO. Se un posto non e in lista NON esiste: non inventarlo, non "ricordarlo", non proporre altre citta o posti lontani.
 - L'app mostra GIA, sotto la tua risposta, una scheda-pulsante per ogni posto (nome, tipo, distanza e i tasti Crea POI / Vai / Aggiungi / Condividi). Quindi NON ripetere quelle schede.
-- VIETATO: scrivere "R1/R2/R3", elencare campi uno per riga, usare emoji, usare asterischi o cancelletti (niente **grassetto**, niente #titoli), scrivere "n/d".
-- Scrivi SOLO 2-4 frasi di prosa naturale e calda: introduci, poi di' QUALE conviene e PERCHE usando i dati reali qui sopra (piu vicino, aperto adesso, gia su POI•LOVE). Esempio: "Vicino a te le piu comode sono la Rotonda e The Legend: la Rotonda e la piu vicina ed e aperta adesso."
+- VIETATO: scrivere "R1/R2/R3", elencare campi uno per riga, usare emoji, usare cancelletti (#titoli), scrivere "n/d". Il grassetto e ammesso in UN SOLO punto, il nome del luogo in apertura: altrove niente asterischi.
+${apertura}- Scrivi SOLO 2-4 frasi di prosa naturale e calda: dopo l'apertura di' QUALE conviene e PERCHE usando i dati reali qui sopra (piu vicino, aperto adesso, gia su POI•LOVE). Esempio: "Vicino a **${cityShort}**, puoi visitare la Rotonda e The Legend: la Rotonda e la piu vicina ed e aperta adesso."
 - Se un dato non ce l'hai (voti, prezzo), NON nominarlo per niente. Se invece il voto Google c'e, CITALO nella motivazione (es. "4,3 su 1399 recensioni"): e il segnale piu forte per l'utente.
 - Scrivi TUTTO nella lingua dell'utente: nessuna parola in inglese, traduci anche i tipi di cucina.
 - Freschezza: questi nomi vengono da OpenStreetMap e possono essere datati. Chiudi con un breve invito a verificare orari e apertura. Da' priorita ai posti gia su POI•LOVE.`;

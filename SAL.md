@@ -7,7 +7,7 @@
 ### Come è andata
 
 1. **Collaudo di Alessandro** dal suo Mac, prima di toccare il DNS: mappa con i 13 luoghi, elenco "I miei POI", apertura delle schede, caricamento foto che persiste dopo uscita e rientro, condivisioni, link brevi, admin, `project`, `sal`, ILLI. Superato.
-2. **Copie di sicurezza attivate** da Alessandro (Backups Hetzner, 5,90 €/mese) e prima copia eseguita, prima del passaggio.
+2. **Copie di sicurezza attivate** da Alessandro (Backups automatici del provider) e prima copia eseguita, prima del passaggio.
 3. **Nameserver girati** su Aruba verso Cloudflare (`algin` e `pam`). Il registro `.com` ha preso il cambio.
 4. **Certificati veri** Let's Encrypt emessi per i sei nomi con validazione via DNS, mentre il traffico andava ancora al server vecchio. Ricarica automatica di nginx al rinnovo installata.
 5. **Spostamento dei record**: `@`, `www`, `admin`, `sal`, `project`, `media` sulla macchina nuova. **Non toccati** `mail`, `webmail`, `ipv4`, `ns1`, `ns2`, `go`, `ftp`, SPF/DKIM/DMARC e i record della posta: restano dove sono.
