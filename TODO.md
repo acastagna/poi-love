@@ -6,6 +6,12 @@
 
 ## ⚡ SUBITO (dalla sessione 04/07)
 
+- [ ] **ILLI: qualità della ricerca (rimandato da Alessandro al dopo-DNS, 17/08)** — diagnosi fatta sul campo a Thiene: chiedendo un panino ILLI risponde che non ce ne sono, ma esistono. Non è il modello che sbaglia, è la **fonte**: il grounding interroga solo OpenStreetMap (Overpass), dove i piccoli esercizi italiani sono in gran parte non mappati o senza il tag giusto. Tre interventi, in ordine:
+  1. **Secondo giro su Google Places** quando OSM restituisce pochi o zero risultati per la categoria chiesta. L'integrazione esiste già con tetto di 1000 chiamate al mese (`GPLACES_MONTHLY_CAP`) e cache 7 giorni: va usata come rete di sicurezza, non come prima scelta, così il costo resta zero.
+  2. **Vocabolario delle richieste più largo**: "panino" oggi non aggancia `sandwich`, `fast_food`, `bakery`, `cafe`, `kebab`, `pizza al taglio`. Da ampliare la mappa parola → categorie, in tre lingue.
+  3. **Usare recensioni e testi** nella motivazione (Google Places li ha): oggi ILLI cita il voto ma non il contenuto, che è il segnale che convince davvero.
+  *(Da fare a DNS girati: tocca il grounding, non il trasloco.)*
+
 - [ ] **Collaudo Alessandro NUOVO EDITOR POI ADMIN (10/07 sera)**: login su admin.poilove.com → POI → Modifica: foto (aggiungi URL/upload, principale, elimina), 3 categorie a chips, tag, indirizzo+geocodifica nei 2 sensi, coordinate, salva e verifica sul sito.
 - [ ] **CONTENUTO ROTTE (scoperta 10/07: nel DB ZERO rotte pubblicate)**: creare e pubblicare le prime rotte storiche vere (Via Egnatia, Riviera, ecc.) dall'admin; assegnare i badge Ufficiale/Indispensabile; il "Più votato" arriva dai salvataggi reali.
 - [ ] **Pagina rotte "meravigliosa" nella webapp** (richiesta 10/07, rafforzata 11/07 notte): la rotta storica è IL prodotto editoriale: nozioni storiche, riferimenti, spiegazioni, foto, tappe navigabili, in futuro audiolibri (POI•VOICE). Blocco grande, primo della lista.

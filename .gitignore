@@ -53,3 +53,7 @@ supabase/.temp/
 
 # Chiavi client ricerca immagini (mai su repo pubblico)
 admin/js/media-keys.js
+
+# Piano trasloco server — dettagli infrastruttura, mai nel repo pubblico
+TRASLOCO-ORDINI.md
+RIFINITURE-MACCHINA-NUOVA.md
