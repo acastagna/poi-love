@@ -434,7 +434,7 @@ body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); 
       <div class="kpi-v"><svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor" aria-hidden="true"><path d="M13 2 4.5 13.5H11l-1 8.5 8.5-11.5H12z"/></svg></div>
       <div class="kpi-l" data-t="kpi_speed">Test velocit&agrave;</div>
     </a>
-    <div class="kpi"><div class="kpi-v">75%</div><div class="kpi-l" data-t="kpi_done">Completamento</div></div>
+    <div class="kpi"><div class="kpi-v">66%</div><div class="kpi-l" data-t="kpi_done">Completamento</div></div>
     <div class="kpi"><div class="kpi-v">17.08</div><div class="kpi-l" data-t="kpi_weeks">Lancio tecnico</div></div>
     <div class="kpi"><div class="kpi-v">12</div><div class="kpi-l" data-t="kpi_tables">Tabelle database</div></div>
     <div class="kpi"><div class="kpi-v">MIT</div><div class="kpi-l" data-t="kpi_license">Licenza</div></div>
@@ -458,22 +458,22 @@ body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); 
       <div class="bar-track"><div class="bar-fill bf-g" data-target="100" style="width:0%"></div></div>
     </div>
     <div class="pg-card c-y">
-      <div class="pg-lbl y" data-t="lbl_active">↗ In corso</div>
+      <div class="pg-lbl m" data-t="lbl_todo">○ Da avviare</div>
       <div class="pg-title" data-t="area2">App Mobile iOS/Android</div>
-      <div class="pg-pct y">75%</div>
-      <div class="bar-track"><div class="bar-fill bf-y" data-target="75" style="width:0%"></div></div>
+      <div class="pg-pct m">25%</div>
+      <div class="bar-track"><div class="bar-fill bf-m" data-target="25" style="width:0%"></div></div>
     </div>
     <div class="pg-card c-m">
-      <div class="pg-lbl m" data-t="lbl_todo">○ Da avviare</div>
+      <div class="pg-lbl y" data-t="lbl_active">↗ In corso</div>
       <div class="pg-title" data-t="area3">UX/UI &amp; Contenuti</div>
-      <div class="pg-pct m">65%</div>
-      <div class="bar-track"><div class="bar-fill bf-m" data-target="65" style="width:0%"></div></div>
+      <div class="pg-pct y">85%</div>
+      <div class="bar-track"><div class="bar-fill bf-y" data-target="85" style="width:0%"></div></div>
     </div>
     <div class="pg-card c-r">
       <div class="pg-lbl r" data-t="lbl_critical">⚡ Critico</div>
       <div class="pg-title" data-t="area4">Lancio &amp; Distribuzione</div>
-      <div class="pg-pct r">40%</div>
-      <div class="bar-track"><div class="bar-fill bf-r" data-target="40" style="width:0%"></div></div>
+      <div class="pg-pct r">55%</div>
+      <div class="bar-track"><div class="bar-fill bf-r" data-target="55" style="width:0%"></div></div>
     </div>
   </div>
 </div>
@@ -1102,12 +1102,12 @@ const T = {
     deadline_anthropic_lbl:'✓ Presentazioni', deadline_anthropic_date:'13-17 Maggio 2026 · fatte',
     deadline_tirana_lbl:'🚀 Lancio Tecnico', deadline_tirana_date:'17 Agosto 2026',
     browser_banner:'📱 Per la migliore esperienza, apri in <strong>Safari</strong> o <strong>Chrome</strong>',
-    sprint_title:'Sprint Pre-Presentazione', sprint_sub:'Cosa serve entro Mercoledì 13 Maggio (apertura finestra)',
+    sprint_title:'Dopo il lancio tecnico', sprint_sub:'Il 17/08 POI•LOVE e passata su macchina propria. Ecco cosa resta verso il lancio pubblico',
     day_today:'Oggi', day_fri:'Sab', day_sat:'Dom', day_sun:'Lun', day_mon:'Mar', day_tue:'Mer', day_wed:'Gio',
     day1_task:'Wire Plesk Upload + nav', day2_task:'Slide demo + storia', day3_task:'Dry-run completo',
     day4_task:'Refining + audience', day5_task:'Dress rehearsal', day6_task:'🎤 Apertura finestra', day7_task:'🎤 Presentazione 2/5',
     ms_title:'Milestone di Progetto', ms_sub:'Roadmap dal lancio di Tirana alla scalabilità globale',
-    ms1_date:'✓ Completata', ms1_title:'Prototipo Web + Infrastruttura', ms1_desc:'Demo live, database Supabase, autenticazione Google, API Maps configurate.', ms1_status:'Rilasciato',
+    ms1_date:'✓ Completata', ms1_title:'Prototipo Web + Macchina dedicata', ms1_desc:'Webapp live in tre lingue, database Supabase, autenticazione Google. Dal 17/08/2026 gira su una macchina tutta sua: 16 processori e 30 GB, non piu divisi con altri 62 progetti.', ms1_status:'Rilasciato',
     ms2_date:'🎯 17 Agosto 2026', ms2_title:'MVP App iOS + Android', ms2_desc:'Lancio pubblico a Tirana. Mappa, inserimento POI, liste, sistema LOVE.', ms2_status:'In sviluppo',
     ms3_title:'POI•VOICE — Audio Guide AI', ms3_desc:'Guide audio generate da Claude. Pipeline AI proprietaria. Nessun servizio terzo.', ms3_status:'Pianificata',
     ms4_title:'Il Libro dei Luoghi', ms4_desc:'Pubblicazione fisica dei luoghi più amati dalla community. Primo stream di ricavi.', ms4_status:'Roadmap',
@@ -1171,12 +1171,12 @@ const T = {
     deadline_anthropic_lbl:'✓ Presentations', deadline_anthropic_date:'May 13-17, 2026 · done',
     deadline_tirana_lbl:'🚀 Technical Launch', deadline_tirana_date:'August 17, 2026',
     browser_banner:'📱 For the best experience, open in <strong>Safari</strong> or <strong>Chrome</strong>',
-    sprint_title:'Pre-Presentation Sprint', sprint_sub:'Goals for Wednesday May 13 (window opens)',
+    sprint_title:'After the technical launch', sprint_sub:'On 17/08 POI•LOVE moved to its own machine. What remains before the public launch',
     day_today:'Today', day_fri:'Sat', day_sat:'Sun', day_sun:'Mon', day_mon:'Tue', day_tue:'Wed', day_wed:'Thu',
     day1_task:'Wire Plesk Upload + nav', day2_task:'Slides + story', day3_task:'Full dry-run',
     day4_task:'Refining + audience', day5_task:'Dress rehearsal', day6_task:'🎤 Window opens', day7_task:'🎤 Presentation 2/5',
     ms_title:'Project Milestones', ms_sub:'Roadmap from Tirana launch to global scale',
-    ms1_date:'✓ Completed', ms1_title:'Web Prototype + Infrastructure', ms1_desc:'Live demo, Supabase database, Google auth, Maps APIs configured.', ms1_status:'Released',
+    ms1_date:'✓ Completed', ms1_title:'Web Prototype + Dedicated machine', ms1_desc:'Live web app in three languages, Supabase database, Google auth. Since 17/08/2026 it runs on its own machine: 16 processors and 30 GB, no longer shared with 62 other projects.', ms1_status:'Released',
     ms2_date:'🎯 August 17, 2026', ms2_title:'MVP App iOS + Android', ms2_desc:'Public launch in Tirana. Map, POI entry, lists, LOVE system.', ms2_status:'In development',
     ms3_title:'POI•VOICE — AI Audio Guides', ms3_desc:'Audio guides generated by Claude. Proprietary AI pipeline. No third-party services.', ms3_status:'Planned',
     ms4_title:'Il Libro dei Luoghi', ms4_desc:'Physical book of the most loved places from the community. First revenue stream.', ms4_status:'Roadmap',
@@ -1289,20 +1289,20 @@ let tr = T[LANG];
 ═══════════════════════════════════════════ */
 /* PIE usa chiavi di traduzione — si risolve dinamicamente al cambio lingua */
 const PIE = [
-  { id:'done',   color:'#22C55E', value:60, label_key:'pie_done',
+  { id:'done',   color:'#22C55E', value:66, label_key:'pie_done',
     items:[
       {key:'t1_name',done:true},{key:'t2_name',done:true},{key:'t3_name',done:true},
       {key:'t4_name',done:true},{key:'t5_name',done:true},{key:'t6_name',done:true}
     ]
   },
-  { id:'active', color:'#F59E0B', value:25, label_key:'pie_active',
+  { id:'active', color:'#F59E0B', value:22, label_key:'pie_active',
     items:[
       {key:'t7_name',done:false},{key:'t8_name',done:false},
       {key:'cta_title',done:false},
       {key:'_video',done:false}  /* chiave speciale */
     ]
   },
-  { id:'todo',   color:'#D42B2B', value:15, label_key:'pie_todo',
+  { id:'todo',   color:'#D42B2B', value:12, label_key:'pie_todo',
     items:[
       {key:'t9_name',done:false},{key:'t10_name',done:false},{key:'t11_name',done:false},
       {key:'t12_name',done:false},{key:'t13_name',done:false},{key:'t14_name',done:false}
