@@ -71,7 +71,10 @@ $ogimg  = $photo ? seo_abs($photo) : ($tpl && !empty($tpl['image_url']) ? $tpl['
 $path     = '/poi.php';
 $params   = array('id' => $id);
 $canonical = SEO_BASE . $path . '?' . http_build_query(array('id'=>$id,'lang'=>$lang));
-$appUrl    = SEO_BASE . '/?poi=' . rawurlencode($id);
+// Il codice di chi ha condiviso viaggia fino all'app: e' quello che assegna i punti referral.
+$refRaw    = isset($_GET['ref']) ? preg_replace('/[^A-Za-z0-9_.-]/', '', (string)$_GET['ref']) : '';
+$refQs     = ($refRaw !== '') ? '&ref=' . rawurlencode(substr($refRaw, 0, 40)) : '';
+$appUrl    = SEO_BASE . '/?poi=' . rawurlencode($id) . $refQs;
 $lat = $poi ? $poi['lat'] : null; $lng = $poi ? $poi['lng'] : null;
 
 // ── Luoghi vicini (stessa area, pubblici) per crawl + contenuto ────────────────

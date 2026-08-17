@@ -38,7 +38,7 @@ RewriteRule ^@([A-Za-z0-9_\.\-]+)/?$ /index.html [L]
 RewriteRule ^p/([0-9\.\-]+,[0-9\.\-]+)/?$ /?at=$1 [R=302,L]
 
 # ── 6. Redirect /p/uuid → /?poi=uuid ──────────────────
-RewriteRule ^p/([0-9a-f\-]{36})/?$ /?poi=$1 [R=302,L,NC]
+RewriteRule ^p/([0-9a-f\-]{36})/?$ /poi.php?id=$1 [R=302,L,NC,QSA]
 
 # ── 7. Fallback /p/* → / ──────────────────────────────
 RewriteRule ^p/(.*)$ / [R=302,L]
