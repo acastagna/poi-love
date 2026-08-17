@@ -5508,28 +5508,36 @@ async function compressToWebPDettaglio(file, maxWidth=1200, quality=0.82){
     canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
     return canvas;
   };
-  const aBlob=(canvas,q)=>new Promise(res=>canvas.toBlob(b=>res(b),'image/webp',q));
+  const aBlob=(canvas,q,tipo)=>new Promise(res=>canvas.toBlob(b=>res(b),tipo||'image/webp',q));
   return new Promise(resolve=>{
     const img=new Image();
     const url=URL.createObjectURL(file);
     img.onload=async()=>{
       try{
-        let lato=maxWidth, q=quality, blob=await aBlob(disegna(img,lato),q);
-        // il browser non sa fare WebP: va detto, non nascosto
+        let lato=maxWidth, q=quality, tipo='image/webp';
+        let blob=await aBlob(disegna(img,lato),q,tipo);
+        // Su iPhone TUTTI i browser usano il motore di Safari, che accetta la richiesta di
+        // WebP ma puo' restituire un PNG senza dirlo: e' cosi' che sono entrati PNG da 4 MB
+        // col nome .webp. Se il tipo non e' quello chiesto si ripiega su JPEG, che qualsiasi
+        // motore sa produrre. Mai rifiutare la foto: l'utente deve poter caricare sempre.
         if(!blob || blob.type!=='image/webp'){
-          URL.revokeObjectURL(url);
-          return resolve({blob:file, webpOk:false, kb:Math.round(file.size/1024)});
+          tipo='image/jpeg';
+          blob=await aBlob(disegna(img,lato),q,tipo);
+          if(!blob || blob.type!=='image/jpeg'){
+            URL.revokeObjectURL(url);
+            return resolve({blob:file, webpOk:false, tipo:file.type, kb:Math.round(file.size/1024)});
+          }
         }
         // finche' resta sopra il tetto: prima abbasso la qualita', poi il lato
         let giri=0;
         while(blob.size > FOTO_TETTO_KB*1024 && giri<6){
           if(q>0.55) q-=0.1; else lato=Math.round(lato*0.8);
-          const b2=await aBlob(disegna(img,lato),q);
+          const b2=await aBlob(disegna(img,lato),q,tipo);
           if(!b2) break;
           blob=b2; giri++;
         }
         URL.revokeObjectURL(url);
-        resolve({blob, webpOk:true, kb:Math.round(blob.size/1024)});
+        resolve({blob, webpOk:true, tipo, kb:Math.round(blob.size/1024)});
       }catch(e){
         URL.revokeObjectURL(url);
         resolve({blob:file, webpOk:false, kb:Math.round(file.size/1024)});
@@ -5587,6 +5595,8 @@ async function uploadPhotosToMediaServer(files, poiId){
       try{ showToast('⚠ Una foto non e stata caricata: formato non supportato'); }catch(_){}
       continue;
     }
+    // il tipo REALE viaggia col file: mai piu' un JPEG o un PNG col nome .webp
+    r.blob._tipoReale = r.tipo || 'image/webp';
     compressed.push(r.blob);
   }
   if(!compressed.length) return urls;
@@ -5598,7 +5608,10 @@ async function uploadPhotosToMediaServer(files, poiId){
 
   const fd = new FormData();
   fd.append('poi_id', poiId || `tmp-${Date.now()}`);
-  compressed.forEach((f,i) => fd.append('photos[]', f, `photo_${i}.webp`));
+  compressed.forEach((f,i) => {
+    const est = (f._tipoReale === 'image/jpeg') ? 'jpg' : 'webp';
+    fd.append('photos[]', f, `photo_${i}.${est}`);
+  });
 
   try {
     const res = await fetch(`${MEDIA_SERVER_URL}/upload.php`, {
@@ -5620,8 +5633,10 @@ async function uploadPhotosToMediaServer(files, poiId){
   // FALLBACK: Supabase Storage (bucket poi_photos)
   for (const file of compressed) {
     try {
-      const path = `${currentUser.id}/${Date.now()}_${Math.random().toString(36).substr(2,6)}.webp`;
-      const { error: upErr } = await sb.storage.from('poi_photos').upload(path, file, { cacheControl: '3600', upsert: false, contentType: 'image/webp' });
+      const tipoReale = file._tipoReale || 'image/webp';
+      const est = (tipoReale === 'image/jpeg') ? 'jpg' : 'webp';
+      const path = `${currentUser.id}/${Date.now()}_${Math.random().toString(36).substr(2,6)}.${est}`;
+      const { error: upErr } = await sb.storage.from('poi_photos').upload(path, file, { cacheControl: '3600', upsert: false, contentType: tipoReale });
       if (upErr) { console.warn('[poilove] storage skip:', upErr.message); continue; }
       const { data: urlData } = sb.storage.from('poi_photos').getPublicUrl(path);
       urls.push(urlData.publicUrl);
@@ -8061,7 +8076,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='3.47';
+const APP_VERSION='3.48';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
