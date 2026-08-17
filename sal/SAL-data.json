@@ -1,17 +1,17 @@
 {
   "_meta": {
-    "last_updated": "2026-07-10",
-    "version": "3.14",
-    "next_deadline": "2026-07-14",
-    "next_deadline_label": "🎤 Finestra presentazioni 14-17 Luglio (mar-ven) — webapp v3.14 live e usabile end-to-end",
+    "last_updated": "2026-08-17",
+    "version": "3.44",
+    "next_deadline": "2026-08-17",
+    "next_deadline_label": "🚀 Lancio tecnico 17 agosto 2026 — POI•LOVE su macchina dedicata",
     "presentation_window_start": "2026-07-14",
     "presentation_window_end": "2026-07-17",
-    "launch_date": "17 agosto 2026 (lun) — Tirana, lancio pubblico",
+    "launch_date": "17 agosto 2026 (lun) — lancio tecnico su macchina dedicata",
     "launch_city": "Tirana"
   },
   "overview": {
-    "overall_pct": 88,
-    "weeks_to_launch": 5,
+    "overall_pct": 66,
+    "weeks_to_launch": 0,
     "db_tables": 42,
     "license": "MIT"
   },
@@ -40,15 +40,15 @@
   "pie": [
     {
       "id": "done",
-      "value": 80
+      "value": 66
     },
     {
       "id": "active",
-      "value": 14
+      "value": 22
     },
     {
       "id": "todo",
-      "value": 6
+      "value": 12
     }
   ],
   "tasks": [
