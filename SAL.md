@@ -1,5 +1,33 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
+## Sessione 17/08/2026 — POI•LOVE è passata sulla macchina propria
+
+**Il dominio non vive più sul server condiviso.** `poilove.com` e i suoi indirizzi rispondono dalla macchina dedicata. Il server storico resta acceso e intatto per almeno 30 giorni: il ritorno indietro costa un minuto.
+
+### Come è andata
+
+1. **Collaudo di Alessandro** dal suo Mac, prima di toccare il DNS: mappa con i 13 luoghi, elenco "I miei POI", apertura delle schede, caricamento foto che persiste dopo uscita e rientro, condivisioni, link brevi, admin, `project`, `sal`, ILLI. Superato.
+2. **Copie di sicurezza attivate** da Alessandro (Backups Hetzner, 5,90 €/mese) e prima copia eseguita, prima del passaggio.
+3. **Nameserver girati** su Aruba verso Cloudflare (`algin` e `pam`). Il registro `.com` ha preso il cambio.
+4. **Certificati veri** Let's Encrypt emessi per i sei nomi con validazione via DNS, mentre il traffico andava ancora al server vecchio. Ricarica automatica di nginx al rinnovo installata.
+5. **Spostamento dei record**: `@`, `www`, `admin`, `sal`, `project`, `media` sulla macchina nuova. **Non toccati** `mail`, `webmail`, `ipv4`, `ns1`, `ns2`, `go`, `ftp`, SPF/DKIM/DMARC e i record della posta: restano dove sono.
+6. **Verifica dal mondo**: i cinque indirizzi rispondono 200 con i contenuti giusti, webapp v3.44, zero errori PHP. I 404 e 403 nei registri sono robot che cercano falle note (`/.env`, `/.git/config`): le protezioni rispondono correttamente.
+
+### Difetti chiusi in questa sessione
+
+- **Le tre foto nere** (`Aeroporto di Tirana`, `Giardino di Via Padova`, `Emerald Center`) non erano immagini rotte: stavano su `media.poilove.com`, che aveva ancora il certificato provvisorio. Il browser blocca in silenzio le immagini servite con un certificato non valido. Col certificato vero rispondono tutte.
+- **ILLI diceva "Vicino a te"** senza nominare il posto. Il dato c'era già, il testo non lo usava e il grassetto era vietato dalle regole di ILLI. Ora apre con il nome del luogo in maiuscolo e in grassetto: *"Vicino a **THIENE**, puoi visitare…"*. Versione 3.44.
+
+### Stato misurato della macchina
+
+Accesso a sole chiavi, firewall attivo, protezione tentativi ripetuti attiva, ora italiana, zero aggiornamenti in attesa, rinnovo certificati automatico, 1,9 GB usati su 301, memoria 0 su 30 GB.
+
+### Cosa resta
+
+Lista completa e ordinata in `RIFINITURE-MACCHINA-NUOVA.md` (fuori da GitHub). In cima: **snapshot a rotazione con prova di ripristino** (per poter spegnere i Backups a pagamento), **schermo Cloudflare**, **riallineamento del repository** con i file modificati sul server fino al 31/07, **nuovo modo di pubblicare** al posto della copia file per file. Sul prodotto: qualità della ricerca di ILLI, marcatori della mappa, anteprima delle condivisioni, `sal` e `project` da riscrivere.
+
+---
+
 ## Sessione 26/07/2026 — Trasloco cartella, dossier commerciale (riservato), Scheda Professionale su project.poilove.com
 
 Sessione di riordino e di documentazione commerciale. Nessuna modifica alla webapp.
