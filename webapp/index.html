@@ -5490,20 +5490,52 @@ function deleteCurrentPOI(){ openDeleteConfirm(); }
 const MEDIA_SERVER_URL = 'https://media.poilove.com';
 
 // Comprime un File/Blob in WebP (max 1200px, qualità 82%) via Canvas
+// Comprime in WebP e NON si accontenta: se il risultato supera il tetto, riprova
+// abbassando qualita' e lato finche' non rientra. Se il browser non sa produrre WebP
+// lo dichiara (webpOk:false) invece di restituire l'originale spacciandolo per compresso:
+// e' cosi' che in passato sono finiti in archivio PNG da 4 MB col nome .webp.
+const FOTO_TETTO_KB = 100;
 async function compressToWebP(file, maxWidth=1200, quality=0.82){
+  const r = await compressToWebPDettaglio(file, maxWidth, quality);
+  return r.blob;
+}
+async function compressToWebPDettaglio(file, maxWidth=1200, quality=0.82){
+  const disegna=(img,w)=>{
+    const ratio=Math.min(w/img.width,1);
+    const canvas=document.createElement('canvas');
+    canvas.width=Math.round(img.width*ratio);
+    canvas.height=Math.round(img.height*ratio);
+    canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
+    return canvas;
+  };
+  const aBlob=(canvas,q)=>new Promise(res=>canvas.toBlob(b=>res(b),'image/webp',q));
   return new Promise(resolve=>{
     const img=new Image();
     const url=URL.createObjectURL(file);
-    img.onload=()=>{
-      const ratio=Math.min(maxWidth/img.width,1);
-      const canvas=document.createElement('canvas');
-      canvas.width=Math.round(img.width*ratio);
-      canvas.height=Math.round(img.height*ratio);
-      canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
-      URL.revokeObjectURL(url);
-      canvas.toBlob(blob=>resolve(blob||file),'image/webp',quality);
+    img.onload=async()=>{
+      try{
+        let lato=maxWidth, q=quality, blob=await aBlob(disegna(img,lato),q);
+        // il browser non sa fare WebP: va detto, non nascosto
+        if(!blob || blob.type!=='image/webp'){
+          URL.revokeObjectURL(url);
+          return resolve({blob:file, webpOk:false, kb:Math.round(file.size/1024)});
+        }
+        // finche' resta sopra il tetto: prima abbasso la qualita', poi il lato
+        let giri=0;
+        while(blob.size > FOTO_TETTO_KB*1024 && giri<6){
+          if(q>0.55) q-=0.1; else lato=Math.round(lato*0.8);
+          const b2=await aBlob(disegna(img,lato),q);
+          if(!b2) break;
+          blob=b2; giri++;
+        }
+        URL.revokeObjectURL(url);
+        resolve({blob, webpOk:true, kb:Math.round(blob.size/1024)});
+      }catch(e){
+        URL.revokeObjectURL(url);
+        resolve({blob:file, webpOk:false, kb:Math.round(file.size/1024)});
+      }
     };
-    img.onerror=()=>{ URL.revokeObjectURL(url); resolve(file); };
+    img.onerror=()=>{ URL.revokeObjectURL(url); resolve({blob:file, webpOk:false, kb:Math.round(file.size/1024)}); };
     img.src=url;
   });
 }
@@ -5542,10 +5574,22 @@ async function uploadPhotosToMediaServer(files, poiId){
   const urls = [];
   if(!currentUser || !files.length) return urls;
 
-  // Comprimi in WebP prima dell'upload
-  const compressed = await Promise.all(files.map(async f=>{
-    try{ return await compressToWebP(f); }catch(_){ return f; }
-  }));
+  // Comprimi in WebP prima dell'upload. Se una foto non si comprime, NON la si carica
+  // spacciandola per .webp: si avvisa e si salta. Meglio una foto in meno che 4 MB
+  // di PNG travestito che poi ogni visitatore deve scaricare.
+  const compressed = [];
+  for(const f of files){
+    let r;
+    try{ r = await compressToWebPDettaglio(f); }
+    catch(_){ r = {blob:f, webpOk:false, kb:Math.round(f.size/1024)}; }
+    if(!r.webpOk){
+      console.warn('[poilove] foto non comprimibile, saltata:', f.name, r.kb+' KB');
+      try{ showToast('⚠ Una foto non e stata caricata: formato non supportato'); }catch(_){}
+      continue;
+    }
+    compressed.push(r.blob);
+  }
+  if(!compressed.length) return urls;
 
   // Recupera il JWT dell'utente per autenticare la richiesta al media server
   const { data: { session } } = await sb.auth.getSession();
@@ -8017,7 +8061,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='3.46';
+const APP_VERSION='3.47';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
