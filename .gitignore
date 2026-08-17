@@ -57,3 +57,14 @@ admin/js/media-keys.js
 # Piano trasloco server — dettagli infrastruttura, mai nel repo pubblico
 TRASLOCO-ORDINI.md
 RIFINITURE-MACCHINA-NUOVA.md
+
+# ── Foto caricate dagli utenti (POI, avatar, copertine): MAI su GitHub ──
+# Vivono sulla macchina e su Supabase Storage, e sono protette dal backup della macchina.
+# Il repository e' pubblico e tiene solo gli asset del progetto (loghi, mascotte, opengraph).
+plesk-media-server/poi/
+plesk-media-server/uploads/
+media/poi/
+**/media/poi/
+**/uploads/
+*.heic
+*.HEIC
