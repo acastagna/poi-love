@@ -383,6 +383,14 @@ body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); 
     font-size:10px; color:var(--muted); font-weight:600;
   }
 }
+
+/* Pulsante alla pagina delle misure di velocita (17/08/2026) */
+.speed-btn{display:inline-flex;align-items:center;gap:6px;background:var(--red);color:#fff;
+ text-decoration:none;border-radius:99px;padding:7px 15px;font-size:12.5px;font-weight:700;
+ white-space:nowrap;transition:transform .15s,box-shadow .15s;box-shadow:0 2px 7px rgba(212,43,43,.28)}
+.speed-btn:hover{transform:translateY(-1px);box-shadow:0 4px 13px rgba(212,43,43,.38)}
+.speed-btn svg{flex-shrink:0}
+@media(max-width:640px){.speed-btn span{display:none}.speed-btn{padding:7px 10px}}
 </style>
 </head>
 <body>
@@ -407,6 +415,10 @@ body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); 
       <button class="lang-btn" data-lang="en" title="English" onclick="switchLang('en')">🇬🇧</button>
     </div>
     <span class="hdr-date" data-t="updated_date">Aggiornato: 8 Maggio 2026</span>
+    <a href="velocita.html" class="speed-btn" title="Misure di velocità del 17/08/2026">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M13 2 4.5 13.5H11l-1 8.5 8.5-11.5H12z"/></svg>
+      <span>Quanto &egrave; veloce</span>
+    </a>
     <div class="status-pill"><div class="sdot"></div><span data-t="status_pill">MVP in sviluppo</span></div>
   </div>
 </header>

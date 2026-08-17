@@ -1,0 +1,263 @@
+<!doctype html>
+<!--
+(c) Alessandro Castagna, 321.al / EVOLAB
+Tutti i diritti riservati. Uso non autorizzato vietato.
+info@321.al - https://321.al
+-->
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>POI•LOVE · Quanto è veloce</title>
+<link rel="icon" href="img/favicon.ico">
+<style>
+@page{size:A4 landscape;margin:10mm}
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+ --red:#D42B2B; --blue:#285EA7; --bg:#EAE4D8; --ink:#1C1C1C; --muted:#6B6B6B;
+ --white:#fff; --green:#1a7f45; --line:#ddd6c6; --soft:#F5F0E8;
+}
+body{font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+ color:var(--ink);background:var(--bg);padding:34px 26px 50px}
+.wrap{max-width:1180px;margin:0 auto}
+
+.top{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:14px;margin-bottom:26px}
+.back{display:inline-flex;align-items:center;gap:7px;background:var(--white);border:1px solid var(--line);
+ border-radius:99px;padding:8px 16px;text-decoration:none;color:var(--ink);font-size:13px;font-weight:600}
+.back:hover{border-color:var(--red);color:var(--red)}
+h1{font-size:38px;line-height:1.1;letter-spacing:-1px;font-weight:800}
+h1 em{font-style:normal;color:var(--red)}
+.date{font-size:13px;color:var(--muted);margin-top:6px}
+
+.hero{background:var(--white);border-radius:16px;padding:26px 30px;margin-bottom:24px;border:1px solid var(--line)}
+.hero p{font-size:19px;line-height:1.55;max-width:900px}
+.hero p b{color:var(--red)}
+.hero .note{font-size:14px;color:var(--muted);margin-top:12px}
+
+h2{font-size:15px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);
+ margin:32px 0 14px;font-weight:700}
+
+/* ── confronto macchine ── */
+.machines{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.m{background:var(--white);border-radius:14px;padding:20px;border:2px solid var(--line)}
+.m.now{border-color:var(--red)}
+.m.next{border-style:dashed;background:var(--soft);opacity:.85}
+.m .tag{font-size:11px;text-transform:uppercase;letter-spacing:1px;font-weight:700;color:var(--muted);margin-bottom:10px}
+.m.now .tag{color:var(--red)}
+.m .power{font-size:27px;font-weight:800;letter-spacing:-.5px;margin-bottom:3px}
+.m .who{font-size:14px;color:var(--muted);margin-bottom:14px}
+.m dl{display:grid;grid-template-columns:auto 1fr;gap:5px 12px;font-size:13.5px}
+.m dt{color:var(--muted)}
+.m dd{text-align:right;font-weight:700}
+.m dd.good{color:var(--green)}
+
+/* ── barre ── */
+.chart{background:var(--white);border-radius:14px;padding:22px 26px;border:1px solid var(--line)}
+.row{display:grid;grid-template-columns:150px 1fr 78px;gap:14px;align-items:center;
+ padding:13px 0;border-bottom:1px solid #f0ece2}
+.row:last-child{border-bottom:none}
+.row .label{font-weight:700;font-size:14px}
+.row .label span{display:block;font-weight:400;font-size:11.5px;color:var(--muted)}
+.pair{display:grid;gap:5px}
+.b{display:flex;align-items:center;gap:9px}
+.b i{display:block;height:19px;border-radius:4px}
+.b.old i{background:#c3bcab}
+.b.new i{background:var(--red)}
+.b span{font-size:12.5px;font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--muted)}
+.b.new span{color:var(--red);font-weight:700}
+.win{text-align:right;font-size:19px;font-weight:800;color:var(--green)}
+.win small{display:block;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.key{display:flex;gap:20px;font-size:12.5px;color:var(--muted);margin-top:14px;padding-top:13px;border-top:1px solid #f0ece2}
+.key b{display:inline-block;width:13px;height:13px;border-radius:3px;vertical-align:-2px;margin-right:5px}
+
+/* ── testo ── */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.box{background:var(--white);border-radius:14px;padding:22px 25px;border:1px solid var(--line)}
+.box h3{font-size:19px;margin-bottom:11px;letter-spacing:-.3px}
+.box p{font-size:14.5px;line-height:1.62;margin-bottom:11px}
+.box p:last-child{margin-bottom:0}
+.box p b{color:var(--red)}
+.box .quiet{color:var(--muted);font-size:13.5px}
+
+.db{display:flex;gap:14px;margin:16px 0}
+.dbc{flex:1;background:var(--soft);border-radius:11px;padding:15px;text-align:center;border:1px solid var(--line)}
+.dbc.next{border-style:dashed;opacity:.75}
+.dbc .v{font-size:29px;font-weight:800;color:var(--red);letter-spacing:-1px}
+.dbc.next .v{color:#b5ada0}
+.dbc .l{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-top:3px}
+
+footer{margin-top:30px;padding-top:16px;border-top:1px solid var(--line);
+ display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:12px;color:var(--muted)}
+
+@media print{
+ body{background:#fff;padding:0;font-size:11.5px}
+ .back{display:none}
+ h1{font-size:26px}
+ .hero p{font-size:14px}
+ .hero,.chart,.box,.m{border:1px solid #ddd;border-radius:9px;padding:13px 15px}
+ h2{margin:16px 0 8px;font-size:11px}
+ .m .power{font-size:19px}
+ .row{padding:7px 0}
+ .box h3{font-size:14px}
+ .box p{font-size:11.5px;margin-bottom:7px}
+ .dbc .v{font-size:20px}
+ .machines,.two{gap:9px}
+}
+@media(max-width:860px){
+ .machines,.two{grid-template-columns:1fr}
+ .row{grid-template-columns:110px 1fr 60px;gap:9px}
+ h1{font-size:29px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="top">
+ <div>
+  <a class="back" href="index.html">&larr; Torna al SAL</a>
+  <h1 style="margin-top:14px">POI<em>&bull;</em>LOVE ha una macchina<br>tutta sua. <em>Ecco cosa cambia.</em></h1>
+  <div class="date">Misure reali del 17 agosto 2026, il giorno del passaggio</div>
+ </div>
+</div>
+
+<div class="hero">
+ <p>Fino a stamattina POI&bull;LOVE viveva su un server <b>condiviso con altri 62 progetti</b>:
+ funzionava, ma la potenza era divisa con tutti. Da oggi ha una macchina <b>dedicata solo a lei</b>,
+ con quasi il triplo dei processori e il doppio della memoria. Ogni pagina si apre pi&ugrave; in fretta,
+ e soprattutto c'&egrave; spazio per crescere.</p>
+ <p class="note">Tutti i numeri di questa pagina sono stati misurati davvero, dodici volte per ogni prova,
+ dallo stesso computer nello stesso momento. Nessuna stima.</p>
+</div>
+
+<h2>Le due macchine, a confronto</h2>
+<div class="machines">
+ <div class="m">
+  <div class="tag">Prima &middot; condivisa</div>
+  <div class="power">6 processori</div>
+  <div class="who">17 GB di memoria</div>
+  <dl>
+   <dt>Progetti ospitati</dt><dd>63</dd>
+   <dt>Gi&agrave; occupata da altri</dt><dd>circa 1/4</dd>
+   <dt>Tempo di viaggio</dt><dd>38,6 ms</dd>
+  </dl>
+ </div>
+ <div class="m now">
+  <div class="tag">Adesso &middot; solo POI&bull;LOVE</div>
+  <div class="power">16 processori</div>
+  <div class="who">30 GB di memoria</div>
+  <dl>
+   <dt>Progetti ospitati</dt><dd>1</dd>
+   <dt>Gi&agrave; occupata da altri</dt><dd class="good">niente</dd>
+   <dt>Tempo di viaggio</dt><dd class="good">27,4 ms</dd>
+  </dl>
+ </div>
+ <div class="m next">
+  <div class="tag">Dopo &middot; con i dati in casa</div>
+  <div class="power">da misurare</div>
+  <div class="who">stessa macchina, dati dentro</div>
+  <dl>
+   <dt>Progetti ospitati</dt><dd>1</dd>
+   <dt>Viaggio verso i dati</dt><dd>nessuno</dd>
+   <dt>Tempo di viaggio</dt><dd>&mdash;</dd>
+  </dl>
+ </div>
+</div>
+
+<h2>Quanto ci mette ad aprirsi, pagina per pagina</h2>
+<div class="chart">
+
+ <div class="row">
+  <div class="label">La app<span>quello che vede l'utente</span></div>
+  <div class="pair">
+   <div class="b old"><i style="width:79%"></i><span>296</span></div>
+   <div class="b new"><i style="width:70%"></i><span>261 millesimi di secondo</span></div>
+  </div>
+  <div class="win">-12%<small>pi&ugrave; veloce</small></div>
+ </div>
+
+ <div class="row">
+  <div class="label">Il cuore della app<span>il file pi&ugrave; pesante, 800 KB</span></div>
+  <div class="pair">
+   <div class="b old"><i style="width:89%"></i><span>333</span></div>
+   <div class="b new"><i style="width:80%"></i><span>300 millesimi di secondo</span></div>
+  </div>
+  <div class="win">-10%<small>pi&ugrave; veloce</small></div>
+ </div>
+
+ <div class="row">
+  <div class="label">La presentazione<span>project.poilove.com</span></div>
+  <div class="pair">
+   <div class="b old"><i style="width:100%"></i><span>373</span></div>
+   <div class="b new"><i style="width:77%"></i><span>289 millesimi di secondo</span></div>
+  </div>
+  <div class="win">-23%<small>pi&ugrave; veloce</small></div>
+ </div>
+
+ <div class="row">
+  <div class="label">Questo SAL<span>sal.poilove.com</span></div>
+  <div class="pair">
+   <div class="b old"><i style="width:63%"></i><span>236</span></div>
+   <div class="b new"><i style="width:55%"></i><span>207 millesimi di secondo</span></div>
+  </div>
+  <div class="win">-12%<small>pi&ugrave; veloce</small></div>
+ </div>
+
+ <div class="row">
+  <div class="label">Il pannello<span>admin.poilove.com</span></div>
+  <div class="pair">
+   <div class="b old"><i style="width:44%"></i><span>165</span></div>
+   <div class="b new"><i style="width:42%"></i><span>156 millesimi di secondo</span></div>
+  </div>
+  <div class="win">-5%<small>pi&ugrave; veloce</small></div>
+ </div>
+
+ <div class="key">
+  <span><b style="background:#c3bcab"></b> Prima, server condiviso</span>
+  <span><b style="background:#D42B2B"></b> Adesso, macchina dedicata</span>
+  <span style="margin-left:auto">Per capirsi: un battito di ciglia dura circa 150 millesimi di secondo.</span>
+ </div>
+</div>
+
+<h2>Cosa vuol dire davvero</h2>
+<div class="two">
+ <div class="box">
+  <h3>Il guadagno vero non &egrave; questo</h3>
+  <p>Le pagine si aprono tra il <b>5% e il 23%</b> pi&ugrave; in fretta. &Egrave; un miglioramento reale,
+  ma non &egrave; il motivo per cui questa macchina serve.</p>
+  <p>Il server vecchio non era lento: era <b>diviso con altri 62 progetti</b>. Con un visitatore alla volta
+  se la cavava bene. Il problema sarebbe arrivato con <b>tante persone insieme</b>: l&agrave; la potenza si
+  spartisce, e il sito di qualcun altro che ha una giornata intensa rallenta il nostro.</p>
+  <p>Oggi la macchina nuova &egrave; occupata allo <b>0,5%</b>. Vuol dire che pu&ograve; reggere il lancio
+  senza che nessuno debba correre a comprare altro ferro.</p>
+  <p class="quiet">Nota tecnica per chi la vuole: circa 80 millesimi di ogni richiesta sono tempo di viaggio
+  sulla rete, uguale per qualsiasi server al mondo. Il server governa la parte restante.</p>
+ </div>
+
+ <div class="box">
+  <h3>I dati: qui c'&egrave; il salto grosso</h3>
+  <p>Oggi i luoghi, i profili e le foto non stanno sulla nostra macchina: stanno su
+  <b>Supabase</b>, un servizio esterno. Ogni volta che apri la mappa, la richiesta <b>esce su internet</b>,
+  va a bussare l&agrave;, e torna indietro.</p>
+  <div class="db">
+   <div class="dbc"><div class="v">118 ms</div><div class="l">Oggi, dati fuori</div></div>
+   <div class="dbc next"><div class="v">?</div><div class="l">Domani, dati in casa</div></div>
+  </div>
+  <p>Sono 118 millesimi di media, ma con <b>punte fino a 738</b> quando il collegamento si assopisce:
+  &egrave; l&igrave; che l'app sembra impuntarsi.</p>
+  <p>Quando i dati saranno <b>sulla stessa macchina</b>, quel viaggio sparisce del tutto.
+  &Egrave; qui che ci aspettiamo il miglioramento pi&ugrave; grosso, molto pi&ugrave; che sulle pagine.</p>
+  <p class="quiet">Non &egrave; ancora fatto perch&eacute; spostare i dati tocca anche gli accessi e le foto:
+  si fa un pezzo alla volta, tenendo Supabase acceso finch&eacute; tutto non &egrave; verificato.
+  Questa pagina si aggiorner&agrave; con la misura vera.</p>
+ </div>
+</div>
+
+<footer>
+ <span>Misure del 17/08/2026 &middot; mediana di 12 richieste per prova &middot; nessun valore stimato o simulato</span>
+ <span>POI&bull;LOVE &middot; Ideazione e Dir. Creativa: Alessandro Castagna &middot; 321.AL / EVOLAB</span>
+</footer>
+
+</div>
+</body>
+</html>
