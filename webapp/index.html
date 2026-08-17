@@ -5595,8 +5595,15 @@ async function uploadPhotosToMediaServer(files, poiId){
     try{ r = await compressToWebPDettaglio(f); }
     catch(_){ r = {blob:f, webpOk:false, kb:Math.round(f.size/1024)}; }
     if(!r.webpOk){
-      console.warn('[poilove] foto non comprimibile, saltata:', f.name, r.kb+' KB');
-      try{ showToast('⚠ Una foto non e stata caricata: formato non supportato'); }catch(_){}
+      // REGOLA: una foto non si perde MAI. Se nessuna conversione riesce si carica
+      // l'originale, dichiarando il suo tipo vero (mai travestito da .webp).
+      // Meglio una foto pesante che una foto persa: il peso si sistema dopo, il
+      // ricordo di chi l'ha scattata no.
+      console.warn('[poilove] conversione non riuscita, carico l originale:', f.name, r.kb+' KB');
+      const grezzo = f;
+      grezzo._tipoReale = f.type || 'application/octet-stream';
+      grezzo._nonCompressa = true;
+      compressed.push(grezzo);
       continue;
     }
     // il tipo REALE viaggia col file: mai piu' un JPEG o un PNG col nome .webp
@@ -5638,12 +5645,24 @@ async function uploadPhotosToMediaServer(files, poiId){
   for (const file of compressed) {
     try {
       const tipoReale = file._tipoReale || 'image/webp';
-      const est = (tipoReale === 'image/jpeg') ? 'jpg' : 'webp';
-      const path = `${currentUser.id}/${Date.now()}_${Math.random().toString(36).substr(2,6)}.${est}`;
-      const { error: upErr } = await sb.storage.from('poi_photos').upload(path, file, { cacheControl: '3600', upsert: false, contentType: tipoReale });
-      if (upErr) { console.warn('[poilove] storage skip:', upErr.message); continue; }
-      const { data: urlData } = sb.storage.from('poi_photos').getPublicUrl(path);
-      urls.push(urlData.publicUrl);
+      const est = (tipoReale === 'image/jpeg') ? 'jpg' : ((tipoReale === 'image/webp') ? 'webp' : (((file.name||'').split('.').pop()||'img').toLowerCase().slice(0,4)));
+      let salvata = null;
+      // DOPPIO PASSAGGIO: si tenta due volte e si verifica che la foto sia davvero
+      // raggiungibile. Un caricamento "riuscito" che poi non si apre e' una foto persa.
+      for (let tentativo = 1; tentativo <= 2 && !salvata; tentativo++) {
+        const path = `${currentUser.id}/${Date.now()}_${Math.random().toString(36).substr(2,6)}.${est}`;
+        const { error: upErr } = await sb.storage.from('poi_photos').upload(path, file, { cacheControl: '3600', upsert: false, contentType: tipoReale });
+        if (upErr) { console.warn(`[poilove] tentativo ${tentativo} fallito:`, upErr.message); continue; }
+        const { data: urlData } = sb.storage.from('poi_photos').getPublicUrl(path);
+        // controprova: la foto si scarica davvero?
+        try {
+          const check = await fetch(urlData.publicUrl, { method: 'HEAD', cache: 'no-store' });
+          if (check.ok) salvata = urlData.publicUrl;
+          else console.warn(`[poilove] tentativo ${tentativo}: salvata ma non raggiungibile (${check.status})`);
+        } catch(_) { salvata = urlData.publicUrl; }  // rete incerta: si tiene comunque l'indirizzo
+      }
+      if (!salvata) { console.error('[poilove] FOTO NON SALVATA dopo 2 tentativi'); try{ showToast('⚠ Una foto non e stata salvata, riprova'); }catch(_){} continue; }
+      urls.push(salvata);
     } catch(e) { console.warn('[poilove] storage error:', e); }
   }
   return urls;
@@ -8080,7 +8099,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='3.49';
+const APP_VERSION='3.50';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
