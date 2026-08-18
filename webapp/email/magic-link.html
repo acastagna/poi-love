@@ -3,11 +3,12 @@
   Tutti i diritti riservati. Uso non autorizzato vietato.
   https://321.al
 -->
-<!-- Email del link di accesso POI•LOVE, trilingue SQ / IT / EN.
-     Servita a GoTrue via GOTRUE_MAILER_TEMPLATES_MAGIC_LINK e _RECOVERY.
-     Solo HTML da email: tabelle e stili inline, niente SVG, niente webfont. -->
-<!DOCTYPE html>
-<html lang="sq">
+<!-- Email del link di accesso POI•LOVE, UNA lingua per destinatario.
+     La lingua arriva dal profilo (user_metadata.lang, scritta dall'app);
+     senza indicazione si va in inglese. Template Go di GoTrue.
+     Solo HTML da email: tabelle e stili inline, PNG, niente webfont. -->
+{{ $l := "en" }}{{ if .Data }}{{ if .Data.lang }}{{ $l = .Data.lang }}{{ end }}{{ end }}<!DOCTYPE html>
+<html lang="{{ $l }}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -18,41 +19,44 @@
   <tr><td align="center">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background-color:#ffffff;border-radius:16px;overflow:hidden;">
       <tr>
-        <td style="background-color:#D42B2B;padding:22px 28px;text-align:center;">
-          <span style="font-family:Arial,Helvetica,sans-serif;font-size:26px;font-weight:900;color:#ffffff;letter-spacing:1px;">POI<span style="color:#ffd7d7;">&#10084;</span>LOVE</span><br>
-          <span style="font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#ffd7d7;letter-spacing:2px;">VENDET E ZEMR&#203;S &#183; I LUOGHI DEL CUORE &#183; PLACES OF THE HEART</span>
+        <td style="background-color:#D42B2B;padding:26px 28px 20px 28px;text-align:center;">
+          <img src="https://poilove.com/img/logo-bianco.png" alt="POI&#8226;LOVE" width="220" style="width:220px;max-width:80%;height:auto;border:0;display:inline-block;">
+          <br>
+          <span style="font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#ffd7d7;letter-spacing:2px;">
+            {{ if eq $l "sq" }}VENDET E ZEMR&#203;S{{ else if eq $l "it" }}I LUOGHI DEL CUORE{{ else }}PLACES OF THE HEART{{ end }}
+          </span>
         </td>
       </tr>
       <tr>
-        <td style="padding:30px 28px 8px 28px;font-family:Arial,Helvetica,sans-serif;color:#1c1c1c;">
-          <p style="margin:0 0 14px 0;font-size:15px;line-height:1.5;">
-            <strong>SQ</strong> &#183; Prek butonin dhe hyn n&#235; POI&#8226;LOVE. Linku vlen nj&#235; her&#235; t&#235; vetme.
-          </p>
-          <p style="margin:0 0 14px 0;font-size:15px;line-height:1.5;">
-            <strong>IT</strong> &#183; Tocca il bottone ed entri in POI&#8226;LOVE. Il link vale una volta sola.
-          </p>
-          <p style="margin:0 0 6px 0;font-size:15px;line-height:1.5;">
-            <strong>EN</strong> &#183; Tap the button to sign in to POI&#8226;LOVE. The link works once.
+        <td style="padding:30px 28px 6px 28px;font-family:Arial,Helvetica,sans-serif;color:#1c1c1c;text-align:center;">
+          <p style="margin:0;font-size:16px;line-height:1.6;">
+            {{ if eq $l "sq" }}Prek butonin dhe hyn n&#235; POI&#8226;LOVE.<br>Linku vlen nj&#235; her&#235; t&#235; vetme.
+            {{ else if eq $l "it" }}Tocca il bottone ed entri in POI&#8226;LOVE.<br>Il link vale una volta sola.
+            {{ else }}Tap the button to sign in to POI&#8226;LOVE.<br>The link works once.{{ end }}
           </p>
         </td>
       </tr>
       <tr>
-        <td align="center" style="padding:18px 28px 8px 28px;">
+        <td align="center" style="padding:20px 28px 10px 28px;">
           <a href="{{ .ConfirmationURL }}"
-             style="display:inline-block;background-color:#D42B2B;color:#ffffff;font-family:Arial,Helvetica,sans-serif;font-size:17px;font-weight:800;text-decoration:none;padding:15px 34px;border-radius:99px;letter-spacing:.5px;">
-            HYR &#183; ENTRA &#183; SIGN IN
+             style="display:inline-block;background-color:#D42B2B;color:#ffffff;font-family:Arial,Helvetica,sans-serif;font-size:17px;font-weight:800;text-decoration:none;padding:15px 44px;border-radius:99px;letter-spacing:1px;">
+            {{ if eq $l "sq" }}HYR{{ else if eq $l "it" }}ENTRA{{ else }}SIGN IN{{ end }}
           </a>
         </td>
       </tr>
       <tr>
         <td style="padding:14px 28px 6px 28px;font-family:Arial,Helvetica,sans-serif;color:#8a8a8a;font-size:12px;line-height:1.5;text-align:center;">
-          N&#235;se butoni nuk punon, kopjo k&#235;t&#235; link n&#235; shfletues &#183; Se il bottone non funziona, copia questo link nel browser &#183; If the button does not work, copy this link:<br>
+          {{ if eq $l "sq" }}N&#235;se butoni nuk punon, kopjo k&#235;t&#235; link n&#235; shfletues:
+          {{ else if eq $l "it" }}Se il bottone non funziona, copia questo link nel browser:
+          {{ else }}If the button does not work, copy this link into your browser:{{ end }}<br>
           <a href="{{ .ConfirmationURL }}" style="color:#D42B2B;word-break:break-all;font-size:11px;">{{ .ConfirmationURL }}</a>
         </td>
       </tr>
       <tr>
         <td style="padding:16px 28px 26px 28px;font-family:Arial,Helvetica,sans-serif;color:#b0a99c;font-size:11px;line-height:1.6;text-align:center;border-top:1px solid #f0ece3;">
-          N&#235;se nuk e k&#235;rkove ti, injoroje k&#235;t&#235; email. &#183; Se non l&#39;hai chiesto tu, ignora questa email. &#183; If you didn&#39;t request this, ignore this email.<br>
+          {{ if eq $l "sq" }}N&#235;se nuk e k&#235;rkove ti, injoroje k&#235;t&#235; email.
+          {{ else if eq $l "it" }}Se non l&#39;hai chiesto tu, ignora questa email.
+          {{ else }}If you didn&#39;t request this, ignore this email.{{ end }}<br>
           <strong style="color:#8a8a8a;">POI&#8226;LOVE</strong> &#183; poilove.com
         </td>
       </tr>

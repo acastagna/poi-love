@@ -3981,7 +3981,7 @@ function enterGuestMode() {
   if (overlay) overlay.style.display = 'none';
   if (!map && typeof initMap === 'function') { try { initMap(); } catch(e) {} }
   // L'ospite entra per GUARDARE: senza questa chiamata la mappa restava vuota
-  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v3.71.
+  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v3.72.
   if (typeof loadPOIsFromDB === 'function') { try { loadPOIsFromDB(); } catch(e) {} }
   if (typeof loadMyTags === 'function') { try { loadMyTags(); } catch(e) {} }
   showToast(t('guest_active'));
@@ -5044,6 +5044,13 @@ function onAuthStateUpdate(event) {
     checkConsentGate();   // GDPR/124-2024: gate consenso al login fresco
     initNotifications();  // campanella + badge non-letti + realtime
     syncProfileFromAuth();
+    // La lingua del device si scrive sul profilo (una volta per sessione):
+    // cosi le prossime email di accesso escono nella lingua giusta.
+    try{
+      if(!window._langSynced && typeof lang!=='undefined' && lang && (currentUser.user_metadata||{}).lang!==lang){
+        window._langSynced=true; sb.auth.updateUser({ data:{ lang: lang } });
+      }
+    }catch(_){}
     loadPOIsFromDB();
     loadHistoricRoutes();
     if(typeof loadPoiCategories==='function') loadPoiCategories(); // include la MIA categoria personalizzata (RLS)
@@ -5235,7 +5242,9 @@ async function sendMagicLink() {
   try { localStorage.setItem('poilove_last_email', email); } catch(_){}
   const { error } = await sb.auth.signInWithOtp({
     email,
-    options: { emailRedirectTo: AUTH_REDIRECT }
+    // La lingua del device viaggia con la richiesta: l'email di accesso
+    // esce in QUELLA lingua (una sola), non in tre.
+    options: { emailRedirectTo: AUTH_REDIRECT, data: { lang: (typeof lang!=='undefined'&&lang)?lang:'en' } }
   });
   if (error) showToast('Error: ' + error.message);
   else {
@@ -8147,7 +8156,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='3.71';
+const APP_VERSION='3.72';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
