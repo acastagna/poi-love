@@ -1,5 +1,31 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
+## Sessione 19/08/2026 (2) — La home di presentazione e il concept dell'app (v3.73)
+
+**poilove.com ha finalmente una porta d'ingresso vera.** Chi arriva per la prima volta trova
+la pagina di presentazione; chi ha gia' toccato "Entra" o "ospite" viene riconosciuto (segnalibro
+pl_app, 1 anno) e finisce sempre dritto in app; i link condivisi e ogni indirizzo con parametri
+passano diretti. Smistamento lato server (nginx, stessa radice per tutte e due le pagine).
+
+1. **Concept grafico dell'app** (5 schermate, Nano Banana Pro): mappa col marcatore definitivo,
+   pagina POI ristrutturata a linguette ("Personali · I miei POI · Loved · Vicini · Liste"),
+   dettaglio, profilo. Testi grandi: la critica leggibilita' diventa la direzione di design.
+2. **Pagina di presentazione ufficiale** (webapp/presentazione.html): ILLI fluttuante sul titolo,
+   "I luoghi del cuore, che puoi ritrovare", copy in positivo (regola nuova: mai negazioni,
+   mai contro gli altri), i tre colori dei luoghi, le 5 schermate in cascata, il lancio scritto
+   dalla community col viaggio di ILLI, chiusura "Vuoi far parte di questo progetto?" verso
+   project.poilove.com, footer standard 321 col logo vero. Trilingue SQ/IT/EN auto-device.
+3. **Webapp 3.73**: segnalibro pl_app a ogni avvio; ?ospite=1 entra da ospite senza schermata;
+   link "Scopri POI•LOVE" nella schermata d'accesso (trilingue).
+4. **Verificato dal vivo**: percorso nuovo arrivato (presentazione → ospite → app con 12 POI),
+   ritorno (dritto in app), link con parametri (dritto in app). Controllo esterno 18/18.
+5. Nel giro sono nati anche: regola marketing in memoria, TODO per accesso professionisti
+   (ristoranti: menu, orari, piu' foto), bug collegamenti veloci, ristrutturazione pagina POI.
+
+Ritorno indietro: /etc/nginx/sites-available/poilove-ssl.bak-pre-presentazione sulla macchina.
+
+---
+
 ## Sessione 19/08/2026 — La posta degli accessi: da zero a firmata (v3.71 → 3.72)
 
 **Scoperta partita da un collaudo di Alessandro** ("il biometrico non funziona sul telefono"):
