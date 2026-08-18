@@ -42,6 +42,15 @@ echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"'
    . ' xmlns:xhtml="http://www.w3.org/1999/xhtml"'
    . ' xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">' . "\n";
 
+// La casa: presentazione nelle tre lingue, con le alternanze hreflang
+$homeAlt = '<xhtml:link rel="alternate" hreflang="sq" href="' . SEO_BASE . '/sq/"/>'
+         . '<xhtml:link rel="alternate" hreflang="it" href="' . SEO_BASE . '/it/"/>'
+         . '<xhtml:link rel="alternate" hreflang="en" href="' . SEO_BASE . '/en/"/>'
+         . '<xhtml:link rel="alternate" hreflang="x-default" href="' . SEO_BASE . '/"/>';
+foreach (array('/', '/sq/', '/it/', '/en/') as $hp) {
+  echo '<url><loc>' . e(SEO_BASE . $hp) . '</loc>' . $homeAlt . '</url>' . "\n";
+}
+
 // Statiche: hub esplora
 echo xurl('/esplora.php', array(), null, null) . "\n";
 
