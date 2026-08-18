@@ -2629,11 +2629,11 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
   <!-- Altri modi: solo quelli VERI (LinkedIn, X). Apple e Facebook torneranno quando esisteranno. -->
   <button class="auth-more-toggle" onclick="const m=document.getElementById('authMore');m.style.display=(m.style.display==='none'?'flex':'none')" style="background:none;border:none;color:rgba(255,255,255,.75);font-size:12.5px;font-weight:600;cursor:pointer;margin-top:12px;text-decoration:underline" data-t="auth_more">Altri modi per entrare</button>
   <div id="authMore" style="display:none;gap:10px;justify-content:center;margin-top:10px">
-    <button class="auth-social-btn li" onclick="signInWithLinkedIn()" aria-label="LinkedIn" style="width:auto;padding:0 16px;border-radius:24px;display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;color:#fff">
-      <svg viewBox="0 0 24 24" fill="#fff" style="width:16px;height:16px"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.67H9.35V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.07 2.07 0 1 1 0-4.14 2.07 2.07 0 0 1 0 4.14zM7.12 20.45H3.55V9h3.57v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/></svg> LinkedIn
+    <button class="auth-social-btn li" onclick="signInWithLinkedIn()" aria-label="LinkedIn" style="width:52px;height:52px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;padding:0;flex:none">
+      <svg viewBox="0 0 24 24" fill="#fff" style="width:20px;height:20px"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.67H9.35V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.07 2.07 0 1 1 0-4.14 2.07 2.07 0 0 1 0 4.14zM7.12 20.45H3.55V9h3.57v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/></svg>
     </button>
-    <button class="auth-social-btn tw" onclick="signInWithTwitter()" aria-label="X" style="width:auto;padding:0 16px;border-radius:24px;display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;color:#fff">
-      <svg viewBox="0 0 24 24" fill="#fff" style="width:15px;height:15px"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231 5.45-6.231zm-1.16 17.52h1.833L7.084 4.126H5.117L17.083 19.77z"/></svg> X
+    <button class="auth-social-btn tw" onclick="signInWithTwitter()" aria-label="X" style="width:52px;height:52px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;padding:0;flex:none">
+      <svg viewBox="0 0 24 24" fill="#fff" style="width:20px;height:20px"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231 5.45-6.231zm-1.16 17.52h1.833L7.084 4.126H5.117L17.083 19.77z"/></svg>
     </button>
   </div>
 
@@ -8113,7 +8113,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='3.57';
+const APP_VERSION='3.58';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
