@@ -11,7 +11,9 @@
 
 - [ ] **Facebook negli "Altri modi per entrare"**: configurare l'accesso Facebook (serve App Review Meta con privacy policy, già in linea) e aggiungerlo alla tendina della schermata d'accesso. Fino ad allora NON compare (regola mai finto).
 - [x] **Biometria: bottone RIMOSSO il 19/08 (v3.71)** — collaudo di Alessandro su iPhone fallito; scoperto che il bottone non usava l'impronta, spediva un magic link (violava la regola mai finto). Tornera' solo con un backend WebAuthn vero (registrazione credenziale + challenge server-side).
-- [ ] **🚨 POSTA DEL SERVIZIO ACCESSI ASSENTE**: GoTrue non ha NESSUNO SMTP configurato e sulla macchina non c'e' un server di posta: "Invia link" via email accetta la richiesta ma NON spedisce niente (verificato da registro il 19/08). Google e ospite funzionano, l'accesso via email no. Serve decisione di Alessandro: casella no-reply@poilove.com sul server di posta nostro `mail.themeli.al` (flotta Hetzner, verificato acceso il 19/08: porte 25/465/587 rispondono) + SPF/DKIM per poilove.com, poi GOTRUE_SMTP_* in /etc/gotrue.env. In alternativa aspettare mail.email.al (oggi il DNS non esiste ancora).
+- [x] **POSTA DEL SERVIZIO ACCESSI: FATTA il 19/08** — casella no-reply@poilove.com su Stalwart, GoTrue agganciato, email monolingua brandizzata, SPF/DKIM/DMARC/MX su Cloudflare, consegna verificata. Dettaglio in SAL.md.
+- [ ] **DKIM: rotazione automatica fra 90 giorni (~16/11/2026)** — Stalwart ruota le chiavi e i selettori cambiano: vanno ripubblicati i 2 record TXT su Cloudflare (o si automatizza col token). Se le email tornano in spam a novembre, e' questo.
+- [ ] ~~POSTA DEL SERVIZIO ACCESSI ASSENTE~~ (voce superata)
 
 - [ ] **Traslocare i 6 programmi da Supabase** (illi-chat, send-email, transcribe, image-search, place-enrich, admin-ai): oggi raggiunti dal ponte `/db/functions`. Sessione dedicata.
 - [ ] **Foto nuove**: gli upload passano ancora dallo storage Supabase via ponte; portare anche quelli sul media server della macchina.

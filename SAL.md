@@ -1,5 +1,27 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
+## Sessione 19/08/2026 — La posta degli accessi: da zero a firmata (v3.71 → 3.72)
+
+**Scoperta partita da un collaudo di Alessandro** ("il biometrico non funziona sul telefono"):
+il bottone impronta era finto (mandava un magic link travestito) e, peggio, il servizio
+accessi non aveva NESSUN server di posta: "Invia link" accettava e non spediva niente.
+
+1. **Bottone biometria RIMOSSO** (3.71, regola mai finto): tornera' solo con un backend WebAuthn vero.
+2. **Posta vera in casa**: dominio poilove.com + casella no-reply@poilove.com creati su Stalwart
+   (mail.themeli.al, flotta Hetzner); password custodita solo sulle macchine e in • chiavi/.
+3. **GoTrue agganciato via SMTP** (465). Primo invio rifiutato da Google: mancava il Message-ID;
+   ora Stalwart completa le intestazioni mancanti in uscita. Consegna verificata dal registro (250).
+4. **Email in UNA lingua sola** (3.72): la lingua del device viaggia con la richiesta e si scrive
+   sul profilo (user_metadata.lang); template brandizzato col logo vero, SQ/IT/EN separate,
+   oggetto per lingua. Gli 8 account esistenti impostati su italiano. Collaudata da Alessandro.
+5. **Firme DNS su Cloudflare** (token via • chiavi/, mai in chat): DKIM ed25519+RSA freschi da
+   Stalwart, SPF pulito "v=spf1 a mx -all" (via il vecchio server.321.it), DMARC quarantine con
+   rapporti a postmaster, MX di poilove.com verso mail.themeli.al. Verificati dall'esterno.
+
+Controllo esterno: 18/18. Ritorno indietro: /etc/gotrue.env.bak-pre-smtp sulla macchina app.
+
+---
+
 ## Sessione 18/08/2026 (sera) — Mappa: marcatore definitivo, mappa piena anche per gli ospiti (v3.62 → 3.70)
 
 **Il marcatore ufficiale è deciso e in linea**: goccia rossa col cuore bianco inciso (variante A
