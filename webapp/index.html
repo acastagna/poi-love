@@ -5097,7 +5097,8 @@ function syncProfileFromAuth() {
           if(pav) pav.src=_src;
           if(pubAv) pubAv.src=_src;
           if(currentUser?.id && sb){
-            sb.from('profiles').upsert({ id: currentUser.id, avatar_url: _src, updated_at: new Date().toISOString() }, { onConflict: 'id' })
+            // update, non upsert: la riga esiste gia', e l'upsert parziale moriva sul vincolo username
+            sb.from('profiles').update({ avatar_url: _src, updated_at: new Date().toISOString() }).eq('id', currentUser.id)
               .then(({error})=>{ if(!error && typeof syncCompagnieFromDB==='function') syncCompagnieFromDB(); });
           }
         }
@@ -8103,7 +8104,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='3.51';
+const APP_VERSION='3.52';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
@@ -10503,11 +10504,10 @@ function setProfileAvatar(src){
   window._myAvatarUrl = src;   // la mia faccia mi accompagna ovunque, subito
   // Salva su Supabase profiles.avatar_url (best-effort) e aggiorna i tondini dei membri
   if(currentUser?.id && sb){
-    sb.from('profiles').upsert({
-      id: currentUser.id,
+    sb.from('profiles').update({
       avatar_url: src,
       updated_at: new Date().toISOString()
-    },{onConflict:'id'}).then(({error})=>{
+    }).eq('id', currentUser.id).then(({error})=>{
       if(error){ console.warn('[poilove] avatar upsert error:',error.message); showToast(t('av_save_fail','Avatar salvato solo qui: riprova online per vederlo ovunque')); }
       else if(typeof syncCompagnieFromDB==='function') syncCompagnieFromDB();
     });
@@ -12573,10 +12573,10 @@ async function saveProfileCover(value, type){
   // Salva su Supabase profiles.cover_url (richiede colonna esistente)
   if(currentUser?.id && sb){
     try{
-      const payload={ id:currentUser.id, updated_at:new Date().toISOString() };
+      const payload={ updated_at:new Date().toISOString() };
       payload.cover_url = type==='gradient' ? value : value; // string in entrambi i casi
       payload.cover_type = type;
-      const { error } = await sb.from('profiles').upsert(payload,{onConflict:'id'});
+      const { error } = await sb.from('profiles').update(payload).eq('id',currentUser.id);
       if(error){
         // Se la colonna non esiste, fallback silenzioso (resta in localStorage)
         if(/column.*cover_url|cover_type/i.test(error.message||'')){
