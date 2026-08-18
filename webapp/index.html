@@ -1091,10 +1091,13 @@ body.kb-open #lang-strip,body.kb-open #brand-strip{opacity:0;pointer-events:none
 /* Tre livelli (18/08): seguiti verdi leggeri, community grigia e discreta. Trasparenze regolabili (in futuro dall'admin). */
 :root{--mk-friend:.85;--mk-comm:.55}
 .poi-marker{display:flex;flex-direction:column;align-items:center;color:var(--red)}
-.poi-heart{width:44px;height:44px;filter:drop-shadow(0 3px 6px rgba(0,0,0,.3))}
+.poi-pin{position:relative;display:flex}
+.poi-heart{width:40px;height:52px;filter:drop-shadow(0 3px 6px rgba(0,0,0,.3))}
+.poi-love-badge{position:absolute;top:-5px;right:-8px;background:#fff;color:#111;font-size:9.5px;font-weight:900;border-radius:9px;padding:1px 5px;border:1.5px solid currentColor;line-height:1.4}
 .poi-marker.tier-friend{color:#1a7f45}
 .poi-marker.tier-comm{color:#8a8a8a}
-.poi-marker.tier-comm .poi-heart{width:32px;height:32px}
+.poi-marker.tier-comm .poi-heart{width:28px;height:36px}
+.poi-marker.tier-comm .poi-love-badge{font-size:8px;padding:0 4px;top:-4px;right:-6px}
 .poi-official-seal,.poi-featured-star{position:absolute;top:-4px;right:2px;font-size:15px;color:#c9a22e;z-index:2}
 .poi-marker.tier-friend{opacity:var(--mk-friend)}
 .poi-marker.tier-friend .poi-bubble{background:#1a7f45;border-color:#fff}
@@ -5356,14 +5359,15 @@ function addDBMarker(p) {
   if(_official||_feat) _tier='';
   const _cls = (_official?' poi-official':(_feat?' poi-featured':''))+_tier;
   const _accent = _official?'<i class="ph-fill ph-seal-check poi-official-seal"></i>':(_feat?'<i class="ph-fill ph-star poi-featured-star"></i>':'');
-  // CUORE-SPILLO (18/08, fusione scelta dal founder): la sagoma del cuore fa da pin,
-  // la punta in basso segna il luogo, il numero dei love vive DENTRO il cuore.
+  // CUORE-SPILLO definitivo (scelta del founder, 18/08): sagoma della proposta 2
+  // (cuore allungato, la punta segna il luogo) + numerino dei love in alto a destra
+  // come nella proposta 1, con il numero NERO su disco bianco.
   const _lv = p.love_count || 0;
   const _lvTxt = _lv > 99 ? '99+' : String(_lv);
   const icon = L.divIcon({
     className: '',
-    html: `<div class="poi-marker${_cls}" ontouchend="window._openPoiById('${safeId}');event.stopPropagation();event.preventDefault()" onclick="window._openPoiById('${safeId}');event.stopPropagation()">${_accent}<svg class="poi-heart" viewBox="0 0 191.35 191.35" aria-hidden="true"><path fill="currentColor" stroke="#fff" stroke-width="10" d="M95.68 174.2c-3.5-2.05-65.4-39.45-79.3-69.7C5.2 79.7 9.05 56.4 28.5 38.85 41.5 27.6 56.5 22.6 71 25.3c12.2 2.27 21.5 9.5 24.7 13.4 3.2-3.9 12.5-11.13 24.7-13.4 14.5-2.7 29.5 2.3 42.5 13.55 19.45 17.55 23.3 40.85 12.12 65.65-13.9 30.25-75.8 67.65-79.3 69.7Z"/><text x="95.7" y="103" text-anchor="middle" font-size="${_lvTxt.length>2?'54':'64'}" font-weight="900" fill="#fff" style="pointer-events:none">${_lvTxt}</text></svg><div class="poi-label">${label.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div></div>`,
-    iconSize: [46, 62], iconAnchor: [23, 46]
+    html: `<div class="poi-marker${_cls}" ontouchend="window._openPoiById('${safeId}');event.stopPropagation();event.preventDefault()" onclick="window._openPoiById('${safeId}');event.stopPropagation()"><div class="poi-pin">${_accent}<svg class="poi-heart" viewBox="0 0 100 130" aria-hidden="true"><path fill="currentColor" stroke="#fff" stroke-width="6" d="M50 125C42 106 8 84 8 48 8 26 24 11 40 13c6 .8 9 4 10 8 1-4 4-7.2 10-8 16-2 32 13 32 35 0 36-34 58-42 77Z"/></svg><div class="poi-love-badge">${_lvTxt}</div></div><div class="poi-label">${label.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div></div>`,
+    iconSize: [46, 70], iconAnchor: [23, 54]
   });
   if(!window._dbMarkers) window._dbMarkers = {};
   if(window._dbMarkers[p.id]) {
@@ -8180,7 +8184,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='3.62';
+const APP_VERSION='3.63';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
