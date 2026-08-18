@@ -1090,14 +1090,15 @@ body.kb-open #lang-strip,body.kb-open #brand-strip{opacity:0;pointer-events:none
 .poi-tail{width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:8px solid var(--red);margin-top:-1px}
 /* Tre livelli (18/08): seguiti verdi leggeri, community grigia e discreta. Trasparenze regolabili (in futuro dall'admin). */
 :root{--mk-friend:.85;--mk-comm:.55}
+.leaflet-marker-icon{overflow:visible!important}
 .poi-marker{display:flex;flex-direction:column;align-items:center;color:var(--red)}
 .poi-pin{position:relative;display:flex}
 .poi-heart{width:42px;height:50px;filter:drop-shadow(0 3px 6px rgba(0,0,0,.3))}
-.poi-love-badge{position:absolute;top:3px;right:-5px;z-index:2;min-width:17px;height:17px;display:flex;align-items:center;justify-content:center;background:#fff;color:#111;font-size:9.5px;font-weight:900;border-radius:99px;border:1.5px solid currentColor;padding:0 3px;line-height:1}
+.poi-love-badge{position:absolute;top:2px;right:0;z-index:2;min-width:17px;height:17px;display:flex;align-items:center;justify-content:center;background:#fff;color:#111;font-size:9.5px;font-weight:900;border-radius:99px;border:1.5px solid currentColor;padding:0 3px;line-height:1;box-shadow:0 1px 3px rgba(0,0,0,.25)}
 .poi-marker.tier-friend{color:#1a7f45}
 .poi-marker.tier-comm{color:#8a8a8a}
 .poi-marker.tier-comm .poi-heart{width:30px;height:36px}
-.poi-marker.tier-comm .poi-love-badge{font-size:7.5px;min-width:13px;height:13px;padding:0 2px;top:2px;right:-4px}
+.poi-marker.tier-comm .poi-love-badge{font-size:7.5px;min-width:13px;height:13px;padding:0 2px;top:1px;right:0}
 .poi-official-seal,.poi-featured-star{position:absolute;top:-4px;right:2px;font-size:15px;color:#c9a22e;z-index:2}
 .poi-marker.tier-friend{opacity:var(--mk-friend)}
 .poi-marker.tier-friend .poi-bubble{background:#1a7f45;border-color:#fff}
@@ -8184,7 +8185,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='3.66';
+const APP_VERSION='3.67';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
