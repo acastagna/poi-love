@@ -4234,11 +4234,11 @@ async function loadNotifications(){
 }
 
 async function markNotifRead(id){
-  try{ await sb.from('notifications').update({read_at:new Date().toISOString()}).eq('id',id).is('read_at',null); }catch(_){}
+  try{ const _n=await sb.from('notifications').update({read_at:new Date().toISOString()}).eq('id',id).is('read_at',null); if(_n.error) salvataggioFallito('Notifiche', _n.error, true); }catch(e){ salvataggioFallito('Notifiche', e, true); }
   updateNotifBadge(); loadNotifications();
 }
 async function markAllNotifRead(){
-  try{ await sb.from('notifications').update({read_at:new Date().toISOString()}).is('read_at',null); }catch(_){}
+  try{ const _n=await sb.from('notifications').update({read_at:new Date().toISOString()}).is('read_at',null); if(_n.error) salvataggioFallito('Notifiche', _n.error, true); }catch(e){ salvataggioFallito('Notifiche', e, true); }
   updateNotifBadge(); loadNotifications();
 }
 
@@ -4375,8 +4375,8 @@ async function loadSupportThread(){
 }
 async function _markSupportRead(){
   if(!(currentUser?.id && sb)) return;
-  try{ await sb.from('support_messages').update({read_at:new Date().toISOString()})
-    .eq('user_id',currentUser.id).eq('sender','admin').is('read_at',null); }catch(_){}
+  try{ const _sm=await sb.from('support_messages').update({read_at:new Date().toISOString()})
+    .eq('user_id',currentUser.id).eq('sender','admin').is('read_at',null); if(_sm.error) salvataggioFallito('Assistenza', _sm.error, true); }catch(e){ salvataggioFallito('Assistenza', e, true); }
 }
 async function sendSupportReply(){
   const inp=document.getElementById('supportReplyIn'); if(!inp) return;
@@ -4490,9 +4490,10 @@ async function _resolveCompanionId(code, name){
         start_date:loc.startDate||null, start_time:loc.startTime||null, end_date:loc.endDate||null, end_time:loc.endTime||null
       });
       if(!ins.error){ const g=await sb.from('companions').select('id').eq('code',code).eq('owner_id',currentUser.id).maybeSingle(); if(!g.error) data=g.data; }
+      else salvataggioFallito(t('sf_compagnia','Compagnia'), ins.error);
     }
     if(data && data.id){ _saveCompagnie((_getCompagnie()||[]).map(x=> x.code===code?{...x, id:data.id}:x)); return data.id; }
-  }catch(e){ console.warn('[comp] resolve id:', e && e.message || e); }
+  }catch(e){ salvataggioFallito(t('sf_compagnia','Compagnia'), e); }
   return null;
 }
 async function openCompagniaDetail(id, name, code){
@@ -4777,7 +4778,7 @@ async function compDeleteMsg(msgId, audioPath){
   try{
     const { error } = await sb.from('companion_messages').delete().eq('id',msgId);
     if(error) throw error;
-    if(audioPath){ try{ await sb.storage.from('companion_audio').remove([audioPath]); }catch(_){} }
+    if(audioPath){ try{ await sb.storage.from('companion_audio').remove([audioPath]); }catch(eA){ salvataggioFallito(t('sf_audio','Rimozione audio'), eA); } }
     loadCompMessages();
   }catch(e){ showToast(t('cv_del_err','Cancellazione non riuscita')); }
 }
@@ -5677,7 +5678,7 @@ async function uploadPhotosToMediaServer(files, poiId){
       }
       if (!salvata) { console.error('[poilove] FOTO NON SALVATA dopo 2 tentativi'); try{ showToast('⚠ Una foto non e stata salvata, riprova'); }catch(_){} continue; }
       urls.push(salvata);
-    } catch(e) { console.warn('[poilove] storage error:', e); }
+    } catch(e) { salvataggioFallito(t('sf_foto','Foto'), e); }
   }
   return urls;
 }
@@ -5694,17 +5695,21 @@ async function savePOIToDB(data) {
   {
     const { data: _exist } = await sb.from('profiles').select('id').eq('id', currentUser.id).maybeSingle();
     if(!_exist){
-      await sb.from('profiles').insert({
+      const _insProf = await sb.from('profiles').insert({
         id: currentUser.id,
         username: _sanitizeHandle(currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || currentUser.email?.split('@')[0] || 'utente') || 'explorer',
         avatar_url: currentUser.user_metadata?.avatar_url || '',
         updated_at: new Date().toISOString()
       });
+      if(_insProf.error) salvataggioFallito(t('sf_profilo','Profilo'), _insProf.error);
     } else {
-      await sb.from('profiles').update({
-        avatar_url: currentUser.user_metadata?.avatar_url || '',
-        updated_at: new Date().toISOString()
-      }).eq('id', currentUser.id);
+      // Si tocca l'avatar SOLO se l'accesso ne porta uno: prima qui si azzerava
+      // l'avatar buono a ogni salvataggio di POI (metadata vuoto → stringa vuota nel DB).
+      const _mAv = currentUser.user_metadata?.avatar_url || '';
+      if(_mAv){
+        const _updProf = await sb.from('profiles').update({ avatar_url: _mAv, updated_at: new Date().toISOString() }).eq('id', currentUser.id);
+        if(_updProf.error) salvataggioFallito(t('sf_profilo','Profilo'), _updProf.error);
+      }
     }
   }
 
@@ -6417,8 +6422,8 @@ async function applyPendingReferral(){
     if(!error){
       localStorage.removeItem('poi_ref_pending');
       if(data===true){ showToast('🎉 Invito accettato, grazie!'); loadUserLovesCount(); }
-    } else { _referralApplied=false; }   // errore di rete: permetti un retry al prossimo login
-  }catch(e){ _referralApplied=false; console.warn('applyPendingReferral:', e); }
+    } else { _referralApplied=false; salvataggioFallito('Invito referral', error, true); }   // riprova al prossimo accesso
+  }catch(e){ _referralApplied=false; salvataggioFallito('Invito referral', e, true); }
 }
 
 // Join compagnia: cattura ?join=CODE all'avvio (sopravvive al redirect OAuth via localStorage),
@@ -6443,8 +6448,8 @@ async function applyPendingJoin(){
       localStorage.removeItem('poi_join_pending');
       if(data){ showToast('🎉 Sei nella compagnia!'); if(typeof syncCompagnieFromDB==='function') syncCompagnieFromDB(); }
       else showToast('⚠ Codice compagnia non valido o scaduto');
-    } else { _joinApplied=false; }   // errore di rete: retry al prossimo login
-  }catch(e){ _joinApplied=false; console.warn('applyPendingJoin:', e); }
+    } else { _joinApplied=false; salvataggioFallito(t('sf_join','Ingresso in compagnia'), error); }   // riprova al prossimo accesso, ma l'utente LO SA
+  }catch(e){ _joinApplied=false; salvataggioFallito(t('sf_join','Ingresso in compagnia'), e); }
 }
 
 function generateAvatar(){
@@ -8113,7 +8118,15 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='3.53';
+const APP_VERSION='3.54';
+// ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
+// Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
+function salvataggioFallito(cosa, err, soloRegistro){
+  const msg=(err&&(err.message||String(err)))||'errore sconosciuto';
+  console.error('[poilove] SALVATAGGIO FALLITO · '+cosa+':', msg);
+  if(!soloRegistro){ try{ showToast('⚠ '+cosa+': '+t('save_fail_short','salvataggio non riuscito, riprova')); }catch(_){} }
+  return false;
+}
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
@@ -9311,7 +9324,8 @@ function suggestToGoogleMaps(key){
   const url = `https://www.google.com/maps/search/?api=1&query=${q}&center=${p.lat},${p.lng}`;
   window.open(url, '_blank', 'noopener');
   if(p.id && currentUser?.id===p.author_id && sb){
-    sb.from('pois').update({ visibility: 'suggested_google' }).eq('id', p.id).then(()=>{
+    sb.from('pois').update({ visibility: 'suggested_google' }).eq('id', p.id).then(({error})=>{
+      if(error) return salvataggioFallito(t('sf_poi','POI'), error);
       p.visibility = 'suggested_google';
       showToast?.(t('toast_google_marked'));
     });
@@ -10141,9 +10155,10 @@ function _persistListOrder(){
       if(r.sort_order!==i+1){
         const {error}=await sb.from('poi_lists').update({sort_order:i+1}).eq('id',r.id);
         if(!error) r.sort_order=i+1;
+        else salvataggioFallito(t('sf_ordine','Ordine della lista'), error);
       }
     }
-  }).catch(()=>{});
+  }).catch(e=>{ salvataggioFallito(t('sf_ordine','Ordine della lista'), e); });
   return _persistChain;
 }
 function moveListPoi(i,dir){
@@ -10165,7 +10180,7 @@ async function _addPoiToListDB(listId,poiId){
   const {data:mx}=await sb.from('poi_lists').select('sort_order').eq('list_id',listId).order('sort_order',{ascending:false}).limit(1);
   const next=((mx&&mx[0]&&mx[0].sort_order)||0)+1;
   const {error}=await sb.from('poi_lists').insert({list_id:listId,poi_id:poiId,sort_order:next});
-  if(error&&!/duplicate/i.test(error.message||'')){ console.warn('poi_lists insert:',error.message); return false; }
+  if(error&&!/duplicate/i.test(error.message||'')){ salvataggioFallito(t('sf_lista','Aggiunta alla lista'), error); return false; }
   return true;
 }
 // Picker: i POI dell'utente non ancora nella lista, tocca + per aggiungere
@@ -10853,9 +10868,9 @@ async function createCompagnia(){
         _saveCompagnie(_getCompagnie().map(x=> x.code===code ? {...x, id:got.id} : x));
         // Inviti email -> companion_members (status 'invited'); diventano 'joined' col codice (RPC join_companion)
         const emails = (invites||'').split(/[,;\s]+/).map(s=>s.trim()).filter(s=>s.includes('@'));
-        if(emails.length) await sb.from('companion_members').insert(emails.map(em=>({companion_id:got.id, email:em, status:'invited'})));
+        if(emails.length){ const _mIns=await sb.from('companion_members').insert(emails.map(em=>({companion_id:got.id, email:em, status:'invited'}))); if(_mIns.error) salvataggioFallito(t('sf_inviti','Inviti della compagnia'), _mIns.error); }
       }
-    }catch(e){ console.warn('createCompagnia DB:', e); }
+    }catch(e){ salvataggioFallito(t('sf_compagnia','Compagnia'), e); }
   }
 
   showToast?.(t('comp_created','✓ "{name}" creato! Codice: {code}').replace('{name}', name).replace('{code}', code) + ` · ${typeLabel}${range?' · '+range:''}`);
@@ -11246,14 +11261,14 @@ async function _autosavePoiPatch(patch, silent){
   try{
     const { data, error } = await sb.from('pois').update(patch).eq('id',currentPOI.id).select('id');
     if(error || !data || !data.length){
-      console.warn('autosave POI:', error&&error.message);
-      if(!silent) showToast(t('autosave_err','Salvataggio non riuscito, riprova'));
+      // anche in modalita' silenziosa il FALLIMENTO parla: silenzioso e' il successo, mai l'errore
+      salvataggioFallito(t('sf_poi','POI'), error||new Error('nessuna riga aggiornata'));
       return false;
     }
     Object.assign(currentPOI, patch);
     if(!silent) showToast(t('autosaved','✓ Salvato'));
     return true;
-  }catch(e){ console.warn('autosave POI:',e); if(!silent) showToast(t('autosave_err','Salvataggio non riuscito, riprova')); return false; }
+  }catch(e){ salvataggioFallito(t('sf_poi','POI'), e); return false; }
 }
 
 /* Titolo del POI: il proprietario lo rinomina QUI, dove sta. Autosave, mai vuoto. */
@@ -12318,7 +12333,7 @@ async function askOtherCategory(){
     const choice=await _askUseOrReplaceCat(existing);
     if(choice==='use'){ const chip=box0&&box0.querySelector('.cat-chip[data-key="'+CSS.escape(existing.key)+'"]'); if(chip) _applyCatSel(chip); return; }
     if(choice!=='replace') return;
-    try{ await sb.rpc('delete_my_custom_category'); }catch(_){}
+    try{ const _dc=await sb.rpc('delete_my_custom_category'); if(_dc.error) salvataggioFallito(t('sf_categoria','Categoria'), _dc.error); }catch(eC){ salvataggioFallito(t('sf_categoria','Categoria'), eC); }
     _POI_CATS=_POI_CATS.filter(c=>c.key!==existing.key);
     _selCats=_selCats.filter(c=>c.key!==existing.key); _syncPrimaryCat();
   }
@@ -12441,10 +12456,10 @@ async function applyPoiRouteExtras(poiId, poi, targetTrip, propose){
     }
     if(propose && sb && poiId){
       const { error }=await sb.rpc('propose_poi_as_route_stop',{ p_poi: poiId });
-      if(error){ console.warn('propose_poi_as_route_stop:', error); }
+      if(error){ salvataggioFallito(t('sf_rotta','Proposta di rotta'), error); }
       else { showToast(t('poi_proposed_ok','Proposto all\'amministrazione come tappa di rotta storica')); }
     }
-  }catch(e){ console.warn('applyPoiRouteExtras:', e); }
+  }catch(e){ salvataggioFallito(t('sf_rotta','Itinerario e rotta'), e); }
 }
 function setVis(btn,ctx,type){
   const row=btn.closest('.vis-row');
@@ -13058,7 +13073,7 @@ async function savePOI(){
       .then(async updated=>{
         if(updated) loadPOIsFromDB();
         if(_rtTripE||_rtProposeE){ await applyPoiRouteExtras(_editId,{name,lat:lat2,lng:lng2,image:(photos[0]||'')},_rtTripE,_rtProposeE); }
-      });
+      }).catch(e=>salvataggioFallito(t('sf_poi','POI'), e));
     const sec2=timerSec; clearInterval(timerInterval);
     closeAddPOI();
     if(nameIn)nameIn.value='';
@@ -13110,7 +13125,7 @@ async function savePOI(){
         if(savedPOI&&(_rtTrip||_rtPropose)){
           await applyPoiRouteExtras(savedPOI.id,{name,lat:lat2,lng:lng2,image:(photos[0]||unsplashSnap[0]||'')},_rtTrip,_rtPropose);
         }
-      });
+      }).catch(e=>salvataggioFallito(t('sf_poi','POI'), e));
   }
   // Salva secondi prima di chiudere
   const sec=timerSec;
@@ -13386,7 +13401,7 @@ async function _awardShare(entity){
     const {data,error}=await sb.rpc('award_share',{p_entity:entity});
     if(error) throw error;
     if(typeof data==='number'){ currentPoints=data; renderBadge(currentPoints); }
-  }catch(e){ console.warn('award_share:', e); }
+  }catch(e){ salvataggioFallito('Punti condivisione', e, true); }
 }
 
 /* ── Modale edit vanity ── */
@@ -13519,7 +13534,7 @@ async function editProfileBio(){
   el.textContent=trimmed;
   el.style.display=trimmed?'block':'none';
   // Salva in Supabase se loggato
-  if(currentUser&&sb) sb.from('profiles').update({bio:trimmed}).eq('id',currentUser.id).then(()=>showToast(t('toast_bio_updated')));
+  if(currentUser&&sb) sb.from('profiles').update({bio:trimmed}).eq('id',currentUser.id).then(({error})=>{ if(error) return salvataggioFallito(t('sf_profilo','Profilo'), error); showToast(t('toast_bio_updated')); });
 }
 
 /* ── Aggiorna livello nel chip ── */
@@ -13838,14 +13853,15 @@ async function togglePublicFollow(){
           following_id: currentViewedUser.id
         });
         if(error && !/duplicate|unique/i.test(error.message||'')){
-          console.warn('[poilove] follow insert error:',error.message);
+          salvataggioFallito(t('sf_segui','Segui'), error);
         }
       } else {
-        await sb.from('follows').delete()
+        const _delF = await sb.from('follows').delete()
           .eq('follower_id', currentUser.id)
           .eq('following_id', currentViewedUser.id);
+        if(_delF.error) salvataggioFallito(t('sf_segui','Segui'), _delF.error);
       }
-    }catch(e){ console.warn('[poilove] follow toggle exception:',e); }
+    }catch(e){ salvataggioFallito(t('sf_segui','Segui'), e); }
   }
   showToast(pubFollowing
     ?(lang==='it'?`Stai seguendo ${targetName}`:lang==='sq'?`Po ndjek ${targetName}`:`Now following ${targetName}`)
@@ -13942,7 +13958,7 @@ async function deleteTripCard(id){
   const t=TRIPS[id]; if(!t) return;
   const ok=await uiConfirm(window.t('trip_del_confirm','Eliminare questo itinerario? Non si può annullare.'), {okText:window.t('trip_delete','Elimina'), danger:true});
   if(!ok) return;
-  if(t.dbId && sb && currentUser){ try{ await sb.from('trips').delete().eq('id',t.dbId).eq('owner_id',currentUser.id); }catch(e){ console.warn('[trip del]',e?.message||e); } }
+  if(t.dbId && sb && currentUser){ try{ const _del=await sb.from('trips').delete().eq('id',t.dbId).eq('owner_id',currentUser.id); if(_del.error) salvataggioFallito(t('sf_itinerario','Itinerario'), _del.error); }catch(e){ salvataggioFallito(t('sf_itinerario','Itinerario'), e); } }
   delete TRIPS[id];
   try{ const s=JSON.parse(localStorage.getItem('poi_trips')||'{}'); delete s[id]; localStorage.setItem('poi_trips',JSON.stringify(s)); }catch(_){}
   renderTripCards(); showToast(window.t('trip_deleted','Itinerario eliminato'));
@@ -13950,7 +13966,7 @@ async function deleteTripCard(id){
 async function archiveTrip(id){
   _closeTripSwipe(id);
   const t=TRIPS[id]; if(!t) return;
-  if(t.dbId && sb && currentUser){ try{ await sb.from('trips').update({archived:true}).eq('id',t.dbId).eq('owner_id',currentUser.id); }catch(e){ console.warn('[trip arch]',e?.message||e); } }
+  if(t.dbId && sb && currentUser){ try{ const _ar=await sb.from('trips').update({archived:true}).eq('id',t.dbId).eq('owner_id',currentUser.id); if(_ar.error) salvataggioFallito(t('sf_itinerario','Itinerario'), _ar.error); }catch(e){ salvataggioFallito(t('sf_itinerario','Itinerario'), e); } }
   try{ const s=JSON.parse(localStorage.getItem('poi_trips')||'{}'); delete s[id]; localStorage.setItem('poi_trips',JSON.stringify(s)); }catch(_){}
   delete TRIPS[id];
   renderTripCards(); showToast(window.t('trip_archived','Itinerario archiviato'));
@@ -14054,7 +14070,7 @@ function _persistTripStops(trip){
       }));
       const { error }=await sb.rpc('replace_trip_stops',{ p_trip_id: trip.dbId, p_stops: rows });
       if(error) throw error;
-    }catch(e){ console.warn('_persistTripStops:', e); }
+    }catch(e){ salvataggioFallito(t('sf_tappe','Tappe dell\'itinerario'), e); }
   }, 400);
 }
 
@@ -14277,7 +14293,7 @@ function _persistTripMeta(t, fields){
     if('startDate' in fields) db.start_date=fields.startDate||null;
     if('endDate' in fields) db.end_date=fields.endDate||null;
     if('description' in fields) db.description=fields.description||null;
-    sb.from('trips').update(db).eq('id',t.dbId).eq('owner_id',currentUser.id).then(({error})=>{ if(error) console.warn('[trip meta]',error.message); });
+    sb.from('trips').update(db).eq('id',t.dbId).eq('owner_id',currentUser.id).then(({error})=>{ if(error) salvataggioFallito(t('sf_itinerario','Itinerario'), error); });
   }
 }
 // Contatore caratteri della descrizione itinerario
@@ -14934,7 +14950,7 @@ async function saveNewTrip(){
       } else {
         try{ const s2 = JSON.parse(localStorage.getItem('poi_trips')||'{}'); s2[id]=trip; localStorage.setItem('poi_trips', JSON.stringify(s2)); }catch(e){}
       }
-    }catch(e){ console.warn('saveNewTrip DB:', e); }
+    }catch(e){ salvataggioFallito(t('sf_itinerario','Itinerario'), e); }
   }
 
   closeNewTripSheet();
@@ -16496,7 +16512,7 @@ async function confirmPhotoPicker(){
       if(dHero && _activeTripDetailId===tripId){ dHero.style.backgroundImage=`url('${url}')`; dHero.classList.add('has-img'); }
       // PERSISTI (prima mancava: la cover cambiata si perdeva al reload) -> localStorage + DB
       try{ const s=JSON.parse(localStorage.getItem('poi_trips')||'{}'); if(s[tripId]){ s[tripId].cover=url; localStorage.setItem('poi_trips', JSON.stringify(s)); } }catch(_){}
-      if(tr.dbId && currentUser?.id && sb){ try{ await sb.from('trips').update({ cover_url:url, updated_at:new Date().toISOString() }).eq('id',tr.dbId).eq('owner_id',currentUser.id); }catch(e){ console.warn('[trip cover] save', e?.message||e); } }
+      if(tr.dbId && currentUser?.id && sb){ try{ const _cv=await sb.from('trips').update({ cover_url:url, updated_at:new Date().toISOString() }).eq('id',tr.dbId).eq('owner_id',currentUser.id); if(_cv.error) salvataggioFallito(t('sf_copertina','Copertina'), _cv.error); }catch(e){ salvataggioFallito(t('sf_copertina','Copertina'), e); } }
       showToast(window.t('trip_cover_saved','Copertina aggiornata'));
     }
     closePhotoPicker();
