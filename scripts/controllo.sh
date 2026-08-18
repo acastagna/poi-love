@@ -111,6 +111,7 @@ fi
 
 echo
 echo "── pagine di servizio ──"
+prova "pagina velocita del SAL" "$C -o /dev/null -w '%{http_code}' https://sal.poilove.com/velocita.html" "200"
 for u in privacy terms sitemap.php robots.txt; do
   prova "/$u" "$C -o /dev/null -w '%{http_code}' -L https://poilove.com/$u" "200"
 done
