@@ -117,7 +117,7 @@ footer{margin-top:30px;padding-top:16px;border-top:1px solid var(--line);
  <div>
   <a class="back" href="index.html">&larr; Torna al SAL</a>
   <h1 style="margin-top:14px">POI<em>&bull;</em>LOVE ha una macchina<br>tutta sua. <em>Ecco cosa cambia.</em></h1>
-  <div class="date">Misure reali del 17 agosto 2026, il giorno del passaggio</div>
+  <div class="date">Misure reali del 17 e 18 agosto 2026: trasloco e dati in casa</div>
  </div>
 </div>
 
@@ -152,14 +152,14 @@ footer{margin-top:30px;padding-top:16px;border-top:1px solid var(--line);
    <dt>Tempo di viaggio</dt><dd class="good">27,4 ms</dd>
   </dl>
  </div>
- <div class="m next">
-  <div class="tag">Dopo &middot; con i dati in casa</div>
-  <div class="power">da misurare</div>
-  <div class="who">stessa macchina, dati dentro</div>
+ <div class="m now">
+  <div class="tag">Dal 18 agosto &middot; dati in casa</div>
+  <div class="power">fatto ✓</div>
+  <div class="who">database e accessi sulla macchina</div>
   <dl>
    <dt>Progetti ospitati</dt><dd>1</dd>
-   <dt>Viaggio verso i dati</dt><dd>nessuno</dd>
-   <dt>Tempo di viaggio</dt><dd>&mdash;</dd>
+   <dt>Viaggio verso i dati</dt><dd class="good">nessuno</dd>
+   <dt>Punte di attesa</dt><dd class="good">sparite</dd>
   </dl>
  </div>
 </div>
@@ -235,21 +235,20 @@ footer{margin-top:30px;padding-top:16px;border-top:1px solid var(--line);
  </div>
 
  <div class="box">
-  <h3>I dati: qui c'&egrave; il salto grosso</h3>
+  <h3>I dati: il salto &egrave; fatto</h3>
   <p>Oggi i luoghi, i profili e le foto non stanno sulla nostra macchina: stanno su
   <b>Supabase</b>, un servizio esterno. Ogni volta che apri la mappa, la richiesta <b>esce su internet</b>,
   va a bussare l&agrave;, e torna indietro.</p>
   <div class="db">
-   <div class="dbc"><div class="v">118 ms</div><div class="l">Oggi, dati fuori</div></div>
-   <div class="dbc next"><div class="v">?</div><div class="l">Domani, dati in casa</div></div>
+   <div class="dbc"><div class="v">152 ms</div><div class="l">Prima: dati fuori (punte a 770)</div></div>
+   <div class="dbc"><div class="v">136 ms</div><div class="l">Dal 18/08: dati in casa (max 147)</div></div>
   </div>
-  <p>Sono 118 millesimi di media, ma con <b>punte fino a 738</b> quando il collegamento si assopisce:
-  &egrave; l&igrave; che l'app sembra impuntarsi.</p>
-  <p>Quando i dati saranno <b>sulla stessa macchina</b>, quel viaggio sparisce del tutto.
-  &Egrave; qui che ci aspettiamo il miglioramento pi&ugrave; grosso, molto pi&ugrave; che sulle pagine.</p>
-  <p class="quiet">Non &egrave; ancora fatto perch&eacute; spostare i dati tocca anche gli accessi e le foto:
-  si fa un pezzo alla volta, tenendo Supabase acceso finch&eacute; tutto non &egrave; verificato.
-  Questa pagina si aggiorner&agrave; con la misura vera.</p>
+  <p><b>Fatto il 18 agosto, e misurato:</b> prima i dati stavano fuori, con una media di 152 millesimi
+  e <b>punte fino a 770</b> quando il collegamento si assopiva: erano le impuntature che si sentivano usando l'app.</p>
+  <p>Ora i dati, e anche gli accessi, vivono <b>sulla stessa macchina</b>: 136 millesimi di mediana e,
+  soprattutto, <b>mai sopra i 147</b>. Le impuntature sono sparite: la velocit&agrave; &egrave; diventata costante.</p>
+  <p class="quiet">Restano ospiti fuori casa solo sei programmi di servizio (l'assistente ILLI, l'invio email,
+  le trascrizioni), raggiunti da un ponte: si trasferiscono in una fase successiva, senza fretta.</p>
  </div>
 </div>
 
