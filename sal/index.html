@@ -418,6 +418,7 @@ body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); 
       <button class="lang-btn" data-lang="sq" title="Shqip" onclick="switchLang('sq')">🇦🇱</button>
       <button class="lang-btn" data-lang="en" title="English" onclick="switchLang('en')">🇬🇧</button>
     </div>
+    <a href="https://project.poilove.com" class="speed-btn2" data-t="btn_project" style="display:inline-flex;align-items:center;background:#1C1C1C;color:#fff;text-decoration:none;border-radius:99px;padding:7px 15px;font-size:12.5px;font-weight:700;white-space:nowrap">Progetto</a>
     <span class="hdr-date" data-t="updated_date">Aggiornato: 18 Agosto 2026</span>
     <div class="status-pill"><div class="sdot"></div><span data-t="status_pill">MVP in sviluppo</span></div>
   </div>
@@ -487,7 +488,7 @@ body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); 
       <svg id="pieSvg" viewBox="-12 -12 224 224" xmlns="http://www.w3.org/2000/svg">
         <g id="pieSlices"></g>
         <circle cx="100" cy="100" r="54" fill="white"/>
-        <text x="100" y="94" text-anchor="middle" font-family="Inter" font-weight="900" font-size="21" fill="#1C1C1C" id="cPct">66%</text>
+        <text x="100" y="94" text-anchor="middle" font-family="Inter" font-weight="900" font-size="21" fill="#1C1C1C" id="cPct">79%</text>
         <text x="100" y="112" text-anchor="middle" font-family="Inter" font-weight="500" font-size="9.5" fill="#6B6B6B" id="cLbl" data-t="completed_lbl">completato</text>
       </svg>
       <div class="pie-popup" id="piePopup">
@@ -614,7 +615,7 @@ body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); 
       <div class="ws-name">
         <div class="ws-ico" style="background:#FEF2F2;color:var(--red)"><i class="ph ph-cloud-arrow-up"></i></div>
         <div>
-          <div class="ws-tname" data-t="t7_name">Plesk Media Server — API Upload Foto</div>
+          <div class="ws-tname" data-t="t7_name">Media server foto — sulla macchina</div>
           <div class="ws-tsub" data-t="t7_sub">Cartelle + endpoint PHP per upload massimo 3 foto per POI</div>
           <div class="ws-time-mobile" data-t="t7_time_m">~3h — 🔴 sprint</div>
         </div>
@@ -854,7 +855,7 @@ body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); 
   <div class="sec-hdr">
     <div class="sec-icon si-r"><i class="ph ph-rocket-launch"></i></div>
     <div>
-      <div class="sec-ttl" data-t="launch_title">Roadmap fino al Lancio Tirana</div>
+      <div class="sec-ttl" data-t="launch_title">Roadmap: dal prototipo alla piattaforma indipendente</div>
       <div class="sec-sub" data-t="launch_sub">27 Apr → Giugno · 4 fasi · finestra presentazioni 13-17 Maggio</div>
     </div>
   </div>
@@ -873,7 +874,7 @@ body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); 
 
     <!-- FASE 1 -->
     <div style="background:#fff;border-radius:16px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,.07);border:1px solid var(--border);border-top:3px solid #285EA7">
-      <div style="font-size:10px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px" data-t="f1_phase">FASE 1 · 27 Apr → 6 Mag</div>
+      <div style="font-size:10px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px" data-t="f1_phase">FASE 1 · aprile–maggio</div>
       <div style="font-size:15px;font-weight:800;margin-bottom:8px" data-t="f1_title">✅ Webapp & Infrastruttura</div>
       <div style="font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:12px" data-t="f1_desc">Webapp HTML SPA navigabile, mappa Leaflet trilingue, sheet system, demo mode. Media server PHP live su media.poilove.com (upload + card + delete + JWT). Supabase 12 tabelle + RLS. Expo scaffold 17 file.</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
@@ -1037,7 +1038,7 @@ const T = {
     sal_badge:'SAL — Stato Avanzamento Lavori', updated_date:'Aggiornato: 18 Agosto 2026',
     status_pill:'MVP in sviluppo', hero_sub:'Stato del Progetto',
     hero_desc:'Mappa comunitaria dei luoghi amati. Prima istanza: Albania · Tirana. Lancio tecnico FATTO il 18 agosto 2026: database e accessi propri, sulla macchina dedicata. Framework open source Cultural Bridge OS — Licenza MIT.',
-    kpi_speed:'Test velocità', kpi_done:'Completamento', kpi_weeks:'Lancio tecnico: fatto', kpi_tables:'Tabelle database', kpi_license:'Licenza',
+    kpi_speed:'Test velocità', btn_project:'Progetto ↗', kpi_done:'Completamento', kpi_weeks:'Lancio tecnico: fatto', kpi_tables:'Tabelle database', kpi_license:'Licenza',
     area_title:'Avanzamento per Area', area_sub:'Stato corrente delle 4 macro-aree di progetto',
     lbl_done:'✓ Completata', lbl_active:'↗ In corso', lbl_todo:'○ Da avviare', lbl_critical:'⚡ Critico',
     area1:'Infrastruttura & Backend', area2:'App Mobile iOS/Android', area3:'UX/UI & Contenuti', area4:'Lancio & Distribuzione',
@@ -1079,24 +1080,24 @@ const T = {
     tech3_role:'Repo pubblico + CI/CD + Demo live', tech4_role:'iOS + Android da un unico codebase',
     tech5_role:'Storage foto proprietario — API PHP custom', tech6_role:'AI pipeline: enrichment, categorizzazione, audio guide future',
     tech_active:'Attivo', tech_start:'Da avviare', tech_config:'Da configurare', tech_phase2:'Fase 2',
-    launch_title:'Roadmap fino al Lancio Tirana',
-    launch_sub:'27 Apr → Giugno · 4 fasi · finestra presentazioni 13-17 Maggio',
-    warn_title:'Cosa può andare storto — senza filtri',
-    warn_body:'Finestra presentazioni: 13-17 Maggio (5 giorni dal Mer 13). La demo HTML è pronta (index.html navigabile, itinerari, media server PHP live su media.poilove.com), ma il wire AddPOI verso upload.php manca. App Expo non testata su device fisico. Il lancio Tirana di Giugno funziona solo se la finestra porta i partner giusti.',
-    f1_phase:'FASE 1 · 27 Apr → 6 Mag', f1_title:'✅ Webapp & Infrastruttura',
+    launch_title:'Roadmap: dal prototipo alla piattaforma indipendente',
+    launch_sub:'Aprile → oggi · 4 fasi · lancio tecnico fatto il 18/08, lancio pubblico legato a un evento',
+    warn_title:'Cosa puo andare storto — senza filtri',
+    warn_body:'I 6 programmi (ILLI, email, trascrizioni) girano ancora su Supabase attraverso un ponte: finche non vengono traslocati, un loro disservizio li ferma. Il ripristino dei backup non e mai stato provato. L app Google e in modalita Test: prima del lancio pubblico va pubblicata, o i nuovi utenti non entrano.',
+    f1_phase:'FASE 1 · aprile–maggio', f1_title:'✅ Webapp & Infrastruttura',
     f1_desc:'Webapp HTML SPA navigabile, mappa Leaflet trilingue, sheet system, demo mode. Media server PHP live su media.poilove.com (upload + card + delete + JWT). Supabase 12 tabelle + RLS. Expo scaffold 17 file.',
     f1_who_c:'Claude', f1_who_t:'Tu',
-    f2_phase:'FASE 2 · 7–9 Maggio', f2_title:'🔄 Rifinitura Demo + API Wire',
-    f2_desc:'index.html consolidato (303KB). Wire AddPOI verso Plesk upload.php. Test end-to-end. Navigabilità chiusa. Slide presentazione + storia.',
+    f2_phase:'FASE 2 · giugno–luglio', f2_title:'✅ Prodotto reale',
+    f2_desc:'POI, liste, itinerari, compagnie con bacheca vocale, gamification, admin desktop, SEO server-rendered, condivisioni con anteprima. Presentazioni a Tirana.',
     f2_risk:'⚠ rischio: device test',
-    f3_phase:'FASE 3 · 13-17 Maggio', f3_title:'🎤 Finestra Presentazioni',
-    f3_desc:'5 giorni di demo live distribuite. SAL aggiornato. Q&A tecniche. Roadmap Tirana mostrata. Audience: partner + investitori + alleati locali, hand-picked, ripartiti nei 5 giorni.',
+    f3_phase:'FASE 3 · 17–18 agosto', f3_title:'✅ Macchina propria + dati in casa',
+    f3_desc:'Trasloco su macchina dedicata, certificati, foto compresse e portate a casa, PostgreSQL e accessi propri. 152→18 ms sul viaggio dei dati, punte sparite.',
     f3_note:'Una sola — niente HN, niente lancio digitale',
-    f4_phase:'FASE 4 · 11 Mag → Giugno', f4_title:'🚀 Pre-Lancio Tirana',
-    f4_desc:'Iterazione su feedback. Test app Expo su device fisico. Accordi partner locali. Evento di lancio fisico Tirana. Lancio pubblico Giugno.',
+    f4_phase:'FASE 4 · in corso', f4_title:'🚀 Verso il lancio pubblico',
+    f4_desc:'Traslocare i 6 programmi, pubblicare l app nella console Google, marcatori mappa, ILLI con Google Places, app mobile, campagna legata a un evento con una storia dedicata.',
     f4_hn:'Lancio fisico, non digitale',
-    why1:'Finestra di 5 giorni (13-17 Maggio) invece di un singolo giorno. Niente HN, niente lancio digitale anticipato. Si mostra a partner, investitori, alleati locali — hand-picked, distribuiti nei 5 giorni. Nessun rumore esterno fino al lancio Tirana di Giugno.',
-    why2:'Tra il 17 Maggio e Giugno passano 2-3 settimane: tempo per iterare su feedback, testare app su device, chiudere accordi locali, organizzare evento di lancio fisico a Tirana.',
+    why1:'Lancio in due tempi, deciso il 15/08: prima il lancio TECNICO (fatto: piattaforma stabile, pubblica, su macchina propria con PostgreSQL), poi il lancio MARKETING legato a un evento, con una storia da raccontare.',
+    why2:'Ogni fase chiude con verifiche misurate, mai dichiarate: il controllo automatico fa 18 prove dall esterno a ogni modifica.',
     cta_title:'Claude for OSS — 6 mesi gratuiti',
     cta_desc:'Non è Anthropic for Startups. È il programma Claude for Open Source: 6 mesi di Claude Max gratuito. Requisito standard: 5.000 stelle GitHub. Percorso alternativo: exception clause per missione culturale, MIT license, sviluppo attivo. POI•LOVE si candida via exception clause — subito, senza aspettare le stelle. Scadenza: rolling, 10.000 posti totali.',
     cta_btn:'Candidati →', links_title:'Link Rapidi', link1_name:'App live', link3_name:'Sito Ufficiale',
@@ -1106,7 +1107,7 @@ const T = {
     sal_badge:'Project Status Report', updated_date:'Updated: August 18, 2026',
     status_pill:'MVP in development', hero_sub:'Project Status',
     hero_desc:'Community map of beloved places. First instance: Albania · Tirana. Technical launch DONE on 18 August 2026: own database and sign-ins, on the dedicated machine. Open source framework Cultural Bridge OS — MIT License.',
-    kpi_speed:'Speed test', kpi_done:'Completion', kpi_weeks:'Technical launch: done', kpi_tables:'Database tables', kpi_license:'License',
+    kpi_speed:'Speed test', btn_project:'Project ↗', kpi_done:'Completion', kpi_weeks:'Technical launch: done', kpi_tables:'Database tables', kpi_license:'License',
     area_title:'Progress by Area', area_sub:'Current status of the 4 main project areas',
     lbl_done:'✓ Completed', lbl_active:'↗ In progress', lbl_todo:'○ Not started', lbl_critical:'⚡ Critical',
     area1:'Infrastructure & Backend', area2:'Mobile App iOS/Android', area3:'UX/UI & Content', area4:'Launch & Distribution',
@@ -1148,24 +1149,24 @@ const T = {
     tech3_role:'Public repo + CI/CD + Live demo', tech4_role:'iOS + Android from a single codebase',
     tech5_role:'Proprietary photo storage — custom PHP API', tech6_role:'AI pipeline: enrichment, categorization, future audio guides',
     tech_active:'Active', tech_start:'To start', tech_config:'To configure', tech_phase2:'Phase 2',
-    launch_title:'Roadmap to Tirana Launch',
-    launch_sub:'Apr 27 → June · 4 phases · presentation window May 13-17',
+    launch_title:'Roadmap: from prototype to independent platform',
+    launch_sub:'April → today · 4 phases · technical launch done 18/08, public launch tied to an event',
     warn_title:'What can go wrong — no filters',
-    warn_body:'Presentation window: May 13-17 (5 days starting Wed 13). The HTML demo is ready (navigable index.html, itinerari, live PHP media server on media.poilove.com), but the AddPOI to upload.php wire is missing. Expo app not yet tested on physical device. The June Tirana launch only works if the window brings the right partners.',
-    f1_phase:'PHASE 1 · Apr 27 → May 6', f1_title:'✅ Webapp & Infrastructure',
+    warn_body:'The 6 programs (ILLI, email, transcriptions) still run on Supabase over a bridge: until they move, an outage there stops them. Backup restore has never been tested. The Google app is in Test mode: it must be published before the public launch, or new users cannot sign in.',
+    f1_phase:'PHASE 1 · April–May', f1_title:'✅ Web app & Infrastructure',
     f1_desc:'Navigable HTML SPA, trilingual Leaflet map, sheet system, demo mode. Live PHP media server on media.poilove.com (upload + card + delete + JWT). Supabase 12 tables + RLS. Expo scaffold 17 files.',
     f1_who_c:'Claude', f1_who_t:'You',
-    f2_phase:'PHASE 2 · May 7–9', f2_title:'🔄 Demo Polish + API Wire',
-    f2_desc:'index.html consolidated (303KB). Wire AddPOI to Plesk upload.php. End-to-end test. Navigation closed. Slides + story.',
+    f2_phase:'PHASE 2 · June–July', f2_title:'✅ Real product',
+    f2_desc:'POIs, lists, itineraries, companies with voice board, gamification, desktop admin, server-rendered SEO, share previews. Presentations in Tirana.',
     f2_risk:'⚠ risk: device testing',
-    f3_phase:'PHASE 3 · May 13-17', f3_title:'🎤 Presentation Window',
-    f3_desc:'5 days of distributed live demos. Updated SAL. Technical Q&A. Tirana roadmap shown. Audience: partners + investors + local allies, hand-picked, spread across 5 days.',
+    f3_phase:'PHASE 3 · 17–18 August', f3_title:'✅ Own machine + data at home',
+    f3_desc:'Move to a dedicated machine, certificates, photos compressed and brought home, own PostgreSQL and sign-ins. Data trip 152→18 ms, spikes gone.',
     f3_note:'One only — no HN, no digital launch',
-    f4_phase:'PHASE 4 · May 11 → June', f4_title:'🚀 Pre-Launch Tirana',
-    f4_desc:'Iteration on feedback. Expo app tested on physical device. Local partner agreements. Physical launch event Tirana. Public launch June.',
+    f4_phase:'PHASE 4 · ongoing', f4_title:'🚀 Toward the public launch',
+    f4_desc:'Move the 6 programs, publish the app in the Google console, map markers, ILLI with Google Places, mobile app, a campaign tied to an event with its own story.',
     f4_hn:'Physical launch, not digital',
-    why1:'A 5-day window (May 13-17) instead of a single day. No HN, no early digital launch. Shown to partners, investors, local allies — hand-picked, spread across 5 days. No external noise until the June Tirana launch.',
-    why2:'Between May 17 and June, 2-3 weeks pass: time to iterate on feedback, test the app on devices, close local agreements, organize the physical launch event in Tirana.',
+    why1:'Two-step launch, decided on 15/08: first the TECHNICAL launch (done: stable, public, on our own machine with PostgreSQL), then the MARKETING launch tied to an event, with a story to tell.',
+    why2:'Every phase closes with measured checks, never claims: the automated control runs 18 external tests on every change.',
     cta_title:'Claude for OSS — 6 months free',
     cta_desc:'Not Anthropic for Startups. This is the Claude for Open Source program: 6 months of free Claude Max for OSS builders. Standard requirement: 5,000 GitHub stars. Alternative path: exception clause for cultural mission, MIT license, active development. POI•LOVE applies via exception clause — now, without waiting for stars. Deadline: rolling, 10,000 spots total.',
     cta_btn:'Apply →', links_title:'Quick Links', link1_name:'Live Demo', link3_name:'Official Website',
@@ -1175,7 +1176,7 @@ const T = {
     sal_badge:'Raport i Progresit të Projektit', updated_date:'Përditësuar: 18 Gusht 2026',
     status_pill:'MVP në zhvillim', hero_sub:'Gjendja e Projektit',
     hero_desc:'Hartë komunitare e vendeve të dashura. Rasti i parë: Shqipëri · Tiranë. Lansimi teknik U KRYE më 18 gusht 2026: bazë të dhënash dhe hyrje tona, në makinën e dedikuar. Kornizë me burim të hapur Cultural Bridge OS — Licencë MIT.',
-    kpi_speed:'Test shpejtësie', kpi_done:'Përfundim', kpi_weeks:'Lansimi teknik: kryer', kpi_tables:'Tabela DB', kpi_license:'Licencë',
+    kpi_speed:'Test shpejtësie', btn_project:'Projekti ↗', kpi_done:'Përfundim', kpi_weeks:'Lansimi teknik: kryer', kpi_tables:'Tabela DB', kpi_license:'Licencë',
     area_title:'Progres sipas Zonës', area_sub:'Gjendja aktuale e 4 zonave kryesore të projektit',
     lbl_done:'✓ Përfunduar', lbl_active:'↗ Në progres', lbl_todo:'○ Nuk ka filluar', lbl_critical:'⚡ Kritike',
     area1:'Infrastrukturë & Backend', area2:'App Mobile iOS/Android', area3:'UX/UI & Përmbajtje', area4:'Lansim & Shpërndarje',
@@ -1217,24 +1218,24 @@ const T = {
     tech3_role:'Repo publik + CI/CD + Demo live', tech4_role:'iOS + Android nga një bazë kodi e vetme',
     tech5_role:'Ruajtje foto pronësor — API PHP me porosi', tech6_role:'Pipeline AI: pasurimi, kategorizimi, audio guida të ardhshme',
     tech_active:'Aktiv', tech_start:'Për t\'u nisur', tech_config:'Për t\'u konfiguruar', tech_phase2:'Faza 2',
-    launch_title:'Plani deri në Lansimin e Tiranës',
-    launch_sub:'27 Pri → Qershor · 4 faza · dritare prezantimesh 13-17 Maj',
-    warn_title:'Çfarë mund të shkojë keq — pa filtër',
-    warn_body:'Dritarja e prezantimit: 13-17 Maj (5 ditë duke nisur të mërkurën 13). Demo HTML është gati (index.html i lundrueshëm, itinerari, media server PHP live në media.poilove.com), por wire AddPOI te upload.php mungon. App Expo ende e patestuar në pajisje fizike. Lansimi i Tiranës i Qershorit funksionon vetëm nëse dritarja sjell partnerët e duhur.',
-    f1_phase:'FAZA 1 · 27 Pri → 6 Maj', f1_title:'✅ Webapp & Infrastrukturë',
+    launch_title:'Udherrefyesi: nga prototipi te platforma e pavarur',
+    launch_sub:'Prill → sot · 4 faza · lansimi teknik u krye me 18/08, lansimi publik lidhet me nje event',
+    warn_title:'Cfare mund te shkoje keq — pa filtra',
+    warn_body:'6 programet (ILLI, email, transkriptimet) punojne ende ne Supabase permes nje ure: derisa te zhvendosen, nje avari atje i ndal. Rikthimi i backup-it nuk eshte provuar kurre. Aplikacioni Google eshte ne modalitet Test: duhet publikuar para lansimit publik, ndryshe perdoruesit e rinj nuk hyjne.',
+    f1_phase:'FAZA 1 · prill–maj', f1_title:'✅ Webapp & Infrastruktura',
     f1_desc:'Webapp HTML SPA e lundrueshme, hartë Leaflet trefishe, sheet system, demo mode. Media server PHP live në media.poilove.com (upload + card + delete + JWT). Supabase 12 tabela + RLS. Expo scaffold 17 file.',
     f1_who_c:'Claude', f1_who_t:'Ti',
-    f2_phase:'FAZA 2 · 7–9 Maj', f2_title:'🔄 Lustrim Demo + Wire API',
-    f2_desc:'index.html i konsoliduar (303KB). Wire AddPOI te Plesk upload.php. Test end-to-end. Navigimi i mbyllur. Slide + histori.',
+    f2_phase:'FAZA 2 · qershor–korrik', f2_title:'✅ Produkt real',
+    f2_desc:'POI, lista, itinerare, shoqeri me tabele zanore, gamification, admin desktop, SEO, ndarje me pamje paraprake. Prezantime ne Tirane.',
     f2_risk:'⚠ rrezik: testim pajisjeje',
-    f3_phase:'FAZA 3 · 13-17 Maj', f3_title:'🎤 Dritarja e Prezantimit',
-    f3_desc:'5 ditë demo live të shpërndara. SAL i përditësuar. Q&A teknike. Roadmap Tirana e shfaqur. Audienca: partnerë + investitorë + aleatë lokalë, të zgjedhur me dorë, të shpërndarë në 5 ditë.',
+    f3_phase:'FAZA 3 · 17–18 gusht', f3_title:'✅ Makine jona + te dhenat ne shtepi',
+    f3_desc:'Zhvendosje ne makine te dedikuar, certifikata, foto te kompresuara, PostgreSQL dhe hyrje tona. Udhetimi i te dhenave 152→18 ms, pikat u zhduken.',
     f3_note:'Vetëm një — pa HN, pa lansim dixhital',
-    f4_phase:'FAZA 4 · 11 Maj → Qershor', f4_title:'🚀 Para-Lansim Tiranë',
-    f4_desc:'Iterim mbi feedback. App Expo i testuar në pajisje fizike. Marrëveshje me partnerë lokalë. Event lansimi fizik në Tiranë. Lansim publik Qershor.',
+    f4_phase:'FAZA 4 · ne vazhdim', f4_title:'🚀 Drejt lansimit publik',
+    f4_desc:'Zhvendosja e 6 programeve, publikimi ne konsolen Google, shenjat ne harte, ILLI me Google Places, aplikacioni mobil, fushate e lidhur me nje event.',
     f4_hn:'Lansim fizik, jo dixhital',
-    why1:'Dritare 5-ditore (13-17 Maj) në vend të një dite të vetme. Pa HN, pa lansim dixhital të parakohshëm. I shfaqet partnerëve, investitorëve, aleatëve lokalë — të zgjedhur me dorë, të shpërndarë në 5 ditë. Pa zhurmë të jashtme deri në lansimin e Tiranës në Qershor.',
-    why2:'Mes 17 Majit dhe Qershorit kalojnë 2-3 javë: koha për të iteruar mbi feedback, testuar app-in në pajisje, mbyllur marrëveshje lokale, organizuar eventin fizik të lansimit në Tiranë.',
+    why1:'Lansim ne dy kohe, vendosur me 15/08: fillimisht lansimi TEKNIK (i kryer), pastaj lansimi MARKETING i lidhur me nje event, me nje histori.',
+    why2:'Cdo faze mbyllet me verifikime te matura, kurre me deklarata: kontrolli automatik ben 18 prova nga jashte ne cdo ndryshim.',
     cta_title:'Claude for OSS — 6 muaj falas',
     cta_desc:'Jo Anthropic for Startups. Ky është programi Claude for Open Source: 6 muaj Claude Max falas. Kërkesë standarde: 5.000 yje GitHub. Rruga alternative: klauzolë përjashtimi për mision kulturor, licencë MIT, zhvillim aktiv. POI•LOVE aplikon me klauzolë përjashtimi — tani, pa pritur yjet. Afati: rolling, 10.000 vende gjithsej.',
     cta_btn:'Apliko →', links_title:'Lidhje të Shpejta', link1_name:'App live', link3_name:'Faqja Zyrtare',
@@ -1252,23 +1253,22 @@ let tr = T[LANG];
 ═══════════════════════════════════════════ */
 /* PIE usa chiavi di traduzione — si risolve dinamicamente al cambio lingua */
 const PIE = [
-  { id:'done',   color:'#22C55E', value:66, label_key:'pie_done',
+  { id:'done',   color:'#22C55E', value:79, label_key:'pie_done',
     items:[
       {key:'t1_name',done:true},{key:'t2_name',done:true},{key:'t3_name',done:true},
-      {key:'t4_name',done:true},{key:'t5_name',done:true},{key:'t6_name',done:true}
+      {key:'t4_name',done:true},{key:'t5_name',done:true},{key:'t6_name',done:true},
+      {key:'t7_name',done:true},{key:'t9_name',done:true},{key:'t10_name',done:true},
+      {key:'t11_name',done:true},{key:'t12_name',done:true}
     ]
   },
-  { id:'active', color:'#F59E0B', value:22, label_key:'pie_active',
+  { id:'active', color:'#F59E0B', value:7, label_key:'pie_active',
     items:[
-      {key:'t7_name',done:false},{key:'t8_name',done:false},
-      {key:'cta_title',done:false},
-      {key:'_video',done:false}  /* chiave speciale */
+      {key:'t8_name',done:false}
     ]
   },
-  { id:'todo',   color:'#D42B2B', value:12, label_key:'pie_todo',
+  { id:'todo',   color:'#D42B2B', value:14, label_key:'pie_todo',
     items:[
-      {key:'t9_name',done:false},{key:'t10_name',done:false},{key:'t11_name',done:false},
-      {key:'t12_name',done:false},{key:'t13_name',done:false},{key:'t14_name',done:false}
+      {key:'t13_name',done:false},{key:'t14_name',done:false}
     ]
   }
 ];
@@ -1392,7 +1392,7 @@ function close(){
   legs.forEach(el=>el.classList.remove('act'));
   popup.classList.remove('vis');
   overlay.classList.remove('act');
-  document.getElementById('cPct').textContent='66%';
+  document.getElementById('cPct').textContent='79%';
   document.getElementById('cLbl').textContent=tr.completed_lbl;
 }
 
