@@ -6875,12 +6875,13 @@ async function _refreshGpsCity(){
 }
 
 function initMap(){
+  window._initMapRuns=(window._initMapRuns||0)+1;
   // La mappa riparte dall'ULTIMO posto visto, come Google Maps (deciso il 18/08).
   // Il GPS non strappa piu' via: resta il suo bottone per tornare "da me".
   let _vistaSalvata=null;
   try{ _vistaSalvata=JSON.parse(localStorage.getItem('poilove_map_view')||'null'); }catch(_){}
   window._savedViewRestored = !!(_vistaSalvata && _vistaSalvata.lat && !_deepLinkActive);
-  map=L.map('map',{zoomControl:false,attributionControl:true,doubleClickZoom:false})
+  map=L.map('map',{zoomControl:false,attributionControl:true,doubleClickZoom:false,maxZoom:19})
     .setView(window._savedViewRestored ? [_vistaSalvata.lat,_vistaSalvata.lng] : CENTER,
              window._savedViewRestored ? (_vistaSalvata.z||15) : 15);
   map.on('moveend zoomend', function(){
@@ -6896,7 +6897,7 @@ function initMap(){
       }
     });
     map.addLayer(window._cluster);
-  }catch(_){ window._cluster=null; }
+  }catch(e){ window._cluster=null; window._clusterErr=(e&&e.message)||String(e); }
   // Doppio clic / doppio tap su mappa: reverse-geocoding + popup OSM
   // Su mobile Leaflet a volte salta l'evento dblclick → aggancio anche un
   // detector custom su click con timing 350ms (più Leaflet dblclick come fallback)
@@ -8169,7 +8170,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='3.59';
+const APP_VERSION='3.61';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
