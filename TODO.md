@@ -12,6 +12,7 @@
 - [ ] **Facebook negli "Altri modi per entrare"**: configurare l'accesso Facebook (serve App Review Meta con privacy policy, già in linea) e aggiungerlo alla tendina della schermata d'accesso. Fino ad allora NON compare (regola mai finto).
 - [x] **Biometria: bottone RIMOSSO il 19/08 (v3.71)** — collaudo di Alessandro su iPhone fallito; scoperto che il bottone non usava l'impronta, spediva un magic link (violava la regola mai finto). Tornera' solo con un backend WebAuthn vero (registrazione credenziale + challenge server-side).
 - [x] **POSTA DEL SERVIZIO ACCESSI: FATTA il 19/08** — casella no-reply@poilove.com su Stalwart, GoTrue agganciato, email monolingua brandizzata, SPF/DKIM/DMARC/MX su Cloudflare, consegna verificata. Dettaglio in SAL.md.
+- [ ] **Barracuda: IP posta (37.27.13.104) in lista** — pagella mail-tester 9,5/10, l'unico mezzo punto e' questo; rimozione gratuita su barracudacentral.org quando si vuole il 10 (deciso il 19/08 di lasciar stare per ora).
 - [ ] **DKIM: rotazione automatica fra 90 giorni (~16/11/2026)** — Stalwart ruota le chiavi e i selettori cambiano: vanno ripubblicati i 2 record TXT su Cloudflare (o si automatizza col token). Se le email tornano in spam a novembre, e' questo.
 - [ ] ~~POSTA DEL SERVIZIO ACCESSI ASSENTE~~ (voce superata)
 
