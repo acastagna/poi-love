@@ -1,0 +1,336 @@
+<!--
+  © Alessandro Castagna — 321.al / EVOLAB
+  Tutti i diritti riservati. Uso non autorizzato vietato.
+  https://321.al
+-->
+<!-- Pagina di presentazione ufficiale di poilove.com: la vede chi arriva per la prima volta. -->
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>POI•LOVE · i luoghi del cuore</title>
+<meta name="description" content="POI•LOVE è la mappa fatta dalle persone che amano viaggiare: luoghi del cuore, itinerari, compagnie di viaggio, rotte storiche. Nasce a Tirana, in Albania.">
+<link rel="canonical" href="https://poilove.com/">
+<meta property="og:title" content="POI•LOVE · i luoghi del cuore">
+<meta property="og:description" content="La mappa fatta dalle persone che amano viaggiare. Luoghi, itinerari, compagnie di viaggio.">
+<meta property="og:image" content="https://poilove.com/img/landing/app-mappa.jpg">
+<meta property="og:url" content="https://poilove.com/">
+<link rel="icon" href="img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#D42B2B; --red-deep:#B22222; --cream:#EAE4D8; --paper:#F6F1E7; --ink:#1C1C1C;
+  --muted:#7c7468; --hair:rgba(28,28,28,.08);
+  --ease:cubic-bezier(0.32,0.72,0,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--cream);color:var(--ink);font-family:'Plus Jakarta Sans',system-ui,sans-serif;line-height:1.6;overflow-x:hidden}
+body::after{content:"";position:fixed;inset:0;z-index:60;pointer-events:none;opacity:.04;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E")}
+.serif{font-family:'Fraunces',Georgia,serif}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+
+/* nav a isola */
+.nav{position:fixed;top:22px;left:50%;transform:translateX(-50%);z-index:50;display:flex;align-items:center;gap:18px;
+  background:rgba(246,241,231,.75);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border:1px solid var(--hair);border-radius:999px;padding:10px 12px 10px 20px;box-shadow:0 12px 40px rgba(28,28,28,.08)}
+.nav img{height:26px;display:block}
+.langs{display:flex;gap:2px;background:rgba(28,28,28,.05);border-radius:999px;padding:3px}
+.langs button{border:0;background:transparent;font:inherit;font-size:12px;font-weight:700;letter-spacing:.06em;color:var(--muted);
+  padding:5px 11px;border-radius:999px;cursor:pointer;transition:all .5s var(--ease)}
+.langs button.on{background:#fff;color:var(--ink);box-shadow:0 2px 8px rgba(28,28,28,.12)}
+.btn{display:inline-flex;align-items:center;gap:12px;background:var(--red);color:#fff;text-decoration:none;
+  font-weight:800;font-size:15px;padding:12px 8px 12px 22px;border-radius:999px;transition:transform .5s var(--ease);white-space:nowrap}
+.btn:active{transform:scale(.98)}
+.btn .cap{width:32px;height:32px;border-radius:999px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;
+  transition:transform .5s var(--ease);font-size:15px}
+.btn:hover .cap{transform:translate(3px,-1px) scale(1.06)}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid rgba(28,28,28,.22)}
+.btn.ghost .cap{background:rgba(28,28,28,.06)}
+
+/* hero */
+.hero{min-height:100dvh;display:flex;align-items:center;padding:120px 0 60px;position:relative}
+.hero .wrap{display:grid;grid-template-columns:1.15fr .85fr;gap:40px;align-items:center}
+.eyebrow{display:inline-block;border:1px solid rgba(212,43,43,.35);color:var(--red);border-radius:999px;
+  padding:5px 14px;font-size:10.5px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;margin-bottom:26px}
+h1{font-size:clamp(44px,6.2vw,84px);line-height:1.02;font-weight:700;letter-spacing:-.02em}
+h1 em{font-style:italic;color:var(--red)}
+.sub{font-size:19px;color:var(--muted);max-width:46ch;margin:26px auto 36px}
+.ctas{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+.hero-phone{position:relative}
+.illi-top{display:block;margin:0 auto 22px;width:280px;filter:drop-shadow(0 18px 36px rgba(28,28,28,.22));animation:flott 5.5s ease-in-out infinite alternate;pointer-events:none}
+@keyframes flott{from{transform:translateY(0) rotate(-4deg)}to{transform:translateY(-18px) rotate(4deg)}}
+.hero-phone img{width:100%;max-width:420px;display:block;margin:0 auto;border-radius:34px;
+  box-shadow:0 40px 90px rgba(28,28,28,.22);transform:rotate(2.5deg)}
+
+/* fascia tre colori */
+.tiers{background:var(--paper);border-top:1px solid var(--hair);border-bottom:1px solid var(--hair);padding:96px 0}
+.tiers .wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.tier{background:var(--cream);border:1px solid var(--hair);border-radius:32px;padding:10px}
+.tier-in{background:#fff;border-radius:24px;padding:34px 30px;height:100%;box-shadow:inset 0 1px 1px rgba(255,255,255,.6)}
+.pin{width:44px;height:54px;margin-bottom:18px}
+.tier h3{font-size:21px;font-weight:800;margin-bottom:8px}
+.tier p{color:var(--muted);font-size:15px}
+
+/* titoli sezione */
+.sec{padding:120px 0 40px;text-align:center}
+h2{font-size:clamp(34px,4.4vw,58px);line-height:1.08;font-weight:700;letter-spacing:-.02em}
+.sec .lead{color:var(--muted);font-size:18px;max-width:60ch;margin:18px auto 0}
+
+/* cascata schermate */
+.gallery{padding:40px 0 130px;overflow:hidden}
+.rail{display:flex;gap:26px;justify-content:center;align-items:center;padding:30px 24px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+.rail::-webkit-scrollbar{display:none}
+.shot{flex:0 0 auto;width:250px;border-radius:30px;overflow:hidden;box-shadow:0 30px 70px rgba(28,28,28,.2);transition:transform .7s var(--ease)}
+.shot img{width:100%;display:block}
+.shot:nth-child(odd){transform:rotate(-2.2deg) translateY(12px)}
+.shot:nth-child(even){transform:rotate(2deg) translateY(-10px)}
+.shot:hover{transform:rotate(0) translateY(-6px) scale(1.03)}
+
+/* come funziona */
+.steps{background:var(--paper);border-top:1px solid var(--hair);padding:110px 0 120px}
+.steps .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:60px}
+.step{background:var(--cream);border:1px solid var(--hair);border-radius:32px;padding:10px}
+.step-in{background:#fff;border-radius:24px;padding:36px 30px;height:100%}
+.num{font-family:'Fraunces',serif;font-size:52px;line-height:1;color:var(--red);font-style:italic}
+.step h3{font-size:20px;font-weight:800;margin:14px 0 8px}
+.step p{color:var(--muted);font-size:15px}
+
+/* ILLI / lancio */
+.illi{padding:130px 0}
+.illi .wrap{max-width:760px;text-align:center}
+.illi p{margin-left:auto;margin-right:auto}
+.illi h2{text-align:center}
+.illi p{color:var(--muted);font-size:17px;margin-top:18px;max-width:52ch}
+.illi p strong{color:var(--ink)}
+
+/* banda finale */
+.band{margin:0 24px 26px;border-radius:44px;background:var(--red);color:#fff;text-align:center;padding:110px 30px;position:relative;overflow:hidden}
+.band::before{content:"";position:absolute;inset:-40%;background:radial-gradient(circle at 30% 20%,rgba(255,255,255,.14),transparent 45%)}
+.band h2{color:#fff;position:relative}
+.band .lead{color:rgba(255,255,255,.85);font-size:18px;margin:16px auto 40px;max-width:52ch;position:relative}
+.band .btn{background:#fff;color:var(--red);position:relative}
+.band .btn .cap{background:rgba(212,43,43,.12)}
+.band img.blogo{height:54px;margin-bottom:34px;position:relative}
+
+/* footer standard 321 */
+footer{padding:34px 24px 42px;display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;
+  font-size:13px;color:var(--muted)}
+footer img.plogo{height:22px}
+footer img.l321{height:36px;display:block}
+footer .sep{width:1px;height:26px;background:rgba(28,28,28,.18)}
+footer a{color:var(--muted);text-decoration:none;border-bottom:1px solid rgba(28,28,28,.15)}
+
+/* reveal */
+.rv{opacity:0;transform:translateY(46px);filter:blur(6px);transition:opacity .9s var(--ease),transform .9s var(--ease),filter .9s var(--ease)}
+.rv.in{opacity:1;transform:none;filter:none}
+
+@media (max-width:860px){
+  .hero .wrap,.tiers .wrap,.steps .grid,.illi .wrap{grid-template-columns:1fr;gap:24px}
+  .hero{padding-top:120px}
+  h1{font-size:clamp(38px,10vw,54px)}
+  .rail{justify-content:flex-start}
+  .nav{gap:10px;padding-left:14px}
+  .nav .btn{display:none}
+  .illi-top{width:170px}
+  .band{margin:0 10px 16px;padding:80px 22px}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <img src="img/logo-steso-alpha.png" alt="POI•LOVE">
+  <div class="langs">
+    <button data-l="sq" onclick="setL('sq')">SQ</button>
+    <button data-l="it" onclick="setL('it')">IT</button>
+    <button data-l="en" onclick="setL('en')">EN</button>
+  </div>
+  <a class="btn" href="https://poilove.com" data-t="nav_cta">Entra <span class="cap">→</span></a>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div style="text-align:center">
+      <img class="illi-top" src="img/illi-trasparente-500.png" alt="ILLI">
+      <span class="eyebrow rv" data-t="eyebrow">Tirana · Shqipëri · 2026</span>
+      <h1 class="serif rv" data-t="h1">I luoghi <em>del cuore</em>,<br>che puoi ritrovare.</h1>
+      <p class="sub rv" data-t="sub">POI•LOVE è la mappa fatta dalle persone che amano viaggiare. Li crei, li racconti, se vuoi li condividi con la community.</p>
+      <div class="ctas rv">
+        <a class="btn" href="https://poilove.com" data-t="cta1">Entra su POI•LOVE <span class="cap">→</span></a>
+        <a class="btn ghost" href="https://poilove.com" data-t="cta2">Guarda la mappa da ospite <span class="cap">◎</span></a>
+      </div>
+    </div>
+    <div class="hero-phone rv"><img src="img/landing/app-mappa.jpg" alt="La mappa POI•LOVE"></div>
+  </div>
+</header>
+
+<section class="tiers">
+  <div class="wrap">
+    <div class="tier rv"><div class="tier-in">
+      <svg class="pin" viewBox="0 0 80 96"><path d="M40 90C37 88 8 66 8 40 8 22 21 8 40 8s32 14 32 32c0 26-29 48-32 50z" fill="#D42B2B" stroke="#fff" stroke-width="4"/><path d="M40 30c-5-6-15-4.5-17 3-2 7 4.5 12 17 22 12.5-10 19-15 17-22-2-7.5-12-9-17-3z" fill="#fff"/></svg>
+      <h3 data-t="t1h">I tuoi, in rosso</h3>
+      <p data-t="t1p">I luoghi che crei tu: casa, rifugi, scoperte. Sono la tua firma sulla mappa.</p>
+    </div></div>
+    <div class="tier rv"><div class="tier-in">
+      <svg class="pin" viewBox="0 0 80 96" style="opacity:.85"><path d="M40 90C37 88 8 66 8 40 8 22 21 8 40 8s32 14 32 32c0 26-29 48-32 50z" fill="#1a7f45" stroke="#fff" stroke-width="4"/><path d="M40 30c-5-6-15-4.5-17 3-2 7 4.5 12 17 22 12.5-10 19-15 17-22-2-7.5-12-9-17-3z" fill="#fff"/></svg>
+      <h3 data-t="t2h">Chi segui, in verde</h3>
+      <p data-t="t2p">Gli amici e le voci di cui ti fidi: i loro luoghi ti accompagnano in viaggio.</p>
+    </div></div>
+    <div class="tier rv"><div class="tier-in">
+      <svg class="pin" viewBox="0 0 80 96" style="opacity:.55"><path d="M40 90C37 88 8 66 8 40 8 22 21 8 40 8s32 14 32 32c0 26-29 48-32 50z" fill="#8a8a8a" stroke="#fff" stroke-width="4"/><path d="M40 30c-5-6-15-4.5-17 3-2 7 4.5 12 17 22 12.5-10 19-15 17-22-2-7.5-12-9-17-3z" fill="#fff"/></svg>
+      <h3 data-t="t3h">La community, in grigio</h3>
+      <p data-t="t3p">Tutto il resto del mondo POI•LOVE, discreto sullo sfondo, pronto a farsi scoprire.</p>
+    </div></div>
+  </div>
+</section>
+
+<section class="sec">
+  <h2 class="serif rv" data-t="g_h">Luoghi, itinerari,<br>compagnie di viaggio.</h2>
+  <p class="lead rv" data-t="g_p">Crei i tuoi luoghi del cuore e raccogli love. Metti le tappe in fila e diventano itinerari da regalare. Con le compagnie di viaggio parti insieme agli amici: vi vedete sulla mappa e vi parlate coi vocali. E camminando rotte storiche e tour guadagni punti, distintivi e vantaggi.</p>
+</section>
+<section class="gallery">
+  <div class="rail">
+    <div class="shot rv"><img src="img/landing/app-personali.jpg" alt="Personali"></div>
+    <div class="shot rv"><img src="img/landing/app-mappa.jpg" alt="Mappa"></div>
+    <div class="shot rv"><img src="img/landing/app-dettaglio.jpg" alt="Dettaglio POI"></div>
+    <div class="shot rv"><img src="img/landing/app-miei-poi.jpg" alt="I miei POI"></div>
+    <div class="shot rv"><img src="img/landing/app-profilo.jpg" alt="Profilo"></div>
+  </div>
+</section>
+
+<section class="steps">
+  <div class="wrap">
+    <h2 class="serif rv" style="text-align:center" data-t="s_h">Semplice come un cuore.</h2>
+    <div class="grid">
+      <div class="step rv"><div class="step-in">
+        <div class="num">1</div>
+        <h3 data-t="s1h">Crea il tuo luogo</h3>
+        <p data-t="s1p">Una foto, due parole, la posizione. Il tuo posto del cuore è sulla mappa in un minuto.</p>
+      </div></div>
+      <div class="step rv"><div class="step-in">
+        <div class="num">2</div>
+        <h3 data-t="s2h">Manda un love</h3>
+        <p data-t="s2p">Il love è il voto che non si compra: dice al mondo che quel posto vale il viaggio.</p>
+      </div></div>
+      <div class="step rv"><div class="step-in">
+        <div class="num">3</div>
+        <h3 data-t="s3h">Costruisci rotte e liste</h3>
+        <p data-t="s3p">Metti i luoghi in fila: nascono itinerari, liste da regalare, rotte storiche da camminare.</p>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<section class="illi">
+  <div class="wrap">
+    <div>
+      <span class="eyebrow rv" data-t="i_eye">Il lancio</span>
+      <h2 class="serif rv" data-t="i_h">La data la scrive<br>la community.</h2>
+      <p class="rv" data-t="i_p1">POI•LOVE non esce quando lo dice un calendario: esce quando la mappa è viva. <strong>Ogni luogo creato avvicina il giorno del lancio.</strong></p>
+      <p class="rv" data-t="i_p2">Intanto ILLI, la nostra guida, parte per un viaggio vero attraverso l'Albania: dai luoghi istituzionali ai posti che nessuna guida racconta. Ogni tappa del suo viaggio diventa un POI da seguire.</p>
+    </div>
+  </div>
+</section>
+
+<section class="band rv">
+  <img class="blogo" src="img/logo-bianco.png" alt="POI•LOVE">
+  <h2 class="serif" data-t="b_h">Vuoi far parte di questo progetto?</h2>
+  <p class="lead" data-t="b_p">Dietro ogni cuore sulla mappa c'è una visione: leggila tutta.</p>
+  <a class="btn" href="https://project.poilove.com" data-t="b_cta">Leggi la visione <span class="cap">→</span></a>
+</section>
+
+<footer>
+  <img class="plogo" src="img/logo-steso-alpha.png" alt="POI•LOVE">
+  <img class="l321" src="img/logo-321.svg" alt="321">
+  <span data-t="f_line">POI•LOVE è un prodotto 321, ingegnerizzato da Alessandro Castagna.</span>
+  <span>NIPT M52411017N · Tiranë</span>
+  <span class="sep"></span>
+  <a href="https://poilove.com/privacy" data-t="f_privacy">Privacy e cookie</a>
+  <a href="https://poilove.com/terms" data-t="f_terms">Condizioni d'uso</a>
+</footer>
+
+<script>
+const T={
+ it:{nav_cta:'Entra <span class="cap">→</span>',eyebrow:'Tirana · Albania · 2026',
+  h1:'I luoghi <em>del cuore</em>,<br>che puoi ritrovare.',
+  sub:'POI•LOVE è la mappa fatta dalle persone che amano viaggiare. Li crei, li racconti, se vuoi li condividi con la community.',
+  cta1:'Entra su POI•LOVE <span class="cap">→</span>',cta2:'Guarda la mappa da ospite <span class="cap">◎</span>',
+  t1h:'I tuoi, in rosso',t1p:'I luoghi che crei tu: casa, rifugi, scoperte. Sono la tua firma sulla mappa.',
+  t2h:'Chi segui, in verde',t2p:'Gli amici e le voci di cui ti fidi: i loro luoghi ti accompagnano in viaggio.',
+  t3h:'La community, in grigio',t3p:'Tutto il resto del mondo POI•LOVE, discreto sullo sfondo, pronto a farsi scoprire.',
+  g_h:'Luoghi, itinerari,<br>compagnie di viaggio.',g_p:'Crei i tuoi luoghi del cuore e raccogli love. Metti le tappe in fila e diventano itinerari da regalare. Con le compagnie di viaggio parti insieme agli amici: vi vedete sulla mappa e vi parlate coi vocali. E camminando rotte storiche e tour guadagni punti, distintivi e vantaggi.',
+  s_h:'Semplice come un cuore.',
+  s1h:'Crea il tuo luogo',s1p:'Una foto, due parole, la posizione. Il tuo posto del cuore è sulla mappa in un minuto.',
+  s2h:'Manda un love',s2p:'Il love è il voto che non si compra: dice al mondo che quel posto vale il viaggio.',
+  s3h:'Costruisci rotte e liste',s3p:'Metti i luoghi in fila: nascono itinerari, liste da regalare, rotte storiche da camminare.',
+  i_eye:'Il lancio',i_h:'La data la scrive<br>la community.',
+  i_p1:'POI•LOVE non esce quando lo dice un calendario: esce quando la mappa è viva. <strong>Ogni luogo creato avvicina il giorno del lancio.</strong>',
+  i_p2:'Intanto ILLI, la nostra guida, parte per un viaggio vero attraverso l\'Albania: dai luoghi istituzionali ai posti che nessuna guida racconta. Ogni tappa del suo viaggio diventa un POI da seguire.',
+  b_h:'Vuoi far parte di questo progetto?',b_p:'Dietro ogni cuore sulla mappa c\'è una visione: leggila tutta.',
+  b_cta:'Leggi la visione <span class="cap">→</span>',
+  f_line:'POI•LOVE è un prodotto 321, ingegnerizzato da Alessandro Castagna.',f_privacy:'Privacy e cookie',f_terms:'Condizioni d\'uso'},
+ sq:{nav_cta:'Hyr <span class="cap">→</span>',eyebrow:'Tiranë · Shqipëri · 2026',
+  h1:'Vendet <em>e zemrës</em>,<br>që mund t’i rigjesh.',
+  sub:'POI•LOVE është harta e bërë nga njerëzit që duan të udhëtojnë. I krijon, i tregon, dhe po deshe i ndan me komunitetin.',
+  cta1:'Hyr në POI•LOVE <span class="cap">→</span>',cta2:'Shiko hartën si vizitor <span class="cap">◎</span>',
+  t1h:'Të tuat, në të kuqe',t1p:'Vendet që krijon ti: shtëpia, strehët, zbulimet. Janë firma jote në hartë.',
+  t2h:'Ata që ndjek, në jeshile',t2p:'Miqtë dhe zërat që u beson: vendet e tyre të shoqërojnë në udhëtim.',
+  t3h:'Komuniteti, në gri',t3p:'Gjithë bota tjetër e POI•LOVE, e qetë në sfond, gati për t\'u zbuluar.',
+  g_h:'Vende, itinerare,<br>shoqëri udhëtimi.',g_p:'Krijon vendet e tua të zemrës dhe mbledh love. Vendos ndalesat në radhë dhe bëhen itinerare për dhuratë. Me shoqëritë e udhëtimit niseni bashkë me miqtë: shiheni në hartë dhe flisni me mesazhe zanore. Dhe duke ecur rrugët historike e turet fiton pikë, stema dhe përfitime.',
+  s_h:'E thjeshtë si një zemër.',
+  s1h:'Krijo vendin tënd',s1p:'Një foto, dy fjalë, vendndodhja. Vendi yt i zemrës është në hartë për një minutë.',
+  s2h:'Dërgo një love',s2p:'Love është vota që nuk blihet: i thotë botës se ai vend ia vlen udhëtimin.',
+  s3h:'Ndërto rrugë dhe lista',s3p:'Vendos vendet në radhë: lindin itinerare, lista për dhuratë, rrugë historike për t\'u ecur.',
+  i_eye:'Nisja',i_h:'Datën e shkruan<br>komuniteti.',
+  i_p1:'POI•LOVE nuk del kur e thotë një kalendar: del kur harta është e gjallë. <strong>Çdo vend i krijuar e afron ditën e nisjes.</strong>',
+  i_p2:'Ndërkohë ILLI, udhërrëfyesi ynë, niset për një udhëtim të vërtetë nëpër Shqipëri: nga vendet institucionale te vendet që asnjë guidë nuk i tregon. Çdo ndalesë e udhëtimit të tij bëhet një POI për t\'u ndjekur.',
+  b_h:'Do të bëhesh pjesë e këtij projekti?',b_p:'Pas çdo zemre në hartë ka një vizion: lexoje të plotë.',
+  b_cta:'Lexo vizionin <span class="cap">→</span>',
+  f_line:'POI•LOVE është një produkt 321, i inxhinieruar nga Alessandro Castagna.',f_privacy:'Privatësia dhe cookies',f_terms:'Kushtet e përdorimit'},
+ en:{nav_cta:'Sign in <span class="cap">→</span>',eyebrow:'Tirana · Albania · 2026',
+  h1:'The places <em>of the heart</em>,<br>yours to find again.',
+  sub:'POI•LOVE is the map made by people who love to travel. You create them, tell their story, and share them with the community if you wish.',
+  cta1:'Enter POI•LOVE <span class="cap">→</span>',cta2:'Browse the map as a guest <span class="cap">◎</span>',
+  t1h:'Yours, in red',t1p:'The places you create: home, hideouts, discoveries. Your signature on the map.',
+  t2h:'Who you follow, in green',t2p:'Friends and voices you trust: their places travel with you.',
+  t3h:'The community, in grey',t3p:'The rest of the POI•LOVE world, quiet in the background, ready to be found.',
+  g_h:'Places, itineraries,<br>travel companies.',g_p:'Create your beloved places and collect loves. Line up your stops and they become itineraries to gift. With travel companies you set off with friends: you see each other on the map and talk with voice notes. And walking historic routes and tours earns you points, badges and perks.',
+  s_h:'Simple as a heart.',
+  s1h:'Create your place',s1p:'One photo, a few words, the location. Your beloved place is on the map in a minute.',
+  s2h:'Send a love',s2p:'A love is the vote money can\'t buy: it tells the world that place is worth the trip.',
+  s3h:'Build routes and lists',s3p:'Line your places up: itineraries, lists to gift, historic routes to walk.',
+  i_eye:'The launch',i_h:'The community<br>writes the date.',
+  i_p1:'POI•LOVE doesn\'t launch when a calendar says so: it launches when the map is alive. <strong>Every place created brings launch day closer.</strong>',
+  i_p2:'Meanwhile ILLI, our guide, sets off on a real journey across Albania: from institutional landmarks to places no guidebook tells. Every stop of the journey becomes a POI to follow.',
+  b_h:'Want to be part of this project?',b_p:'Behind every heart on the map there is a vision: read it in full.',
+  b_cta:'Read the vision <span class="cap">→</span>',
+  f_line:'POI•LOVE is a 321 product, engineered by Alessandro Castagna.',f_privacy:'Privacy and cookies',f_terms:'Terms of use'}
+};
+function setL(l){
+  document.documentElement.lang=l;
+  document.querySelectorAll('[data-t]').forEach(e=>{ const k=e.getAttribute('data-t'); if(T[l][k]!==undefined) e.innerHTML=T[l][k]; });
+  document.querySelectorAll('.langs button').forEach(b=>b.classList.toggle('on', b.dataset.l===l));
+  try{localStorage.setItem('pl_landing_lang',l)}catch(_){}
+}
+let l='en'; const nav=(navigator.language||'en').slice(0,2).toLowerCase();
+if(['sq','it','en'].includes(nav)) l=nav;
+try{ l=localStorage.getItem('pl_landing_lang')||l }catch(_){}
+setL(l);
+const io=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} }),{threshold:.12});
+document.querySelectorAll('.rv').forEach((e,i)=>{ e.style.transitionDelay=(i%4*90)+'ms'; io.observe(e); });
+function entra(dest){ document.cookie='pl_app=1;max-age=31536000;path=/;secure'; location.href=dest; }
+document.querySelectorAll('a.btn').forEach(a=>{
+  const href=a.getAttribute('href')||'';
+  if(href==='https://poilove.com'){
+    const ospite=(a.dataset.t==='cta2');
+    a.setAttribute('href', ospite?'/?ospite=1':'/');
+    a.addEventListener('click', e=>{ e.preventDefault(); entra(ospite?'/?ospite=1':'/'); });
+  }
+});
+</script>
+</body>
+</html>
