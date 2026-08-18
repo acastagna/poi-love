@@ -2632,10 +2632,8 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
   <img class="auth-logo" src="img/logo-completo.svg" onerror="this.src='https://poilove.com/img/logo-completo.svg'" alt="POI•LOVE">
   <h3 class="auth-tagline" data-t="auth_tagline">i luoghi del cuore</h3>
 
-  <!-- Bentornato: SOLO per chi e' gia' entrato da questo dispositivo (deciso col founder il 18/08) -->
-  <button class="auth-btn auth-btn-passkey" id="authPasskeyBtn" onclick="signInWithPasskey()" style="display:none">
-    <i class="ph-duotone ph-fingerprint"></i> <span data-t="auth_passkey_back">Bentornato: entra con l'impronta</span>
-  </button>
+  <!-- Biometria RIMOSSA il 19/08 (regola mai finto): il bottone "entra con l'impronta"
+       non usava l'impronta, spediva un magic link. Tornera' solo con un backend WebAuthn vero. -->
 
   <!-- LA PORTA PRINCIPALE: Google, grande e con l'etichetta -->
   <button class="auth-btn" onclick="signInWithGoogle()" style="background:#fff;color:#1C1C1C;font-weight:800;display:flex;align-items:center;justify-content:center;gap:10px">
@@ -3983,7 +3981,7 @@ function enterGuestMode() {
   if (overlay) overlay.style.display = 'none';
   if (!map && typeof initMap === 'function') { try { initMap(); } catch(e) {} }
   // L'ospite entra per GUARDARE: senza questa chiamata la mappa restava vuota
-  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v3.70.
+  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v3.71.
   if (typeof loadPOIsFromDB === 'function') { try { loadPOIsFromDB(); } catch(e) {} }
   if (typeof loadMyTags === 'function') { try { loadMyTags(); } catch(e) {} }
   showToast(t('guest_active'));
@@ -5227,36 +5225,9 @@ async function signInWithTwitter() {
   _providerErrorToast('X', error);
 }
 
-/* ── PASSKEY (WebAuthn) — biometric login per Android/iOS/desktop ──
-   MVP: usa email memorizzata nel device per spedire magic link senza re-digitarla.
-   Quando il backend webauthn (Edge Function Supabase) sarà attivo, qui verrà
-   sostituito il flow con navigator.credentials.create/get + verifica server-side. */
-async function signInWithPasskey(){
-  const lastEmail = localStorage.getItem('poilove_last_email');
-  if(!lastEmail){
-    // Prima volta: NIENTE prompt() nativo (inaffidabile/bloccante su iOS PWA standalone).
-    // Portiamo l'utente al campo email dell'overlay e diamo focus.
-    const inp = document.getElementById('authEmailIn');
-    if(inp){
-      try { inp.scrollIntoView({behavior:'smooth', block:'center'}); } catch(_){}
-      inp.focus();
-    }
-    showToast(t('auth_passkey_need_email'));
-    return;
-  }
-  // Tentativo WebAuthn nativo (se backend non è ancora pronto, fallback magic link)
-  if(window.PublicKeyCredential && navigator.credentials){
-    try {
-      // Solo prova di disponibilità; vero flow richiede challenge server-side
-      const ok = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
-      if(!ok) throw new Error('No platform authenticator');
-    } catch(_){}
-  }
-  // Fallback pulito: magic link verso l'email memorizzata
-  document.getElementById('authEmailIn').value = lastEmail;
-  showToast(`🔐 ${t('auth_passkey_as')} ${lastEmail}…`);
-  return sendMagicLink();
-}
+/* Biometria (WebAuthn) rimossa il 19/08: il vecchio bottone non usava l'impronta,
+   spediva un magic link fingendosi biometria (regola mai finto). Si rifara' con
+   un backend WebAuthn vero: registrazione credenziale + challenge server-side. */
 
 async function sendMagicLink() {
   const email = document.getElementById('authEmailIn')?.value?.trim();
@@ -5272,27 +5243,6 @@ async function sendMagicLink() {
     document.getElementById('authEmailIn').value = '';
   }
 }
-
-// Aggiorna il testo del bottone biometria se c'è già un'email memorizzata
-// (es. "Accedi come tu@email.com" invece di "Accedi con Biometria")
-(async function detectPasskey(){
-  try {
-    const btn = document.getElementById('authPasskeyBtn');
-    if(!btn) return;
-    const lastEmail = localStorage.getItem('poilove_last_email');
-    if(lastEmail){
-      const handle = lastEmail.split('@')[0];
-      btn.innerHTML = `<i class="ph-duotone ph-fingerprint"></i> ${t('auth_passkey_as')} <strong style="margin-left:4px">${handle}</strong>`;
-    }
-    // Verifica disponibilità WebAuthn (per stile, non blocco — il fallback magic link funziona sempre)
-    if(window.PublicKeyCredential && navigator.credentials){
-      try {
-        const ok = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
-        if(ok) btn.title = 'Riconoscimento biometrico disponibile sul tuo dispositivo';
-      } catch(_){}
-    }
-  } catch(_){}
-})();
 
 async function signOut() {
   // Privacy: pulisci i marker/POI in memoria PRIMA di disconnettere.
@@ -8197,7 +8147,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='3.70';
+const APP_VERSION='3.71';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
@@ -8209,14 +8159,7 @@ function salvataggioFallito(cosa, err, soloRegistro){
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
-// La biometria e' una scorciatoia per chi TORNA, e SOLO su telefono:
-// sul computer non funziona e non deve nemmeno comparire (regola del 18/08, come su Top Market).
-try{
-  const _telefono = matchMedia('(pointer:coarse)').matches || /Android|iPhone|iPad/i.test(navigator.userAgent);
-  if(_telefono && localStorage.getItem('poilove_remembered_user')){
-    const pk=document.getElementById('authPasskeyBtn'); if(pk) pk.style.display='flex';
-  }
-}catch(_){}
+// Biometria rimossa il 19/08 (regola mai finto): tornera' solo con un backend WebAuthn vero.
 // AUTO-AGGIORNAMENTO: se sul server c'è una versione più nuova, ricarico bypassando la cache di iOS/PWA.
 // Risolve il problema ricorrente del telefono bloccato su una versione vecchia.
 async function _checkForUpdate(){
