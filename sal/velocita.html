@@ -8,38 +8,34 @@ info@321.al - https://321.al
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>POI•LOVE · Quanto è veloce</title>
+<title>POI•LOVE · Sa e shpejtë · Quanto è veloce · How fast</title>
 <link rel="icon" href="img/favicon.ico">
 <style>
 @page{size:A4 landscape;margin:10mm}
 *{box-sizing:border-box;margin:0;padding:0}
-:root{
- --red:#D42B2B; --blue:#285EA7; --bg:#EAE4D8; --ink:#1C1C1C; --muted:#6B6B6B;
- --white:#fff; --green:#1a7f45; --line:#ddd6c6; --soft:#F5F0E8;
-}
+:root{--red:#D42B2B;--blue:#285EA7;--bg:#EAE4D8;--ink:#1C1C1C;--muted:#6B6B6B;
+ --white:#fff;--green:#1a7f45;--line:#ddd6c6;--soft:#F5F0E8}
 body{font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
  color:var(--ink);background:var(--bg);padding:34px 26px 50px}
 .wrap{max-width:1180px;margin:0 auto}
-
-.top{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:14px;margin-bottom:26px}
+.top{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px;margin-bottom:26px}
 .back{display:inline-flex;align-items:center;gap:7px;background:var(--white);border:1px solid var(--line);
  border-radius:99px;padding:8px 16px;text-decoration:none;color:var(--ink);font-size:13px;font-weight:600}
 .back:hover{border-color:var(--red);color:var(--red)}
+.langs{display:flex;gap:6px}
+.langs button{border:1px solid var(--line);background:var(--white);border-radius:99px;padding:7px 15px;
+ font-size:12.5px;font-weight:700;cursor:pointer;color:var(--muted)}
+.langs button.on{background:var(--ink);border-color:var(--ink);color:#fff}
 h1{font-size:38px;line-height:1.1;letter-spacing:-1px;font-weight:800}
 h1 em{font-style:normal;color:var(--red)}
 .date{font-size:13px;color:var(--muted);margin-top:6px}
-
 .hero{background:var(--white);border-radius:16px;padding:26px 30px;margin-bottom:24px;border:1px solid var(--line)}
 .hero p{font-size:19px;line-height:1.55;max-width:900px}
 .hero p b{color:var(--red)}
 .hero .note{font-size:14px;color:var(--muted);margin-top:12px}
-
-h2{font-size:15px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);
- margin:32px 0 14px;font-weight:700}
-
-/* ── LA MISURA GRANDE: tre tappe, una barra per ciascuna ── */
+h2{font-size:15px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin:32px 0 14px;font-weight:700}
 .big{background:var(--white);border-radius:16px;padding:26px 30px;margin-bottom:24px;border:1px solid var(--line)}
-.big .brow{display:grid;grid-template-columns:210px 1fr 120px;gap:16px;align-items:center;padding:14px 0}
+.big .brow{display:grid;grid-template-columns:230px 1fr 120px;gap:16px;align-items:center;padding:14px 0}
 .big .brow+.brow{border-top:1px solid #f0ece2}
 .big .blbl{font-weight:800;font-size:15.5px;line-height:1.3}
 .big .blbl small{display:block;font-weight:500;font-size:11.5px;color:var(--muted)}
@@ -50,14 +46,9 @@ h2{font-size:15px;text-transform:uppercase;letter-spacing:1.2px;color:var(--mute
 .big .bval{font-size:23px;font-weight:800;text-align:right;letter-spacing:-.5px}
 .big .b3 .bval{color:var(--green)}
 .big .bnote{font-size:12px;color:var(--muted);margin-top:10px;padding-top:10px;border-top:1px solid #f0ece2}
-@media print{.big{border:1px solid #ddd;border-radius:9px;padding:13px 15px}.big .bbar{height:20px}.big .bval{font-size:16px}}
-@media(max-width:860px){.big .brow{grid-template-columns:1fr;gap:6px}.big .bval{text-align:left}}
-
-/* ── confronto macchine ── */
 .machines{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
 .m{background:var(--white);border-radius:14px;padding:20px;border:2px solid var(--line)}
 .m.now{border-color:var(--red)}
-.m.next{border-style:dashed;background:var(--soft);opacity:.85}
 .m .tag{font-size:11px;text-transform:uppercase;letter-spacing:1px;font-weight:700;color:var(--muted);margin-bottom:10px}
 .m.now .tag{color:var(--red)}
 .m .power{font-size:27px;font-weight:800;letter-spacing:-.5px;margin-bottom:3px}
@@ -66,65 +57,55 @@ h2{font-size:15px;text-transform:uppercase;letter-spacing:1.2px;color:var(--mute
 .m dt{color:var(--muted)}
 .m dd{text-align:right;font-weight:700}
 .m dd.good{color:var(--green)}
-
-/* ── barre ── */
 .chart{background:var(--white);border-radius:14px;padding:22px 26px;border:1px solid var(--line)}
-.row{display:grid;grid-template-columns:150px 1fr 78px;gap:14px;align-items:center;
- padding:13px 0;border-bottom:1px solid #f0ece2}
+.row{display:grid;grid-template-columns:150px 1fr 78px;gap:14px;align-items:center;padding:13px 0;border-bottom:1px solid #f0ece2}
 .row:last-child{border-bottom:none}
 .row .label{font-weight:700;font-size:14px}
 .row .label span{display:block;font-weight:400;font-size:11.5px;color:var(--muted)}
 .pair{display:grid;gap:5px}
 .b{display:flex;align-items:center;gap:9px}
-.b i{display:block;height:19px;border-radius:4px}
+.b i{display:block;height:15px;border-radius:4px}
 .b.old i{background:#c3bcab}
 .b.new i{background:var(--red)}
 .b.db i{background:var(--green)}
-.b.db span{color:var(--green);font-weight:700}
 .b span{font-size:12.5px;font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--muted)}
 .b.new span{color:var(--red);font-weight:700}
+.b.db span{color:var(--green);font-weight:700}
 .win{text-align:right;font-size:19px;font-weight:800;color:var(--green)}
 .win small{display:block;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
-.key{display:flex;gap:20px;font-size:12.5px;color:var(--muted);margin-top:14px;padding-top:13px;border-top:1px solid #f0ece2}
+.key{display:flex;gap:20px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);margin-top:14px;padding-top:13px;border-top:1px solid #f0ece2}
 .key b{display:inline-block;width:13px;height:13px;border-radius:3px;vertical-align:-2px;margin-right:5px}
-
-/* ── testo ── */
-.two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.two{display:grid;grid-template-columns:1.05fr .95fr;gap:18px}
 .box{background:var(--white);border-radius:14px;padding:22px 25px;border:1px solid var(--line)}
 .box h3{font-size:19px;margin-bottom:11px;letter-spacing:-.3px}
 .box p{font-size:14.5px;line-height:1.62;margin-bottom:11px}
 .box p:last-child{margin-bottom:0}
 .box p b{color:var(--red)}
 .box .quiet{color:var(--muted);font-size:13.5px}
-
 .db{display:flex;gap:14px;margin:16px 0}
 .dbc{flex:1;background:var(--soft);border-radius:11px;padding:15px;text-align:center;border:1px solid var(--line)}
-.dbc.next{border-style:dashed;opacity:.75}
 .dbc .v{font-size:29px;font-weight:800;color:var(--red);letter-spacing:-1px}
-.dbc.next .v{color:#b5ada0}
+.dbc.win2 .v{color:var(--green)}
 .dbc .l{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-top:3px}
-
 footer{margin-top:30px;padding-top:16px;border-top:1px solid var(--line);
  display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:12px;color:var(--muted)}
-
 @media print{
  body{background:#fff;padding:0;font-size:11.5px}
- .back{display:none}
- h1{font-size:26px}
- .hero p{font-size:14px}
- .hero,.chart,.box,.m{border:1px solid #ddd;border-radius:9px;padding:13px 15px}
+ .back,.langs{display:none}
+ h1{font-size:26px}.hero p{font-size:14px}
+ .hero,.chart,.box,.m,.big{border:1px solid #ddd;border-radius:9px;padding:13px 15px}
  h2{margin:16px 0 8px;font-size:11px}
- .m .power{font-size:19px}
- .row{padding:7px 0}
- .box h3{font-size:14px}
- .box p{font-size:11.5px;margin-bottom:7px}
- .dbc .v{font-size:20px}
- .machines,.two{gap:9px}
+ .m .power{font-size:19px}.row{padding:7px 0}
+ .box h3{font-size:14px}.box p{font-size:11.5px;margin-bottom:7px}
+ .dbc .v{font-size:20px}.machines,.two{gap:9px}
+ .big .bbar{height:20px}.big .bval{font-size:16px}
 }
 @media(max-width:860px){
  .machines,.two{grid-template-columns:1fr}
  .row{grid-template-columns:110px 1fr 60px;gap:9px}
  h1{font-size:29px}
+ .big .brow{grid-template-columns:1fr;gap:6px}
+ .big .bval{text-align:left}
 }
 </style>
 </head>
@@ -133,179 +114,254 @@ footer{margin-top:30px;padding-top:16px;border-top:1px solid var(--line);
 
 <div class="top">
  <div>
-  <a class="back" href="index.html">&larr; Torna al SAL</a>
-  <h1 style="margin-top:14px">POI<em>&bull;</em>LOVE ha una macchina<br>tutta sua. <em>Ecco cosa cambia.</em></h1>
-  <div class="date">Misure reali del 17 e 18 agosto 2026: trasloco e dati in casa</div>
+  <a class="back" href="index.html"><span data-t="back"></span></a>
+  <h1 style="margin-top:14px" data-t="h1"></h1>
+  <div class="date" data-t="date"></div>
+ </div>
+ <div class="langs">
+  <button onclick="setL('sq')" id="lb-sq">SQ</button>
+  <button onclick="setL('it')" id="lb-it">IT</button>
+  <button onclick="setL('en')" id="lb-en">EN</button>
  </div>
 </div>
 
 <div class="hero">
- <p>Fino a stamattina POI&bull;LOVE viveva su un server <b>condiviso con altri 62 progetti</b>:
- funzionava, ma la potenza era divisa con tutti. Da oggi ha una macchina <b>dedicata solo a lei</b>,
- con quasi il triplo dei processori e il doppio della memoria. Ogni pagina si apre pi&ugrave; in fretta,
- e soprattutto c'&egrave; spazio per crescere.</p>
- <p class="note">Tutti i numeri di questa pagina sono stati misurati davvero, dodici volte per ogni prova,
- dallo stesso computer nello stesso momento. Nessuna stima.</p>
+ <p data-t="hero"></p>
+ <p class="note" data-t="hero_note"></p>
 </div>
 
-<h2>La misura che conta: l'app pronta all'uso, dall'inizio alla fine</h2>
+<h2 data-t="big_h"></h2>
 <div class="big">
  <div class="brow b1">
-  <div class="blbl">Server condiviso<small>fino al 16 agosto &middot; 63 progetti insieme</small></div>
+  <div class="blbl"><span data-t="big1"></span><small data-t="big1s"></small></div>
   <div><div class="bbar" style="width:100%"></div></div>
   <div class="bval">781 ms</div>
  </div>
  <div class="brow b2">
-  <div class="blbl">Macchina dedicata<small>dal 17 agosto &middot; dati ancora fuori</small></div>
+  <div class="blbl"><span data-t="big2"></span><small data-t="big2s"></small></div>
   <div><div class="bbar" style="width:91%"></div></div>
   <div class="bval">713 ms</div>
  </div>
  <div class="brow b3">
-  <div class="blbl">Con PostgreSQL nostro<small>dal 18 agosto &middot; dati e accessi in casa</small></div>
+  <div class="blbl"><span data-t="big3"></span><small data-t="big3s"></small></div>
   <div><div class="bbar" style="width:89%"></div></div>
   <div class="bval">699 ms</div>
  </div>
- <div class="bnote">Somma dei tre passi di un avvio (pagina + motore dell'app + primi dati), mediane di 12 misure reali per passo.
- La differenza vera per&ograve; sta nella <b>giornata storta</b>: prima, quando il collegamento coi dati si assopiva, l'avvio poteva
- superare <b>1.500 millesimi</b>; ora il caso peggiore misurato resta sotto i <b>750</b>. Costante, sempre.</div>
+ <div class="bnote" data-t="big_note"></div>
 </div>
 
-<h2>Le due macchine, a confronto</h2>
+<h2 data-t="mach_h"></h2>
 <div class="machines">
  <div class="m">
-  <div class="tag">Prima &middot; condivisa</div>
-  <div class="power">6 processori</div>
-  <div class="who">17 GB di memoria</div>
+  <div class="tag" data-t="m1t"></div>
+  <div class="power" data-t="m1p"></div>
+  <div class="who" data-t="m1w"></div>
   <dl>
-   <dt>Progetti ospitati</dt><dd>63</dd>
-   <dt>Gi&agrave; occupata da altri</dt><dd>circa 1/4</dd>
-   <dt>Tempo di viaggio</dt><dd>38,6 ms</dd>
+   <dt data-t="d_prog"></dt><dd>63</dd>
+   <dt data-t="d_busy"></dt><dd data-t="m1busy"></dd>
+   <dt data-t="d_trip"></dt><dd>38,6 ms</dd>
   </dl>
  </div>
  <div class="m now">
-  <div class="tag">Adesso &middot; solo POI&bull;LOVE</div>
-  <div class="power">16 processori</div>
-  <div class="who">30 GB di memoria</div>
+  <div class="tag" data-t="m2t"></div>
+  <div class="power" data-t="m2p"></div>
+  <div class="who" data-t="m2w"></div>
   <dl>
-   <dt>Progetti ospitati</dt><dd>1</dd>
-   <dt>Gi&agrave; occupata da altri</dt><dd class="good">niente</dd>
-   <dt>Tempo di viaggio</dt><dd class="good">27,4 ms</dd>
+   <dt data-t="d_prog"></dt><dd>1</dd>
+   <dt data-t="d_busy"></dt><dd class="good" data-t="m2busy"></dd>
+   <dt data-t="d_trip"></dt><dd class="good">27,4 ms</dd>
   </dl>
  </div>
  <div class="m now">
-  <div class="tag">Dal 18 agosto &middot; dati in casa</div>
-  <div class="power">fatto ✓</div>
-  <div class="who">database e accessi sulla macchina</div>
+  <div class="tag" data-t="m3t"></div>
+  <div class="power" data-t="m3p"></div>
+  <div class="who" data-t="m3w"></div>
   <dl>
-   <dt>Progetti ospitati</dt><dd>1</dd>
-   <dt>Viaggio verso i dati</dt><dd class="good">nessuno</dd>
-   <dt>Punte di attesa</dt><dd class="good">sparite</dd>
+   <dt data-t="d_prog"></dt><dd>1</dd>
+   <dt data-t="d_datatrip"></dt><dd class="good" data-t="m3trip"></dd>
+   <dt data-t="d_spikes"></dt><dd class="good" data-t="m3spike"></dd>
   </dl>
  </div>
 </div>
 
-<h2>Quanto ci mette ad aprirsi, pagina per pagina</h2>
-<div class="chart">
+<h2 data-t="pages_h"></h2>
+<div class="chart" id="pages"></div>
 
- <div class="row">
-  <div class="label">La app<span>quello che vede l'utente</span></div>
-  <div class="pair">
-   <div class="b old"><i style="width:79%"></i><span>296</span></div>
-   <div class="b new"><i style="width:70%"></i><span>261 millesimi di secondo</span></div>
-   <div class="b db"><i style="width:70%"></i><span>259 · dati in casa (18/08)</span></div>
-  </div>
-  <div class="win">-12%<small>pi&ugrave; veloce</small></div>
- </div>
-
- <div class="row">
-  <div class="label">Il cuore della app<span>il file pi&ugrave; pesante, 800 KB</span></div>
-  <div class="pair">
-   <div class="b old"><i style="width:89%"></i><span>333</span></div>
-   <div class="b new"><i style="width:80%"></i><span>300 millesimi di secondo</span></div>
-   <div class="b db"><i style="width:81%"></i><span>304 · dati in casa (18/08)</span></div>
-  </div>
-  <div class="win">-10%<small>pi&ugrave; veloce</small></div>
- </div>
-
- <div class="row">
-  <div class="label">La presentazione<span>project.poilove.com</span></div>
-  <div class="pair">
-   <div class="b old"><i style="width:100%"></i><span>373</span></div>
-   <div class="b new"><i style="width:77%"></i><span>289 millesimi di secondo</span></div>
-   <div class="b db"><i style="width:78%"></i><span>291 · dati in casa (18/08)</span></div>
-  </div>
-  <div class="win">-23%<small>pi&ugrave; veloce</small></div>
- </div>
-
- <div class="row">
-  <div class="label">Questo SAL<span>sal.poilove.com</span></div>
-  <div class="pair">
-   <div class="b old"><i style="width:63%"></i><span>236</span></div>
-   <div class="b new"><i style="width:55%"></i><span>207 millesimi di secondo</span></div>
-   <div class="b db"><i style="width:60%"></i><span>222 · dati in casa (18/08)</span></div>
-  </div>
-  <div class="win">-12%<small>pi&ugrave; veloce</small></div>
- </div>
-
- <div class="row">
-  <div class="label">Il pannello<span>admin.poilove.com</span></div>
-  <div class="pair">
-   <div class="b old"><i style="width:44%"></i><span>165</span></div>
-   <div class="b new"><i style="width:42%"></i><span>156 millesimi di secondo</span></div>
-   <div class="b db"><i style="width:38%"></i><span>143 · dati in casa (18/08)</span></div>
-  </div>
-  <div class="win">-5%<small>pi&ugrave; veloce</small></div>
- </div>
-
- <div class="key">
-  <span><b style="background:#c3bcab"></b> Prima, server condiviso</span>
-  <span><b style="background:#D42B2B"></b> 17/08, macchina dedicata</span>
-  <span><b style="background:#1a7f45"></b> 18/08, anche i dati in casa</span>
-  <span style="margin-left:auto">Per capirsi: un battito di ciglia dura circa 150 millesimi di secondo.</span>
- </div>
-</div>
-
-<h2>Cosa vuol dire davvero</h2>
+<h2 data-t="mean_h"></h2>
 <div class="two">
  <div class="box">
-  <h3>Il guadagno vero non &egrave; questo</h3>
-  <p>Le pagine si aprono tra il <b>5% e il 23%</b> pi&ugrave; in fretta. &Egrave; un miglioramento reale,
-  ma non &egrave; il motivo per cui questa macchina serve.</p>
-  <p>Il server vecchio non era lento: era <b>diviso con altri 62 progetti</b>. Con un visitatore alla volta
-  se la cavava bene. Il problema sarebbe arrivato con <b>tante persone insieme</b>: l&agrave; la potenza si
-  spartisce, e il sito di qualcun altro che ha una giornata intensa rallenta il nostro.</p>
-  <p>Oggi la macchina nuova &egrave; occupata allo <b>0,5%</b>. Vuol dire che pu&ograve; reggere il lancio
-  senza che nessuno debba correre a comprare altro ferro.</p>
-  <p class="quiet">Nota tecnica per chi la vuole: circa 80 millesimi di ogni richiesta sono tempo di viaggio
-  sulla rete, uguale per qualsiasi server al mondo. Il server governa la parte restante.</p>
+  <h3 data-t="box1_h"></h3>
+  <p data-t="box1_p1"></p>
+  <p data-t="box1_p2"></p>
+  <p data-t="box1_p3"></p>
+  <p class="quiet" data-t="box1_p4"></p>
  </div>
-
  <div class="box">
-  <h3>I dati: il salto &egrave; fatto</h3>
-  <p>Oggi i luoghi, i profili e le foto non stanno sulla nostra macchina: stanno su
-  <b>Supabase</b>, un servizio esterno. Ogni volta che apri la mappa, la richiesta <b>esce su internet</b>,
-  va a bussare l&agrave;, e torna indietro.</p>
+  <h3 data-t="box2_h"></h3>
+  <p data-t="box2_p1"></p>
   <div class="db">
-   <div class="dbc"><div class="v">152 ms</div><div class="l">Prima: viaggio dei dati (punte a 794)</div></div>
-   <div class="dbc"><div class="v">18 ms</div><div class="l">Dal 18/08: dati in casa, mai sopra i 30</div></div>
+   <div class="dbc"><div class="v">152 ms</div><div class="l" data-t="db_old"></div></div>
+   <div class="dbc win2"><div class="v">18 ms</div><div class="l" data-t="db_new"></div></div>
   </div>
-  <p><b>Fatto il 18 agosto, e misurato dal punto giusto:</b> il tempo che vedi tu &egrave; fatto di due pezzi.
-  Il <b>viaggio fino alla macchina</b> (circa 120 millesimi di rete e cifratura, uguale per chiunque, nessun
-  server pu&ograve; toglierlo) e il <b>lavoro sui dati</b>.</p>
-  <p>&Egrave; il secondo pezzo quello crollato: da <b>152 millesimi con punte a 794</b> quando i dati stavano
-  fuori, a <b>18 millesimi, mai sopra i 30</b>, ora che sono in casa. <b>Meno 88%</b> sul pezzo che dipende
-  da noi, e soprattutto: le impuntature da quasi un secondo sono sparite. Sul totale percepito il guadagno
-  &egrave; pi&ugrave; piccolo (136 contro 152) proprio perch&eacute; il viaggio di rete resta.</p>
-  <p class="quiet">Restano ospiti fuori casa solo sei programmi di servizio (l'assistente ILLI, l'invio email,
-  le trascrizioni), raggiunti da un ponte: si trasferiscono in una fase successiva, senza fretta.</p>
+  <p data-t="box2_p2"></p>
+  <p class="quiet" data-t="box2_p3"></p>
  </div>
 </div>
 
 <footer>
- <span>Misure del 17/08/2026 &middot; mediana di 12 richieste per prova &middot; nessun valore stimato o simulato</span>
+ <span data-t="foot1"></span>
  <span>POI&bull;LOVE &middot; Ideazione e Dir. Creativa: Alessandro Castagna &middot; 321.AL / EVOLAB</span>
 </footer>
 
 </div>
+<script>
+/* Tre lingue, ordine SQ-IT-EN, apertura sulla lingua del dispositivo. Nessun dato inventato: i numeri sono fissi e condivisi. */
+const T={
+sq:{
+ back:'← Kthehu te SAL',
+ h1:'POI•LOVE ka një makinë <em>vetëm të sajën.</em>',
+ date:'Matje reale, 17–18 gusht 2026: transferimi dhe të dhënat në shtëpi',
+ hero:'Deri dje POI•LOVE jetonte në një server <b>të ndarë me 62 projekte të tjera</b>. Tani ka një makinë <b>vetëm për të</b>, dhe që nga 18 gushti edhe <b>baza e të dhënave dhe hyrjet janë në shtëpi</b>: asgjë nuk del më jashtë për çdo kërkesë.',
+ hero_note:'Të gjithë numrat janë matur vërtet, 12 herë për çdo provë. Asnjë vlerësim.',
+ big_h:'Matja që ka rëndësi: aplikacioni gati për përdorim, nga fillimi në fund',
+ big1:'Server i ndarë',big1s:'deri më 16 gusht · 63 projekte bashkë',
+ big2:'Makinë e dedikuar',big2s:'nga 17 gushti · të dhënat ende jashtë',
+ big3:'Me PostgreSQL tonë',big3s:'nga 18 gushti · të dhëna dhe hyrje në shtëpi',
+ big_note:'Shuma e tre hapave të një nisjeje (faqja + motori + të dhënat e para), mediana e 12 matjeve reale për hap. Dallimi i vërtetë është <b>dita e keqe</b>: më parë nisja mund të kalonte <b>1.500 ms</b> kur lidhja me të dhënat ngecënte; tani rasti më i keq i matur mbetet nën <b>750</b>. Konstante, gjithmonë.',
+ mach_h:'Tri etapat, në detaje',
+ m1t:'Më parë · i ndarë',m1p:'6 procesorë',m1w:'17 GB memorie',m1busy:'rreth 1/4',
+ m2t:'17 gusht · vetëm POI•LOVE',m2p:'16 procesorë',m2w:'30 GB memorie',m2busy:'asgjë',
+ m3t:'18 gusht · të dhënat në shtëpi',m3p:'berë ✓',m3w:'baza e të dhënave dhe hyrjet në makinë',
+ m3trip:'asnjë',m3spike:'zhdukur',
+ d_prog:'Projekte të strehuara',d_busy:'E zënë nga të tjerë',d_trip:'Koha e udhëtimit',
+ d_datatrip:'Udhëtimi drejt të dhënave',d_spikes:'Pika pritjeje',
+ pages_h:'Sa kohë i duhet një faqeje të hapet',
+ mean_h:'Çfarë do të thotë në të vërtetë',
+ box1_h:'Fitimi i vërtetë nuk është ky',
+ box1_p1:'Faqet hapen <b>5–23% më shpejt</b>. Éshtë një përmirësim real, por jo arsyeja kryesore e kësaj makine.',
+ box1_p2:'Serveri i vjetër nuk ishte i ngadaltë: ishte <b>i ndarë me 62 projekte</b>. Me një vizitor në herë ia dilte. Problemi do të vinte me <b>shumë njerëz bashkë</b>.',
+ box1_p3:'Sot makina e re është e zënë në <b>0,5%</b>: mund ta mbajë lansimin pa blerje të reja.',
+ box1_p4:'Shënim teknik: rreth 120 ms të çdo kërkese janë udhëtim në rrjet dhe kriptim, të njëjta për çdo server në botë.',
+ box2_h:'Të dhënat: hapi është bërë',
+ box2_p1:'<b>Bërë më 18 gusht, dhe matur nga pika e duhur:</b> koha që sheh ti përbëhet nga dy pjesë. <b>Udhëtimi deri te makina</b> (rreth 120 ms, i pandryshueshëm) dhe <b>puna mbi të dhënat</b>.',
+ box2_p2:'Éshtë pjesa e dytë ajo që ka rënë: nga <b>152 ms me pika deri në 794</b> kur të dhënat ishin jashtë, në <b>18 ms, kurrë mbi 30</b>, tani që janë në shtëpi. <b>Minus 88%</b> në pjesën që varet nga ne.',
+ box2_p3:'Jashtë shtëpisë mbeten vetëm gjashtë programe shërbimi (asistenti ILLI, email, transkriptimet), të arritshëm me një urë: transferohen në një fazë të mëvonshme, pa nxitim.',
+ db_old:'Më parë: udhëtimi i të dhënave (pika në 794)',db_new:'Nga 18/08: në shtëpi, kurrë mbi 30',
+ foot1:'Matje të 17–18 gushtit 2026 · mediana e 12 provave · asnjë vlerë e sajuar',
+ legend1:'Serveri i ndarë',legend2:'17/08, makinë e dedikuar',legend3:'18/08, edhe të dhënat në shtëpi',
+ blink:'Sa një kapsallitje syri: rreth 150 ms.',
+ r1:'Aplikacioni',r1s:'ajo që sheh përdoruesi',r2:'Zemra e aplikacionit',r2s:'skedari më i rëndë, 800 KB',
+ r3:'Prezantimi',r3s:'project.poilove.com',r4:'Ky SAL',r4s:'sal.poilove.com',r5:'Paneli',r5s:'admin.poilove.com',
+ faster:'më shpejt',ms:'ms'
+},
+it:{
+ back:'← Torna al SAL',
+ h1:'POI•LOVE ha una macchina <em>tutta sua.</em>',
+ date:'Misure reali del 17 e 18 agosto 2026: trasloco e dati in casa',
+ hero:'Fino a ieri POI•LOVE viveva su un server <b>condiviso con altri 62 progetti</b>. Ora ha una macchina <b>dedicata solo a lei</b> e, dal 18 agosto, anche <b>la base dati e gli accessi sono in casa</b>: niente esce più su internet a ogni richiesta.',
+ hero_note:'Tutti i numeri sono misurati davvero, 12 volte per ogni prova. Nessuna stima.',
+ big_h:'La misura che conta: l’app pronta all’uso, dall’inizio alla fine',
+ big1:'Server condiviso',big1s:'fino al 16 agosto · 63 progetti insieme',
+ big2:'Macchina dedicata',big2s:'dal 17 agosto · dati ancora fuori',
+ big3:'Con PostgreSQL nostro',big3s:'dal 18 agosto · dati e accessi in casa',
+ big_note:'Somma dei tre passi di un avvio (pagina + motore dell’app + primi dati), mediane di 12 misure reali per passo. La differenza vera però sta nella <b>giornata storta</b>: prima, quando il collegamento coi dati si assopiva, l’avvio poteva superare <b>1.500 millesimi</b>; ora il caso peggiore misurato resta sotto i <b>750</b>. Costante, sempre.',
+ mach_h:'Le tre tappe, nel dettaglio',
+ m1t:'Prima · condivisa',m1p:'6 processori',m1w:'17 GB di memoria',m1busy:'circa 1/4',
+ m2t:'17 agosto · solo POI•LOVE',m2p:'16 processori',m2w:'30 GB di memoria',m2busy:'niente',
+ m3t:'18 agosto · dati in casa',m3p:'fatto ✓',m3w:'database e accessi sulla macchina',
+ m3trip:'nessuno',m3spike:'sparite',
+ d_prog:'Progetti ospitati',d_busy:'Già occupata da altri',d_trip:'Tempo di viaggio',
+ d_datatrip:'Viaggio verso i dati',d_spikes:'Punte di attesa',
+ pages_h:'Quanto ci mette ad aprirsi, pagina per pagina',
+ mean_h:'Cosa vuol dire davvero',
+ box1_h:'Il guadagno vero non è questo',
+ box1_p1:'Le pagine si aprono tra il <b>5% e il 23% più in fretta</b>. È un miglioramento reale, ma non è il motivo per cui questa macchina serve.',
+ box1_p2:'Il server vecchio non era lento: era <b>diviso con altri 62 progetti</b>. Con un visitatore alla volta se la cavava. Il problema sarebbe arrivato con <b>tante persone insieme</b>.',
+ box1_p3:'Oggi la macchina nuova è occupata allo <b>0,5%</b>: può reggere il lancio senza comprare altro.',
+ box1_p4:'Nota tecnica: circa 120 millesimi di ogni richiesta sono viaggio di rete e cifratura, uguali per qualsiasi server al mondo.',
+ box2_h:'I dati: il salto è fatto',
+ box2_p1:'<b>Fatto il 18 agosto, e misurato dal punto giusto:</b> il tempo che vedi è fatto di due pezzi. Il <b>viaggio fino alla macchina</b> (circa 120 millesimi, incomprimibile) e il <b>lavoro sui dati</b>.',
+ box2_p2:'È il secondo pezzo quello crollato: da <b>152 millesimi con punte a 794</b> quando i dati stavano fuori, a <b>18 millesimi, mai sopra i 30</b>, ora che sono in casa. <b>Meno 88%</b> sul pezzo che dipende da noi.',
+ box2_p3:'Restano fuori casa solo sei programmi di servizio (l’assistente ILLI, l’invio email, le trascrizioni), raggiunti da un ponte: si trasferiscono in una fase successiva, senza fretta.',
+ db_old:'Prima: viaggio dei dati (punte a 794)',db_new:'Dal 18/08: in casa, mai sopra i 30',
+ foot1:'Misure del 17 e 18 agosto 2026 · mediana di 12 prove · nessun valore inventato',
+ legend1:'Server condiviso',legend2:'17/08, macchina dedicata',legend3:'18/08, anche i dati in casa',
+ blink:'Per capirsi: un battito di ciglia dura circa 150 millesimi di secondo.',
+ r1:'La app',r1s:'quello che vede l’utente',r2:'Il cuore della app',r2s:'il file più pesante, 800 KB',
+ r3:'La presentazione',r3s:'project.poilove.com',r4:'Questo SAL',r4s:'sal.poilove.com',r5:'Il pannello',r5s:'admin.poilove.com',
+ faster:'più veloce',ms:'millesimi'
+},
+en:{
+ back:'← Back to the SAL',
+ h1:'POI•LOVE has a machine <em>of its own.</em>',
+ date:'Real measurements, 17–18 August 2026: the move, and data at home',
+ hero:'Until yesterday POI•LOVE lived on a server <b>shared with 62 other projects</b>. Now it has a machine <b>dedicated to it alone</b> and, since 18 August, <b>the database and sign-ins live at home too</b>: nothing goes out to the internet on every request any more.',
+ hero_note:'Every number here was truly measured, 12 runs per test. No estimates.',
+ big_h:'The measure that matters: the app ready to use, start to finish',
+ big1:'Shared server',big1s:'until 16 August · 63 projects together',
+ big2:'Dedicated machine',big2s:'from 17 August · data still outside',
+ big3:'With our PostgreSQL',big3s:'from 18 August · data and sign-ins at home',
+ big_note:'Sum of the three steps of a start-up (page + app engine + first data), medians of 12 real runs per step. The real difference is the <b>bad day</b>: before, when the data link dozed off, start-up could exceed <b>1,500 ms</b>; now the worst measured case stays under <b>750</b>. Steady, always.',
+ mach_h:'The three stages, in detail',
+ m1t:'Before · shared',m1p:'6 processors',m1w:'17 GB of memory',m1busy:'about 1/4',
+ m2t:'17 August · POI•LOVE only',m2p:'16 processors',m2w:'30 GB of memory',m2busy:'none',
+ m3t:'18 August · data at home',m3p:'done ✓',m3w:'database and sign-ins on the machine',
+ m3trip:'none',m3spike:'gone',
+ d_prog:'Projects hosted',d_busy:'Already used by others',d_trip:'Travel time',
+ d_datatrip:'Trip to the data',d_spikes:'Waiting spikes',
+ pages_h:'How long each page takes to open',
+ mean_h:'What it really means',
+ box1_h:'The real gain is not this',
+ box1_p1:'Pages open <b>5–23% faster</b>. A real improvement, but not why this machine matters.',
+ box1_p2:'The old server was not slow: it was <b>shared with 62 other projects</b>. One visitor at a time was fine. The trouble would come with <b>many people at once</b>.',
+ box1_p3:'Today the new machine runs at <b>0.5%</b> load: it can carry the launch without buying anything more.',
+ box1_p4:'Technical note: about 120 ms of every request is network travel and encryption, the same for any server on Earth.',
+ box2_h:'The data: the leap is done',
+ box2_p1:'<b>Done on 18 August, measured from the right spot:</b> the time you see is two parts. The <b>trip to the machine</b> (about 120 ms, incompressible) and the <b>work on the data</b>.',
+ box2_p2:'The second part is what collapsed: from <b>152 ms with spikes to 794</b> when data lived outside, to <b>18 ms, never above 30</b>, now that it lives at home. <b>Minus 88%</b> on the part that depends on us.',
+ box2_p3:'Only six service programs remain outside (the ILLI assistant, email sending, transcriptions), reached over a bridge: they move in a later phase, no rush.',
+ db_old:'Before: the data trip (spikes to 794)',db_new:'Since 18/08: at home, never above 30',
+ foot1:'Measurements of 17–18 August 2026 · median of 12 runs · no invented values',
+ legend1:'Shared server',legend2:'17/08, dedicated machine',legend3:'18/08, data at home too',
+ blink:'For scale: a blink of an eye lasts about 150 ms.',
+ r1:'The app',r1s:'what the user sees',r2:'The app engine',r2s:'the heaviest file, 800 KB',
+ r3:'The presentation',r3s:'project.poilove.com',r4:'This SAL',r4s:'sal.poilove.com',r5:'The panel',r5s:'admin.poilove.com',
+ faster:'faster',ms:'ms'
+}};
+const ROWS=[
+ {k:'r1',old:296,now:261,db:259,gain:12},
+ {k:'r2',old:333,now:300,db:304,gain:10},
+ {k:'r3',old:373,now:289,db:291,gain:23},
+ {k:'r4',old:236,now:207,db:222,gain:12},
+ {k:'r5',old:165,now:156,db:143,gain:5}
+];
+function setL(l){
+ localStorage.setItem('vel_lang',l);
+ document.documentElement.lang=l;
+ const d=T[l];
+ document.querySelectorAll('[data-t]').forEach(e=>{ const k=e.getAttribute('data-t'); if(d[k]!=null) e.innerHTML=d[k]; });
+ ['sq','it','en'].forEach(x=>document.getElementById('lb-'+x).classList.toggle('on',x===l));
+ const MAX=373;
+ document.getElementById('pages').innerHTML=ROWS.map(r=>`
+  <div class="row">
+   <div class="label">${d[r.k]}<span>${d[r.k+'s']}</span></div>
+   <div class="pair">
+    <div class="b old"><i style="width:${Math.round(r.old/MAX*100)}%"></i><span>${r.old}</span></div>
+    <div class="b new"><i style="width:${Math.round(r.now/MAX*100)}%"></i><span>${r.now} ${d.ms}</span></div>
+    <div class="b db"><i style="width:${Math.round(r.db/MAX*100)}%"></i><span>${r.db} · 18/08</span></div>
+   </div>
+   <div class="win">-${r.gain}%<small>${d.faster}</small></div>
+  </div>`).join('')+`
+  <div class="key">
+   <span><b style="background:#c3bcab"></b> ${d.legend1}</span>
+   <span><b style="background:#D42B2B"></b> ${d.legend2}</span>
+   <span><b style="background:#1a7f45"></b> ${d.legend3}</span>
+   <span style="margin-left:auto">${d.blink}</span>
+  </div>`;
+}
+const salvata=localStorage.getItem('vel_lang');
+const nav=(navigator.language||'en').slice(0,2).toLowerCase();
+setL(salvata || (nav==='sq'?'sq':nav==='it'?'it':'en'));
+</script>
 </body>
 </html>
