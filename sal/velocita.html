@@ -63,6 +63,8 @@ h2{font-size:15px;text-transform:uppercase;letter-spacing:1.2px;color:var(--mute
 .b i{display:block;height:19px;border-radius:4px}
 .b.old i{background:#c3bcab}
 .b.new i{background:var(--red)}
+.b.db i{background:var(--green)}
+.b.db span{color:var(--green);font-weight:700}
 .b span{font-size:12.5px;font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--muted)}
 .b.new span{color:var(--red);font-weight:700}
 .win{text-align:right;font-size:19px;font-weight:800;color:var(--green)}
@@ -172,6 +174,7 @@ footer{margin-top:30px;padding-top:16px;border-top:1px solid var(--line);
   <div class="pair">
    <div class="b old"><i style="width:79%"></i><span>296</span></div>
    <div class="b new"><i style="width:70%"></i><span>261 millesimi di secondo</span></div>
+   <div class="b db"><i style="width:70%"></i><span>259 · dati in casa (18/08)</span></div>
   </div>
   <div class="win">-12%<small>pi&ugrave; veloce</small></div>
  </div>
@@ -181,6 +184,7 @@ footer{margin-top:30px;padding-top:16px;border-top:1px solid var(--line);
   <div class="pair">
    <div class="b old"><i style="width:89%"></i><span>333</span></div>
    <div class="b new"><i style="width:80%"></i><span>300 millesimi di secondo</span></div>
+   <div class="b db"><i style="width:81%"></i><span>304 · dati in casa (18/08)</span></div>
   </div>
   <div class="win">-10%<small>pi&ugrave; veloce</small></div>
  </div>
@@ -190,6 +194,7 @@ footer{margin-top:30px;padding-top:16px;border-top:1px solid var(--line);
   <div class="pair">
    <div class="b old"><i style="width:100%"></i><span>373</span></div>
    <div class="b new"><i style="width:77%"></i><span>289 millesimi di secondo</span></div>
+   <div class="b db"><i style="width:78%"></i><span>291 · dati in casa (18/08)</span></div>
   </div>
   <div class="win">-23%<small>pi&ugrave; veloce</small></div>
  </div>
@@ -199,6 +204,7 @@ footer{margin-top:30px;padding-top:16px;border-top:1px solid var(--line);
   <div class="pair">
    <div class="b old"><i style="width:63%"></i><span>236</span></div>
    <div class="b new"><i style="width:55%"></i><span>207 millesimi di secondo</span></div>
+   <div class="b db"><i style="width:60%"></i><span>222 · dati in casa (18/08)</span></div>
   </div>
   <div class="win">-12%<small>pi&ugrave; veloce</small></div>
  </div>
@@ -208,13 +214,15 @@ footer{margin-top:30px;padding-top:16px;border-top:1px solid var(--line);
   <div class="pair">
    <div class="b old"><i style="width:44%"></i><span>165</span></div>
    <div class="b new"><i style="width:42%"></i><span>156 millesimi di secondo</span></div>
+   <div class="b db"><i style="width:38%"></i><span>143 · dati in casa (18/08)</span></div>
   </div>
   <div class="win">-5%<small>pi&ugrave; veloce</small></div>
  </div>
 
  <div class="key">
   <span><b style="background:#c3bcab"></b> Prima, server condiviso</span>
-  <span><b style="background:#D42B2B"></b> Adesso, macchina dedicata</span>
+  <span><b style="background:#D42B2B"></b> 17/08, macchina dedicata</span>
+  <span><b style="background:#1a7f45"></b> 18/08, anche i dati in casa</span>
   <span style="margin-left:auto">Per capirsi: un battito di ciglia dura circa 150 millesimi di secondo.</span>
  </div>
 </div>
@@ -240,13 +248,16 @@ footer{margin-top:30px;padding-top:16px;border-top:1px solid var(--line);
   <b>Supabase</b>, un servizio esterno. Ogni volta che apri la mappa, la richiesta <b>esce su internet</b>,
   va a bussare l&agrave;, e torna indietro.</p>
   <div class="db">
-   <div class="dbc"><div class="v">152 ms</div><div class="l">Prima: dati fuori (punte a 770)</div></div>
-   <div class="dbc"><div class="v">136 ms</div><div class="l">Dal 18/08: dati in casa (max 147)</div></div>
+   <div class="dbc"><div class="v">152 ms</div><div class="l">Prima: viaggio dei dati (punte a 794)</div></div>
+   <div class="dbc"><div class="v">18 ms</div><div class="l">Dal 18/08: dati in casa, mai sopra i 30</div></div>
   </div>
-  <p><b>Fatto il 18 agosto, e misurato:</b> prima i dati stavano fuori, con una media di 152 millesimi
-  e <b>punte fino a 770</b> quando il collegamento si assopiva: erano le impuntature che si sentivano usando l'app.</p>
-  <p>Ora i dati, e anche gli accessi, vivono <b>sulla stessa macchina</b>: 136 millesimi di mediana e,
-  soprattutto, <b>mai sopra i 147</b>. Le impuntature sono sparite: la velocit&agrave; &egrave; diventata costante.</p>
+  <p><b>Fatto il 18 agosto, e misurato dal punto giusto:</b> il tempo che vedi tu &egrave; fatto di due pezzi.
+  Il <b>viaggio fino alla macchina</b> (circa 120 millesimi di rete e cifratura, uguale per chiunque, nessun
+  server pu&ograve; toglierlo) e il <b>lavoro sui dati</b>.</p>
+  <p>&Egrave; il secondo pezzo quello crollato: da <b>152 millesimi con punte a 794</b> quando i dati stavano
+  fuori, a <b>18 millesimi, mai sopra i 30</b>, ora che sono in casa. <b>Meno 88%</b> sul pezzo che dipende
+  da noi, e soprattutto: le impuntature da quasi un secondo sono sparite. Sul totale percepito il guadagno
+  &egrave; pi&ugrave; piccolo (136 contro 152) proprio perch&eacute; il viaggio di rete resta.</p>
   <p class="quiet">Restano ospiti fuori casa solo sei programmi di servizio (l'assistente ILLI, l'invio email,
   le trascrizioni), raggiunti da un ponte: si trasferiscono in una fase successiva, senza fretta.</p>
  </div>
