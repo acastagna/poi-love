@@ -2649,14 +2649,14 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
 
   <!-- Selettore lingua — chip ultramoderni glassmorphism (EN · SQ · IT) -->
   <div class="auth-lang-row" role="group" aria-label="Language selector">
-    <button class="auth-lang-chip" data-lang="en" onclick="applyLang('en')" aria-label="English">
-      <i class="ph-duotone ph-globe flag"></i> EN
-    </button>
     <button class="auth-lang-chip" data-lang="sq" onclick="applyLang('sq')" aria-label="Shqip">
       <i class="ph-duotone ph-globe flag"></i> SQ
     </button>
     <button class="auth-lang-chip" data-lang="it" onclick="applyLang('it')" aria-label="Italiano">
       <i class="ph-duotone ph-globe flag"></i> IT
+    </button>
+    <button class="auth-lang-chip" data-lang="en" onclick="applyLang('en')" aria-label="English">
+      <i class="ph-duotone ph-globe flag"></i> EN
     </button>
   </div>
 </div>
@@ -8113,7 +8113,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='3.56';
+const APP_VERSION='3.57';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
@@ -8125,9 +8125,11 @@ function salvataggioFallito(cosa, err, soloRegistro){
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
-// La biometria e' una scorciatoia per chi TORNA: il nuovo utente non deve vederla (18/08).
+// La biometria e' una scorciatoia per chi TORNA, e SOLO su telefono:
+// sul computer non funziona e non deve nemmeno comparire (regola del 18/08, come su Top Market).
 try{
-  if(localStorage.getItem('poilove_remembered_user')){
+  const _telefono = matchMedia('(pointer:coarse)').matches || /Android|iPhone|iPad/i.test(navigator.userAgent);
+  if(_telefono && localStorage.getItem('poilove_remembered_user')){
     const pk=document.getElementById('authPasskeyBtn'); if(pk) pk.style.display='flex';
   }
 }catch(_){}

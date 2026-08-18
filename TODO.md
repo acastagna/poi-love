@@ -6,6 +6,9 @@
 
 ## ⚡ SUBITO (aggiornato 18/08 dopo il cutover)
 
+- [ ] **Facebook negli "Altri modi per entrare"**: configurare l'accesso Facebook (serve App Review Meta con privacy policy, già in linea) e aggiungerlo alla tendina della schermata d'accesso. Fino ad allora NON compare (regola mai finto).
+- [ ] **Biometria su telefono con gli accessi nostri**: il pulsante ora compare solo a chi torna e solo su telefono; verificare su iPhone vero che il flusso funzioni con GoTrue, altrimenti toglierlo finché non è vero.
+
 - [ ] **Traslocare i 6 programmi da Supabase** (illi-chat, send-email, transcribe, image-search, place-enrich, admin-ai): oggi raggiunti dal ponte `/db/functions`. Sessione dedicata.
 - [ ] **Foto nuove**: gli upload passano ancora dallo storage Supabase via ponte; portare anche quelli sul media server della macchina.
 - [ ] **Fra 30 giorni (dal 18/09)**: se tutto regge, valutare spegnimento Supabase e disdetta graduale; il Plesk resta per gli altri progetti.
