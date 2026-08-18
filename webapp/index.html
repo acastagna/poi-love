@@ -5097,9 +5097,13 @@ function syncProfileFromAuth() {
           if(pav) pav.src=_src;
           if(pubAv) pubAv.src=_src;
           if(currentUser?.id && sb){
-            // update, non upsert: la riga esiste gia', e l'upsert parziale moriva sul vincolo username
+            // update, non upsert: la riga esiste gia', e l'upsert parziale moriva sul vincolo username.
+            // REGOLA: un salvataggio che fallisce NON tace mai (lezione del 18/08: anni di avatar mai salvati in silenzio).
             sb.from('profiles').update({ avatar_url: _src, updated_at: new Date().toISOString() }).eq('id', currentUser.id)
-              .then(({error})=>{ if(!error && typeof syncCompagnieFromDB==='function') syncCompagnieFromDB(); });
+              .then(({error})=>{
+                if(error){ console.error('[poilove] salvataggio avatar FALLITO:', error.message); try{ showToast('⚠ '+t('av_save_fail','Avatar salvato solo qui: riprova online per vederlo ovunque')); }catch(_){} }
+                else if(typeof syncCompagnieFromDB==='function') syncCompagnieFromDB();
+              });
           }
         }
       }
@@ -5119,8 +5123,13 @@ function syncProfileFromAuth() {
           if(pubH) pubH.style.background=css;
         }
       } else {
-        // Fallback locale
+        // Fallback locale. E se il browser ha uno sfondo che il DB non ha, lo si salva nel DB:
+        // e' la sanatoria dei profili nati quando il salvataggio era rotto (upsert sul vincolo username).
         loadProfileCover();
+        try{
+          const _rawCover=localStorage.getItem('poilove_cover');
+          if(_rawCover){ const _c=JSON.parse(_rawCover); if(_c && _c.value && typeof saveProfileCover==='function') saveProfileCover(_c.value,_c.type); }
+        }catch(_){}
       }
       // Bio
       if(data?.bio){
@@ -8104,7 +8113,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='3.52';
+const APP_VERSION='3.53';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
@@ -12582,7 +12591,8 @@ async function saveProfileCover(value, type){
         if(/column.*cover_url|cover_type/i.test(error.message||'')){
           console.warn('[poilove] Aggiungi colonne profiles.cover_url + cover_type — vedi SQL in CLAUDE.md');
         } else {
-          console.warn('[poilove] saveProfileCover error:',error.message);
+          console.error('[poilove] salvataggio sfondo FALLITO:', error.message);
+          try{ showToast('⚠ '+t('cover_save_fail','Sfondo salvato solo su questo dispositivo')); }catch(_){}
         }
       }
     }catch(e){ console.warn('[poilove] saveProfileCover exception:',e); }
