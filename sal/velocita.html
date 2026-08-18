@@ -87,6 +87,16 @@ h2{font-size:15px;text-transform:uppercase;letter-spacing:1.2px;color:var(--mute
 .dbc .v{font-size:29px;font-weight:800;color:var(--red);letter-spacing:-1px}
 .dbc.win2 .v{color:var(--green)}
 .dbc .l{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-top:3px}
+/* ── IL SALTO: 12 misure vere per fase, barre animate ── */
+.leap{background:var(--white);border-radius:16px;padding:26px 30px;margin-bottom:24px;border:1px solid var(--line)}
+.leap svg{width:100%;height:auto;display:block}
+.sb{transform-box:fill-box;transform-origin:bottom;transform:scaleY(0);animation:sbGrow .7s cubic-bezier(.2,.7,.3,1) forwards}
+@keyframes sbGrow{to{transform:scaleY(1)}}
+.spike{animation:sbGrow .7s cubic-bezier(.2,.7,.3,1) forwards, spikePulse 2.6s 1.4s ease-in-out infinite}
+@keyframes spikePulse{0%,100%{opacity:1}50%{opacity:.55}}
+.glide{animation:glideX 3.2s 1.2s linear infinite}
+@keyframes glideX{0%{transform:translateX(0)}100%{transform:translateX(388px)}}
+.leap .db{margin-top:18px}
 footer{margin-top:30px;padding-top:16px;border-top:1px solid var(--line);
  display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:12px;color:var(--muted)}
 @media print{
@@ -128,6 +138,34 @@ footer{margin-top:30px;padding-top:16px;border-top:1px solid var(--line);
 <div class="hero">
  <p data-t="hero"></p>
  <p class="note" data-t="hero_note"></p>
+</div>
+
+<h2 data-t="box2_h"></h2>
+<div class="leap">
+ <svg viewBox="0 0 1000 300" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <!-- battito di ciglia: 150 ms -->
+  <line x1="40" y1="248" x2="960" y2="248" stroke="#ddd6c6" stroke-width="1.5"/>
+  <line x1="40" y1="206" x2="960" y2="206" stroke="#c9c2b2" stroke-width="1" stroke-dasharray="5 6"/>
+  <text x="958" y="200" text-anchor="end" font-size="12.5" fill="#8a8378" id="blinkLbl"></text>
+  <!-- PRIMA: 12 misure vere verso Supabase -->
+  <text x="42" y="30" font-size="15" font-weight="800" fill="#1C1C1C" id="lblPrima"></text>
+  <text x="42" y="48" font-size="11.5" fill="#6B6B6B" id="lblRuns1"></text>
+  <g id="gPrima"></g>
+  <text x="365" y="76" font-size="12.5" font-weight="700" fill="#D42B2B" text-anchor="end" id="lblSpike"></text>
+  <!-- ADESSO: 12 misure vere in casa -->
+  <text x="552" y="30" font-size="15" font-weight="800" fill="#1a7f45" id="lblAdesso"></text>
+  <text x="552" y="48" font-size="11.5" fill="#6B6B6B" id="lblRuns2"></text>
+  <g id="gAdesso"></g>
+  <circle class="glide" cx="552" cy="238" r="4.5" fill="#1a7f45"/>
+  <text x="958" y="285" text-anchor="end" font-size="12.5" font-weight="700" fill="#1a7f45" id="lblFlat"></text>
+ </svg>
+ <div class="db">
+  <div class="dbc"><div class="v">152 ms</div><div class="l" data-t="db_old"></div></div>
+  <div class="dbc win2"><div class="v">18 ms</div><div class="l" data-t="db_new"></div></div>
+ </div>
+ <p style="font-size:14.5px;line-height:1.62;margin-top:14px" data-t="box2_p1"></p>
+ <p style="font-size:14.5px;line-height:1.62" data-t="box2_p2"></p>
+ <p class="quiet" style="font-size:13.5px;color:var(--muted)" data-t="box2_p3"></p>
 </div>
 
 <h2 data-t="big_h"></h2>
@@ -188,24 +226,12 @@ footer{margin-top:30px;padding-top:16px;border-top:1px solid var(--line);
 <div class="chart" id="pages"></div>
 
 <h2 data-t="mean_h"></h2>
-<div class="two">
- <div class="box">
+<div class="box">
   <h3 data-t="box1_h"></h3>
   <p data-t="box1_p1"></p>
   <p data-t="box1_p2"></p>
   <p data-t="box1_p3"></p>
   <p class="quiet" data-t="box1_p4"></p>
- </div>
- <div class="box">
-  <h3 data-t="box2_h"></h3>
-  <p data-t="box2_p1"></p>
-  <div class="db">
-   <div class="dbc"><div class="v">152 ms</div><div class="l" data-t="db_old"></div></div>
-   <div class="dbc win2"><div class="v">18 ms</div><div class="l" data-t="db_new"></div></div>
-  </div>
-  <p data-t="box2_p2"></p>
-  <p class="quiet" data-t="box2_p3"></p>
- </div>
 </div>
 
 <footer>
@@ -250,6 +276,8 @@ sq:{
  foot1:'Matje të 17–18 gushtit 2026 · mediana e 12 provave · asnjë vlerë e sajuar',
  legend1:'Serveri i ndarë',legend2:'17/08, makinë e dedikuar',legend3:'18/08, edhe të dhënat në shtëpi',
  blink:'Sa një kapsallitje syri: rreth 150 ms.',
+ c_prima:'MË PARË · të dhënat jashtë shtëpisë',c_adesso:'TANI · të dhënat në shtëpi',
+ c_runs:'12 matje reale, një shtyllë secila',c_spike:'ngecja: 794 ms',c_flat:'e sheshtë dhe konstante: rrjedhshmëria',
  r1:'Aplikacioni',r1s:'ajo që sheh përdoruesi',r2:'Zemra e aplikacionit',r2s:'skedari më i rëndë, 800 KB',
  r3:'Prezantimi',r3s:'project.poilove.com',r4:'Ky SAL',r4s:'sal.poilove.com',r5:'Paneli',r5s:'admin.poilove.com',
  faster:'më shpejt',ms:'ms'
@@ -286,7 +314,9 @@ it:{
  db_old:'Prima: viaggio dei dati (punte a 794)',db_new:'Dal 18/08: in casa, mai sopra i 30',
  foot1:'Misure del 17 e 18 agosto 2026 · mediana di 12 prove · nessun valore inventato',
  legend1:'Server condiviso',legend2:'17/08, macchina dedicata',legend3:'18/08, anche i dati in casa',
- blink:'Per capirsi: un battito di ciglia dura circa 150 millesimi di secondo.',
+ blink:'Un battito di ciglia: circa 150 ms.',
+ c_prima:'PRIMA · i dati fuori casa',c_adesso:'ADESSO · i dati in casa',
+ c_runs:'12 misure reali, una barra ciascuna',c_spike:'l\'impuntatura: 794 ms',c_flat:'piatto e costante: la fluidità',
  r1:'La app',r1s:'quello che vede l’utente',r2:'Il cuore della app',r2s:'il file più pesante, 800 KB',
  r3:'La presentazione',r3s:'project.poilove.com',r4:'Questo SAL',r4s:'sal.poilove.com',r5:'Il pannello',r5s:'admin.poilove.com',
  faster:'più veloce',ms:'millesimi'
@@ -323,7 +353,9 @@ en:{
  db_old:'Before: the data trip (spikes to 794)',db_new:'Since 18/08: at home, never above 30',
  foot1:'Measurements of 17–18 August 2026 · median of 12 runs · no invented values',
  legend1:'Shared server',legend2:'17/08, dedicated machine',legend3:'18/08, data at home too',
- blink:'For scale: a blink of an eye lasts about 150 ms.',
+ blink:'A blink of an eye: about 150 ms.',
+ c_prima:'BEFORE · data outside',c_adesso:'NOW · data at home',
+ c_runs:'12 real runs, one bar each',c_spike:'the stutter: 794 ms',c_flat:'flat and steady: fluidity',
  r1:'The app',r1s:'what the user sees',r2:'The app engine',r2s:'the heaviest file, 800 KB',
  r3:'The presentation',r3s:'project.poilove.com',r4:'This SAL',r4s:'sal.poilove.com',r5:'The panel',r5s:'admin.poilove.com',
  faster:'faster',ms:'ms'
@@ -341,6 +373,7 @@ function setL(l){
  const d=T[l];
  document.querySelectorAll('[data-t]').forEach(e=>{ const k=e.getAttribute('data-t'); if(d[k]!=null) e.innerHTML=d[k]; });
  ['sq','it','en'].forEach(x=>document.getElementById('lb-'+x).classList.toggle('on',x===l));
+ chartLabels(d); barre();
  const MAX=373;
  document.getElementById('pages').innerHTML=ROWS.map(r=>`
   <div class="row">
@@ -358,6 +391,29 @@ function setL(l){
    <span><b style="background:#1a7f45"></b> ${d.legend3}</span>
    <span style="margin-left:auto">${d.blink}</span>
   </div>`;
+}
+/* Le 12 misure VERE per fase (millesimi): frastagliato prima, piatto adesso = fluidita' */
+const PRIMA=[97,98,127,132,135,144,160,172,172,176,222,794];
+const ADESSO=[19,18,21,19,18,19,27,30,27,19,2,3];
+function barre(){
+  const MAXV=794, H=190, BASE=248, W=27, GAP=6;
+  const mk=(vals,x0,color,cls)=>vals.map((v,i)=>{
+    const h=Math.max(4, v/MAXV*H), x=x0+i*(W+GAP);
+    const sp=(v>600)?` class="sb spike"`:` class="sb"`;
+    return `<rect${sp} x="${x}" y="${BASE-h}" width="${W}" height="${h}" rx="4" fill="${color}" style="animation-delay:${i*0.06}s"></rect>`
+      +((v>600)?`<text x="${x+W/2}" y="${BASE-h-8}" text-anchor="middle" font-size="12" font-weight="800" fill="#D42B2B">794</text>`:'');
+  }).join('');
+  document.getElementById('gPrima').innerHTML=mk(PRIMA,42,'#c3bcab');
+  document.getElementById('gAdesso').innerHTML=mk(ADESSO,552,'#1a7f45');
+}
+function chartLabels(d){
+  document.getElementById('lblPrima').textContent=d.c_prima;
+  document.getElementById('lblAdesso').textContent=d.c_adesso;
+  document.getElementById('lblRuns1').textContent=d.c_runs;
+  document.getElementById('lblRuns2').textContent=d.c_runs;
+  document.getElementById('lblSpike').textContent=d.c_spike;
+  document.getElementById('lblFlat').textContent=d.c_flat;
+  document.getElementById('blinkLbl').textContent=d.blink;
 }
 const salvata=localStorage.getItem('vel_lang');
 const nav=(navigator.language||'en').slice(0,2).toLowerCase();
