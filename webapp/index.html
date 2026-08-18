@@ -2627,8 +2627,8 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
   </button>
 
   <!-- Altri modi: solo quelli VERI (LinkedIn, X). Apple e Facebook torneranno quando esisteranno. -->
-  <button class="auth-more-toggle" onclick="const m=document.getElementById('authMore');m.hidden=!m.hidden" style="background:none;border:none;color:rgba(255,255,255,.75);font-size:12.5px;font-weight:600;cursor:pointer;margin-top:12px;text-decoration:underline" data-t="auth_more">Altri modi per entrare</button>
-  <div id="authMore" hidden style="display:flex;gap:10px;justify-content:center;margin-top:10px">
+  <button class="auth-more-toggle" onclick="const m=document.getElementById('authMore');m.style.display=(m.style.display==='none'?'flex':'none')" style="background:none;border:none;color:rgba(255,255,255,.75);font-size:12.5px;font-weight:600;cursor:pointer;margin-top:12px;text-decoration:underline" data-t="auth_more">Altri modi per entrare</button>
+  <div id="authMore" style="display:none;gap:10px;justify-content:center;margin-top:10px">
     <button class="auth-social-btn li" onclick="signInWithLinkedIn()" aria-label="LinkedIn" style="width:auto;padding:0 16px;border-radius:24px;display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;color:#fff">
       <svg viewBox="0 0 24 24" fill="#fff" style="width:16px;height:16px"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.67H9.35V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.07 2.07 0 1 1 0-4.14 2.07 2.07 0 0 1 0 4.14zM7.12 20.45H3.55V9h3.57v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/></svg> LinkedIn
     </button>
