@@ -6,6 +6,9 @@
 
 ## ⚡ SUBITO (aggiornato 18/08 dopo il cutover)
 
+- [ ] **POI Prova: love a 2330 solo per collaudo grafico** — riportare al valore vero (o cancellare il POI) prima del lancio.
+- [ ] **Manopola trasparenze marcatori nell'admin**: oggi i livelli amici/community usano le variabili CSS `--mk-friend` (.85) e `--mk-comm` (.55); esporle come regolazione nell'admin come chiesto da Alessandro.
+
 - [ ] **Facebook negli "Altri modi per entrare"**: configurare l'accesso Facebook (serve App Review Meta con privacy policy, già in linea) e aggiungerlo alla tendina della schermata d'accesso. Fino ad allora NON compare (regola mai finto).
 - [ ] **Biometria su telefono con gli accessi nostri**: il pulsante ora compare solo a chi torna e solo su telefono; verificare su iPhone vero che il flusso funzioni con GoTrue, altrimenti toglierlo finché non è vero.
 

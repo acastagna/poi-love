@@ -1,5 +1,26 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
+## Sessione 18/08/2026 (sera) — Mappa: marcatore definitivo, mappa piena anche per gli ospiti (v3.62 → 3.70)
+
+**Il marcatore ufficiale è deciso e in linea**: goccia rossa col cuore bianco inciso (variante A
+scelta da Alessandro), cerchietto dei love a cavallo della spalla destra, numero nero centrato.
+
+1. **Cerchietto dei love, tre difetti chiusi in fila**:
+   - era tagliato dalla scatola del marcatore (3.67: riportato dentro, scatola senza tagli);
+   - era COPERTO dal cuore: il cuore, da figlio flex, faceva valere una priorità di disegno 200
+     anche da statico. Ora cuore a z:1, cerchietto a z:300, misurato con la pila di pittura (3.69);
+   - con zero love il cerchietto NON esiste proprio: nasce col primo love (3.70).
+2. **Numeri grandi compatti**: 2000 → "2k", 2330 → "2,3k", 12000 → "12k"; il numero esatto resta
+   nella scheda. Collaudato dal vivo col POI Prova portato a 2330 love nel DB.
+3. **Mappa vuota per gli ospiti, difetto vero trovato per caso**: "Entra e guarda, senza account"
+   mostrava la mappa SENZA nessun POI (si caricavano solo al login). Chiuso in 3.68, verificato:
+   l'ospite ora vede subito i 12 luoghi della community.
+4. Se un POI ha sigillo ufficiale o stella, il cerchietto passa a sinistra per non accavallarsi.
+
+Tutto in linea su entrambe le macchine, controllo esterno 18/18 a ogni giro.
+
+---
+
 ## Sessione 18/08/2026 — POI•LOVE è indipendente: database e accessi sulla macchina propria
 
 **Il passaggio è completo.** poilove.com non dipende più da Supabase per entrare né per i dati:
