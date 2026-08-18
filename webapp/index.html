@@ -5056,8 +5056,9 @@ function syncProfileFromAuth() {
   const meta = currentUser?.user_metadata || {};
   const name = meta.full_name || meta.name || currentUser?.email?.split('@')[0] || 'Utente';
   const authAvatar = meta.avatar_url || meta.picture || '';
-  // Aggiorna UI profilo (nome)
-  const pname = document.getElementById('profileName');
+  // Aggiorna UI profilo (nome). L'elemento vero e' myProfileName: il vecchio id
+  // 'profileName' non esiste piu' dal rinominamento, e il nome restava per sempre "—".
+  const pname = document.getElementById('myProfileName') || document.getElementById('profileName');
   if (pname) pname.textContent = name;
   const pubName = document.getElementById('pubProfileName');
   if (pubName) pubName.textContent = name;
@@ -5078,6 +5079,9 @@ function syncProfileFromAuth() {
     .then(({data})=>{
       // Il MIO username vero, a portata di mano.
       window._myUsername  = (data && data.username) || currentUser?.user_metadata?.full_name || currentUser?.user_metadata?.name || '';
+      // E scritto anche in testa al profilo: il dato del DB prevale su quello dell'accesso.
+      const _nEl=document.getElementById('myProfileName');
+      if(_nEl && window._myUsername) _nEl.textContent=window._myUsername;
       const _localAv = (function(){ try{ return localStorage.getItem('poilove_avatar')||''; }catch(_){ return ''; } })();
       // Se nel DB c'è un avatar, prevale.
       if(data?.avatar_url){
@@ -8099,7 +8103,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='3.50';
+const APP_VERSION='3.51';
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
