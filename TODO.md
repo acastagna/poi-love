@@ -4,6 +4,13 @@
 
 ---
 
+## ⚡ SUBITO (aggiornato 18/08 dopo il cutover)
+
+- [ ] **Traslocare i 6 programmi da Supabase** (illi-chat, send-email, transcribe, image-search, place-enrich, admin-ai): oggi raggiunti dal ponte `/db/functions`. Sessione dedicata.
+- [ ] **Foto nuove**: gli upload passano ancora dallo storage Supabase via ponte; portare anche quelli sul media server della macchina.
+- [ ] **Fra 30 giorni (dal 18/09)**: se tutto regge, valutare spegnimento Supabase e disdetta graduale; il Plesk resta per gli altri progetti.
+- [ ] **App Google in modalità Test**: prima del lancio pubblico va PUBBLICATA nella console (oggi entrano solo account in lista, max 100).
+
 ## ⚡ SUBITO (dalla sessione 04/07)
 
 - [ ] **ILLI: qualità della ricerca (rimandato da Alessandro al dopo-DNS, 17/08)** — diagnosi fatta sul campo a Thiene: chiedendo un panino ILLI risponde che non ce ne sono, ma esistono. Non è il modello che sbaglia, è la **fonte**: il grounding interroga solo OpenStreetMap (Overpass), dove i piccoli esercizi italiani sono in gran parte non mappati o senza il tag giusto. Tre interventi, in ordine:

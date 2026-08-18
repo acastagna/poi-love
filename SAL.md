@@ -1,5 +1,49 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
+## Sessione 18/08/2026 — POI•LOVE è indipendente: database e accessi sulla macchina propria
+
+**Il passaggio è completo.** poilove.com non dipende più da Supabase per entrare né per i dati:
+tutto vive sulla macchina dedicata. Collaudato dal vivo da Alessandro: accesso con Google,
+12 luoghi ritrovati, nome, avatar e sfondo al loro posto.
+
+### Cosa è stato fatto
+
+1. **Servizio accessi proprio** (GoTrue, lo stesso motore che usa Supabase) su `accessi.poilove.com`,
+   con i 7 account trasferiti a identificativi invariati: ognuno ritrova i propri luoghi.
+   La schermata di Google non dice più `ptppxwl…supabase.co`.
+2. **Database PostgreSQL 17 + PostGIS sulla macchina**: 56 tabelle, 427 righe fresche,
+   161 regole di sicurezza, 90 funzioni, chiavi e vincoli. Verificato tabella per tabella.
+3. **Foto in casa**: 41 file portati sulla macchina (`media.poilove.com/sb/`), indirizzi
+   riscritti nel database, 23 su 23 raggiungibili.
+4. **Velocità misurata**: mediana da 152 a 136 ms, ma soprattutto **punte da 770 a 147**:
+   le impuntature sono sparite. Terza colonna di `sal/velocita.html` compilata con dati veri.
+5. **Ritorno indietro sempre pronto**: `scripts/ritorno-accessi.sh` (un minuto, Supabase resta
+   acceso e intatto per 30 giorni). Fotografie della macchina prima e dopo il passaggio.
+
+### Difetti storici trovati e chiusi durante il lavoro (v3.51 → 3.55)
+
+- **Nome del profilo mai renderizzato** (id morto da un rinominamento) — 3.51
+- **Avatar e sfondo mai salvati nel DB** (upsert parziale che moriva sul vincolo username) — 3.52/3.53
+- **L'assassino dell'avatar**: ogni salvataggio di POI azzerava avatar_url — 3.54
+- **37 salvataggi con errori ingoiati in silenzio**: ora tutti passano da `salvataggioFallito()`,
+  contenuto utente a schermo, servizio nel registro — 3.54 (caccia fatta con scansione a 5 agenti)
+- Schermata Google: nome app, privacy/termini e domini sistemati nella console (client rinominato,
+  dominio morto demo.poilove.com rimosso, chiave di programma rigenerata)
+
+### Restano su Supabase (per scelta, raggiunti dal ponte /db/)
+
+I **6 programmi**: illi-chat, send-email, transcribe, image-search, place-enrich, admin-ai.
+Da traslocare in una sessione dedicata. Le foto NUOVE caricate dagli utenti passano ancora
+dallo storage Supabase attraverso il ponte.
+
+### Architettura attuale
+
+`poilove.com` → nginx → SPA + `/db/rest` (PostgREST locale) + `/db/auth` (GoTrue locale)
++ `/db/storage` e `/db/functions` (ponte verso Supabase). App v3.55.
+`prova.poilove.com` = ambiente di collaudo identico. Plesk = riserva, spegnibile fra 30 giorni.
+
+---
+
 ## Sessione 17/08/2026 — POI•LOVE è passata sulla macchina propria
 
 **Il dominio non vive più sul server condiviso.** `poilove.com` e i suoi indirizzi rispondono dalla macchina dedicata. Il server storico resta acceso e intatto per almeno 30 giorni: il ritorno indietro costa un minuto.
