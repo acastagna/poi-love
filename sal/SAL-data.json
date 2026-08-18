@@ -1,18 +1,18 @@
 {
   "_meta": {
-    "last_updated": "2026-08-17",
-    "version": "3.44",
-    "next_deadline": "2026-08-17",
-    "next_deadline_label": "🚀 Lancio tecnico 17 agosto 2026 — POI•LOVE su macchina dedicata",
+    "last_updated": "2026-08-18",
+    "version": "3.55",
+    "next_deadline": "2026-09-18",
+    "next_deadline_label": "Entro il 18/09: traslocare i 6 programmi, poi valutare lo spegnimento di Supabase",
     "presentation_window_start": "2026-07-14",
     "presentation_window_end": "2026-07-17",
-    "launch_date": "17 agosto 2026 (lun) — lancio tecnico su macchina dedicata",
+    "launch_date": "lancio tecnico FATTO il 18/08/2026: database e accessi propri sulla macchina dedicata",
     "launch_city": "Tirana"
   },
   "overview": {
     "overall_pct": 66,
     "weeks_to_launch": 0,
-    "db_tables": 42,
+    "db_tables": 56,
     "license": "MIT"
   },
   "areas": [

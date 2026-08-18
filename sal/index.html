@@ -418,7 +418,7 @@ body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); 
       <button class="lang-btn" data-lang="sq" title="Shqip" onclick="switchLang('sq')">🇦🇱</button>
       <button class="lang-btn" data-lang="en" title="English" onclick="switchLang('en')">🇬🇧</button>
     </div>
-    <span class="hdr-date" data-t="updated_date">Aggiornato: 17 Agosto 2026</span>
+    <span class="hdr-date" data-t="updated_date">Aggiornato: 18 Agosto 2026</span>
     <div class="status-pill"><div class="sdot"></div><span data-t="status_pill">MVP in sviluppo</span></div>
   </div>
 </header>
@@ -427,7 +427,7 @@ body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); 
 <div class="hero">
   <div class="hero-text">
     <h1><span class="h1-main">POI•LOVE</span><span class="h1-sub" data-t="hero_sub">Stato del Progetto</span></h1>
-    <p data-t="hero_desc">Mappa comunitaria dei luoghi amati. Prima istanza: Albania · Tirana. Lancio tecnico 17 agosto 2026. Framework open source Cultural Bridge OS — Licenza MIT.</p>
+    <p data-t="hero_desc">Mappa comunitaria dei luoghi amati. Prima istanza: Albania · Tirana. Lancio tecnico FATTO il 18 agosto 2026: database e accessi propri, sulla macchina dedicata. Framework open source Cultural Bridge OS — Licenza MIT.</p>
   </div>
   <div class="kpis">
     <a class="kpi kpi-link" href="velocita.html" title="Misure reali del 17/08/2026">
@@ -435,8 +435,8 @@ body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); 
       <div class="kpi-l" data-t="kpi_speed">Test velocit&agrave;</div>
     </a>
     <div class="kpi"><div class="kpi-v">66%</div><div class="kpi-l" data-t="kpi_done">Completamento</div></div>
-    <div class="kpi"><div class="kpi-v">17.08</div><div class="kpi-l" data-t="kpi_weeks">Lancio tecnico</div></div>
-    <div class="kpi"><div class="kpi-v">12</div><div class="kpi-l" data-t="kpi_tables">Tabelle database</div></div>
+    <div class="kpi"><div class="kpi-v">✓ 18.08</div><div class="kpi-l" data-t="kpi_weeks">Lancio tecnico</div></div>
+    <div class="kpi"><div class="kpi-v">56</div><div class="kpi-l" data-t="kpi_tables">Tabelle database</div></div>
     <div class="kpi"><div class="kpi-v">MIT</div><div class="kpi-l" data-t="kpi_license">Licenza</div></div>
   </div>
 </div>
@@ -854,7 +854,7 @@ body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); 
   <div class="tech-grid">
     <div class="tech-card">
       <div class="tech-ico" style="background:#ECFDF5;color:#15803D"><i class="ph ph-database"></i></div>
-      <div class="tech-info"><div class="tech-name">Supabase</div><div class="tech-role" data-t="tech1_role">PostgreSQL + RLS + Auth + Realtime</div></div>
+      <div class="tech-info"><div class="tech-name">PostgreSQL + GoTrue (in casa)</div><div class="tech-role" data-t="tech1_role">PostgreSQL + RLS + Auth + Realtime</div></div>
       <span class="badge bd" data-t="tech_active">Attivo</span>
     </div>
     <div class="tech-card">
@@ -874,7 +874,7 @@ body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); 
     </div>
     <div class="tech-card">
       <div class="tech-ico" style="background:#FFFBEB;color:#B45309"><i class="ph ph-cloud-arrow-up"></i></div>
-      <div class="tech-info"><div class="tech-name">Plesk Media Server</div><div class="tech-role" data-t="tech5_role">Storage foto proprietario — API PHP custom</div></div>
+      <div class="tech-info"><div class="tech-name">Media server sulla macchina</div><div class="tech-role" data-t="tech5_role">Storage foto proprietario — API PHP custom</div></div>
       <span class="badge bs" data-t="tech_config">Da configurare</span>
     </div>
     <div class="tech-card">
@@ -1070,10 +1070,10 @@ function rebuildPieLegend() {
 
 const T = {
   it: {
-    sal_badge:'SAL — Stato Avanzamento Lavori', updated_date:'Aggiornato: 17 Agosto 2026',
+    sal_badge:'SAL — Stato Avanzamento Lavori', updated_date:'Aggiornato: 18 Agosto 2026',
     status_pill:'MVP in sviluppo', hero_sub:'Stato del Progetto',
-    hero_desc:'Mappa comunitaria dei luoghi amati. Prima istanza: Albania · Tirana. Lancio tecnico 17 agosto 2026. Framework open source Cultural Bridge OS — Licenza MIT.',
-    kpi_speed:'Test velocità', kpi_done:'Completamento', kpi_weeks:'Lancio tecnico', kpi_tables:'Tabelle database', kpi_license:'Licenza',
+    hero_desc:'Mappa comunitaria dei luoghi amati. Prima istanza: Albania · Tirana. Lancio tecnico FATTO il 18 agosto 2026: database e accessi propri, sulla macchina dedicata. Framework open source Cultural Bridge OS — Licenza MIT.',
+    kpi_speed:'Test velocità', kpi_done:'Completamento', kpi_weeks:'Lancio tecnico: fatto', kpi_tables:'Tabelle database', kpi_license:'Licenza',
     area_title:'Avanzamento per Area', area_sub:'Stato corrente delle 4 macro-aree di progetto',
     lbl_done:'✓ Completata', lbl_active:'↗ In corso', lbl_todo:'○ Da avviare', lbl_critical:'⚡ Critico',
     area1:'Infrastruttura & Backend', area2:'App Mobile iOS/Android', area3:'UX/UI & Contenuti', area4:'Lancio & Distribuzione',
@@ -1084,7 +1084,7 @@ const T = {
     ws_title:'Dettaglio Attività', ws_sub:'Stato, fase, tempo stimato e avanzamento di ogni deliverable',
     col_activity:'Attività', col_phase:'Fase', col_progress:'Progresso', col_time:'Tempo stimato', col_status:'Stato',
     t1_name:'Repository GitHub + Macchina dedicata', t1_sub:'acastagna/poi-love — dal 17/08/2026 su macchina propria: 16 processori, 30 GB, solo POI•LOVE', t1_phase:'Infrastruttura', t1_time_m:'~8h — ✅ completato',
-    t2_name:'Schema Supabase — 9 tabelle + RLS', t2_sub:'POIs, Profiles, Loves, Lists, Categories, Routes, Media, Card Generations + visibility 3 stati', t2_phase:'Backend', t2_time_m:'~6h — ✅ completato',
+    t2_name:'Database PostgreSQL proprio — 56 tabelle', t2_sub:'Sulla macchina dedicata dal 18/08: 161 regole di sicurezza, 90 funzioni, PostGIS. Supabase resta solo come ponte per 6 programmi', t2_phase:'Backend', t2_time_m:'~6h — ✅ completato',
     t3_name:'Google OAuth — Autenticazione utenti', t3_sub:'Supabase Auth + Google Cloud Console configurati e attivi', t3_phase:'Autenticazione', t3_time_m:'~2h — ✅ completato',
     t4_name:'Google Maps Platform — 3 API configurate', t4_sub:'Maps JS + Places + Geocoding — chiave ristretta ai domini autorizzati', t4_phase:'Mappe', t4_time_m:'~2h — ✅ completato',
     t5_name:'Prototipo Web Interattivo', t5_sub:'HTML5 navigabile — mappa + inserimento POI simulato + tutte le schermate', t5_phase:'UX/UI', t5_time_m:'~12h — ✅ completato',
@@ -1099,15 +1099,15 @@ const T = {
     t14_name:'Campagna Lancio — Hacker News, Reddit, Twitter', t14_sub:'Show HN post, r/opensource, thread Twitter founder story', t14_phase:'Marketing', t14_time_m:'~4h — futuro',
     done_lbl:'completato', badge_done:'Fatto', badge_sprint:'Sprint', badge_next:'Prossimo', badge_future:'Futuro',
     deadline_anthropic_lbl:'✓ Presentazioni', deadline_anthropic_date:'13-17 Maggio 2026 · fatte',
-    deadline_tirana_lbl:'🚀 Lancio Tecnico', deadline_tirana_date:'17 Agosto 2026',
+    deadline_tirana_lbl:'✓ Lancio Tecnico', deadline_tirana_date:'fatto il 18 Agosto 2026',
     browser_banner:'📱 Per la migliore esperienza, apri in <strong>Safari</strong> o <strong>Chrome</strong>',
     sprint_title:'Dopo il lancio tecnico', sprint_sub:'Il 17/08 POI•LOVE e passata su macchina propria. Ecco cosa resta verso il lancio pubblico',
     day_today:'Oggi', day_fri:'Sab', day_sat:'Dom', day_sun:'Lun', day_mon:'Mar', day_tue:'Mer', day_wed:'Gio',
-    day1_task:'Wire Plesk Upload + nav', day2_task:'Slide demo + storia', day3_task:'Dry-run completo',
-    day4_task:'Refining + audience', day5_task:'Dress rehearsal', day6_task:'🎤 Apertura finestra', day7_task:'🎤 Presentazione 2/5',
+    day1_task:'Traslocare i 6 programmi da Supabase', day2_task:'Foto nuove sul media server', day3_task:'Pubblicare l\'app nella console Google',
+    day4_task:'Marcatori mappa: rossi/verdi/altri', day5_task:'ILLI: ricerca con Google Places', day6_task:'Snapshot economici + prova di ripristino', day7_task:'18/09: valutare spegnimento Supabase',
     ms_title:'Milestone di Progetto', ms_sub:'Roadmap dal lancio di Tirana alla scalabilità globale',
     ms1_date:'✓ Completata', ms1_title:'Prototipo Web + Macchina dedicata', ms1_desc:'Webapp live in tre lingue, database Supabase, autenticazione Google. Dal 17/08/2026 gira su una macchina tutta sua: 16 processori e 30 GB, non piu divisi con altri 62 progetti.', ms1_status:'Rilasciato',
-    ms2_date:'🎯 17 Agosto 2026', ms2_title:'MVP App iOS + Android', ms2_desc:'Lancio pubblico a Tirana. Mappa, inserimento POI, liste, sistema LOVE.', ms2_status:'In sviluppo',
+    ms2_date:'🎯 dopo il lancio pubblico', ms2_title:'MVP App iOS + Android', ms2_desc:'Lancio pubblico a Tirana. Mappa, inserimento POI, liste, sistema LOVE.', ms2_status:'In sviluppo',
     ms3_title:'POI•VOICE — Audio Guide AI', ms3_desc:'Guide audio generate da Claude. Pipeline AI proprietaria. Nessun servizio terzo.', ms3_status:'Pianificata',
     ms4_title:'Il Libro dei Luoghi', ms4_desc:'Pubblicazione fisica dei luoghi più amati dalla community. Primo stream di ricavi.', ms4_status:'Roadmap',
     stack_title:'Stack Tecnologico', stack_sub:'Ogni componente del sistema e il suo stato attuale',
@@ -1139,10 +1139,10 @@ const T = {
     open_link:'Apri →', link_demo:'Demo Live', footer_copy:'SAL — Documento per investitori e partner',
   },
   en: {
-    sal_badge:'Project Status Report', updated_date:'Updated: August 17, 2026',
+    sal_badge:'Project Status Report', updated_date:'Updated: August 18, 2026',
     status_pill:'MVP in development', hero_sub:'Project Status',
-    hero_desc:'Community map of beloved places. First instance: Albania · Tirana. Technical launch August 17, 2026. Open source framework Cultural Bridge OS — MIT License.',
-    kpi_speed:'Speed test', kpi_done:'Completion', kpi_weeks:'Technical launch', kpi_tables:'Database tables', kpi_license:'License',
+    hero_desc:'Community map of beloved places. First instance: Albania · Tirana. Technical launch DONE on 18 August 2026: own database and sign-ins, on the dedicated machine. Open source framework Cultural Bridge OS — MIT License.',
+    kpi_speed:'Speed test', kpi_done:'Completion', kpi_weeks:'Technical launch: done', kpi_tables:'Database tables', kpi_license:'License',
     area_title:'Progress by Area', area_sub:'Current status of the 4 main project areas',
     lbl_done:'✓ Completed', lbl_active:'↗ In progress', lbl_todo:'○ Not started', lbl_critical:'⚡ Critical',
     area1:'Infrastructure & Backend', area2:'Mobile App iOS/Android', area3:'UX/UI & Content', area4:'Launch & Distribution',
@@ -1153,7 +1153,7 @@ const T = {
     ws_title:'Activity Detail', ws_sub:'Status, phase, estimated time and progress of each deliverable',
     col_activity:'Activity', col_phase:'Phase', col_progress:'Progress', col_time:'Est. time', col_status:'Status',
     t1_name:'GitHub Repository + Dedicated machine', t1_sub:'acastagna/poi-love — live app on poilove.com', t1_phase:'Infrastructure', t1_time_m:'~8h — ✅ done',
-    t2_name:'Supabase Schema — 9 tables + RLS', t2_sub:'POIs, Profiles, Loves, Lists, Categories, Routes, Media, Card Generations + 3-state visibility', t2_phase:'Backend', t2_time_m:'~6h — ✅ done',
+    t2_name:'Own PostgreSQL database — 56 tables', t2_sub:'On the dedicated machine since 18/08: 161 security rules, 90 functions, PostGIS. Supabase remains only as a bridge for 6 programs', t2_phase:'Backend', t2_time_m:'~6h — ✅ done',
     t3_name:'Google OAuth — User authentication', t3_sub:'Supabase Auth + Google Cloud Console configured and active', t3_phase:'Authentication', t3_time_m:'~2h — ✅ done',
     t4_name:'Google Maps Platform — 3 APIs configured', t4_sub:'Maps JS + Places + Geocoding — key restricted to authorized domains', t4_phase:'Maps', t4_time_m:'~2h — ✅ done',
     t5_name:'Interactive Web Prototype', t5_sub:'Navigable HTML5 — map + simulated POI entry + all screens', t5_phase:'UX/UI', t5_time_m:'~12h — ✅ done',
@@ -1168,15 +1168,15 @@ const T = {
     t14_name:'Launch Campaign — Hacker News, Reddit, Twitter', t14_sub:'Show HN post, r/opensource, Twitter founder story thread', t14_phase:'Marketing', t14_time_m:'~4h — future',
     done_lbl:'done', badge_done:'Done', badge_sprint:'Sprint', badge_next:'Next', badge_future:'Future',
     deadline_anthropic_lbl:'✓ Presentations', deadline_anthropic_date:'May 13-17, 2026 · done',
-    deadline_tirana_lbl:'🚀 Technical Launch', deadline_tirana_date:'August 17, 2026',
+    deadline_tirana_lbl:'✓ Technical Launch', deadline_tirana_date:'done on 18 August 2026',
     browser_banner:'📱 For the best experience, open in <strong>Safari</strong> or <strong>Chrome</strong>',
     sprint_title:'After the technical launch', sprint_sub:'On 17/08 POI•LOVE moved to its own machine. What remains before the public launch',
     day_today:'Today', day_fri:'Sat', day_sat:'Sun', day_sun:'Mon', day_mon:'Tue', day_tue:'Wed', day_wed:'Thu',
-    day1_task:'Wire Plesk Upload + nav', day2_task:'Slides + story', day3_task:'Full dry-run',
-    day4_task:'Refining + audience', day5_task:'Dress rehearsal', day6_task:'🎤 Window opens', day7_task:'🎤 Presentation 2/5',
+    day1_task:'Move the 6 programs off Supabase', day2_task:'New photos on our media server', day3_task:'Publish the app in Google console',
+    day4_task:'Map markers: red/green/others', day5_task:'ILLI: search with Google Places', day6_task:'Cheap snapshots + restore test', day7_task:'18/09: consider switching Supabase off',
     ms_title:'Project Milestones', ms_sub:'Roadmap from Tirana launch to global scale',
     ms1_date:'✓ Completed', ms1_title:'Web Prototype + Dedicated machine', ms1_desc:'Live web app in three languages, Supabase database, Google auth. Since 17/08/2026 it runs on its own machine: 16 processors and 30 GB, no longer shared with 62 other projects.', ms1_status:'Released',
-    ms2_date:'🎯 August 17, 2026', ms2_title:'MVP App iOS + Android', ms2_desc:'Public launch in Tirana. Map, POI entry, lists, LOVE system.', ms2_status:'In development',
+    ms2_date:'🎯 after the public launch', ms2_title:'MVP App iOS + Android', ms2_desc:'Public launch in Tirana. Map, POI entry, lists, LOVE system.', ms2_status:'In development',
     ms3_title:'POI•VOICE — AI Audio Guides', ms3_desc:'Audio guides generated by Claude. Proprietary AI pipeline. No third-party services.', ms3_status:'Planned',
     ms4_title:'Il Libro dei Luoghi', ms4_desc:'Physical book of the most loved places from the community. First revenue stream.', ms4_status:'Roadmap',
     stack_title:'Technology Stack', stack_sub:'Every system component and its current status',
@@ -1208,10 +1208,10 @@ const T = {
     open_link:'Open →', link_demo:'Live Demo', footer_copy:'Status Report — For investors and partners',
   },
   sq: {
-    sal_badge:'Raport i Progresit të Projektit', updated_date:'Përditësuar: 17 Gusht 2026',
+    sal_badge:'Raport i Progresit të Projektit', updated_date:'Përditësuar: 18 Gusht 2026',
     status_pill:'MVP në zhvillim', hero_sub:'Gjendja e Projektit',
-    hero_desc:'Hartë komunitare e vendeve të dashura. Rasti i parë: Shqipëri · Tiranë. Lansim teknik 17 gusht 2026. Kornizë me burim të hapur Cultural Bridge OS — Licencë MIT.',
-    kpi_speed:'Test shpejtësie', kpi_done:'Përfundim', kpi_weeks:'Lansim teknik', kpi_tables:'Tabela DB', kpi_license:'Licencë',
+    hero_desc:'Hartë komunitare e vendeve të dashura. Rasti i parë: Shqipëri · Tiranë. Lansimi teknik U KRYE më 18 gusht 2026: bazë të dhënash dhe hyrje tona, në makinën e dedikuar. Kornizë me burim të hapur Cultural Bridge OS — Licencë MIT.',
+    kpi_speed:'Test shpejtësie', kpi_done:'Përfundim', kpi_weeks:'Lansimi teknik: kryer', kpi_tables:'Tabela DB', kpi_license:'Licencë',
     area_title:'Progres sipas Zonës', area_sub:'Gjendja aktuale e 4 zonave kryesore të projektit',
     lbl_done:'✓ Përfunduar', lbl_active:'↗ Në progres', lbl_todo:'○ Nuk ka filluar', lbl_critical:'⚡ Kritike',
     area1:'Infrastrukturë & Backend', area2:'App Mobile iOS/Android', area3:'UX/UI & Përmbajtje', area4:'Lansim & Shpërndarje',
@@ -1222,7 +1222,7 @@ const T = {
     ws_title:'Detajet e Aktiviteteve', ws_sub:'Gjendja, faza, koha e vlerësuar dhe progresi i çdo të dorëzueshmi',
     col_activity:'Aktivitet', col_phase:'Fazë', col_progress:'Progres', col_time:'Kohë e vlerësuar', col_status:'Gjendje',
     t1_name:'Depo GitHub + Makinë e dedikuar', t1_sub:'acastagna/poi-love — app live në poilove.com', t1_phase:'Infrastrukturë', t1_time_m:'~8h — ✅ kryer',
-    t2_name:'Skema Supabase — 9 tabela + RLS', t2_sub:'POIs, Profiles, Loves, Lists, Categories, Routes, Media, Card Generations + dukshmëria 3 gjendja', t2_phase:'Backend', t2_time_m:'~6h — ✅ kryer',
+    t2_name:'Baza jonë PostgreSQL — 56 tabela', t2_sub:'Në makinën e dedikuar nga 18/08: 161 rregulla sigurie, 90 funksione, PostGIS. Supabase mbetet vetëm si urë për 6 programe', t2_phase:'Backend', t2_time_m:'~6h — ✅ kryer',
     t3_name:'Google OAuth — Autentikimi i përdoruesve', t3_sub:'Supabase Auth + Google Cloud Console të konfiguruara dhe aktive', t3_phase:'Autentikim', t3_time_m:'~2h — ✅ kryer',
     t4_name:'Google Maps Platform — 3 API të konfiguruara', t4_sub:'Maps JS + Places + Geocoding — çelës i kufizuar në domenet e autorizuara', t4_phase:'Harta', t4_time_m:'~2h — ✅ kryer',
     t5_name:'Prototip Web Interaktiv', t5_sub:'HTML5 i lundrueshëm — hartë + futja e POI e simuluar + të gjitha ekranet', t5_phase:'UX/UI', t5_time_m:'~12h — ✅ kryer',
