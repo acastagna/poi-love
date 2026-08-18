@@ -1380,6 +1380,30 @@ h3{font-family:"Ubuntu",sans-serif;font-size:16px;font-weight:700;color:var(--mu
 </div>
 
 <!-- FOOTER -->
+<div style="max-width:1100px;margin:30px auto;padding:0 20px">
+<!-- VERSO L'APP NEGLI STORE -->
+<div class="sec" id="app-roadmap" style="background:#fff;border-radius:14px;padding:24px 28px;border:1px solid rgba(0,0,0,.08);margin:18px 0">
+  <div style="font-size:19px;font-weight:800;letter-spacing:-.3px;margin-bottom:14px" data-i18n="app_h">Verso l'app negli store: preparazione, pubblicazione, backend</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px" class="app-cols">
+    <div>
+      <div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#D42B2B;margin-bottom:8px" data-i18n="app_prep_h">1 · Preparazione</div>
+      <ol style="padding-left:18px;font-size:13.5px;line-height:1.6;display:grid;gap:7px">
+        <li data-i18n="app_p1">Completare l'app mobile (Expo / React Native): stesse funzioni della webapp, stesso backend</li><li data-i18n="app_p2">I superpoteri nativi, il motivo vero dell'app: notifiche push e geofence anche a schermo spento</li><li data-i18n="app_p3">Collaudo su telefoni veri, iPhone e Android, con la checklist delle 18 prove</li><li data-i18n="app_p4">Requisiti store: account sviluppatore Apple e Google, schede store in 3 lingue (icone, screenshot, testi), dichiarazioni privacy</li><li data-i18n="app_p5">Prova generale: TestFlight (iOS) e collaudo chiuso (Android) con la community del pre-lancio</li>
+      </ol>
+    </div>
+    <div>
+      <div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#D42B2B;margin-bottom:8px" data-i18n="app_pub_h">2 · Pubblicazione</div>
+      <ol style="padding-left:18px;font-size:13.5px;line-height:1.6;display:grid;gap:7px">
+        <li data-i18n="app_q1">Pubblicare l'app d'accesso nella console Google (oggi in modalità Test: entrano solo account in lista)</li><li data-i18n="app_q2">Invio in revisione: Apple richiede giorni, Google da ore a giorni. Si pianifica, non si improvvisa</li><li data-i18n="app_q3">Uscita coordinata con la storia: l'arrivo di ILLI a Tirana e il traguardo della community</li><li data-i18n="app_q4">Dopo: aggiornamenti continui via store, ogni versione verificata dal controllo automatico</li>
+      </ol>
+    </div>
+  </div>
+  <div style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(0,0,0,.08)">
+    <div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#1a7f45;margin-bottom:7px" data-i18n="app_be_h">Il backend: uno solo, gia' pronto</div>
+    <p style="font-size:13.5px;line-height:1.65;color:#333" data-i18n="app_be_p">Dal 18 agosto tutto vive sulla macchina dedicata: PostgreSQL con PostGIS (56 tabelle, 161 regole di sicurezza per utente, 90 funzioni), accessi propri (Google, LinkedIn, email), API PostgREST e media server delle foto. L'app mobile parlera' con le STESSE porte della webapp: nessun secondo backend da costruire, nessuna doppia manutenzione. Un solo pezzo nuovo lato server: il motore delle notifiche push (APNs per Apple, FCM per Google). Restano da traslocare i 6 programmi oggi raggiunti via ponte (ILLI, email, trascrizioni).</p>
+  </div>
+</div>
+<style>@media(max-width:760px){.app-cols{grid-template-columns:1fr!important}}</style></div>
 <footer class="footer">
   <span class="ft-l">321.al · Alessandro Castagna · alessandrocastagna.it · Tirana / Vicenza</span>
   <span class="ft-r">Ubuntu Bold · Open Source · MIT</span>
@@ -1437,7 +1461,7 @@ h3{font-family:"Ubuntu",sans-serif;font-size:16px;font-weight:700;color:var(--mu
 const T = {
   it:{
     header_tag:"Documento per investitori · v6.0 · 2026",
-    nav_visione:"Visione",nav_pubblico:"Pubblico",nav_libro:"Libro",nav_pagamento:"Pagamento",
+    app_h:"Verso l'app negli store: preparazione, pubblicazione, backend",app_prep_h:"1 · Preparazione",app_p1:"Completare l'app mobile (Expo / React Native): stesse funzioni della webapp, stesso backend",app_p2:"I superpoteri nativi, il motivo vero dell'app: notifiche push e geofence anche a schermo spento",app_p3:"Collaudo su telefoni veri, iPhone e Android, con la checklist delle 18 prove",app_p4:"Requisiti store: account sviluppatore Apple e Google, schede store in 3 lingue (icone, screenshot, testi), dichiarazioni privacy",app_p5:"Prova generale: TestFlight (iOS) e collaudo chiuso (Android) con la community del pre-lancio",app_pub_h:"2 · Pubblicazione",app_q1:"Pubblicare l'app d'accesso nella console Google (oggi in modalità Test: entrano solo account in lista)",app_q2:"Invio in revisione: Apple richiede giorni, Google da ore a giorni. Si pianifica, non si improvvisa",app_q3:"Uscita coordinata con la storia: l'arrivo di ILLI a Tirana e il traguardo della community",app_q4:"Dopo: aggiornamenti continui via store, ogni versione verificata dal controllo automatico",app_be_h:"Il backend: uno solo, gia' pronto",app_be_p:"Dal 18 agosto tutto vive sulla macchina dedicata: PostgreSQL con PostGIS (56 tabelle, 161 regole di sicurezza per utente, 90 funzioni), accessi propri (Google, LinkedIn, email), API PostgREST e media server delle foto. L'app mobile parlera' con le STESSE porte della webapp: nessun secondo backend da costruire, nessuna doppia manutenzione. Un solo pezzo nuovo lato server: il motore delle notifiche push (APNs per Apple, FCM per Google). Restano da traslocare i 6 programmi oggi raggiunti via ponte (ILLI, email, trascrizioni).",nav_visione:"Visione",nav_pubblico:"Pubblico",nav_libro:"Libro",nav_pagamento:"Pagamento",
     nav_pro:"Professionale",
     pro_eye:"La scheda professionale",
     pro_title:"Un esercente non paga<br><em>per una vetrina.</em>",
@@ -1566,7 +1590,7 @@ const T = {
   },
   en:{
     header_tag:"Investor Document · v6.0 · 2026",
-    nav_visione:"Vision",nav_pubblico:"Audience",nav_libro:"Book",nav_pagamento:"Payment",
+    app_h:"Toward the app in the stores: preparation, publication, backend",app_prep_h:"1 · Preparation",app_p1:"Finish the mobile app (Expo / React Native): same features as the web app, same backend",app_p2:"The native superpowers, the real reason for the app: push notifications and background geofencing",app_p3:"Testing on real phones, iPhone and Android, with the 18-check list",app_p4:"Store requirements: Apple and Google developer accounts, store listings in 3 languages (icons, screenshots, copy), privacy declarations",app_p5:"Dress rehearsal: TestFlight (iOS) and closed testing (Android) with the pre-launch community",app_pub_h:"2 · Publication",app_q1:"Publish the sign-in app in the Google console (today in Test mode: only listed accounts can enter)",app_q2:"Submission for review: Apple takes days, Google hours to days. Planned, never improvised",app_q3:"Release coordinated with the story: ILLI's arrival in Tirana and the community milestone",app_q4:"After: continuous updates through the stores, every version checked automatically",app_be_h:"The backend: one, already in place",app_be_p:"Since 18 August everything lives on the dedicated machine: PostgreSQL with PostGIS (56 tables, 161 per-user security rules, 90 functions), our own sign-ins (Google, LinkedIn, email), PostgREST API and the photo media server. The mobile app will talk to the SAME endpoints as the web app: no second backend to build, no double maintenance. One new server piece only: the push notification engine (APNs for Apple, FCM for Google). The 6 programs still reached over the bridge (ILLI, email, transcriptions) remain to be moved.",nav_visione:"Vision",nav_pubblico:"Audience",nav_libro:"Book",nav_pagamento:"Payment",
     nav_pro:"Professional",
     pro_eye:"The professional card",
     pro_title:"A venue owner does not pay<br><em>for a showcase.</em>",
@@ -1695,7 +1719,7 @@ const T = {
   },
   sq:{
     header_tag:"Dokument për Investitorët · v6.0 · 2026",
-    nav_visione:"Vizioni",nav_pubblico:"Publiku",nav_libro:"Libri",nav_pagamento:"Pagesa",
+    app_h:"Drejt aplikacionit ne store: pergatitja, publikimi, backend-i",app_prep_h:"1 · Pergatitja",app_p1:"Perfundimi i aplikacionit mobil (Expo / React Native): funksione dhe backend i njejte me webapp-in",app_p2:"Superfuqite native, arsyeja e vertete e aplikacionit: njoftime push dhe geofence ne sfond",app_p3:"Testim ne telefona te vertete, iPhone dhe Android, me listen e 18 provave",app_p4:"Kerkesat e store-ve: llogari zhvilluesi Apple dhe Google, skeda ne 3 gjuhe (ikona, screenshot, tekste), deklarata privatesie",app_p5:"Prova gjenerale: TestFlight (iOS) dhe testim i mbyllur (Android) me komunitetin e para-lansimit",app_pub_h:"2 · Publikimi",app_q1:"Publikimi i aplikacionit te hyrjes ne konsolen Google (sot ne modalitet Test)",app_q2:"Dergimi per rishikim: Apple do dite, Google ore deri dite. Planifikohet, nuk improvizohet",app_q3:"Dalja e koordinuar me historine: mberritja e ILLI-t ne Tirane dhe caku i komunitetit",app_q4:"Me pas: perditesime te vazhdueshme permes store-ve, cdo version i verifikuar automatikisht",app_be_h:"Backend-i: nje i vetem, tashme gati",app_be_p:"Nga 18 gushti gjithcka jeton ne makinen e dedikuar: PostgreSQL me PostGIS (56 tabela, 161 rregulla sigurie per perdorues, 90 funksione), hyrje tona (Google, LinkedIn, email), API PostgREST dhe serveri i fotove. Aplikacioni mobil do te flase me TE NJEJTAT porta si webapp-i: asnje backend i dyte, asnje mirembajtje e dyfishte. Vetem nje pjese e re ne server: motori i njoftimeve push (APNs per Apple, FCM per Google). Mbeten per t'u zhvendosur 6 programet e arritura permes ures (ILLI, email, transkriptimet).",nav_visione:"Vizioni",nav_pubblico:"Publiku",nav_libro:"Libri",nav_pagamento:"Pagesa",
     nav_pro:"Profesionale",
     pro_eye:"Skeda profesionale",
     pro_title:"Një pronar lokali nuk paguan<br><em>për një vitrinë.</em>",
