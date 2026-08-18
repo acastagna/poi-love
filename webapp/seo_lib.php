@@ -16,7 +16,7 @@ if (!defined('SEO_LIB')) {
   // inquinerebbero l'output (fatale per l'XML della sitemap). Li silenziamo, lasciando visibili i veri errori.
   error_reporting(E_ALL & ~E_DEPRECATED);
 
-  define('SEO_SUPA', 'https://ptppxwlafswfhbueakjt.supabase.co');
+  define('SEO_SUPA', 'https://poilove.com/db');
   define('SEO_ANON', 'sb_publishable_PC1xQ8XiQK9jpzwsAlFLxw_E-PKN40V');
   define('SEO_BASE', 'https://poilove.com');
   define('SEO_OG_FALLBACK', 'https://poilove.com/img/opengraph.jpg');

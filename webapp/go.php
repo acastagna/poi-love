@@ -9,7 +9,7 @@
  * l'admin (RLS), quindi è fidato: nessun open-redirect da input utente.
  */
 $slug = preg_replace('/[^A-Za-z0-9\-_]/', '', isset($_GET['s']) ? $_GET['s'] : '');
-$SUPA = 'https://ptppxwlafswfhbueakjt.supabase.co';
+$SUPA = 'https://poilove.com/db';
 $ANON = 'sb_publishable_PC1xQ8XiQK9jpzwsAlFLxw_E-PKN40V';
 $fallback = 'https://poilove.com/';
 

@@ -3940,7 +3940,7 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
 /* ══════════════════════════════════════════
    SUPABASE — connessione reale
 ══════════════════════════════════════════ */
-const SUPABASE_URL = 'https://ptppxwlafswfhbueakjt.supabase.co';
+const SUPABASE_URL = 'https://poilove.com/db';
 const SUPABASE_ANON = 'sb_publishable_PC1xQ8XiQK9jpzwsAlFLxw_E-PKN40V';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 let currentUser = null;
@@ -8118,7 +8118,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='3.54';
+const APP_VERSION='3.55';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
@@ -15004,7 +15004,7 @@ document.addEventListener('click',e=>{
 ═══════════════════════════════════════════════════════ */
 // ILLI•AI passa dall'edge function illi-chat: la chiave OpenAI vive SOLO server-side.
 // Autorizzazione dal client: token di sessione Supabase se loggato, altrimenti anon key.
-const GROQ_URL='https://ptppxwlafswfhbueakjt.supabase.co/functions/v1/illi-chat';
+const GROQ_URL='https://poilove.com/db/functions/v1/illi-chat';
 const GROQ_MODEL='gpt-4o-mini';
 // Header condivisi per tutte le chiamate alle edge function AI
 async function _aiAuthHeaders(){
