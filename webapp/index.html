@@ -466,6 +466,7 @@ body.tab-active #mapQuickBtns{display:none}
 .pl-section{padding:12px 14px 0;background:var(--card);border-bottom:2px solid var(--border)}
 .pl-section-title{font-size:10px;font-weight:900;letter-spacing:.9px;color:var(--muted);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:5px}
 .pl-chips{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pl-chips>.pl-chip{min-width:0}
 @media(max-width:560px){.pl-chips{grid-template-columns:1fr}}
 .pl-chip{display:flex;align-items:center;gap:12px;border-radius:16px;padding:14px 14px;cursor:pointer;transition:box-shadow .15s;border-left:4px solid transparent;border-top:1px solid var(--border);border-right:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--bg)}
 .pl-chip.pl-casa{border-left-color:#F59E0B}
@@ -479,11 +480,12 @@ body.tab-active #mapQuickBtns{display:none}
 .pl-chip-info{flex:1;min-width:0}
 .pl-chip-name{font-size:17px;font-weight:800;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pl-chip-addr{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
-.pl-chip-acts{display:flex;gap:5px;flex-shrink:0}
-.pl-chip-btn{width:40px;height:40px;border-radius:12px;border:1px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:17px;transition:color .15s,border-color .15s}
+.pl-chip-acts{display:flex;gap:6px;flex-shrink:0}
+.pl-chip-btn{width:38px;height:38px;border-radius:12px;flex-shrink:0;border:1px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:17px;transition:color .15s,border-color .15s}
 .pl-chip-btn:active{color:var(--red);border-color:var(--red)}
-.pl-add-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px 0 12px}
-.pl-add-btn{height:52px;border-radius:14px;border:1.5px dashed var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-size:15px;font-weight:700;color:var(--muted);font-family:inherit;transition:border-color .2s,color .2s}
+.pl-add-row{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;padding:10px 0 14px}
+.pl-add-btn{min-width:0;border-radius:14px;border:1.5px dashed var(--border);background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:11px 2px 9px;font-size:11.5px;font-weight:700;color:var(--muted);font-family:inherit;transition:border-color .2s,color .2s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pl-add-btn i{font-size:21px}
 .pl-add-btn:active{border-color:var(--red);color:var(--red)}
 .poi-list-row{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--border)}
 .poi-list-row .pi-emoji{font-size:22px;width:36px;text-align:center;flex-shrink:0}
@@ -3983,7 +3985,7 @@ function enterGuestMode() {
   if (overlay) overlay.style.display = 'none';
   if (!map && typeof initMap === 'function') { try { initMap(); } catch(e) {} }
   // L'ospite entra per GUARDARE: senza questa chiamata la mappa restava vuota
-  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v3.76.
+  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v3.77.
   if (typeof loadPOIsFromDB === 'function') { try { loadPOIsFromDB(); } catch(e) {} }
   if (typeof loadMyTags === 'function') { try { loadMyTags(); } catch(e) {} }
   showToast(t('guest_active'));
@@ -5991,7 +5993,7 @@ function renderPlaces(){
       <i class="ph-duotone ${cfg.icon} pl-chip-icon" style="color:${cfg.color}"></i>
       <div class="pl-chip-info">
         <div class="pl-chip-name">${label}</div>
-        <div class="pl-chip-addr">${p.address||'Posizione salvata'}</div>
+        <div class="pl-chip-addr">${_plAddrOk(p.address)?p.address:'Recupero l\'indirizzo…'}</div>
       </div>
       <div class="pl-chip-acts" onclick="event.stopPropagation()">
         <button class="pl-chip-btn" title="Vai verso (apri il navigatore)" onclick="_plNavTo(${i})"><i class="ph-duotone ph-navigation-arrow"></i></button>
@@ -6001,13 +6003,29 @@ function renderPlaces(){
     </div>`;
   });
   chips.innerHTML = html || '';
+  plPlaces.forEach((p,i)=>{ if(!_plAddrOk(p.address)) setTimeout(()=>_plFetchAddr(i), 200+i*1100); });
   // Mostra/nascondi bottoni aggiungi per ciascun tipo
   Object.entries(PL_TYPE_CFG).forEach(([type, cfg])=>{
     const btn = document.getElementById(`plAdd${type.charAt(0).toUpperCase()+type.slice(1)}Btn`);
-    if(btn) btn.style.display = plPlaces.filter(p=>p.type===type).length >= cfg.max ? 'none' : '';
+    if(btn) btn.style.display = ''; // sempre visibili tutti e sei (regola 19/08); se pieno lo dice il tocco
   });
 }
 
+// Un indirizzo vero contiene numeri o virgole; "natura"/"cultura" (vecchi salvataggi) no.
+function _plAddrOk(a){ return !!a && /[0-9,]/.test(a); }
+// Ricava l'indirizzo pulito (via numero, citta, stato) dalle coordinate e lo SALVA.
+async function _plFetchAddr(i){
+  const p=plPlaces[i]; if(!p||p._addrBusy||_plAddrOk(p.address)) return; p._addrBusy=true;
+  try{
+    const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${p.lat}&lon=${p.lng}&addressdetails=1&zoom=18`,{headers:{'Accept-Language':(typeof lang!=='undefined'?lang:'it')}});
+    const d=await r.json(); const a=d.address||{};
+    const via=[a.road||a.pedestrian||a.square, a.house_number].filter(Boolean).join(' ');
+    const citta=a.city||a.town||a.village||a.hamlet||a.municipality;
+    const indirizzo=[via,citta,a.country].filter(Boolean).join(', ');
+    delete p._addrBusy;
+    if(indirizzo){ p.address=indirizzo; localStorage.setItem('pl_places',JSON.stringify(plPlaces)); renderPlaces(); return; }
+  }catch(_){ delete p._addrBusy; }
+}
 function _plLabel(p){
   const cfg = PL_TYPE_CFG[p.type] || { label: p.type||'Luogo' };
   return p.word ? `${cfg.label} ${p.word}` : cfg.label;
@@ -8165,7 +8183,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='3.76';
+const APP_VERSION='3.77';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
