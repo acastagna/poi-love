@@ -1,5 +1,23 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
+## Sessione 19/08/2026 (5) — I pannelli si aprono al centro, la condivisione c'e' ovunque (v4.03 → 4.06)
+
+1. **Tutto quello che si apriva dal basso ora si apre al centro** (v4.03). Sul telefono la parte bassa
+   dello schermo e' occupata dalla barra di sistema: i pannelli piccoli finivano sotto le dita e sotto
+   il richiamo dell'assistente. Portati al centro: le tendine costruite dal programma (4), i pannelli
+   di conferma, il salvataggio, la scelta della foto, la scheda della rotta storica, la bacheca vocale,
+   la tappa dell'itinerario.
+2. **Condividi su ogni riga** (v4.04). Nella lista dei luoghi vicini c'erano solo tre comandi e la
+   condivisione mancava: aggiunta. I comandi della riga ora vanno a capo invece di nascondersi dietro
+   uno scorrimento laterale, quindi si vedono tutti.
+3. **Riparata la conseguenza della centratura** (v4.05). I pannelli chiusi si nascondevano scorrendo
+   sotto il bordo dello schermo: centrandoli restavano mezzi in vista (si vedevano "Itinerario" e il QR
+   dietro alla tendina). Ora da chiusi sono invisibili e da aperti salgono di poco.
+4. **Larghezza dei pannelli su computer** (v4.06): la tappa e la bacheca vocale non si allargano piu' a
+   tutto schermo.
+
+Controllo esterno: **18 prove superate su 18**.
+
 ## Sessione 19/08/2026 (4) — Gli inviti: consultare e' libero, iscriversi vale 200 punti a testa (v3.82 → 3.83)
 
 **Il modello degli inviti e' deciso e funzionante** (direttiva di Alessandro: "tutti gli inviti saranno cosi").
