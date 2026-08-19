@@ -1720,7 +1720,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 .trip-detail-rename:active{transform:scale(.9)}
 .trip-detail-hdr-title{cursor:pointer}
 /* ── Dettaglio rotta storica / itinerario pubblico (apribile, tappe visibili, salva) ── */
-.route-detail-ov{position:fixed;inset:0;background:rgba(20,14,6,.5);z-index:9600;display:none;align-items:center;justify-content:center;;padding:20px}
+.route-detail-ov{position:fixed;inset:0;background:rgba(20,14,6,.5);z-index:9600;display:none;align-items:center;justify-content:center;padding:20px}
 .route-detail-ov.open{display:flex}
 .route-detail-sheet{width:100%;max-width:520px;max-height:92vh;background:var(--bg);border-radius:22px;overflow-y:auto;box-shadow:0 -10px 40px rgba(0,0,0,.25)}
 .rd-cover{height:150px;background:linear-gradient(135deg,#7C3AED,#D42B2B);background-size:cover;background-position:center;position:relative}
@@ -2051,9 +2051,9 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
 .hero-bg-swatch{width:20px;height:20px;border-radius:5px;flex-shrink:0;border:1px solid rgba(0,0,0,.1)}
 
 /* AVATAR POPUP */
-.av-popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.62);z-index:600;display:none;align-items:center;padding:20px}
+.av-popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.62);z-index:600;display:none;align-items:center;justify-content:center;padding:20px}
 .av-popup-overlay.open{display:flex}
-.av-popup{background:var(--card);border-radius:24px;padding:0 0 52px;width:100%;max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.av-popup{background:var(--card);border-radius:24px;padding:0 0 24px;width:100%;max-width:520px;max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .av-popup-handle{width:44px;height:5px;background:#C8BFB0;border-radius:3px;margin:14px auto 4px}
 .av-popup-head{padding:14px 20px 0;display:flex;align-items:flex-start;justify-content:space-between}
 .av-popup-title{font-size:18px;font-weight:800;color:var(--text)}
@@ -2082,9 +2082,9 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
 .av-gen-warning{margin:10px 20px 0;font-size:10px;color:var(--muted);line-height:1.5;display:flex;align-items:flex-start;gap:6px}
 
 /* STOP DETAIL MODAL */
-.stop-detail-overlay{position:fixed;inset:0;background:rgba(0,0,0,.62);z-index:600;display:none;align-items:center;padding:20px}
+.stop-detail-overlay{position:fixed;inset:0;background:rgba(0,0,0,.62);z-index:600;display:none;align-items:center;justify-content:center;padding:20px}
 .stop-detail-overlay.open{display:flex}
-.stop-detail-sheet{background:var(--card);border-radius:24px;padding:0 0 52px;width:100%;max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.stop-detail-sheet{background:var(--card);border-radius:24px;padding:0 0 24px;width:100%;max-width:520px;max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .stop-detail-handle{width:44px;height:5px;background:#C8BFB0;border-radius:3px;margin:14px auto 4px}
 .stop-detail-head{padding:14px 20px 0;display:flex;align-items:flex-start;justify-content:space-between}
 .stop-detail-title{font-size:18px;font-weight:800;color:var(--text);flex:1;padding-right:8px}
@@ -4062,7 +4062,7 @@ function enterGuestMode() {
   if (overlay) overlay.style.display = 'none';
   if (!map && typeof initMap === 'function') { try { initMap(); } catch(e) {} }
   // L'ospite entra per GUARDARE: senza questa chiamata la mappa restava vuota
-  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v4.05.
+  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v4.06.
   if (typeof loadPOIsFromDB === 'function') { try { loadPOIsFromDB(); } catch(e) {} }
   if (typeof loadMyTags === 'function') { try { loadMyTags(); } catch(e) {} }
   showToast(t('guest_active'));
@@ -8416,7 +8416,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='4.05';
+const APP_VERSION='4.06';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
