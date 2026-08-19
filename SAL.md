@@ -1,5 +1,32 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
+## Sessione 19/08/2026 (11) — La mappa resta dove la metti (v4.24)
+
+**Ordine perentorio**: la mappa torna sulla posizione dell'utente **solo** all'apertura dell'app o
+toccando "La mia posizione". Niente altro la sposta.
+
+Cosa succedeva: dopo aver cercato un posto ed esserci andati sopra, toccare il "+" e scegliere
+"Crea POI" faceva ripartire la scheda dal GPS, e la mappa tornava a casa.
+
+Cosa fa ora:
+
+| Azione | Prima | Ora |
+|---|---|---|
+| Scelgo un risultato della ricerca | mappa sul risultato, zoom 16 | mappa sul risultato, **zoom 17**, e le quattro scelte si aprono subito |
+| Tocco "+" → Crea POI | la scheda partiva dal GPS | la scheda parte **da dove sto guardando** |
+| Apro un luogo, un link condiviso, una tappa | il GPS d'avvio poteva rubare la vista | la vista scelta vince sempre |
+| Tocco "La mia posizione" | torna a casa | torna a casa (unico modo, con l'apertura dell'app) |
+
+Misurato dal vivo: posizione fittizia a Tirana, ricerca su Valona, "+" → mappa e mini mappa della
+scheda restano a Valona (40,47 · 19,49); toccando "La mia posizione" torna a Tirana (41,33 · 19,82).
+
+Il segno tecnico e' `window._vistaScelta`, acceso da `_vistaDellUtente()` e spento solo da `centerMap()`.
+
+**Cenno di scorrimento sulle card degli itinerari**: piu' ampio (64 px invece di 30) e piu' lento
+(2,1 s invece di 1,15 s), come chiesto.
+
+Controllo esterno: **18 prove superate su 18**.
+
 ## Sessione 19/08/2026 (10) — Condividere DOVE serve, non solo il link (v4.22 → 4.23)
 
 Il foglio Condividi si adatta a cio' che stai mandando. Ogni voce compare solo se puo' davvero

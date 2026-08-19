@@ -1,4 +1,6 @@
 # TODO — POI•LOVE
+
+- [ ] **Foglio Condividi come modello per tutta l'app** (direttiva 19/08): stesso schema (destinazioni vere, voci nascoste quando non applicabili, riga con icona + titolo + spiegazione) da portare sulle altre finestre di scelta.
 > Aggiornato: **11/07/2026** · L'INVENTARIO COMPLETO e ufficiale e' CONTRATTO.md (questo file e' la lista operativa) · Stato: webapp **v3.23 live** — 11/07 costruita la **ZONA MEDIA** completa nell'admin (template email + edge send-email AcumbaMail, OpenGraph poi.php/route.php, deep-link tracciati go.php, pixel social consent-gated con manuale) + mig 072 (8 tabelle). Dettaglio in SAL.md, tag `checkpoint-2026-07-11-media-full`. **Restano ad Alessandro:** chiave `ACUMBA_KEY` nei segreti + ID pixel nell'admin + SPF/DKIM. Prossima scadenza **presentazioni 14-17 luglio (mar-ven)**, lancio pubblico **17/08**.
 > 🔒 Regola di ferro su TUTTO il nuovo: tre lingue perfette, ordine **SQ → IT → EN**, apertura automatica sulla lingua del device. Niente trattini lunghi. Chiavi/segreti solo server-side. **Ogni modifica chiude il giro: scrivi → valida → deploya → verifica live.**
 
