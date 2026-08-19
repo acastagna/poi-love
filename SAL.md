@@ -1,5 +1,35 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
+## Sessione 19/08/2026 (13) — I livelli in ordine, e la pagina che li racconta (v4.29 → 4.32)
+
+**Nel pannello dell'app** i livelli sono ora in due famiglie, nell'ordine deciso:
+
+| Famiglia | Livelli, in ordine | Quota | Condizione per tenerlo |
+|---|---|---|---|
+| Sostegno | Sostenitore | quota libera, soglia minima | il sostegno che si ferma ferma i vantaggi |
+| Sostegno | Mecenate | quota mensile | come sopra |
+| Professionisti | Influencer | gratuito | almeno 30 POI al mese, altrimenti via vantaggi e spunta |
+| Professionisti | Professionista | quota annuale | senza rinnovo i vantaggi si fermano |
+| Professionisti | Plus · Locali e attività | quota annuale in definizione | senza rinnovo la scheda del locale torna normale |
+
+Il livello dei locali elenca cio' che avra': 20 foto, listino e menu, sistemi di pagamento, orari,
+QR del locale, statistiche. E' marcato **in costruzione**, perche' quelle funzioni vanno ancora fatte.
+
+**Due difetti trovati e chiusi mentre si lavorava**
+- Il pannello mostrava le soglie di riserva se veniva aperto prima che arrivassero quelle vere dal
+  database: ora si ridisegna da solo appena arrivano.
+- Nuovo indirizzo diretto **poilove.com/?livelli=1**: apre il pannello dei livelli, anche da ospite.
+
+**Pagina dedicata**: `livelli.html`, pubblicata su **project.poilove.com** e su **sal.poilove.com**,
+**una pagina per lingua** (italiano, albanese, inglese) generata da `scripts/build_livelli.js`.
+Ha canonical e hreflang fra le tre lingue, dati strutturati (pagina, briciole, sei domande e risposte,
+offerte con quote e periodi), immagine di anteprima 1200x630 costruita con **schermate vere dell'app**
+messe di traverso, sitemap e robots. Le soglie dei livelli personali le rilegge dal database, cosi'
+la pagina non racconta numeri vecchi quando le cambi dal pannello.
+
+Verificato senza JavaScript (come leggono i motori e gli assistenti): titolo, canonical, lingua,
+4 hreflang, 4 blocchi di dati strutturati, 6 domande, 607 parole di testo vero sulla pagina inglese.
+
 ## Sessione 19/08/2026 (12) — Revisione del codice su ricerca ed esperienza d'uso (v4.26 → 4.28)
 
 **Pulizia chiusa (4.27-4.28)**, le tre voci che la revisione aveva lasciato aperte:

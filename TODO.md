@@ -1,5 +1,9 @@
 # TODO — POI•LOVE
 
+- [ ] **Profilo Plus dei locali** (prossimo lavoro): 20 foto, listino/menu, sistemi di pagamento, orari di apertura, QR del locale, statistiche avanzate. Da costruire uno alla volta.
+- [ ] **Controllo automatico dei livelli**: oggi la condizione (30 POI al mese per Influencer, rinnovo per Professionista e Plus) e' scritta nella pagina ma non la verifica nessuno. Serve un lavoro automatico che tolga i vantaggi a chi non la rispetta.
+- [ ] **Sitemap dei livelli da mandare a Google Search Console e Bing**: https://project.poilove.com/sitemap.xml (lo fa Alessandro).
+
 - [ ] **Foglio Condividi come modello per tutta l'app** (direttiva 19/08): stesso schema (destinazioni vere, voci nascoste quando non applicabili, riga con icona + titolo + spiegazione) da portare sulle altre finestre di scelta.
 > Aggiornato: **11/07/2026** · L'INVENTARIO COMPLETO e ufficiale e' CONTRATTO.md (questo file e' la lista operativa) · Stato: webapp **v3.23 live** — 11/07 costruita la **ZONA MEDIA** completa nell'admin (template email + edge send-email AcumbaMail, OpenGraph poi.php/route.php, deep-link tracciati go.php, pixel social consent-gated con manuale) + mig 072 (8 tabelle). Dettaglio in SAL.md, tag `checkpoint-2026-07-11-media-full`. **Restano ad Alessandro:** chiave `ACUMBA_KEY` nei segreti + ID pixel nell'admin + SPF/DKIM. Prossima scadenza **presentazioni 14-17 luglio (mar-ven)**, lancio pubblico **17/08**.
 > 🔒 Regola di ferro su TUTTO il nuovo: tre lingue perfette, ordine **SQ → IT → EN**, apertura automatica sulla lingua del device. Niente trattini lunghi. Chiavi/segreti solo server-side. **Ogni modifica chiude il giro: scrivi → valida → deploya → verifica live.**
