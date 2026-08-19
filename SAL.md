@@ -1,5 +1,42 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
+## Sessione 19/08/2026 (12) — Revisione del codice su ricerca ed esperienza d'uso (v4.26)
+
+Revisione mirata su ricerca e interazione. Riscontri verificati uno per uno prima di correggere.
+
+**Due difetti bloccanti, chiusi**
+
+1. **La mappa poteva ancora tornare a casa da sola.** `reverseGeocodeAndShow` spostava la mappa
+   sempre, e veniva chiamata da due risposte GPS in ritardo (avvio dell'app e linguetta GPS della
+   scheda "Aggiungi POI"). Chi cercava un posto e apriva la scheda si vedeva la mappa saltare sulla
+   propria posizione. Ora la posizione GPS **registra il punto nella scheda ma non muove la mappa**
+   se sto guardando altrove per mia scelta; il punto scelto col dito sulla mappa e l'indirizzo
+   scritto, invece, la spostano come prima. Misurato dal vivo: ricerca su Valona, risposta GPS
+   tardiva da Tirana, la mappa resta su Valona (40,47 · 19,49); punto scelto sulla mappa, la mappa
+   ci va (39,88 · 20,01).
+2. **Nome del luogo dentro un comando senza protezione completa** (righe delle liste POI): il nome
+   veniva ripulito solo dagli apici, non dalle virgolette. Un nome con una virgoletta poteva
+   chiudere l'attributo e infilare codice nella pagina di chiunque vedesse quella lista. Ora si usa
+   la protezione di casa (`_escArg`). Provato con un nome costruito apposta: nessun attributo
+   iniettato, il nome resta testo.
+
+**Rifiniture della stessa revisione**
+
+- I link condivisi di **itinerario** e **rotta** ora contano come "vista scelta": prima solo `poi` e
+  `at` erano riconosciuti, quindi il GPS d'avvio poteva rubare la vista.
+- La ricerca usava una protezione piu' debole di quella di casa: unificata su `_escArg`.
+- La coda degli indirizzi ha un **tetto di 24** richieste: una lista lunga non tiene piu' occupata
+  la rete per minuti.
+- La sorveglianza delle finestre guarda **solo il corpo della pagina**: rifare una lista di 50 righe
+  non costa piu' nulla.
+- Tolti tre **caratteri di controllo** finiti nel sorgente: rendevano il file "binario" per gli
+  strumenti di ricerca, che si fermavano a meta'.
+
+Restano in TODO tre pulizie non bloccanti (bacheca pubblica con il POI in JSON dentro il comando,
+doppio significato di `_savedViewRestored`, contatori dei livelli che crescono e basta).
+
+Controllo esterno: **18 prove superate su 18**.
+
 ## Sessione 19/08/2026 (11) — La mappa resta dove la metti (v4.24 → 4.25)
 
 **4.25**: anche la **lente di ingrandimento** si apre dove sto guardando. Prima partiva sempre dal GPS,
