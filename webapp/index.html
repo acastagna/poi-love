@@ -778,6 +778,12 @@ body.tab-active #mapQuickBtns{display:none}
 .tier-badge{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;background:rgba(255,255,255,.14);flex-shrink:0;box-shadow:inset 0 1px 0 rgba(255,255,255,.25)}
 .tier-name{font-size:15px;font-weight:800;display:flex;align-items:center;gap:7px}
 .tier-pitch{font-size:11.5px;opacity:.85;margin-top:3px;line-height:1.4}
+.tier-quota{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:900;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);border-radius:20px;padding:6px 12px;margin:10px 0 12px}
+.tier-quota i{font-size:15px}
+.tier-keep{display:flex;align-items:flex-start;gap:7px;font-size:11.5px;font-weight:600;opacity:.9;line-height:1.4;margin-bottom:12px}
+.tier-keep i{font-size:15px;flex-shrink:0;margin-top:1px}
+.tier-soon{display:flex;align-items:center;gap:7px;font-size:11.5px;font-weight:800;background:rgba(255,255,255,.14);border-radius:10px;padding:8px 10px;margin-bottom:10px}
+.tier-soon i{font-size:15px}
 .tier-perks{display:flex;flex-direction:column;gap:8px;margin-bottom:13px}
 .tier-perk{display:flex;align-items:center;gap:9px;font-size:12.5px;font-weight:600}
 .tier-perk i{font-size:17px;opacity:.92;flex-shrink:0}
@@ -2792,7 +2798,7 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
 
   <!-- LA PORTA PRINCIPALE: Google, grande e con l'etichetta -->
   <button class="auth-btn" onclick="signInWithGoogle()" style="background:#fff;color:#1C1C1C;font-weight:800;display:flex;align-items:center;justify-content:center;gap:10px">
-    <svg viewBox="0 0 24 24" style="width:20px;height:20px;flex-shrink:0"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.28h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+    <svg viewBox="0 0 24 24" style="width:20px;height:20px;flex-shrink:0"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.30h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
     <span data-t="auth_google_big">Continua con Google</span>
   </button>
 
@@ -4154,7 +4160,7 @@ function enterGuestMode() {
   if (overlay) overlay.style.display = 'none';
   if (!map && typeof initMap === 'function') { try { initMap(); } catch(e) {} }
   // L'ospite entra per GUARDARE: senza questa chiamata la mappa restava vuota
-  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v4.28.
+  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v4.30.
   if (typeof loadPOIsFromDB === 'function') { try { loadPOIsFromDB(); } catch(e) {} }
   if (typeof loadMyTags === 'function') { try { loadMyTags(); } catch(e) {} }
   showToast(t('guest_active'));
@@ -6498,7 +6504,10 @@ function badgeLabel(b){ return b && b.key ? t(b.key) : (b&&b.label)||''; }
 // Blu notte metallico elegante. Danno AI illimitata (max 20 consultazioni/giorno) e badge esclusivo.
 const SPECIAL_TIERS={
   professionista:{labelKey:'tier_professionista', label:'Professionista', icon:'ph-fill ph-briefcase', style:'background:linear-gradient(135deg,#334155 0%,#0b1220 52%,#475569 100%);color:#e2e8f0;border-color:rgba(148,163,184,.6);box-shadow:0 3px 12px rgba(71,85,105,.45),inset 0 1px 0 rgba(255,255,255,.25)',
-    pitchKey:'tier_pro_pitch', pitch:'Per chi vive POI•LOVE da professionista: gli strumenti al massimo.',
+    gruppo:'pro', ordine:2,
+    quotaKey:'tier_pro_price', quota:'100 € all\'anno',
+    tenutaKey:'tier_pro_keep', tenuta:'Alla scadenza, senza rinnovo, i vantaggi si fermano.',
+    pitchKey:'tier_pro_pitch', pitch:'Il profilo professionale della persona: gli strumenti al massimo.',
     ctaKey:'tier_pro_cta', cta:'Passa a Professionista',
     perks:[
       {i:'ph-infinity',     k:'tier_pro_p1', t:'ILLI•AI senza limiti, ogni giorno'},
@@ -6509,6 +6518,9 @@ const SPECIAL_TIERS={
       {i:'ph-compass',      k:'tier_pro_p6', t:'La tua voce sulla roadmap del progetto'}
     ]},
   sostenitore:{labelKey:'tier_sostenitore', label:'Sostenitore', icon:'ph-fill ph-hand-heart', style:'background:linear-gradient(135deg,#1e3a8a 0%,#0b1226 52%,#1d4ed8 100%);color:#dbeafe;border-color:rgba(147,197,253,.6);box-shadow:0 3px 12px rgba(29,78,216,.45),inset 0 1px 0 rgba(255,255,255,.3)',
+    gruppo:'sostegno', ordine:1,
+    quotaKey:'tier_sost_price', quota:'Quota libera, da 10 € al mese in su',
+    tenutaKey:'tier_sost_keep', tenuta:'Se il sostegno si ferma, i vantaggi si fermano con lui.',
     pitchKey:'tier_sost_pitch', pitch:'Sostieni la mappa culturale libera. In cambio, vantaggi concreti: non solo un badge.',
     ctaKey:'tier_sost_cta', cta:'Sostieni il progetto',
     perks:[
@@ -6520,7 +6532,10 @@ const SPECIAL_TIERS={
       {i:'ph-cards-three',  k:'tier_sost_p6', t:'Il tuo nome nel Muro dei Sostenitori'}
     ]},
   mecenate:   {labelKey:'tier_mecenate', label:'Mecenate', icon:'ph-fill ph-crown', style:'background:linear-gradient(135deg,#6d28d9 0%,#0f0a1e 50%,#7c3aed 100%);color:#ede9fe;border-color:rgba(196,181,253,.7);box-shadow:0 3px 16px rgba(124,58,237,.55),inset 0 1px 0 rgba(255,255,255,.4)',
-    pitchKey:'tier_mec_pitch', pitch:'Il livello piu alto: tutto del Professionista, piu i privilegi esclusivi.',
+    gruppo:'sostegno', ordine:2,
+    quotaKey:'tier_mec_price', quota:'25 € al mese',
+    tenutaKey:'tier_mec_keep', tenuta:'Se il sostegno si ferma, i vantaggi si fermano con lui.',
+    pitchKey:'tier_mec_pitch', pitch:'Il gradino piu alto del sostegno: tutto quello di Sostenitore, piu i privilegi esclusivi.',
     ctaKey:'tier_mec_cta', cta:'Diventa Mecenate',
     perks:[
       {i:'ph-headphones',   k:'tier_mec_p1', t:'Audiolibri ovunque, navigando, senza scansionare il QR sul posto'},
@@ -6530,15 +6545,23 @@ const SPECIAL_TIERS={
       {i:'ph-users-three',  k:'tier_mec_p5', t:'Amministratore di una compagnia in evidenza'}
     ]},
   professionista_plus:{labelKey:'tier_professionista_plus', label:'Professionista Plus', icon:'ph-fill ph-briefcase', style:'background:linear-gradient(135deg,#0f766e 0%,#052e2b 52%,#14b8a6 100%);color:#ccfbf1;border-color:rgba(94,234,212,.6);box-shadow:0 3px 14px rgba(20,184,166,.5),inset 0 1px 0 rgba(255,255,255,.3)',
-    pitchKey:'tier_proplus_pitch', pitch:'Tutto del Professionista, con priorita e strumenti avanzati.',
-    ctaKey:'tier_proplus_cta', cta:'Passa a Professionista Plus',
+    gruppo:'pro', ordine:3, inCostruzione:true,
+    quotaKey:'tier_plus_price', quota:'Quota annuale, in definizione',
+    tenutaKey:'tier_plus_keep', tenuta:'Alla scadenza, senza rinnovo, la scheda del locale torna normale.',
+    pitchKey:'tier_proplus_pitch', pitch:'Per ristoranti, bar e locali: la scheda completa della tua attivita.',
+    ctaKey:'tier_proplus_cta', cta:'Scrivimi per il Plus',
     perks:[
-      {i:'ph-infinity',      k:'tier_proplus_p1', t:'ILLI•AI senza limiti con priorita'},
-      {i:'ph-map-pin-line',  k:'tier_proplus_p2', t:'Piu POI in evidenza sulla mappa'},
-      {i:'ph-qr-code',       k:'tier_proplus_p3', t:'Piu QR business per le tue attivita'},
-      {i:'ph-chart-line-up', k:'tier_proplus_p4', t:'Statistiche avanzate dei tuoi luoghi'}
+      {i:'ph-images',        k:'tier_plus_p1', t:'Fino a 20 foto del locale'},
+      {i:'ph-list-numbers',  k:'tier_plus_p2', t:'Listino e menu con i prezzi'},
+      {i:'ph-credit-card',   k:'tier_plus_p3', t:'Sistemi di pagamento collegati'},
+      {i:'ph-clock',         k:'tier_plus_p4', t:'Orari di apertura, giorno per giorno'},
+      {i:'ph-qr-code',       k:'tier_plus_p5', t:'QR del locale da stampare e mettere in vetrina'},
+      {i:'ph-chart-line-up', k:'tier_plus_p6', t:'Statistiche avanzate del tuo locale'}
     ]},
   influencer:{labelKey:'tier_influencer', label:'Influencer', icon:'ph-fill ph-megaphone', style:'background:linear-gradient(135deg,#be185d 0%,#2a0a1a 52%,#ec4899 100%);color:#fce7f3;border-color:rgba(249,168,212,.65);box-shadow:0 3px 14px rgba(236,72,153,.5),inset 0 1px 0 rgba(255,255,255,.35)',
+    gruppo:'pro', ordine:1,
+    quotaKey:'tier_infl_price', quota:'Gratuito',
+    tenutaKey:'tier_infl_keep', tenuta:'Servono almeno 30 POI al mese: sotto quella soglia si perdono vantaggi e spunta.',
     pitchKey:'tier_infl_pitch', pitch:'Per chi porta la community: visibilita e punti moltiplicati.',
     ctaKey:'tier_infl_cta', cta:'Diventa Influencer',
     perks:[
@@ -6622,22 +6645,34 @@ function openLevels(){
         <div class="level-info"><div class="level-name">${badgeLabel(b)}${isCur?' '+youHere:''}</div><div class="level-thr">${soglia}</div></div>
       </div>`;
     }).join('');
-    html += `<div class="level-special-sep">${t('tier_support_sep')}</div>`;
-    html += Object.keys(SPECIAL_TIERS).map(k=>{
+    // Due famiglie, nell'ordine deciso: prima chi sostiene il progetto, poi chi ci lavora.
+    const _scheda = k => {
       const b=SPECIAL_TIERS[k];
       const isCur=window._userSpecialTier===k;
       const perks=(b.perks||[]).map(p=>`<div class="tier-perk"><i class="ph-duotone ${p.i}"></i><span>${t(p.k,p.t)}</span></div>`).join('');
+      const quota=b.quota?`<div class="tier-quota"><i class="ph-fill ph-tag"></i>${t(b.quotaKey,b.quota)}</div>`:'';
+      const tenuta=b.tenuta?`<div class="tier-keep"><i class="ph-duotone ph-warning-circle"></i>${t(b.tenutaKey,b.tenuta)}</div>`:'';
+      const lavori=b.inCostruzione?`<div class="tier-soon"><i class="ph-duotone ph-hammer"></i>${t('tier_soon','In costruzione: le funzioni del locale arrivano una alla volta')}</div>`:'';
       return `<div class="tier-card${isCur?' current':''}" style="${b.style}">
         <div class="tier-head">
           <div class="tier-badge"><i class="${b.icon}"></i></div>
           <div class="tier-ttl"><div class="tier-name">${b.labelKey?t(b.labelKey):(b.label||'')}${isCur?' '+youHere:''}</div><div class="tier-pitch">${b.pitchKey?t(b.pitchKey,b.pitch):(b.pitch||'')}</div></div>
         </div>
+        ${quota}
         <div class="tier-perks">${perks}</div>
+        ${lavori}
+        ${tenuta}
         ${isCur
           ? `<div class="tier-active"><i class="ph-fill ph-check-circle"></i> ${t('tier_thanks')}</div>`
           : `<button class="tier-cta" onclick="becomeSupporter('${k}')"><i class="ph-fill ph-hand-heart"></i> ${b.ctaKey?t(b.ctaKey,b.cta):(b.cta||t('tier_cta_fallback'))}</button>`}
       </div>`;
-    }).join('');
+    };
+    const _famiglia = g => Object.keys(SPECIAL_TIERS)
+      .filter(k=>SPECIAL_TIERS[k].gruppo===g)
+      .sort((a,b)=>(SPECIAL_TIERS[a].ordine||9)-(SPECIAL_TIERS[b].ordine||9))
+      .map(_scheda).join('');
+    html += `<div class="level-special-sep">${t('tier_support_sep')}</div>` + _famiglia('sostegno');
+    html += `<div class="level-special-sep">${t('tier_pro_sep','Professionisti')}</div>` + _famiglia('pro');
     wrap.innerHTML=html;
   }
   document.getElementById('levelsOv')?.classList.add('show');
@@ -6790,14 +6825,14 @@ const T={
     foll_modal_title:'Follower',foll_modal_sub:'Visibile a chi ti segue',
     /* Tier / Livelli */
     tier_lvl_amatore:'Amatore',tier_lvl_viaggiatore:'Viaggiatore',tier_lvl_giramondo:'Giramondo',tier_lvl_instancabile:'Instancabile',tier_lvl_leggenda:'Leggenda',
-    tier_professionista:'Professionista',tier_professionista_plus:'Professionista Plus',tier_influencer:'Influencer',tier_sostenitore:'Sostenitore',tier_mecenate:'Mecenate',tier_proplus_pitch:'Tutto del Professionista, con priorità e strumenti avanzati.',tier_proplus_cta:'Passa a Professionista Plus',tier_proplus_p1:'ILLI•AI senza limiti, con priorità',tier_proplus_p2:'Più POI in evidenza sulla mappa',tier_proplus_p3:'Più QR business per le tue attività',tier_proplus_p4:'Statistiche avanzate dei tuoi luoghi',tier_infl_pitch:'Per chi porta la community: visibilità e punti moltiplicati.',tier_infl_cta:'Diventa Influencer',tier_infl_p1:'Punti raddoppiati su ogni azione',tier_infl_p2:'Spunta e profilo in evidenza',tier_infl_p3:'I tuoi itinerari consigliati alla community',
-    tier_pro_pitch:'Per chi vive POI•LOVE da professionista: gli strumenti al massimo.',
+    tier_professionista:'Professionista',tier_professionista_plus:'Plus · Locali e attività',tier_influencer:'Influencer',tier_sostenitore:'Sostenitore',tier_mecenate:'Mecenate',tier_proplus_pitch:'Per ristoranti, bar e locali: la scheda completa della tua attività.',tier_proplus_cta:'Scrivimi per il Plus',tier_proplus_p1:'ILLI•AI senza limiti, con priorità',tier_proplus_p2:'Più POI in evidenza sulla mappa',tier_proplus_p3:'Più QR business per le tue attività',tier_proplus_p4:'Statistiche avanzate dei tuoi luoghi',tier_infl_pitch:'Per chi porta la community: visibilità e punti moltiplicati.',tier_infl_cta:'Diventa Influencer',tier_infl_p1:'Punti raddoppiati su ogni azione',tier_infl_p2:'Spunta e profilo in evidenza',tier_infl_p3:'I tuoi itinerari consigliati alla community',
+    tier_pro_pitch:'Il profilo professionale della persona: gli strumenti al massimo.',
     tier_pro_cta:'Passa a Professionista',
     tier_pro_p1:'ILLI•AI senza limiti, ogni giorno',tier_pro_p2:'Profilo influencer: punti raddoppiati',tier_pro_p3:'Adotta una rotta culturale con la tua dedica',tier_pro_p4:'Un QR business incluso per la tua attivita',tier_pro_p5:'Inviti agli eventi POI•LOVE dal vivo',tier_pro_p6:'La tua voce sulla roadmap del progetto',
     tier_sost_pitch:'Sostieni la mappa culturale libera. In cambio, vantaggi concreti: non solo un badge.',
     tier_sost_cta:'Sostieni il progetto',
     tier_sost_p1:'ILLI•AI potenziata, 20 consigli al giorno',tier_sost_p2:'Spunta di verifica sul profilo',tier_sost_p3:'I tuoi POI in evidenza sulla mappa',tier_sost_p4:'Copertine e temi profilo esclusivi',tier_sost_p5:'Accesso anticipato alle nuove funzioni',tier_sost_p6:'Il tuo nome nel Muro dei Sostenitori',
-    tier_mec_pitch:'Il livello piu alto: tutto del Professionista, piu i privilegi esclusivi.',
+    tier_mec_pitch:'Il gradino più alto del sostegno: tutto di Sostenitore, più i privilegi esclusivi.',
     tier_mec_cta:'Diventa Mecenate',
     tier_mec_p1:'Audiolibri ovunque, navigando, senza scansionare il QR sul posto',tier_mec_p2:'Segnala e proponi nuove rotte storiche',tier_mec_p3:'Un tuo itinerario nella sezione In Evidenza',tier_mec_p4:'5 dei tuoi POI in evidenza sulla mappa',tier_mec_p5:'Amministratore di una compagnia in evidenza',
     tier_cta_fallback:'Sostieni',
@@ -6806,6 +6841,24 @@ const T={
     tier_you_here:'tu sei qui',
     tier_from_points:'da {x} punti in su',tier_range_points:'da {x} a {y} punti',
     tier_support_sep:'Livelli di sostegno, a chi sostiene il progetto',
+    tier_pro_sep:'Professionisti',
+    tier_soon:'In costruzione: le funzioni del locale arrivano una alla volta',
+    tier_sost_price:'Quota libera, da 10 € al mese in su',
+    tier_sost_keep:'Se il sostegno si ferma, i vantaggi si fermano con lui.',
+    tier_mec_price:'25 € al mese',
+    tier_mec_keep:'Se il sostegno si ferma, i vantaggi si fermano con lui.',
+    tier_infl_price:'Gratuito',
+    tier_infl_keep:'Servono almeno 30 POI al mese: sotto quella soglia si perdono vantaggi e spunta.',
+    tier_pro_price:'100 € all\'anno',
+    tier_pro_keep:'Alla scadenza, senza rinnovo, i vantaggi si fermano.',
+    tier_plus_price:'Quota annuale, in definizione',
+    tier_plus_keep:'Alla scadenza, senza rinnovo, la scheda del locale torna normale.',
+    tier_plus_p1:'Fino a 20 foto del locale',
+    tier_plus_p2:'Listino e menu con i prezzi',
+    tier_plus_p3:'Sistemi di pagamento collegati',
+    tier_plus_p4:'Orari di apertura, giorno per giorno',
+    tier_plus_p5:'QR del locale da stampare e mettere in vetrina',
+    tier_plus_p6:'Statistiche avanzate del tuo locale',
     tier_thanks:'Grazie per il tuo sostegno',
     tier_mail_subject:'Voglio diventare {label} di POI•LOVE',
     tier_mail_body:'Ciao team POI•LOVE,\n\nvoglio sostenere il progetto come {label}.\nFatemi sapere come procedere.\n\nGrazie!',
@@ -6891,14 +6944,14 @@ const T={
     foll_modal_title:'Ndjekës',foll_modal_sub:'I dukshëm për ata që të ndjekin',
     /* Tier / Livelli */
     tier_lvl_amatore:'Amator',tier_lvl_viaggiatore:'Udhëtar',tier_lvl_giramondo:'Endacak',tier_lvl_instancabile:'I palodhur',tier_lvl_leggenda:'Legjendë',
-    tier_professionista:'Profesionist',tier_professionista_plus:'Profesionist Plus',tier_influencer:'Influencer',tier_sostenitore:'Mbështetës',tier_mecenate:'Mecen',tier_proplus_pitch:'Gjithçka e Profesionistit, me përparësi dhe mjete të avancuara.',tier_proplus_cta:'Kalo në Profesionist Plus',tier_proplus_p1:'ILLI•AI pa limit, me përparësi',tier_proplus_p2:'Më shumë POI në pah në hartë',tier_proplus_p3:'Më shumë QR biznesi për aktivitetet e tua',tier_proplus_p4:'Statistika të avancuara të vendeve të tua',tier_infl_pitch:'Për ata që sjellin komunitetin: dukshmëri dhe pikë të shumëfishuara.',tier_infl_cta:'Bëhu Influencer',tier_infl_p1:'Pikë të dyfishta për çdo veprim',tier_infl_p2:'Shenjë verifikimi dhe profil në pah',tier_infl_p3:'Itineraret e tua të sugjeruara komunitetit',
+    tier_professionista:'Profesionist',tier_professionista_plus:'Plus · Lokale dhe biznese',tier_influencer:'Influencer',tier_sostenitore:'Mbështetës',tier_mecenate:'Mecen',tier_proplus_pitch:'Për restorante, bare dhe lokale: skeda e plotë e biznesit tënd.',tier_proplus_cta:'Më shkruaj për Plus',tier_proplus_p1:'ILLI•AI pa limit, me përparësi',tier_proplus_p2:'Më shumë POI në pah në hartë',tier_proplus_p3:'Më shumë QR biznesi për aktivitetet e tua',tier_proplus_p4:'Statistika të avancuara të vendeve të tua',tier_infl_pitch:'Për ata që sjellin komunitetin: dukshmëri dhe pikë të shumëfishuara.',tier_infl_cta:'Bëhu Influencer',tier_infl_p1:'Pikë të dyfishta për çdo veprim',tier_infl_p2:'Shenjë verifikimi dhe profil në pah',tier_infl_p3:'Itineraret e tua të sugjeruara komunitetit',
     tier_pro_pitch:'Për ata që e jetojnë POI•LOVE si profesionistë: mjetet në maksimum.',
     tier_pro_cta:'Kalo te Profesionisti',
     tier_pro_p1:'ILLI•AI pa kufij, çdo ditë',tier_pro_p2:'Profil influencer: pikë të dyfishuara',tier_pro_p3:'Birëso një rrugë kulturore me dedikimin tënd',tier_pro_p4:'Një QR biznesi i përfshirë për aktivitetin tënd',tier_pro_p5:'Ftesa në eventet POI•LOVE drejtpërdrejt',tier_pro_p6:'Zëri yt në planin e projektit',
     tier_sost_pitch:'Mbështet hartën kulturore të lirë. Në këmbim, përfitime konkrete: jo thjesht një stemë.',
     tier_sost_cta:'Mbështet projektin',
     tier_sost_p1:'ILLI•AI e fuqizuar, 20 këshilla në ditë',tier_sost_p2:'Shenjë verifikimi në profil',tier_sost_p3:'POI-të e tua në pah në hartë',tier_sost_p4:'Kopertina dhe tema profili ekskluzive',tier_sost_p5:'Qasje e parakohshme te funksionet e reja',tier_sost_p6:'Emri yt në Murin e Mbështetësve',
-    tier_mec_pitch:'Niveli më i lartë: gjithçka e Profesionistit, plus privilegjet ekskluzive.',
+    tier_mec_pitch:'Shkalla më e lartë e mbështetjes: gjithçka e Mbështetësit, plus privilegjet ekskluzive.',
     tier_mec_cta:'Bëhu Mecen',
     tier_mec_p1:'Audiolibra kudo, duke lundruar, pa skanuar QR-in në vend',tier_mec_p2:'Sinjalizo dhe propozo rrugë të reja historike',tier_mec_p3:'Një itinerar yti në seksionin Në Pah',tier_mec_p4:'5 nga POI-të e tua në pah në hartë',tier_mec_p5:'Administrator i një kompanie në pah',
     tier_cta_fallback:'Mbështet',
@@ -6907,6 +6960,24 @@ const T={
     tier_you_here:'ti je këtu',
     tier_from_points:'nga {x} pikë e lart',tier_range_points:'nga {x} deri në {y} pikë',
     tier_support_sep:'Nivele mbështetjeje, për ata që mbështesin projektin',
+    tier_pro_sep:'Profesionistët',
+    tier_soon:'Në ndërtim: funksionet e lokalit vijnë një nga një',
+    tier_sost_price:'Shumë e lirë, nga 10 € në muaj e lart',
+    tier_sost_keep:'Nëse mbështetja ndalon, ndalojnë edhe përfitimet.',
+    tier_mec_price:'25 € në muaj',
+    tier_mec_keep:'Nëse mbështetja ndalon, ndalojnë edhe përfitimet.',
+    tier_infl_price:'Falas',
+    tier_infl_keep:'Duhen të paktën 30 POI në muaj: nën atë prag humbasin përfitimet dhe shenja.',
+    tier_pro_price:'100 € në vit',
+    tier_pro_keep:'Në mbarim, pa rinovim, përfitimet ndalen.',
+    tier_plus_price:'Tarifë vjetore, në përcaktim',
+    tier_plus_keep:'Në mbarim, pa rinovim, skeda e lokalit kthehet normale.',
+    tier_plus_p1:'Deri në 20 foto të lokalit',
+    tier_plus_p2:'Listë çmimesh dhe menu',
+    tier_plus_p3:'Sisteme pagese të lidhura',
+    tier_plus_p4:'Orari i hapjes, ditë për ditë',
+    tier_plus_p5:'QR i lokalit për ta vënë në vitrinë',
+    tier_plus_p6:'Statistika të avancuara të lokalit',
     tier_thanks:'Faleminderit për mbështetjen tënde',
     tier_mail_subject:'Dua të bëhem {label} i POI•LOVE',
     tier_mail_body:'Përshëndetje ekipi POI•LOVE,\n\ndua të mbështes projektin si {label}.\nMë tregoni si të vazhdoj.\n\nFaleminderit!',
@@ -6992,14 +7063,14 @@ const T={
     foll_modal_title:'Followers',foll_modal_sub:'Visible to those who follow you',
     /* Tier / Levels */
     tier_lvl_amatore:'Amateur',tier_lvl_viaggiatore:'Traveler',tier_lvl_giramondo:'Globetrotter',tier_lvl_instancabile:'Tireless',tier_lvl_leggenda:'Legend',
-    tier_professionista:'Professional',tier_professionista_plus:'Professional Plus',tier_influencer:'Influencer',tier_sostenitore:'Supporter',tier_mecenate:'Patron',tier_proplus_pitch:'Everything of Professional, with priority and advanced tools.',tier_proplus_cta:'Go Professional Plus',tier_proplus_p1:'Unlimited ILLI•AI, with priority',tier_proplus_p2:'More featured POIs on the map',tier_proplus_p3:'More business QR for your activities',tier_proplus_p4:'Advanced stats of your places',tier_infl_pitch:'For those who bring the community: multiplied visibility and points.',tier_infl_cta:'Become Influencer',tier_infl_p1:'Double points on every action',tier_infl_p2:'Verified badge and featured profile',tier_infl_p3:'Your itineraries recommended to the community',
+    tier_professionista:'Professional',tier_professionista_plus:'Plus · Venues and business',tier_influencer:'Influencer',tier_sostenitore:'Supporter',tier_mecenate:'Patron',tier_proplus_pitch:'For restaurants, bars and venues: the full card of your business.',tier_proplus_cta:'Write to me about Plus',tier_proplus_p1:'Unlimited ILLI•AI, with priority',tier_proplus_p2:'More featured POIs on the map',tier_proplus_p3:'More business QR for your activities',tier_proplus_p4:'Advanced stats of your places',tier_infl_pitch:'For those who bring the community: multiplied visibility and points.',tier_infl_cta:'Become Influencer',tier_infl_p1:'Double points on every action',tier_infl_p2:'Verified badge and featured profile',tier_infl_p3:'Your itineraries recommended to the community',
     tier_pro_pitch:'For those who live POI•LOVE professionally: tools at their fullest.',
     tier_pro_cta:'Go Professional',
     tier_pro_p1:'Unlimited ILLI•AI, every day',tier_pro_p2:'Influencer profile: double points',tier_pro_p3:'Adopt a cultural route with your dedication',tier_pro_p4:'A business QR included for your activity',tier_pro_p5:'Invitations to live POI•LOVE events',tier_pro_p6:'Your voice on the project roadmap',
     tier_sost_pitch:'Support the free cultural map. In return, real perks: not just a badge.',
     tier_sost_cta:'Support the project',
     tier_sost_p1:'Boosted ILLI•AI, 20 tips a day',tier_sost_p2:'Verified check on your profile',tier_sost_p3:'Your POIs featured on the map',tier_sost_p4:'Exclusive profile covers and themes',tier_sost_p5:'Early access to new features',tier_sost_p6:'Your name on the Supporters Wall',
-    tier_mec_pitch:'The highest tier: everything in Professional, plus exclusive privileges.',
+    tier_mec_pitch:'The top step of support: everything in Supporter, plus exclusive privileges.',
     tier_mec_cta:'Become a Patron',
     tier_mec_p1:'Audiobooks anywhere, while browsing, without scanning the on-site QR',tier_mec_p2:'Report and propose new historic routes',tier_mec_p3:'One of your itineraries in the Featured section',tier_mec_p4:'5 of your POIs featured on the map',tier_mec_p5:'Administrator of a featured company',
     tier_cta_fallback:'Support',
@@ -7008,6 +7079,24 @@ const T={
     tier_you_here:'you are here',
     tier_from_points:'from {x} points up',tier_range_points:'from {x} to {y} points',
     tier_support_sep:'Support levels, for those who back the project',
+    tier_pro_sep:'Professionals',
+    tier_soon:'Being built: the venue tools arrive one at a time',
+    tier_sost_price:'Free amount, from €10 a month up',
+    tier_sost_keep:'If the support stops, the benefits stop with it.',
+    tier_mec_price:'€25 a month',
+    tier_mec_keep:'If the support stops, the benefits stop with it.',
+    tier_infl_price:'Free',
+    tier_infl_keep:'At least 30 POIs a month: below that, benefits and check mark are lost.',
+    tier_pro_price:'€100 a year',
+    tier_pro_keep:'Once expired, without renewal, the benefits stop.',
+    tier_plus_price:'Yearly fee, being defined',
+    tier_plus_keep:'Once expired, without renewal, the venue card goes back to normal.',
+    tier_plus_p1:'Up to 20 photos of the venue',
+    tier_plus_p2:'Price list and menu',
+    tier_plus_p3:'Connected payment systems',
+    tier_plus_p4:'Opening hours, day by day',
+    tier_plus_p5:'Venue QR to print and put in the window',
+    tier_plus_p6:'Advanced statistics of your venue',
     tier_thanks:'Thank you for your support',
     tier_mail_subject:'I want to become a {label} of POI•LOVE',
     tier_mail_body:'Hi POI•LOVE team,\n\nI want to support the project as a {label}.\nLet me know how to proceed.\n\nThanks!',
@@ -8547,7 +8636,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='4.28';
+const APP_VERSION='4.30';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
