@@ -420,4 +420,10 @@ function scrivi(dest, testo) {
   // Sul SAL la stessa pagina, ma l'originale per i motori resta quella di project
   scrivi(path.join(RADICE, 'sal', sotto, 'livelli.html'), pagina(l, url(l)));
 });
+
+// L'italiano vive sulla radice (project.poilove.com/livelli.html). Chi scrive /it/
+// come per le altre lingue trova comunque la pagina: stessa pagina, e per i motori
+// l'originale resta quella della radice (canonical), cosi' non c'e' doppione.
+scrivi(path.join(RADICE, 'web', 'it', 'livelli.html'), pagina('it', url('it')));
+scrivi(path.join(RADICE, 'sal', 'it', 'livelli.html'), pagina('it', url('it')));
 console.log('Fatto: 6 pagine (3 lingue x 2 siti).');
