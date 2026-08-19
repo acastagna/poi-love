@@ -63,7 +63,7 @@ $D = [
            'btn' => 'SEE YOUR PROFILE', 'ign' => 'Your invitations earn points every time someone joins.'],
 ][$lang];
 $e = function ($x) { return htmlspecialchars((string)$x, ENT_QUOTES, 'UTF-8'); };
-$nomeArrivato = preg_replace('/[\x00-\x1F\x7F]+/u', ' ', (string)$d['nome_arrivato']);
+$nomeArrivato = preg_replace('/[\x00-\x1F\x7F]+/u', ' ', (string)$d['newcomer_name']);
 $url = 'https://poilove.com/';
 $html = '<!DOCTYPE html><html lang="' . $lang . '"><head><meta charset="utf-8"></head>'
  . '<body style="margin:0;padding:0;background-color:#EAE4D8;">'
@@ -102,12 +102,12 @@ stream_set_timeout($fp, 25);
 $passo = function ($cmd, $atteso) use ($fp) { if ($cmd !== null) fwrite($fp, $cmd . "\r\n"); return smtp_codice($fp) === $atteso; };
 $ok = $passo(null, 220) && $passo('EHLO poilove.com', 250) && $passo('AUTH LOGIN', 334)
    && $passo(base64_encode($smtpUser), 334) && $passo(base64_encode($smtpPass), 235)
-   && $passo('MAIL FROM:<' . $smtpUser . '>', 250) && $passo('RCPT TO:<' . $d['mail_invitante'] . '>', 250)
+   && $passo('MAIL FROM:<' . $smtpUser . '>', 250) && $passo('RCPT TO:<' . $d['inviter_email'] . '>', 250)
    && $passo('DATA', 354);
-if (!$ok) { @fclose($fp); nota('dialogo interrotto verso ' . $d['mail_invitante']); fine(502, 'invio'); }
+if (!$ok) { @fclose($fp); nota('dialogo interrotto verso ' . $d['inviter_email']); fine(502, 'invio'); }
 $bnd = 'plb' . bin2hex(random_bytes(8));
 $msg  = 'From: =?UTF-8?B?' . base64_encode('POI•LOVE') . "?= <{$smtpUser}>\r\n";
-$msg .= 'To: <' . $d['mail_invitante'] . ">\r\n";
+$msg .= 'To: <' . $d['inviter_email'] . ">\r\n";
 $msg .= 'Subject: =?UTF-8?B?' . base64_encode($D['sub']) . "?=\r\n";
 $msg .= "MIME-Version: 1.0\r\nContent-Type: multipart/alternative; boundary=\"$bnd\"\r\n\r\n";
 $msg .= "--$bnd\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Transfer-Encoding: base64\r\n\r\n" . chunk_split(base64_encode($testo));
@@ -116,6 +116,6 @@ $msg .= "\r\n--$bnd--";
 fwrite($fp, $msg . "\r\n.\r\n");
 $fin = smtp_codice($fp);
 @fwrite($fp, "QUIT\r\n"); @fclose($fp);
-if ($fin === 250 || $fin === 0) { nota('avviso 200 punti a ' . $d['mail_invitante']); echo '{"ok":true}'; exit; }
-nota('avviso rifiutato (' . $fin . ') a ' . $d['mail_invitante']);
+if ($fin === 250 || $fin === 0) { nota('avviso 200 punti a ' . $d['inviter_email']); echo '{"ok":true}'; exit; }
+nota('avviso rifiutato (' . $fin . ') a ' . $d['inviter_email']);
 fine(502, 'invio');
