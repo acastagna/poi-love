@@ -448,9 +448,10 @@ body.tab-active #mapQuickBtns{display:none}
 .illi-view-hdr p{font-size:13px;color:rgba(255,255,255,0.65);margin:6px 0 0;line-height:1.5}
 .illi-view-hdr img{width:48px;height:48px;border-radius:50%;background:#fff;object-fit:cover;box-shadow:0 2px 10px rgba(0,0,0,.25)}
 /* Sub-tabs per Tab POI */
-.poi-subtabs{display:flex;gap:4px;padding:8px;background:var(--card);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:5}
-.poi-subtab{flex:1;height:36px;border:none;background:transparent;border-radius:9px;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;font-family:inherit}
-.poi-subtab.active{background:var(--red);color:#fff}
+.poi-subtabs{display:flex;gap:8px;padding:12px 14px 10px;background:var(--card);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:5;overflow-x:auto;scrollbar-width:none}
+.poi-subtabs::-webkit-scrollbar{display:none}
+.poi-subtab{flex:0 0 auto;height:42px;padding:0 16px;border:1px solid var(--border);background:var(--bg);border-radius:999px;font-size:14px;font-weight:800;color:var(--ink);cursor:pointer;font-family:inherit;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.poi-subtab.active{background:var(--red);color:#fff;border-color:var(--red)}
 .poi-filter-chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:8px 10px 4px;background:var(--card)}
 .poi-filter-chips::-webkit-scrollbar{display:none}
 .pf-chip{flex-shrink:0;display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:999px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}
@@ -466,7 +467,7 @@ body.tab-active #mapQuickBtns{display:none}
 .pl-section-title{font-size:10px;font-weight:900;letter-spacing:.9px;color:var(--muted);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:5px}
 .pl-chips{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 @media(max-width:560px){.pl-chips{grid-template-columns:1fr}}
-.pl-chip{display:flex;align-items:center;gap:10px;border-radius:13px;padding:9px 12px;cursor:pointer;transition:box-shadow .15s;border-left:4px solid transparent;border-top:1px solid var(--border);border-right:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--bg)}
+.pl-chip{display:flex;align-items:center;gap:12px;border-radius:16px;padding:14px 14px;cursor:pointer;transition:box-shadow .15s;border-left:4px solid transparent;border-top:1px solid var(--border);border-right:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--bg)}
 .pl-chip.pl-casa{border-left-color:#F59E0B}
 .pl-chip.pl-lavoro{border-left-color:var(--blue)}
 .pl-chip.pl-famiglia{border-left-color:#8B5CF6}
@@ -474,15 +475,15 @@ body.tab-active #mapQuickBtns{display:none}
 .pl-chip.pl-sport{border-left-color:#F97316}
 .pl-chip.pl-preferito{border-left-color:#EF4444}
 .pl-chip:active{box-shadow:0 0 0 2px var(--red)}
-.pl-chip-icon{font-size:24px;flex-shrink:0;width:32px;text-align:center}
+.pl-chip-icon{font-size:28px;flex-shrink:0;width:36px;text-align:center}
 .pl-chip-info{flex:1;min-width:0}
-.pl-chip-name{font-size:14px;font-weight:800;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pl-chip-addr{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.pl-chip-name{font-size:17px;font-weight:800;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pl-chip-addr{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
 .pl-chip-acts{display:flex;gap:5px;flex-shrink:0}
-.pl-chip-btn{width:30px;height:30px;border-radius:9px;border:1px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:14px;transition:color .15s,border-color .15s}
+.pl-chip-btn{width:40px;height:40px;border-radius:12px;border:1px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:17px;transition:color .15s,border-color .15s}
 .pl-chip-btn:active{color:var(--red);border-color:var(--red)}
 .pl-add-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px 0 12px}
-.pl-add-btn{height:42px;border-radius:12px;border:1.5px dashed var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px;font-weight:700;color:var(--muted);font-family:inherit;transition:border-color .2s,color .2s}
+.pl-add-btn{height:52px;border-radius:14px;border:1.5px dashed var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-size:15px;font-weight:700;color:var(--muted);font-family:inherit;transition:border-color .2s,color .2s}
 .pl-add-btn:active{border-color:var(--red);color:var(--red)}
 .poi-list-row{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--border)}
 .poi-list-row .pi-emoji{font-size:22px;width:36px;text-align:center;flex-shrink:0}
@@ -3180,9 +3181,16 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
 
 <!-- ═══ POI VIEW (Miei · Loved · Vicini) ═══ -->
 <div class="poi-view zone-poi" id="poiView">
-  <!-- ── LUOGHI PERSONALI ── -->
+  <!-- ── LINGUETTE POI: ogni compito ha la pagina intera (regola 19/08) ── -->
+  <div class="poi-subtabs">
+    <button class="poi-subtab active" data-subtab="personali" onclick="setPoiSubtab('personali')"><i class="ph-duotone ph-house-line"></i> Personali</button>
+    <button class="poi-subtab" data-subtab="mine"  onclick="setPoiSubtab('mine')"><i class="ph-duotone ph-map-pin"></i> I miei POI</button>
+    <button class="poi-subtab" data-subtab="loved" onclick="setPoiSubtab('loved')"><i class="ph-duotone ph-heart"></i> Loved</button>
+    <button class="poi-subtab" data-subtab="near"  onclick="setPoiSubtab('near')"><i class="ph-duotone ph-compass"></i> Vicini</button>
+    <button class="poi-subtab" data-subtab="lists" onclick="setPoiSubtab('lists')"><i class="ph-duotone ph-list-bullets"></i> Liste</button>
+  </div>
+  <!-- ── PERSONALI (prima linguetta, pagina intera) ── -->
   <div class="pl-section" id="plSection">
-    <div class="pl-section-title"><i class="ph-duotone ph-house-line"></i> Luoghi Personali</div>
     <div class="pl-chips" id="plChips"><!-- renderizzato via JS --></div>
     <div class="pl-add-row" id="plAddRow">
       <button class="pl-add-btn" id="plAddCasaBtn" onclick="openPlCategory('casa')">
@@ -3205,16 +3213,9 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
       </button>
     </div>
   </div>
-  <!-- ── SUBTAB POI ── -->
-  <div class="poi-subtabs">
-    <button class="poi-subtab active" data-subtab="mine"  onclick="setPoiSubtab('mine')"><i class="ph-duotone ph-map-pin"></i> I miei POI</button>
-    <button class="poi-subtab"        data-subtab="loved" onclick="setPoiSubtab('loved')"><i class="ph-duotone ph-heart"></i> Loved</button>
-    <button class="poi-subtab"        data-subtab="near"  onclick="setPoiSubtab('near')"><i class="ph-duotone ph-compass"></i> Vicini</button>
-    <button class="poi-subtab"        data-subtab="lists" onclick="setPoiSubtab('lists')"><i class="ph-duotone ph-list-bullets"></i> Liste</button>
-  </div>
-  <div class="poi-search-wrap"><i class="ph-duotone ph-magnifying-glass ps-ico"></i><input class="poi-search" id="poiSearchInput" type="text" placeholder="Cerca: nome, categoria, indirizzo, tag…" oninput="_poiSearch(this.value)"></div>
-  <div class="poi-filter-chips" id="poiFilterChips"></div>
-  <div id="poi-list-area"></div>
+  <div class="poi-search-wrap" style="display:none"><i class="ph-duotone ph-magnifying-glass ps-ico"></i><input class="poi-search" id="poiSearchInput" type="text" placeholder="Cerca: nome, categoria, indirizzo, tag…" oninput="_poiSearch(this.value)"></div>
+  <div class="poi-filter-chips" id="poiFilterChips" style="display:none"></div>
+  <div id="poi-list-area" style="display:none"></div>
 </div>
 
 <!-- ═══ COMPAGNI DI VIAGGIO VIEW ═══ -->
@@ -3982,7 +3983,7 @@ function enterGuestMode() {
   if (overlay) overlay.style.display = 'none';
   if (!map && typeof initMap === 'function') { try { initMap(); } catch(e) {} }
   // L'ospite entra per GUARDARE: senza questa chiamata la mappa restava vuota
-  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v3.75.
+  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v3.76.
   if (typeof loadPOIsFromDB === 'function') { try { loadPOIsFromDB(); } catch(e) {} }
   if (typeof loadMyTags === 'function') { try { loadMyTags(); } catch(e) {} }
   showToast(t('guest_active'));
@@ -8164,7 +8165,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='3.75';
+const APP_VERSION='3.76';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
@@ -9070,11 +9071,19 @@ function showTab(tab){
 /* ══════════════════════════════════════════
    TAB POI — render dinamico (Miei / Loved / Vicini)
 ══════════════════════════════════════════ */
-let poiSubtab = 'mine'; // mine | loved | near
+let poiSubtab = 'personali'; // personali | mine | loved | near | lists
 function setPoiSubtab(t){
   poiSubtab=t;
+  // Ogni linguetta ha la pagina INTERA (regola 19/08): su Personali si vedono
+  // solo i luoghi personali; sulle altre solo ricerca, filtri e lista.
+  const pers = (t==='personali');
+  const pl=document.getElementById('plSection'); if(pl) pl.style.display = pers?'':'none';
+  document.querySelectorAll('.poi-search-wrap').forEach(e=>e.style.display = pers?'none':'');
+  const fc=document.getElementById('poiFilterChips'); if(fc) fc.style.display = pers?'none':'';
+  const area=document.getElementById('poi-list-area'); if(area) area.style.display = pers?'none':'';
   const s=document.getElementById('poiSearchInput'); if(s){ s.value=''; s.placeholder = (t==='lists') ? 'Cerca tra le tue liste…' : 'Cerca: nome, categoria, indirizzo, tag…'; }
   document.querySelectorAll('.poi-subtab').forEach(b=>b.classList.toggle('active', b.dataset.subtab===t));
+  if(pers){ try{ renderPlaces(); }catch(_){}; return; }
   if(t==='lists') renderPoiLists(); else renderPoiTab();
 }
 // Sub-tab Liste dentro POI: riusa il sistema liste esistente (openListDetail / openAddList / shareListDetail)
@@ -9184,6 +9193,7 @@ function _poiSearch(q){
   } else if(none){ none.style.display='none'; }
 }
 async function renderPoiTab(){
+  if(poiSubtab==='personali') return; // la prima linguetta e' gestita da setPoiSubtab/renderPlaces
   const list = document.getElementById('poi-list-area');
   if(!list) return;
   // tab buttons attivi
