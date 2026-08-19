@@ -4154,7 +4154,7 @@ function enterGuestMode() {
   if (overlay) overlay.style.display = 'none';
   if (!map && typeof initMap === 'function') { try { initMap(); } catch(e) {} }
   // L'ospite entra per GUARDARE: senza questa chiamata la mappa restava vuota
-  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v4.24.
+  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v4.25.
   if (typeof loadPOIsFromDB === 'function') { try { loadPOIsFromDB(); } catch(e) {} }
   if (typeof loadMyTags === 'function') { try { loadMyTags(); } catch(e) {} }
   showToast(t('guest_active'));
@@ -7666,7 +7666,9 @@ async function _lensReverse(lat,lng){
    medio-largo GIA' impostato: cosi' la ghiera ha strada in tutte e due le direzioni. */
 function openLensFromFab(){
   if(typeof closeFab==='function') closeFab();
-  const c=gpsPos?{lat:gpsPos.lat,lng:gpsPos.lng}:(map?{lat:map.getCenter().lat,lng:map.getCenter().lng}:{lat:CENTER[0],lng:CENTER[1]});
+  const _qui = (typeof map!=='undefined' && map) ? {lat:map.getCenter().lat, lng:map.getCenter().lng} : null;
+  const c = (window._vistaScelta && _qui) ? _qui
+          : (gpsPos ? {lat:gpsPos.lat, lng:gpsPos.lng} : (_qui || {lat:CENTER[0], lng:CENTER[1]}));
   openLens(c.lat,c.lng);
   _lensZoom=14;                      // zoom fuori medio: quartiere intero nel cerchio
   _lensMagSync(c.lat,c.lng);
@@ -8545,7 +8547,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='4.24';
+const APP_VERSION='4.25';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
