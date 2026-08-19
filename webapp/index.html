@@ -2792,7 +2792,7 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
 
   <!-- LA PORTA PRINCIPALE: Google, grande e con l'etichetta -->
   <button class="auth-btn" onclick="signInWithGoogle()" style="background:#fff;color:#1C1C1C;font-weight:800;display:flex;align-items:center;justify-content:center;gap:10px">
-    <svg viewBox="0 0 24 24" style="width:20px;height:20px;flex-shrink:0"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+    <svg viewBox="0 0 24 24" style="width:20px;height:20px;flex-shrink:0"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.27h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
     <span data-t="auth_google_big">Continua con Google</span>
   </button>
 
@@ -4154,7 +4154,7 @@ function enterGuestMode() {
   if (overlay) overlay.style.display = 'none';
   if (!map && typeof initMap === 'function') { try { initMap(); } catch(e) {} }
   // L'ospite entra per GUARDARE: senza questa chiamata la mappa restava vuota
-  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v4.26.
+  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v4.27.
   if (typeof loadPOIsFromDB === 'function') { try { loadPOIsFromDB(); } catch(e) {} }
   if (typeof loadMyTags === 'function') { try { loadMyTags(); } catch(e) {} }
   showToast(t('guest_active'));
@@ -8392,7 +8392,7 @@ function _openSharedPoint(lat, lng, label){
   window._sharedPoint = { lat, lng, name: nome };
   const vai = ()=>{
     if(typeof map==='undefined' || !map){ setTimeout(vai, 400); return; }
-    try{ window._savedViewRestored = true; _vistaDellUtente(); }catch(_){}
+    try{ _vistaDellUtente(); }catch(_){}   // il luogo del link vince: nessun ritorno a casa
     map.setView([lat,lng], 17);
     const icona = L.divIcon({ className:'', iconSize:[48,66], iconAnchor:[24,50],
       html:'<div class="poi-marker"><div class="poi-pin"><svg class="poi-heart" viewBox="0 0 80 96" aria-hidden="true"><path d="M40 90C37 88 8 66 8 40 8 22 21 8 40 8s32 14 32 32c0 26-29 48-32 50z" fill="currentColor" stroke="#fff" stroke-width="4"/><path d="M40 30c-5-6-15-4.5-17 3-2 7 4.5 12 17 22 12.5-10 19-15 17-22-2-7.5-12-9-17-3z" fill="#fff"/></svg></div><div class="poi-label">'+nome.replace(/</g,'&lt;')+'</div></div>' });
@@ -8547,7 +8547,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='4.26';
+const APP_VERSION='4.27';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
@@ -13645,6 +13645,17 @@ window._zTop = window._zTop || 10000; window._zModalTop = window._zModalTop || 1
     el.style.zIndex=String(++window._zTop);
   };
   const aperta = el => el.classList.contains('show')||el.classList.contains('open')||el.classList.contains('vis')||el.style.display==='flex'||el.style.display==='block';
+  // Quando non resta nessuna finestra aperta i contatori ripartono da capo:
+  // non e' un problema pratico, ma lasciarli crescere per sempre e' sciatto.
+  let _puliziaT=0;
+  const restanoFinestre = () => [...document.body.children].some(el=>{
+    const z=parseInt(el.style.zIndex||'0',10);
+    return z>=10000 && el.isConnected && aperta(el);
+  });
+  const forsePulisco = () => {
+    clearTimeout(_puliziaT);
+    _puliziaT=setTimeout(()=>{ if(!restanoFinestre()){ window._zTop=10000; window._zModalTop=100000; } }, 700);
+  };
   const obs = new MutationObserver(ms=>{
     for(const m of ms){
       // Le finestre si appendono al corpo della pagina: il rifacimento di una lista
@@ -13654,7 +13665,9 @@ window._zTop = window._zTop || 10000; window._zModalTop = window._zModalTop || 1
         m.addedNodes.forEach(nodo=>{ if(eFinestra(nodo) && aperta(nodo)) alzo(nodo); });
         continue;
       }
-      const el=m.target; if(eFinestra(el) && aperta(el)) alzo(el);
+      const el=m.target;
+      if(!eFinestra(el)) continue;
+      if(aperta(el)) alzo(el); else forsePulisco();
     }
   });
   (function start(){ if(!document.body){ setTimeout(start,50); return; }
@@ -14436,14 +14449,24 @@ function renderPubPOIBoard(pois){
   const board=document.querySelector('#publicProfile .poi-board');
   if(!board) return;
   if(!pois.length){ board.innerHTML='<div style="padding:16px;font-size:12px;color:var(--muted)">Nessun POI pubblico ancora</div>'; return; }
-  board.innerHTML=pois.map(p=>{
+  // Il POI si tiene nell'indice e la riga porta solo la chiave: com'e' fatto in tutte le
+  // altre liste dell'app. Prima l'intero POI viaggiava scritto dentro il comando del tocco.
+  if(!window._poiTabIndex) window._poiTabIndex={};
+  board.innerHTML=pois.map((p,i)=>{
+    const key = p.id || ('pub_'+i);
+    window._poiTabIndex[key]=p;
     const img=(Array.isArray(p.photos)?p.photos[0]:p.photos)||'https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Pyramid_of_Tirana_2022.jpg/320px-Pyramid_of_Tirana_2022.jpg';
-    return `<div class="poi-card" onclick="openDBDetail(${JSON.stringify(p).replace(/"/g,'&quot;')})">
-      <div class="poi-card-img" style="background-image:url('${img}')"></div>
-      <div class="poi-card-body"><div class="poi-card-name">${p.name}</div>
-      <div class="poi-card-footer"><div class="poi-card-love"><i class="ph-duotone ph-heart"></i> ${p.love_count||0}</div></div></div>
+    return `<div class="poi-card" onclick="openPubPoiCard('${_escArg(key)}')">
+      <div class="poi-card-img" style="background-image:url('${_escHtml(img)}')"></div>
+      <div class="poi-card-body"><div class="poi-card-name">${_escHtml(p.name||'')}</div>
+      <div class="poi-card-footer"><div class="poi-card-love"><i class="ph-duotone ph-heart"></i> ${Number(p.love_count||0)}</div></div></div>
     </div>`;
   }).join('');
+}
+
+function openPubPoiCard(key){
+  const p=(window._poiTabIndex||{})[key];
+  if(p) openDBDetail(p);
 }
 
 // Rendi cliccabili le righe utente nelle connessioni
