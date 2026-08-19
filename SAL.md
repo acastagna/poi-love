@@ -1,6 +1,16 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
-## Sessione 19/08/2026 (12) — Revisione del codice su ricerca ed esperienza d'uso (v4.26)
+## Sessione 19/08/2026 (12) — Revisione del codice su ricerca ed esperienza d'uso (v4.26 → 4.28)
+
+**Pulizia chiusa (4.27-4.28)**, le tre voci che la revisione aveva lasciato aperte:
+- la bacheca pubblica del profilo non scrive piu' l'intero POI dentro il comando del tocco: tiene i
+  luoghi nell'indice e passa solo la chiave, come tutte le altre liste (e ora fa l'escape di nome e foto);
+- `_savedViewRestored` torna ad avere un solo significato: il luogo arrivato per link usa soltanto
+  il segno "vista scelta";
+- i contatori dei livelli **ripartono da 10.000** quando non resta nessuna finestra aperta, e le
+  finestre chiuse perdono il livello rimasto scritto addosso. Misurato: finestra aperta 10.001,
+  chiusa -> contatore 10.000 e livello residuo pulito; il messaggino resta a 1.000.000.
+
 
 Revisione mirata su ricerca e interazione. Riscontri verificati uno per uno prima di correggere.
 
