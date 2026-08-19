@@ -75,7 +75,7 @@ $html = '<!DOCTYPE html><html lang="' . $lang . '"><head><meta charset="utf-8"><
  . '<img src="https://poilove.com/img/logo-bianco.png" alt="POI&#8226;LOVE" width="200" style="width:200px;max-width:80%;height:auto;border:0;display:inline-block;"></td></tr>'
  . '<tr><td style="padding:30px 28px 4px;font-family:Arial,Helvetica,sans-serif;color:#1c1c1c;text-align:center;">'
  . '<p style="margin:0 0 6px;font-size:15px;color:#8a8a8a;"><strong style="color:#1c1c1c;">' . $e($mittente) . '</strong> ' . $e($T['line']) . '</p>'
- . '<p style="margin:10px 0 4px;font-size:26px;line-height:1.25;font-weight:800;">' . $e($place) . '</p>'
+ . '<p style="margin:10px 0 4px;font-size:22px;line-height:1.3;font-weight:800;">' . $e($place) . '</p>'
  . ($address !== '' ? '<p style="margin:0;font-size:14px;color:#8a8a8a;">' . $e($address) . '</p>' : '')
  . '</td></tr>'
  . '<tr><td align="center" style="padding:22px 28px 10px;">'
@@ -110,8 +110,16 @@ if ($ok) {
     $msg .= "To: <{$to}>\r\n";
     $msg .= "Subject: {$subB64}\r\n";
     $msg .= "Reply-To: <" . str_replace(["\r", "\n"], '', $user['email']) . ">\r\n";
-    $msg .= "MIME-Version: 1.0\r\nContent-Type: text/html; charset=utf-8\r\nContent-Transfer-Encoding: base64\r\n\r\n";
+    $testo = $mittente . ' ' . $T['line'] . "\n\n" . $place
+           . ($address !== '' ? "\n" . $address : '')
+           . "\n\n" . $T['btn'] . ":\n" . $url . "\n\n" . $T['ign'] . "\nPOI-LOVE - poilove.com\n";
+    $bnd = 'plb' . bin2hex(random_bytes(8));
+    $msg .= "MIME-Version: 1.0\r\nContent-Type: multipart/alternative; boundary=\"$bnd\"\r\n\r\n";
+    $msg .= "--$bnd\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Transfer-Encoding: base64\r\n\r\n";
+    $msg .= chunk_split(base64_encode($testo));
+    $msg .= "\r\n--$bnd\r\nContent-Type: text/html; charset=utf-8\r\nContent-Transfer-Encoding: base64\r\n\r\n";
     $msg .= chunk_split(base64_encode($html));
+    $msg .= "\r\n--$bnd--";
     fwrite($fp, $msg . "\r\n.\r\n");
     $ok = smtp_ok($fp, [250]);
     @fwrite($fp, "QUIT\r\n");
