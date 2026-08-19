@@ -330,7 +330,12 @@ body.tab-active #mapQuickBtns{display:none}
 .mqb:active .mqb-circle,.mqb:hover .mqb-circle{transform:scale(.92);box-shadow:0 2px 8px rgba(212,43,43,.3)}
 .mqb-circle.mqb-chiaro{background:var(--card);color:var(--blue);box-shadow:0 3px 12px rgba(0,0,0,.18)}
 .mqb-circle.mqb-bandiera{background:var(--card);overflow:hidden;padding:0;box-shadow:0 3px 12px rgba(0,0,0,.18)}
-.mqb-circle.mqb-bandiera svg{width:100%;height:100%;display:block}
+.mqb-circle.mqb-bandiera svg,.mqb-circle.mqb-bandiera img{width:100%;height:100%;object-fit:cover;display:block}
+.lang-scelte{position:absolute;right:58px;top:0;display:flex;gap:8px;opacity:0;pointer-events:none;transform:translateX(12px);transition:opacity .25s cubic-bezier(.32,.72,0,1),transform .25s cubic-bezier(.32,.72,0,1)}
+.lang-scelte.aperto{opacity:1;pointer-events:all;transform:none}
+.lang-scelta{width:50px;height:50px;border-radius:50%;border:2px solid #fff;background:var(--card);overflow:hidden;padding:0;cursor:pointer;box-shadow:0 3px 12px rgba(0,0,0,.25);flex-shrink:0}
+.lang-scelta img{width:100%;height:100%;object-fit:cover;display:block}
+.lang-scelta.scelta-attiva{border-color:var(--red);box-shadow:0 0 0 3px rgba(212,43,43,.35)}
 .mqb-lbl{font-size:11px;font-weight:800;color:#fff;text-shadow:0 1px 5px rgba(0,0,0,.7);letter-spacing:.4px;line-height:1;white-space:nowrap}
 /* Desktop ≥1024px: fila orizzontale allineata al centro, label nascosta */
 @media(min-width:1024px){
@@ -2229,10 +2234,15 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
     <div class="mqb-circle mqb-chiaro"><i class="ph-duotone ph-crosshair-simple"></i></div>
     <span class="mqb-lbl" data-t="mqb_center">La mia posizione</span>
   </button>
-  <button class="mqb solo-mobile" id="langBtn" onclick="cycleLang()" title="Cambia lingua">
-    <div class="mqb-circle mqb-bandiera" id="langFlag"></div>
+  <div class="mqb solo-mobile" id="langBtn" style="position:relative">
+    <div class="lang-scelte" id="langScelte">
+      <button class="lang-scelta" data-l="sq" onclick="scegliLingua('sq')" title="Shqip"><img src="img/flags/al.svg" alt="Shqip"></button>
+      <button class="lang-scelta" data-l="it" onclick="scegliLingua('it')" title="Italiano"><img src="img/flags/it.svg" alt="Italiano"></button>
+      <button class="lang-scelta" data-l="en" onclick="scegliLingua('en')" title="English"><img src="img/flags/gb.svg" alt="English"></button>
+    </div>
+    <div class="mqb-circle mqb-bandiera" id="langFlag" onclick="apriLingue()"></div>
     <span class="mqb-lbl" data-t="mqb_lang">Lingua</span>
-  </button>
+  </div>
   <button class="mqb" onclick="showTab('poi')" title="POI">
     <div class="mqb-circle"><i class="ph-duotone ph-map-pin"></i></div>
     <span class="mqb-lbl">POI</span>
@@ -4045,7 +4055,7 @@ function enterGuestMode() {
   if (overlay) overlay.style.display = 'none';
   if (!map && typeof initMap === 'function') { try { initMap(); } catch(e) {} }
   // L'ospite entra per GUARDARE: senza questa chiamata la mappa restava vuota
-  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v3.99.
+  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v4.00.
   if (typeof loadPOIsFromDB === 'function') { try { loadPOIsFromDB(); } catch(e) {} }
   if (typeof loadMyTags === 'function') { try { loadMyTags(); } catch(e) {} }
   showToast(t('guest_active'));
@@ -6971,14 +6981,25 @@ function cycleLang(){applyLang(LANGS[(LANGS.indexOf(lang)+1)%LANGS.length])}
 
 // Bandiere disegnate a mano: riempiono il tondo e si vedono uguali ovunque
 // (le emoji su Windows diventano due lettere). Aggiunto il 19/08.
-const BANDIERE = {
-  sq: '<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><rect width="60" height="60" fill="#E41E20"/><g fill="#000"><path d="M30 16c-2.6-3.4-7-4-9.6-2.2 1.6.2 2.6 1 3 2-1.6-.4-3.2 0-4.2 1 1.8 0 3 .6 3.6 1.6-2.2.4-3.6 2-3.8 3.8 1.2-1.2 2.6-1.6 4-1.2-1.4 1.6-1.6 3.6-.6 5.2.4-1.6 1.4-2.6 2.8-3-.4 2 .4 3.8 2 4.8-.2-1.6.2-2.8 1.2-3.6l1.6 2.4 1.6-2.4c1 .8 1.4 2 1.2 3.6 1.6-1 2.4-2.8 2-4.8 1.4.4 2.4 1.4 2.8 3 1-1.6.8-3.6-.6-5.2 1.4-.4 2.8 0 4 1.2-.2-1.8-1.6-3.4-3.8-3.8.6-1 1.8-1.6 3.6-1.6-1-1-2.6-1.4-4.2-1 .4-1 1.4-1.8 3-2C37 12 32.6 12.6 30 16z"/><path d="M26 28c-2 2.4-2.4 5.6-1 8.4-1.8.4-3.2 1.6-4 3.2 2-.6 3.8-.4 5.2.6-1.2 1.6-1.4 3.6-.6 5.4 1-1.6 2.4-2.6 4.4-2.8-.6 2 0 4 1.6 5.4l-1.8 3.4h3.2l1.6-3c1.4-1.4 2-3.4 1.4-5.4h.2c1.8.4 3.2 1.4 4.2 3 .8-1.8.6-3.8-.6-5.4 1.4-1 3.2-1.2 5.2-.6-.8-1.6-2.2-2.8-4-3.2 1.4-2.8 1-6-1-8.4-.4 2-1.6 3.4-3.4 4.2.6-2.2 0-4.4-1.8-5.8-.2 2.2-1.2 3.8-3 4.8-1.8-1-2.8-2.6-3-4.8-1.8 1.4-2.4 3.6-1.8 5.8-1.8-.8-3-2.2-3.4-4.2z" transform="translate(0,-2)"/></g></svg>',
-  it: '<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><rect width="20" height="60" fill="#009246"/><rect x="20" width="20" height="60" fill="#fff"/><rect x="40" width="20" height="60" fill="#CE2B37"/></svg>',
-  en: '<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><rect width="60" height="60" fill="#012169"/><path d="M0 0l60 60M60 0L0 60" stroke="#fff" stroke-width="12"/><path d="M0 0l60 60M60 0L0 60" stroke="#C8102E" stroke-width="7"/><path d="M30 0v60M0 30h60" stroke="#fff" stroke-width="20"/><path d="M30 0v60M0 30h60" stroke="#C8102E" stroke-width="12"/></svg>'
-};
+// Bandiere vere (file ufficiali), non disegnate a mano: quella albanese
+// fatta da me era indegna (segnalato il 19/08).
+const BANDIERE = { sq:'img/flags/al.svg', it:'img/flags/it.svg', en:'img/flags/gb.svg' };
 function _mostraBandiera(l){
-  const b = BANDIERE[l] || BANDIERE.en;
-  ['langFlag','langFlagDesktop'].forEach(id=>{ const c=document.getElementById(id); if(c) c.innerHTML=b; });
+  const f = BANDIERE[l] || BANDIERE.en;
+  ['langFlag','langFlagDesktop'].forEach(id=>{
+    const c=document.getElementById(id);
+    if(c) c.innerHTML = '<img src="'+f+'" alt="'+l+'" style="width:100%;height:100%;object-fit:cover;display:block">';
+  });
+  document.querySelectorAll('.lang-scelta').forEach(b=>b.classList.toggle('scelta-attiva', b.dataset.l===l));
+}
+// Tocchi la bandiera: si aprono le tre di lato. Ne tocchi una: si sceglie.
+function apriLingue(){
+  const box = document.getElementById('langScelte'); if(!box) return;
+  box.classList.toggle('aperto');
+}
+function scegliLingua(l){
+  applyLang(l);
+  const box = document.getElementById('langScelte'); if(box) box.classList.remove('aperto');
 }
 
 /* ══════════════════════════════════════════
@@ -8388,7 +8409,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='3.99';
+const APP_VERSION='4.00';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
