@@ -1,6 +1,11 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
-## Sessione 19/08/2026 (11) — La mappa resta dove la metti (v4.24)
+## Sessione 19/08/2026 (11) — La mappa resta dove la metti (v4.24 → 4.25)
+
+**4.25**: anche la **lente di ingrandimento** si apre dove sto guardando. Prima partiva sempre dal GPS,
+quindi aprirla dopo una ricerca riportava tutto sulla mia posizione. Misurato: ricerca su Valona,
+lente aperta dal "+" → resta su Valona (40,47 · 19,49).
+
 
 **Ordine perentorio**: la mappa torna sulla posizione dell'utente **solo** all'apertura dell'app o
 toccando "La mia posizione". Niente altro la sposta.
