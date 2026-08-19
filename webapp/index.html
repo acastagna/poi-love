@@ -2847,7 +2847,8 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
      PANNELLO NOTIFICHE — lista in tempo reale + impostazioni per-tipo/per-canale.
      Autonomo (non tocca il layout del profilo). Push mostrato come "Presto" (no service worker).
 ══════════════════════════════════════════════════════════════════ -->
-<div id="notifPanel" style="display:none;position:fixed;inset:0;z-index:9200;background:rgba(0,0,0,.45);top:0;right:0;bottom:0;width:100%;max-width:420px;background:var(--bg,#EAE4D8);display:flex;flex-direction:column;box-shadow:-8px 0 40px rgba(0,0,0,.3)">
+<div id="notifPanel" style="display:none;position:fixed;inset:0;z-index:9200;background:rgba(0,0,0,.45)" onclick="if(event.target===this)closeNotifications()">
+  <div style="position:absolute;top:0;right:0;bottom:0;width:100%;max-width:420px;background:var(--bg,#EAE4D8);display:flex;flex-direction:column;box-shadow:-8px 0 40px rgba(0,0,0,.3)">
     <!-- header -->
     <div style="display:flex;align-items:center;gap:10px;padding:16px 16px 12px;border-bottom:1px solid rgba(0,0,0,.08)">
       <button onclick="closeNotifications()" aria-label="Indietro" title="Indietro" style="background:none;border:none;cursor:pointer;color:var(--muted,#777);font-size:22px;padding:0;display:flex;align-items:center"><i class="ph-duotone ph-arrow-left"></i></button>
@@ -4061,7 +4062,7 @@ function enterGuestMode() {
   if (overlay) overlay.style.display = 'none';
   if (!map && typeof initMap === 'function') { try { initMap(); } catch(e) {} }
   // L'ospite entra per GUARDARE: senza questa chiamata la mappa restava vuota
-  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v4.01.
+  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v4.02.
   if (typeof loadPOIsFromDB === 'function') { try { loadPOIsFromDB(); } catch(e) {} }
   if (typeof loadMyTags === 'function') { try { loadMyTags(); } catch(e) {} }
   showToast(t('guest_active'));
@@ -8415,7 +8416,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='4.01';
+const APP_VERSION='4.02';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
