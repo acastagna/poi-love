@@ -3991,7 +3991,7 @@ function enterGuestMode() {
   if (overlay) overlay.style.display = 'none';
   if (!map && typeof initMap === 'function') { try { initMap(); } catch(e) {} }
   // L'ospite entra per GUARDARE: senza questa chiamata la mappa restava vuota
-  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v3.80.
+  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v3.81.
   if (typeof loadPOIsFromDB === 'function') { try { loadPOIsFromDB(); } catch(e) {} }
   if (typeof loadMyTags === 'function') { try { loadMyTags(); } catch(e) {} }
   showToast(t('guest_active'));
@@ -6898,6 +6898,7 @@ async function _refreshGpsCity(){
 }
 
 function initMap(){
+  if(map) return;                       // gia' avviata: la seconda chiamata rompeva l'avvio
   window._initMapRuns=(window._initMapRuns||0)+1;
   // La mappa riparte dall'ULTIMO posto visto, come Google Maps (deciso il 18/08).
   // Il GPS non strappa piu' via: resta il suo bottone per tornare "da me".
@@ -8220,7 +8221,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='3.80';
+const APP_VERSION='3.81';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
