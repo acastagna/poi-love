@@ -2084,7 +2084,7 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
 @keyframes voicePulse{0%,100%{box-shadow:0 0 0 0 rgba(212,43,43,0)}50%{box-shadow:0 0 0 5px rgba(212,43,43,.3)}}
 
 /* TOAST */
-.toast{position:fixed;bottom:120px;left:50%;transform:translateX(-50%) translateY(20px);background:#1C1C1C;color:#fff;border-radius:20px;padding:10px 20px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
+.toast{position:fixed;bottom:120px;left:50%;transform:translateX(-50%) translateY(20px);background:#1C1C1C;color:#fff;border-radius:20px;padding:11px 20px;font-size:14px;font-weight:600;z-index:1000000;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 /* HERO BG BUTTON */
@@ -4125,7 +4125,7 @@ function enterGuestMode() {
   if (overlay) overlay.style.display = 'none';
   if (!map && typeof initMap === 'function') { try { initMap(); } catch(e) {} }
   // L'ospite entra per GUARDARE: senza questa chiamata la mappa restava vuota
-  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v4.19.
+  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v4.20.
   if (typeof loadPOIsFromDB === 'function') { try { loadPOIsFromDB(); } catch(e) {} }
   if (typeof loadMyTags === 'function') { try { loadMyTags(); } catch(e) {} }
   showToast(t('guest_active'));
@@ -8479,7 +8479,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='4.19';
+const APP_VERSION='4.20';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
@@ -12802,7 +12802,7 @@ function _presetCatPicker(subKey, macro, categories){
 // Chiede a quale FAMIGLIA GENITORE appartiene (le 13 del founder, coi loro colori). Ritorna il macro o null.
 function _askCategoryFamily(){
   return new Promise(resolve=>{
-    const ov=document.createElement('div'); ov.className='micro-modal-ov'; ov.style.display='flex';
+    const ov=document.createElement('div'); ov.className='micro-modal-ov open'; ov.style.display='flex'; ov.style.zIndex=String(++window._zModalTop);
     const box=document.createElement('div'); box.className='micro-modal'; box.onclick=e=>e.stopPropagation();
     const ttl=document.createElement('div'); ttl.className='micro-modal-title'; ttl.innerHTML='<i class="ph-duotone ph-squares-four"></i> '+t('cat_fam_ask','A quale famiglia appartiene?'); box.appendChild(ttl);
     Object.keys(_CAT_FAMS).forEach(fid=>{
@@ -12824,7 +12824,7 @@ function _askCategoryFamily(){
 // Modale: ho già la mia categoria personalizzata → usala o sostituiscila. Ritorna 'use'|'replace'|null.
 function _askUseOrReplaceCat(existing){
   return new Promise(resolve=>{
-    const ov=document.createElement('div'); ov.className='micro-modal-ov'; ov.style.display='flex';
+    const ov=document.createElement('div'); ov.className='micro-modal-ov open'; ov.style.display='flex'; ov.style.zIndex=String(++window._zModalTop);
     const box=document.createElement('div'); box.className='micro-modal'; box.onclick=e=>e.stopPropagation();
     const ttl=document.createElement('div'); ttl.className='micro-modal-title';
     ttl.innerHTML='<i class="ph-duotone ph-tag"></i> '+t('cat_one_only','Hai già la tua categoria personalizzata')+' «'+_catLabel(existing)+'»'; box.appendChild(ttl);
@@ -13426,10 +13426,21 @@ function showToast(msg){
 // restano comunque sopra.
 window._zTop = window._zTop || 10000; window._zModalTop = window._zModalTop || 100000;
 (function(){
-  const lift = el => { if(el&&el.style&&(el.classList.contains('show')||el.classList.contains('open')||el.classList.contains('vis'))) el.style.zIndex=String(++window._zTop); };
-  const isOv = id => /(?:Ov|Modal|Sheet|Bg|Overlay)$/.test(id||'');
-  const obs = new MutationObserver(ms=>{ for(const m of ms){ const el=m.target; if(el.nodeType===1 && isOv(el.id)) lift(el); } });
-  (function start(){ if(!document.body){ setTimeout(start,50); return; } obs.observe(document.body,{attributes:true,attributeFilter:['class'],subtree:true}); })();
+  // Riconosco una finestra sia dal nome (…Ov, …Modal, …Sheet, …Overlay) sia dalla classe
+  // (qualsiasi -ov / -overlay): cosi' anche le finestre nate al volo salgono in cima.
+  const perNome  = id => /(?:Ov|Modal|Sheet|Bg|Overlay)$/.test(id||'');
+  const perClasse = cl => typeof cl==='string' && /(?:^|\s)[a-z][a-z0-9-]*-(?:ov|overlay)(?:\s|$)/.test(cl);
+  const eFinestra = el => el && el.nodeType===1 && (perNome(el.id) || perClasse(el.className));
+  const alzo = el => { if(el&&el.style) el.style.zIndex=String(++window._zTop); };
+  const aperta = el => el.classList.contains('show')||el.classList.contains('open')||el.classList.contains('vis')||el.style.display==='flex'||el.style.display==='block';
+  const obs = new MutationObserver(ms=>{
+    for(const m of ms){
+      if(m.type==='childList'){ m.addedNodes.forEach(nodo=>{ if(eFinestra(nodo) && aperta(nodo)) alzo(nodo); }); continue; }
+      const el=m.target; if(eFinestra(el) && aperta(el)) alzo(el);
+    }
+  });
+  (function start(){ if(!document.body){ setTimeout(start,50); return; }
+    obs.observe(document.body,{attributes:true,attributeFilter:['class','style'],subtree:true,childList:true}); })();
 })();
 function _uiModal({title='', message='', input=false, defaultValue='', okText='Ok', cancelText='Annulla', danger=false}){
   return new Promise(resolve=>{
@@ -15237,6 +15248,7 @@ function openStockSearch(opts){
     +'.sk-src{position:absolute;bottom:3px;left:3px;background:rgba(0,0,0,.62);color:#fff;font-size:8px;font-weight:800;text-transform:uppercase;padding:2px 5px;border-radius:4px}.sk-empty{text-align:center;color:var(--muted);font-size:13px;padding:20px}';
     document.head.appendChild(st); }
   const ov=document.createElement('div'); ov.className='sk-ov';
+  ov.style.zIndex=String(++window._zModalTop);   // sta sopra la finestra da cui l'ho aperta
   ov.innerHTML='<div class="sk-mod"><div class="sk-hd"><i class="ph-duotone ph-images"></i><b>'+t('stock_title','Cerca una foto (stock)')+'</b><button aria-label="chiudi">&times;</button></div>'
     +'<div class="sk-srow"><input class="sk-in" type="text" autocomplete="off" placeholder="'+t('stock_ph','Cerca: un luogo o una cosa, es. spiaggia, hotel…')+'"><button class="sk-go">'+t('search_tap','Cerca')+'</button></div>'
     +'<div class="sk-body"><div class="sk-empty">'+t('stock_hint','Scrivi e cerca: foto reali da più sorgenti (Unsplash, Pexels, Pixabay, Wikipedia, StockSnap…).')+'</div></div></div>';
