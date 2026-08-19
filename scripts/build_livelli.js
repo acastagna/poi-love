@@ -18,7 +18,7 @@ const path = require('path');
 
 const RADICE = path.join(__dirname, '..');
 const BASE = 'https://project.poilove.com';
-const OG = 'https://project.poilove.com/img/og-livelli.png';
+const OG = l => `https://project.poilove.com/img/og-livelli-${l}.jpg`;
 
 /* ── Livelli personali: le soglie vere stanno nel database (pannello admin,
       gamification_config.level_thresholds). Qui la fotografia di oggi, che la
@@ -97,7 +97,7 @@ const SCELTI = [
 ];
 
 const P = {
-  it:{ lang:'it', file:'livelli.html', dir:'',
+  it:{ lang:'it', file:'livelli.html', dir:'it',
     titolo:'Livelli POI•LOVE: personali, di sostegno, professionali',
     descr:'I livelli di POI•LOVE spiegati: i livelli personali si guadagnano con i punti, Sostenitore e Mecenate sostengono il progetto, Influencer, Professionista e Plus sono per chi lavora. Quota e condizione di ogni livello.',
     occhiello:'POI•LOVE', h1:'I livelli',
@@ -194,14 +194,14 @@ function datiStrutturati(l) {
   const blocchi = [
     { '@context':'https://schema.org', '@type':'WebPage', name:t.titolo, description:t.descr, inLanguage:l, url:url(l),
       isPartOf:{ '@type':'WebSite', name:'POI•LOVE', url:'https://poilove.com/' },
-      primaryImageOfPage:{ '@type':'ImageObject', url:OG, width:1200, height:630 } },
+      primaryImageOfPage:{ '@type':'ImageObject', url:OG(l), width:1200, height:630 } },
     { '@context':'https://schema.org', '@type':'BreadcrumbList', itemListElement:[
       { '@type':'ListItem', position:1, name:'POI•LOVE', item:'https://poilove.com/' },
       { '@type':'ListItem', position:2, name:t.h1, item:url(l) } ] },
     { '@context':'https://schema.org', '@type':'FAQPage', inLanguage:l, mainEntity:t.faq.map(([q, a]) => (
       { '@type':'Question', name:q, acceptedAnswer:{ '@type':'Answer', text:a } })) },
     { '@context':'https://schema.org', '@type':'Product', name:'POI•LOVE', description:t.descr,
-      brand:{ '@type':'Brand', name:'POI•LOVE' }, image:OG, offers:offerte }
+      brand:{ '@type':'Brand', name:'POI•LOVE' }, image:OG(l), offers:offerte }
   ];
   return blocchi.map(b => `<script type="application/ld+json">${JSON.stringify(b)}<\/script>`).join('\n');
 }
@@ -232,14 +232,15 @@ ${alt}
 <meta property="og:title" content="${esc(t.titolo)}">
 <meta property="og:description" content="${esc(t.descr)}">
 <meta property="og:url" content="${url(l)}">
-<meta property="og:image" content="${OG}">
+<meta property="og:image" content="${OG(l)}">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
+<meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:alt" content="POI•LOVE · ${esc(t.h1)}">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${esc(t.titolo)}">
 <meta name="twitter:description" content="${esc(t.descr)}">
-<meta name="twitter:image" content="${OG}">
+<meta name="twitter:image" content="${OG(l)}">
 <meta name="author" content="Alessandro Castagna">
 <meta name="theme-color" content="#D42B2B">
 <link rel="icon" href="https://poilove.com/img/favicon.svg" type="image/svg+xml">
@@ -421,9 +422,8 @@ function scrivi(dest, testo) {
   scrivi(path.join(RADICE, 'sal', sotto, 'livelli.html'), pagina(l, url(l)));
 });
 
-// L'italiano vive sulla radice (project.poilove.com/livelli.html). Chi scrive /it/
-// come per le altre lingue trova comunque la pagina: stessa pagina, e per i motori
-// l'originale resta quella della radice (canonical), cosi' non c'e' doppione.
-scrivi(path.join(RADICE, 'web', 'it', 'livelli.html'), pagina('it', url('it')));
-scrivi(path.join(RADICE, 'sal', 'it', 'livelli.html'), pagina('it', url('it')));
+// L'indirizzo ufficiale dell'italiano e' /it/livelli.html. Sulla radice resta la stessa
+// pagina, cosi' i link vecchi continuano a funzionare, ma per i motori l'originale e' /it/.
+scrivi(path.join(RADICE, 'web', 'livelli.html'), pagina('it', url('it')));
+scrivi(path.join(RADICE, 'sal', 'livelli.html'), pagina('it', url('it')));
 console.log('Fatto: 6 pagine (3 lingue x 2 siti).');
