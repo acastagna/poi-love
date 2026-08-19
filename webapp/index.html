@@ -505,16 +505,18 @@ body.tab-active #mapQuickBtns{display:none}
 .poi-list-row .pi-head{display:flex;align-items:baseline;gap:10px;min-width:0}
 .poi-list-row .pi-name{font-size:20px;font-weight:800;color:var(--ink);flex:1;min-width:0;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .poi-list-row .pi-tail{display:flex;align-items:baseline;gap:10px;flex-shrink:0;margin-left:auto}
-.poi-list-row .pi-vis{font-size:11px;font-weight:700;color:var(--muted);display:inline-flex;align-items:center;gap:3px;white-space:nowrap}
-.poi-list-row .pi-love{font-size:20px;font-weight:800;color:var(--red);display:inline-flex;align-items:center;gap:5px;line-height:1;white-space:nowrap}
+.poi-list-row .pi-vis{font-size:11px;font-weight:700;color:var(--muted);display:inline-flex;align-items:center;justify-content:flex-end;gap:3px;white-space:nowrap;flex:0 0 auto;min-width:78px}
+.poi-list-row .pi-love{font-size:20px;font-weight:800;color:var(--red);display:inline-flex;align-items:center;justify-content:flex-end;gap:5px;line-height:1;white-space:nowrap;flex:0 0 auto;min-width:84px}
 .poi-list-row .pi-love i{font-size:18px}
 .poi-list-row .pi-addr{font-size:13px;color:var(--muted);margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .poi-list-row .pi-sub{font-size:13px;color:var(--muted);margin-top:4px}
 .poi-list-row .list-vis{align-self:center}
 .poi-list-row .pi-dist{font-size:11px;color:var(--blue);font-weight:700;flex-shrink:0;background:#EBF2FC;padding:3px 8px;border-radius:8px}
 /* i comandi: icone grandi, 7 px di aria tutto intorno dentro al pulsante */
-.poi-list-row .pi-actions{display:flex;gap:6px;flex:1 1 100%;justify-content:flex-start;margin-top:10px;flex-wrap:wrap;row-gap:6px}
-.poi-list-row .pi-act-btn{width:38px;height:38px;padding:7px;border-radius:12px;border:1px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);flex:0 0 auto}
+.poi-list-row .pi-actions{display:grid;grid-template-columns:repeat(8,38px);gap:6px;flex:1 1 100%;margin-top:10px;justify-content:start}
+.poi-list-row .pi-actions-4{grid-template-columns:repeat(4,38px)}
+.poi-list-row .pi-act-void{width:38px;height:38px}
+.poi-list-row .pi-act-btn{width:38px;height:38px;padding:7px;border-radius:12px;border:1px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted)}
 .poi-list-row .pi-act-btn i{font-size:24px;line-height:1}
 .poi-list-row .pi-act-btn:hover{color:var(--red);border-color:var(--red)}
 /* Compagnie: card e status indicator */
@@ -2154,13 +2156,18 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
   .map-search-item-name{font-size:13px}
   .mqb-lbl{font-size:9px}
   .nav-item .nav-lbl{font-size:9px}
-  .poi-list-row{flex-wrap:nowrap;align-items:center}
+  .poi-list-row.riga-4{flex-wrap:nowrap;align-items:center}
+  .poi-list-row.riga-4 .pi-actions{margin-top:0}
   .poi-list-row .pi-name{font-size:17px}
-  .poi-list-row .pi-love{font-size:17px}
+  .poi-list-row .pi-love{font-size:17px;min-width:72px}
   .poi-list-row .pi-love i{font-size:15px}
+  .poi-list-row .pi-vis{min-width:78px}
   .poi-list-row .pi-addr{font-size:12px}
-  .poi-list-row .pi-actions{flex:0 1 auto;margin-top:0;overflow:visible;justify-content:flex-end}
+  .poi-list-row .pi-actions{grid-template-columns:repeat(8,34px);gap:6px}
+  .poi-list-row.riga-4 .pi-actions{flex:0 0 auto}
+  .poi-list-row .pi-actions-4{grid-template-columns:repeat(4,34px)}
   .poi-list-row .pi-act-btn{width:34px;height:34px;padding:7px}
+  .poi-list-row .pi-act-void{width:34px;height:34px}
   .poi-list-row .pi-act-btn i{font-size:20px}
   .pf-chip{padding:5px 11px;font-size:11.5px;min-height:0}
   .poi-search{padding:9px 13px 9px 38px;font-size:13px}
@@ -2175,9 +2182,16 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
   .mmo-text strong{font-size:13px}
   .pl-chip-name{font-size:14px}
   .pl-chip-addr{font-size:11px}
-  .pl-chip-btn{width:30px;height:30px;font-size:14px}
+  .pl-chip-btn{width:30px;height:30px;padding:7px;font-size:16px;line-height:1}
   .pl-add-btn{font-size:12px}
   .auth-bg-heart{animation:none;transform:translate(-50%,-50%)}
+}
+/* Schermo largo: la riga dei luoghi sta tutta su una linea, comandi compresi.
+   Sotto questa misura la colonna della lista e' meta' schermo e il nome verrebbe
+   tagliato dopo tre lettere: li' i comandi restano sulla riga sotto. */
+@media(min-width:1400px){
+  .poi-list-row{flex-wrap:nowrap;align-items:center}
+  .poi-list-row .pi-actions{flex:0 0 auto;margin-top:0}
 }
 
 </style>
@@ -4071,7 +4085,7 @@ function enterGuestMode() {
   if (overlay) overlay.style.display = 'none';
   if (!map && typeof initMap === 'function') { try { initMap(); } catch(e) {} }
   // L'ospite entra per GUARDARE: senza questa chiamata la mappa restava vuota
-  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v4.09.
+  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v4.12.
   if (typeof loadPOIsFromDB === 'function') { try { loadPOIsFromDB(); } catch(e) {} }
   if (typeof loadMyTags === 'function') { try { loadMyTags(); } catch(e) {} }
   showToast(t('guest_active'));
@@ -8425,7 +8439,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='4.09';
+const APP_VERSION='4.12';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
@@ -9597,19 +9611,19 @@ async function renderPoiTab(){
 
     if(poiSubtab==='near'){
       // Lista vicini: click apre dettaglio, "Naviga" lancia maps esterne
-      return `<div class="poi-list-row" data-poi-key="${key}" data-search="${_searchHay}" style="cursor:pointer">
+      return `<div class="poi-list-row riga-4" data-poi-key="${key}" data-search="${_searchHay}" style="cursor:pointer">
         <div class="pi-emoji" onclick="openPoiFromTab('${key}')">${emoji}</div>
         <div class="pi-info" onclick="openPoiFromTab('${key}')">
           <div class="pi-head">
             <div class="pi-name">${_nome}</div>
             <div class="pi-tail">
               ${dist?`<span class="pi-dist">${dist}</span>`:''}
-              ${_love?`<span class="pi-love"><i class="ph-fill ph-heart"></i>${_love}</span>`:''}
+              <span class="pi-love">${_love?`<i class="ph-fill ph-heart"></i>${_love}`:''}</span>
             </div>
           </div>
           <div class="pi-addr" data-ak="${_ak}">${_addr}</div>
         </div>
-        <div class="pi-actions">
+        <div class="pi-actions pi-actions-4">
           <button class="pi-act-btn" title="Salva in un luogo personale" onclick="event.stopPropagation();poiToSafe('${key}')"><i class="ph-duotone ph-vault"></i></button>
           <button class="pi-act-btn" data-tt="act_open_map" title="${t('act_open_map')}" onclick="event.stopPropagation();centerMapOnPoi(${p.lat},${p.lng})"><i class="ph-duotone ph-crosshair"></i></button>
           <button class="pi-act-btn" data-tt="act_navigate" title="${t('act_navigate')}" onclick="event.stopPropagation();navigateToPoi(${p.lat},${p.lng},'${(p.name||'').replace(/'/g,'')}')"><i class="ph-duotone ph-navigation-arrow"></i></button>
@@ -9626,7 +9640,7 @@ async function renderPoiTab(){
           <div class="pi-name">${_nome}</div>
           <div class="pi-tail">
             <span class="pi-vis"><i class="ph-duotone ${visIcon}"></i>${visLblT}</span>
-            ${_love?`<span class="pi-love"><i class="ph-fill ph-heart"></i>${_love}</span>`:''}
+            <span class="pi-love">${_love?`<i class="ph-fill ph-heart"></i>${_love}`:''}</span>
           </div>
         </div>
         <div class="pi-addr" data-ak="${_ak}">${_addr}</div>
@@ -9636,10 +9650,10 @@ async function renderPoiTab(){
         <button class="pi-act-btn" data-tt="act_navigate" title="${t('act_navigate')}" onclick="navigateToPoi(${p.lat},${p.lng},'${(p.name||'').replace(/'/g,'')}')"><i class="ph-duotone ph-navigation-arrow"></i></button>
         <button class="pi-act-btn" data-tt="act_open_map" title="${t('act_open_map')}" onclick="centerMapOnPoi(${p.lat},${p.lng})"><i class="ph-duotone ph-map-pin"></i></button>
         <button class="pi-act-btn" data-tt="act_share" title="${t('act_share')}" onclick="sharePoiByKey('${key}')"><i class="ph-duotone ph-share-network"></i></button>
-        ${isMine||poiSubtab==='mine'?`<button class="pi-act-btn" data-tt="act_visibility" title="${t('act_visibility')}" onclick="cyclePoiVisibility('${key}')"><i class="ph-duotone ${visIcon}"></i></button>`:''}
-        ${vis==='community'?`<button class="pi-act-btn" data-tt="act_suggest_google" title="${t('act_suggest_google')}" onclick="suggestToGoogleMaps('${key}')"><i class="ph-duotone ph-google-logo"></i></button>`:''}
-        ${isMine||poiSubtab==='mine'?`<button class="pi-act-btn" data-tt="act_edit" title="${t('act_edit')}" onclick="editPoiByKey('${key}')"><i class="ph-duotone ph-pencil-simple"></i></button>`:''}
-        ${isMine||poiSubtab==='mine'?`<button class="pi-act-btn" data-tt="act_delete" title="${t('act_delete')}" style="color:var(--red);border-color:var(--red)" onclick="deletePoiByKey('${key}')"><i class="ph-duotone ph-trash"></i></button>`:''}
+        ${isMine||poiSubtab==='mine'?`<button class="pi-act-btn" data-tt="act_visibility" title="${t('act_visibility')}" onclick="cyclePoiVisibility('${key}')"><i class="ph-duotone ${visIcon}"></i></button>`:'<span class="pi-act-void"></span>'}
+        ${vis==='community'?`<button class="pi-act-btn" data-tt="act_suggest_google" title="${t('act_suggest_google')}" onclick="suggestToGoogleMaps('${key}')"><i class="ph-duotone ph-google-logo"></i></button>`:'<span class="pi-act-void"></span>'}
+        ${isMine||poiSubtab==='mine'?`<button class="pi-act-btn" data-tt="act_edit" title="${t('act_edit')}" onclick="editPoiByKey('${key}')"><i class="ph-duotone ph-pencil-simple"></i></button>`:'<span class="pi-act-void"></span>'}
+        ${isMine||poiSubtab==='mine'?`<button class="pi-act-btn" data-tt="act_delete" title="${t('act_delete')}" style="color:var(--red);border-color:var(--red)" onclick="deletePoiByKey('${key}')"><i class="ph-duotone ph-trash"></i></button>`:'<span class="pi-act-void"></span>'}
       </div>
     </div>`;
   }).join('');
