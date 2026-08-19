@@ -37,33 +37,18 @@ try {
     $pdo = new PDO($DB_DSN, $dbUser, $dbPass, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_TIMEOUT => 8]);
 } catch (Throwable $t) { nota('database non raggiungibile'); fine(500, 'db'); }
 
-$q = $pdo->prepare(
-  "SELECT r.id AS rid, inv.email AS mail_invitante,
-          coalesce(pinv.username, split_part(inv.email,'@',1)) AS nome_invitante,
-          coalesce(pme.username, split_part(me.email,'@',1))  AS nome_arrivato,
-          coalesce(pinv.points, 0) AS punti_invitante
-     FROM public.profiles pme
-     JOIN auth.users me       ON me.id  = pme.id
-     JOIN auth.users inv      ON inv.id = pme.referred_by
-     LEFT JOIN public.profiles pinv ON pinv.id = pme.referred_by
-     LEFT JOIN public.referrals r   ON r.referred_id = pme.id AND r.notified_at IS NULL
-    WHERE pme.id = :id AND pme.referred_by IS NOT NULL");
+$q = $pdo->prepare("SELECT rid, inviter_email, inviter_name, newcomer_name, inviter_lang FROM public.referral_to_notify(:id)");
 $q->execute([':id' => $user['id']]);
 $d = $q->fetch(PDO::FETCH_ASSOC);
-if (!$d || empty($d['mail_invitante'])) { echo '{"ok":true,"nulla":true}'; exit; }   // nessun invito da avvisare
+if (!$d || empty($d['inviter_email'])) { echo '{"ok":true,"nulla":true}'; exit; }   // niente da avvisare
 
-// una volta sola: se non c'e' una riga da segnare, l'avviso e' gia' partito
-if (empty($d['rid'])) { echo '{"ok":true,"gia":true}'; exit; }
-$seg = $pdo->prepare("UPDATE public.referrals SET notified_at = now() WHERE id = :rid AND notified_at IS NULL");
+// una volta sola: se qualcun altro ha gia' segnato l'avviso, mi fermo
+$seg = $pdo->prepare("SELECT public.referral_mark_notified(:rid)");
 $seg->execute([':rid' => $d['rid']]);
-if ($seg->rowCount() !== 1) { echo '{"ok":true,"gia":true}'; exit; }
+if (!$seg->fetchColumn()) { echo '{"ok":true,"gia":true}'; exit; }
 
 // ── il vestito, nella lingua di chi ha invitato ──
-$lang = 'en';
-$ql = $pdo->prepare("SELECT raw_user_meta_data->>'lang' AS l FROM auth.users WHERE email = :e");
-$ql->execute([':e' => $d['mail_invitante']]);
-$l = $ql->fetchColumn();
-if (in_array($l, ['sq', 'it', 'en'], true)) $lang = $l;
+$lang = in_array($d['inviter_lang'], ['sq','it','en'], true) ? $d['inviter_lang'] : 'en';
 
 $punti = 200;
 $D = [

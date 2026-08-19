@@ -73,7 +73,7 @@ if (is_string($dc) && strpos($dc, ':') !== false) {
     try {
         $pdo = new PDO('pgsql:host=127.0.0.1;port=5433;dbname=poilove', $dbU, $dbP,
             [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_TIMEOUT => 5]);
-        $q = $pdo->prepare("SELECT raw_user_meta_data->>'lang' FROM auth.users WHERE lower(email) = lower(:e) LIMIT 1");
+        $q = $pdo->prepare("SELECT public.mail_lang_for(:e)");
         $q->execute([':e' => $to]);
         $suaLingua = $q->fetchColumn();
         if (in_array($suaLingua, ['sq', 'it', 'en'], true)) $lang = $suaLingua;
