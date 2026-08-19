@@ -24,7 +24,7 @@
 - [ ] ~~POSTA DEL SERVIZIO ACCESSI ASSENTE~~ (voce superata)
 
 - [ ] **Traslocare i 6 programmi da Supabase** (illi-chat, send-email, transcribe, image-search, place-enrich, admin-ai): oggi raggiunti dal ponte `/db/functions`. Sessione dedicata.
-- [ ] **Foto nuove**: gli upload passano ancora dallo storage Supabase via ponte; portare anche quelli sul media server della macchina.
+- [x] **Foto nuove: FATTO il 19/08** — il server delle foto chiedeva ancora il permesso a Supabase, quindi ogni caricamento ricadeva sul loro deposito. Ora valida col nostro servizio accessi e scrive sulla macchina (provato: foto caricata e riaperta). Restano i 6 programmi.
 - [ ] **Fra 30 giorni (dal 18/09)**: se tutto regge, valutare spegnimento Supabase e disdetta graduale; il Plesk resta per gli altri progetti.
 - [ ] **App Google in modalità Test**: prima del lancio pubblico va PUBBLICATA nella console (oggi entrano solo account in lista, max 100).
 

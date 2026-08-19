@@ -2,7 +2,9 @@
 // =============================================================================
 // POI•LOVE — Helpers: Autenticazione JWT Supabase
 // =============================================================================
-// Strategia: valida il token chiamando Supabase /auth/v1/user.
+// Strategia: valida il token chiamando il NOSTRO servizio accessi.
+// Dal 19/08/2026 gli accessi sono nostri (GoTrue sulla macchina): le foto non
+// dipendono piu' da Supabase. Indirizzo configurabile in config.php.
 // Non serve la JWT secret — Supabase verifica internamente e restituisce
 // l'utente se il token è valido e non scaduto.
 // =============================================================================
@@ -51,7 +53,7 @@ function validate_supabase_token(string $token): ?array {
         return null;
     }
 
-    $url = SUPABASE_URL . '/auth/v1/user';
+    $url = (defined('AUTH_USER_URL') && AUTH_USER_URL) ? AUTH_USER_URL : (SUPABASE_URL . '/auth/v1/user');
 
     $ch = curl_init($url);
     curl_setopt_array($ch, [
@@ -59,7 +61,6 @@ function validate_supabase_token(string $token): ?array {
         CURLOPT_TIMEOUT        => 8,
         CURLOPT_HTTPHEADER     => [
             'Authorization: Bearer ' . $token,
-            'apikey: '              . SUPABASE_ANON_KEY,
             'Content-Type: application/json',
         ],
         CURLOPT_SSL_VERIFYPEER => true,

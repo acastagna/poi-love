@@ -35,3 +35,6 @@ define('ALLOWED_ORIGINS', [
     'http://localhost:8081',
     'exp://localhost:8081',
 ]);
+
+// Servizio accessi nostro (GoTrue sulla macchina): valida i token delle foto.
+define('AUTH_USER_URL', 'http://127.0.0.1:9999/user');
