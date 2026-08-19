@@ -1676,7 +1676,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 .itin-ac-drop{position:absolute;top:100%;left:20px;right:20px;background:var(--card);border:1.5px solid var(--blue);border-radius:11px;box-shadow:0 8px 24px rgba(0,0,0,.14);z-index:20;overflow:hidden;display:none}
 .itin-ac-drop.open{display:block}
 /* Trip cards — griglia quadrata responsive (2 col mobile / 3 col desktop) */
-.itin-cards{padding:0 20px 20px;display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.itin-cards{padding:0 16px 20px;display:grid;grid-template-columns:1fr;gap:14px}
 #itinArchivedWrap{padding:0 20px 24px}
 #itinArchivedBtn{display:flex;align-items:center;gap:9px;width:100%;padding:12px 14px;background:var(--card);border:1.5px solid var(--border);border-radius:14px;cursor:pointer;font-family:inherit;color:var(--text);font-size:13.5px;font-weight:700}
 #itinArchivedBtn i{font-size:18px;color:var(--muted)}
@@ -1688,8 +1688,8 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 .itin-arch-info span{font-size:11px;color:var(--muted)}
 .itin-arch-restore{flex:none;display:flex;align-items:center;gap:5px;padding:8px 12px;border-radius:10px;border:1.5px solid var(--green,#059669);background:transparent;color:var(--green,#059669);font-size:12px;font-weight:800;cursor:pointer;font-family:inherit}
 .itin-arch-restore:active{transform:scale(.96)}
-@media(min-width:768px){.itin-cards{grid-template-columns:repeat(3,1fr);gap:16px}}
-@media(min-width:1200px){.itin-cards{grid-template-columns:repeat(4,1fr)}}
+@media(min-width:768px){.itin-cards{grid-template-columns:repeat(2,1fr);gap:16px}}
+@media(min-width:1200px){.itin-cards{grid-template-columns:repeat(3,1fr)}}
 .trip-feat-badge{position:absolute;top:8px;right:8px;background:rgba(212,43,43,.92);color:#fff;font-size:9.5px;font-weight:800;padding:3px 8px;border-radius:8px;display:inline-flex;align-items:center;gap:3px;z-index:2}
 .trip-feat-toggle{position:absolute;bottom:8px;right:44px;width:26px;height:26px;border-radius:50%;border:none;background:rgba(255,255,255,.9);color:var(--red);cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2}
 .trip-feat-toggle.on{background:var(--red);color:#fff}
@@ -1712,11 +1712,11 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 .trip-swipe .trip-card{position:relative;z-index:1;border-radius:0;box-shadow:none;will-change:transform;touch-action:pan-y}
 .trip-swipe .trip-card:hover{transform:none;box-shadow:none}
 .trip-swipe.swiping .trip-card{transition:none}
-.trip-cover{aspect-ratio:1/1;background-size:cover;background-position:center;position:relative}
+.trip-cover{aspect-ratio:16/9;background-size:cover;background-position:center;position:relative}
 .trip-cover-overlay{position:absolute;inset:0;background:linear-gradient(transparent 35%,rgba(0,0,0,.78))}
-.trip-cover-badge{position:absolute;top:10px;left:10px;background:rgba(255,255,255,.22);border-radius:8px;padding:3px 8px;font-size:9px;font-weight:800;color:#fff;display:flex;align-items:center;gap:4px;max-width:calc(100% - 20px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.trip-cover-dates{position:absolute;bottom:8px;left:10px;right:10px;font-size:10px;font-weight:700;color:rgba(255,255,255,.95);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.trip-cover-change{position:absolute;top:10px;right:10px;background:rgba(0,0,0,.45);border:none;color:#fff;border-radius:8px;padding:4px 6px;font-size:9px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:3px}
+.trip-cover-badge{position:absolute;top:12px;left:12px;background:rgba(0,0,0,.42);border-radius:9px;padding:5px 10px;font-size:12px;font-weight:800;color:#fff;display:flex;align-items:center;gap:4px;max-width:calc(100% - 20px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.trip-cover-dates{position:absolute;bottom:10px;left:14px;right:14px;font-size:13.5px;font-weight:700;color:rgba(255,255,255,.95);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.trip-cover-change{position:absolute;top:12px;right:12px;width:38px;height:38px;padding:7px;background:rgba(0,0,0,.5);border:none;color:#fff;border-radius:50%;font-size:22px;line-height:1;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:3px}
 /* Visibility + share bar (ora dentro overlay dettaglio) */
 .trip-vis-bar{display:flex;align-items:center;gap:6px;padding:10px 14px;border-bottom:1px solid var(--border);flex-wrap:wrap}
 .trip-vis-btn{height:34px;padding:0 13px;border-radius:17px;border:1.5px solid var(--border);background:none;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--muted);transition:all .15s;display:flex;align-items:center;gap:5px}
@@ -1804,20 +1804,20 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 .trip-vis-btn.trip-vis-link{background:var(--red);border-color:var(--red);color:#fff}
 .trip-vis-btn.trip-vis-link:active{transform:scale(.96)}
 /* Trip body — compatto sotto cover quadrata */
-.trip-body{padding:10px 12px 12px;display:flex;flex-direction:column;gap:6px}
-.trip-name{font-size:14px;font-weight:900;color:var(--text);line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.5em}
-@media(min-width:768px){.trip-name{font-size:14px}}
-.trip-meta{display:flex;gap:4px 10px;font-size:10.5px;color:var(--muted);flex-wrap:wrap;align-items:center;margin-top:2px}
+.trip-body{padding:13px 15px 15px;display:flex;flex-direction:column;gap:7px}
+.trip-name{font-size:20px;font-weight:900;color:var(--text);line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+@media(min-width:768px){.trip-name{font-size:18px}}
+.trip-meta{display:flex;gap:6px 14px;font-size:13px;color:var(--muted);flex-wrap:wrap;align-items:center;margin-top:2px}
 .trip-meta .trip-meta-area{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 /* Descrizione sulla card: 2 righe, poi puntini */
-.trip-card-desc{font-size:11px;color:var(--muted);line-height:1.35;margin:3px 0 5px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.trip-card-desc{font-size:14px;color:var(--muted);line-height:1.35;margin:3px 0 5px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .trip-meta span{display:flex;align-items:center;gap:3px}
 .trip-footer{display:flex;align-items:center;gap:6px;margin-top:2px}
 .trip-companions{display:flex}
 .trip-comp-av{width:20px;height:20px;border-radius:50%;border:2px solid var(--card);overflow:hidden;margin-left:-5px}
 .trip-comp-av:first-child{margin-left:0}
 .trip-comp-av img{width:100%;height:100%;object-fit:cover}
-.trip-open-btn{margin-left:auto;height:24px;padding:0 8px;background:transparent;color:var(--blue);border:none;border-radius:12px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:3px}
+.trip-open-btn{margin-left:auto;height:34px;padding:0 12px;background:#EBF2FC;color:var(--blue);border:none;border-radius:17px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:3px}
 /* Trip detail — ora apre in overlay dedicato */
 .trip-detail-ov{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.62);display:none;align-items:center;justify-content:center;padding:16px}
 .trip-detail-ov.open{display:flex}
@@ -1844,7 +1844,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 .trip-detail-close{width:38px;height:38px;padding:7px;border:1px solid var(--border);background:var(--card);cursor:pointer;color:var(--muted);font-size:24px;line-height:1;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
 .trip-detail-close:hover{background:#f5f0e8;color:var(--text)}
 .trip-detail-section{padding:12px 16px 0}
-.trip-bar{position:sticky;bottom:0;z-index:20;display:flex;gap:10px;padding:12px 16px calc(env(safe-area-inset-bottom,0px) + 12px);background:var(--bg);border-top:1px solid var(--border);margin-top:14px;box-shadow:0 -8px 20px rgba(0,0,0,.07)}
+.trip-bar{position:sticky;bottom:0;z-index:800;display:flex;gap:10px;padding:12px 16px calc(env(safe-area-inset-bottom,0px) + 12px);background:var(--bg);border-top:1px solid var(--border);margin-top:14px;box-shadow:0 -8px 20px rgba(0,0,0,.07)}
 .trip-bar-btn{flex:1;height:50px;border-radius:14px;border:none;font-family:inherit;font-size:15px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px}
 .trip-bar-btn>i{font-size:21px}
 .trip-bar-btn.main{background:var(--red);color:#fff}
@@ -1856,7 +1856,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 .trip-cal-toggle.aperto .tct-caret{transform:rotate(180deg)}
 .trip-detail-header{font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
 /* Mappa itinerario */
-.itin-map{height:200px;border-radius:12px;overflow:hidden;margin-bottom:14px;border:1px solid var(--border)}
+.itin-map{height:200px;border-radius:12px;overflow:hidden;margin-bottom:14px;border:1px solid var(--border);position:relative;z-index:0;isolation:isolate}
 /* Sempre a tutta larghezza: quadrata solo su schermo stretto; su schermi larghi altezza fissa
    (il vecchio max-height con aspect-ratio 1/1 si trasferiva alla LARGHEZZA e lasciava il vuoto a destra) */
 .itin-map.square{width:100%;height:auto;aspect-ratio:1/1}
@@ -4125,7 +4125,7 @@ function enterGuestMode() {
   if (overlay) overlay.style.display = 'none';
   if (!map && typeof initMap === 'function') { try { initMap(); } catch(e) {} }
   // L'ospite entra per GUARDARE: senza questa chiamata la mappa restava vuota
-  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v4.18.
+  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v4.19.
   if (typeof loadPOIsFromDB === 'function') { try { loadPOIsFromDB(); } catch(e) {} }
   if (typeof loadMyTags === 'function') { try { loadMyTags(); } catch(e) {} }
   showToast(t('guest_active'));
@@ -8479,7 +8479,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='4.18';
+const APP_VERSION='4.19';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
@@ -14632,10 +14632,10 @@ function renderTripCardHTML(t){
   <div class="trip-card" id="tc-${t.id}" onclick="_tripCardTap(event,'${t.id}')">
     <div class="trip-cover" style="${t.cover?`background-image:url('${t.cover}')`:'background:linear-gradient(135deg,#D42B2B,#7C3AED)'}">
       <div class="trip-cover-overlay"></div>
-      <div class="trip-cover-badge"><i class="ph-duotone ph-map-pin" style="font-size:9px"></i> ${t.badge}</div>
+      <div class="trip-cover-badge"><i class="ph-duotone ph-map-pin" style="font-size:14px"></i> ${t.badge}</div>
       ${t.isFeatured?`<div class="trip-feat-badge"><i class="ph-fill ph-star"></i> ${window.t('flag_featured','In evidenza')}</div>`:''}
       <div class="trip-cover-dates">${t.dates}</div>
-      <button class="trip-cover-change" onclick="event.stopPropagation();changeTripCover('${t.id}')" title="${window.t('trip_change_cover','Cambia copertina')}"><i class="ph-duotone ph-image" style="font-size:10px"></i></button>
+      <button class="trip-cover-change" onclick="event.stopPropagation();changeTripCover('${t.id}')" title="${window.t('trip_change_cover','Cambia copertina')}"><i class="ph-duotone ph-image"></i></button>
       ${_TRIP_FEAT_TIERS[window._userSpecialTier]?`<button class="trip-feat-toggle${t.isFeatured?' on':''}" onclick="event.stopPropagation();toggleTripFeatured('${t.id}')" title="${window.t('feature_add','Metti in evidenza')}"><i class="ph-${t.isFeatured?'fill':'duotone'} ph-star" style="font-size:11px"></i></button>`:''}
     </div>
     <div class="trip-body">
