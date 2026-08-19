@@ -1,5 +1,26 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
+## Sessione 19/08/2026 (7) — Le righe dei luoghi vanno in colonna (v4.10 → 4.12)
+
+Il disordine aveva due cause, tutte e due chiuse.
+
+1. **Un comando che non serve lasciava il posto vuoto e spostava tutti gli altri.**
+   Ora i comandi stanno in una griglia a **otto posti fissi** (quattro nella lista Vicini):
+   quando un comando non si applica (per esempio "suggerisci a Google" su un luogo privato)
+   il suo posto resta vuoto e gli altri non si muovono. Cestino, matita e condividi cadono
+   sempre nella stessa colonna, riga dopo riga.
+2. **L'etichetta e i cuori non avevano una colonna loro.** Ora Pubblico/Privato ha la sua
+   larghezza minima e i cuori la loro, quindi le etichette partono tutte allo stesso punto e
+   i numeri finiscono tutti allo stesso punto.
+
+**Una riga sola solo se ci sta**: sopra i 1400 px di finestra la riga con otto comandi sta su una
+linea; sotto (dove la lista occupa mezza finestra) i comandi vanno sulla riga di sotto, altrimenti
+il nome verrebbe tagliato dopo tre lettere. La lista Vicini, che ha quattro comandi, resta su una
+linea gia' da 1024 px.
+
+Misurato dal vivo: etichette, cuori e primo pulsante allo stesso pixel su tutte le righe, a 375, 1280 e 1600 px.
+Controllo esterno: **18 prove superate su 18**.
+
 ## Sessione 19/08/2026 (6) — Le righe dei luoghi si leggono (v4.07 → 4.09)
 
 Vale per tutte le linguette: Personali, I miei POI, Loved, Vicini.
