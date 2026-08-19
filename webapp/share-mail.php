@@ -66,6 +66,20 @@ if (!filter_var($to, FILTER_VALIDATE_EMAIL) || mb_strlen($to) > 254) fine(400, '
 if ($place === '' || $lat === null || $lng === null) fine(400, 'dati');
 if ($lat < -90 || $lat > 90 || $lng < -180 || $lng > 180) fine(400, 'dati');
 
+// Se il destinatario e' gia' iscritto, la sua lingua vince su quella di chi manda.
+$dc = @file_get_contents('/var/www/poilove/private/db-creds');
+if (is_string($dc) && strpos($dc, ':') !== false) {
+    [$dbU, $dbP] = explode(':', trim($dc), 2);
+    try {
+        $pdo = new PDO('pgsql:host=127.0.0.1;port=5433;dbname=poilove', $dbU, $dbP,
+            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_TIMEOUT => 5]);
+        $q = $pdo->prepare("SELECT raw_user_meta_data->>'lang' FROM auth.users WHERE lower(email) = lower(:e) LIMIT 1");
+        $q->execute([':e' => $to]);
+        $suaLingua = $q->fetchColumn();
+        if (in_array($suaLingua, ['sq', 'it', 'en'], true)) $lang = $suaLingua;
+    } catch (Throwable $t) { /* se il database non risponde, resta la lingua di chi manda */ }
+}
+
 // ── 3. tetto giornaliero: contato PRIMA di spedire, con blocco esclusivo ──
 if (!is_dir($RATE_DIR) && !@mkdir($RATE_DIR, 0770, true)) { nota('tetto: cartella non creata'); fine(500, 'tetto'); }
 $rf = $RATE_DIR . '/' . preg_replace('/[^0-9a-fA-F-]/', '', (string)$user['id']) . '.json';
