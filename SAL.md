@@ -1,5 +1,33 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
+## Sessione 19/08/2026 (9) — Itinerario rifatto, livelli rimessi in ordine (v4.15 → 4.21)
+
+**Scheda dell'itinerario, rifatta**
+
+| Prima | Ora |
+|---|---|
+| Titolo su una riga a parte sotto la foto | **Nome e numeri sopra la foto** (tappe, km, zona), testata alta 190 px |
+| Due riquadri con solo le date | **Cruscotto**: date, durata in giorni, quanto manca alla partenza (o giorno X di Y, o concluso) e **barra di avanzamento vera** con "n di N tappe fatte" |
+| Tappe come elenco piatto | **Linea del tempo**: pallino numerato per ogni tappa e **distanza reale fra una tappa e l'altra** |
+| Calendario sempre aperto (duplicava le date) | Si apre solo per cambiare le date |
+| Link mescolato alle visibilita' | Sezione **Chi lo vede** separata; **barra fissa in basso** con Aggiungi tappa e Condividi |
+| Card in lista strette su due colonne | **Una per riga, copertina 16:9**, nome 20 px, descrizione 14 px |
+
+**Livelli (l'ordine di chi sta sopra a chi)**
+Difetti trovati e chiusi: il messaggino di conferma stava a quota 999 e finiva **sotto** ogni finestra
+aperta (che sale a 10.000); la ricerca foto di repertorio stava a 2.000 e finiva sotto la finestra che
+l'aveva chiamata; due finestrelle delle categorie nascevano senza il segno "aperta" e restavano invisibili
+(difetto mio, entrato con la centratura del 4.05); i segnaposto della mappa dell'itinerario passavano
+sopra la barra dei comandi.
+Ora: messaggino sempre in cima, ogni finestra nasce sopra quella che l'ha chiamata, la mappa resta
+dentro la sua cornice.
+
+**Guasto introdotto e riparato in 4.21**: la sorveglianza delle finestre reagiva anche alla modifica che
+faceva lei stessa, quindi si richiamava all'infinito e **bloccava il browser**. Ora ignora il proprio
+ritocco e non rialza una finestra gia' in cima. Verificato dal vivo: pagina reattiva, contatore fermo.
+
+Controllo esterno: **18 prove superate su 18**.
+
 ## Sessione 19/08/2026 (8) — Compagnie e scheda itinerario alla stessa misura (v4.13 → 4.14)
 
 **Compagni di Viaggio**
