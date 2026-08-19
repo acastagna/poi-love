@@ -1247,8 +1247,8 @@ body.kb-open #lang-strip,body.kb-open #brand-strip{opacity:0;pointer-events:none
    (compagnia 9100, rotta 9600): deve stare sopra tutte, o resterebbe invisibile. */
 #sharePoiDisambigOv{z-index:9800}
 .micro-modal-ov.open{background:rgba(0,0,0,.58);pointer-events:all;}
-.micro-modal{background:var(--card);border-radius:24px;padding-bottom:env(safe-area-inset-bottom,12px);width:100%;max-width:480px;transform:translateY(100%);transition:transform .32s cubic-bezier(.32,.72,0,1);overflow:hidden}
-.micro-modal-ov.open .micro-modal{transform:translateY(0)}
+.micro-modal{background:var(--card);border-radius:24px;padding-bottom:env(safe-area-inset-bottom,12px);width:100%;max-width:480px;opacity:0;visibility:hidden;transform:translateY(26px) scale(.97);transition:transform .28s cubic-bezier(.32,.72,0,1),opacity .2s,visibility .28s;overflow:hidden;max-height:88vh;overflow-y:auto}
+.micro-modal-ov.open .micro-modal{opacity:1;visibility:visible;transform:none}
 .micro-modal-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:12px auto 2px}
 .micro-modal-title{font-size:15px;font-weight:800;color:var(--text);padding:10px 20px 12px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border)}
 .micro-modal-title i{font-size:17px;color:var(--muted)}
@@ -1474,7 +1474,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 .vanity-modal-ov{position:fixed;inset:0;z-index:900;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.55)}
 .vanity-modal-ov.open{display:flex}
 .vanity-modal{background:var(--card);border-radius:24px;padding:0 0 40px;width:100%;max-width:540px;animation:slideUp .35s cubic-bezier(.32,.72,0,1)}
-@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(26px) scale(.97)}to{opacity:1;transform:none}}
 .vanity-modal-handle{width:44px;height:5px;background:#C8BFB0;border-radius:3px;margin:14px auto 18px}
 .vanity-modal-title{font-size:17px;font-weight:900;color:var(--text);padding:0 20px 12px;text-align:center}
 .vanity-modal-sub{font-size:12px;color:var(--muted);padding:0 20px 16px;text-align:center;line-height:1.5}
@@ -1576,8 +1576,8 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 /* POST-SAVE MODAL */
 .save-modal-overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center}
 .save-modal-overlay.show{display:flex}
-.save-modal{background:var(--card);border-radius:24px;padding:0 24px 52px;width:100%;text-align:center;transform:translateY(100%);transition:transform .4s cubic-bezier(.32,.72,0,1)}
-.save-modal-overlay.show .save-modal{transform:translateY(0)}
+.save-modal{background:var(--card);border-radius:24px;padding:0 24px 32px;width:100%;max-width:480px;text-align:center;opacity:0;transform:translateY(26px) scale(.97);transition:transform .32s cubic-bezier(.32,.72,0,1),opacity .22s;max-height:88vh;overflow-y:auto}
+.save-modal-overlay.show .save-modal{opacity:1;transform:none}
 .save-modal-icon{font-size:64px;margin:24px 0 8px;line-height:1}
 .save-modal-title{font-size:22px;font-weight:900;color:var(--text);margin-bottom:8px;line-height:1.2}
 .save-modal-sub{font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:24px}
@@ -4062,7 +4062,7 @@ function enterGuestMode() {
   if (overlay) overlay.style.display = 'none';
   if (!map && typeof initMap === 'function') { try { initMap(); } catch(e) {} }
   // L'ospite entra per GUARDARE: senza questa chiamata la mappa restava vuota
-  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v4.04.
+  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v4.05.
   if (typeof loadPOIsFromDB === 'function') { try { loadPOIsFromDB(); } catch(e) {} }
   if (typeof loadMyTags === 'function') { try { loadMyTags(); } catch(e) {} }
   showToast(t('guest_active'));
@@ -8416,7 +8416,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='4.04';
+const APP_VERSION='4.05';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
