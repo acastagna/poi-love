@@ -1,5 +1,33 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
+## Sessione 19/08/2026 (3) — Pagina POI ristrutturata, invio email dei luoghi, revisione avversariale (v3.75 → 3.81)
+
+1. **Bug collegamenti veloci chiuso** (3.75): il bottone tratteggiato AGGIUNGE sempre, anche la seconda casa;
+   per andare in un luogo salvato c'e' la sua scheda.
+2. **Pagina POI come il concept approvato** (3.76-3.77): cinque linguette in cima con "Personali" davanti,
+   ogni linguetta a pagina intera, schede che non sbordano, **indirizzo pulito** (via, numero, citta', stato)
+   al posto delle categorie vecchie, ricavato dalle coordinate e salvato; i sei tratteggiati sempre visibili
+   in una fila unica, icona sopra e nome sotto.
+3. **Invio di un luogo per email** (3.78-3.80): nuova voce "Manda per email" nel pannello Condividi,
+   template POI•LOVE trilingue con parte testuale, dalla casella no-reply@poilove.com.
+4. **Revisione avversariale con 33 agenti**: 21 difetti confermati, tutti chiusi. I tre gravi:
+   - il NOME di chi manda ora lo decide il server dall'identita' verificata (prima il chiamante poteva
+     travestirsi e usare la nostra casella firmata per il phishing);
+   - il tetto giornaliero e' contato PRIMA di spedire, con blocco esclusivo del file, e se non si riesce
+     a contare NON si spedisce (prima era aggirabile in parallelo e si spegneva in silenzio);
+   - il dialogo con la posta ha tempi massimi veri e legge le risposte per intero (niente piu' falsi
+     successi ne' falsi errori); testo libero ripulito da indirizzi web e caratteri di controllo.
+5. **CONSULTARE E' LIBERO** (3.80, direttiva di Alessandro): un luogo mandato per email si apre per
+   chiunque, senza accesso, col marcatore, il nome e il bottone "Vai". L'accesso resta solo per creare,
+   lovvare e per la condivisione dentro la community.
+6. **Difetto d'avvio trovato per caso e chiuso** (3.81): la mappa veniva avviata due volte, la seconda
+   chiamata andava in errore e **fermava in silenzio tutto il resto dell'avvio** (link in arrivo compresi).
+   Ora si avvia una volta sola.
+
+Verificato dal vivo da browser azzerato: il link email apre il punto senza accesso. Controllo esterno 18/18.
+
+---
+
 ## Sessione 19/08/2026 (2) — La home di presentazione e il concept dell'app (v3.73)
 
 **poilove.com ha finalmente una porta d'ingresso vera.** Chi arriva per la prima volta trova

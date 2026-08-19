@@ -13,9 +13,10 @@
 - [x] **Biometria: bottone RIMOSSO il 19/08 (v3.71)** — collaudo di Alessandro su iPhone fallito; scoperto che il bottone non usava l'impronta, spediva un magic link (violava la regola mai finto). Tornera' solo con un backend WebAuthn vero (registrazione credenziale + challenge server-side).
 - [x] **POSTA DEL SERVIZIO ACCESSI: FATTA il 19/08** — casella no-reply@poilove.com su Stalwart, GoTrue agganciato, email monolingua brandizzata, SPF/DKIM/DMARC/MX su Cloudflare, consegna verificata. Dettaglio in SAL.md.
 - [ ] **ACCESSO PROFESSIONISTI (direttiva 19/08, gia' previsto)**: profilo dedicato per ristoranti e locali con piu' foto, menu, orari di apertura, notizie e informazioni del locale. Si aggancia al tier Professionista esistente e al futuro "reclama questo luogo": il locale reclamato sblocca la scheda ricca. Da progettare con Alessandro (campi, prezzi nel dossier riservato, moderazione).
-- [ ] **BUG collegamenti veloci (19/08, da screenshot iPhone)**: il bottone tratteggiato "Casa"/"Lavoro" dopo il primo salvataggio APRE il POI salvato invece di CREARE un secondo luogo. Il tratteggiato deve sempre creare, mai aprire (si tengono i bottoni per la seconda casa/lavoro).
-- [ ] **Pagina POI da ristrutturare (19/08)**: linguette in cima "Personali · I miei POI · Loved · Vicini · Liste"; "Personali" sostituisce la sezione "Luoghi personali"; ogni linguetta occupa tutta la pagina, mai divisa in due.
+- [x] **BUG collegamenti veloci** — chiuso il 19/08 (v3.75): il tratteggiato aggiunge sempre.
+- [x] **Pagina POI ristrutturata** — chiusa il 19/08 (v3.76-3.77): linguette in cima con Personali, pagina intera, indirizzi puliti, sei tratteggiati in fila.
 - [ ] **Leggibilita mobile**: testi e comandi troppo piccoli su telefono; il redesign segue la grafica app approvata da Alessandro.
+- [ ] **Email dei luoghi: da provare sul campo** — mandane uno a un amico e verifica che gli si apra senza accesso; se serve, il registro degli invii sta sulla macchina in /var/www/poilove/private/mailshare/registro.log.
 - [ ] **Barracuda: IP posta (37.27.13.104) in lista** — pagella mail-tester 9,5/10, l'unico mezzo punto e' questo; rimozione gratuita su barracudacentral.org quando si vuole il 10 (deciso il 19/08 di lasciar stare per ora).
 - [ ] **DKIM: rotazione automatica fra 90 giorni (~16/11/2026)** — Stalwart ruota le chiavi e i selettori cambiano: vanno ripubblicati i 2 record TXT su Cloudflare (o si automatizza col token). Se le email tornano in spam a novembre, e' questo.
 - [ ] ~~POSTA DEL SERVIZIO ACCESSI ASSENTE~~ (voce superata)
