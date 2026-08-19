@@ -3991,7 +3991,7 @@ function enterGuestMode() {
   if (overlay) overlay.style.display = 'none';
   if (!map && typeof initMap === 'function') { try { initMap(); } catch(e) {} }
   // L'ospite entra per GUARDARE: senza questa chiamata la mappa restava vuota
-  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v3.83.
+  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v3.84.
   if (typeof loadPOIsFromDB === 'function') { try { loadPOIsFromDB(); } catch(e) {} }
   if (typeof loadMyTags === 'function') { try { loadMyTags(); } catch(e) {} }
   showToast(t('guest_active'));
@@ -5201,9 +5201,20 @@ function syncProfileFromAuth() {
 
 // ── LOGIN ──
 // URL di redirect = origine corrente (funziona sia su poilove.com sia in locale)
-const AUTH_REDIRECT = (location.origin && location.origin.startsWith('http'))
-  ? location.origin + location.pathname
-  : 'https://poilove.com/';
+// Tornando dall'accesso si torna ESATTAMENTE dove si era: se stavi guardando un
+// luogo ricevuto (lat/lng/label) e l'invito, quelli viaggiano col rientro (19/08).
+const AUTH_REDIRECT = (function(){
+  const base = (location.origin && location.origin.startsWith('http'))
+    ? location.origin + location.pathname : 'https://poilove.com/';
+  try{
+    const q = new URLSearchParams(location.search), tieni = new URLSearchParams();
+    ['lat','lng','label','ref','poi','at','trip','route','join','ospite'].forEach(k=>{
+      if(q.has(k)) tieni.set(k, q.get(k));
+    });
+    const coda = tieni.toString();
+    return coda ? base + '?' + coda : base;
+  }catch(_){ return base; }
+})();
 
 function _providerErrorToast(name, error){
   if(!error) return;
@@ -8191,6 +8202,8 @@ async function _salvaPuntoInSospeso(){
   if(!pt || !currentUser) return;
   window._sharedPoint = pt;
   await salvaPuntoRicevuto();
+  // e lo faccio rivedere: chi torna dall'accesso deve ritrovare il suo luogo, non una mappa qualunque
+  try{ _openSharedPoint(pt.lat, pt.lng, pt.name); }catch(_){}
 }
 function handleDeepLink(){
   const params = new URLSearchParams(window.location.search);
@@ -8275,7 +8288,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='3.83';
+const APP_VERSION='3.84';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
