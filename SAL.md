@@ -1,5 +1,28 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
+## Sessione 19/08/2026 (4) — Gli inviti: consultare e' libero, iscriversi vale 200 punti a testa (v3.82 → 3.83)
+
+**Il modello degli inviti e' deciso e funzionante** (direttiva di Alessandro: "tutti gli inviti saranno cosi").
+
+1. **Un luogo mandato per email si apre per chiunque, senza accesso.** Nella stessa tendina tre azioni:
+   **Vai** (navigatore), **Salva il POI**, **Entra o registrati**. Chi non e' iscritto vede l'etichetta
+   rossa **"200 punti per te!"**.
+2. **L'invito viaggia col link**: il programma di invio aggiunge `&ref=<handle di chi manda>`, l'app lo
+   mette da parte e lo consegna al database appena la persona entra.
+3. **200 punti a testa** (migrazione 087): prima l'invitante prendeva 50 e chi arrivava non prendeva nulla.
+   Ora `referral_confirmed` e il nuovo `referral_welcome` valgono 200; la regola automatica del database
+   accredita tutti e due.
+4. **Email di ringraziamento a chi ha invitato** (`referral-mail.php`): "Wow, grazie! +200", nella lingua
+   del destinatario, mandata una volta sola (colonna `referrals.notified_at`). Il server legge dal database
+   chi ha invitato chi con un utente dedicato di sola lettura (`poilove_web`), il chiamante non decide nulla.
+5. **Chi tocca "Salva il POI" senza essere iscritto**: il luogo viene messo da parte e salvato da solo
+   appena entra.
+
+Verificato dal vivo da browser azzerato: tendina con le tre azioni e l'etichetta punti, invito catturato
+(`poi_ref_pending`), endpoint chiuso a chi non ha accesso (401). Controllo esterno 18/18.
+
+---
+
 ## Sessione 19/08/2026 (3) — Pagina POI ristrutturata, invio email dei luoghi, revisione avversariale (v3.75 → 3.81)
 
 1. **Bug collegamenti veloci chiuso** (3.75): il bottone tratteggiato AGGIUNGE sempre, anche la seconda casa;

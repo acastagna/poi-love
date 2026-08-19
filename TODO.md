@@ -16,6 +16,7 @@
 - [x] **BUG collegamenti veloci** — chiuso il 19/08 (v3.75): il tratteggiato aggiunge sempre.
 - [x] **Pagina POI ristrutturata** — chiusa il 19/08 (v3.76-3.77): linguette in cima con Personali, pagina intera, indirizzi puliti, sei tratteggiati in fila.
 - [ ] **Leggibilita mobile**: testi e comandi troppo piccoli su telefono; il redesign segue la grafica app approvata da Alessandro.
+- [ ] **Inviti: provare il giro completo sul campo** — manda un luogo a un amico non iscritto, fallo registrare, controlla che arrivino i 200 punti a tutti e due e che a te arrivi l'email "Wow, grazie!".
 - [ ] **Email dei luoghi: da provare sul campo** — mandane uno a un amico e verifica che gli si apra senza accesso; se serve, il registro degli invii sta sulla macchina in /var/www/poilove/private/mailshare/registro.log.
 - [ ] **Barracuda: IP posta (37.27.13.104) in lista** — pagella mail-tester 9,5/10, l'unico mezzo punto e' questo; rimozione gratuita su barracudacentral.org quando si vuole il 10 (deciso il 19/08 di lasciar stare per ora).
 - [ ] **DKIM: rotazione automatica fra 90 giorni (~16/11/2026)** — Stalwart ruota le chiavi e i selettori cambiano: vanno ripubblicati i 2 record TXT su Cloudflare (o si automatizza col token). Se le email tornano in spam a novembre, e' questo.
