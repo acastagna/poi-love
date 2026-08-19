@@ -4125,7 +4125,7 @@ function enterGuestMode() {
   if (overlay) overlay.style.display = 'none';
   if (!map && typeof initMap === 'function') { try { initMap(); } catch(e) {} }
   // L'ospite entra per GUARDARE: senza questa chiamata la mappa restava vuota
-  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v4.20.
+  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v4.21.
   if (typeof loadPOIsFromDB === 'function') { try { loadPOIsFromDB(); } catch(e) {} }
   if (typeof loadMyTags === 'function') { try { loadMyTags(); } catch(e) {} }
   showToast(t('guest_active'));
@@ -8479,7 +8479,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='4.20';
+const APP_VERSION='4.21';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
@@ -13431,7 +13431,14 @@ window._zTop = window._zTop || 10000; window._zModalTop = window._zModalTop || 1
   const perNome  = id => /(?:Ov|Modal|Sheet|Bg|Overlay)$/.test(id||'');
   const perClasse = cl => typeof cl==='string' && /(?:^|\s)[a-z][a-z0-9-]*-(?:ov|overlay)(?:\s|$)/.test(cl);
   const eFinestra = el => el && el.nodeType===1 && (perNome(el.id) || perClasse(el.className));
-  const alzo = el => { if(el&&el.style) el.style.zIndex=String(++window._zTop); };
+  // Non rialzo una finestra che e' gia' in cima: altrimenti la modifica che faccio io
+  // fa scattare di nuovo la sorveglianza e si va in circolo (il browser si bloccava).
+  const alzo = el => {
+    if(!el||!el.style) return;
+    const ora = parseInt(el.style.zIndex||'0',10);
+    if(ora >= window._zTop) return;
+    el.style.zIndex=String(++window._zTop);
+  };
   const aperta = el => el.classList.contains('show')||el.classList.contains('open')||el.classList.contains('vis')||el.style.display==='flex'||el.style.display==='block';
   const obs = new MutationObserver(ms=>{
     for(const m of ms){
@@ -13440,7 +13447,7 @@ window._zTop = window._zTop || 10000; window._zModalTop = window._zModalTop || 1
     }
   });
   (function start(){ if(!document.body){ setTimeout(start,50); return; }
-    obs.observe(document.body,{attributes:true,attributeFilter:['class','style'],subtree:true,childList:true}); })();
+    obs.observe(document.body,{attributes:true,attributeFilter:['class'],subtree:true,childList:true}); })();
 })();
 function _uiModal({title='', message='', input=false, defaultValue='', okText='Ok', cancelText='Annulla', danger=false}){
   return new Promise(resolve=>{
