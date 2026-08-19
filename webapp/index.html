@@ -172,32 +172,32 @@ button{touch-action:manipulation}
 #authOverlay{position:fixed;inset:0;z-index:9000;background:linear-gradient(160deg,#1a0a0a 0%,#2d1515 40%,#0f1e35 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;gap:0;overflow:hidden}
 /* Cuori giganti animati che navigano TUTTA la schermata, dietro ai bottoni */
 .auth-bg-hearts{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0}
-.auth-bg-heart{position:absolute;top:50%;left:50%;width:420px;height:420px;opacity:.10;will-change:transform;animation-timing-function:cubic-bezier(.45,.05,.55,.95);animation-iteration-count:infinite}
+.auth-bg-heart{position:absolute;top:50%;left:50%;width:340px;height:340px;opacity:.10;will-change:transform;transform:translateZ(0);backface-visibility:hidden;contain:paint;animation-timing-function:linear;animation-iteration-count:infinite}
 .auth-bg-heart svg{width:100%;height:100%;display:block}
-.auth-bg-heart.h1{animation-name:authHeartFloat1;animation-duration:26s;color:#D42B2B}
-.auth-bg-heart.h2{width:520px;height:520px;animation-name:authHeartFloat2;animation-duration:32s;animation-delay:-9s;color:#FF6B6B;opacity:.08}
+.auth-bg-heart.h1{animation-name:authHeartFloat1;animation-duration:38s;color:#D42B2B}
+.auth-bg-heart.h2{width:400px;height:400px;animation-name:authHeartFloat2;animation-duration:44s;animation-delay:-9s;color:#FF6B6B;opacity:.08}
 /* Le keyframe portano il cuore (centrato in -50%/-50%) lungo un percorso ampio.
    I valori sono percentuali della dimensione del cuore stesso → naturale "navigare" */
 @keyframes authHeartFloat1{
-  0%   {transform:translate(-130%,-140%) rotate(-12deg) scale(.9)}
-  20%  {transform:translate(  30%, -90%) rotate(  4deg) scale(1.05)}
-  40%  {transform:translate(  60%,  20%) rotate( 14deg) scale(1)}
-  60%  {transform:translate( -40%,  70%) rotate( -6deg) scale(1.1)}
-  80%  {transform:translate(-110%,  10%) rotate(  6deg) scale(.95)}
-  100% {transform:translate(-130%,-140%) rotate(-12deg) scale(.9)}
+  0%   {transform:translate(-130%,-140%)}
+  25%  {transform:translate(  30%, -90%)}
+  50%  {transform:translate(  60%,  20%)}
+  75%  {transform:translate( -40%,  70%)}
+  100% {transform:translate(-130%,-140%)}
 }
 @keyframes authHeartFloat2{
-  0%   {transform:translate(  50%,  60%) rotate( 14deg) scale(1.1)}
-  20%  {transform:translate( -80%,  10%) rotate( -4deg) scale(.95)}
-  40%  {transform:translate(-100%,-100%) rotate(-16deg) scale(1.05)}
-  60%  {transform:translate(  20%,-110%) rotate(  6deg) scale(1)}
-  80%  {transform:translate(  90%, -20%) rotate( 12deg) scale(1.08)}
-  100% {transform:translate(  50%,  60%) rotate( 14deg) scale(1.1)}
+  0%   {transform:translate(  50%,  60%)}
+  25%  {transform:translate( -80%,  10%)}
+  50%  {transform:translate(-100%,-100%)}
+  75%  {transform:translate(  90%, -20%)}
+  100% {transform:translate(  50%,  60%)}
 }
 /* Riduci al minimo se l'utente ha "prefers-reduced-motion" attivo */
 @media (prefers-reduced-motion: reduce){
   .auth-bg-heart{animation:none;transform:translate(-50%,-50%);opacity:.06}
 }
+/* Macchina modesta: niente animazione, resta il disegno fermo. */
+html.poco-potente .auth-bg-heart{animation:none;transform:translate(-50%,-50%);opacity:.07}
 /* Tutti i contenuti dell'auth devono stare SOPRA i cuori (z-index:1 vs cuori z-index:0) */
 #authOverlay > *:not(.auth-bg-hearts){position:relative;z-index:1}
 .auth-logo{width:280px;max-width:80vw;height:auto;margin-bottom:18px;image-rendering:-webkit-optimize-contrast;-webkit-backface-visibility:hidden;display:block}
@@ -275,7 +275,9 @@ button{touch-action:manipulation}
 }
 
 /* ── MAP TYPES ── */
-.map-types{position:fixed;top:14px;left:14px;z-index:200;display:flex;gap:5px}
+.map-types{position:fixed;top:14px;left:14px;z-index:200;display:flex;gap:5px;max-width:calc(100vw - 150px);overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.map-types::-webkit-scrollbar{display:none}
+.map-types .mt-btn{flex:0 0 auto}
 /* ── MAP SEARCH BAR ── */
 .map-search-wrap{position:fixed;top:58px;left:14px;right:14px;z-index:210;display:none}
 .map-search-wrap.show{display:block}
@@ -3991,7 +3993,7 @@ function enterGuestMode() {
   if (overlay) overlay.style.display = 'none';
   if (!map && typeof initMap === 'function') { try { initMap(); } catch(e) {} }
   // L'ospite entra per GUARDARE: senza questa chiamata la mappa restava vuota
-  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v3.93.
+  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v3.94.
   if (typeof loadPOIsFromDB === 'function') { try { loadPOIsFromDB(); } catch(e) {} }
   if (typeof loadMyTags === 'function') { try { loadMyTags(); } catch(e) {} }
   showToast(t('guest_active'));
@@ -8301,7 +8303,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='3.93';
+const APP_VERSION='3.94';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
@@ -8313,6 +8315,12 @@ function salvataggioFallito(cosa, err, soloRegistro){
 document.querySelectorAll('.app-ver').forEach(e=>{ e.textContent='v'+APP_VERSION; });
 try{ _injectSheetBackButtons(); }catch(_){}   // freccia "indietro" su tutte le testate sheet
 console.info('POI•LOVE v'+APP_VERSION);
+// Macchina modesta o batteria bassa: spegniamo le animazioni decorative.
+// I cuori grandi che navigavano rallentavano browser lenti (segnalato il 19/08).
+try{
+  const pochi = (navigator.hardwareConcurrency||8) <= 4 || (navigator.deviceMemory||8) <= 4;
+  if(pochi) document.documentElement.classList.add('poco-potente');
+}catch(_){}
 try{ document.cookie='pl_app=1;max-age=31536000;path=/;secure'; }catch(_){}
 // Biometria rimossa il 19/08 (regola mai finto): tornera' solo con un backend WebAuthn vero.
 // AUTO-AGGIORNAMENTO: se sul server c'è una versione più nuova, ricarico bypassando la cache di iOS/PWA.
