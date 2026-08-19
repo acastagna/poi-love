@@ -487,29 +487,35 @@ body.tab-active #mapQuickBtns{display:none}
 .pl-chip:active{box-shadow:0 0 0 2px var(--red)}
 .pl-chip-icon{font-size:28px;flex-shrink:0;width:36px;text-align:center}
 .pl-chip-info{flex:1;min-width:0}
-.pl-chip-name{font-size:17px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pl-chip-name{font-size:19px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pl-chip-tema{color:var(--muted);font-weight:700}
 .pl-chip-titolo{color:var(--ink)}
 .pl-chip-addr{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
 .pl-chip-acts{display:flex;gap:6px;flex-shrink:0}
-.pl-chip-btn{width:38px;height:38px;border-radius:12px;flex-shrink:0;border:1px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:17px;transition:color .15s,border-color .15s}
+.pl-chip-btn{width:40px;height:40px;padding:7px;border-radius:12px;flex-shrink:0;border:1px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:26px;line-height:1;transition:color .15s,border-color .15s}
 .pl-chip-btn:active{color:var(--red);border-color:var(--red)}
 .pl-add-row{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;padding:10px 0 14px}
 .pl-add-btn{min-width:0;border-radius:14px;border:1.5px dashed var(--border);background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:11px 2px 9px;font-size:11.5px;font-weight:700;color:var(--muted);font-family:inherit;transition:border-color .2s,color .2s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pl-add-btn i{font-size:21px}
 .pl-add-btn:active{border-color:var(--red);color:var(--red)}
-.poi-list-row{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--border);flex-wrap:wrap}
-.poi-list-row .pi-info{flex:1 1 auto}
-.poi-list-row .pi-actions{flex:1 1 100%;justify-content:flex-start;margin-top:8px;flex-wrap:wrap;row-gap:8px}
-.poi-list-row .pi-actions::-webkit-scrollbar{display:none}
-.poi-list-row .pi-act-btn{flex:0 0 auto}
-.poi-list-row .pi-emoji{font-size:22px;width:36px;text-align:center;flex-shrink:0}
-.poi-list-row .pi-info{flex:1;min-width:0}
-.poi-list-row .pi-name{font-size:16px;font-weight:700;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.poi-list-row .pi-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.poi-list-row{display:flex;align-items:flex-start;gap:12px;padding:14px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.poi-list-row .pi-emoji{font-size:26px;width:32px;text-align:center;flex-shrink:0;line-height:1.15}
+.poi-list-row .pi-info{flex:1 1 0;min-width:0}
+/* prima riga: nome grande a sinistra, etichetta piccola e cuori grandi a destra */
+.poi-list-row .pi-head{display:flex;align-items:baseline;gap:10px;min-width:0}
+.poi-list-row .pi-name{font-size:20px;font-weight:800;color:var(--ink);flex:1;min-width:0;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.poi-list-row .pi-tail{display:flex;align-items:baseline;gap:10px;flex-shrink:0;margin-left:auto}
+.poi-list-row .pi-vis{font-size:11px;font-weight:700;color:var(--muted);display:inline-flex;align-items:center;gap:3px;white-space:nowrap}
+.poi-list-row .pi-love{font-size:20px;font-weight:800;color:var(--red);display:inline-flex;align-items:center;gap:5px;line-height:1;white-space:nowrap}
+.poi-list-row .pi-love i{font-size:18px}
+.poi-list-row .pi-addr{font-size:13px;color:var(--muted);margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.poi-list-row .pi-sub{font-size:13px;color:var(--muted);margin-top:4px}
+.poi-list-row .list-vis{align-self:center}
 .poi-list-row .pi-dist{font-size:11px;color:var(--blue);font-weight:700;flex-shrink:0;background:#EBF2FC;padding:3px 8px;border-radius:8px}
-.poi-list-row .pi-actions{display:flex;gap:8px;flex-shrink:0}
-.poi-list-row .pi-act-btn{width:38px;height:38px;border-radius:8px;border:1px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+/* i comandi: icone grandi, 7 px di aria tutto intorno dentro al pulsante */
+.poi-list-row .pi-actions{display:flex;gap:6px;flex:1 1 100%;justify-content:flex-start;margin-top:10px;flex-wrap:wrap;row-gap:6px}
+.poi-list-row .pi-act-btn{width:38px;height:38px;padding:7px;border-radius:12px;border:1px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);flex:0 0 auto}
+.poi-list-row .pi-act-btn i{font-size:24px;line-height:1}
 .poi-list-row .pi-act-btn:hover{color:var(--red);border-color:var(--red)}
 /* Compagnie: card e status indicator */
 .comp-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin:10px 14px}
@@ -2148,11 +2154,14 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
   .map-search-item-name{font-size:13px}
   .mqb-lbl{font-size:9px}
   .nav-item .nav-lbl{font-size:9px}
-  .poi-list-row .pi-name{font-size:14px}
-  .poi-list-row .pi-sub{font-size:11px}
-  .poi-list-row{flex-wrap:nowrap}
-  .poi-list-row .pi-actions{flex:0 0 auto;margin-top:0;overflow:visible}
-  .poi-list-row .pi-act-btn{width:32px;height:32px}
+  .poi-list-row{flex-wrap:nowrap;align-items:center}
+  .poi-list-row .pi-name{font-size:17px}
+  .poi-list-row .pi-love{font-size:17px}
+  .poi-list-row .pi-love i{font-size:15px}
+  .poi-list-row .pi-addr{font-size:12px}
+  .poi-list-row .pi-actions{flex:0 1 auto;margin-top:0;overflow:visible;justify-content:flex-end}
+  .poi-list-row .pi-act-btn{width:34px;height:34px;padding:7px}
+  .poi-list-row .pi-act-btn i{font-size:20px}
   .pf-chip{padding:5px 11px;font-size:11.5px;min-height:0}
   .poi-search{padding:9px 13px 9px 38px;font-size:13px}
   .itin-subtab{height:36px;font-size:12px}
@@ -4062,7 +4071,7 @@ function enterGuestMode() {
   if (overlay) overlay.style.display = 'none';
   if (!map && typeof initMap === 'function') { try { initMap(); } catch(e) {} }
   // L'ospite entra per GUARDARE: senza questa chiamata la mappa restava vuota
-  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v4.06.
+  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v4.09.
   if (typeof loadPOIsFromDB === 'function') { try { loadPOIsFromDB(); } catch(e) {} }
   if (typeof loadMyTags === 'function') { try { loadMyTags(); } catch(e) {} }
   showToast(t('guest_active'));
@@ -8416,7 +8425,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='4.06';
+const APP_VERSION='4.09';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
@@ -9449,6 +9458,46 @@ function _poiSearch(q){
     none.textContent='Nessun risultato per "'+q+'"'; none.style.display='';
   } else if(none){ none.style.display='none'; }
 }
+/* ── L'indirizzo vero sotto il nome del luogo ──
+   Molti luoghi non hanno l'indirizzo scritto nel database: i salvataggi vecchi
+   ci mettevano la categoria ("natura", "cultura"). Lo ricaviamo dalle coordinate
+   con OpenStreetMap UNA volta sola, lo teniamo da parte sul telefono e lo
+   scriviamo nella riga appena arriva, senza ridisegnare tutta la lista.
+   OpenStreetMap ammette una domanda al secondo: le mettiamo in fila. */
+const _ADDR_MEM_KEY = 'poi_addr_cache';
+let _addrMem = (()=>{ try{ return JSON.parse(localStorage.getItem(_ADDR_MEM_KEY)||'{}'); }catch(_){ return {}; } })();
+function _addrKeyOf(p){ return (Math.round((p.lat||0)*10000)/10000)+','+(Math.round((p.lng||0)*10000)/10000); }
+function _poiAddr(p){ return _plAddrOk(p.address) ? p.address : (_addrMem[_addrKeyOf(p)] || ''); }
+const _addrCoda = []; let _addrInCorso = false;
+function _addrChiedi(p){
+  if(!p || !p.lat || !p.lng) return;
+  const k = _addrKeyOf(p);
+  if(_addrMem[k] || _addrCoda.some(x=>x.k===k)) return;
+  _addrCoda.push({ k, lat:p.lat, lng:p.lng });
+  _addrGira();
+}
+async function _addrGira(){
+  if(_addrInCorso) return; _addrInCorso = true;
+  while(_addrCoda.length){
+    const q = _addrCoda.shift();
+    try{
+      const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${q.lat}&lon=${q.lng}&addressdetails=1&zoom=18`,
+                            { headers:{ 'Accept-Language': (typeof lang!=='undefined'?lang:'it') } });
+      const d = await r.json(); const a = d.address || {};
+      const via = [a.road||a.pedestrian||a.square, a.house_number].filter(Boolean).join(' ');
+      const citta = a.city||a.town||a.village||a.hamlet||a.municipality;
+      const ind = [via, citta, a.country].filter(Boolean).join(', ');
+      if(ind){
+        _addrMem[q.k] = ind;
+        try{ localStorage.setItem(_ADDR_MEM_KEY, JSON.stringify(_addrMem)); }catch(_){}
+        document.querySelectorAll('.pi-addr[data-ak="'+q.k+'"]').forEach(el=>{ el.textContent = ind; });
+      }
+    }catch(_){ }
+    await new Promise(r=>setTimeout(r, 1100));
+  }
+  _addrInCorso = false;
+}
+
 async function renderPoiTab(){
   if(poiSubtab==='personali') return; // la prima linguetta e' gestita da setPoiSubtab/renderPlaces
   const list = document.getElementById('poi-list-area');
@@ -9538,13 +9587,27 @@ async function renderPoiTab(){
     const _subLabel = (p.subcategory && typeof catLabelByKey==='function') ? catLabelByKey(p.subcategory) : '';
     const _searchHay = `${p.name||''} ${p.cat||p.category||''} ${_subLabel} ${p.address||''} ${p.city||''} ${p.description||''} ${(Array.isArray(p.tags)?p.tags.join(' '):(p.tags||''))}`.toLowerCase().replace(/"/g,'&quot;');
 
+    // Nome, cuori e indirizzo: uguali per tutte le liste
+    const _nome = (p.name||'').replace(/</g,'&lt;');
+    const _love = Number(p.love||p.love_count||0) || 0;   // zero cuori: non si scrive nulla
+    const _ak   = _addrKeyOf(p);
+    let _addr   = _poiAddr(p);
+    if(!_addr){ _addrChiedi(p); _addr = (p.cat||p.category||''); }   // intanto mostro la categoria
+    _addr = String(_addr).replace(/</g,'&lt;');
+
     if(poiSubtab==='near'){
       // Lista vicini: click apre dettaglio, "Naviga" lancia maps esterne
       return `<div class="poi-list-row" data-poi-key="${key}" data-search="${_searchHay}" style="cursor:pointer">
         <div class="pi-emoji" onclick="openPoiFromTab('${key}')">${emoji}</div>
         <div class="pi-info" onclick="openPoiFromTab('${key}')">
-          <div class="pi-name">${p.name}</div>
-          <div class="pi-sub">${p.cat||p.category||''} · ${p.address||''}</div>
+          <div class="pi-head">
+            <div class="pi-name">${_nome}</div>
+            <div class="pi-tail">
+              ${dist?`<span class="pi-dist">${dist}</span>`:''}
+              ${_love?`<span class="pi-love"><i class="ph-fill ph-heart"></i>${_love}</span>`:''}
+            </div>
+          </div>
+          <div class="pi-addr" data-ak="${_ak}">${_addr}</div>
         </div>
         <div class="pi-actions">
           <button class="pi-act-btn" title="Salva in un luogo personale" onclick="event.stopPropagation();poiToSafe('${key}')"><i class="ph-duotone ph-vault"></i></button>
@@ -9552,7 +9615,6 @@ async function renderPoiTab(){
           <button class="pi-act-btn" data-tt="act_navigate" title="${t('act_navigate')}" onclick="event.stopPropagation();navigateToPoi(${p.lat},${p.lng},'${(p.name||'').replace(/'/g,'')}')"><i class="ph-duotone ph-navigation-arrow"></i></button>
           <button class="pi-act-btn" data-tt="act_share" title="${t('act_share')}" onclick="event.stopPropagation();sharePoiByKey('${key}')"><i class="ph-duotone ph-share-network"></i></button>
         </div>
-        <div class="pi-dist">${dist}</div>
       </div>`;
     }
 
@@ -9560,8 +9622,14 @@ async function renderPoiTab(){
     return `<div class="poi-list-row" data-poi-key="${key}" data-search="${_searchHay}">
       <div class="pi-emoji" onclick="openPoiFromTab('${key}')" style="cursor:pointer">${emoji}</div>
       <div class="pi-info" onclick="openPoiFromTab('${key}')" style="cursor:pointer">
-        <div class="pi-name">${p.name}</div>
-        <div class="pi-sub"><i class="ph-duotone ${visIcon}" style="font-size:10px"></i> ${visLblT} · <i class="ph-duotone ph-heart" style="color:var(--red);font-size:11px;vertical-align:-1px"></i> ${p.love||p.love_count||0}</div>
+        <div class="pi-head">
+          <div class="pi-name">${_nome}</div>
+          <div class="pi-tail">
+            <span class="pi-vis"><i class="ph-duotone ${visIcon}"></i>${visLblT}</span>
+            ${_love?`<span class="pi-love"><i class="ph-fill ph-heart"></i>${_love}</span>`:''}
+          </div>
+        </div>
+        <div class="pi-addr" data-ak="${_ak}">${_addr}</div>
       </div>
       <div class="pi-actions">
         <button class="pi-act-btn" title="Salva in un luogo personale" onclick="poiToSafe('${key}')"><i class="ph-duotone ph-vault"></i></button>
