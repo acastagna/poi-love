@@ -62,9 +62,17 @@ $nomeDest = testo_pulito($in['name'] ?? '', 40);   // nome di chi riceve: solo n
 $lat     = is_numeric($in['lat'] ?? null) ? (float)$in['lat'] : null;
 $lng     = is_numeric($in['lng'] ?? null) ? (float)$in['lng'] : null;
 $lang    = (isset($in['lang']) && is_string($in['lang']) && in_array($in['lang'], ['sq', 'it', 'en'], true)) ? $in['lang'] : 'en';
+// Cosa si manda: un LUOGO (coordinate) oppure un ITINERARIO (solo il suo numero di
+// riconoscimento). L'indirizzo web lo scrive il server: chi chiama non puo' scegliere
+// dove porta il bottone dell'email.
+$trip    = (isset($in['trip']) && is_string($in['trip']) && preg_match('/^[0-9a-fA-F-]{36}$/', $in['trip'])) ? $in['trip'] : '';
+$tipo    = $trip !== '' ? 'trip' : 'luogo';
 if (!filter_var($to, FILTER_VALIDATE_EMAIL) || mb_strlen($to) > 254) fine(400, 'destinatario');
-if ($place === '' || $lat === null || $lng === null) fine(400, 'dati');
-if ($lat < -90 || $lat > 90 || $lng < -180 || $lng > 180) fine(400, 'dati');
+if ($place === '') fine(400, 'dati');
+if ($tipo === 'luogo') {
+    if ($lat === null || $lng === null) fine(400, 'dati');
+    if ($lat < -90 || $lat > 90 || $lng < -180 || $lng > 180) fine(400, 'dati');
+}
 
 // Se il destinatario e' gia' iscritto, la sua lingua vince su quella di chi manda.
 $dc = @file_get_contents('/var/www/poilove/private/db-creds');
@@ -112,10 +120,12 @@ foreach (['username', 'handle', 'display_name'] as $k) {
 }
 if ($handle === '' && isset($in['handle']) && is_string($in['handle'])) $handle = $in['handle'];
 $handle = preg_replace('/[^A-Za-z0-9._-]/', '', (string)$handle);
-$url = 'https://poilove.com/?lat=' . rawurlencode(number_format($lat, 6, '.', ''))
-     . '&lng=' . rawurlencode(number_format($lng, 6, '.', ''))
-     . '&label=' . rawurlencode($place)
-     . ($handle !== '' ? '&ref=' . rawurlencode(mb_substr($handle, 0, 40)) : '');
+$rifer = $handle !== '' ? '&ref=' . rawurlencode(mb_substr($handle, 0, 40)) : '';
+$url = $tipo === 'trip'
+     ? 'https://poilove.com/trip.php?id=' . rawurlencode($trip) . ($rifer !== '' ? '&' . ltrim($rifer, '&') : '')
+     : 'https://poilove.com/?lat=' . rawurlencode(number_format($lat, 6, '.', ''))
+       . '&lng=' . rawurlencode(number_format($lng, 6, '.', ''))
+       . '&label=' . rawurlencode($place) . $rifer;
 $D = [
   'sq' => ['sub' => 'të dërgon një vend zemre · POI•LOVE', 'line' => 'të dërgon një vend zemre:', 'ciao' => 'Përshëndetje',
            'btn' => 'HAPE NË HARTË', 'fall' => 'Nëse butoni nuk punon, kopjo këtë link në shfletues:',
@@ -128,6 +138,14 @@ $D = [
            'ign' => 'If you were not expecting this email, ignore it.'],
 ];
 $T = $D[$lang];
+if ($tipo === 'trip') {
+    $V = [
+      'sq' => ['sub' => 'të dërgon një itinerar · POI•LOVE', 'line' => 'të dërgon një itinerar:', 'btn' => 'SHIKO ITINERARIN'],
+      'it' => ['sub' => 'ti manda un itinerario · POI•LOVE', 'line' => 'ti manda un itinerario:', 'btn' => 'GUARDA L\'ITINERARIO'],
+      'en' => ['sub' => 'sends you an itinerary · POI•LOVE', 'line' => 'sends you an itinerary:', 'btn' => 'SEE THE ITINERARY'],
+    ][$lang];
+    $T = array_merge($T, $V);
+}
 $e = function ($x) { return htmlspecialchars((string)$x, ENT_QUOTES, 'UTF-8'); };
 $html = '<!DOCTYPE html><html lang="' . $lang . '"><head><meta charset="utf-8"></head>'
  . '<body style="margin:0;padding:0;background-color:#EAE4D8;">'
