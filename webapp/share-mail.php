@@ -58,6 +58,7 @@ if (!is_array($in)) fine(400, 'dati');
 $to      = is_string($in['to'] ?? null) ? trim($in['to']) : '';
 $place   = testo_pulito($in['place'] ?? '', 80);
 $address = testo_pulito($in['address'] ?? '', 140);
+$nomeDest = testo_pulito($in['name'] ?? '', 40);   // nome di chi riceve: solo nel saluto, mai nell'oggetto
 $lat     = is_numeric($in['lat'] ?? null) ? (float)$in['lat'] : null;
 $lng     = is_numeric($in['lng'] ?? null) ? (float)$in['lng'] : null;
 $lang    = (isset($in['lang']) && is_string($in['lang']) && in_array($in['lang'], ['sq', 'it', 'en'], true)) ? $in['lang'] : 'en';
@@ -102,13 +103,13 @@ $url = 'https://poilove.com/?lat=' . rawurlencode(number_format($lat, 6, '.', ''
      . '&label=' . rawurlencode($place)
      . ($handle !== '' ? '&ref=' . rawurlencode(mb_substr($handle, 0, 40)) : '');
 $D = [
-  'sq' => ['sub' => 'të dërgon një vend zemre · POI•LOVE', 'line' => 'të dërgon një vend zemre:',
+  'sq' => ['sub' => 'të dërgon një vend zemre · POI•LOVE', 'line' => 'të dërgon një vend zemre:', 'ciao' => 'Përshëndetje',
            'btn' => 'HAPE NË HARTË', 'fall' => 'Nëse butoni nuk punon, kopjo këtë link në shfletues:',
            'ign' => 'Nëse nuk e prisje këtë email, injoroje.'],
-  'it' => ['sub' => 'ti manda un luogo del cuore · POI•LOVE', 'line' => 'ti manda un luogo del cuore:',
+  'it' => ['sub' => 'ti manda un luogo del cuore · POI•LOVE', 'line' => 'ti manda un luogo del cuore:', 'ciao' => 'Ciao',
            'btn' => 'APRILO SULLA MAPPA', 'fall' => 'Se il bottone non funziona, copia questo link nel browser:',
            'ign' => "Se non aspettavi questa email, ignorala."],
-  'en' => ['sub' => 'sends you a beloved place · POI•LOVE', 'line' => 'sends you a beloved place:',
+  'en' => ['sub' => 'sends you a beloved place · POI•LOVE', 'line' => 'sends you a beloved place:', 'ciao' => 'Hi',
            'btn' => 'OPEN IT ON THE MAP', 'fall' => 'If the button does not work, copy this link into your browser:',
            'ign' => 'If you were not expecting this email, ignore it.'],
 ];
@@ -121,6 +122,7 @@ $html = '<!DOCTYPE html><html lang="' . $lang . '"><head><meta charset="utf-8"><
  . '<tr><td style="background-color:#D42B2B;padding:26px 28px 22px;text-align:center;">'
  . '<img src="https://poilove.com/img/logo-bianco.png" alt="POI&#8226;LOVE" width="200" style="width:200px;max-width:80%;height:auto;border:0;display:inline-block;"></td></tr>'
  . '<tr><td style="padding:30px 28px 4px;font-family:Arial,Helvetica,sans-serif;color:#1c1c1c;text-align:center;">'
+ . ($nomeDest !== '' ? '<p style="margin:0 0 12px;font-size:17px;font-weight:800;">' . $e($T['ciao']) . ' ' . $e($nomeDest) . ',</p>' : '')
  . '<p style="margin:0 0 6px;font-size:15px;color:#8a8a8a;"><strong style="color:#1c1c1c;">' . $e($mittente) . '</strong> ' . $e($T['line']) . '</p>'
  . '<p style="margin:10px 0 4px;font-size:22px;line-height:1.3;font-weight:800;">' . $e($place) . '</p>'
  . ($address !== '' ? '<p style="margin:0;font-size:14px;color:#8a8a8a;">' . $e($address) . '</p>' : '')
@@ -132,7 +134,8 @@ $html = '<!DOCTYPE html><html lang="' . $lang . '"><head><meta charset="utf-8"><
  . '<tr><td style="padding:16px 28px 26px;font-family:Arial,Helvetica,sans-serif;color:#b0a99c;font-size:11px;text-align:center;border-top:1px solid #f0ece3;">'
  . $e($T['ign']) . '<br><strong style="color:#8a8a8a;">POI&#8226;LOVE</strong> &#183; poilove.com</td></tr>'
  . '</table></td></tr></table></body></html>';
-$testo = $mittente . ' ' . $T['line'] . "\n\n" . $place . ($address !== '' ? "\n" . $address : '')
+$testo = ($nomeDest !== '' ? $T['ciao'] . ' ' . $nomeDest . ",\n\n" : '')
+       . $mittente . ' ' . $T['line'] . "\n\n" . $place . ($address !== '' ? "\n" . $address : '')
        . "\n\n" . $T['btn'] . ":\n" . $url . "\n\n" . $T['ign'] . "\nPOI-LOVE - poilove.com\n";
 
 // ── 5. invio dalla nostra casella ──
