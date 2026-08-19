@@ -526,9 +526,9 @@ body.tab-active #mapQuickBtns{display:none}
 .comp-creator-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
 .comp-creator-av{width:28px;height:28px;border-radius:50%;object-fit:cover;border:2px solid #D97706;flex-shrink:0}
 .comp-creator-av-ph{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#D97706,#92400E);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:2px solid #D97706}
-.comp-creator-lbl{font-size:11px;font-weight:700;color:#D97706;display:flex;align-items:center;gap:4px;line-height:1.2;flex:1}
+.comp-creator-lbl{font-size:12.5px;font-weight:700;color:#D97706;display:flex;align-items:center;gap:4px;line-height:1.2;flex:1}
 .comp-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-.comp-name{font-size:15px;font-weight:800;color:var(--ink);flex:1}
+.comp-name{font-size:20px;font-weight:800;color:var(--ink);flex:1;line-height:1.2}
 .comp-status{font-size:18px}
 .comp-code{display:inline-block;background:#EBF2FC;color:var(--blue);font-family:monospace;font-size:13px;font-weight:900;letter-spacing:3px;padding:4px 10px;border-radius:8px;margin-right:6px}
 .comp-meta{font-size:11px;color:var(--muted);margin-top:4px}
@@ -543,10 +543,10 @@ body.tab-active #mapQuickBtns{display:none}
 .comp-act.del-off{color:var(--muted);border-color:var(--border);background:var(--bg);opacity:.45;cursor:default;flex-shrink:0;padding:0 10px}
 .comp-hd{display:flex;align-items:center;gap:9px;margin-bottom:8px}
 .comp-hd-icons{display:flex;gap:5px;margin-left:auto;flex-shrink:0}
-.comp-mini{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--bg);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;-webkit-tap-highlight-color:transparent}
+.comp-mini{width:38px;height:38px;padding:7px;border-radius:50%;border:1px solid var(--border);background:var(--bg);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:24px;line-height:1;-webkit-tap-highlight-color:transparent}
 .comp-mini.del{color:var(--red);border-color:rgba(212,43,43,.3);background:#FFF0F0}
 .comp-mini:active{transform:scale(.9)}
-.comp-desc{font-size:13px;color:var(--muted);line-height:1.5;margin:0 0 9px}
+.comp-desc{font-size:15px;color:var(--text);line-height:1.5;margin:2px 0 11px}
 .comp-mavs{display:flex;align-items:center;margin-bottom:11px;min-height:2px}
 .comp-mav,.comp-mav-ph{width:28px;height:28px;border-radius:50%;margin-left:-8px;border:2px solid var(--card);object-fit:cover;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0}
 .comp-mavs .comp-mav:first-child,.comp-mavs .comp-mav-ph:first-child{margin-left:0}
@@ -557,25 +557,25 @@ body.tab-active #mapQuickBtns{display:none}
 .comp-btns .cb-alt{background:rgba(212,43,43,.09);color:#D42B2B;border:1px solid rgba(212,43,43,.22)}
 .comp-close-hint{font-size:10px;color:var(--muted);margin-top:6px;line-height:1.4}
 /* ── Card compagnia ridisegnata: creatore vero + membri + codice grande + un solo bottone nero ── */
-.comp-cr-av,.comp-cr-av-ph{width:42px;height:42px;border-radius:50%;object-fit:cover;flex-shrink:0;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800}
-.comp-av-edit{position:relative;width:42px;height:42px;flex-shrink:0;cursor:pointer}
+.comp-cr-av,.comp-cr-av-ph{width:48px;height:48px;border-radius:50%;object-fit:cover;flex-shrink:0;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800}
+.comp-av-edit{position:relative;width:48px;height:48px;flex-shrink:0;cursor:pointer}
 .comp-av-cam{position:absolute;right:-3px;bottom:-3px;width:19px;height:19px;border-radius:50%;background:#111;color:#fff;display:flex;align-items:center;justify-content:center;font-size:9px;border:2px solid var(--card)}
 .comp-av-edit:active{transform:scale(.92)}
 .cvh-main,.cvh-main-ph{width:48px;height:48px;border-radius:14px;object-fit:cover;flex-shrink:0;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800}
 .cvh-main-edit{position:relative;width:48px;height:48px;flex-shrink:0;cursor:pointer}
 .cvh-main-edit:active{transform:scale(.94)}
 .cvh-title{font-size:16px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-.comp-cr-lbl{font-size:11px;font-weight:700;color:#D97706;display:flex;align-items:center;gap:4px;margin-top:2px;flex-wrap:wrap}
+.comp-cr-lbl{font-size:12.5px;font-weight:700;color:#D97706;display:flex;align-items:center;gap:4px;margin-top:3px;flex-wrap:wrap}
 .comp-members{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
 .comp-memb{display:inline-flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:3px 10px 3px 3px;max-width:100%}
-.comp-memb-av,.comp-memb-av-ph{width:24px;height:24px;border-radius:50%;object-fit:cover;flex-shrink:0;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800}
-.comp-memb-nm{font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px;display:inline-flex;align-items:center;gap:3px}
+.comp-memb-av,.comp-memb-av-ph{width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800}
+.comp-memb-nm{font-size:14px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px;display:inline-flex;align-items:center;gap:3px}
 .comp-code-box{background:rgba(212,43,43,.06);border:1px dashed rgba(212,43,43,.35);border-radius:13px;padding:11px 13px;margin-bottom:11px;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .comp-code-box:active{transform:scale(.99)}
-.comp-code-lbl{font-size:10px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:5px}
-.comp-code-big{font-size:26px;font-weight:900;letter-spacing:3px;color:#D42B2B;margin:3px 0 4px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
-.comp-code-hint{font-size:11px;color:var(--muted);line-height:1.4}
-.comp-open-btn{width:100%;height:46px;border-radius:12px;border:none;background:#111;color:#fff;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;-webkit-tap-highlight-color:transparent}
+.comp-code-lbl{font-size:11.5px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:5px}
+.comp-code-big{font-size:32px;font-weight:900;letter-spacing:3px;color:#D42B2B;margin:3px 0 4px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.comp-code-hint{font-size:13px;color:var(--muted);line-height:1.45}
+.comp-open-btn{width:100%;height:52px;border-radius:14px;border:none;background:#111;color:#fff;font-family:inherit;font-size:16px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;-webkit-tap-highlight-color:transparent}
 .comp-open-btn:active{transform:scale(.98)}
 .friend-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid var(--border);cursor:pointer;transition:background .15s;border-radius:6px;padding-left:6px;padding-right:6px;margin:0 -6px}
 .friend-row:hover{background:#f5f0e8}
@@ -1719,12 +1719,13 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 .trip-cover-change{position:absolute;top:10px;right:10px;background:rgba(0,0,0,.45);border:none;color:#fff;border-radius:8px;padding:4px 6px;font-size:9px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:3px}
 /* Visibility + share bar (ora dentro overlay dettaglio) */
 .trip-vis-bar{display:flex;align-items:center;gap:6px;padding:10px 14px;border-bottom:1px solid var(--border);flex-wrap:wrap}
-.trip-vis-btn{height:26px;padding:0 10px;border-radius:13px;border:1.5px solid var(--border);background:none;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--muted);transition:all .15s;display:flex;align-items:center;gap:4px}
+.trip-vis-btn{height:34px;padding:0 13px;border-radius:17px;border:1.5px solid var(--border);background:none;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--muted);transition:all .15s;display:flex;align-items:center;gap:5px}
+.trip-vis-btn>i{font-size:16px}
 .trip-vis-btn.active-pub{background:#DCFCE7;border-color:#16A34A;color:#16A34A}
 .trip-vis-btn.active-friends{background:#EBF2FC;border-color:var(--blue);color:var(--blue)}
 .trip-vis-btn.active-prv{background:#f5f0e8;border-color:#C8BFB0;color:var(--muted)}
 .trip-vis-btn.active-comp{background:#FFF1F1;border-color:var(--red);color:var(--red)}
-.trip-detail-rename{background:none;border:none;cursor:pointer;color:var(--muted);font-size:15px;padding:4px 6px;border-radius:8px;flex-shrink:0}
+.trip-detail-rename{margin-left:auto;width:38px;height:38px;padding:7px;border:1px solid var(--border);background:var(--card);cursor:pointer;color:var(--muted);font-size:24px;line-height:1;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
 .trip-detail-rename:active{transform:scale(.9)}
 .trip-detail-hdr-title{cursor:pointer}
 /* ── Dettaglio rotta storica / itinerario pubblico (apribile, tappe visibili, salva) ── */
@@ -1755,32 +1756,32 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 .rd-credit{font-size:12px;color:var(--muted);margin-top:12px;display:flex;align-items:center;gap:6px}
 .rd-credit b{color:var(--text)}
 .trip-desc-sec{padding:12px 14px 2px}
-.trip-desc-lbl{font-size:11px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:6px;margin-bottom:6px}
-.trip-desc-lbl>i{color:var(--red);font-size:13px}
+.trip-desc-lbl{font-size:12px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.trip-desc-lbl>i{color:var(--red);font-size:16px}
 .trip-desc-wrap{position:relative}
-.trip-desc-in{width:100%;background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:11px 44px 11px 13px;font-size:14px;line-height:1.5;font-family:inherit;color:var(--text);outline:none;resize:vertical;min-height:74px;box-sizing:border-box;transition:border-color .2s}
+.trip-desc-in{width:100%;background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:12px 52px 12px 14px;font-size:15px;line-height:1.5;font-family:inherit;color:var(--text);outline:none;resize:vertical;min-height:74px;box-sizing:border-box;transition:border-color .2s}
 .trip-desc-in:focus{border-color:var(--blue)}
-.trip-desc-mic{position:absolute;right:8px;top:8px;width:30px;height:30px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg);color:var(--blue);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;transition:all .15s}
+.trip-desc-mic{position:absolute;right:8px;top:8px;width:36px;height:36px;padding:7px;border-radius:11px;border:1.5px solid var(--border);background:var(--bg);color:var(--blue);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:22px;line-height:1;transition:all .15s}
 .trip-desc-mic.recording{background:var(--red);border-color:var(--red);color:#fff;animation:pulse 1.2s infinite}
 .trip-desc-foot{display:flex;justify-content:space-between;align-items:center;margin-top:3px;gap:8px}
-.trip-desc-cnt{font-size:10px;color:var(--muted)}
+.trip-desc-cnt{font-size:11.5px;color:var(--muted)}
 .trip-desc-status{font-size:10px;font-weight:600;color:var(--muted);transition:color .2s}
 .trip-desc-status.saving{color:var(--muted)}
 .trip-desc-status.saved{color:#22C55E}
 /* Frontalino: riga meta tappe · km · area, subito sotto il titolo */
 .trip-front-meta{display:flex;flex-wrap:wrap;gap:6px 14px;padding:9px 18px 2px;align-items:center}
-.trip-front-meta .tfm{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:600;color:var(--text)}
-.trip-front-meta .tfm>i{font-size:16px;color:var(--red)}
+.trip-front-meta .tfm{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600;color:var(--text)}
+.trip-front-meta .tfm>i{font-size:19px;color:var(--red)}
 .trip-front-meta .tfm.tfm-dim{color:var(--muted)}
 .trip-front-meta .tfm.tfm-dim>i{color:var(--muted)}
 .trip-detail-summary.two .tds-item{flex:1 1 calc(50% - 4px)}
 .trip-detail-summary{display:flex;flex-wrap:wrap;gap:8px;padding:10px 14px 2px}
 .tds-item{flex:1 1 calc(50% - 4px);display:flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--border);border-radius:11px;padding:8px 9px;min-width:0}
-.tds-item>i{font-size:17px;color:var(--red);flex-shrink:0}
+.tds-item>i{font-size:20px;color:var(--red);flex-shrink:0}
 .tds-item>div{min-width:0}
-.tds-v{font-size:12.5px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tds-l{font-size:9px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:var(--muted);margin-top:1px}
-.tdh-hint{font-size:10px;font-weight:600;color:var(--muted);text-transform:none;letter-spacing:0}
+.tds-v{font-size:14.5px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tds-l{font-size:10.5px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:var(--muted);margin-top:1px}
+.tdh-hint{font-size:11.5px;font-weight:600;color:var(--muted);text-transform:none;letter-spacing:0}
 .trip-share-btn{margin-left:auto;height:26px;padding:0 10px;border-radius:13px;background:var(--red);border:none;color:#fff;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px}
 .trip-vis-btn.trip-vis-link{background:var(--red);border-color:var(--red);color:#fff}
 .trip-vis-btn.trip-vis-link:active{transform:scale(.96)}
@@ -1809,12 +1810,12 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 .trip-detail-cover.has-img::after{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(transparent 45%,rgba(0,0,0,.4))}
 .tdc-change{position:relative;z-index:1;background:rgba(0,0,0,.58);color:#fff;border:none;border-radius:10px;padding:8px 12px;font-family:inherit;font-size:12px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:6px;}
 .tdc-change:active{transform:scale(.96)}
-.trip-detail-hdr{position:sticky;top:0;background:var(--bg);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);z-index:2}
-.trip-detail-hdr-title{font-size:16px;font-weight:900;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.trip-detail-close{background:none;border:none;cursor:pointer;color:var(--muted);font-size:20px;padding:4px;border-radius:8px}
+.trip-detail-hdr{position:sticky;top:0;background:var(--bg);padding:12px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);z-index:2}
+.trip-detail-hdr-title{font-size:20px;font-weight:900;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.trip-detail-close{width:38px;height:38px;padding:7px;border:1px solid var(--border);background:var(--card);cursor:pointer;color:var(--muted);font-size:24px;line-height:1;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
 .trip-detail-close:hover{background:#f5f0e8;color:var(--text)}
 .trip-detail-section{padding:12px 16px 0}
-.trip-detail-header{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.trip-detail-header{font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
 /* Mappa itinerario */
 .itin-map{height:200px;border-radius:12px;overflow:hidden;margin-bottom:14px;border:1px solid var(--border)}
 /* Sempre a tutta larghezza: quadrata solo su schermo stretto; su schermi larghi altezza fissa
@@ -1863,8 +1864,8 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 .stop-act-btn.act-del:hover,.stop-act-btn.act-del:active{background:#FEE2E2}
 /* Mini calendario modificabile */
 .mini-cal{background:var(--card);border-radius:12px;padding:12px 14px;margin-bottom:14px;border:1px solid var(--border)}
-.mini-cal-header{display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:800;color:var(--text);margin-bottom:8px}
-.mini-cal-nav{background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;padding:2px 6px;border-radius:6px}
+.mini-cal-header{display:flex;align-items:center;justify-content:space-between;font-size:14px;font-weight:800;color:var(--text);margin-bottom:8px}
+.mini-cal-nav{background:none;border:none;cursor:pointer;color:var(--muted);font-size:22px;line-height:1;padding:4px 10px;border-radius:8px}
 .mini-cal-nav:hover{background:#f5f0e8}
 .mini-cal-days{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center}
 .cal-day-lbl{font-size:8px;color:var(--muted);font-weight:700;padding:3px 0}
@@ -3321,7 +3322,7 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
       <i class="ph-duotone ph-users-three" style="color:var(--blue);font-size:22px"></i>
       <div style="font-size:18px;font-weight:900;color:var(--ink)" data-t="comp_view_title">Compagni di Viaggio</div>
     </div>
-    <div style="font-size:12px;color:var(--muted);line-height:1.4" data-t="comp_view_sub">Le tue compagnie attive e quelle a cui hai partecipato. Tocca <strong>+</strong> per crearne una nuova.</div>
+    <div style="font-size:14px;color:var(--muted);line-height:1.45" data-t="comp_view_sub">Le tue compagnie attive e quelle a cui hai partecipato. Tocca Crea un nuovo gruppo per farne una.</div>
   </div>
   <div style="padding:0 14px 6px"><button class="itin-new-btn" style="width:100%;justify-content:center;height:46px" onclick="openCompagniaSheet()"><i class="ph-duotone ph-plus" style="font-size:15px"></i> <span data-t="comp_create_group">Crea un nuovo gruppo</span></button></div>
   <div id="companions-list"></div>
@@ -4085,7 +4086,7 @@ function enterGuestMode() {
   if (overlay) overlay.style.display = 'none';
   if (!map && typeof initMap === 'function') { try { initMap(); } catch(e) {} }
   // L'ospite entra per GUARDARE: senza questa chiamata la mappa restava vuota
-  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v4.12.
+  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v4.14.
   if (typeof loadPOIsFromDB === 'function') { try { loadPOIsFromDB(); } catch(e) {} }
   if (typeof loadMyTags === 'function') { try { loadMyTags(); } catch(e) {} }
   showToast(t('guest_active'));
@@ -6661,7 +6662,7 @@ const T={
     trip_no_stops:'Nessuna tappa ancora, aggiungine una!',trip_status_suspended:'Sospesa',trip_status_done:'Completata',trip_status_planned:'Pianificata',trip_resume:'Riprendi',trip_suspend:'Sospendi',trip_edit:'Modifica',trip_delete:'Elimina',trip_vis_pub:'Pubblico',trip_vis_friends:'Amici',trip_vis_prv:'Privato',stop_note_ph:'Aggiungi note, promemoria, info pratiche…',stop_share_title:'Condividi o invita a questa tappa',stop_share_friend:'Condividi',stop_share_maps:'Apri in mappe',stop_share_warn_b:'Attenzione:',stop_share_warn:'se inviti qualcuno che non conosci personalmente, attiva la condivisione della posizione con una persona di fiducia prima di incontrarlo in un luogo fisico.',stop_share_copied:'Copiato: incollalo dove vuoi',trip_share_line:'Itinerario su POI•LOVE:',stop_f_name:'Cerca la tappa',stop_f_region:'Prefettura / regione / luogo',stop_f_region_ph:'Es. Tirana, Qark di Tirana',stop_f_date:'Data',stop_f_stay:'Rimanenza',stop_f_stay_ph:'Es. 2 notti',stop_f_img:'Immagine della tappa',stop_f_img_add:'Tocca per caricare',stop_find_photo:'Trova la foto del luogo',stop_photo_need:'Serve il nome o il luogo della tappa',searching_photo:'Cerco la foto del luogo…',photo_none:'Nessuna foto del luogo trovata: caricala tu',photo_found:'✓ Foto del luogo trovata',stop_f_note:'Note personali',stop_search_ph:'Cerca un posto: es. Mont Saint-Michel…',stop_n_of:'Tappa {n}/{tot}',stop_saved:'Tappa aggiornata',stop_save_edit:'Salva modifiche',trip_desc_lbl:'Descrizione',trip_area_none:'area da definire',trip_saving:'salvo…',trip_saved:'salvato ✓',trip_desc_ph:'Racconta l\'itinerario: cosa lo rende speciale, cosa vedrete, per chi è… Questo testo accompagna il link quando lo condividi.',trip_desc_saved:'Descrizione salvata',stop_lbl_trip:'In quale itinerario',stop_no_trip:'Nessun itinerario: creane uno',itin_one:'Itinerario',cat_cultura:'Cultura',cat_natura:'Natura',cat_cibo:'Cibo',cat_pratico:'Pratico',cat_arte:'Arte',cat_sport:'Sport',support_team:'Team POI•LOVE',support_human:'Umano · Team',support_reply_ph:'Rispondi al team…',support_new:'Nuovo messaggio dal team POI•LOVE',app_update:'Nuova versione, aggiorno…',photo_max3:'Puoi avere al massimo 3 foto',photos_saved:'foto salvate',photo_saved_one:'✓ Foto salvata',route_open_btn:'Apri',route_save_btn:'Salva',route_saved_btn:'Salvata',route_share_btn:'Condividi',route_share_txt:'una rotta storica su POI•LOVE',route_saved_ok:'✓ Salvata tra le tue',route_unsaved:'Rimossa dai salvati',sw_archive:'Archivia',sw_delete:'Elimina',sw_share:'Condividi',sw_public:'Pubblico',sw_official:'Ufficiale',trip_del_confirm:'Eliminare questo itinerario? Non si può annullare.',trip_deleted:'Itinerario eliminato',trip_archived:'Itinerario archiviato',trip_already_pub:'Già pubblico',trip_official_ask:'Proporre questo itinerario al team perché diventi ufficiale, col tuo nome? Potrà usarlo chiunque.',trip_official_sent:'✓ Proposta inviata al team, grazie!',
     tlp_badge_dest:'Destinazione',tlp_stops_lbl:'Tappe del viaggio',tlp_poi_lbl:'POI•LOVE lungo la rotta',tlp_cta_text:'Vuoi seguire questo itinerario o pianificarne uno simile?',tlp_open_app:'Apri POI•LOVE',tlp_share:'Condividi',tlp_stops_unavail:'Tappe non ancora disponibili',
     /* Liste */
-    list_sheet_title:'Nuova Lista',list_sheet_sub:'Crea una raccolta personale',list_name_lbl:'Nome della lista',itin_lists_empty:'Ancora nessuna lista. Tocca <strong>Nuovo</strong> per crearne una.',list_remove_from:'Rimuovi dalla lista',list_chip_none:'Nessuno',list_trip_none:'Nessun itinerario ancora, creane uno nella tab Itinerari',list_delete_confirm:'Eliminare "{name}"? L\'azione è irreversibile.',list_delete_ok:'Elimina',list_deleted:'🗑 Lista eliminata',
+    list_sheet_title:'Nuova Lista',list_sheet_sub:'Crea una raccolta personale',list_name_lbl:'Nome della lista',itin_lists_empty:'Ancora nessuna lista. Tocca Nuovo per crearne una.',list_remove_from:'Rimuovi dalla lista',list_chip_none:'Nessuno',list_trip_none:'Nessun itinerario ancora, creane uno nella tab Itinerari',list_delete_confirm:'Eliminare "{name}"? L\'azione è irreversibile.',list_delete_ok:'Elimina',list_deleted:'🗑 Lista eliminata',
     list_name_ph:'Nome della lista',list_count_poi:'{n} POI',list_vis_pub:'Pubblica',list_vis_prv:'Privata',list_vis_comp:'Compagnia',list_which_comp:'Quale compagnia',list_trip_opt:'Itinerario (facoltativo)',list_desc_ph:'A cosa serve questa lista? (facoltativo)',list_poi_in:'POI nella lista',list_act_share:'Condividi',list_act_delete:'Elimina',list_act_save:'Salva',list_act_cancel:'Annulla',list_edit_title:'Modifica',list_desc_lbl:'Descrizione',list_vis_lbl:'Visibilità',list_vis_link:'Link',list_create_btn:'Crea lista',
     /* Profile background popup */
     bg_change_title:'Cambia sfondo profilo',bg_change_sub:'Carica una tua foto, scegli un paesaggio, oppure fattelo dipingere da ILLI•AI.',bg_tab_upload:'Upload',bg_tab_landscapes:'Paesaggi',bg_upload_drop_title:"Carica un'immagine panoramica",bg_upload_drop_sub:'JPG, PNG · max 8 MB · meglio se larga',bg_search_ph:'Cerca: tirana, mare, montagne…',bg_use_photo:'Usa questa foto',bg_loading:'Carico…',bg_painting:'ILLI•AI sta dipingendo lo sfondo…',bg_painting_long:'(può richiedere 15-30 sec)',bg_use_bg:'Usa questo sfondo',bg_generate_again:'Genera un altro',bg_ai_prompt_ph:'Es: panorama di Tirana al tramonto, luci calde, montagne sullo sfondo, atmosfera cinematografica',bg_generate_btn:'Genera con ILLI•AI',bg_describe:"Descrivi lo sfondo del tuo profilo. ILLI•AI genererà un'immagine panoramica con Flux.",bg_error_size:'Immagine > 8 MB, troppo grande',bg_error_invalid:"Seleziona un'immagine valida",bg_updated:'🖼 Sfondo aggiornato',bg_gradient_updated:'🎨 Sfondo aggiornato',bg_landscape_updated:'🖼 Sfondo paesaggio aggiornato',bg_writeprompt:'Scrivi una descrizione',
@@ -6681,12 +6682,12 @@ const T={
     follow_now:'Stai seguendo',follow_no_more:'Non segui più',
     /* Compagnie (compagni di viaggio) */
     comp_title:'Compagni di Viaggio',comp_sheet_sub:'Condividi la tua posizione GPS in tempo reale con gli amici',comp_have_code:'Hai già un codice? Unisciti',comp_join:'Unisciti',comp_create_group:'Crea un nuovo gruppo',comp_name_lbl:'Nome del gruppo',comp_name_ph:'Es: Tirana Weekend, Cena del giovedì…',comp_duration:'Durata',comp_forever:'Per sempre',comp_trip:'Un viaggio',comp_dinner:'Una cena',comp_start:'Inizio',comp_end:'Fine',comp_desc_lbl:'Descrizione (opzionale)',comp_desc_ph:'Es: Cena giovedì sera per festeggiare insieme',comp_invite_lbl:'Invita amici (email separate da virgola)',comp_create_btn:'Crea gruppo e ottieni codice',comp_create_hint:'Otterrai un codice di 6 caratteri da condividere con i tuoi compagni di viaggio. Anche WhatsApp, link diretto o QR code.',comp_leave:'Lascia il gruppo',
-    comp_view_title:'Compagni di Viaggio',comp_view_sub:'Le tue compagnie attive e quelle a cui hai partecipato. Tocca <strong>+</strong> per crearne una nuova.',
+    comp_view_title:'Compagni di Viaggio',comp_view_sub:'Le tue compagnie attive e quelle a cui hai partecipato. Tocca Crea un nuovo gruppo per farne una.',
     comp_modal_title:'Compagnia',comp_modal_sub:'Condividi con una compagnia di viaggio',
     comp_toast_name_req:'Nome del gruppo obbligatorio',comp_lbl_forever_emoji:'Per sempre 🥰',comp_lbl_dinner_emoji:'Una cena 🍽️',comp_lbl_trip_emoji:'Un viaggio ✈️',
     comp_updated:'✓ "{name}" aggiornato!',comp_created:'✓ "{name}" creato! Codice: {code}',
     comp_invite_subject:'{sender} ti ha invitato a unirti a "{name}" su POI•LOVE',comp_invite_hello:'Ciao!',comp_invite_line:'{sender} ti invita a unirti a "{name}": {type}.',comp_invite_code:'Codice gruppo',comp_invite_link:'Link diretto',comp_invite_bye:'A presto',comp_invite_ready:'📧 Invito pronto per',comp_invite_dest1:'destinatario',comp_invite_destN:'destinatari',
-    comp_empty:'Nessun gruppo ancora. Tocca <strong>+</strong> per crearne uno.',comp_status_forever:'Per sempre',comp_status_expires:'Scade',comp_status_ongoing:'In corso',comp_friend_traveling:'In viaggio',comp_friend_stopped:'Fermo',comp_friend_offline:'Offline',comp_left:'Sei uscito',comp_admin_all:'Admin condivisa con tutti',comp_admin_creator:'Creatore & Amministratore',comp_member:'membro',comp_members:'membri',comp_edit:'Modifica',comp_admin_to_all:'Admin a tutti',comp_close_title:'Chiudi e scioglie il gruppo',comp_close_disabled_title:'Disponibile solo quando rimangono in 2',
+    comp_empty:'Nessun gruppo ancora. Tocca Crea un nuovo gruppo.',comp_status_forever:'Per sempre',comp_status_expires:'Scade',comp_status_ongoing:'In corso',comp_friend_traveling:'In viaggio',comp_friend_stopped:'Fermo',comp_friend_offline:'Offline',comp_left:'Sei uscito',comp_admin_all:'Admin condivisa con tutti',comp_admin_creator:'Creatore & Amministratore',comp_member:'membro',comp_members:'membri',comp_edit:'Modifica',comp_admin_to_all:'Admin a tutti',comp_close_title:'Chiudi e scioglie il gruppo',comp_close_disabled_title:'Disponibile solo quando rimangono in 2',
     comp_close_hint:'Puoi chiudere il gruppo solo quando rimaste in 2, ora {n} {members}',comp_close_blocked:'⛔ Puoi chiudere il gruppo solo quando rimaste in 2',comp_close_confirm:'Chiudere "{name}"? Il gruppo verrà sciolto definitivamente. Questa azione è irreversibile.',comp_close_ok:'Chiudi',comp_retry_online:'⚠ Riprova quando sei online',comp_close_failed:'⚠ Chiusura non riuscita, riprova',comp_closed:'🗑 "{name}" chiusa',comp_admin_confirm:'Dare i permessi di amministratore a tutti i partecipanti di "{name}"? Tutti potranno modificare e chiudere il gruppo.',comp_admin_done:'👑 Tutti i partecipanti sono ora amministratori',comp_edit_not_saved:'⚠ Modifica non salvata, riprova',comp_not_found:'Compagnia non trovata',comp_none_yet:'Nessuna compagnia ancora, creane una nella tab Compagni',
     comp_edit_title:'✏️ Modifica gruppo',comp_update_btn:'Aggiorna gruppo',comp_soon:'👥 Funzione Compagnia, prossimamente!',
     comp_leg_expiry:'= scadenza',comp_leg_forever:'= per sempre',comp_leg_traveling:'in viaggio',comp_leg_offline:'offline',comp_leg_stopped:'fermo da +1g',
@@ -6762,7 +6763,7 @@ const T={
     trip_no_stops:'Ende asnjë stacion, shto një!',trip_status_suspended:'Pezulluar',trip_status_done:'Përfunduar',trip_status_planned:'Planifikuar',trip_resume:'Vazhdo',trip_suspend:'Pezullo',trip_edit:'Redakto',trip_delete:'Fshi',trip_vis_pub:'Publik',trip_vis_friends:'Miq',trip_vis_prv:'Privat',stop_note_ph:'Shto shënime, kujtesa, info praktike…',stop_share_title:'Ndaj ose fto dikë në këtë stacion',stop_share_friend:'Ndaj',stop_share_maps:'Hap në harta',stop_share_warn_b:'Kujdes:',stop_share_warn:'nëse fton dikë që nuk e njeh personalisht, aktivizo ndarjen e vendndodhjes me një person të besuar para se ta takosh në një vend fizik.',stop_share_copied:'U kopjua: ngjite ku të duash',trip_share_line:'Itinerari në POI•LOVE:',stop_f_name:'Kërko stacionin',stop_f_region:'Prefekturë / rajon / vend',stop_f_region_ph:'P.sh. Tiranë, Qarku i Tiranës',stop_f_date:'Data',stop_f_stay:'Qëndrimi',stop_f_stay_ph:'P.sh. 2 net',stop_f_img:'Fotoja e stacionit',stop_f_img_add:'Prek për të ngarkuar',stop_find_photo:'Gjej foton e vendit',stop_photo_need:'Duhet emri ose vendi i ndalesës',searching_photo:'Po kërkoj foton e vendit…',photo_none:'Asnjë foto e vendit: ngarkoje ti',photo_found:'✓ Fotoja e vendit u gjet',stop_f_note:'Shënime personale',stop_search_ph:'Kërko një vend: p.sh. Mont Saint-Michel…',stop_n_of:'Stacioni {n}/{tot}',stop_saved:'Stacioni u përditësua',stop_save_edit:'Ruaj ndryshimet',trip_desc_lbl:'Përshkrimi',trip_area_none:'zona për t\'u përcaktuar',trip_saving:'po ruaj…',trip_saved:'u ruajt ✓',trip_desc_ph:'Trego itinerarin: çfarë e bën të veçantë, çfarë do të shihni, për kë është… Ky tekst shoqëron linkun kur e ndan.',trip_desc_saved:'Përshkrimi u ruajt',stop_lbl_trip:'Në cilin itinerar',stop_no_trip:'Asnjë itinerar: krijo një',itin_one:'Itinerar',cat_cultura:'Kulturë',cat_natura:'Natyrë',cat_cibo:'Ushqim',cat_pratico:'Praktik',cat_arte:'Art',cat_sport:'Sport',support_team:'Ekipi POI•LOVE',support_human:'Njeri · Ekipi',support_reply_ph:'Përgjigju ekipit…',support_new:'Mesazh i ri nga ekipi POI•LOVE',app_update:'Version i ri, po përditësoj…',photo_max3:'Maksimumi 3 foto',photos_saved:'foto u ruajtën',photo_saved_one:'✓ Fotoja u ruajt',route_open_btn:'Hap',route_save_btn:'Ruaj',route_saved_btn:'E ruajtur',route_share_btn:'Ndaje',route_share_txt:'një rrugë historike në POI•LOVE',route_saved_ok:'✓ U ruajt te të tuat',route_unsaved:'U hoq nga të ruajturat',sw_archive:'Arkivo',sw_delete:'Fshi',sw_share:'Ndaj',sw_public:'Publik',sw_official:'Zyrtar',trip_del_confirm:'Të fshihet ky itinerar? Nuk kthehet.',trip_deleted:'Itinerari u fshi',trip_archived:'Itinerari u arkivua',trip_already_pub:'Tashmë publik',trip_official_ask:'Ta propozosh këtë itinerar te ekipi që të bëhet zyrtar, me emrin tënd?',trip_official_sent:'✓ Propozimi u dërgua te ekipi, faleminderit!',
     tlp_badge_dest:'Destinacioni',tlp_stops_lbl:'Stacionet e udhëtimit',tlp_poi_lbl:'POI•LOVE përgjatë rrugës',tlp_cta_text:'Dëshiron ta ndjekësh këtë itinerar ose të planifikosh një të ngjashëm?',tlp_open_app:'Hap POI•LOVE',tlp_share:'Nda',tlp_stops_unavail:'Stacionet ende nuk janë të disponueshme',
     /* Liste */
-    list_sheet_title:'Listë e re',list_sheet_sub:'Krijo një koleksion personal',list_name_lbl:'Emri i listës',itin_lists_empty:'Ende asnjë listë. Prek <strong>I ri</strong> për të krijuar një.',list_remove_from:'Hiq nga lista',list_chip_none:'Asnjë',list_trip_none:'Ende asnjë itinerar, krijo një te skeda Itinerare',list_delete_confirm:'Të fshihet "{name}"? Veprimi është i pakthyeshëm.',list_delete_ok:'Fshi',list_deleted:'🗑 Lista u fshi',
+    list_sheet_title:'Listë e re',list_sheet_sub:'Krijo një koleksion personal',list_name_lbl:'Emri i listës',itin_lists_empty:'Ende asnjë listë. Prek I ri për të krijuar një.',list_remove_from:'Hiq nga lista',list_chip_none:'Asnjë',list_trip_none:'Ende asnjë itinerar, krijo një te skeda Itinerare',list_delete_confirm:'Të fshihet "{name}"? Veprimi është i pakthyeshëm.',list_delete_ok:'Fshi',list_deleted:'🗑 Lista u fshi',
     list_name_ph:'Emri i listës',list_count_poi:'{n} POI',list_vis_pub:'Publike',list_vis_prv:'Private',list_vis_comp:'Shoqëri',list_which_comp:'Cila shoqëri',list_trip_opt:'Itinerar (opsional)',list_desc_ph:'Për çfarë shërben kjo listë? (opsional)',list_poi_in:'POI në listë',list_act_share:'Nda',list_act_delete:'Fshi',list_act_save:'Ruaj',list_act_cancel:'Anulo',list_edit_title:'Redakto',list_desc_lbl:'Përshkrim',list_vis_lbl:'Dukshmëria',list_vis_link:'Link',list_create_btn:'Krijo listën',
     /* Profile background popup */
     bg_change_title:'Ndrysho sfondin e profilit',bg_change_sub:'Ngarko një foto tënde, zgjidh një peizazh, ose lëre ILLI•AI ta vizatojë.',bg_tab_upload:'Ngarko',bg_tab_landscapes:'Peizazhe',bg_upload_drop_title:'Ngarko një imazh panoramik',bg_upload_drop_sub:'JPG, PNG · max 8 MB · më mirë e gjerë',bg_search_ph:'Kërko: tirana, det, male…',bg_use_photo:'Përdor këtë foto',bg_loading:'Po ngarkohet…',bg_painting:'ILLI•AI po vizaton sfondin…',bg_painting_long:'(mund të zgjasë 15-30 sek)',bg_use_bg:'Përdor këtë sfond',bg_generate_again:'Gjenero një tjetër',bg_ai_prompt_ph:'P.sh.: panorama e Tiranës në perëndim, drita të ngrohta, male në sfond, atmosferë kinematografike',bg_generate_btn:'Gjenero me ILLI•AI',bg_describe:'Përshkruaj sfondin e profilit. ILLI•AI do të gjenerojë një imazh panoramik me Flux.',bg_error_size:'Imazhi > 8 MB, shumë i madh',bg_error_invalid:'Zgjidh një imazh të vlefshëm',bg_updated:'🖼 Sfondi u përditësua',bg_gradient_updated:'🎨 Sfondi u përditësua',bg_landscape_updated:'🖼 Sfondi peizazh u përditësua',bg_writeprompt:'Shkruaj një përshkrim',
@@ -6782,12 +6783,12 @@ const T={
     follow_now:'Po ndjek',follow_no_more:'Nuk ndjek më',
     /* Compagnie (shokë udhëtimi) */
     comp_title:'Shokë Udhëtimi',comp_sheet_sub:'Ndaje vendndodhjen tënde GPS në kohë reale me miqtë',comp_have_code:'Ke tashmë një kod? Bashkohu',comp_join:'Bashkohu',comp_create_group:'Krijo një grup të ri',comp_name_lbl:'Emri i grupit',comp_name_ph:'P.sh.: Tirana Weekend, Darka e enjtes…',comp_duration:'Kohëzgjatja',comp_forever:'Përgjithmonë',comp_trip:'Një udhëtim',comp_dinner:'Një darkë',comp_start:'Fillimi',comp_end:'Mbarimi',comp_desc_lbl:'Përshkrim (opsional)',comp_desc_ph:'P.sh.: Darkë të enjten në mbrëmje për të festuar bashkë',comp_invite_lbl:'Fto miqtë (email-e të ndara me presje)',comp_create_btn:'Krijo grupin dhe merr kodin',comp_create_hint:'Do të marrësh një kod me 6 karaktere për ta ndarë me shokët e udhëtimit. Edhe me WhatsApp, link të drejtpërdrejtë ose QR code.',comp_leave:'Largohu nga grupi',
-    comp_view_title:'Shokë Udhëtimi',comp_view_sub:'Shoqëritë e tua aktive dhe ato ku ke marrë pjesë. Prek <strong>+</strong> për të krijuar një të re.',
+    comp_view_title:'Shokë Udhëtimi',comp_view_sub:'Shoqëritë e tua aktive dhe ato ku ke marrë pjesë. Prek Krijo një grup të ri.',
     comp_modal_title:'Shoqëri',comp_modal_sub:'Ndaje me një shoqëri udhëtimi',
     comp_toast_name_req:'Emri i grupit është i detyrueshëm',comp_lbl_forever_emoji:'Përgjithmonë 🥰',comp_lbl_dinner_emoji:'Një darkë 🍽️',comp_lbl_trip_emoji:'Një udhëtim ✈️',
     comp_updated:'✓ "{name}" u përditësua!',comp_created:'✓ "{name}" u krijua! Kodi: {code}',
     comp_invite_subject:'{sender} të ka ftuar të bashkohesh me "{name}" në POI•LOVE',comp_invite_hello:'Përshëndetje!',comp_invite_line:'{sender} të fton të bashkohesh me "{name}": {type}.',comp_invite_code:'Kodi i grupit',comp_invite_link:'Link i drejtpërdrejtë',comp_invite_bye:'Shihemi së shpejti',comp_invite_ready:'📧 Ftesa gati për',comp_invite_dest1:'marrës',comp_invite_destN:'marrës',
-    comp_empty:'Ende asnjë grup. Prek <strong>+</strong> për të krijuar një.',comp_status_forever:'Përgjithmonë',comp_status_expires:'Skadon',comp_status_ongoing:'Në vazhdim',comp_friend_traveling:'Në udhëtim',comp_friend_stopped:'Ndalur',comp_friend_offline:'Offline',comp_left:'Je larguar',comp_admin_all:'Admin i ndarë me të gjithë',comp_admin_creator:'Krijues & Administrator',comp_member:'anëtar',comp_members:'anëtarë',comp_edit:'Redakto',comp_admin_to_all:'Admin për të gjithë',comp_close_title:'Mbyll dhe shpërndaje grupin',comp_close_disabled_title:'I disponueshëm vetëm kur mbeteni në 2',
+    comp_empty:'Ende asnjë grup. Prek Krijo një grup të ri.',comp_status_forever:'Përgjithmonë',comp_status_expires:'Skadon',comp_status_ongoing:'Në vazhdim',comp_friend_traveling:'Në udhëtim',comp_friend_stopped:'Ndalur',comp_friend_offline:'Offline',comp_left:'Je larguar',comp_admin_all:'Admin i ndarë me të gjithë',comp_admin_creator:'Krijues & Administrator',comp_member:'anëtar',comp_members:'anëtarë',comp_edit:'Redakto',comp_admin_to_all:'Admin për të gjithë',comp_close_title:'Mbyll dhe shpërndaje grupin',comp_close_disabled_title:'I disponueshëm vetëm kur mbeteni në 2',
     comp_close_hint:'Mund ta mbyllësh grupin vetëm kur mbeteni në 2, tani {n} {members}',comp_close_blocked:'⛔ Mund ta mbyllësh grupin vetëm kur mbeteni në 2',comp_close_confirm:'Të mbyllet "{name}"? Grupi do të shpërndahet përfundimisht. Ky veprim është i pakthyeshëm.',comp_close_ok:'Mbyll',comp_retry_online:'⚠ Provo përsëri kur je online',comp_close_failed:'⚠ Mbyllja dështoi, provo përsëri',comp_closed:'🗑 "{name}" u mbyll',comp_admin_confirm:'T\'u jepen të drejtat e administratorit të gjithë pjesëmarrësve të "{name}"? Të gjithë do të mund ta redaktojnë dhe ta mbyllin grupin.',comp_admin_done:'👑 Të gjithë pjesëmarrësit janë tani administratorë',comp_edit_not_saved:'⚠ Ndryshimi nuk u ruajt, provo përsëri',comp_not_found:'Shoqëria nuk u gjet',comp_none_yet:'Ende asnjë shoqëri, krijo një te skeda Shokë',
     comp_edit_title:'✏️ Redakto grupin',comp_update_btn:'Përditëso grupin',comp_soon:'👥 Funksioni Shoqëri, së shpejti!',
     comp_leg_expiry:'= skadenca',comp_leg_forever:'= përgjithmonë',comp_leg_traveling:'në udhëtim',comp_leg_offline:'offline',comp_leg_stopped:'ndalur prej +1 dite',
@@ -6863,7 +6864,7 @@ const T={
     trip_no_stops:'No stops yet, add one!',trip_status_suspended:'Suspended',trip_status_done:'Completed',trip_status_planned:'Planned',trip_resume:'Resume',trip_suspend:'Suspend',trip_edit:'Edit',trip_delete:'Delete',trip_vis_pub:'Public',trip_vis_friends:'Friends',trip_vis_prv:'Private',stop_note_ph:'Add notes, reminders, practical info…',stop_share_title:'Share or invite to this stop',stop_share_friend:'Share',stop_share_maps:'Open in maps',stop_share_warn_b:'Warning:',stop_share_warn:'if you invite someone you do not know personally, turn on location sharing with a trusted person before meeting them at a physical place.',stop_share_copied:'Copied: paste it anywhere',trip_share_line:'Itinerary on POI•LOVE:',stop_f_name:'Search the stop',stop_f_region:'Prefecture / region / place',stop_f_region_ph:'E.g. Tirana, Tirana County',stop_f_date:'Date',stop_f_stay:'Stay',stop_f_stay_ph:'E.g. 2 nights',stop_f_img:'Stop image',stop_f_img_add:'Tap to upload',stop_find_photo:'Find the place photo',stop_photo_need:'Stop name or location needed',searching_photo:'Finding the place photo…',photo_none:'No place photo found: upload one',photo_found:'✓ Place photo found',stop_f_note:'Personal notes',stop_search_ph:'Search a place: e.g. Mont Saint-Michel…',stop_n_of:'Stop {n}/{tot}',stop_saved:'Stop updated',stop_save_edit:'Save changes',trip_desc_lbl:'Description',trip_area_none:'area to be defined',trip_saving:'saving…',trip_saved:'saved ✓',trip_desc_ph:'Tell the itinerary: what makes it special, what you will see, who it is for… This text goes with the link when you share it.',trip_desc_saved:'Description saved',stop_lbl_trip:'Which itinerary',stop_no_trip:'No itinerary: create one',itin_one:'Itinerary',cat_cultura:'Culture',cat_natura:'Nature',cat_cibo:'Food',cat_pratico:'Practical',cat_arte:'Art',cat_sport:'Sport',support_team:'POI•LOVE Team',support_human:'Human · Team',support_reply_ph:'Reply to the team…',support_new:'New message from the POI•LOVE team',app_update:'New version, updating…',photo_max3:'Up to 3 photos',photos_saved:'photos saved',photo_saved_one:'✓ Photo saved',route_open_btn:'Open',route_save_btn:'Save',route_saved_btn:'Saved',route_share_btn:'Share',route_share_txt:'a historic route on POI•LOVE',route_saved_ok:'✓ Saved to yours',route_unsaved:'Removed from saved',sw_archive:'Archive',sw_delete:'Delete',sw_share:'Share',sw_public:'Public',sw_official:'Official',trip_del_confirm:'Delete this itinerary? This cannot be undone.',trip_deleted:'Itinerary deleted',trip_archived:'Itinerary archived',trip_already_pub:'Already public',trip_official_ask:'Propose this itinerary to the team to become official, with your name?',trip_official_sent:'✓ Proposal sent to the team, thank you!',
     tlp_badge_dest:'Destination',tlp_stops_lbl:'Trip stops',tlp_poi_lbl:'POI•LOVE along the route',tlp_cta_text:'Want to follow this itinerary or plan a similar one?',tlp_open_app:'Open POI•LOVE',tlp_share:'Share',tlp_stops_unavail:'Stops not available yet',
     /* Lists */
-    list_sheet_title:'New List',list_sheet_sub:'Create a personal collection',list_name_lbl:'List name',itin_lists_empty:'No list yet. Tap <strong>New</strong> to create one.',list_remove_from:'Remove from list',list_chip_none:'None',list_trip_none:'No itinerary yet, create one in the Itineraries tab',list_delete_confirm:'Delete "{name}"? This action is irreversible.',list_delete_ok:'Delete',list_deleted:'🗑 List deleted',
+    list_sheet_title:'New List',list_sheet_sub:'Create a personal collection',list_name_lbl:'List name',itin_lists_empty:'No list yet. Tap New to create one.',list_remove_from:'Remove from list',list_chip_none:'None',list_trip_none:'No itinerary yet, create one in the Itineraries tab',list_delete_confirm:'Delete "{name}"? This action is irreversible.',list_delete_ok:'Delete',list_deleted:'🗑 List deleted',
     list_name_ph:'List name',list_count_poi:'{n} POI',list_vis_pub:'Public',list_vis_prv:'Private',list_vis_comp:'Company',list_which_comp:'Which company',list_trip_opt:'Itinerary (optional)',list_desc_ph:'What is this list for? (optional)',list_poi_in:'POI in the list',list_act_share:'Share',list_act_delete:'Delete',list_act_save:'Save',list_act_cancel:'Cancel',list_edit_title:'Edit',list_desc_lbl:'Description',list_vis_lbl:'Visibility',list_vis_link:'Link',list_create_btn:'Create list',
     /* Profile background popup */
     bg_change_title:'Change profile background',bg_change_sub:'Upload a photo, pick a landscape, or have ILLI•AI paint it for you.',bg_tab_upload:'Upload',bg_tab_landscapes:'Landscapes',bg_upload_drop_title:'Upload a panoramic image',bg_upload_drop_sub:'JPG, PNG · max 8 MB · wide preferred',bg_search_ph:'Search: tirana, sea, mountains…',bg_use_photo:'Use this photo',bg_loading:'Loading…',bg_painting:'ILLI•AI is painting the background…',bg_painting_long:'(may take 15-30 sec)',bg_use_bg:'Use this background',bg_generate_again:'Generate another',bg_ai_prompt_ph:'E.g. Tirana skyline at sunset, warm lights, mountains in the background, cinematic atmosphere',bg_generate_btn:'Generate with ILLI•AI',bg_describe:'Describe your profile background. ILLI•AI will generate a panoramic image with Flux.',bg_error_size:'Image > 8 MB, too big',bg_error_invalid:'Please select a valid image',bg_updated:'🖼 Background updated',bg_gradient_updated:'🎨 Background updated',bg_landscape_updated:'🖼 Landscape background updated',bg_writeprompt:'Write a description',
@@ -6883,12 +6884,12 @@ const T={
     follow_now:'Now following',follow_no_more:'Unfollowed',
     /* Compagnie (travel companions) */
     comp_title:'Travel Companions',comp_sheet_sub:'Share your live GPS location with friends',comp_have_code:'Already have a code? Join',comp_join:'Join',comp_create_group:'Create a new group',comp_name_lbl:'Group name',comp_name_ph:'E.g. Tirana Weekend, Thursday dinner…',comp_duration:'Duration',comp_forever:'Forever',comp_trip:'A trip',comp_dinner:'A dinner',comp_start:'Start',comp_end:'End',comp_desc_lbl:'Description (optional)',comp_desc_ph:'E.g. Thursday evening dinner to celebrate together',comp_invite_lbl:'Invite friends (comma-separated emails)',comp_create_btn:'Create group and get code',comp_create_hint:'You will get a 6-character code to share with your travel companions. Also via WhatsApp, direct link or QR code.',comp_leave:'Leave the group',
-    comp_view_title:'Travel Companions',comp_view_sub:'Your active companies and the ones you joined. Tap <strong>+</strong> to create a new one.',
+    comp_view_title:'Travel Companions',comp_view_sub:'Your active companies and the ones you joined. Tap Create a new group.',
     comp_modal_title:'Company',comp_modal_sub:'Share with a travel company',
     comp_toast_name_req:'Group name is required',comp_lbl_forever_emoji:'Forever 🥰',comp_lbl_dinner_emoji:'A dinner 🍽️',comp_lbl_trip_emoji:'A trip ✈️',
     comp_updated:'✓ "{name}" updated!',comp_created:'✓ "{name}" created! Code: {code}',
     comp_invite_subject:'{sender} invited you to join "{name}" on POI•LOVE',comp_invite_hello:'Hi!',comp_invite_line:'{sender} invites you to join "{name}": {type}.',comp_invite_code:'Group code',comp_invite_link:'Direct link',comp_invite_bye:'See you soon',comp_invite_ready:'📧 Invitation ready for',comp_invite_dest1:'recipient',comp_invite_destN:'recipients',
-    comp_empty:'No groups yet. Tap <strong>+</strong> to create one.',comp_status_forever:'Forever',comp_status_expires:'Expires',comp_status_ongoing:'Ongoing',comp_friend_traveling:'Traveling',comp_friend_stopped:'Stopped',comp_friend_offline:'Offline',comp_left:'You left',comp_admin_all:'Admin shared with everyone',comp_admin_creator:'Creator & Administrator',comp_member:'member',comp_members:'members',comp_edit:'Edit',comp_admin_to_all:'Admin to all',comp_close_title:'Close and disband the group',comp_close_disabled_title:'Available only when 2 remain',
+    comp_empty:'No groups yet. Tap Create a new group.',comp_status_forever:'Forever',comp_status_expires:'Expires',comp_status_ongoing:'Ongoing',comp_friend_traveling:'Traveling',comp_friend_stopped:'Stopped',comp_friend_offline:'Offline',comp_left:'You left',comp_admin_all:'Admin shared with everyone',comp_admin_creator:'Creator & Administrator',comp_member:'member',comp_members:'members',comp_edit:'Edit',comp_admin_to_all:'Admin to all',comp_close_title:'Close and disband the group',comp_close_disabled_title:'Available only when 2 remain',
     comp_close_hint:'You can close the group only when 2 remain, now {n} {members}',comp_close_blocked:'⛔ You can close the group only when 2 remain',comp_close_confirm:'Close "{name}"? The group will be permanently disbanded. This action is irreversible.',comp_close_ok:'Close',comp_retry_online:'⚠ Try again when you are online',comp_close_failed:'⚠ Closing failed, try again',comp_closed:'🗑 "{name}" closed',comp_admin_confirm:'Give administrator permissions to all participants of "{name}"? Everyone will be able to edit and close the group.',comp_admin_done:'👑 All participants are now administrators',comp_edit_not_saved:'⚠ Change not saved, try again',comp_not_found:'Company not found',comp_none_yet:'No company yet, create one in the Companions tab',
     comp_edit_title:'✏️ Edit group',comp_update_btn:'Update group',comp_soon:'👥 Company feature, coming soon!',
     comp_leg_expiry:'= expiry',comp_leg_forever:'= forever',comp_leg_traveling:'traveling',comp_leg_offline:'offline',comp_leg_stopped:'stopped for +1d',
@@ -8439,7 +8440,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='4.12';
+const APP_VERSION='4.14';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
@@ -10206,7 +10207,7 @@ async function renderItinLists(){
     });
   }
   if(lists.length===0){
-    cont.innerHTML = '<div class="itin-lists-empty">'+t('itin_lists_empty','Ancora nessuna lista. Tocca <strong>Nuovo</strong> per crearne una.')+'</div>';
+    cont.innerHTML = '<div class="itin-lists-empty">'+t('itin_lists_empty','Ancora nessuna lista. Tocca Nuovo per crearne una.')+'</div>';
     return;
   }
   const palette = ['#D42B2B','#285EA7','#7C3AED','#16A34A','#F59E0B','#EC4899'];
@@ -11307,7 +11308,7 @@ function renderCompanionsTab(){
   const compagnie = [...saved];
 
   if(!compagnie.length){
-    root.innerHTML='<div class="poi-list-empty">'+t('comp_empty','Nessun gruppo ancora. Tocca <strong>+</strong> per crearne uno.')+'</div>';
+    root.innerHTML='<div class="poi-list-empty">'+t('comp_empty','Nessun gruppo ancora. Tocca Crea un nuovo gruppo.')+'</div>';
     return;
   }
 
