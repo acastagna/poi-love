@@ -4154,7 +4154,7 @@ function enterGuestMode() {
   if (overlay) overlay.style.display = 'none';
   if (!map && typeof initMap === 'function') { try { initMap(); } catch(e) {} }
   // L'ospite entra per GUARDARE: senza questa chiamata la mappa restava vuota
-  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v4.25.
+  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v4.26.
   if (typeof loadPOIsFromDB === 'function') { try { loadPOIsFromDB(); } catch(e) {} }
   if (typeof loadMyTags === 'function') { try { loadMyTags(); } catch(e) {} }
   showToast(t('guest_active'));
@@ -7138,7 +7138,7 @@ let map,tileStreet,tileSat,tileLabels,routeLayer,currentPOI;
 let gpsPos=null,gpsRegistered=false,userLocMarker=null,_gpsCity='';
 // Link condiviso (?poi= o ?at=): le coordinate del link VINCONO sulla posizione GPS.
 // Finche' e' attivo, il GPS non ricentra la mappa (altrimenti il posto condiviso "scappa").
-let _deepLinkActive = /[?&](poi|at)=/i.test(location.search);
+let _deepLinkActive = /[?&](poi|at|lat|lng|trip|route|join)=/i.test(location.search);
 // Reverse-geocoda la posizione GPS in NOME CITTA, cosi ILLI sa davvero dove sei: le coordinate da sole non bastano, il modello rispondeva Tirana
 async function _refreshGpsCity(){
   if(!gpsPos) return;
@@ -8053,7 +8053,7 @@ async function contributeToOSM(){
   if(btn&&btn.classList.contains('done')) return;
   const cats=(typeof _selCats!=='undefined'&&_selCats.length)?_selCats.map(c=>c.label).filter(Boolean).join(', '):'';
   // Testo pulito e limitato (niente caratteri di controllo, cap a 400): è testo utente inviato a un servizio esterno.
-  const clean=s=>String(s||'').replace(/[ -]/g,' ').trim();
+  const clean=s=>String(s||'').replace(/[\x00-\x1f\x7f]/g,' ').trim();
   const text=(`POI•LOVE: «${clean(name).slice(0,80)}»${cats?' · '+clean(cats).slice(0,120):''}\n`+
     'Segnalato da un utente della community POI•LOVE (https://poilove.com). Da verificare e mappare. Grazie!').slice(0,400);
   if(btn){ btn.disabled=true; }
@@ -8547,7 +8547,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='4.25';
+const APP_VERSION='4.26';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
@@ -9595,8 +9595,10 @@ let _addrMem = (()=>{ try{ return JSON.parse(localStorage.getItem(_ADDR_MEM_KEY)
 function _addrKeyOf(p){ return (Math.round((p.lat||0)*10000)/10000)+','+(Math.round((p.lng||0)*10000)/10000); }
 function _poiAddr(p){ return _plAddrOk(p.address) ? p.address : (_addrMem[_addrKeyOf(p)] || ''); }
 const _addrCoda = []; let _addrInCorso = false;
+const _ADDR_MAX_CODA = 24;      // tetto: OpenStreetMap accetta una domanda al secondo
 function _addrChiedi(p){
   if(!p || !p.lat || !p.lng) return;
+  if(_addrCoda.length >= _ADDR_MAX_CODA) return;   // il resto lo chiedo quando servira' davvero
   const k = _addrKeyOf(p);
   if(_addrMem[k] || _addrCoda.some(x=>x.k===k)) return;
   _addrCoda.push({ k, lat:p.lat, lng:p.lng });
@@ -9738,7 +9740,7 @@ async function renderPoiTab(){
         <div class="pi-actions pi-actions-4">
           <button class="pi-act-btn" title="Salva in un luogo personale" onclick="event.stopPropagation();poiToSafe('${key}')"><i class="ph-duotone ph-vault"></i></button>
           <button class="pi-act-btn" data-tt="act_open_map" title="${t('act_open_map')}" onclick="event.stopPropagation();centerMapOnPoi(${p.lat},${p.lng})"><i class="ph-duotone ph-crosshair"></i></button>
-          <button class="pi-act-btn" data-tt="act_navigate" title="${t('act_navigate')}" onclick="event.stopPropagation();navigateToPoi(${p.lat},${p.lng},'${(p.name||'').replace(/'/g,'')}')"><i class="ph-duotone ph-navigation-arrow"></i></button>
+          <button class="pi-act-btn" data-tt="act_navigate" title="${t('act_navigate')}" onclick="event.stopPropagation();navigateToPoi(${p.lat},${p.lng},'${_escArg(p.name||'')}')"><i class="ph-duotone ph-navigation-arrow"></i></button>
           <button class="pi-act-btn" data-tt="act_share" title="${t('act_share')}" onclick="event.stopPropagation();sharePoiByKey('${key}')"><i class="ph-duotone ph-share-network"></i></button>
         </div>
       </div>`;
@@ -9759,7 +9761,7 @@ async function renderPoiTab(){
       </div>
       <div class="pi-actions">
         <button class="pi-act-btn" title="Salva in un luogo personale" onclick="poiToSafe('${key}')"><i class="ph-duotone ph-vault"></i></button>
-        <button class="pi-act-btn" data-tt="act_navigate" title="${t('act_navigate')}" onclick="navigateToPoi(${p.lat},${p.lng},'${(p.name||'').replace(/'/g,'')}')"><i class="ph-duotone ph-navigation-arrow"></i></button>
+        <button class="pi-act-btn" data-tt="act_navigate" title="${t('act_navigate')}" onclick="navigateToPoi(${p.lat},${p.lng},'${_escArg(p.name||'')}')"><i class="ph-duotone ph-navigation-arrow"></i></button>
         <button class="pi-act-btn" data-tt="act_open_map" title="${t('act_open_map')}" onclick="centerMapOnPoi(${p.lat},${p.lng})"><i class="ph-duotone ph-map-pin"></i></button>
         <button class="pi-act-btn" data-tt="act_share" title="${t('act_share')}" onclick="sharePoiByKey('${key}')"><i class="ph-duotone ph-share-network"></i></button>
         ${isMine||poiSubtab==='mine'?`<button class="pi-act-btn" data-tt="act_visibility" title="${t('act_visibility')}" onclick="cyclePoiVisibility('${key}')"><i class="ph-duotone ${visIcon}"></i></button>`:'<span class="pi-act-void"></span>'}
@@ -10215,7 +10217,7 @@ function onSearchPickPlace(lat,lng,name){
       className:'', iconSize:[40,52], iconAnchor:[20,52]
     })
   }).addTo(map);
-  const safe=(name||'').replace(/'/g,"\\'").replace(/"/g,'&quot;');
+  const safe=_escArg(name||'');
   setMapPopupCtx(lat, lng, name);
   // ── Controlla se esiste già un POI DB entro 50 m ──
   const _nearby = (window._dbPOIs||[])
@@ -12641,7 +12643,9 @@ function reverseGeocodeAndShow(lat,lng,src){
   const shareTxtEl=document.getElementById('locShareTxt');
   if(shareTxtEl) shareTxtEl.textContent=linkTxt;
   updateShareLink(lat,lng);
-  if(map) map.setView([lat,lng],17);
+  // REGOLA: se sto guardando un posto per mia scelta, la posizione GPS registra il punto
+  // nella scheda ma NON mi riporta a casa. Il tocco sulla mappa e l'indirizzo, invece, si vedono.
+  if(map && !(window._vistaScelta && (src||'gps')==='gps')) map.setView([lat,lng],17);
   // Mostra risultato subito
   document.getElementById('locResult').classList.add('show');
   document.getElementById('locGpsLoading').style.display='none';
@@ -13643,7 +13647,13 @@ window._zTop = window._zTop || 10000; window._zModalTop = window._zModalTop || 1
   const aperta = el => el.classList.contains('show')||el.classList.contains('open')||el.classList.contains('vis')||el.style.display==='flex'||el.style.display==='block';
   const obs = new MutationObserver(ms=>{
     for(const m of ms){
-      if(m.type==='childList'){ m.addedNodes.forEach(nodo=>{ if(eFinestra(nodo) && aperta(nodo)) alzo(nodo); }); continue; }
+      // Le finestre si appendono al corpo della pagina: il rifacimento di una lista
+      // (che aggiunge decine di righe) non deve costare niente.
+      if(m.type==='childList'){
+        if(m.target!==document.body) continue;
+        m.addedNodes.forEach(nodo=>{ if(eFinestra(nodo) && aperta(nodo)) alzo(nodo); });
+        continue;
+      }
       const el=m.target; if(eFinestra(el) && aperta(el)) alzo(el);
     }
   });
