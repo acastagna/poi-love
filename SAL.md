@@ -1,5 +1,24 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
+## Sessione 19/08/2026 (6) — Le righe dei luoghi si leggono (v4.07 → 4.09)
+
+Vale per tutte le linguette: Personali, I miei POI, Loved, Vicini.
+
+| Elemento | Prima | Ora |
+|---|---|---|
+| Nome del luogo | 16 px | **20 px** (17 px su computer) |
+| Etichetta Pubblico/Privato | in mezzo alla riga sotto | piccola, **a destra accanto al nome** |
+| Numero dei cuori | 11 px in mezzo al testo | **20 px, come il nome**, rosso, a destra (a zero cuori non compare) |
+| Sotto il nome | categoria vecchia, spesso "natura ·" | **l'indirizzo vero**: via, numero, citta, stato |
+| Icone dei comandi | ~16 px dentro un pulsante da 38 | **24 px**, con 7 px di aria tutto intorno |
+| Otto comandi sul telefono | uno andava a capo da solo | stanno **su una riga sola** (pulsante 38, spazio 6) |
+
+**L'indirizzo vero**: molti luoghi non ce l'hanno scritto nel database (i salvataggi vecchi ci mettevano
+la categoria). Ora si ricava dalle coordinate con OpenStreetMap, una domanda al secondo, una volta sola:
+resta messo da parte sul telefono e compare nella riga appena arriva.
+
+Controllo esterno: **18 prove superate su 18**.
+
 ## Sessione 19/08/2026 (5) — I pannelli si aprono al centro, la condivisione c'e' ovunque (v4.03 → 4.06)
 
 1. **Tutto quello che si apriva dal basso ora si apre al centro** (v4.03). Sul telefono la parte bassa
