@@ -89,9 +89,18 @@ $scala_tetto = function () use ($rf) {                    // se poi non spedisco
 };
 
 // ── 4. il vestito, nella lingua scelta da chi manda ──
+// L'invito di chi manda viaggia col link: se il destinatario si iscrive da qui,
+// i punti vanno a tutti e due (regola degli inviti, 19/08).
+$handle = '';
+foreach (['username', 'handle', 'display_name'] as $k) {
+    if (!empty($meta[$k]) && is_string($meta[$k])) { $handle = $meta[$k]; break; }
+}
+if ($handle === '' && isset($in['handle']) && is_string($in['handle'])) $handle = $in['handle'];
+$handle = preg_replace('/[^A-Za-z0-9._-]/', '', (string)$handle);
 $url = 'https://poilove.com/?lat=' . rawurlencode(number_format($lat, 6, '.', ''))
      . '&lng=' . rawurlencode(number_format($lng, 6, '.', ''))
-     . '&label=' . rawurlencode($place);
+     . '&label=' . rawurlencode($place)
+     . ($handle !== '' ? '&ref=' . rawurlencode(mb_substr($handle, 0, 40)) : '');
 $D = [
   'sq' => ['sub' => 'të dërgon një vend zemre · POI•LOVE', 'line' => 'të dërgon një vend zemre:',
            'btn' => 'HAPE NË HARTË', 'fall' => 'Nëse butoni nuk punon, kopjo këtë link në shfletues:',
