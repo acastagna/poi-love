@@ -1,5 +1,36 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
+## Sessione 19/08/2026 (8) — Compagnie e scheda itinerario alla stessa misura (v4.13 → 4.14)
+
+**Compagni di Viaggio**
+
+| Elemento | Prima | Ora |
+|---|---|---|
+| Nome della compagnia | 15 px | 20 px |
+| Descrizione | 13 px grigia | 15 px, colore del testo |
+| Nome dei membri | 12 px | 14 px (tondino 24 → 28) |
+| Codice di accesso | 26 px | 32 px |
+| Matita e cestino | 36 px, icona 14 | 38 px, **icona 24 con 7 px di aria** |
+| Apri la compagnia | 46 px, testo 14 | 52 px, testo 16 |
+| Sottotitolo della pagina | 12 px | 14 px |
+
+**Difetto trovato e chiuso**: la frase di aiuto mostrava i tag come parole (`Tocca <strong>+</strong> per…`).
+Il traduttore protegge il testo dal codice, quindi i tag comparivano scritti. Tolti da tutte e nove le frasi
+(compagnie e itinerari, tre lingue), e il testo ora nomina il pulsante vero: "Tocca Crea un nuovo gruppo".
+
+**Scheda itinerario**
+
+| Elemento | Prima | Ora |
+|---|---|---|
+| Titolo | 16 px | 20 px |
+| Matita e chiusura | icone nude 15/20 px | pulsanti 38 px, **icona 24 con 7 px di aria**, vicini a destra |
+| Riga tappe · km · zona | 12,5 px | 14 px (icone 16 → 19) |
+| Descrizione | 14 px | 15 px, microfono 30 → 36 px con icona 22 |
+| Pubblico / Compagnia / Amici / Privato / Link | alte 26 px, testo 10 px | alte 34 px, testo 12,5 px, icone 16 px |
+| Titoli di sezione e calendario | 10 / 12 px | 11,5 / 14 px |
+
+Controllo esterno: **18 prove superate su 18**.
+
 ## Sessione 19/08/2026 (7) — Le righe dei luoghi vanno in colonna (v4.10 → 4.12)
 
 Il disordine aveva due cause, tutte e due chiuse.
