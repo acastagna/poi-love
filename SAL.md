@@ -1,5 +1,31 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
+## Sessione 19/08/2026 (10) — Condividere DOVE serve, non solo il link (v4.22 → 4.23)
+
+Il foglio Condividi si adatta a cio' che stai mandando. Ogni voce compare solo se puo' davvero
+funzionare: niente pulsanti che non fanno nulla.
+
+| Destinazione | Luogo | Itinerario | Cosa fa davvero |
+|---|---|---|---|
+| Follower · Amici | si | **si (nuovo)** | Accoda notifiche vere ai destinatari (migrazione 089, RPC `share_trip_with_audience` con le stesse difese della 086) |
+| **Compagnia (nuovo)** | si | si | Scrivi un messaggio vero sulla bacheca della compagnia scelta, con titolo e collegamento (tipo `share` in `companion_messages`) |
+| **Itinerario (nuovo)** | si | — | Aggiunge il luogo come tappa di un tuo viaggio (salvata su database) |
+| **Mappa storica (nuovo)** | — | si | Propone l'itinerario come rotta ufficiale (RPC `propose_trip_official`) |
+| Posta di POI•LOVE | si | **si (nuovo)** | `share-mail.php` ora manda anche gli itinerari: l'indirizzo del bottone lo scrive il server, mai chi chiama |
+| WhatsApp · Telegram · Email · Facebook · X · Copia | si | si | come prima |
+
+**Migrazione 089** applicata sulla nostra macchina: nuovo tipo di notifica `trip_shared_with_you`,
+`companion_messages` accetta il tipo `share` con `share_url`/`share_title`/`share_kind` (con vincolo:
+un messaggio `share` deve avere titolo e indirizzo), funzione `share_trip_with_audience`.
+Sulla bacheca il messaggio condiviso appare come scheda rossa con "Aprilo"; si apre solo se
+l'indirizzo e' di poilove.com, altrimenti il bottone non compare.
+
+**Card degli itinerari**: "Apri" e' salito accanto al titolo, a destra; la riga tappe · km · zona e'
+nera in grassetto e non va piu' a capo; entrando negli Itinerari le prime tre card fanno un passo a
+sinistra e tornano, cosi' si capisce che sotto ci sono i comandi (il cenno si ferma appena tocchi).
+
+Controllo esterno: **18 prove superate su 18**.
+
 ## Sessione 19/08/2026 (9) — Itinerario rifatto, livelli rimessi in ordine (v4.15 → 4.21)
 
 **Scheda dell'itinerario, rifatta**
