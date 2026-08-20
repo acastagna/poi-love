@@ -136,15 +136,14 @@ async function leggi(){
   const ora=new Date();
   document.getElementById('quando').textContent='aggiornato alle '+ora.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
 
-  /* Una domanda si fa al punto giusto: quando manca poco al blocco che la usa.
-     "Quanto manca" e' la somma delle giornate ancora da fare che vengono prima. */
-  const quanto = d => righe.filter(x=>x.stato!=='fatto' && x.stato!=='in_attesa' && x.ordine < d.ordine)
-                           .reduce((a,x)=>a+Number(x.giornate||0),0);
-  const SOGLIA = 3;
-  const adesso = attesa.filter(x=>quanto(x) <= SOGLIA);
-  const dopo   = attesa.filter(x=>quanto(x) >  SOGLIA)
-                       .map(x=>({...x, fra: quanto(x)}))
-                       .sort((a,b)=>a.fra-b.fra);
+  /* Una domanda si fa al punto giusto: appena finito il blocco che viene prima di lei.
+     Se davanti non c'e' piu' niente da fare, allora serve adesso. */
+  const prima = d => righe.filter(x=>x.stato!=='fatto' && x.stato!=='in_attesa' && x.ordine < d.ordine)
+                          .sort((a,b)=>b.ordine-a.ordine)[0] || null;
+  const adesso = attesa.filter(x=>!prima(x));
+  const dopo   = attesa.filter(x=>prima(x))
+                       .map(x=>({...x, dopoDi: prima(x)}))
+                       .sort((a,b)=>a.ordine-b.ordine);
 
   document.getElementById('nAttesa').textContent=adesso.length;
   document.getElementById('attesa').innerHTML = adesso.length
@@ -155,12 +154,10 @@ async function leggi(){
 
   document.getElementById('dopo').innerHTML = dopo.length
     ? '<div class="dopo"><b>Te lo chiedero&#39; piu&#39; avanti ('+dopo.length+')</b><ul>'+
-      dopo.map(x=>{
-        const g=new Date(); g.setDate(g.getDate()+Math.ceil(x.fra));
-        return '<li><b>'+testo(x.blocco)+'</b> · <span class="fra">fra circa '+
-               Math.ceil(x.fra)+' giornate, verso il '+g.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit'})+'</span>'+
-               (x.dettaglio?'<br>'+testo(x.dettaglio):'')+'</li>';
-      }).join('')+'</ul></div>'
+      dopo.map(x=>'<li><b>'+testo(x.blocco)+'</b><br>'+
+               '<span class="fra">te lo chiedo appena finito: '+testo(x.dopoDi.blocco)+'</span>'+
+               (x.dettaglio?'<br>'+testo(x.dettaglio):'')+'</li>').join('')+
+      '</ul></div>'
     : '';
 
   document.getElementById('adesso').innerHTML = corso.length
