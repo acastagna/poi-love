@@ -8186,7 +8186,7 @@ async function _refreshTripSaveCount(tripId){
 async function openProfileByUsername(username){
   if(!username || !sb) return;
   try{
-    const { data } = await sb.from('profiles').select('*').ilike('username', username).limit(1);
+    const { data } = await sb.from('profiles').select('id,username,display_name,avatar_url,bio,language,created_at,updated_at,cover_url,cover_type,points,special_tier').ilike('username', username).limit(1);
     if(data && data[0]){
       if(!currentUser){ if(typeof showProfileLanding==='function') showProfileLanding(data[0]); }
       else if(typeof openUserProfile==='function'){ openUserProfile(data[0]); }
@@ -8514,7 +8514,7 @@ function openPendingSharedProfile(){
   if(!h||!sb) return;
   try{ localStorage.removeItem('pl_pending_profile'); }catch(_){}
   hideProfileLanding();
-  sb.from('profiles').select('*').ilike('username',h).limit(1).then(({data})=>{
+  sb.from('profiles').select('id,username,display_name,avatar_url,bio,language,created_at,updated_at,cover_url,cover_type,points,special_tier').ilike('username',h).limit(1).then(({data})=>{
     if(data&&data[0]) setTimeout(()=>openUserProfile(data[0]),500);
   });
 }
@@ -8780,7 +8780,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='4.65';
+const APP_VERSION='4.66';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
@@ -15001,7 +15001,7 @@ function checkVanityUrlOnLoad(){
   if(!match) return;
   const handle=decodeURIComponent(match[1]);
   if(sb){
-    sb.from('profiles').select('*').ilike('username',handle).limit(1).then(({data})=>{
+    sb.from('profiles').select('id,username,display_name,avatar_url,bio,language,created_at,updated_at,cover_url,cover_type,points,special_tier').ilike('username',handle).limit(1).then(({data})=>{
       if(!(data&&data[0])) return;
       // Sloggato: vetrina personale sopra il login, il profilo vero dopo l accesso
       if(!currentUser){ showProfileLanding(data[0]); return; }
