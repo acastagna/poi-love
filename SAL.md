@@ -1,6 +1,22 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
-## Sessione 19/08/2026 (14) — La schermata del POI: nomi veri, indirizzi intelligenti, punti a tempo (v4.33 → 4.38)
+## Sessione 19/08/2026 (14) — La schermata del POI: nomi veri, indirizzi intelligenti, punti a tempo (v4.33 → 4.43)
+
+**4.39-4.43 — le ultime richieste, una per una**
+- Il **cronometro non si ferma piu' al minuto**: corre finche' non salvi (misurato 0:59 → 1:05 e oltre).
+- Il messaggio del risultato **non esce mentre scrivi**: durante la compilazione parlano solo il
+  cronometro e i punti in cima. Esce **quando salvi**, al centro dello schermo: **verde** con la coppa
+  sotto il minuto, **oro** col cappello da laureato sopra, e il pulsante porta **dritto al POI appena
+  creato** ("Vai al POI": la mappa ci si posa sopra e si apre la sua scheda).
+- **"Complimenti"** al posto di "Bravo", in tutte e tre le lingue.
+- **La ricerca parte da dove sei**, non da dove guarda la mappa. Nominatim non riceveva nemmeno il
+  punto (vuole un riquadro, non le coordinate): per questo i posti vicini non uscivano. Provato da
+  Zugliano: "tosano" -> **Iper Tosano, Thiene, 3,1 km** primo; "motta" -> Motta di Costabissara 13 km.
+- **Guasto mio, riparato**: per allineare la testata avevo cambiato tre regole (freccia, chiudi,
+  cronometro) che sono **condivise da tutte le schede**: erano cambiate le misure ovunque. Rimesse
+  identiche all'originale (verificate riga per riga contro ieri), le misure nuove valgono solo dentro
+  la testata della scheda POI.
+
 
 **4.37-4.38 — testata in ordine e ricerca per distanza.**
 La testata era in disordine: freccia sopra da sola, targhette impilate, nome del livello giallo su
