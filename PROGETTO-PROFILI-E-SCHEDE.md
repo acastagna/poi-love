@@ -466,3 +466,52 @@ Da riconfermare per iscritto, come dice quel documento: la percentuale vera sull
 3. Gli abbonamenti si vendono anche dal sito oltre che dall'app? (dal sito restano 12-15 euro in piu' su ogni Professionista)
 4. Chi si prende la responsabilita' legale della parola scelta per il rapporto, prima che un professionista lo mostri a terzi?
 5. Prima di fissare 9 giornate per 200 luoghi: faccio 10 schede complete e misuro il tempo vero?
+
+
+---
+
+## 10. Incassi: cosa chiedere, a chi, in che ordine (20/08/2026)
+
+Non serve cercare un incassatore nuovo. Il gruppo ha gia' deciso a luglio e il conto Raiffeisen e' aperto.
+Per POI•LOVE serve **agganciare**, non studiare.
+
+### 10.1 Le tre telefonate, in ordine
+
+**1. Raiffeisen, ufficio commerciale VPOS.** Chiedere un **secondo contratto VPOS intestato a poilove.com**,
+sotto lo stesso conto gia' aperto. Le domande da fare, tutte per iscritto nell'offerta:
+
+| Domanda | Perche' conta |
+|---|---|
+| Percentuale sulle **carte albanesi** e sulle **carte estere**, separate | i professionisti stranieri pagheranno con carta non albanese: e' li' che il costo esplode |
+| C'e' la conversione automatica in valuta (DCC)? Si puo' spegnere? | e' la voce che fa saltare il tetto del 4% senza che te ne accorgi |
+| **Pagamento ricorrente**: il VPOS sa tenere la carta e riaddebitare l'anno dopo? | se non lo fa, il rinnovo dell'abbonamento va rifatto a mano ogni anno, con l'avviso e il collegamento di pagamento |
+| **Payment Link** (collegamento di pagamento) attivo subito? | permette di incassare i primi professionisti prima che l'integrazione sia finita |
+| **3DS2** e pagina di pagamento ospitata da loro | i dati della carta non toccano il nostro server: e' quello che ci tiene fuori dagli obblighi pesanti |
+| Prezzi in **euro** o solo in lek? Quando accreditano? | i listini sono in euro |
+| Rimborsi e contestazioni: come si fanno e quanto costano | serve prima di vendere, non dopo |
+
+**2. BKT.** Secondo contratto VPOS: serve per le rate e come riserva se Raiffeisen si ferma.
+Non urgente, ma va aperto in parallelo perche' i tempi delle banche sono lunghi.
+
+**3. PayPal.** Resta il secondo bottone, per chi si fida solo di quello. Costa 3,9-8%,
+quindi va tenuto minoritario, non messo per primo.
+
+### 10.2 Cosa incassa cosa
+
+| Dove compra | Chi incassa | Quanto resta su 100 euro |
+|---|---|---|
+| Dal sito poilove.com | RaiAccept (o bonifico) | circa 96-97 euro |
+| Dentro l'app iPhone | Apple | 85 euro con il programma piccole imprese |
+| Dentro l'app Android | Google | 85 euro |
+| Bonifico diretto | Raiffeisen | oltre 99 euro |
+
+Per questo la fase 1 degli abbonamenti (registrazione dentro, pagamento fuori) non e' un ripiego:
+**e' anche la piu' conveniente**, e resta valida anche dopo.
+
+### 10.3 Quello che POI•LOVE deve avere pronto quando la banca dice si'
+
+Lavoro nostro, non della banca. Si fa mentre la banca risponde:
+- pagina di pagamento con il nostro aspetto, che manda al VPOS e torna indietro;
+- registro degli abbonamenti gia' previsto nel Blocco 11, con stato pagato, scaduto, rimborsato;
+- ricevuta o fattura all'utente, con i dati fiscali giusti;
+- riconciliazione: ogni incasso legato al suo abbonamento, per non impazzire a fine anno.
