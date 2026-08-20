@@ -823,15 +823,14 @@ body.kb-open #lang-strip,body.kb-open #brand-strip{opacity:0;pointer-events:none
 .sheet.open{transform:translateY(0);pointer-events:all}
 .sh-handle{width:44px;height:5px;background:#C8BFB0;border-radius:3px;margin:14px auto 4px;cursor:grab;flex-shrink:0}
 .sh-head{display:flex;align-items:flex-start;gap:10px;padding:14px 20px 0}
-.sh-back{width:36px;height:36px;border-radius:18px;background:#ede7dc;border:none;cursor:pointer;font-size:20px;color:var(--muted);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:0;pointer-events:all;transition:transform .12s}
+.sh-back{width:32px;height:32px;border-radius:16px;background:#ede7dc;border:none;cursor:pointer;font-size:18px;color:var(--muted);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;pointer-events:all;transition:transform .12s}
 .sh-back:active{transform:scale(.9)}
 .sh-title{font-size:19px;font-weight:800;color:var(--text);line-height:1.2}
 .sh-sub{font-size:13.5px;color:var(--muted);margin-top:2px;line-height:1.4}
-.sh-close{width:38px;height:38px;border-radius:20px;background:#ede7dc;border:none;cursor:pointer;font-size:17px;color:var(--muted);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;margin-left:auto;pointer-events:all}
+.sh-close{width:40px;height:40px;border-radius:20px;background:#ede7dc;border:none;cursor:pointer;font-size:17px;color:var(--muted);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;margin-left:auto;pointer-events:all}
 #closeAddPoiBtn{background:#DAEEFF;color:#1A7FC1}
 .sh-body{padding:14px 20px 0}
-.sh-timer{display:flex;align-items:center;gap:5px;background:#FFF5F5;border:1px solid #F7C1C1;border-radius:20px;padding:6px 11px;font-size:13px;font-weight:800;color:var(--red);flex-shrink:0}
-.sh-timer i{font-size:15px}
+.sh-timer{display:flex;align-items:center;gap:5px;background:#FFF5F5;border:1px solid #F7C1C1;border-radius:20px;padding:5px 10px;font-size:12px;font-weight:700;color:var(--red);flex-shrink:0}
 .congrats{border-radius:12px;padding:12px 16px;font-size:13px;font-weight:600;margin:10px 20px 0;line-height:1.6;display:none;gap:10px;align-items:flex-start}
 .congrats.show{display:flex}
 .congrats.fast{background:#EAF3DE;border:1.5px solid #C0DD97;color:#3B6D11}
@@ -914,7 +913,10 @@ body.kb-open #lang-strip,body.kb-open #brand-strip{opacity:0;pointer-events:none
 .sh-head-poi{flex-direction:column;align-items:stretch;gap:0}
 .shp-riga{display:flex;align-items:center;gap:10px}
 .shp-riga .sh-title{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.shp-riga .sh-close{margin-top:0}
+.shp-riga .sh-close{margin-top:0;width:38px;height:38px}
+.shp-riga .sh-back{margin-top:0;width:36px;height:36px;border-radius:18px;font-size:20px}
+.shp-riga .sh-timer{padding:6px 11px;font-size:13px;font-weight:800}
+.shp-riga .sh-timer i{font-size:15px}
 .sh-gain{display:flex;align-items:center;gap:7px;margin-top:8px;flex-wrap:nowrap;min-width:0}
 .pg-liv{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:800;border-radius:20px;padding:5px 11px;border:1.5px solid;white-space:nowrap;flex-shrink:0}
 .pg-pts{display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:900;color:var(--red);background:#FDE7E7;border-radius:20px;padding:5px 12px;white-space:nowrap;flex-shrink:0;transition:background .3s,color .3s}
@@ -2821,7 +2823,7 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
 
   <!-- LA PORTA PRINCIPALE: Google, grande e con l'etichetta -->
   <button class="auth-btn" onclick="signInWithGoogle()" style="background:#fff;color:#1C1C1C;font-weight:800;display:flex;align-items:center;justify-content:center;gap:10px">
-    <svg viewBox="0 0 24 24" style="width:20px;height:20px;flex-shrink:0"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.41h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+    <svg viewBox="0 0 24 24" style="width:20px;height:20px;flex-shrink:0"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.42h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
     <span data-t="auth_google_big">Continua con Google</span>
   </button>
 
@@ -4182,7 +4184,7 @@ function enterGuestMode() {
   if (overlay) overlay.style.display = 'none';
   if (!map && typeof initMap === 'function') { try { initMap(); } catch(e) {} }
   // L'ospite entra per GUARDARE: senza questa chiamata la mappa restava vuota
-  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v4.41.
+  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v4.42.
   if (typeof loadPOIsFromDB === 'function') { try { loadPOIsFromDB(); } catch(e) {} }
   if (typeof loadMyTags === 'function') { try { loadMyTags(); } catch(e) {} }
   showToast(t('guest_active'));
@@ -8691,7 +8693,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='4.41';
+const APP_VERSION='4.42';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
