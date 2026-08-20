@@ -1602,6 +1602,12 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 .save-modal{background:var(--card);border-radius:24px;padding:0 24px 32px;width:100%;max-width:480px;text-align:center;opacity:0;transform:translateY(26px) scale(.97);transition:transform .32s cubic-bezier(.32,.72,0,1),opacity .22s;max-height:88vh;overflow-y:auto}
 .save-modal-overlay.show .save-modal{opacity:1;transform:none}
 .save-modal-icon{font-size:64px;margin:24px 0 8px;line-height:1}
+.save-modal-pts{display:inline-flex;align-items:center;gap:7px;font-size:16px;font-weight:900;border-radius:22px;padding:7px 15px;margin-bottom:10px}
+.save-modal-pts i{font-size:18px}
+.save-modal.veloce{border-top:6px solid #16A34A}
+.save-modal.veloce .save-modal-pts{background:#DCFCE7;color:#166534}
+.save-modal.lento{border-top:6px solid #CA8A04}
+.save-modal.lento .save-modal-pts{background:#FDF0C9;color:#7A5B00}
 .save-modal-title{font-size:22px;font-weight:900;color:var(--text);margin-bottom:8px;line-height:1.2}
 .save-modal-sub{font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:24px}
 .save-modal-poi{background:var(--bg);border-radius:12px;padding:12px 16px;text-align:left;margin-bottom:20px;display:flex;align-items:center;gap:10px}
@@ -2807,7 +2813,7 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
 
   <!-- LA PORTA PRINCIPALE: Google, grande e con l'etichetta -->
   <button class="auth-btn" onclick="signInWithGoogle()" style="background:#fff;color:#1C1C1C;font-weight:800;display:flex;align-items:center;justify-content:center;gap:10px">
-    <svg viewBox="0 0 24 24" style="width:20px;height:20px;flex-shrink:0"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.35h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+    <svg viewBox="0 0 24 24" style="width:20px;height:20px;flex-shrink:0"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.36h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
     <span data-t="auth_google_big">Continua con Google</span>
   </button>
 
@@ -4061,6 +4067,7 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
 <div class="save-modal-overlay" id="saveModalOv" onclick="closeSaveModal()">
   <div class="save-modal" onclick="event.stopPropagation()">
     <div class="save-modal-icon" id="saveModalIcon"></div>
+    <div class="save-modal-pts" id="saveModalPts"></div>
     <div class="save-modal-title" id="saveModalTitle"></div>
     <div class="save-modal-sub" id="saveModalSub"></div>
     <div class="save-modal-poi">
@@ -4169,7 +4176,7 @@ function enterGuestMode() {
   if (overlay) overlay.style.display = 'none';
   if (!map && typeof initMap === 'function') { try { initMap(); } catch(e) {} }
   // L'ospite entra per GUARDARE: senza questa chiamata la mappa restava vuota
-  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v4.35.
+  // (i POI si caricavano solo al login). Trovato e chiuso il 18/08, v4.36.
   if (typeof loadPOIsFromDB === 'function') { try { loadPOIsFromDB(); } catch(e) {} }
   if (typeof loadMyTags === 'function') { try { loadMyTags(); } catch(e) {} }
   showToast(t('guest_active'));
@@ -6053,6 +6060,8 @@ async function savePOIToDB(data) {
       .then(({data,error})=>{
         if(error){ console.warn('[punti POI]', error.message); return; }
         const dati = (typeof data==='number') ? data : 0;
+        window._puntiPoiUltimo = 10 + dati;      // base del database + quello che ho guadagnato
+        if(typeof _mostraPuntiPresi==='function') _mostraPuntiPresi(null);
         if(dati>0 && typeof currentPoints!=='undefined'){
           currentPoints += dati;
           if(typeof renderBadge==='function') renderBadge(currentPoints);
@@ -8672,7 +8681,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='4.35';
+const APP_VERSION='4.36';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
@@ -11777,6 +11786,7 @@ function openAddPOI(){
   // Reset posizione: niente coordinate ereditate da POI precedenti o placeholder
   currentLocLatLng=null;
   window._indirizzoPieno=null;   // niente indirizzo ereditato dal POI precedente
+  window._puntiPoiUltimo=null;
   _ccPhoto=null;
   if(!(typeof editingPOIId!=='undefined'&&editingPOIId)) _resetPoiPhotos(); // ogni nuovo POI parte pulito, mai la foto del precedente
   { const h=document.getElementById('ccPhotoHint'); if(h){ h.classList.remove('show','used'); } }
@@ -14179,11 +14189,25 @@ async function savePOI(){
   setTimeout(()=>openSaveModal(name,lat2,lng2,sec),320);
 }
 
+// Quanti punti hai preso davvero. Il numero arriva dal server; finche' non risponde
+// mostro il conto della regola, poi lo correggo appena arriva la risposta.
+function _mostraPuntiPresi(stima){
+  const box=document.getElementById('saveModalPts'); if(!box) return;
+  const p = (typeof window._puntiPoiUltimo==='number') ? window._puntiPoiUltimo : stima;
+  if(p==null){ box.style.display='none'; return; }
+  box.style.display='inline-flex';
+  box.innerHTML=`<i class="ph-fill ph-lightning"></i>+${p} ${t('add_points','punti')}`;
+}
+
 function openSaveModal(name,lat,lng,sec){
   const fast=sec<=60;
+  // Il colore resta quello del traguardo: verde se sei stato veloce, oro se ti sei
+  // preso il tempo di fare le cose per bene.
+  const scheda=document.querySelector('#saveModalOv .save-modal');
+  if(scheda){ scheda.classList.remove('veloce','lento'); scheda.classList.add(fast?'veloce':'lento'); }
   document.getElementById('saveModalIcon').innerHTML=fast
-    ?'<i class="ph-duotone ph-trophy" style="font-size:52px;color:#D97706"></i>'
-    :'<i class="ph-duotone ph-chalkboard-teacher" style="font-size:52px;color:#92400E"></i>';
+    ?'<i class="ph-fill ph-trophy" style="font-size:52px;color:#16A34A"></i>'
+    :'<i class="ph-fill ph-graduation-cap" style="font-size:52px;color:#CA8A04"></i>';
   document.getElementById('saveModalTitle').innerHTML=emoToIcons(fast
     ?(lang==='it'?`Bravo, sei un razzo! ⚡ ${sec}s`
       :lang==='sq'?`Bravo, je një raketë! ⚡ ${sec}s`
@@ -14200,6 +14224,7 @@ function openSaveModal(name,lat,lng,sec){
       :'You took extra care mapping this place. That dedication matters.');
   document.getElementById('saveModalPoiName').textContent=name;
   document.getElementById('saveModalPoiCoords').textContent=`${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+  _mostraPuntiPresi(typeof puntiDelPoi==='function' ? puntiDelPoi(sec) : null);
   document.getElementById('saveModalOv').classList.add('show');
 }
 
