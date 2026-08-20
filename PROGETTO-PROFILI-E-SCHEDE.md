@@ -620,6 +620,29 @@ e lo stesso luogo puo' comparire nella raccolta di piu' persone senza diventare 
 |---|---|---|
 | Contenuti (viaggi e luoghi) | 9 | **11** (i 15 viaggi vanno disegnati, non solo le tappe) |
 | ILLI che conosce i viaggi e li propone | - | **0,5** |
-| **Totale programma** | 92,5 | **95** |
+| **Totale programma** | 92,5 | **95,5** (con l'invito a seguirsi, capitolo 13) |
 
 Traguardo dei contenuti spostato dal 15/10 al **18/10**; app agli store dal 20/11 al **23/11**.
+
+
+---
+
+## 13. L'invito a seguirsi (direttiva del 20/08/2026)
+
+Non serve la schermata delle richieste di amicizia: l'amicizia nasce dal secondo "ti seguo".
+Quello che serve e' **la spinta** perche' il secondo arrivi.
+
+**Come funziona.** Quando segui qualcuno, subito dopo compare la proposta: *vuoi chiedergli di seguirti?*
+- testo gia' pronto, **modificabile**: "Ti seguo. Seguimi anche tu, possiamo esserci utili";
+- si puo' saltare: chi non vuole scrivere niente non scrive niente;
+- arriva come avviso dentro POI•LOVE, e per email solo se quella persona ha acceso quell'avviso
+  (le preferenze esistono gia', tabella `notification_prefs`);
+- se l'altro ricambia, tutti e due ricevono **"ora siete amici"**, e da quel momento valgono le recensioni.
+
+**Perche' non diventi molestia**, tre regole dentro fin dall'inizio:
+1. un solo invito alla stessa persona, e non si ripete prima di un tempo stabilito;
+2. tetto giornaliero di inviti per persona;
+3. il testo personalizzato passa **dalla stessa moderazione AI delle recensioni** (Blocco 2):
+  chi ci scrive un insulto o un collegamento pubblicitario non lo manda. Chi e' bloccato non riceve niente.
+
+Costo: **mezza giornata**, dentro il Blocco 2. Totale programma: **95,5 giornate**.
