@@ -45,7 +45,22 @@ Non esiste nessuna tabella di recensioni. Serve tutto:
 - **regola di amicizia**: sui locali scrive solo chi e' amico, una a testa. Oggi esiste `follows`, che e' a senso unico:
   va deciso se "amico" vuol dire seguirsi a vicenda o se serve una tabella di amicizia vera **(decisione tua)**;
 - il locale puo' bandire una persona (le recensioni restano), la persona che toglie l'amicizia fa sparire le sue;
-- medie calcolate e tenute aggiornate, moderazione dall'amministrazione, +200 punti a chi recensisce;
+- medie calcolate e tenute aggiornate, +200 punti a chi recensisce;
+
+**Moderazione fatta dall'AI, guidata da direttive scritte (20/08/2026)**
+- Le direttive stanno **nell'amministrazione**, scritte da noi e modificabili senza toccare il codice:
+  cosa non passa (insulti, razzismo, dati personali di terzi, numeri di telefono e collegamenti,
+  attacchi ai concorrenti, testo fuori tema, recensione palesemente falsa), tono ammesso, lingue.
+- Ogni recensione nuova passa dal controllo **prima di comparire**. Tre esiti: **pubblica**,
+  **mettila in coda per una persona**, **rifiuta con il motivo scritto**.
+- L'AI scrive sempre **quale direttiva** ha fatto scattare la decisione: la persona in coda vede il perche',
+  non un verdetto muto. Ogni decisione resta scritta, cosi' le direttive si correggono sui casi veri.
+- Vale anche per le segnalazioni degli utenti: e' questo che permette di rispondere **entro 24 ore**,
+  come pretende Apple, senza che qualcuno stia sveglio a leggere.
+- Chiave dell'AI **solo sul server**, tetto mensile di chiamate come gia' fatto per le mappe,
+  e ricaduta se il tetto si esaurisce: la recensione resta in coda invece di passare senza controllo.
+- La stessa impalcatura servira' domani per i luoghi, le foto e i messaggi delle compagnie:
+  si costruisce una volta sola.
 - viste: sulla scheda del locale, sul profilo di influencer e professionisti (a scorrimento).
 
 ### Blocco 3 · Profilo pubblico dell'utente
@@ -115,6 +130,16 @@ Fase 1: l'influencer accende la disponibilita' e pubblica il listino; il profess
 per zona, tema, numeri veri e recensioni; la proposta e l'accordo passano dentro POI•LOVE.
 Fase 2 (dipende dall'incassatore): pagamento trattenuto fino alla consegna e commissione a POI•LOVE.
 
+**Regola di visibilita' del listino (20/08/2026, non negoziabile)**
+- Il listino di un influencer lo vedono **solo i professionisti e i locali Plus**. E l'amministrazione.
+- **Un influencer non vede mai il listino di un altro influencer.** Vede solo il proprio.
+- Chi non ha diritto vede il riquadro "Disponibile per collaborazioni" e il pulsante per proporre,
+  ma **non i prezzi**.
+- Il divieto si fa rispettare **sul server** (regola per riga sul database), non nascondendo il riquadro
+  nella pagina: nascondere non e' proteggere.
+- Nel pannello dell'influencer la cosa e' scritta **grande e chiara**, non in una nota a pie' di pagina:
+  *"Il tuo listino lo vedono solo i professionisti e i locali. Nessun altro influencer puo' vederlo."*
+
 ### Blocco 13 · Amministrazione trasversale
 Tipi di scheda organizzabili, tempi di scorrimento, moderazione delle recensioni, gestione del menu,
 gestione degli abbonamenti, assegnazione dei luoghi in omaggio.
@@ -133,7 +158,7 @@ Non comprende il tempo di collaudo di Alessandro.
 | # | Blocco | Giornate |
 |---|---|---|
 | 1 | Scheda del luogo, struttura vera | 2 |
-| 2 | Recensioni | 3 |
+| 2 | Recensioni, con moderazione fatta dall'AI su direttive scritte | 4 |
 | 3 | Profilo pubblico dell'utente | 4 |
 | 4 | Vantaggi dei livelli resi veri | 3 |
 | 5 | Controllo automatico delle condizioni | 1 |
@@ -147,10 +172,10 @@ Non comprende il tempo di collaudo di Alessandro.
 | 12 | Mercato professionisti e influencer (fase 1) | 3 |
 | 13 | Amministrazione trasversale | 2 |
 | 14 | Tre lingue, motori di ricerca, collaudo | 2,5 |
-| | **Totale fase 1** | **34,5** |
+| | **Totale fase 1** | **35,5** |
 | 15 | Incasso con carta (dipende dall'incassatore) | 2 |
 | 16 | Pagamento trattenuto e commissione del mercato | 2,5 |
-| | **Totale con la fase 2** | **39** |
+| | **Totale con la fase 2** | **40** |
 
 A una giornata al giorno lavorativo: **circa sette settimane** per la fase 1, otto con la fase 2.
 
@@ -242,12 +267,12 @@ e **200 luoghi veri in tutta l'Albania, 50 dei quali Ufficiali**. I tempi si all
 
 | Cantiere | Cosa comprende | Giornate |
 |---|---|---|
-| **A · Web, fase 1** | i blocchi del capitolo 2: schede, profili, livelli, recensioni, locale Plus, audio della persona, audioguide ufficiali, QR, abbonamenti | 34,5 |
+| **A · Web, fase 1** | i blocchi del capitolo 2: schede, profili, livelli, recensioni, locale Plus, audio della persona, audioguide ufficiali, QR, abbonamenti | 35,5 |
 | **B · Amministrazione al massimo** | persone, luoghi, moderazione recensioni, menu dei locali, abbonamenti, media, livelli, statistiche, ruoli | 6 |
 | **C · Contenuti: 200 luoghi, 50 Ufficiali** | raccolta dai dati aperti, scrittura, foto con licenza, verifica, bollino Ufficiale | 5 |
 | **D · App iOS e Android** | dall'impianto esistente fino agli store | 24,5 |
 | **E · Fase 2 web** | mercato professionisti-influencer, rapporto notarizzato, promemoria di scadenza | 5,5 |
-| | **Totale** | **75,5** |
+| | **Totale** | **76,5** |
 
 L'incasso con carta (2 giornate) resta fuori conteggio: dipende da quale incassatore accetta una societa' albanese.
 
@@ -340,7 +365,7 @@ sul codice e sul web. Quello che ha trovato, e come cambia il piano.
 - **Apple e gli abbonamenti**: venduti dentro l'app, passano dal sistema di Apple con la sua percentuale. Alessandro ha detto che gli sta bene: i numeri sono nel capitolo 9.4.
 - **Moderazione entro 24 ore**: Apple pretende segnalazione dei contenuti e intervento entro un giorno, con espulsione dell'utente. Oggi la moderazione e' tutta a mano. Serve il giro completo segnalazione, coda, blocco.
 - **Posizione in sottofondo**: e' il punto piu' delicato della revisione degli store, non una voce come le altre.
-- **Recensioni**: nessun tempo minimo fra "ti seguo" e "ti recensisco", nessun tetto giornaliero, nessuna procedura di contestazione per il gestore. Vanno messi prima di aprire le recensioni.
+- **Recensioni**: nessun tempo minimo fra "ti seguo" e "ti recensisco", nessun tetto giornaliero, nessuna procedura di contestazione per il gestore. Vanno messi prima di aprire le recensioni. La moderazione con l'AI su direttive scritte (Blocco 2) copre il resto.
 - **Chi controlla l'albanese** delle 50 schede Ufficiali. Serve un nome. Erion e' commercialista, non revisore di lingua.
 - **Le bozze grafiche stavano solo nella cartella temporanea**: spostate in `docs/mockup-schede-profili/`.
 
@@ -378,22 +403,22 @@ Due cose da sapere:
 
 | Cantiere | Prima | Adesso | Perche' |
 |---|---|---|---|
-| Web fase 1 | 34,5 | **38,5** | locale Plus +2, licenze e attribuzione foto +1, anti abuso recensioni +0,5, cambio +0,5. Comprende l'audio della persona e le audioguide ufficiali, separate il 20/08 |
+| Web fase 1 | 35,5 | **39,5** | locale Plus +2, licenze e attribuzione foto +1, anti abuso recensioni +0,5, cambio +0,5. Comprende l'audio della persona e le audioguide ufficiali, separate il 20/08 |
 | Amministrazione | 6 | **7** | moderazione entro 24 ore e blocco utenti, richiesti da Apple |
 | 200 luoghi, 50 Ufficiali | 5 | **9** | si parte da 18 luoghi e zero Ufficiali |
 | App iOS e Android | 24,5 | **30** | riscrittura del livello dati, porto alla versione attuale, tre punti delicati in revisione |
 | Fase 2 web | 5,5 | **6** | marcatura temporale vera per il rapporto |
-| | **75,5** | **90,5** | |
+| | **76,5** | **91,5** | |
 
-Calendario aggiornato, una giornata al giorno da venerdi 21/08 (90,5 giornate):
+Calendario aggiornato, una giornata al giorno da venerdi 21/08 (91,5 giornate):
 
 | Traguardo | Prima | Adesso |
 |---|---|---|
-| Web fase 1 completo | 22/09 | **28/09** |
-| Amministrazione perfezionata | 28/09 | **05/10** |
-| 200 luoghi in linea | 03/10 | **14/10** |
-| Fase 2 web | 09/10 | **20/10** |
-| App inviata agli store | 03/11 | **19/11** |
+| Web fase 1 completo | 22/09 | **29/09** |
+| Amministrazione perfezionata | 28/09 | **06/10** |
+| 200 luoghi in linea | 03/10 | **15/10** |
+| Fase 2 web | 09/10 | **21/10** |
+| App inviata agli store | 03/11 | **20/11** |
 | App pubblicata | meta' novembre | **fine novembre, inizio dicembre** |
 
 ### 9.6 Le cinque domande da sciogliere prima del via

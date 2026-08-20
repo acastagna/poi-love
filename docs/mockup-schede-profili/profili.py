@@ -209,7 +209,7 @@ P.append(dict(n=4, tit='Influencer',
       +'''
         '''+sez('handshake','Collaborazioni')+'''
         <div class="mercato"><i class="ph-fill ph-handshake"></i><div><b>Disponibile per collaborazioni</b>
-          <span>listino visibile ai professionisti e ai locali · risponde in 24 ore</span></div>
+          <span><b>Il listino lo vedono solo i professionisti e i locali.</b> Nessun altro influencer puo vederlo. Risponde in 24 ore.</span></div>
           <span class="dx">Proponi</span></div>
         '''+sez('push-pin','I suoi itinerari in evidenza')
       +riga('path','Riviera segreta, 4 giorni','9 tappe · 1.204 salvataggi')
@@ -262,7 +262,7 @@ P.append(dict(n=5, tit='Professionista',
       +'<div class="riga rvoice"><i class="ph-duotone ph-headphones"></i><div><b>Chi sono, in 52 secondi</b><br><span style="color:var(--tenue);font-weight:600">massimo un minuto per i professionisti · MP3 192</span></div><span class="dx">Ascolta</span></div>'
       +sez('handshake','Collaborazioni')
       +'<div class="mercato"><i class="ph-fill ph-storefront"></i><div><b>Cerca un influencer per il tuo lavoro</b>'
-      +'<span>listini, numeri veri e recensioni · la proposta passa da POI-LOVE</span></div><span class="dx">Apri</span></div>'
+      +'<span>listini veri, numeri e recensioni · la proposta passa da POI-LOVE</span></div><span class="dx">Apri</span></div>'
       +sez('scroll','Rotta adottata')
       +'<div class="rotta"><i class="ph-fill ph-scroll"></i><div><b>La via di Scanderbeg</b><br><span>adottata da Genc Kola · "a mio nonno, che me la raccontava"</span></div></div>'
       +sez('heart','I suoi luoghi piu votati')+poi_votati([
