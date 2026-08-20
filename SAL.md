@@ -1,5 +1,33 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
+## Sessione 20/08/2026 — Revisione sulla scheda POI: due guasti seri chiusi (v4.59 → 4.61)
+
+**SALVA POI in alto** (richiesta del founder, col disegno): pulsante rosso in alto a destra nella
+testata, sempre sotto gli occhi; quello in fondo si chiama uguale (prima diceva "Segna sulla mappa").
+Riaprendo un luogo per modificarlo la scheda **parte dall'inizio**.
+
+**Revisione del codice (agente code-quality), verdetto iniziale BLOCCATO. Riscontri verificati uno
+per uno e chiusi tutti:**
+
+1. **Le foto potevano passare da un luogo a un altro.** Dopo aver salvato un luogo nuovo restavano
+   in canna i FILE delle foto (si azzeravano le anteprime, non i file). Aprendo poi un altro luogo
+   in modifica e salvando senza toccare le foto, quelle vecchie **sostituivano** le sue. Ora i file
+   si azzerano col salvataggio e all'apertura di una modifica.
+2. **Chiudere la scheda col gesto (non con la X) lasciava aperta la modifica.** Il "+" successivo
+   creava un luogo nuovo che in realta' **sovrascriveva quello vecchio**, senza alcun segnale. Ora
+   la chiusura col gesto chiude anche la modifica e ferma il cronometro.
+3. **I due pulsanti dicevano cose diverse**: ora dicono **AGGIORNA POI** quando modifichi e
+   **SALVA POI** quando crei, tutti e due, in tutte e tre le lingue.
+4. **La linguetta "Luogo dove sono" restava ferma alla prima lettura**: se ti spostavi mentre
+   compilavi non lo sapeva. Ora mostra subito quella di prima e intanto rilegge il GPS.
+5. **Il nome dell'autore che arriva in ritardo** poteva finire sulla scheda di un altro luogo
+   aperto nel frattempo: ora si scrive solo sul luogo che l'ha chiesto.
+6. **Migrazione 092** allineata alle altre (`on conflict do nothing`): stesso account su due schermi
+   non genera piu' un errore.
+
+Misurato dal vivo: creando i pulsanti dicono SALVA POI, modificando dicono AGGIORNA POI, nessun file
+foto ereditato, e dopo la chiusura col gesto la modifica risulta chiusa.
+
 ## Sessione 19/08/2026 (15) — Chi migliora un luogo prende punti e viene ringraziato (v4.57 → 4.58)
 
 **4.58 — due difetti trovati e chiusi**
