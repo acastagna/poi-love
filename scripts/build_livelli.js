@@ -83,15 +83,15 @@ const SCELTI = [
   { id:'plus', gruppo:'pro', ico:'ph-fill ph-storefront', lavori:true,
     stile:'background:linear-gradient(135deg,#0f766e 0%,#052e2b 52%,#14b8a6 100%);color:#ccfbf1;border-color:rgba(94,234,212,.6)',
     it:{n:'Plus · Locali e attività', f:'Per ristoranti, bar e locali: la scheda completa della tua attività.',
-        q:'Quota annuale, in definizione', k:'Alla scadenza, senza rinnovo, la scheda del locale torna normale.',
+        q:'250 € all\'anno', k:'Alla scadenza, senza rinnovo, la scheda del locale torna normale.',
         w:'In costruzione: le funzioni del locale arrivano una alla volta',
         v:['Fino a 20 foto del locale','Listino e menu con i prezzi','Sistemi di pagamento collegati','Orari di apertura, giorno per giorno','QR del locale da stampare e mettere in vetrina','Statistiche avanzate del tuo locale']},
     sq:{n:'Plus · Lokale dhe biznese', f:'Për restorante, bare dhe lokale: skeda e plotë e biznesit tënd.',
-        q:'Tarifë vjetore, në përcaktim', k:'Në mbarim, pa rinovim, skeda e lokalit kthehet normale.',
+        q:'250 € në vit', k:'Në mbarim, pa rinovim, skeda e lokalit kthehet normale.',
         w:'Në ndërtim: funksionet e lokalit vijnë një nga një',
         v:['Deri në 20 foto të lokalit','Listë çmimesh dhe menu','Sisteme pagese të lidhura','Orari i hapjes, ditë për ditë','QR i lokalit për ta vënë në vitrinë','Statistika të avancuara të lokalit']},
     en:{n:'Plus · Venues and business', f:'For restaurants, bars and venues: the full card of your business.',
-        q:'Yearly fee, being defined', k:'Once expired, without renewal, the venue card goes back to normal.',
+        q:'€250 a year', k:'Once expired, without renewal, the venue card goes back to normal.',
         w:'Being built: the venue tools arrive one at a time',
         v:['Up to 20 photos of the venue','Price list and menu','Connected payment systems','Opening hours, day by day','Venue QR to print and put in the window','Advanced statistics of your venue']} }
 ];

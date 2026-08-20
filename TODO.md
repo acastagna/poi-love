@@ -10,6 +10,47 @@
 
 ---
 
+## 🗂️ SCHEDA PUBBLICA DEL LUOGO, sei tipologie (specifica del 20/08, mockup approvato in cosmesi)
+
+Bozza grafica: `scratchpad/schede2/mock.html` (immagine `schede6.jpg`). Dopo il via libera si costruisce tutto vero.
+
+**Regole comuni**
+- Il POI si apre sempre in popup, versione pubblica.
+- La prima foto si chiama **Copertina** ed e' quella letta dai codici di geolocalizzazione.
+- Testata: tre foto che scorrono da sole ogni 3000 ms. Galleria: sei alla volta, salto di quattro, 3000 ms. Tempi regolabili dall'admin.
+- Le tipologie di scheda si organizzano dal pannello di amministrazione.
+- Posizione della persona visibile nella community solo con la levetta accesa nel suo profilo.
+- Per il **locale** questa scheda E' il suo profilo. Per tutti gli altri il profilo resta quello tradizionale e queste sono le schede dei loro luoghi.
+
+**Cosa cambia per tipologia**
+
+| Tipologia | Foto | Video | Audioguida POI•VOICE | In piu' |
+|---|---|---|---|---|
+| Persona a punti | 4 | no | no | itinerari e compagnie pubbliche in "Fa parte di" |
+| Sostenitore | 6 | no | no | spunta, badge, nome nel Muro dei Sostenitori |
+| Mecenate | 8 | no | si | badge, un itinerario in evidenza |
+| Influencer | 6 | 1 | si | spunta rosa, follower, bollino Consigliato, i suoi itinerari |
+| Professionista | 6 | 1 | si | Chiama, Scrivi, Sito, fino a 4 social autoadattivi, "Vieni a trovarmi" con indirizzo confermato e navigazione, rotta adottata, QR che salva i suoi dati in rubrica |
+| Plus locale (250 euro/anno) | 20 | si | si (bonus) | menu, recensioni, orari, pagamenti, QR del locale, statistiche private |
+
+**Recensioni**
+- Valgono per i **luoghi**, mai per le persone.
+- Le scrive solo chi ha tra gli amici chi ha creato il luogo (per i locali: chi e' amico del locale). Una a testa.
+- Da 0 a 5 love, la media ha i decimali. Portano nome e avatar di chi scrive, che deve essere iscritto.
+- Il locale puo' bandire una persona: le sue recensioni restano. Se la persona toglie l'amicizia, le sue recensioni di quel locale spariscono.
+- Punti: salvare un locale **+100**, recensire **+200**.
+
+**Menu del locale**
+- Doppia valuta automatica: scritto in lek mostra anche l'euro e viceversa.
+- Cambio della Banca d'Albania preso **una volta al giorno** e tenuto in memoria. Se la banca non risponde resta l'ultimo cambio noto, con la sua data.
+- I piatti si aprono: si apre una tendina con la foto, caricata dal locale o scattata sul momento col telefono.
+
+**Rapporto notarizzato (direttiva 20/08)**
+- Influencer e Professionista scaricano dal **proprio profilo** un rapporto completo dei numeri (volume della community, follower, luoghi, salvataggi, visite, navigazioni, QR letti, recensioni, media).
+- PDF con impronta SHA-256 e data certa, vale come referenza verso terzi, anche per la cessione del marchio.
+
+---
+
 ## ⚡ SUBITO (aggiornato 18/08 dopo il cutover)
 
 - [ ] **POI Prova: love a 2330 solo per collaudo grafico** — riportare al valore vero (o cancellare il POI) prima del lancio.

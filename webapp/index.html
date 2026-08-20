@@ -6648,7 +6648,7 @@ const SPECIAL_TIERS={
     ]},
   professionista_plus:{labelKey:'tier_professionista_plus', label:'Professionista Plus', icon:'ph-fill ph-briefcase', style:'background:linear-gradient(135deg,#0f766e 0%,#052e2b 52%,#14b8a6 100%);color:#ccfbf1;border-color:rgba(94,234,212,.6);box-shadow:0 3px 14px rgba(20,184,166,.5),inset 0 1px 0 rgba(255,255,255,.3)',
     gruppo:'pro', ordine:3, inCostruzione:true,
-    quotaKey:'tier_plus_price', quota:'Quota annuale, in definizione',
+    quotaKey:'tier_plus_price', quota:'250 € all\'anno',
     tenutaKey:'tier_plus_keep', tenuta:'Alla scadenza, senza rinnovo, la scheda del locale torna normale.',
     pitchKey:'tier_proplus_pitch', pitch:'Per ristoranti, bar e locali: la scheda completa della tua attivita.',
     ctaKey:'tier_proplus_cta', cta:'Scrivimi per il Plus',
@@ -6953,7 +6953,7 @@ const T={
     tier_infl_keep:'Servono almeno 30 POI al mese: sotto quella soglia si perdono vantaggi e spunta.',
     tier_pro_price:'100 € all\'anno',
     tier_pro_keep:'Alla scadenza, senza rinnovo, i vantaggi si fermano.',
-    tier_plus_price:'Quota annuale, in definizione',
+    tier_plus_price:'250 € all\'anno',
     tier_plus_keep:'Alla scadenza, senza rinnovo, la scheda del locale torna normale.',
     tier_plus_p1:'Fino a 20 foto del locale',
     tier_plus_p2:'Listino e menu con i prezzi',
@@ -7072,7 +7072,7 @@ const T={
     tier_infl_keep:'Duhen të paktën 30 POI në muaj: nën atë prag humbasin përfitimet dhe shenja.',
     tier_pro_price:'100 € në vit',
     tier_pro_keep:'Në mbarim, pa rinovim, përfitimet ndalen.',
-    tier_plus_price:'Tarifë vjetore, në përcaktim',
+    tier_plus_price:'250 € në vit',
     tier_plus_keep:'Në mbarim, pa rinovim, skeda e lokalit kthehet normale.',
     tier_plus_p1:'Deri në 20 foto të lokalit',
     tier_plus_p2:'Listë çmimesh dhe menu',
@@ -7191,7 +7191,7 @@ const T={
     tier_infl_keep:'At least 30 POIs a month: below that, benefits and check mark are lost.',
     tier_pro_price:'€100 a year',
     tier_pro_keep:'Once expired, without renewal, the benefits stop.',
-    tier_plus_price:'Yearly fee, being defined',
+    tier_plus_price:'€250 a year',
     tier_plus_keep:'Once expired, without renewal, the venue card goes back to normal.',
     tier_plus_p1:'Up to 20 photos of the venue',
     tier_plus_p2:'Price list and menu',
@@ -8738,7 +8738,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='4.61';
+const APP_VERSION='4.62';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
