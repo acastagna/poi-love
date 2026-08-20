@@ -1,6 +1,23 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
-## Sessione 19/08/2026 (14) — La schermata del POI: nomi veri, indirizzi intelligenti, punti a tempo (v4.33 → 4.45)
+## Sessione 19/08/2026 (14) — La schermata del POI e la ricerca (v4.33 → 4.54)
+
+**4.46-4.54 — ricerca e testata, chiuse**
+- **Ricerca principale**: prima i tuoi POI, poi un solo elenco di luoghi **dal piu' vicino al piu'
+  lontano coi chilometri scritti**. La ricerca parte da **dove sei tu** (Google entro 50 km da te
+  piu' una domanda dedicata a OpenStreetMap sulla tua zona): prima Nominatim non riceveva nemmeno il
+  punto, per questo i posti vicini non uscivano.
+- **Niente piu' righe uguali**: OpenStreetMap spezza una via lunga in tanti tratti con lo stesso
+  nome (erano cinque "Rruga 5 Maji" identiche). Ora la stessa via nella stessa citta' compare una
+  volta sola, il tratto piu' vicino, anche quando la citta' arriva scritta in due lingue.
+- **Testata**: livello col punteggio gia' conseguito ("Viaggiatore · 340"), punti in **blu**,
+  cronometro **sulla stessa riga**; sotto la **barra di avanzamento** col traguardo. Livello e barra
+  si toccano e aprono il pannello dei livelli.
+- I quattro modi restano allineati a sinistra (provato centrato, non piaceva: rimesso com'era) e
+  ognuno **si ricorda il suo punto**: torni su GPS e trovi il GPS, torni su Foto e trovi la foto.
+- Verificato su schermo largo (1680 px): riga e barra ci sono e sono piene; popup finale **verde**
+  sotto il minuto e **oro** sopra, sempre al centro, con "Vai al POI".
+
 
 **4.44-4.45**
 - In testa torna **lo stato del profilo**: livello, punti che stai per prendere e **barra di
