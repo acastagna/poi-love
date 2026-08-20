@@ -8994,7 +8994,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='5.02';
+const APP_VERSION='5.03';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
@@ -13341,7 +13341,6 @@ function _avviaScorrimentoCopertina(p){
   const c=document.getElementById('detailPhotos');
   const foto=(p&&Array.isArray(p.photos))?p.photos.filter(Boolean):[];
   if(!c || foto.length<2) return;
-  if((typeof _canEditCurrentPoi==='function') && _canEditCurrentPoi()) return; // sul tuo luogo no: i tasti agiscono sulla copertina
   const slot=c.querySelector('.pdm-photo-slot'); if(!slot) return;
   const prima=slot.querySelector('img'); if(!prima) return;
   // Due immagini sovrapposte: mentre una svanisce l'altra e' gia' li'.
@@ -13470,6 +13469,15 @@ function _tastiVisore(e){
 
 function _pickPhotoForSlot(idx, container){
   if(!container) return;
+  // si ferma il giro e torna in vista la copertina: si cambia quella che si vede
+  try{
+    _fermaScorrimento();
+    const im=container.querySelector('.pdm-photo-slot img:not(.kb2)');
+    const cop=(currentPOI&&Array.isArray(currentPOI.photos))?currentPOI.photos[0]:null;
+    if(im&&cop){ im.style.opacity='1'; im.src=cop; }
+    const dietro=container.querySelector('.pdm-photo-slot img.kb2');
+    if(dietro) dietro.style.opacity='0';
+  }catch(_){}
   const inp = document.createElement('input');
   inp.type='file'; inp.accept='image/*';
   inp.onchange = (e)=>{
