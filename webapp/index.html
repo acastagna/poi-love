@@ -1333,6 +1333,34 @@ body.kb-open #lang-strip,body.kb-open #brand-strip{opacity:0;pointer-events:none
                 background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;
                 font-size:11px;font-weight:800;background-size:cover;background-position:center}
 .pdm-amanti div:first-child{margin-left:0}
+/* le recensioni: media in stelle, elenco, bottone per scriverne una */
+.rec-media{margin-left:auto;display:inline-flex;align-items:center;gap:5px;font-weight:900;font-size:13.5px;color:var(--text)}
+.rec-media i{color:#E8A317}
+.rec-media small{font-weight:700;color:var(--muted)}
+.rec-lista{display:flex;flex-direction:column;gap:10px}
+.rec-riga{display:flex;gap:10px;align-items:flex-start}
+.rec-riga .rec-viso{width:34px;height:34px;border-radius:50%;flex:0 0 34px;background-size:cover;background-position:50% 38%;
+  background-color:var(--border);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;color:var(--muted)}
+.rec-corpo{flex:1;min-width:0}
+.rec-testa{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.rec-nome{font-weight:900;font-size:13.5px}
+.rec-stelle{display:inline-flex;gap:1px;color:#E8A317;font-size:12.5px}
+.rec-quando{font-size:11.5px;color:var(--muted);font-weight:700}
+.rec-testo{font-size:13.5px;line-height:1.45;margin-top:3px;word-break:break-word}
+.rec-scrivi{margin-top:11px;width:100%;height:44px;border-radius:16px;border:1.5px dashed var(--border);background:var(--card);
+  font-family:inherit;font-weight:900;font-size:14px;color:var(--text);cursor:pointer;display:flex;align-items:center;
+  justify-content:center;gap:8px;transition:transform .15s ease,border-color .15s ease}
+.rec-scrivi:hover{transform:translateY(-1px);border-color:var(--red);color:var(--red)}
+.rec-nota{font-size:12.5px;color:var(--muted);font-weight:700;line-height:1.4;margin-top:9px}
+.rec-mia{border-left:3px solid var(--red);padding-left:9px}
+.rec-stato{font-size:11.5px;font-weight:900;padding:2px 8px;border-radius:9px}
+.rec-stato.coda{background:#FDF0D5;color:#8A6300}
+.rec-stato.no{background:#FBE3E3;color:#A32020}
+/* le stelle da toccare, quando si scrive */
+.rec-scelta{display:flex;justify-content:center;gap:6px;margin:4px 0 12px}
+.rec-scelta i{font-size:34px;color:var(--border);cursor:pointer;transition:transform .12s ease,color .12s ease}
+.rec-scelta i.on{color:#E8A317}
+.rec-scelta i:hover{transform:translateY(-2px)}
 .pdm-piede{margin:22px 16px 0;padding-top:14px;border-top:1px solid var(--border);font-size:11.5px;
            color:var(--muted);line-height:1.6}
 .pdm-piede .pf-righe{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;text-align:center}
@@ -4163,6 +4191,18 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
       <div class="pdm-sez-lbl"><i class="ph-duotone ph-users-three"></i> <span data-t="chi_ama_lbl">Chi lo ama</span></div>
       <div class="pdm-amanti" id="detailAmanti"></div>
     </div>
+    <!-- 5b. Recensioni: le scrivono gli amici del luogo, la moderazione le legge prima -->
+    <div class="pdm-sez" id="detailRecSez" style="display:none">
+      <div class="pdm-sez-lbl">
+        <i class="ph-duotone ph-chat-centered-text"></i> <span data-t="rec_lbl">Recensioni</span>
+        <span class="rec-media" id="detailRecMedia"></span>
+      </div>
+      <div class="rec-lista" id="detailRecLista"></div>
+      <button class="rec-scrivi" id="detailRecScrivi" style="display:none" onclick="apriRecensione()">
+        <i class="ph-duotone ph-pencil-simple-line"></i> <span data-t="rec_scrivi">Scrivi una recensione</span>
+      </button>
+      <div class="rec-nota" id="detailRecNota"></div>
+    </div>
     <!-- 6. Link condivisione -->
     <div class="pdm-share-link" id="detailShareLink" onclick="copyDetailLink()">
       <i class="ph-duotone ph-link"></i>
@@ -5902,7 +5942,7 @@ function openDBDetail(p) {
   // prima stavano solo sull'altra strada di apertura, e cosi' non si vedevano mai
   mostraGalleria(photos, p);
   mostraLivelloAutore(p);
-  _pittaTag(p); _pittaViaggio(); _pittaKmSullaCopertina(); _pittaAmanti(p); _pittaPiede(p);
+  _pittaTag(p); _pittaViaggio(); _pittaKmSullaCopertina(); _pittaAmanti(p); _pittaRecensioni(p); _pittaPiede(p);
   _sistemaAzioni(); _sistemaAutore(); _sistemaSegui(p); _frecciaGiu(); _avviaScorrimentoCopertina({...p, photos});
   // Hero: tag bianco su rosso
   const cat = p.category || 'Luogo';
@@ -8998,7 +9038,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='5.04';
+const APP_VERSION='5.05';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
@@ -13302,6 +13342,157 @@ function _pittaTag(p){
 }
 
 /* chi lo ama: i tondini di chi ha messo il cuore */
+/* ═══════════════════════════════════════════════════════
+   RECENSIONI
+   Le scrive solo chi e' amico di chi ha creato il luogo, una a testa, da 0 a 5.
+   Non compaiono da sole: passano dalla moderazione, che segue le direttive
+   scritte nel pannello. Se chi ha scritto smette di seguire, la sua recensione
+   sparisce da sola (lo decide il database, non questo codice).
+═══════════════════════════════════════════════════════ */
+function _stelleDisegnate(v){
+  let h='';
+  for(let i=1;i<=5;i++){
+    if(v>=i)        h+='<i class="ph-fill ph-star"></i>';
+    else if(v>=i-.5)h+='<i class="ph-fill ph-star-half"></i>';
+    else            h+='<i class="ph-duotone ph-star" style="opacity:.35"></i>';
+  }
+  return h;
+}
+function _quandoBreve(iso){
+  try{ const d=new Date(iso); return d.toLocaleDateString(navigator.language||'it-IT',{day:'2-digit',month:'2-digit',year:'numeric'}); }
+  catch(_){ return ''; }
+}
+
+async function _pittaRecensioni(p){
+  const sez=document.getElementById('detailRecSez');
+  const lista=document.getElementById('detailRecLista');
+  const media=document.getElementById('detailRecMedia');
+  const btn=document.getElementById('detailRecScrivi');
+  const nota=document.getElementById('detailRecNota');
+  if(!sez||!lista||!p||!p.id) return;
+  sez.style.display='none'; lista.innerHTML=''; media.innerHTML=''; nota.innerHTML='';
+  btn.style.display='none';
+  window._recPoi=p.id; window._recAutore=p.author_id||(p.profiles&&p.profiles.id)||null;
+  try{
+    const { data } = await sb.from('recensioni')
+      .select('id,voto,testo,stato,motivo,autore_id,created_at')
+      .eq('poi_id', p.id).order('created_at',{ascending:false}).limit(30);
+    if(!currentPOI || currentPOI.id!==p.id) return;
+    const righe=data||[];
+    const pubbliche=righe.filter(r=>r.stato==='pubblicata');
+    const mia=currentUser ? righe.find(r=>r.autore_id===currentUser.id) : null;
+
+    if(pubbliche.length){
+      const somma=pubbliche.reduce((a,r)=>a+Number(r.voto||0),0);
+      const m=Math.round((somma/pubbliche.length)*10)/10;
+      media.innerHTML=_stelleDisegnate(m)+' <b>'+String(m).replace('.',',')+'</b> <small>('+pubbliche.length+')</small>';
+    }
+    const ids=[...new Set(righe.map(r=>r.autore_id))];
+    let chi={};
+    if(ids.length){
+      const { data: pf } = await sb.from('profiles').select('id,username,display_name,avatar_url').in('id', ids);
+      (pf||[]).forEach(u=>{ chi[u.id]=u; });
+    }
+    const disegna=(r)=>{
+      const u=chi[r.autore_id]||{};
+      const n=(u.display_name||u.username||'?').trim();
+      const viso=u.avatar_url
+        ? '<div class="rec-viso" style="background-image:url(\''+String(u.avatar_url).replace(/['"]/g,'')+'\')"></div>'
+        : '<div class="rec-viso">'+_escHtml(n.slice(0,2).toUpperCase())+'</div>';
+      let stato='';
+      if(r.stato==='in_coda')   stato=' <span class="rec-stato coda">in controllo'+'</span>';
+      if(r.stato==='rifiutata') stato=' <span class="rec-stato no">non pubblicata'+'</span>';
+      const suo=(currentUser&&r.autore_id===currentUser.id);
+      return '<div class="rec-riga '+(suo?'rec-mia':'')+'">'+viso+
+        '<div class="rec-corpo"><div class="rec-testa"><span class="rec-nome">'+_escHtml(n)+'</span>'+
+        '<span class="rec-stelle">'+_stelleDisegnate(Number(r.voto||0))+'</span>'+
+        '<span class="rec-quando">'+_quandoBreve(r.created_at)+'</span>'+stato+'</div>'+
+        (r.testo?'<div class="rec-testo">'+_escHtml(r.testo)+'</div>':'')+
+        (suo&&r.stato==='rifiutata'&&r.motivo?'<div class="rec-nota">'+_escHtml(r.motivo)+'</div>':'')+
+        '</div></div>';
+    };
+    lista.innerHTML=pubbliche.map(disegna).join('') + ((mia&&mia.stato!=='pubblicata')?disegna(mia):'');
+
+    // Chi puo' scrivere: serve essere collegati, amici dell autore, e non e il proprio luogo.
+    if(currentUser && window._recAutore && window._recAutore!==currentUser.id && !mia){
+      let amici=false;
+      try{ const { data: a } = await sb.rpc('siamo_amici',{p_altro:window._recAutore}); amici=!!a; }catch(_){}
+      if(amici){ btn.style.display='flex'; }
+      else{ nota.innerHTML=t('rec_solo_amici','Le recensioni le scrivono le persone che sono amiche di chi ha creato il luogo: vi seguite tutti e due.'); }
+    } else if(!currentUser && !pubbliche.length){
+      nota.innerHTML=t('rec_entra','Entra per vedere e scrivere le recensioni.');
+    }
+    if(pubbliche.length || mia || btn.style.display==='flex' || nota.innerHTML) sez.style.display='block';
+  }catch(_){ }
+}
+
+let _recVoto=0;
+function apriRecensione(){
+  if(!currentUser || !window._recPoi) return;
+  _recVoto=0;
+  const ov=document.createElement('div');
+  ov.className='micro-modal-ov show'; ov.id='recOv';
+  ov.innerHTML=
+    '<div class="micro-modal" style="max-width:380px">'+
+      '<div style="font-size:17px;font-weight:900;margin-bottom:4px">'+t('rec_titolo','La tua recensione')+'</div>'+
+      '<div style="font-size:13px;color:var(--muted);font-weight:600;line-height:1.4;margin-bottom:10px">'+
+        t('rec_sotto','La legge prima la moderazione: se rispetta le regole compare subito.')+'</div>'+
+      '<div class="rec-scelta" id="recScelta"></div>'+
+      '<textarea id="recTesto" maxlength="1000" rows="4" placeholder="'+t('rec_ph','Com e andata? Racconta il luogo, non le persone.')+'" '+
+        'style="width:100%;border:1.5px solid var(--border);border-radius:14px;padding:11px 13px;font-family:inherit;'+
+        'font-size:14.5px;resize:none;background:var(--card);color:var(--text)"></textarea>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px">'+
+        '<button class="cta vuoto" style="height:46px;border-radius:20px;border:1.5px solid var(--border);'+
+          'background:var(--card);font-family:inherit;font-weight:900;cursor:pointer" onclick="_chiudiRecensione()">'+
+          t('rec_annulla','Annulla')+'</button>'+
+        '<button id="recManda" style="height:46px;border-radius:20px;border:none;background:var(--red);color:#fff;'+
+          'font-family:inherit;font-weight:900;cursor:pointer" onclick="_salvaRecensione()">'+
+          t('rec_manda','Manda')+'</button>'+
+      '</div>'+
+    '</div>';
+  ov.onclick=(e)=>{ if(e.target===ov) _chiudiRecensione(); };
+  document.body.appendChild(ov);
+  _pittaScelta();
+}
+function _pittaScelta(){
+  const c=document.getElementById('recScelta'); if(!c) return;
+  let h='';
+  for(let i=1;i<=5;i++) h+='<i class="ph-fill ph-star '+(i<=_recVoto?'on':'')+'" onclick="_recVoto='+i+';_pittaScelta()"></i>';
+  c.innerHTML=h;
+}
+function _chiudiRecensione(){ document.getElementById('recOv')?.remove(); }
+
+async function _salvaRecensione(){
+  if(!_recVoto){ showToast(t('rec_serve_voto','Tocca le stelle per dare il tuo voto')); return; }
+  const testo=(document.getElementById('recTesto')?.value||'').trim().slice(0,1000);
+  const b=document.getElementById('recManda');
+  if(b){ b.disabled=true; b.textContent=t('rec_invio','Controllo...'); }
+  try{
+    const { data, error } = await sb.from('recensioni')
+      .insert({ poi_id: window._recPoi, voto:_recVoto, testo: testo||null }).select().single();
+    if(error) throw error;
+    // il verdetto arriva dal server: il telefono non pubblica da solo
+    let esito='in_coda', motivo='';
+    try{
+      const h=await _aiAuthHeaders();
+      const r=await fetch('https'+'://poilove.com/db/functions/v1/modera-recensione',
+        { method:'POST', headers:h, body: JSON.stringify({ recensione_id: data.id }) });
+      const j=await r.json(); esito=j.esito||'in_coda'; motivo=j.motivo||'';
+    }catch(_){}
+    _chiudiRecensione();
+    if(esito==='pubblicata')      showToast(t('rec_ok','Recensione pubblicata. +200 punti.'));
+    else if(esito==='rifiutata')  showToast((motivo||t('rec_no','La recensione non rispetta le regole')));
+    else                          showToast(t('rec_coda','La guarda una persona prima di pubblicarla'));
+    if(currentPOI) _pittaRecensioni(currentPOI);
+  }catch(e){
+    if(b){ b.disabled=false; b.textContent=t('rec_manda','Manda'); }
+    const m=String((e&&e.message)||'');
+    if(/duplicate|unique/i.test(m)) showToast(t('rec_gia','Hai gia recensito questo luogo'));
+    else if(/row-level|policy/i.test(m)) showToast(t('rec_non_amici','Si puo recensire solo i luoghi degli amici'));
+    else showToast(t('error_generic','Qualcosa e andato storto, riprova'));
+  }
+}
+
 async function _pittaAmanti(p){
   const sez=document.getElementById('detailAmaSez'), box=document.getElementById('detailAmanti');
   if(!sez||!box||!p.id) return;
@@ -13731,7 +13922,7 @@ function openDetail(idx){
   renderPhotoStrip(ph, p.photos||[], p.name, p.address||'Tiranë, Albania', p.cat||'Luogo');
   mostraGalleria(p.photos||[], p);
   mostraLivelloAutore(p);
-  _pittaTag(p); _pittaViaggio(); _pittaKmSullaCopertina(); _pittaAmanti(p); _pittaPiede(p);
+  _pittaTag(p); _pittaViaggio(); _pittaKmSullaCopertina(); _pittaAmanti(p); _pittaRecensioni(p); _pittaPiede(p);
   _sistemaAzioni(); _sistemaAutore(); _sistemaSegui(p); _frecciaGiu(); _avviaScorrimentoCopertina(p);
   // Hero: tag
   const tag=document.getElementById('detailTag');
