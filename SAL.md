@@ -1,5 +1,41 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
+## Notte fra 20 e 21/08/2026 — Recensioni, vantaggi dei livelli, controllo delle condizioni (5.04 → 5.07)
+
+Lavoro in autonomia, tre blocchi del programma chiusi e in linea. Stato sempre aggiornato su
+https://sal.poilove.com/avanzamento.html
+
+### Recensioni con moderazione AI (5.05, migrazioni 103-106)
+- Le scrive solo chi e' **amico** di chi ha creato il luogo, una a testa, da 0 a 5.
+- **Nessuno pubblica da solo**: il database impone lo stato "in coda" a qualunque cosa arrivi dal
+  telefono. L'unica a poter pubblicare e' la funzione di moderazione sul server (`modera-recensione`).
+- La moderazione segue **otto direttive scritte nel database**, cambiabili dal pannello.
+  Prova reale: testo con insulti e numero di telefono -> respinta, direttive 1 e 4; testo corretto -> pubblicata.
+- Se chi ha scritto smette di seguire, la recensione sparisce; se il locale blocca, la recensione resta.
+- Recensire vale 200 punti.
+- **Guasto riparato**: nel passaggio al nostro database si era perso l'indice unico di `point_events`.
+  Da allora **nessuna azione assegnava piu' punti**, in tutto il sistema, e l'errore spariva in silenzio.
+
+### I vantaggi dei livelli, resi veri (5.06, migrazioni 107-108)
+- Tabella `livelli`: foto, video, secondi di voce, audioguide, luoghi in evidenza, spunta, muro.
+  Tutti numeri **nel database**, cambiabili dal pannello senza toccare il programma.
+- Foto per luogo: Persona copertina + 3, Sostenitore + 6, Mecenate + 9, Influencer e Professionista + 12,
+  Locale Plus + 21. Il tetto lo fa rispettare il database al salvataggio, verificato.
+- Tolto il vecchio **tetto fisso di 3 foto per chiunque**, che rendeva impossibili tutti i livelli superiori.
+- Riparato: il **video era spento per tutti**, il codice leggeva una variabile che nessuno riempiva.
+
+### Controllo automatico delle condizioni (5.07, migrazione 109)
+- Patto per livello: **30 luoghi in trenta giorni** all'Influencer, **rinnovo** a Professionista e Locale Plus.
+- Lavoro della notte alle 03:20 (`/usr/local/bin/poilove-condizioni.sh`, `/etc/cron.d/poilove-condizioni`):
+  chi e' fuori riceve un **avviso**, e se dopo **quattordici giorni** non e' cambiato niente perde il livello
+  da solo. Ogni passo resta scritto in `livello_eventi`.
+- Nell'app compare il riquadro **"Il tuo patto"** con i numeri veri.
+- Riparato: l'invito a ricambiare scriveva un avviso che il database rifiutava in silenzio.
+
+Controlli esterni: **18 su 18** dopo ogni pubblicazione. Programma: **20 giornate su 97**.
+
+---
+
 ## Sessione 20/08/2026 (pomeriggio e sera) — La scheda del luogo diventa il disegno approvato (v4.62 → 4.78)
 
 **Dove si guarda lo stato, da oggi**: https://sal.poilove.com/avanzamento.html
