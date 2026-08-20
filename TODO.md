@@ -67,6 +67,54 @@ Le audioguide caricate diventano subito **MP3 192**.
 
 ---
 
+## 👤 PROFILO PUBBLICO DELL'UTENTE, cinque tipologie (specifica del 20/08)
+
+Bozza grafica: `scratchpad/schede2/profili.html`, immagine `profili.jpg`. Il **locale non e' qui**: per lui la scheda del luogo E' il profilo.
+
+**Struttura uguale per tutti**
+- Copertina scelta dall'utente. Il **viso o avatar sta al centro, a meta' della copertina**, sotto di essa.
+- Poi nome con badge, indirizzo del profilo, i suoi dati, la posizione **solo se l'ha resa pubblica**.
+- Quattro numeri in fila, poi la presentazione, poi Segui e Condividi.
+- **I suoi luoghi piu' votati**, **itinerari pubblici**, **compagnie pubbliche**. Niente di privato.
+
+**Cosa aggiunge ogni tipologia**
+
+| Tipologia | Aggiunge |
+|---|---|
+| Persona | niente, e' la base |
+| Sostenitore | pastiglia sulla copertina, spunta, badge, Muro dei Sostenitori |
+| Mecenate | pastiglia oro-viola, itinerario in evidenza, scaffale delle audioguide che ascolta, rotte adottate |
+| Influencer | pastiglia Consigliata, tre itinerari e una compagnia in evidenza, recensioni ricevute a scorrimento, QR, **mercato delle collaborazioni**, rapporto notarizzato (privato) |
+| Professionista | biglietto da visita completo (Chiama, Scrivi, sito, Vieni a trovarmi, social, QR), audiopresentazione fino a 1 minuto, rotta adottata, recensioni ricevute, **mercato delle collaborazioni**, abbonamento e rapporto notarizzato (privati) |
+
+Il comando per mostrare o nascondere il QR sta **nel pannello**, non scritto sulla scheda pubblica.
+
+---
+
+## 💳 INCASSI DEI DUE LIVELLI A PAGAMENTO (da progettare in admin, direttiva 20/08)
+
+Paga il **Professionista (100 euro/anno)** e paga il **Plus locale (250 euro/anno)**. L'**Influencer non paga**: porta valore, e in futuro incassa dai professionisti.
+
+**Fase 1, senza dipendenze esterne (si puo' fare subito)**
+- Scheda **Abbonamenti** nell'amministrazione: chi paga, livello, prezzo, inizio, scadenza, stato, documento di pagamento.
+- Attivazione a mano dopo il bonifico, con ricevuta caricata e visibile all'utente nel suo pannello.
+- Promemoria automatici a 30, 7 e 1 giorno dalla scadenza.
+- Alla scadenza senza rinnovo il livello **decade da solo**: si aggancia al lavoro gia' in lista "Controllo automatico dei livelli".
+
+**Fase 2, incasso con carta**
+- Da decidere con l'agente pagamenti: incassatore che fattura al posto nostro e gestisce l'IVA dei vari paesi, oppure incasso locale albanese. **Da verificare prima di promettere date**: quali incassatori accettano un venditore con sede in Albania.
+
+---
+
+## 🤝 MERCATO PROFESSIONISTI ↔ INFLUENCER (direttiva 20/08)
+
+- L'influencer mette la levetta **Disponibile per collaborazioni** e il proprio listino.
+- Il professionista e il locale cercano per zona, tema, numeri veri e recensioni ricevute.
+- La proposta passa **dentro POI•LOVE**: messaggio, accordo, consegna, pagamento trattenuto fino alla consegna, commissione a POI•LOVE.
+- L'influencer non paga mai la piattaforma: incassa.
+
+---
+
 ## ⚡ SUBITO (aggiornato 18/08 dopo il cutover)
 
 - [ ] **POI Prova: love a 2330 solo per collaudo grafico** — riportare al valore vero (o cancellare il POI) prima del lancio.
