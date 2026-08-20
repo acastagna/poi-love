@@ -1,6 +1,18 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
-## Sessione 19/08/2026 (15) — Chi migliora un luogo prende punti e viene ringraziato (v4.57)
+## Sessione 19/08/2026 (15) — Chi migliora un luogo prende punti e viene ringraziato (v4.57 → 4.58)
+
+**4.58 — due difetti trovati e chiusi**
+1. **Il grazie non usciva.** Il numero del luogo veniva letto DOPO il salvataggio, ma nel frattempo
+   la scheda si chiude e azzera quel numero: il premio non veniva mai chiesto (nel registro punti
+   non c'era nessun `poi_improved`). Ora il numero si prende all'ingresso della funzione. Provata la
+   regola sul database: accredita 5 punti, una volta al giorno per luogo.
+2. **"Anonimo" al posto dell'autore.** Nel database l'autore e' sempre giusto: era la scheda a
+   scrivere "Anonimo" quando apriva un luogo appena salvato, perche' in quel momento il nome
+   dell'autore non e' ancora agganciato. Ora: se il luogo e' mio metto il mio nome, altrimenti lo
+   chiedo al database e lo scrivo appena arriva. Misurato su un luogo senza profilo agganciato:
+   mostra "Alessandro Castagna", non piu' "Anonimo".
+
 
 Ordine del founder: "quando vado a modificare acquisisco altri punti e vengo ringraziato, perche' ho
 migliorato un posto del cuore e quindi tutta la community, sia in mobile che in desktop".
