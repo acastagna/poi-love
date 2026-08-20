@@ -1571,6 +1571,22 @@ body.kb-open #lang-strip,body.kb-open #brand-strip{opacity:0;pointer-events:none
 .pcb-del:active{background:#FEE2E2;color:var(--red)}
 
 /* ── Desktop: mappa fullscreen di default · split 50/50 SOLO quando una tab è attiva ── */
+
+/* ── Il profilo pubblico sul computer: una colonna comoda al centro,
+      non un lenzuolo largo mezzo schermo. ─────────────────────────────── */
+@media(min-width:1024px){
+  #publicProfile{max-width:520px;margin:0 auto;padding-bottom:24px}
+  #publicProfile .pp-cop{height:210px;border-radius:0 0 22px 22px}
+  #publicProfile .pp-viso{width:124px;height:124px;bottom:-62px}
+  #publicProfile .pp-testa{padding-top:72px}
+  #publicProfile .pp-nome{font-size:28px}
+  #publicProfile .pp-corpo{border-radius:0 0 22px 22px}
+  #publicProfile .pp-luoghi{grid-template-columns:1fr 1fr}
+  #publicProfile .pp-luoghi .im{height:110px}
+}
+@media(min-width:1500px){
+  #publicProfile{max-width:560px}
+}
 @media(min-width:1024px){
   /* Mappa fullscreen quando si è sulla tab Mappa */
   #map{inset:0}
@@ -1730,7 +1746,7 @@ img.cover-safe{object-fit:cover;width:100%;display:block}
 .profile-vanity-edit:hover{color:#fff}
 
 /* PUBLIC PROFILE */
-.public-profile-view{display:none}
+.public-profile-view{display:none;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .pub-header{background:linear-gradient(160deg,#3A72BE 0%,#285EA7 36%,#1F4A82 68%,#163459 100%);padding:52px 20px 30px;text-align:center;position:relative}
 .back-btn{position:absolute;top:14px;left:14px;border:none;background:rgba(255,255,255,.2);border-radius:20px;padding:6px 12px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px}
 .back-profile-btn{position:absolute;top:14px;right:14px;border:none;background:rgba(255,255,255,.2);border-radius:20px;padding:6px 12px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px}
@@ -8953,7 +8969,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='4.82';
+const APP_VERSION='4.83';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
