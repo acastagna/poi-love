@@ -42,8 +42,21 @@ Tocca: `pois` (nuove colonne), regole di caricamento, la scheda nella webapp, `p
 ### Blocco 2 · Recensioni
 Non esiste nessuna tabella di recensioni. Serve tutto:
 - tabella `reviews`: chi scrive, su cosa (luogo o persona), voto da 0 a 5 con decimali nella media, testo, data;
-- **regola di amicizia**: sui locali scrive solo chi e' amico, una a testa. Oggi esiste `follows`, che e' a senso unico:
-  va deciso se "amico" vuol dire seguirsi a vicenda o se serve una tabella di amicizia vera **(decisione tua)**;
+- **regola di amicizia, decisa il 20/08/2026**:
+  - **Follower** e' chi ti segue, a senso unico. Resta com'e' oggi (`follows`).
+  - **Amicizia** e' quando **tutti e due si seguono**, e tutti e due lo sanno. Nessuna richiesta da accettare,
+    nessuna schermata in piu': l'amicizia nasce dal secondo "ti seguo".
+  - Nel profilo si vedono **tre elenchi**: chi mi segue, chi seguo, chi ho bloccato.
+  - Serve la tabella dei **bloccati**: oggi non esiste (verificato sul database). Chi e' bloccato non e' amico,
+    non scrive, non segue.
+  - Sui locali scrive solo chi e' amico del locale, **una recensione a testa**.
+
+  **Buco trovato subito, e come lo chiudo.** Era gia' stabilito che togliendo l'amicizia le proprie recensioni
+  spariscono. Con l'amicizia reciproca, "togliere l'amicizia" lo puo' fare anche **il locale**: gli basterebbe
+  smettere di seguire chi lo ha criticato per far sparire la recensione. Regola asimmetrica, quindi:
+  - se **chi ha scritto** smette di seguire il locale, la sua recensione sparisce (e' una sua scelta);
+  - se **il locale** smette di seguire o blocca, la recensione **resta**. Il locale puo' impedire le prossime,
+    non cancellare il passato. E' esattamente quello che era gia' stato deciso il 20/08.
 - il locale puo' bandire una persona (le recensioni restano), la persona che toglie l'amicizia fa sparire le sue;
 - medie calcolate e tenute aggiornate, +200 punti a chi recensisce;
 
@@ -158,7 +171,7 @@ Non comprende il tempo di collaudo di Alessandro.
 | # | Blocco | Giornate |
 |---|---|---|
 | 1 | Scheda del luogo, struttura vera | 2 |
-| 2 | Recensioni, con moderazione fatta dall'AI su direttive scritte | 4 |
+| 2 | Recensioni, amicizia reciproca, bloccati, moderazione fatta dall'AI su direttive scritte | 4,5 |
 | 3 | Profilo pubblico dell'utente | 4 |
 | 4 | Vantaggi dei livelli resi veri | 3 |
 | 5 | Controllo automatico delle condizioni | 1 |
@@ -172,10 +185,10 @@ Non comprende il tempo di collaudo di Alessandro.
 | 12 | Mercato professionisti e influencer (fase 1) | 3 |
 | 13 | Amministrazione trasversale | 2 |
 | 14 | Tre lingue, motori di ricerca, collaudo | 2,5 |
-| | **Totale fase 1** | **35,5** |
+| | **Totale fase 1** | **36** |
 | 15 | Incasso con carta (dipende dall'incassatore) | 2 |
 | 16 | Pagamento trattenuto e commissione del mercato | 2,5 |
-| | **Totale con la fase 2** | **40** |
+| | **Totale con la fase 2** | **40,5** |
 
 A una giornata al giorno lavorativo: **circa sette settimane** per la fase 1, otto con la fase 2.
 
@@ -267,12 +280,12 @@ e **200 luoghi veri in tutta l'Albania, 50 dei quali Ufficiali**. I tempi si all
 
 | Cantiere | Cosa comprende | Giornate |
 |---|---|---|
-| **A · Web, fase 1** | i blocchi del capitolo 2: schede, profili, livelli, recensioni, locale Plus, audio della persona, audioguide ufficiali, QR, abbonamenti | 35,5 |
+| **A · Web, fase 1** | i blocchi del capitolo 2: schede, profili, livelli, recensioni, locale Plus, audio della persona, audioguide ufficiali, QR, abbonamenti | 36 |
 | **B · Amministrazione al massimo** | persone, luoghi, moderazione recensioni, menu dei locali, abbonamenti, media, livelli, statistiche, ruoli | 6 |
 | **C · Contenuti: 200 luoghi, 50 Ufficiali** | raccolta dai dati aperti, scrittura, foto con licenza, verifica, bollino Ufficiale | 5 |
 | **D · App iOS e Android** | dall'impianto esistente fino agli store | 24,5 |
 | **E · Fase 2 web** | mercato professionisti-influencer, rapporto notarizzato, promemoria di scadenza | 5,5 |
-| | **Totale** | **76,5** |
+| | **Totale** | **77** |
 
 L'incasso con carta (2 giornate) resta fuori conteggio: dipende da quale incassatore accetta una societa' albanese.
 
@@ -327,7 +340,7 @@ Una giornata al giorno, sette giorni su sette, a partire da venerdi 21/08/2026.
 
 | Cosa | Quando serve | Nota |
 |---|---|---|
-| Decidere cosa vuol dire **amico** | subito | blocca le recensioni |
+| ~~Decidere cosa vuol dire amico~~ **RISPOSTO il 20/08: amicizia = seguirsi a vicenda, piu' l'elenco dei bloccati** | fatto | blocco 2 sbloccato |
 | Foto del locale: copertina + 21 oppure 20 | subito | blocca la scheda |
 | **Account Apple Developer** (99 dollari l'anno) e **Google Play** (25 dollari una volta) | entro meta' ottobre | li apre lui: io non apro account ne' inserisco password |
 | Chiave per le notifiche del suo account Apple | quando l'app e' pronta | serve per le notifiche vere |
@@ -403,14 +416,14 @@ Due cose da sapere:
 
 | Cantiere | Prima | Adesso | Perche' |
 |---|---|---|---|
-| Web fase 1 | 35,5 | **39,5** | locale Plus +2, licenze e attribuzione foto +1, anti abuso recensioni +0,5, cambio +0,5. Comprende l'audio della persona e le audioguide ufficiali, separate il 20/08 |
+| Web fase 1 | 36 | **40** | locale Plus +2, licenze e attribuzione foto +1, anti abuso recensioni +0,5, cambio +0,5. Comprende l'audio della persona e le audioguide ufficiali, separate il 20/08 |
 | Amministrazione | 6 | **7** | moderazione entro 24 ore e blocco utenti, richiesti da Apple |
 | 200 luoghi, 50 Ufficiali | 5 | **9** | si parte da 18 luoghi e zero Ufficiali |
 | App iOS e Android | 24,5 | **30** | riscrittura del livello dati, porto alla versione attuale, tre punti delicati in revisione |
 | Fase 2 web | 5,5 | **6** | marcatura temporale vera per il rapporto |
-| | **76,5** | **91,5** | |
+| | **77** | **92** | |
 
-Calendario aggiornato, una giornata al giorno da venerdi 21/08 (91,5 giornate):
+Calendario aggiornato, una giornata al giorno da venerdi 21/08 (92 giornate):
 
 | Traguardo | Prima | Adesso |
 |---|---|---|
