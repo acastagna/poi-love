@@ -646,3 +646,38 @@ Quello che serve e' **la spinta** perche' il secondo arrivi.
   chi ci scrive un insulto o un collegamento pubblicitario non lo manda. Chi e' bloccato non riceve niente.
 
 Costo: **mezza giornata**, dentro il Blocco 2. Totale programma: **95,5 giornate**.
+
+
+---
+
+## 14. Decisioni del fondatore, 20/08/2026 pomeriggio
+
+| Tema | Deciso |
+|---|---|
+| Audioguide ufficiali | prodotte **per tutti**, ascolto in streaming o su richiesta. Dove stanno i file (Bunny.net o macchina nostra) si decide dopo, quando si conosce il peso vero |
+| App e browser | una sola sorgente di dati per tutti e due, in tempo reale. Niente due mondi separati |
+| Foto automatiche | licenza libera **e** foto vere e credibili. **I volti di terzi vanno oscurati, i bambini per primi.** Verifica di legge in corso |
+| Formato foto | **WebP sotto i 100 KB** per la scheda, con la versione grande solo quando si apre |
+| I 200 luoghi | li produco **in automatico**, anche con una sola foto se non se ne trovano altre |
+| I 18 luoghi di oggi | sono prove: li pulisce e li corregge Alessandro, poi lo dice lui |
+| Lingua albanese | la controlliamo **noi con l'AI**. Nessun revisore umano esterno |
+| Abbonamenti venduti dal sito | **no**, per ora |
+| Collaborazioni fra professionisti e influencer | **libere per ora**. Il 33% si chiede quando POI•LOVE ci mette dentro servizi veri, altrimenti se la fanno da soli sotto il nostro naso |
+| Conto Raiffeisen per POI•LOVE | **si**, ma non c'e' fretta: finche' non si vende niente online non si incassa niente |
+| Recensioni, potere del locale | il locale puo' **bloccare**, la recensione **resta**. Puo' solo chiedere una **revisione umana** secondo le regole scritte |
+| Profili dimostrativi | vanno creati: influencer, professionisti, locali, mecenati, sostenitori. Oggi l'unica persona vera e' Alessandro. Verifica di legge in corso su come si fa senza rischi |
+| Documenti | da consegnare in **HTML, con tasto stampa e fondo bianco** |
+| Progetto mondiale | POI•LOVE nasce a Tirana ma deve poter uscire dai confini: studio in corso su lingue, dati e legge |
+| Themeli PAY | non ancora attivo, serve Erion |
+
+### 14.1 Conseguenza sugli incassi
+
+Se gli abbonamenti non si vendono dal sito e le collaborazioni restano libere, **oggi non si incassa niente online**.
+Il secondo contratto VPOS con Raiffeisen resta la strada giusta, ma **non e' piu' urgente**: si apre quando c'e'
+la prima cosa da vendere. Nel frattempo la fase 1 degli abbonamenti resta com'e': registrazione dentro, pagamento fuori.
+
+### 14.2 Quello che il 33% significa davvero
+
+Non e' una tassa sulle trattative. E' il prezzo di quello che POI•LOVE ci mette dentro:
+garanzia di consegna, numeri veri e verificati, recensioni, documenti, e la sicurezza di non essere fregati.
+Finche' non ci mettiamo dentro quei servizi, le collaborazioni restano libere.
