@@ -68,6 +68,9 @@ else
 fi
 
 echo
+# La chiave pubblica dell'app (quella che sta gia' nel sito): serve per chiedere al
+# database un POI con le foto, senza indovinare.
+ANON=$(grep -o "SUPABASE_ANON *= *'[^']*'" "$(dirname "$0")/../webapp/index.html" | head -1 | sed "s/.*'\\(.*\\)'/\\1/")
 echo "── condivisione di un POI ──"
 PID=$($C "https://poilove.com/sitemap.php" | grep -oE 'poi\.php\?id=[0-9a-f-]{36}' | head -1 | cut -d= -f2)
 if printf '%s' "$PID" | grep -qE '^[0-9a-f-]{36}$'; then
@@ -75,8 +78,12 @@ if printf '%s' "$PID" | grep -qE '^[0-9a-f-]{36}$'; then
     "$C -o /dev/null -w '%{redirect_url}' 'https://poilove.com/p/$PID' | grep -o 'poi\.php'" "poi.php"
   prova "il referral viaggia col link" \
     "$C -o /dev/null -w '%{redirect_url}' 'https://poilove.com/p/$PID?ref=prova' | grep -o 'ref=prova'" "ref=prova"
-  # l'anteprima si verifica in POSITIVO: deve esistere e NON essere quella generica
-  OG=$($C -L -A 'WhatsApp/2.23' "https://poilove.com/p/$PID" | grep -oE '<meta property="og:image" content="[^"]+' | head -1 | sed 's/.*content="//')
+  # L'anteprima con la foto vera si prova su un POI CHE LE FOTO CE LE HA: un luogo
+  # appena creato senza foto usa giustamente l'immagine generica, non e' un guasto.
+  PID_FOTO=$($C "https://poilove.com/db/rest/v1/pois?select=id&photos=neq.%7B%7D&is_public=eq.true&limit=1" \
+      -H "apikey: $ANON" -H "Authorization: Bearer $ANON" | grep -oE '[0-9a-f-]{36}' | head -1)
+  [ -n "$PID_FOTO" ] || PID_FOTO="$PID"
+  OG=$($C -L -A 'WhatsApp/2.23' "https://poilove.com/p/$PID_FOTO" | grep -oE '<meta property="og:image" content="[^"]+' | head -1 | sed 's/.*content="//')
   if [ -z "$OG" ]; then
     red "  KO  "; echo "anteprima: nessun og:image trovato"; KO=$((KO+1))
   elif printf '%s' "$OG" | grep -q 'img/opengraph.jpg'; then
