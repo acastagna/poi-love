@@ -2545,6 +2545,8 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
     placeholder="Cerca un POI o un luogo (es. Blloku, Tirana)…"
     oninput="onMapSearch(this.value)"
     onfocus="onMapSearchFocus()"
+    onkeydown="if(event.key==='Enter'){event.preventDefault();vaiSullaRicerca(this.value)}"
+    enterkeyhint="go"
     autocomplete="off"/>
   <button class="map-search-clear" id="mapSearchClear" onclick="clearMapSearch()" aria-label="Cancella">
     <i class="ph-duotone ph-x"></i>
@@ -8989,7 +8991,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='4.93';
+const APP_VERSION='4.94';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
@@ -10410,6 +10412,38 @@ let _mapSearchTimer = null;
 let _mapSearchToken = 0;
 let _mapSearchTransientMarker = null;
 
+
+/* ── Invio nella barra di ricerca: si va e basta ────────────────────────────
+   Niente elenco da scegliere, niente puntatore piantato sulla mappa: la mappa
+   si sposta sulla zona cercata e la inquadra. Se il posto ha un contorno
+   (una citta', un quartiere) si usa quello, altrimenti ci si avvicina al punto. */
+async function vaiSullaRicerca(q){
+  q=(q||'').trim(); if(q.length<2 || !map) return;
+  clearTimeout(_mapSearchTimer);
+  const drop=document.getElementById('mapSearchDrop');
+  if(drop) drop.classList.remove('show');
+  document.getElementById('mapSearchIn')?.blur();
+  if(typeof closeLens==='function') closeLens();
+  closeMapSearchMarker();                       // niente puntatori di ricerca
+  try{
+    const da=(typeof gpsPos!=='undefined' && gpsPos)?gpsPos:{lat:41.3275,lng:19.8187};
+    const raggio=0.35, box=[da.lng-raggio, da.lat+raggio, da.lng+raggio, da.lat-raggio].map(v=>v.toFixed(4)).join(',');
+    const u='https://nominatim.openstreetmap.org/search?q='+encodeURIComponent(q)+
+            '&format=json&limit=1&addressdetails=1&viewbox='+box+'&bounded=0';
+    const r=await fetch(u,{headers:{'Accept-Language':(typeof lang!=='undefined'?lang:'it')}});
+    if(!r.ok) throw 0;
+    const d=await r.json();
+    const x=d && d[0];
+    if(!x){ showToast(t('ric_niente','Non ho trovato quel posto')); return; }
+    _vistaDellUtente();                          // la mappa resta dove decido io
+    const bb=x.boundingbox;
+    if(bb && bb.length===4){
+      map.fitBounds([[+bb[0],+bb[2]],[+bb[1],+bb[3]]], {padding:[40,40], maxZoom:17});
+    } else {
+      map.setView([+x.lat,+x.lon], 15);
+    }
+  }catch(_){ showToast(t('ric_niente','Non ho trovato quel posto')); }
+}
 function onMapSearchFocus(){
   const v = document.getElementById('mapSearchIn')?.value.trim();
   if(v) onMapSearch(v);
