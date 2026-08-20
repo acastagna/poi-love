@@ -178,7 +178,7 @@ A una giornata al giorno lavorativo: **circa sette settimane** per la fase 1, ot
 
 ---
 
-## 7. Piano a 20 giorni (deciso il 20/08/2026)
+## 7. Piano a 20 giorni (superato il 20/08/2026: il perimetro si e' allargato, resta come traccia del primo tratto)
 
 Scadenza: **mercoledi 9 settembre 2026**. Venti giorni pieni, sabati e domeniche compresi.
 
@@ -215,3 +215,89 @@ Ci sta questo, che e' il prodotto vendibile e completo per l'utente:
 3. Dentro i venti giorni **non entrano funzioni nuove**. Ogni aggiunta fa uscire qualcosa d'altro, e lo diciamo subito.
 4. I contenuti dei 15 luoghi in omaggio: se non arrivano, li preparo dai luoghi ufficiali gia' esistenti.
 5. Ogni blocco finisce pubblicato e verificato dal vivo, non "pronto ma da provare".
+
+
+---
+
+## 8. Programma completo, con app e contenuti (deciso il 20/08/2026)
+
+Alessandro allarga il perimetro: oltre al web servono **l'app sugli store**, l'**amministrazione perfezionata**
+e **200 luoghi veri in tutta l'Albania, 50 dei quali Ufficiali**. I tempi si allargano di conseguenza.
+
+### 8.1 I quattro cantieri
+
+| Cantiere | Cosa comprende | Giornate |
+|---|---|---|
+| **A · Web, fase 1** | i 14 blocchi del capitolo 2: schede, profili, livelli, recensioni, locale Plus, audioguide, QR, abbonamenti | 32,5 |
+| **B · Amministrazione al massimo** | persone, luoghi, moderazione recensioni, menu dei locali, abbonamenti, media, livelli, statistiche, ruoli | 6 |
+| **C · Contenuti: 200 luoghi, 50 Ufficiali** | raccolta dai dati aperti, scrittura, foto con licenza, verifica, bollino Ufficiale | 5 |
+| **D · App iOS e Android** | dall'impianto esistente fino agli store | 24,5 |
+| **E · Fase 2 web** | mercato professionisti-influencer, rapporto notarizzato, promemoria di scadenza | 5,5 |
+| | **Totale** | **73,5** |
+
+L'incasso con carta (2 giornate) resta fuori conteggio: dipende da quale incassatore accetta una societa' albanese.
+
+### 8.2 L'app, nel dettaglio
+
+Punto di partenza vero: in `poi-love-app/` c'e' gia' un impianto Expo con mappa, accesso, elenco luoghi,
+scheda del luogo e profilo. E' fermo a maggio e parla ancora con Supabase.
+**Buona notizia**: dal 18/08 il nostro stack e' PostgREST piu' GoTrue, cioe' esattamente le due interfacce
+che quella libreria sa gia' usare. Si cambia l'indirizzo, non si riscrive il collegamento ai dati.
+
+| Passo | Giornate |
+|---|---|
+| Aggiornare l'impianto alla versione attuale di Expo e agganciarlo al nostro stack | 2 |
+| Accesso: Google, email, sessione che dura | 1,5 |
+| Mappa, lente, marcatori, ricerca | 3 |
+| Luoghi: elenco, scheda pubblica nelle sei tipologie, creazione con posizione, foto e dati della foto | 4 |
+| Profilo utente nelle cinque tipologie | 2,5 |
+| Itinerari e compagnie | 2,5 |
+| **Notifiche vere** (sul web sono impossibili) | 1,5 |
+| **Avviso quando arrivi vicino a un luogo, anche con l'app chiusa** (il motivo vero dell'app) | 2 |
+| Audioguide, QR, condivisione | 1,5 |
+| Tre lingue, icone, schermata d'avvio, immagini per gli store, cancellazione dell'account (Apple la pretende) | 1,5 |
+| Compilazione, invio agli store, correzioni dopo l'eventuale rifiuto | 2,5 |
+| | **24,5** |
+
+### 8.3 I 200 luoghi, come si fanno davvero
+
+Niente inventato. Si parte dai dati aperti e si verifica uno per uno.
+
+- **Dove si prendono**: OpenStreetMap (gia' collegato per ILLI), Wikidata e Wikipedia per la storia,
+  Wikimedia Commons e Openverse per le foto **con licenza utilizzabile** (il gestore dei media le cerca gia').
+- **I 150 normali**: nome giusto, coordinate verificate, indirizzo completo, categoria e tag, una foto, descrizione breve.
+- **I 50 Ufficiali**: come sopra, piu' descrizione originale nelle tre lingue, almeno tre foto, controllo a mano
+  di posizione e nome, collegamento a un itinerario o a una rotta storica dove ha senso, **bollino Ufficiale**
+  (la colonna `badge_official` esiste gia' su `pois`).
+- **Copertura**: tutte le dodici prefetture, non solo Tirana e la Riviera.
+
+### 8.4 Calendario indicativo
+
+Una giornata al giorno, sette giorni su sette, a partire da venerdi 21/08/2026.
+
+| Traguardo | Quando |
+|---|---|
+| Web fase 1 completo: schede, profili, livelli, recensioni, locale Plus | **22/09/2026** |
+| Amministrazione perfezionata | **28/09/2026** |
+| 200 luoghi in linea, 50 con il bollino Ufficiale | **03/10/2026** |
+| Fase 2 web: mercato, rapporto notarizzato, promemoria | **09/10/2026** |
+| App pronta e inviata agli store | **03/11/2026** |
+| App pubblicata (dipende dai tempi di revisione degli store) | **meta' novembre 2026** |
+
+### 8.5 Cosa deve fare Alessandro, e quando
+
+| Cosa | Quando serve | Nota |
+|---|---|---|
+| Decidere cosa vuol dire **amico** | subito | blocca le recensioni |
+| Foto del locale: copertina + 21 oppure 20 | subito | blocca la scheda |
+| **Account Apple Developer** (99 dollari l'anno) e **Google Play** (25 dollari una volta) | entro meta' ottobre | li apre lui: io non apro account ne' inserisco password |
+| Chiave per le notifiche del suo account Apple | quando l'app e' pronta | serve per le notifiche vere |
+| Chi incassa con carta da una societa' albanese | quando decide di incassare | unico punto che non dipende da noi |
+| Commissione del mercato | prima del cantiere E | |
+
+### 8.6 Condizioni
+
+1. Ogni blocco finisce **pubblicato e verificato dal vivo**, non "pronto da provare".
+2. Il collaudo di Alessandro avviene strada facendo, blocco per blocco.
+3. Funzioni nuove che entrano in corsa spostano la data: lo dico subito, con il conto.
+4. Le date degli store non sono nostre: la revisione di Apple e Google puo' aggiungere giorni.
