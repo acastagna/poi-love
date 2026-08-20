@@ -8991,7 +8991,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='4.94';
+const APP_VERSION='4.97';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
@@ -10427,13 +10427,34 @@ async function vaiSullaRicerca(q){
   closeMapSearchMarker();                       // niente puntatori di ricerca
   try{
     const da=(typeof gpsPos!=='undefined' && gpsPos)?gpsPos:{lat:41.3275,lng:19.8187};
-    const raggio=0.35, box=[da.lng-raggio, da.lat+raggio, da.lng+raggio, da.lat-raggio].map(v=>v.toFixed(4)).join(',');
-    const u='https://nominatim.openstreetmap.org/search?q='+encodeURIComponent(q)+
-            '&format=json&limit=1&addressdetails=1&viewbox='+box+'&bounded=0';
-    const r=await fetch(u,{headers:{'Accept-Language':(typeof lang!=='undefined'?lang:'it')}});
-    if(!r.ok) throw 0;
-    const d=await r.json();
-    const x=d && d[0];
+    const acc={'Accept-Language':(typeof lang!=='undefined'?lang:'it')};
+    const chiedi=async(extra)=>{
+      const r=await fetch('https://nominatim.openstreetmap.org/search?q='+encodeURIComponent(q)+
+                          '&format=json&limit=6&addressdetails=1'+extra, {headers:acc});
+      if(r.status===429){ showToast(t('ric_attendi','Il servizio delle mappe chiede un attimo di pausa')); return null; }
+      if(!r.ok) return [];
+      return await r.json();
+    };
+    // 1) Prima si cerca un LUOGO: paese, citta', quartiere. Senza guardare dove sei,
+    //    altrimenti "Milano" diventa la via Milano dietro casa. Questo era il guasto.
+    let d = await chiedi('&featureType=settlement');
+    if(d===null) return;
+    // 2) Se non e' un abitato (un monumento, un locale), si cerca in generale,
+    //    e allora si', si guarda anche vicino a te.
+    if(!d || !d.length){
+      const raggio=0.6, box=[da.lng-raggio, da.lat+raggio, da.lng+raggio, da.lat-raggio].map(v=>v.toFixed(4)).join(',');
+      d = await chiedi('&viewbox='+box+'&bounded=0');
+      if(d===null) return;
+    }
+    // fra i risultati si preferisce un luogo vero a una strada con quel nome
+    const punteggio=x=>{
+      let p=Number(x.importance||0);
+      if(x.class==='place')    p+=1;
+      if(x.class==='boundary') p+=0.8;
+      if(x.class==='highway')  p-=1;
+      return p;
+    };
+    const x=(d||[]).slice().sort((a,b)=>punteggio(b)-punteggio(a))[0];
     if(!x){ showToast(t('ric_niente','Non ho trovato quel posto')); return; }
     _vistaDellUtente();                          // la mappa resta dove decido io
     const bb=x.boundingbox;
@@ -12904,11 +12925,96 @@ function _durata(min){
     const sec=Math.max(1, Math.round(min*60));
     return sec+' '+(sec===1?t('secondo','secondo'):t('secondi','secondi'));
   }
-  if(min < 60) return Math.round(min)+' minuti';
-  const h=Math.floor(min/60), m=Math.round(min%60);
-  return h+(h===1?' ora':' ore')+(m?' e '+m:'');
+  if(min < 60) return Math.round(min)+' '+t('minuti','minuti');
+  const oreTot=min/60;
+  if(oreTot < 24){
+    const h=Math.floor(oreTot), m=Math.round(min%60);
+    return h+(h===1?' '+t('ora','ora'):' '+t('ore','ore'))+(m?' e '+m:'');
+  }
+  const g=Math.floor(oreTot/24), h=Math.round(oreTot%24);
+  return g+(g===1?' '+t('giorno','giorno'):' '+t('giorni','giorni'))+(h?' e '+h+(h===1?' '+t('ora','ora'):' '+t('ore','ore')):'');
 }
-/* i mezzi: stime oneste sulla linea d'aria, non un navigatore */
+
+/* ── Quanto ci metti davvero, per ogni mezzo ────────────────────────────────
+   Non piu' la linea d'aria: a piedi, in bicicletta e in auto si chiede la
+   STRADA vera (OSRM, dati OpenStreetMap). L'aereo parte dall'aeroporto piu'
+   vicino a te e atterra al piu' vicino al luogo; la nave dal porto piu' vicino.
+   Se un servizio non risponde si torna alla stima in linea d'aria, dicendolo. */
+const _VALHALLA='https://valhalla1.openstreetmap.de/route';
+const _OSRM='https://router.project-osrm.org/route/v1';
+const _cacheStrada={};
+
+/* Valhalla conosce le strade per ognuno: a piedi passa dove passa un pedone,
+   in bici dove passa una bici, in auto dove passa un'auto. Se non risponde si
+   ripiega su OSRM, che pero' conosce solo l'automobile. */
+async function _strada(mezzo, da, a){
+  const k=mezzo+'|'+da.lat.toFixed(4)+','+da.lng.toFixed(4)+'|'+a.lat.toFixed(4)+','+a.lng.toFixed(4);
+  if(_cacheStrada[k]) return _cacheStrada[k];
+  const costing={piedi:'pedestrian', bici:'bicycle', auto:'auto'}[mezzo]||'auto';
+  try{
+    const r=await fetch(_VALHALLA,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({locations:[{lat:da.lat,lon:da.lng},{lat:a.lat,lon:a.lng}],costing,units:'km'})});
+    if(!r.ok) throw 0;
+    const j=await r.json(); const sm=j&&j.trip&&j.trip.summary; if(!sm) throw 0;
+    const out={km:sm.length, min:sm.time/60};
+    _cacheStrada[k]=out; return out;
+  }catch(_){
+    const r=await fetch(_OSRM+'/driving/'+da.lng+','+da.lat+';'+a.lng+','+a.lat+'?overview=false');
+    if(!r.ok) throw 0;
+    const j=await r.json(); const rt=j.routes&&j.routes[0]; if(!rt) throw 0;
+    const v={piedi:5, bici:18, auto:null}[mezzo];
+    const out={km:rt.distance/1000, min: v ? (rt.distance/1000)/v*60 : rt.duration/60};
+    _cacheStrada[k]=out; return out;
+  }
+}
+
+/* Aeroporti e porti veri, con le loro coordinate: una lista breve e curata,
+   cosi' non si dipende da un servizio esterno per dire "imbarco a". */
+const _AEROPORTI=[
+ {n:'Tirana',c:'TIA',lat:41.415,lng:19.720},{n:'Podgorica',c:'TGD',lat:42.359,lng:19.252},
+ {n:'Skopje',c:'SKP',lat:41.962,lng:21.621},{n:'Corfu',c:'CFU',lat:39.602,lng:19.912},
+ {n:'Bari',c:'BRI',lat:41.139,lng:16.766},{n:'Brindisi',c:'BDS',lat:40.658,lng:17.947},
+ {n:'Napoli',c:'NAP',lat:40.884,lng:14.291},{n:'Roma Fiumicino',c:'FCO',lat:41.800,lng:12.239},
+ {n:'Roma Ciampino',c:'CIA',lat:41.799,lng:12.595},{n:'Pisa',c:'PSA',lat:43.684,lng:10.393},
+ {n:'Firenze',c:'FLR',lat:43.810,lng:11.205},{n:'Bologna',c:'BLQ',lat:44.535,lng:11.289},
+ {n:'Venezia',c:'VCE',lat:45.505,lng:12.352},{n:'Treviso',c:'TSF',lat:45.648,lng:12.194},
+ {n:'Verona',c:'VRN',lat:45.396,lng:10.888},{n:'Bergamo',c:'BGY',lat:45.669,lng:9.704},
+ {n:'Milano Malpensa',c:'MXP',lat:45.630,lng:8.723},{n:'Milano Linate',c:'LIN',lat:45.445,lng:9.277},
+ {n:'Torino',c:'TRN',lat:45.201,lng:7.650},{n:'Genova',c:'GOA',lat:44.413,lng:8.841},
+ {n:'Trieste',c:'TRS',lat:45.827,lng:13.472},{n:'Ancona',c:'AOI',lat:43.616,lng:13.362},
+ {n:'Palermo',c:'PMO',lat:38.176,lng:13.091},{n:'Catania',c:'CTA',lat:37.467,lng:15.066},
+ {n:'Cagliari',c:'CAG',lat:39.251,lng:9.054},{n:'Lamezia Terme',c:'SUF',lat:38.905,lng:16.242},
+ {n:'Atene',c:'ATH',lat:37.936,lng:23.947},{n:'Salonicco',c:'SKG',lat:40.520,lng:22.971},
+ {n:'Zagabria',c:'ZAG',lat:45.743,lng:16.069},{n:'Lubiana',c:'LJU',lat:46.224,lng:14.458},
+ {n:'Vienna',c:'VIE',lat:48.110,lng:16.570},{n:'Monaco',c:'MUC',lat:48.354,lng:11.786},
+ {n:'Zurigo',c:'ZRH',lat:47.458,lng:8.548},{n:'Parigi Charles de Gaulle',c:'CDG',lat:49.010,lng:2.548},
+ {n:'Londra Heathrow',c:'LHR',lat:51.470,lng:-0.454},{n:'Amsterdam',c:'AMS',lat:52.309,lng:4.764},
+ {n:'Francoforte',c:'FRA',lat:50.037,lng:8.562},{n:'Madrid',c:'MAD',lat:40.472,lng:-3.561},
+ {n:'Barcellona',c:'BCN',lat:41.297,lng:2.083},{n:'Istanbul',c:'IST',lat:41.262,lng:28.742},
+ {n:'New York JFK',c:'JFK',lat:40.641,lng:-73.778},{n:'Dubai',c:'DXB',lat:25.253,lng:55.365}
+];
+const _PORTI=[
+ {n:'Durazzo',lat:41.310,lng:19.455},{n:'Valona',lat:40.452,lng:19.487},
+ {n:'Saranda',lat:39.874,lng:20.008},{n:'Bari',lat:41.140,lng:16.870},
+ {n:'Brindisi',lat:40.646,lng:17.960},{n:'Ancona',lat:43.618,lng:13.505},
+ {n:'Venezia',lat:45.435,lng:12.313},{n:'Trieste',lat:45.647,lng:13.760},
+ {n:'Ravenna',lat:44.470,lng:12.283},{n:'Napoli',lat:40.842,lng:14.257},
+ {n:'Civitavecchia',lat:42.094,lng:11.786},{n:'Livorno',lat:43.552,lng:10.301},
+ {n:'Genova',lat:44.409,lng:8.917},{n:'Palermo',lat:38.132,lng:13.368},
+ {n:'Catania',lat:37.500,lng:15.096},{n:'Cagliari',lat:39.207,lng:9.117},
+ {n:'Igoumenitsa',lat:39.505,lng:20.263},{n:'Patrasso',lat:38.246,lng:21.735},
+ {n:'Pireo',lat:37.942,lng:23.643},{n:'Spalato',lat:43.504,lng:16.440},
+ {n:'Dubrovnik',lat:42.660,lng:18.087},{n:'Bar',lat:42.096,lng:19.089},
+ {n:'Marsiglia',lat:43.322,lng:5.352},{n:'Barcellona',lat:41.351,lng:2.174},
+ {n:'Valencia',lat:39.446,lng:-0.318}
+];
+function _piuVicino(lista, pos){
+  let best=null, bd=Infinity;
+  lista.forEach(x=>{ const d=_kmTra(pos.lat,pos.lng,x.lat,x.lng); if(d<bd){bd=d;best=x;} });
+  return best ? {...best, km:bd} : null;
+}
+
+/* i mezzi: ora ognuno per la sua via */
 function _mezziPer(km){
   // Uno per riga, sempre tutti. Velocita' medie oneste, distanza in linea d'aria.
   const sec = km / 74948.1149;   // a tutto impulso: un quarto della luce
@@ -12959,11 +13065,73 @@ function _pittaViaggio(){
     box.innerHTML='<div class="km">'+t('dove_no_pos','Accendi la posizione per sapere quanto dista')+'</div>';
     return;
   }
-  const km=_kmTra(da.lat, da.lng, currentPOI.lat, currentPOI.lng);
-  box.innerHTML='<div class="km">'+_quantoDista(km)+' '+t('da_dove_sei','da dove sei ora')+'</div>'+
-    '<div class="mezzi">'+_mezziPer(km).map(m=>
+  const aria=_kmTra(da.lat, da.lng, currentPOI.lat, currentPOI.lng);
+  // prima la stima veloce, cosi' non si resta col vuoto; poi arrivano le strade vere
+  box.innerHTML='<div class="km">'+_quantoDista(aria)+' '+t('da_dove_sei','da dove sei ora')+'</div>'+
+    '<div class="mezzi">'+_mezziPer(aria).map(m=>
       '<span'+(m.trek?' class="trek"':'')+'><i class="ph-duotone '+m.i+'"></i>'+
       '<b>'+m.t+'</b><em>'+m.n+'</em></span>').join('')+'</div>';
+  _viaggioVero(da, {lat:currentPOI.lat, lng:currentPOI.lng}, currentPOI.id);
+}
+
+
+/* Le vie vere: strada per piedi, bici e auto; volo fra i due aeroporti piu'
+   vicini; nave fra i due porti piu' vicini. Ogni riga porta la sua distanza. */
+async function _viaggioVero(da, a, idAtteso){
+  const box=document.getElementById('detailViaggio'); if(!box) return;
+  const righe=[];
+  const aria=_kmTra(da.lat,da.lng,a.lat,a.lng);
+  let kmAuto=null;
+  // strada: le tre andature che usano le strade vere
+  const vie=[['piedi','ph-person-simple-walk',t('mezzo_piedi','a piedi')],
+             ['bici', 'ph-bicycle',            t('mezzo_bici','in bicicletta')],
+             ['auto', 'ph-car',                t('mezzo_auto','in auto')]];
+  for(const [prof,ico,nome] of vie){
+    try{
+      const r=await _strada(prof, da, a);
+      if(prof==='auto') kmAuto=r.km;
+      righe.push({i:ico, n:nome, t:_durata(r.min), d:_quantoDista(r.km)});
+    }catch(_){
+      const v=prof==='piedi'?5:(prof==='bici'?18:60);
+      righe.push({i:ico, n:nome, t:_durata(aria/v*60), d:_quantoDista(aria)+' '+t('in_aria','in linea d aria')});
+    }
+  }
+  // aereo: si parte dall'aeroporto piu' vicino a te
+  const ap1=_piuVicino(_AEROPORTI, da), ap2=_piuVicino(_AEROPORTI, a);
+  if(ap1 && ap2){
+    if(ap1.c===ap2.c){
+      righe.push({i:'ph-airplane-tilt', n:t('mezzo_aereo','in aereo')+' · '+t('stesso_aeroporto','stesso aeroporto, non serve'),
+                  t:'—', d:''});
+    } else {
+      const volo=_kmTra(ap1.lat,ap1.lng,ap2.lat,ap2.lng);
+      righe.push({i:'ph-airplane-tilt',
+                  n:t('mezzo_aereo','in aereo')+' · '+t('imbarco_a','imbarco a')+' '+ap1.n+' ('+ap1.c+')',
+                  t:_durata(volo/800*60), d:_quantoDista(volo)+' '+t('di_volo','di volo')});
+    }
+  }
+  // nave: dal porto piu' vicino a te
+  const po1=_piuVicino(_PORTI, da), po2=_piuVicino(_PORTI, a);
+  if(po1 && po2){
+    if(po1.n===po2.n){
+      righe.push({i:'ph-boat', n:t('mezzo_nave','in nave')+' · '+t('stesso_porto','stesso porto, non serve'), t:'—', d:''});
+    } else {
+      const mare=_kmTra(po1.lat,po1.lng,po2.lat,po2.lng);
+      righe.push({i:'ph-boat', n:t('mezzo_nave','in nave')+' · '+t('da_porto','da')+' '+po1.n,
+                  t:_durata(mare/40*60), d:_quantoDista(mare)+' '+t('di_mare','di mare')});
+    }
+  }
+  // a tutto impulso, sulla linea d'aria: nello spazio non ci sono strade
+  const sec=aria/74948.1149;
+  righe.push({i:'ph-flying-saucer', n:t('mezzo_trek','a tutto impulso'), trek:true,
+              t:(sec<1 ? (sec*1000).toFixed(sec*1000<1?3:1).replace('.',',')+' '+t('millesimi','millesimi di secondo') : _durata(sec/60)),
+              d:''});
+  if(!currentPOI || currentPOI.id!==idAtteso) return;   // la scheda e' cambiata
+  const testa = (kmAuto!=null)
+    ? _quantoDista(kmAuto)+' '+t('di_strada','di strada da dove sei ora')
+    : _quantoDista(aria)+' '+t('da_dove_sei','da dove sei ora');
+  box.innerHTML='<div class="km">'+testa+'</div><div class="mezzi">'+
+    righe.map(m=>'<span'+(m.trek?' class="trek"':'')+'><i class="ph-duotone '+m.i+'"></i>'+
+      '<b>'+m.t+'</b><em>'+m.n+(m.d?' · '+m.d:'')+'</em></span>').join('')+'</div>';
 }
 
 /* i chilometri sulla copertina, semitrasparenti come il cartellino delle foto */
