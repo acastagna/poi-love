@@ -58,7 +58,8 @@ begin
   if v_pts <= 0 then return 0; end if;
 
   insert into public.point_events(user_id, action, entity_id, points)
-    values (v_me, 'poi_improved', p_poi::text, v_pts);
+    values (v_me, 'poi_improved', p_poi::text, v_pts)
+    on conflict do nothing;   -- stesso account su due schermi: nessun errore, nessun doppio punto
   update public.profiles set points = points + v_pts where id = v_me;
   return v_pts;
 end $$;
