@@ -1,5 +1,38 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
+## Sessione 19/08/2026 (14) — La schermata del POI: nomi veri, indirizzi intelligenti, punti a tempo (v4.33 → 4.35)
+
+**I quattro modi di dire dove sei**, chiamati con parole vere (titolo grande + sigla piccola):
+
+| Prima | Ora |
+|---|---|
+| GPS Live | **Luogo dove sono** · GPS LIVE |
+| Foto EXIF | **Dove è stata scattata la foto** · DATI EXIF |
+| Indirizzo | **Indirizzo** · VIA, NUMERO, CITTÀ |
+| Tocca mappa | **Posiziona la mappa** · TOCCA IL PUNTO |
+
+**Il motore degli indirizzi, rifatto.** Prima: un solo motore, dalla terza lettera, che non
+perdonava un errore di battitura. Ora due motori insieme (Photon di komoot, nato per scrivere e
+tollerante agli errori, e Nominatim, preciso sui numeri civici), dalla seconda lettera, vicino a
+dove sta guardando la mappa, senza doppioni, con chi ha il numero civico per primo. Ogni riga mostra
+tutta la scala: **via e numero, CAP, città, provincia, regione, stato**, e quella scala finisce nel
+POI (migrazione 090: colonne `province`, `region`, `postcode`).
+Provato dal vivo con "rruga myslym shyr tiran" scritto male: **7 risultati**, il primo è
+"Rruga Myslym Shyri · 1014 · Tiranë · Qarku i Tiranës · Shqipëria".
+
+**"Fissa il punto"**: era una pillolina bianca in alto a destra, ora è un bottone rosso grande al
+centro sotto il mirino, con un battito leggero. Non si può non vederlo.
+
+**I punti del POI, a tempo** (migrazione 091). In cima alla scheda: **Salva il tuo POI**, il tuo
+livello e i punti che stai per prendere. Si parte da **30** e si scende di uno ogni 3 secondi, mai
+sotto **10**. Entro 60 secondi resta la coppa e il "bravo"; oltre i 60 il riquadro diventa **oro**,
+la coppa diventa un **cappello da laureato** e il messaggio è "I miei complimenti per l'accuratezza".
+Chi **rientra a perfezionare** un POI già salvato non è in gara: nessun conto alla rovescia.
+I punti non sono una scritta: il server rifà il conto (`award_poi_speed_bonus`), controlla che il POI
+sia tuo e appena creato, accredita una sola volta e ha un tetto giornaliero.
+
+Controllo esterno: **18 prove superate su 18**.
+
 ## Sessione 19/08/2026 (13) — I livelli in ordine, e la pagina che li racconta (v4.29 → 4.32)
 
 **Nel pannello dell'app** i livelli sono ora in due famiglie, nell'ordine deciso:
