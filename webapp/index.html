@@ -3509,6 +3509,10 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
         <div class="pdm-sez-lbl"><i class="ph-duotone ph-cards-three"></i> <span data-t="muro_lbl">Muro dei Sostenitori</span></div>
         <div class="pp-muro" id="ppMuro"></div>
       </div>
+      <div class="pp-sez" id="ppPersoneSez" style="display:none">
+        <div class="pdm-sez-lbl"><i class="ph-duotone ph-users-three"></i> <span data-t="le_tue_persone">Le tue persone</span></div>
+        <div id="ppPersone"></div>
+      </div>
       <div class="pp-sez" id="ppLuoghiSez" style="display:none">
         <div class="pdm-sez-lbl"><i class="ph-duotone ph-heart"></i> <span data-t="suoi_luoghi">I suoi luoghi piu votati</span></div>
         <div class="pp-luoghi" id="ppLuoghi"></div>
@@ -8994,7 +8998,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='5.03';
+const APP_VERSION='5.04';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
@@ -11111,6 +11115,117 @@ async function sharePlaceToContact(){
 
 // Apre profilo pubblico dell'autore del POI corrente nel detail sheet
 
+
+/* ═══ AMICIZIA, BLOCCATI, INVITO A RICAMBIARE ══════════════════════════════
+   Amici si e' quando tutti e due si seguono: non c'e' niente da accettare.
+   Dopo che segui qualcuno, l'app propone di chiedergli di ricambiare, con un
+   testo gia' pronto che puoi cambiare. Uno solo a testa. */
+async function _giaInvitato(chi){
+  try{
+    const { data } = await sb.from('inviti_segui').select('a_id')
+      .eq('da_id', currentUser.id).eq('a_id', chi).limit(1);
+    return !!(data && data.length);
+  }catch(_){ return true; }   // nel dubbio non si insiste
+}
+async function apriInvitoSegui(chi, nome){
+  if(!currentUser || !chi || chi===currentUser.id) return;
+  if(await _giaInvitato(chi)) return;
+  const ov=document.createElement('div');
+  ov.className='micro-modal-ov show'; ov.id='invitoOv';
+  ov.innerHTML=
+    '<div class="micro-modal" style="max-width:360px">'+
+      '<div style="font-size:17px;font-weight:900;margin-bottom:6px">'+t('inv_titolo','Gli chiedi di seguirti?')+'</div>'+
+      '<div style="font-size:13.5px;color:var(--muted);font-weight:600;line-height:1.4;margin-bottom:12px">'+
+        t('inv_sotto','Se ricambia diventate amici, e da li in poi potete recensire i vostri luoghi.')+'</div>'+
+      '<textarea id="invitoTesto" maxlength="200" rows="3" style="width:100%;border:1.5px solid var(--border);'+
+        'border-radius:14px;padding:11px 13px;font-family:inherit;font-size:14.5px;resize:none">'+
+        t('inv_testo','Ti seguo. Seguimi anche tu, possiamo esserci utili')+'</textarea>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px">'+
+        '<button class="cta vuoto" style="height:46px;border-radius:20px;border:1.5px solid var(--border);'+
+          'background:var(--card);font-family:inherit;font-weight:900;cursor:pointer" onclick="_chiudiInvito()">'+
+          t('inv_salta','Salta')+'</button>'+
+        '<button style="height:46px;border-radius:20px;border:none;background:var(--red);color:#fff;'+
+          'font-family:inherit;font-weight:900;cursor:pointer" onclick="_mandaInvito(\''+chi+'\')">'+
+          t('inv_manda','Manda')+'</button>'+
+      '</div>'+
+    '</div>';
+  ov.onclick=(e)=>{ if(e.target===ov) _chiudiInvito(); };
+  document.body.appendChild(ov);
+}
+function _chiudiInvito(){ document.getElementById('invitoOv')?.remove(); }
+async function _mandaInvito(chi){
+  const txt=(document.getElementById('invitoTesto')?.value||'').trim().slice(0,200);
+  _chiudiInvito();
+  try{
+    const r=await sb.from('inviti_segui').insert({da_id:currentUser.id, a_id:chi, testo:txt});
+    if(r.error && !/duplicate|unique/i.test(r.error.message||'')) throw r.error;
+    try{ await sb.from('notifications').insert({user_id:chi, kind:'segui_invito', title:t('inv_arrivato','Ti ha chiesto di ricambiare'), body:txt}); }catch(_){}
+    showToast(t('inv_mandato','Invito mandato'));
+  }catch(_){ showToast(t('error_generic','Qualcosa e andato storto, riprova')); }
+}
+
+/* Bloccare: sparisce dai tuoi luoghi e non ti scrive piu'. Adesso si salva davvero. */
+async function bloccaPersona(chi, blocca){
+  if(!currentUser || !chi) return false;
+  try{
+    if(blocca){
+      const r=await sb.from('blocchi').insert({bloccante_id:currentUser.id, bloccato_id:chi});
+      if(r.error && !/duplicate|unique/i.test(r.error.message||'')) throw r.error;
+      // chi blocchi non lo segui piu'
+      await sb.from('follows').delete().eq('follower_id',currentUser.id).eq('following_id',chi);
+      if(window._followedIds) window._followedIds.delete(chi);
+    } else {
+      const r=await sb.from('blocchi').delete().eq('bloccante_id',currentUser.id).eq('bloccato_id',chi);
+      if(r.error) throw r.error;
+    }
+    return true;
+  }catch(_){ return false; }
+}
+
+/* I tre elenchi del tuo profilo: chi ti segue, chi segui, chi hai bloccato. */
+async function _pittaLeTuePersone(userId){
+  const sez=document.getElementById('ppPersoneSez'); if(!sez) return;
+  if(!currentUser || currentUser.id!==userId){ sez.style.display='none'; return; }
+  try{
+    const [seguo, miSeguono, bloccati] = await Promise.all([
+      sb.from('follows').select('following_id').eq('follower_id',userId).limit(50),
+      sb.from('follows').select('follower_id').eq('following_id',userId).limit(50),
+      sb.from('blocchi').select('bloccato_id').eq('bloccante_id',userId).limit(50)
+    ]);
+    const ids=[...new Set([...(seguo.data||[]).map(x=>x.following_id),
+                           ...(miSeguono.data||[]).map(x=>x.follower_id),
+                           ...(bloccati.data||[]).map(x=>x.bloccato_id)])];
+    let mappa={};
+    if(ids.length){
+      const { data: pf } = await sb.from('profiles').select('id,username,display_name,avatar_url').in('id',ids);
+      (pf||[]).forEach(u=>mappa[u.id]=u);
+    }
+    const setSeguo=new Set((seguo.data||[]).map(x=>x.following_id));
+    const setMi=new Set((miSeguono.data||[]).map(x=>x.follower_id));
+    const amici=[...setSeguo].filter(x=>setMi.has(x));
+    const tondini=(lista)=>lista.length
+      ? '<div class="pdm-amanti">'+lista.slice(0,6).map(id=>{
+          const u=mappa[id]||{};
+          const n=_nomeVero(u);
+          return u.avatar_url
+            ? '<div style="background-image:url(\''+String(u.avatar_url).replace(/'/g,'')+'\')"></div>'
+            : '<div>'+_escHtml(n.slice(0,2).toUpperCase())+'</div>';
+        }).join('')+(lista.length>6?'<div>+'+(lista.length-6)+'</div>':'')+'</div>'
+      : '<div style="font-size:13px;color:var(--muted);font-weight:600">'+t('nessuno','ancora nessuno')+'</div>';
+    document.getElementById('ppPersone').innerHTML=
+      '<div class="riga" style="flex-direction:column;align-items:stretch;gap:8px">'+
+        '<b>'+t('amici_tuoi','Amici')+' · '+amici.length+'</b>'+tondini(amici)+'</div>'+
+      '<div class="riga" style="flex-direction:column;align-items:stretch;gap:8px">'+
+        '<b>'+t('chi_segui','Chi segui')+' · '+setSeguo.size+'</b>'+tondini([...setSeguo])+'</div>'+
+      '<div class="riga" style="flex-direction:column;align-items:stretch;gap:8px">'+
+        '<b>'+t('chi_ti_segue','Chi ti segue')+' · '+setMi.size+'</b>'+tondini([...setMi])+'</div>'+
+      '<div class="riga" style="flex-direction:column;align-items:stretch;gap:8px">'+
+        '<b>'+t('bloccati','Bloccati')+' · '+(bloccati.data||[]).length+'</b>'+
+        tondini((bloccati.data||[]).map(x=>x.bloccato_id))+'</div>';
+    sez.style.display='block';
+  }catch(_){ sez.style.display='none'; }
+}
+
 /* ═══ IL PROFILO PUBBLICO, riempito con dati veri ═══════════════════════ */
 const _PP_NASTRO = {
   sostenitore:        {t:'Sostenitore di POI-LOVE', b:'linear-gradient(135deg,#1e3a8a,#2b56b8)', i:'ph-hand-heart', c:'lb-sos', n:'Sostenitore'},
@@ -11295,6 +11410,7 @@ async function _pittaProfiloPubblico(userId){
                    '<span class="pf-claim">'+t('claim_mappa','la mappa fatta dalle persone')+'</span>'+
                    '<span class="pf-date">'+da+'</span></div>';
     }
+    _pittaLeTuePersone(userId);
     // il pulsante "torna al tuo profilo" solo se sto guardando me stesso
     const tb=g('ppTornaBtn');
     if(tb) tb.style.display = (currentUser && currentUser.id===userId) ? 'flex' : 'none';
@@ -13298,6 +13414,7 @@ async function seguiAutore(){
       _aggiornaSeguiti(chi, true);
       _guardaSeCiSeguiamo(chi);
       showToast(t('ora_segui','Adesso lo segui'));
+      setTimeout(()=>apriInvitoSegui(chi, ''), 700);
     }
   }catch(e){ showToast(t('error_generic','Qualcosa e andato storto, riprova')); }
 }
@@ -16405,6 +16522,7 @@ async function togglePublicFollow(){
     }catch(e){ salvataggioFallito(t('sf_segui','Segui'), e); }
   }
   if(currentViewedUser?.id) _aggiornaSeguiti(currentViewedUser.id, pubFollowing);
+  if(pubFollowing && currentViewedUser?.id) setTimeout(()=>apriInvitoSegui(currentViewedUser.id, targetName), 700);
   showToast(pubFollowing
     ?(lang==='it'?`Stai seguendo ${targetName}`:lang==='sq'?`Po ndjek ${targetName}`:`Now following ${targetName}`)
     :(lang==='it'?`Non segui più ${targetName}`:lang==='sq'?'Nuk ndjek më':`Unfollowed ${targetName}`));
@@ -16422,8 +16540,13 @@ function togglePublicConnect(){
     ?(lang==='it'?'Richiesta di amicizia inviata!':lang==='sq'?'Kërkesë miqësie dërguar!':'Friend request sent!')
     :(lang==='it'?'Richiesta ritirata':lang==='sq'?'Kërkesa u tërhoq':'Request withdrawn'));
 }
-function togglePublicBlock(){
+async function togglePublicBlock(){
   pubBlocked=!pubBlocked;
+  if(currentUser && currentViewedUser?.id && currentUser.id!==currentViewedUser.id){
+    const ok=await bloccaPersona(currentViewedUser.id, pubBlocked);
+    if(!ok){ pubBlocked=!pubBlocked; showToast(t('error_generic','Qualcosa e andato storto, riprova')); return; }
+    if(pubBlocked) _aggiornaSeguiti(currentViewedUser.id, false);
+  }
   const btn=document.getElementById('pubBlockBtn');
   const lbl=document.getElementById('pubBlockLbl');
   btn.classList.toggle('active',pubBlocked);
