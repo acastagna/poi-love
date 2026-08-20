@@ -67,6 +67,15 @@ Le audioguide caricate diventano subito **MP3 192**.
 
 ---
 
+## 🎭 PROFILI DIMOSTRATIVI (regola del 20/08/2026)
+
+- Le persone finte portano una **scritta visibile** dovunque compaiano, e un segno nel database (`is_demo`).
+- **Mai recensioni finte su un locale vero.** Sui locali veri scrive Alessandro, e sono vere.
+- I locali dimostrativi sono inventati; i locali veri hanno solo contenuto vero.
+- I profili con la scritta non entrano in classifiche, conteggi pubblici, pagine per i motori, consigli di ILLI.
+
+---
+
 ## 👤 PROFILO PUBBLICO DELL'UTENTE, cinque tipologie (specifica del 20/08)
 
 Bozza grafica: `scratchpad/schede2/profili.html`, immagine `profili.jpg`. Il **locale non e' qui**: per lui la scheda del luogo E' il profilo.

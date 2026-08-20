@@ -681,3 +681,27 @@ la prima cosa da vendere. Nel frattempo la fase 1 degli abbonamenti resta com'e'
 Non e' una tassa sulle trattative. E' il prezzo di quello che POI•LOVE ci mette dentro:
 garanzia di consegna, numeri veri e verificati, recensioni, documenti, e la sicurezza di non essere fregati.
 Finche' non ci mettiamo dentro quei servizi, le collaborazioni restano libere.
+
+
+---
+
+## 15. Profili dimostrativi: la regola (20/08/2026)
+
+Deciso dal fondatore, e chiude il problema legale:
+
+1. **Le persone finte portano una scritta.** Non nascosta: visibile sul profilo e dovunque compaiano
+   (riga nell'elenco, fascia dell'autore su un luogo, firma di una recensione).
+   Nel database un segno proprio (`is_demo`), cosi' si possono togliere tutte insieme in un secondo.
+2. **Nessuna recensione finta su un locale vero. Mai.**
+   Sui locali veri le recensioni le scrive Alessandro, e sono vere.
+3. Di conseguenza: i locali dimostrativi sono **inventati** (nome e luogo di fantasia),
+   i locali veri hanno **solo contenuto vero**.
+
+**Tre conseguenze tecniche da rispettare:**
+- i profili con la scritta **non entrano** nelle classifiche, nei "piu' votati", nei conteggi pubblici
+  e nelle pagine per i motori di ricerca: altrimenti la vetrina mente lo stesso;
+- ILLI non li propone come consigli veri;
+- prima del lancio di una citta' nuova si passa un comando che elenca tutto quello che ha il segno,
+  cosi' si decide cosa resta e cosa sparisce.
+
+Cosi' la vetrina si riempie senza raccontare bugie a nessuno, e senza rischi con la legge sulle recensioni.
