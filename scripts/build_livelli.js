@@ -85,15 +85,15 @@ const SCELTI = [
     it:{n:'Plus · Locali e attività', f:'Per ristoranti, bar e locali: la scheda completa della tua attività.',
         q:'250 € all\'anno', k:'Alla scadenza, senza rinnovo, la scheda del locale torna normale.',
         w:'In costruzione: le funzioni del locale arrivano una alla volta',
-        v:['Fino a 20 foto del locale','Listino e menu con i prezzi','Sistemi di pagamento collegati','Orari di apertura, giorno per giorno','QR del locale da stampare e mettere in vetrina','Statistiche avanzate del tuo locale']},
+        v:['Copertina, 21 foto e un video del locale','Listino e menu con i prezzi','Sistemi di pagamento collegati','Orari di apertura, giorno per giorno','QR del locale da stampare e mettere in vetrina','Statistiche avanzate del tuo locale']},
     sq:{n:'Plus · Lokale dhe biznese', f:'Për restorante, bare dhe lokale: skeda e plotë e biznesit tënd.',
         q:'250 € në vit', k:'Në mbarim, pa rinovim, skeda e lokalit kthehet normale.',
         w:'Në ndërtim: funksionet e lokalit vijnë një nga një',
-        v:['Deri në 20 foto të lokalit','Listë çmimesh dhe menu','Sisteme pagese të lidhura','Orari i hapjes, ditë për ditë','QR i lokalit për ta vënë në vitrinë','Statistika të avancuara të lokalit']},
+        v:['Kopertina, 21 foto dhe një video e lokalit','Listë çmimesh dhe menu','Sisteme pagese të lidhura','Orari i hapjes, ditë për ditë','QR i lokalit për ta vënë në vitrinë','Statistika të avancuara të lokalit']},
     en:{n:'Plus · Venues and business', f:'For restaurants, bars and venues: the full card of your business.',
         q:'€250 a year', k:'Once expired, without renewal, the venue card goes back to normal.',
         w:'Being built: the venue tools arrive one at a time',
-        v:['Up to 20 photos of the venue','Price list and menu','Connected payment systems','Opening hours, day by day','Venue QR to print and put in the window','Advanced statistics of your venue']} }
+        v:['Cover, 21 photos and one video of the venue','Price list and menu','Connected payment systems','Opening hours, day by day','Venue QR to print and put in the window','Advanced statistics of your venue']} }
 ];
 
 const P = {
@@ -112,7 +112,7 @@ const P = {
       ['Quanto costa Mecenate?','25 € al mese. Dà tutto quello di Sostenitore più i privilegi esclusivi: audioguide ovunque, rotte storiche, itinerario in evidenza.'],
       ['Il livello Influencer è gratuito?','Sì, è gratuito, ma servono almeno 30 POI al mese: sotto quella soglia si perdono i vantaggi e la spunta.'],
       ['Quanto costa il livello Professionista?','100 € all\'anno. È il profilo professionale della persona: ILLI•AI senza limiti, punti raddoppiati, QR business, adozione di una rotta culturale.'],
-      ['Cosa dà il livello Plus ai ristoranti e ai locali?','Fino a 20 foto del locale, listino e menu, sistemi di pagamento, orari di apertura, QR del locale e statistiche avanzate. È in costruzione: le funzioni arrivano una alla volta.']
+      ['Cosa dà il livello Plus ai ristoranti e ai locali?','Copertina, 21 foto e un video del locale, listino e menu, sistemi di pagamento, orari di apertura, QR del locale e statistiche avanzate. È in costruzione: le funzioni arrivano una alla volta.']
     ]},
   sq:{ lang:'sq', file:'livelli.html', dir:'sq',
     titolo:'Nivelet POI•LOVE: personale, mbështetjeje, profesionale',
@@ -129,7 +129,7 @@ const P = {
       ['Sa kushton Mecen?','25 € në muaj. Jep gjithçka të Mbështetësit plus privilegjet ekskluzive: audioudhëzues kudo, rrugë historike, itinerar në pah.'],
       ['A është falas niveli Influencer?','Po, është falas, por duhen të paktën 30 POI në muaj: nën atë prag humbasin përfitimet dhe shenja.'],
       ['Sa kushton niveli Profesionist?','100 € në vit. Është profili profesional i personit: ILLI•AI pa kufij, pikë të dyfishuara, QR biznesi, adoptim i një rruge kulturore.'],
-      ['Çfarë jep niveli Plus për restorantet dhe lokalet?','Deri në 20 foto të lokalit, listë çmimesh dhe menu, sisteme pagese, orar hapjeje, QR i lokalit dhe statistika të avancuara. Është në ndërtim: funksionet vijnë një nga një.']
+      ['Çfarë jep niveli Plus për restorantet dhe lokalet?','Kopertina, 21 foto dhe një video e lokalit, listë çmimesh dhe menu, sisteme pagese, orar hapjeje, QR i lokalit dhe statistika të avancuara. Është në ndërtim: funksionet vijnë një nga një.']
     ]},
   en:{ lang:'en', file:'livelli.html', dir:'en',
     titolo:'POI•LOVE levels: personal, support, professional',
@@ -146,7 +146,7 @@ const P = {
       ['How much does Patron cost?','€25 a month. It gives everything in Supporter plus exclusive privileges: audio guides anywhere, historic routes, featured itinerary.'],
       ['Is the Influencer level free?','Yes, it is free, but it needs at least 30 POIs a month: below that, benefits and check mark are lost.'],
       ['How much does the Professional level cost?','€100 a year. It is the professional profile of the person: unlimited ILLI•AI, double points, business QR, adoption of a cultural route.'],
-      ['What does the Plus level give to restaurants and venues?','Up to 20 photos of the venue, price list and menu, payment systems, opening hours, venue QR and advanced statistics. It is being built: the tools arrive one at a time.']
+      ['What does the Plus level give to restaurants and venues?','Cover, 21 photos and one video of the venue, price list and menu, payment systems, opening hours, venue QR and advanced statistics. It is being built: the tools arrive one at a time.']
     ]}
 };
 

@@ -35,7 +35,11 @@ Oggi la scheda esiste ma non ha la forma decisa. Serve:
 - copertina separata dalla galleria, galleria sempre a **multipli di tre**, scorrimento automatico regolabile;
 - ordine delle sezioni per tipologia di autore, come nel disegno approvato;
 - limiti di foto per livello scritti nel database e **fatti rispettare** al caricamento;
-- sezioni che compaiono solo se il livello dell'autore ne ha diritto.
+- sezioni che compaiono solo se il livello dell'autore ne ha diritto;
+- **il video**: chi ne ha diritto ne carica uno. Va compresso sulla macchina, non lasciato come esce dal telefono.
+  Regola proposta: **al massimo 60 secondi**, lato lungo 1080, H.264 con audio AAC, circa 2,5 Mbit al secondo,
+  immagine di copertina presa dal video. Un filmato da telefono passa cosi' da 80-150 MB a 15-20 MB,
+  senza differenza visibile sul telefono. Se vuoi durate diverse si cambia il numero, non il lavoro.
 
 Tocca: `pois` (nuove colonne), regole di caricamento, la scheda nella webapp, `poi.php` per i motori.
 
@@ -170,7 +174,7 @@ Non comprende il tempo di collaudo di Alessandro.
 
 | # | Blocco | Giornate |
 |---|---|---|
-| 1 | Scheda del luogo, struttura vera | 2 |
+| 1 | Scheda del luogo, struttura vera, video compresso compreso | 2,5 |
 | 2 | Recensioni, amicizia reciproca, bloccati, moderazione fatta dall'AI su direttive scritte | 4,5 |
 | 3 | Profilo pubblico dell'utente | 4 |
 | 4 | Vantaggi dei livelli resi veri | 3 |
@@ -185,10 +189,10 @@ Non comprende il tempo di collaudo di Alessandro.
 | 12 | Mercato professionisti e influencer (fase 1) | 3 |
 | 13 | Amministrazione trasversale | 2 |
 | 14 | Tre lingue, motori di ricerca, collaudo | 2,5 |
-| | **Totale fase 1** | **36** |
+| | **Totale fase 1** | **36,5** |
 | 15 | Incasso con carta (dipende dall'incassatore) | 2 |
 | 16 | Pagamento trattenuto e commissione del mercato | 2,5 |
-| | **Totale con la fase 2** | **40,5** |
+| | **Totale con la fase 2** | **41** |
 
 A una giornata al giorno lavorativo: **circa sette settimane** per la fase 1, otto con la fase 2.
 
@@ -213,7 +217,7 @@ A una giornata al giorno lavorativo: **circa sette settimane** per la fase 1, ot
 |---|---|
 | Cosa vuol dire **amico** (seguirsi a vicenda, oppure amicizia da accettare) | senza questo non parte il Blocco 2 |
 | Numero di foto del locale: **copertina + 21** oppure restiamo a 20 con una riga monca | Blocco 1 e testo del pannello dei livelli |
-| Via libera alla **fase 1 degli abbonamenti** (registrazione, pagamento fuori dal sistema) | Blocco 11 |
+| ~~Via libera alla fase 1 degli abbonamenti~~ **DATO il 20/08: si, pagamento fuori dal sistema** | Blocco 11 sbloccato |
 | Chi puo' incassare con carta da una societa' albanese | Blocco 15, da verificare prima di promettere date |
 | Commissione del mercato: quanto trattiene POI•LOVE | Blocco 16 |
 | I 15 luoghi in omaggio: chi li prepara e con quali contenuti | Blocco 4 |
@@ -280,12 +284,12 @@ e **200 luoghi veri in tutta l'Albania, 50 dei quali Ufficiali**. I tempi si all
 
 | Cantiere | Cosa comprende | Giornate |
 |---|---|---|
-| **A · Web, fase 1** | i blocchi del capitolo 2: schede, profili, livelli, recensioni, locale Plus, audio della persona, audioguide ufficiali, QR, abbonamenti | 36 |
+| **A · Web, fase 1** | i blocchi del capitolo 2: schede, profili, livelli, recensioni, locale Plus, audio della persona, audioguide ufficiali, QR, abbonamenti | 36,5 |
 | **B · Amministrazione al massimo** | persone, luoghi, moderazione recensioni, menu dei locali, abbonamenti, media, livelli, statistiche, ruoli | 6 |
 | **C · Contenuti: 200 luoghi, 50 Ufficiali** | raccolta dai dati aperti, scrittura, foto con licenza, verifica, bollino Ufficiale | 5 |
 | **D · App iOS e Android** | dall'impianto esistente fino agli store | 24,5 |
 | **E · Fase 2 web** | mercato professionisti-influencer, rapporto notarizzato, promemoria di scadenza | 5,5 |
-| | **Totale** | **77** |
+| | **Totale** | **77,5** |
 
 L'incasso con carta (2 giornate) resta fuori conteggio: dipende da quale incassatore accetta una societa' albanese.
 
@@ -341,7 +345,7 @@ Una giornata al giorno, sette giorni su sette, a partire da venerdi 21/08/2026.
 | Cosa | Quando serve | Nota |
 |---|---|---|
 | ~~Decidere cosa vuol dire amico~~ **RISPOSTO il 20/08: amicizia = seguirsi a vicenda, piu' l'elenco dei bloccati** | fatto | blocco 2 sbloccato |
-| Foto del locale: copertina + 21 oppure 20 | subito | blocca la scheda |
+| ~~Foto del locale~~ **RISPOSTO il 20/08: copertina + 21, mai righe monche. Piu' un video** | fatto | gia' in linea, versione 4.63 |
 | **Account Apple Developer** (99 dollari l'anno) e **Google Play** (25 dollari una volta) | entro meta' ottobre | li apre lui: io non apro account ne' inserisco password |
 | Chiave per le notifiche del suo account Apple | quando l'app e' pronta | serve per le notifiche vere |
 | Chi incassa con carta da una societa' albanese | quando decide di incassare | unico punto che non dipende da noi |
@@ -416,14 +420,14 @@ Due cose da sapere:
 
 | Cantiere | Prima | Adesso | Perche' |
 |---|---|---|---|
-| Web fase 1 | 36 | **40** | locale Plus +2, licenze e attribuzione foto +1, anti abuso recensioni +0,5, cambio +0,5. Comprende l'audio della persona e le audioguide ufficiali, separate il 20/08 |
+| Web fase 1 | 36,5 | **40,5** | locale Plus +2, licenze e attribuzione foto +1, anti abuso recensioni +0,5, cambio +0,5. Comprende l'audio della persona e le audioguide ufficiali, separate il 20/08 |
 | Amministrazione | 6 | **7** | moderazione entro 24 ore e blocco utenti, richiesti da Apple |
 | 200 luoghi, 50 Ufficiali | 5 | **9** | si parte da 18 luoghi e zero Ufficiali |
 | App iOS e Android | 24,5 | **30** | riscrittura del livello dati, porto alla versione attuale, tre punti delicati in revisione |
 | Fase 2 web | 5,5 | **6** | marcatura temporale vera per il rapporto |
-| | **77** | **92** | |
+| | **77,5** | **92,5** | |
 
-Calendario aggiornato, una giornata al giorno da venerdi 21/08 (92 giornate):
+Calendario aggiornato, una giornata al giorno da venerdi 21/08 (92,5 giornate):
 
 | Traguardo | Prima | Adesso |
 |---|---|---|
@@ -433,6 +437,27 @@ Calendario aggiornato, una giornata al giorno da venerdi 21/08 (92 giornate):
 | Fase 2 web | 09/10 | **21/10** |
 | App inviata agli store | 03/11 | **20/11** |
 | App pubblicata | meta' novembre | **fine novembre, inizio dicembre** |
+
+### 9.5-bis Chi incassa: la risposta c'e' gia', va solo agganciata
+
+Dal documento di gruppo `• THEMELI pay/studi/DECISIONE-incasso-carte-Albania.md` (luglio 2026):
+
+| Ruolo | Strumento | Costo | Stato |
+|---|---|---|---|
+| Carte, primario | **RaiAccept**, il VPOS di Raiffeisen | circa 1,5-3,5% | **conto gia' aperto** |
+| Carte, secondo binario | **BKT VPOS** | circa 1,5-3,5% | da aprire, serve per le rate e come riserva |
+| Comodita' | PayPal | 3,9-8% | acceso, da tenere minoritario |
+| Bonifico | IBAN Raiffeisen | sotto l'1% | il piu' economico |
+| Stripe | | | **non disponibile per l'Albania** |
+| Incassatore che fattura al posto nostro (Polar, 2Checkout) | | 5-6% | scartato: sfora il tetto del 4% |
+
+La regola gia' scelta dal gruppo e' **un contratto per dominio**, cosi' i conti restano puliti.
+Quindi per POI•LOVE **non serve cercare un incassatore nuovo**: serve chiedere a Raiffeisen
+**un secondo contratto VPOS intestato a poilove.com**, sotto lo stesso conto.
+Una telefonata e la firma, non uno studio.
+
+Da riconfermare per iscritto, come dice quel documento: la percentuale vera sulle **carte estere**
+(la maggior parte dei professionisti stranieri paghera' con carta non albanese).
 
 ### 9.6 Le cinque domande da sciogliere prima del via
 
