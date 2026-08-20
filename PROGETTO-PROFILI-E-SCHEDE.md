@@ -175,3 +175,43 @@ A una giornata al giorno lavorativo: **circa sette settimane** per la fase 1, ot
   la lettura va corretta. Per questo esiste la ricaduta sull'ultimo cambio noto.
 - **Audio**: la conversione occupa la macchina. Con molti caricamenti insieme serve una coda.
 - **Incasso con carta**: e' l'unico punto che non dipende da noi.
+
+---
+
+## 7. Piano a 20 giorni (deciso il 20/08/2026)
+
+Scadenza: **mercoledi 9 settembre 2026**. Venti giorni pieni, sabati e domeniche compresi.
+
+Il perimetro completo della fase 1 vale 32,5 giornate: **in venti giorni non ci sta tutto**.
+Ci sta questo, che e' il prodotto vendibile e completo per l'utente:
+
+| Giorni | Blocco | Giornate |
+|---|---|---|
+| 21-22/08 | Scheda del luogo, struttura vera | 2 |
+| 23-25/08 | Profilo pubblico dell'utente, cinque tipologie | 3 |
+| 26-28/08 | Vantaggi dei livelli resi veri (foto, badge, muro, 15 luoghi in omaggio, evidenze) | 2,5 |
+| 28-30/08 | Recensioni, sui luoghi e ricevute da influencer e professionisti | 2,5 |
+| 31/08-03/09 | Locale Plus: orari a tendina, menu con CSV, doppia valuta, Consigli dello Chef, pagamenti, statistiche | 3,5 |
+| 03-04/09 | Cambio Banca d'Albania, QR veri, controllo automatico delle condizioni | 1,5 |
+| 05-06/09 | Audioguide POI•VOICE, versione essenziale (caricamento, limiti, conversione, ascolto) | 1,5 |
+| 06-07/09 | Abbonamenti in amministrazione, versione minima, e amministrazione trasversale | 2 |
+| 08-09/09 | Tre lingue, pagine nei motori di ricerca, collaudo end-to-end | 1,5 |
+| | **Totale** | **20** |
+
+### Cosa resta fuori dai venti giorni
+
+| Fuori | Giornate | Quando |
+|---|---|---|
+| Mercato professionisti e influencer | 3 | settimana successiva |
+| Rapporto notarizzato | 1,5 | settimana successiva |
+| Promemoria di scadenza e ricevute automatiche | 1 | settimana successiva |
+| Incasso con carta | 2 | dipende dall'incassatore, non da noi |
+| Coda di conversione degli audio | 0,5 | solo se il carico cresce |
+
+### Condizioni perche' i venti giorni tengano
+
+1. Le due decisioni bloccanti arrivano **entro domani**: cosa vuol dire amico, e le foto del locale (copertina + 21 oppure 20).
+2. Il collaudo di Alessandro avviene **strada facendo**, blocco per blocco, non tutto alla fine.
+3. Dentro i venti giorni **non entrano funzioni nuove**. Ogni aggiunta fa uscire qualcosa d'altro, e lo diciamo subito.
+4. I contenuti dei 15 luoghi in omaggio: se non arrivano, li preparo dai luoghi ufficiali gia' esistenti.
+5. Ogni blocco finisce pubblicato e verificato dal vivo, non "pronto ma da provare".
