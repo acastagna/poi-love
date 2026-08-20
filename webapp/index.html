@@ -1242,6 +1242,52 @@ body.kb-open #lang-strip,body.kb-open #brand-strip{opacity:0;pointer-events:none
 .fv-conta{position:absolute;bottom:calc(20px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);
           background:rgba(0,0,0,.6);color:#fff;border-radius:20px;padding:7px 15px;font-size:13px;font-weight:800}
 
+
+/* ══ PROFILO PUBBLICO, il disegno approvato del 20/08/2026 ══════════════ */
+.pp-cop{height:170px;background:#cfc6b8 center/cover no-repeat;position:relative}
+.pp-cop::after{content:'';position:absolute;inset:0;background:linear-gradient(transparent 45%,rgba(0,0,0,.35))}
+.pp-tondo{position:absolute;top:14px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.92);
+          border:none;cursor:pointer;font-size:19px;color:var(--text);display:flex;align-items:center;justify-content:center;z-index:3}
+.pp-tondo.sx{left:14px}.pp-tondo.dx{right:14px}
+.pp-nastro{position:absolute;left:50%;top:19px;transform:translateX(-50%);padding:7px 14px;color:#fff;font-size:10.5px;
+           font-weight:900;letter-spacing:1.2px;text-transform:uppercase;z-index:2;display:inline-flex;align-items:center;
+           gap:7px;border-radius:24px;white-space:nowrap;max-width:252px;box-shadow:0 6px 18px rgba(0,0,0,.35)}
+.pp-viso{width:108px;height:108px;border-radius:50%;border:5px solid var(--card);position:absolute;left:50%;bottom:-54px;
+         transform:translateX(-50%);overflow:hidden;z-index:4;background:var(--red);box-shadow:0 10px 26px rgba(0,0,0,.25)}
+.pp-viso img{width:100%;height:100%;object-fit:cover;display:block}
+.pp-corpo{background:var(--card);padding:0 0 22px}
+.pp-testa{text-align:center;padding:62px 16px 0}
+.pp-nome{font-size:25px;font-weight:900;line-height:1.25;display:flex;align-items:center;justify-content:center;gap:7px;flex-wrap:wrap}
+.pp-spunta{font-size:19px;color:var(--blue)}
+.pp-manetta{font-size:14px;font-weight:800;color:var(--muted);margin-top:3px;cursor:pointer}
+.pp-manetta span+span::before{content:' · '}
+.pp-posiz{display:inline-flex;align-items:center;gap:7px;background:#E9F7EE;border:1px solid #A7E0BC;color:#0B7A38;
+          border-radius:20px;padding:7px 13px;font-size:12.5px;font-weight:800;margin-top:12px}
+.pp-numeri{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:14px}
+.pp-numeri>div{background:#FBF8F2;border:1px solid var(--border);border-radius:14px;padding:10px 3px}
+.pp-numeri b{display:block;font-size:16.5px;font-weight:900;line-height:1.1}
+.pp-numeri span{font-size:10px;font-weight:800;color:var(--muted);letter-spacing:.2px;text-transform:uppercase}
+.pp-bio{font-size:15.5px;line-height:1.5;padding:0 16px;margin-top:14px}
+.due-bottoni{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:0 16px;margin-top:14px}
+.pp-btn{height:58px;border-radius:26px;border:2px solid transparent;font-family:inherit;font-size:15px;font-weight:900;
+        cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;line-height:1.15}
+.pp-btn.pieno{background:var(--red);color:#fff}
+.pp-btn.vuoto{background:var(--card);border-color:var(--border);color:var(--text)}
+.pp-btn small{display:block;font-size:10.5px;font-weight:800;opacity:.92;margin-top:2px}
+.pp-btn i{font-size:19px}
+.pp-altri{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:12px 16px 0}
+.pp-sez{padding:0 16px;margin-top:20px}
+.pp-muro{display:flex;align-items:center;gap:9px;background:#EEF3FF;border:1px solid #B9CBF0;border-radius:14px;
+         padding:12px 13px;font-size:13.5px;font-weight:800;color:#1e3a8a;line-height:1.4}
+.pp-luoghi{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pp-luoghi>button{border:1px solid var(--border);border-radius:14px;overflow:hidden;background:var(--card);
+                  padding:0;cursor:pointer;font-family:inherit;text-align:left;position:relative}
+.pp-luoghi .im{height:86px;background:#cfc6b8 center/cover no-repeat;position:relative}
+.pp-luoghi .im::after{content:'';position:absolute;left:0;top:0;right:0;bottom:0;
+                      box-shadow:inset 0 0 0 1px rgba(0,0,0,.10), inset 0 3px 12px rgba(0,0,0,.28)}
+.pp-luoghi .tx{padding:8px 9px}
+.pp-luoghi b{font-size:13px;font-weight:900;display:block;line-height:1.25;color:var(--text)}
+.pp-luoghi span{font-size:11.5px;color:var(--red);font-weight:900;display:inline-flex;align-items:center;gap:4px;margin-top:3px}
 /* ══ LA SCHEDA DEL LUOGO, vestita come il disegno approvato (20/08/2026) ══ */
 .pdm-testa{padding:16px 16px 4px;background:var(--card)}
 .pdm-titolo{font-size:26px;font-weight:900;line-height:1.12;letter-spacing:-.4px;color:var(--text)}
@@ -3368,39 +3414,35 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
     </div>
   </div>
 
-  <!-- PUBLIC PROFILE -->
+  <!-- ═══ PROFILO PUBBLICO, come nel disegno approvato del 20/08/2026 ═══ -->
   <div id="publicProfile" class="public-profile-view">
-    <div class="pub-header">
-      <button class="back-btn" onclick="togglePublicProfile(false)">
-        <i class="ph-duotone ph-arrow-left"></i> <span data-t="back">Indietro</span>
-      </button>
-      <button class="back-profile-btn" onclick="togglePublicProfile(false)">
-        <i class="ph-duotone ph-user-circle"></i> <span>Ritorna al tuo profilo</span>
-      </button>
-      <div class="profile-avatar-wrap" style="cursor:default">
-        <div class="profile-avatar">
-          <img src="https://ui-avatars.com/api/?name=%3F&background=285EA7&color=fff&size=200" alt="avatar"/>
-        </div>
+    <div class="pp-cop" id="ppCop">
+      <button class="pp-tondo sx" onclick="togglePublicProfile(false)" aria-label="Indietro"><i class="ph-duotone ph-arrow-left"></i></button>
+      <button class="pp-tondo dx" onclick="condividiProfilo()" aria-label="Condividi"><i class="ph-duotone ph-share-network"></i></button>
+      <div class="pp-nastro" id="ppNastro" style="display:none"></div>
+      <div class="pp-viso" id="ppViso"><img src="https://ui-avatars.com/api/?name=%3F&background=285EA7&color=fff&size=240" alt="" id="pubAvatarImg"></div>
+    </div>
+    <div class="pp-corpo">
+      <div class="pp-testa">
+        <div class="pp-nome" id="pubProfileName">—<i class="ph-fill ph-seal-check pp-spunta" id="ppSpunta" style="display:none"></i><span class="liv-badge" id="pubProfileBadge" style="display:none"><i class="ph-fill ph-medal" id="pubProfileBadgeIco"></i><span id="pubProfileBadgeTxt"></span></span></div>
+        <div class="pp-manetta" id="pubVanityUrl" onclick="copyVanityUrl()"><span id="pubVanityTxt">—</span><span id="ppCitta"></span></div>
+        <div class="pp-posiz" id="ppPosiz" style="display:none"></div>
+        <div class="pp-numeri" id="ppNumeri"></div>
       </div>
-      <div class="profile-name" id="pubProfileName">—</div>
-      <!-- L'email NON va mai nel profilo pubblico (privacy): rimossa -->
-      <div class="profile-vanity" id="pubVanityUrl" onclick="copyVanityUrl()">
-        <i class="ph-duotone ph-link"></i>
-        <span id="pubVanityTxt">—</span>
-      </div>
-      <div class="prof-badge" id="pubProfileBadge" style="background:rgba(245,158,11,.2);color:#FDE68A;border-color:rgba(245,158,11,.3)">
-        <i class="ph-duotone ph-star" style="color:#FDE68A"></i>
-        <span id="pubProfileBadgeTxt">Amatore</span>
-      </div>
-      <div class="pub-actions">
-        <button class="pub-action-btn follow" id="pubFollowBtn" onclick="togglePublicFollow()">
-          <i class="ph-duotone ph-user-plus"></i> <span id="pubFollowLbl" data-t="foll_follow">Segui</span>
+      <p class="pp-bio" id="ppBio" style="display:none"></p>
+      <div class="due-bottoni">
+        <button class="pp-btn pieno" id="pubFollowBtn" onclick="togglePublicFollow()">
+          <i class="ph-duotone ph-user-plus"></i><span><span id="pubFollowLbl" data-t="foll_follow">Segui</span><small id="ppPunti"></small></span>
         </button>
+        <button class="pp-btn vuoto" onclick="condividiProfilo()">
+          <i class="ph-duotone ph-share-network"></i><span data-t="act_condividi">Condividi</span>
+        </button>
+      </div>
+      <div class="pp-altri" id="ppAltri">
         <button class="pub-action-btn connect" id="pubConnectBtn" onclick="togglePublicConnect()">
           <i class="ph-duotone ph-handshake"></i> <span id="pubConnectLbl">Collegati</span>
         </button>
-        <button class="pub-action-btn share-loc" id="pubShareLocBtn" onclick="toggleLocDurPicker()"
-          style="background:rgba(34,197,94,.2);color:#16A34A">
+        <button class="pub-action-btn share-loc" id="pubShareLocBtn" onclick="toggleLocDurPicker()">
           <i class="ph-duotone ph-navigation-arrow"></i> <span id="pubShareLocLbl">Condividi posizione</span>
         </button>
         <button class="pub-action-btn block" id="pubBlockBtn" onclick="togglePublicBlock()">
@@ -3417,28 +3459,31 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
           <button class="loc-dur-opt" onclick="startLocShare('always')">Sempre</button>
         </div>
       </div>
-    </div>
-    <div class="profile-stats">
-      <div class="stat-item"><i class="ph-duotone ph-map-pin"></i><div class="stat-v" id="pubStatPoi">0</div><div class="stat-l">POI pub.</div></div>
-      <div class="stat-item"><i class="ph-duotone ph-heart" style="color:var(--red)"></i><div class="stat-v" id="pubStatLove">0</div><div class="stat-l">Love tot.</div></div>
-      <div class="stat-item"><i class="ph-duotone ph-path"></i><div class="stat-v" id="pubStatItin">0</div><div class="stat-l">Itinerari</div></div>
-    </div>
-    <div class="profile-body">
-      <!-- Stesso verde toggle — torna al tuo profilo -->
-      <button class="pub-toggle-card" onclick="togglePublicProfile(false)">
+      <div class="pp-sez" id="ppMuroSez" style="display:none">
+        <div class="pdm-sez-lbl"><i class="ph-duotone ph-cards-three"></i> <span data-t="muro_lbl">Muro dei Sostenitori</span></div>
+        <div class="pp-muro" id="ppMuro"></div>
+      </div>
+      <div class="pp-sez" id="ppLuoghiSez" style="display:none">
+        <div class="pdm-sez-lbl"><i class="ph-duotone ph-heart"></i> <span data-t="suoi_luoghi">I suoi luoghi piu votati</span></div>
+        <div class="pp-luoghi" id="ppLuoghi"></div>
+      </div>
+      <div class="pp-sez" id="ppItinSez" style="display:none">
+        <div class="pdm-sez-lbl"><i class="ph-duotone ph-path"></i> <span data-t="itin_pubblici">Itinerari pubblici</span></div>
+        <div id="ppItin"></div>
+      </div>
+      <div class="pp-sez" id="ppCompSez" style="display:none">
+        <div class="pdm-sez-lbl"><i class="ph-duotone ph-users-three"></i> <span data-t="comp_pubbliche">Compagnie pubbliche</span></div>
+        <div id="ppComp"></div>
+      </div>
+      <button class="pub-toggle-card" id="ppTornaBtn" onclick="togglePublicProfile(false)">
         <div class="pub-toggle-icon"><i class="ph-duotone ph-arrow-left"></i></div>
         <div class="pub-toggle-text">
-          <div class="pub-toggle-title">Torna al tuo profilo</div>
-          <div class="pub-toggle-sub">Esci dall'anteprima pubblica e torna alla tua area privata</div>
+          <div class="pub-toggle-title" data-t="torna_tuo">Torna al tuo profilo</div>
+          <div class="pub-toggle-sub" data-t="torna_tuo_sub">Esci dall'anteprima pubblica e torna alla tua area privata</div>
         </div>
         <i class="ph-duotone ph-caret-right pub-toggle-arrow"></i>
       </button>
-      <div class="profile-sec">
-        <div class="prof-sec-lbl">POI pubblici</div>
-        <div class="poi-board">
-          <!-- POI pubblici reali dell'utente, caricati da Supabase -->
-        </div>
-      </div>
+      <div class="pdm-piede" id="ppPiede"></div>
     </div>
   </div>
 </div><!-- /profile-view -->
@@ -7156,7 +7201,7 @@ const T={
     illi_search_in:'Cerca in:',illi_more:'Ne vuoi altri?',illi_country_auto:'Auto',illi_country_ph:'Altro paese…',illi_country_set:'ILLI cercherà in: ',
     illi_login:'Accedi per usare ILLI',
     illi_limit:'Hai finito i messaggi di oggi per il tuo livello',
-    foto_del_posto:'Le foto del posto', segui_gia:'Segui gia', ora_segui:'Adesso lo segui', non_segui_piu:'Non lo segui piu', mezzo_piedi:'a piedi', mezzo_bici:'in bicicletta', mezzo_auto:'in auto', mezzo_aereo:'in aereo', mezzo_nave:'in nave', mezzo_trek:'a tutto impulso', millesimi:'millesimi di secondo', aggiungi_foto:'Aggiungi foto', tag_lbl:'Tag', dove_lbl:'Dove si trova', chi_ama_lbl:'Chi lo ama', fa_parte_lbl:'Fa parte di', da_te:'da te', da_dove_sei:'da dove sei ora', dove_no_pos:'Accendi la posizione per sapere quanto dista', creato_il:'Creato il ', aggiornato_il:'aggiornato il ', claim_mappa:'la mappa fatta dalle persone', segui:'Segui', act_naviga:'Naviga', act_aggiungi:'Aggiungi', act_condividi:'Condividi', act_salva:'Salva', act_modifica:'Modifica', act_cancella:'Cancella', aggiungi_video:'Aggiungi un video', video_solo_tuo:'Il video lo mette chi ha creato il luogo', video_invio:'Mando il video (', video_ok:'Video caricato: da ', video_err:'Non sono riuscito a caricare il video', illi_error:'ILLI ha un problema tecnico, riprova tra poco',},
+    foto_del_posto:'Le foto del posto', muro_lbl:'Muro dei Sostenitori', muro_testo:'sostiene attivamente il progetto POI-LOVE assieme a', persone:'persone', suoi_luoghi:'I suoi luoghi piu votati', itin_pubblici:'Itinerari pubblici', comp_pubbliche:'Compagnie pubbliche', n_luoghi:'luoghi', n_seguaci:'seguaci', n_punti:'punti', punti:'punti', su_poilove_dal:'Su POI-LOVE dal ', profilo_dimostrativo:'Profilo dimostrativo di POI-LOVE', profilo_non_disp:'Profilo dell autore non disponibile', link_copiato:'Indirizzo copiato', torna_tuo:'Torna al tuo profilo', torna_tuo_sub:'Esci dall anteprima pubblica e torna alla tua area privata', segui_gia:'Segui gia', ora_segui:'Adesso lo segui', non_segui_piu:'Non lo segui piu', mezzo_piedi:'a piedi', mezzo_bici:'in bicicletta', mezzo_auto:'in auto', mezzo_aereo:'in aereo', mezzo_nave:'in nave', mezzo_trek:'a tutto impulso', millesimi:'millesimi di secondo', aggiungi_foto:'Aggiungi foto', tag_lbl:'Tag', dove_lbl:'Dove si trova', chi_ama_lbl:'Chi lo ama', fa_parte_lbl:'Fa parte di', da_te:'da te', da_dove_sei:'da dove sei ora', dove_no_pos:'Accendi la posizione per sapere quanto dista', creato_il:'Creato il ', aggiornato_il:'aggiornato il ', claim_mappa:'la mappa fatta dalle persone', segui:'Segui', act_naviga:'Naviga', act_aggiungi:'Aggiungi', act_condividi:'Condividi', act_salva:'Salva', act_modifica:'Modifica', act_cancella:'Cancella', aggiungi_video:'Aggiungi un video', video_solo_tuo:'Il video lo mette chi ha creato il luogo', video_invio:'Mando il video (', video_ok:'Video caricato: da ', video_err:'Non sono riuscito a caricare il video', illi_error:'ILLI ha un problema tecnico, riprova tra poco',},
   sq:{nav_map:'Harta',nav_itin:'Itinerare',nav_profile:'Profili',mt_street:'Rrugore',mt_sat:'Satelitor',mt_routes:'Rrugët Historike',fab_poi:'Krijo POI',fab_itin:'Stacion Itinerarit',add_title:'Ruaj POI-n tënd',add_points:'pikë',imp_title:'Faleminderit!',imp_sub:'Ke përmirësuar një vend zemre: fiton kush do ta gjejë pas teje.',save_go_poi:'Shko te POI',add_next_level:'te niveli tjetër',add_top_level:'niveli maksimal',add_sub:'Shto një vend që e do',add_challenge:'Arrin brenda 60 sekondave?',loc_hint_use:'Përdor si emër',congrats:'',lbl_name:'Emri i vendit',req:'E DETYRUESHME',lbl_where:'Ku ndodhet',loc_gps:'Vendi ku ndodhem',loc_gps_s:'GPS LIVE',loc_exif:'Ku është bërë fotoja',loc_exif_s:'Të dhëna EXIF',loc_addr:'Adresa',loc_addr_s:'Rruga, numri, qyteti',loc_map:'Vendos në hartë',loc_map_s:'Prek pikën',addr_searching:'Po kërkoj…',addr_none:'Asnjë adresë e gjetur',addr_none_s:'Provo me emrin e rrugës ose të vendit',lbl_photos:'Foto',ph_main:'Kryesore',ph_2:'Foto 2',ph_3:'Foto 3',ph_hint:'Nuk jeni aty? Mund të shtoni foto më vonë.',lbl_story:'Trego',lbl_cat:'Kategori',lbl_tag:'Tag',lbl_tag_add:'Shto etiketë',cat_max3:'Mund të zgjedhësh maksimumi 3 kategori',cat_add_more:'Shto',lbl_list:'Shto në listë',lbl_route:'Rrugë Historike',route_none:'Asnjë rrugë historike',bdg_official:'Zyrtare',bdg_essential:'E domosdoshme',bdg_top:'Më e votuara',lbl_poi_trip:'Shto në një itinerar',opt_lbl:'(opsionale)',poi_propose_title:'Propozoje si ndalesë e një rruge historike',poi_propose_sub:'Administrata e vlerëson dhe, nëse është e përshtatshme, e shton në një rrugë zyrtare',poi_trip_none:'Ende s\'ke itinerare: krijo një te skeda Itinerare.',poi_proposed_ok:'U propozua te administrata si ndalesë e rrugës historike',untitled:'Pa emër',lbl_vis:'Dukshmëria',vis_pub_btn:'Publik',vis_prv_btn:'Privat',vis_share_btn:'Nda',save_disabled:'Fut emrin për të vazhduar',save_ready:'RUAJ POI',save_update:'PËRDITËSO POI',google_suggest:'Sugjeroni te Google Maps',share_link_ph:'Vendos pozicionin: linku gjenerohet këtu',discover_hint:'Ndihmoje këtë vend të gjendet edhe jashtë POI•LOVE.',discover_osm:'Sinjalizo në OpenStreetMap',discover_osm_done:'U sinjalizua në OpenStreetMap',discover_gmaps:'Hap në Google Maps',discover_why:'OpenStreetMap është harta e lirë e botës (e përdorim edhe ne): sinjalizimin tënd e shtojnë vullnetarët. Google nuk lejon të shtosh vende nga aplikacioni, e hap dhe e shton me dorë nëse do.',discover_osm_ok:'✓ U sinjalizua në OpenStreetMap: do ta shtojnë vullnetarët.',discover_osm_err:'Sinjalizimi dështoi, provo pas pak',discover_need_name:'Vendos një emër para se ta sinjalizosh',discover_need_pos:'Vendos fillimisht pozicionin',stop_title:'Stacion Itinerarit',stop_sub:'Pa foto. Planifiko tani, trego kur je aty.',stop_lbl_name:'Emri i stacionit',stop_lbl_cat:'Kategori',stop_lbl_vis:'Dukshmëria Itinerarit',itin_pub:'Publik',itin_prv:'Privat',stop_lbl_date:'Data e planifikuar',stop_save:'Shto stacionin',stat_poi:'POI',stat_love:'Love',stat_list:'Lista',stat_itin:'Itinerare',stat_comp:'Shoqëri',diffondi:'Përhap POI•LOVE',prof_lists:'Listat e mia',prof_new_list:'Listë e re',prof_tags:'Etiketat e mia',prof_new_tag:'Shto',prof_my_poi:'POI-të e mia',prof_add_poi:'Shto',prof_pub_toggle:'Pamja publike',itin_h:'Itinerare Udhëtimi',itin_desc:'Planifikoni stacionet para nisjes. Gjeni shokë udhëtimi.',itin_open:'Hap Itineraret',itin_note:'Hartë, mini-kalendar, GPS live.',back:'Kthehu',cr_top:'Krijim i POI•LOVE nga 321.AL',cr_bot:'Projekt Open Source · Ide dhe Drejtim Krijues: Alessandro Castagna© · Liçensë MIT',
     /* Auth overlay */
     auth_tagline:'vendet e zemrës',auth_discover:'Zbulo POI•LOVE',shared_point:'Një vend zemre',nav_go:'Shko',mqb_center:'Vendndodhja ime',mqb_lang:'Gjuha',mqb_notif:'Njoftime',shared_from:'një vend zemre i ndarë me ty',shared_points:'200 pikë për ty!',shared_join_save:'Regjistrohu dhe ruaje POI-n',shared_points_note:'nëse nuk je ende i regjistruar në POI•LOVE',shared_have_account:'Kam llogari, po hyj',ref_welcome:'🎉 Ftesa u pranua: 200 pikë për ty!',shared_save:'Ruaje POI-n',shared_join:'Hyr ose regjistrohu',shared_need_join:'Hyr ose regjistrohu: pastaj ta ruaj unë te vendet e tua',shared_saving:'Po e ruaj…',shared_saved:'✓ U ruajt te vendet e tua',shared_already:'Këtë vend e ke tashmë te vendet e tua',shared_desc:'Marrë nga një mik në POI•LOVE',share_mail_lbl:'Me postën e POI•LOVE',share_mail_t:'Dërgo me email',share_mail_s:'Vjen me veshjen POI•LOVE, në gjuhën tënde',share_mail_login:'Hyr për të dërguar një email',share_mail_sub:'Po dërgon',share_mail_name:'Emri i marrësit',share_mail_opt:'opsionale',share_mail_name_ph:'Marko',share_mail_addr:'Email-i i tij',share_mail_busy:'Po e dërgoj, një çast',share_mail_empty:'Shkruaj email-in e marrësit',share_mail_expired:'Sesioni skadoi: hyr sërish dhe provo',share_mail_bad:'Kontrollo adresën e marrësit',share_mail_ko:'Posta nuk e pranoi dërgimin, provo pas pak',share_mail_net:'Pa internet: provo kur të kthehet rrjeti',share_mail_ask:'Kujt ia dërgojmë',share_mail_send:'Dërgo',share_mail_sending:'Po e dërgoj…',share_mail_ok:'✉️ U dërgua te',share_mail_wait:'(mund të vonojë një minutë, shiko edhe te spam)',share_mail_cap:'Ke dërguar shumë email sot, provo nesër',auth_apple:'Apple ID',auth_passkey:'Hyr me biometri',auth_passkey_as:'Hyr si',auth_passkey_need_email:'✉️ Vendos email-in tënd më poshtë dhe shtyp "Dërgo linkun"',auth_or_magic:'ose me link magjik via email',auth_email_ph:'email-juaj@email.com',auth_email_send:'Dërgo linkun',auth_terms:'Duke hyrë pranoni Kushtet e shërbimit të POI•LOVE',auth_oss:'Projekt Open Source · Liçensë MIT · © 2026 321.AL',auth_continue_google:'Vazhdo me Google',auth_continue_apple:'Vazhdo me Apple',auth_continue_li:'Vazhdo me LinkedIn',auth_continue_fb:'Vazhdo me Facebook',auth_continue_x:'Vazhdo me X',auth_email_invalid:'Vendos një email të vlefshëm',auth_link_sent:'📧 Linku u dërgua! Kontrollo postën.',auth_welcome_back:'Mirëserdhe',auth_provider_off:'nuk është aktivuar ende (Supabase → Auth → Providers)',auth_soon:'së shpejti',auth_google_big:'Vazhdo me Google', auth_nopass:'Pa fjalekalim: nje prekje, ose nje link me email', auth_more:'Menyra te tjera hyrjeje', auth_passkey_back:'Mire se u ktheve: hyr me gjurme', auth_guest:'Hyr dhe shiko, pa llogari',guest_active:'👀 Po eksploron si vizitor, hyr për të krijuar vendet e tua',list_move_up:'Lart',list_move_down:'Poshtë',love_login:'Hyr për të dhënë LOVE ❤️',love_on:'❤️ LOVE!',love_off:'💔 LOVE u hoq',cat_other:'Kategori tjetër',cat_mine:'Kategoria ime',cat_fam_ask:'Në cilën familje bën pjesë?',cat_other_done2:'Kategoria jote është gati: e përdor menjëherë. Bëhet publike nëse e përdor 20 herë ose nëse e miraton admini.',cat_login:'Hyr për të krijuar kategorinë tënde',cat_one_only:'Ke tashmë kategorinë tënde personale',cat_use:'Përdor kategorinë time',cat_replace:'Zëvendësoje me një tjetër',cat_already_public:'Kjo kategori është tashmë publike: u zgjodh.',share_sent_to:'U nda me',share_person:'person',share_people:'persona',share_nobody:'Askush per te njoftuar, per momentin',share_failed:'Ndarja deshtoi, provo serish',share_inside:'Brenda POI•LOVE',share_comp:'Shoqëri',share_comp_sub:'E vendos në tabelën e një shoqërie',share_comp_none:'Nuk je në asnjë shoqëri, për momentin',share_comp_ok:'U vendos në tabelën e',share_trip:'Itinerar',share_trip_sub:'E shtoj si ndalesë të një udhëtimi',share_trip_ok:'U shtua te',share_trip_dup:'Kjo ndalesë ekziston tashmë te',share_historic:'Harta historike',share_historic_sub:'E propozoj si rrugë zyrtare',share_place:'Vend',share_open:'Hape',share_login:'Hyr për të ndarë',share_friends:'Miq',share_friends_sub:'Vetëm personat e lidhur',share_community:'Community POI•LOVE',share_send:'Dërgo linkun',wall_title:'Muri i Mbështetësve',wall_sub:'Njerëzit që mbajnë gjallë hartën e vendeve të zemrës.',wall_open:'Shiko Murin e Mbështetësve',wall_join:'Bashkohu me ta',wall_empty:'Ende asnjë mbështetës: mund të jesh i pari.',flag_official:'Zyrtare',flag_featured:'Në pah',flag_suggested:'Sugjeruar',feature_add:'Vër në pah',feature_remove:'Hiq nga pah',feature_cap:'Ke arritur numrin maksimal të POI-ve në pah',feature_notier:'POI-t në pah janë përfitim i niveleve me pagesë',feature_done:'✓ U vu në pah',feature_undone:'U hoq nga pah',qr_biz_btn:'QR biznesi',qr_biz_title:'QR-i i biznesit tënd',qr_biz_note:'Printoje dhe vëre në vitrinë: kush e skanon vjen drejt këtu.',qr_biz_dl:'Shkarko për printim',qr_biz_close:'Mbyll',qr_biz_done:'⬇️ QR u shkarkua për printim!',trip_feat_cap:'Mund të vësh në pah vetëm një itinerar',trip_save_first:'Ruaj fillimisht itinerarin',route_adopt:'Adopto',route_release:'Lësho',route_adopted_by:'Adoptuar nga',route_adopt_ask:'Shkruaj dedikimin tënd për këtë rrugë (opsional)',route_taken:'Kjo rrugë është adoptuar tashmë',route_adopted_ok:'✓ Rruga u adoptua, faleminderit!',route_released:'Rruga u lëshua',rt_suggest_btn:'Sugjero një rrugë historike',rt_suggest_sub:'E propozon ti, e botojmë me emrin tënd',rt_suggest_title:'Sugjero një rrugë historike',rt_suggest_help:'Na trego rrugën: emrin, zonën dhe pse ia vlen. Administrata do ta vlerësojë dhe, nëse botohet, do të falënderojë publikisht me emrin tënd.',rt_suggest_f_name:'Emri i rrugës',rt_suggest_f_area:'Zona ose qyteti',rt_suggest_f_desc:'Përshkrimi',rt_suggest_ph_name:'P.sh. Muret e Beratit',rt_suggest_ph_area:'P.sh. Berat',rt_suggest_ph_desc:'Çfarë shihet, pse është e veçantë, stacionet kryesore...',rt_suggest_send:'Dërgo',rt_suggest_need_name:'Vendos një emër, të paktën 3 shkronja',rt_suggest_toomany:'Ke disa sugjerime në pritje, prit t\'i vlerësojmë',rt_suggest_login:'Hyr për të sugjeruar një rrugë historike',rt_thanks_title:'Faleminderit nga zemra!',rt_thanks_body:'Rruga jote arriti te administrata. Nëse e botojmë, do të shfaqet me "Falënderim për" dhe emrin tënd, të lidhur me profilin tënd.',rt_thanks_ok:'Perfekt',rt_credit:'Falënderim për: ',rt_credit_anon:'një anëtar i komunitetit',profile_unavailable:'Profili s\'është i disponueshëm',cat_other_ask:'Cila kategori mungon?',cat_other_send:'Përdor dhe propozo',cat_other_done:'Faleminderit, do ta shqyrtojmë. E vura si tag',tag_hint:'Tag…',list_add_poi:'Shto një POI',list_added:'U shtua në listë',list_removed:'U hoq nga lista',list_pick_title:'POI-të e tua',list_pick_none:'Asnjë POI tjetër për të shtuar: krijo një nga harta',list_empty_tap:'Lista bosh: shto një POI më poshtë',plnd_kicker:'Të fton në POI•LOVE',plnd_cta:'Hyr në POI•LOVE',plnd_hint:'Falas: brenda për 30 sekonda',teaser_kicker:'Dikush ndau me ty një vend të zemrës',teaser_title:'Një vend i zemrës të pret',teaser_cta:'Hyr falas dhe hape në hartë',teaser_hint:'Regjistrimi është falas: pika e saktë, navigimi dhe love hapen pas hyrjes',cons_title:'Një çast para se të fillojmë',cons_sub:'Për të përdorur POI•LOVE duhet pëlqimi yt. Kushtet dhe Privatësia janë të nevojshme, zgjedhjet e tjera janë opsionale.',cons_terms_1:'Kam të paktën 16 vjeç, pranoj',cons_terms_2:'dhe kam lexuar',cons_terms_3:'Informacionin e privatësisë',cons_required:'E detyrueshme',cons_geo:'Përdor vendndodhjen time për të parë vendet më të afërta dhe për të marrë një njoftim kur po afrohem.',cons_optional:'Opsionale',cons_photo:'Mund të ngarkoj foto të vendeve, nën përgjegjësinë time për personat e paraqitur.',cons_mic:'Përdor mikrofonin për të diktuar me zë, vetëm kur e zgjedh unë.',cons_marketing:'Pranoj matje dhe komunikime marketing (statistika anonime të rrjeteve sociale dhe, nëse e zgjedh, email me risi). Mund t\'i revokoj kur të dua.',cons_mic_needed:'Aktivizo pëlqimin e mikrofonit për të përdorur diktimin',cons_continue:'Vazhdo',cons_decline:'Dil',cons_need_terms:'Duhet të pranosh Kushtet, Privatësinë dhe moshën minimale për të vazhduar',cons_saved:'✓ Pëlqimi u ruajt, faleminderit!',cons_err:'Gabim gjatë ruajtjes, provo sërish',notif_title:'Njoftime',notif_tab_list:'Të fundit',notif_tab_settings:'Cilësimet',notif_loading:'Po ngarkoj…',notif_empty:'Asnjë njoftim, për momentin.',notif_err:'Gabim gjatë ngarkimit të njoftimeve',notif_now:'tani',notif_someone:'Dikush',notif_new_follower:'filloi të të ndjekë',notif_love:'i vuri LOVE vendit tënd',notif_new_poi:'shtoi një vend të ri',notif_comp_invite:'Të ftuan në një shoqëri',notif_comp_join:'hyri në shoqëri',notif_route_pub:'Rruga jote historike u botua, faleminderit!',notif_route_adopt:'adoptoi rrugën tënde',notif_generic:'Të reja në POI•LOVE',notif_g_social:'Sociale',notif_g_comp:'Shoqëritë e udhëtimit',notif_g_routes:'Rrugët dhe përmbajtja',notif_push_soon:'Njoftimet push (me ekran të fikur): së shpejti, me aplikacionin e instaluar.',notiflbl_new_follower:'Ndjekës i ri',notiflbl_poi_received_love:'LOVE vendit tënd',notiflbl_followed_user_new_poi:'Një mik krijon një vend',notiflbl_companion_invite_received:'Ftesë në një shoqëri',notiflbl_companion_member_joined:'Dikush hyn në shoqëri',notiflbl_companion_new_voice:'Zë i ri në shoqëri',notif_comp_voice:'la një zë në',notiflbl_route_suggestion_published:'Rruga jote u botua',notiflbl_route_adopted:'Dikush adopton rrugën tënde',geo_near:'Je afër',mt_places_poi:'Pika me interes',cv_open:'Tabela zanore',cv_sub:'Tabela zanore e shoqërisë',cv_empty:'Ende asnjë zë. Mbaj shtypur dhe fol për të parin.',cv_transcribing:'Po transkriptohet…',cv_hold:'MBAJ DHE FOL',cv_recording:'LËSHO PËR TA DËRGUAR',cv_hint:'Mbaj shtypur, fol, lësho për ta dërguar',cv_reply_to:'Përgjigju',cv_no_rec:'Regjistrimi nuk mbështetet në këtë shfletues',cv_too_short:'Shumë i shkurtër, mbaj shtypur më gjatë',cv_send_err:'Dërgimi i zërit dështoi, provo sërish',cv_play_err:'Audio nuk disponohet',cv_no_id:'Shoqëria ende nuk u sinkronizua, provo pas pak',cv_itins:'Itineraret',cv_itin_untitled:'Pa emër',cv_invite_txt:'Bashkohu me shoqërinë time në POI•LOVE me kodin {code}: {url}',cv_code_copied:'Kodi u kopjua: jepja miqve për të hyrë',cv_del_confirm:'Ta fshij këtë zë?',cv_del_ok:'Fshij',cv_del_err:'Fshirja dështoi',cv_images:'Imazhet',cv_img_added:'Foto u shtua',cv_img_err:'Ngarkimi i fotos dështoi',cv_photo_needed:'Aktivizo pëlqimin e fotove për të ngarkuar',cv_soon:'Jashtë rrugës: së shpejti',comp_created_by:'Krijuar nga',comp_you:'Ti',comp_code_lbl:'Kodi i hyrjes',comp_code_hint:'Dërgoja një miku: do të fusë këtë kod për t\'u bërë pjesë e jona',comp_open_btn:'Hap shoqërinë',comp_av_change:'Ndrysho foton e shoqërisë',comp_av_save_first:'Ruaj fillimisht shoqërinë, pastaj vër foton',comp_av_invalid:'Zgjidh një imazh',comp_av_done:'Fotoja e shoqërisë u përditësua',comp_av_err:'Ngarkimi i fotos dështoi',cv_dev_title:'Propozo një devijim',cv_dev_sub:'Një alternativë jashtë rrugës: shoqëria voton',cv_dev_ph:'Ku shkojmë në vend të kësaj? Trego devijimin…',cv_dev_place_ph:'Ku (opsionale)',cv_dev_here:'Bashkëngjit vendndodhjen time',cv_dev_here_lbl:'Këtu',cv_dev_cancel:'Anulo',cv_dev_send:'Propozo',cv_dev_label:'Devijim',cv_dev_approve:'Pro',cv_dev_reject:'Jo',cv_dev_pending:'Në pritje të votave të shoqërisë',cv_dev_ok:'Mbështetur nga shoqëria',cv_dev_dropped:'Devijimi u refuzua nga shoqëria',cv_dev_added:'Devijimi u propozua: shoqëria mund ta votojë',cv_dev_empty:'Shkruaj propozimin e devijimit',
@@ -7275,7 +7320,7 @@ const T={
     illi_search_in:'Kërko në:',illi_more:'Do të tjerë?',illi_country_auto:'Auto',illi_country_ph:'Shtet tjetër…',illi_country_set:'ILLI do të kërkojë në: ',
     illi_login:'Hyr për të përdorur ILLI-n',
     illi_limit:'I ke mbaruar mesazhet e sotme për nivelin tënd',
-    foto_del_posto:'Fotot e vendit', segui_gia:'E ndjek', ora_segui:'Tani e ndjek', non_segui_piu:'Nuk e ndjek me', mezzo_piedi:'ne kembe', mezzo_bici:'me biciklete', mezzo_auto:'me makine', mezzo_aereo:'me avion', mezzo_nave:'me anije', mezzo_trek:'me impuls te plote', millesimi:'te miliste sekonde', aggiungi_foto:'Shto foto', tag_lbl:'Etiketa', dove_lbl:'Ku ndodhet', chi_ama_lbl:'Kush e do', fa_parte_lbl:'Ben pjese ne', da_te:'nga ti', da_dove_sei:'nga ku je tani', dove_no_pos:'Ndiz vendndodhjen per te ditur distancen', creato_il:'Krijuar me ', aggiornato_il:'perditesuar me ', claim_mappa:'harta e bere nga njerezit', segui:'Ndiq', act_naviga:'Nis', act_aggiungi:'Shto', act_condividi:'Ndaj', act_salva:'Ruaj', act_modifica:'Ndrysho', act_cancella:'Fshi', aggiungi_video:'Shto nje video', video_solo_tuo:'Videon e vendos ai qe ka krijuar vendin', video_invio:'Po dergoj videon (', video_ok:'Video u ngarkua: nga ', video_err:'Nuk arrita ta ngarkoj videon', illi_error:'ILLI ka një problem teknik, provo përsëri pas pak',},
+    foto_del_posto:'Fotot e vendit', muro_lbl:'Muri i Mbeshtetesve', muro_testo:'e mbeshtet aktivisht POI-LOVE bashke me', persone:'persona', suoi_luoghi:'Vendet e tij me te dashura', itin_pubblici:'Itinerare publike', comp_pubbliche:'Shoqeri publike', n_luoghi:'vende', n_seguaci:'ndjekes', n_punti:'pike', punti:'pike', su_poilove_dal:'Ne POI-LOVE qe nga ', profilo_dimostrativo:'Profil demonstrues i POI-LOVE', profilo_non_disp:'Profili i autorit nuk eshte i disponueshem', link_copiato:'Adresa u kopjua', torna_tuo:'Kthehu te profili yt', torna_tuo_sub:'Dil nga pamja publike dhe kthehu ne zonen tende', segui_gia:'E ndjek', ora_segui:'Tani e ndjek', non_segui_piu:'Nuk e ndjek me', mezzo_piedi:'ne kembe', mezzo_bici:'me biciklete', mezzo_auto:'me makine', mezzo_aereo:'me avion', mezzo_nave:'me anije', mezzo_trek:'me impuls te plote', millesimi:'te miliste sekonde', aggiungi_foto:'Shto foto', tag_lbl:'Etiketa', dove_lbl:'Ku ndodhet', chi_ama_lbl:'Kush e do', fa_parte_lbl:'Ben pjese ne', da_te:'nga ti', da_dove_sei:'nga ku je tani', dove_no_pos:'Ndiz vendndodhjen per te ditur distancen', creato_il:'Krijuar me ', aggiornato_il:'perditesuar me ', claim_mappa:'harta e bere nga njerezit', segui:'Ndiq', act_naviga:'Nis', act_aggiungi:'Shto', act_condividi:'Ndaj', act_salva:'Ruaj', act_modifica:'Ndrysho', act_cancella:'Fshi', aggiungi_video:'Shto nje video', video_solo_tuo:'Videon e vendos ai qe ka krijuar vendin', video_invio:'Po dergoj videon (', video_ok:'Video u ngarkua: nga ', video_err:'Nuk arrita ta ngarkoj videon', illi_error:'ILLI ka një problem teknik, provo përsëri pas pak',},
   en:{nav_map:'Map',nav_itin:'Itineraries',nav_profile:'Profile',mt_street:'Street',mt_sat:'Satellite',mt_routes:'Historic Routes',fab_poi:'Create POI',fab_itin:'Itinerary Stop',add_title:'Save your POI',add_points:'points',imp_title:'Thank you!',imp_sub:'You improved a beloved place: whoever finds it after you gains from it.',save_go_poi:'Go to the POI',add_next_level:'to the next level',add_top_level:'top level',add_sub:'Add a place you love',add_challenge:'Can you do it in 60 seconds?',loc_hint_use:'Use as name',congrats:'',lbl_name:'Place name',req:'REQUIRED',lbl_where:'Where is it',loc_gps:'Where I am now',loc_gps_s:'LIVE GPS',loc_exif:'Where the photo was taken',loc_exif_s:'EXIF data',loc_addr:'Address',loc_addr_s:'Street, number, city',loc_map:'Place it on the map',loc_map_s:'Tap the point',addr_searching:'Searching…',addr_none:'No address found',addr_none_s:'Try the street or place name',lbl_photos:'Photos',ph_main:'Main',ph_2:'Photo 2',ph_3:'Photo 3',ph_hint:"Not there yet? You can add photos later.",lbl_story:'Tell your story',lbl_cat:'Category',lbl_tag:'Tags',lbl_tag_add:'Add tag',cat_max3:'You can pick up to 3 categories',cat_add_more:'Add',lbl_list:'Add to a list',lbl_route:'Historic Route',route_none:'No historic route',bdg_official:'Official',bdg_essential:'Essential',bdg_top:'Most voted',lbl_poi_trip:'Add to an itinerary',opt_lbl:'(optional)',poi_propose_title:'Propose as a stop on a historic route',poi_propose_sub:'The team reviews it and, if suitable, adds it to an official route',poi_trip_none:'You have no itineraries yet: create one from the Itineraries tab.',poi_proposed_ok:'Proposed to the team as a historic route stop',untitled:'Untitled',lbl_vis:'Visibility',vis_pub_btn:'Public',vis_prv_btn:'Private',vis_share_btn:'Share',save_disabled:'Enter the name to continue',save_ready:'SAVE POI',save_update:'UPDATE POI',google_suggest:'Suggest to Google Maps',share_link_ph:'Set the position: the link appears here',discover_hint:'Help this place be found beyond POI•LOVE.',discover_osm:'Report on OpenStreetMap',discover_osm_done:'Reported on OpenStreetMap',discover_gmaps:'Open in Google Maps',discover_why:'OpenStreetMap is the free map of the world (we use it too): volunteers add your report. Google does not allow adding places from an app, so open it and add it by hand if you want.',discover_osm_ok:'✓ Reported on OpenStreetMap: volunteers will add it.',discover_osm_err:'Report failed, try again shortly',discover_need_name:'Name the place before reporting it',discover_need_pos:'Set the position first',stop_title:'Itinerary Stop',stop_sub:"No photos. Plan now, tell the story when you're there.",stop_lbl_name:'Stop name',stop_lbl_cat:'Category',stop_lbl_vis:'Itinerary Visibility',itin_pub:'Public',itin_prv:'Private',stop_lbl_date:'Planned date',stop_save:'Add stop',stat_poi:'POI',stat_love:'Love',stat_list:'Lists',stat_itin:'Itineraries',stat_comp:'Companions',diffondi:'Spread POI•LOVE',prof_lists:'My lists',prof_new_list:'New list',prof_tags:'My tags',prof_new_tag:'Add',prof_my_poi:'My POIs',prof_add_poi:'Add',prof_pub_toggle:'Public view',itin_h:'Travel Itineraries',itin_desc:'Plan your stops before you leave. Find travel companions.',itin_open:'Open Itineraries',itin_note:'Map, mini-calendar, live GPS and companions.',back:'Back',cr_top:'POI•LOVE created by 321.AL',cr_bot:'Open Source Project · Creative Direction: Alessandro Castagna© · MIT License',
     /* Auth overlay */
     auth_tagline:'places of the heart',auth_discover:'Discover POI•LOVE',shared_point:'A beloved place',nav_go:'Go',mqb_center:'My location',mqb_lang:'Language',mqb_notif:'Alerts',shared_from:'a beloved place shared with you',shared_points:'200 points for you!',shared_join_save:'Join and save this place',shared_points_note:'if you are not a member of POI•LOVE yet',shared_have_account:'I already have an account',ref_welcome:'🎉 Invitation accepted: 200 points for you!',shared_save:'Save this place',shared_join:'Sign in or join',shared_need_join:'Sign in or join: then I save it among your places',shared_saving:'Saving…',shared_saved:'✓ Saved among your places',shared_already:'You already have this place',shared_desc:'Received from a friend on POI•LOVE',share_mail_lbl:'With POI•LOVE mail',share_mail_t:'Send by email',share_mail_s:'Arrives in POI•LOVE colours, in your language',share_mail_login:'Sign in to send an email',share_mail_sub:'You are sending',share_mail_name:'Name of the recipient',share_mail_opt:'optional',share_mail_name_ph:'Mark',share_mail_addr:'Their email',share_mail_busy:'Already sending, one moment',share_mail_empty:'Write the recipient email address',share_mail_expired:'Session expired: sign in again and retry',share_mail_bad:'Check the recipient address',share_mail_ko:'The mail server did not accept it, try shortly',share_mail_net:'No connection: try again when the network is back',share_mail_ask:'Who are we sending',share_mail_send:'Send',share_mail_sending:'Sending…',share_mail_ok:'✉️ Sent to',share_mail_wait:'(may take a minute, check spam too)',share_mail_cap:'You sent many emails today, try tomorrow',auth_apple:'Apple ID',auth_passkey:'Sign in with Biometrics',auth_passkey_as:'Sign in as',auth_passkey_need_email:'✉️ Enter your email below and tap "Send link"',auth_or_magic:'or with magic link via email',auth_email_ph:'your@email.com',auth_email_send:'Send link',auth_terms:'By signing in you accept POI•LOVE Terms of Service',auth_oss:'Open Source Project · MIT License · © 2026 321.AL',auth_continue_google:'Continue with Google',auth_continue_apple:'Continue with Apple',auth_continue_li:'Continue with LinkedIn',auth_continue_fb:'Continue with Facebook',auth_continue_x:'Continue with X',auth_email_invalid:'Enter a valid email',auth_link_sent:'📧 Link sent! Check your mail.',auth_welcome_back:'Welcome back',auth_provider_off:'not yet enabled (Supabase → Auth → Providers)',auth_soon:'soon',auth_google_big:'Continue with Google', auth_nopass:'No password: one tap, or a link by email', auth_more:'Other ways to sign in', auth_passkey_back:'Welcome back: use your fingerprint', auth_guest:'Look around, no account needed',guest_active:'👀 You are exploring as a guest, sign in to create your places',list_move_up:'Up',list_move_down:'Down',love_login:'Sign in to give LOVE ❤️',love_on:'❤️ LOVE!',love_off:'💔 LOVE removed',cat_other:'Other category',cat_mine:'My category',cat_fam_ask:'Which family does it belong to?',cat_other_done2:'Your category is ready: use it now. It goes public if you use it 20 times or an admin approves it.',cat_login:'Sign in to create your category',cat_one_only:'You already have your custom category',cat_use:'Use my category',cat_replace:'Replace it with another',cat_already_public:'This category is already public: selected.',share_sent_to:'Shared with',share_person:'person',share_people:'people',share_nobody:'Nobody to notify yet',share_failed:'Sharing failed, try again',share_inside:'Inside POI•LOVE',share_comp:'Companion group',share_comp_sub:'Post it on a group board',share_comp_none:'You are not in any group yet',share_comp_ok:'Posted on the board of',share_trip:'Itinerary',share_trip_sub:'Add it as a stop of a trip',share_trip_ok:'Added to',share_trip_dup:'This stop is already in',share_historic:'Historic map',share_historic_sub:'Propose it as an official route',share_place:'Place',share_open:'Open it',share_login:'Sign in to share',share_friends:'Friends',share_friends_sub:'Only connected people',share_community:'POI•LOVE community',share_send:'Send the link',wall_title:'Wall of Supporters',wall_sub:'The people keeping the map of beloved places alive.',wall_open:'See the Wall of Supporters',wall_join:'Join them',wall_empty:'No supporters yet: you could be the first.',flag_official:'Official',flag_featured:'Featured',flag_suggested:'Suggested',feature_add:'Feature this POI',feature_remove:'Unfeature',feature_cap:'You reached the maximum number of featured POIs',feature_notier:'Featured POIs are a paid-tier benefit',feature_done:'✓ Featured',feature_undone:'Unfeatured',qr_biz_btn:'Business QR',qr_biz_title:'Your business QR',qr_biz_note:'Print it and put it in your window: scanning it lands right here.',qr_biz_dl:'Download to print',qr_biz_close:'Close',qr_biz_done:'⬇️ QR downloaded for print!',trip_feat_cap:'You can feature only one itinerary',trip_save_first:'Save the itinerary first',route_adopt:'Adopt',route_release:'Release',route_adopted_by:'Adopted by',route_adopt_ask:'Write your dedication for this route (optional)',route_taken:'This route is already adopted',route_adopted_ok:'✓ Route adopted, thank you!',route_released:'Route released',rt_suggest_btn:'Suggest a historic route',rt_suggest_sub:'You propose it, we publish it with your name',rt_suggest_title:'Suggest a historic route',rt_suggest_help:'Tell us the route: name, area and why it matters. The team will review it and, if published, will thank you publicly with your name.',rt_suggest_f_name:'Route name',rt_suggest_f_area:'Area or city',rt_suggest_f_desc:'Description',rt_suggest_ph_name:'E.g. The walls of Berat',rt_suggest_ph_area:'E.g. Berat',rt_suggest_ph_desc:'What you see, why it is special, the main stops...',rt_suggest_send:'Send',rt_suggest_need_name:'Give the route a name, at least 3 letters',rt_suggest_toomany:'You already have several suggestions pending, wait until we review them',rt_suggest_login:'Sign in to suggest a historic route',rt_thanks_title:'Thank you so much!',rt_thanks_body:'Your route reached the team. If we publish it, it will appear with "Thanks to" and your name, linked to your profile.',rt_thanks_ok:'Perfect',rt_credit:'Thanks to: ',rt_credit_anon:'a community member',profile_unavailable:'Profile unavailable',cat_other_ask:'Which category is missing?',cat_other_send:'Use and propose',cat_other_done:'Thanks, we\'ll review it. Added as a tag for now',tag_hint:'Tag…',list_add_poi:'Add a POI',list_added:'Added to the list',list_removed:'Removed from the list',list_pick_title:'Your POIs',list_pick_none:'No other POI to add: create one from the map',list_empty_tap:'Empty list: add a POI below',plnd_kicker:'Invites you to POI•LOVE',plnd_cta:'Join POI•LOVE',plnd_hint:'Free: join in 30 seconds',teaser_kicker:'Someone shared a beloved place with you',teaser_title:'A beloved place awaits you',teaser_cta:'Join free and open it on the map',teaser_hint:'Signing up is free: exact spot, navigation and love unlock after login',cons_title:'One moment before we start',cons_sub:'To use POI•LOVE we need your consent. Terms and Privacy are required, the other choices are optional.',cons_terms_1:'I am at least 16, I accept the',cons_terms_2:'and I have read the',cons_terms_3:'Privacy Policy',cons_required:'Required',cons_geo:'I use my location to see the nearest places and to get an alert when I am getting close.',cons_optional:'Optional',cons_photo:'I can upload photos of places, under my responsibility for any people portrayed.',cons_mic:'I use the microphone to dictate by voice, only when I choose to.',cons_marketing:'I accept marketing measurement and communications (anonymous social stats and, if I choose, email news). I can revoke them anytime.',cons_mic_needed:'Enable microphone consent to use dictation',cons_continue:'Continue',cons_decline:'Exit',cons_need_terms:'You must accept Terms, Privacy and minimum age to continue',cons_saved:'✓ Consent saved, thank you!',cons_err:'Error saving, please try again',notif_title:'Notifications',notif_tab_list:'Recent',notif_tab_settings:'Settings',notif_loading:'Loading…',notif_empty:'No notifications yet.',notif_err:'Error loading notifications',notif_now:'now',notif_someone:'Someone',notif_new_follower:'started following you',notif_love:'loved your place',notif_new_poi:'added a new place',notif_comp_invite:'You were invited to a companion group',notif_comp_join:'joined the companion group',notif_route_pub:'Your historic route was published, thank you!',notif_route_adopt:'adopted your route',notif_generic:'News on POI•LOVE',notif_g_social:'Social',notif_g_comp:'Travel companions',notif_g_routes:'Routes and content',notif_push_soon:'Push notifications (screen off): soon, with the app installed.',notiflbl_new_follower:'New follower',notiflbl_poi_received_love:'LOVE on your place',notiflbl_followed_user_new_poi:'A friend creates a place',notiflbl_companion_invite_received:'Invite to a companion group',notiflbl_companion_member_joined:'Someone joins a companion group',notiflbl_companion_new_voice:'New voice note in a companion',notif_comp_voice:'left a voice note in',notiflbl_route_suggestion_published:'Your route published',notiflbl_route_adopted:'Someone adopts your route',geo_near:'You are near',mt_places_poi:'Points of interest',cv_open:'Voice board',cv_sub:'Companion voice board',cv_empty:'No voice notes yet. Press and hold to record the first.',cv_transcribing:'Transcribing…',cv_hold:'PRESS AND TALK',cv_recording:'RELEASE TO SEND',cv_hint:'Hold, talk, release to send',cv_reply_to:'Reply to',cv_no_rec:'Recording not supported on this browser',cv_too_short:'Too short, hold a bit longer',cv_send_err:'Voice note failed to send, try again',cv_play_err:'Audio unavailable',cv_no_id:'Companion not synced yet, try again shortly',cv_itins:'Itineraries',cv_itin_untitled:'Untitled',cv_invite_txt:'Join my companion on POI•LOVE with code {code}: {url}',cv_code_copied:'Code copied: share it with friends so they can join',cv_del_confirm:'Delete this voice note?',cv_del_ok:'Delete',cv_del_err:'Delete failed',cv_images:'Images',cv_img_added:'Photo added',cv_img_err:'Photo upload failed',cv_photo_needed:'Enable photo consent to upload images',cv_soon:'Off Route: coming soon',comp_created_by:'Created by',comp_you:'You',comp_code_lbl:'Access code',comp_code_hint:'Send it to a friend: they enter this code to join us',comp_open_btn:'Open the companion',comp_av_change:'Change the group photo',comp_av_save_first:'Save the group first, then add a photo',comp_av_invalid:'Pick an image',comp_av_done:'Group photo updated',comp_av_err:'Photo upload failed',cv_dev_title:'Propose a detour',cv_dev_sub:'An off-route alternative: the group votes',cv_dev_ph:'Where do we go instead? Describe the detour…',cv_dev_place_ph:'Where (optional)',cv_dev_here:'Attach my current location',cv_dev_here_lbl:'Here',cv_dev_cancel:'Cancel',cv_dev_send:'Propose',cv_dev_label:'Detour',cv_dev_approve:'Approve',cv_dev_reject:'No',cv_dev_pending:'Waiting for the group to vote',cv_dev_ok:'Backed by the group',cv_dev_dropped:'Detour rejected by the group',cv_dev_added:'Detour proposed: the group can vote on it',cv_dev_empty:'Write the detour proposal',
@@ -7394,7 +7439,7 @@ const T={
     illi_search_in:'Search in:',illi_more:'Want more?',illi_country_auto:'Auto',illi_country_ph:'Other country…',illi_country_set:'ILLI will search in: ',
     illi_login:'Sign in to use ILLI',
     illi_limit:'You have used up today\'s messages for your level',
-    foto_del_posto:'The photos of this place', segui_gia:'Following', ora_segui:'You now follow them', non_segui_piu:'You no longer follow them', mezzo_piedi:'on foot', mezzo_bici:'by bike', mezzo_auto:'by car', mezzo_aereo:'by plane', mezzo_nave:'by boat', mezzo_trek:'at full impulse', millesimi:'thousandths of a second', aggiungi_foto:'Add photos', tag_lbl:'Tags', dove_lbl:'Where it is', chi_ama_lbl:'Who loves it', fa_parte_lbl:'Part of', da_te:'from you', da_dove_sei:'from where you are', dove_no_pos:'Turn on location to know the distance', creato_il:'Created on ', aggiornato_il:'updated on ', claim_mappa:'the map made by people', segui:'Follow', act_naviga:'Go', act_aggiungi:'Add', act_condividi:'Share', act_salva:'Save', act_modifica:'Edit', act_cancella:'Delete', aggiungi_video:'Add a video', video_solo_tuo:'The video is added by who created the place', video_invio:'Sending the video (', video_ok:'Video uploaded: from ', video_err:'I could not upload the video', illi_error:'ILLI has a technical problem, try again shortly',}
+    foto_del_posto:'The photos of this place', muro_lbl:'Supporters wall', muro_testo:'actively supports POI-LOVE together with', persone:'people', suoi_luoghi:'Their most loved places', itin_pubblici:'Public trips', comp_pubbliche:'Public companions', n_luoghi:'places', n_seguaci:'followers', n_punti:'points', punti:'points', su_poilove_dal:'On POI-LOVE since ', profilo_dimostrativo:'POI-LOVE demo profile', profilo_non_disp:'Author profile not available', link_copiato:'Address copied', torna_tuo:'Back to your profile', torna_tuo_sub:'Leave the public preview and go back to your private area', segui_gia:'Following', ora_segui:'You now follow them', non_segui_piu:'You no longer follow them', mezzo_piedi:'on foot', mezzo_bici:'by bike', mezzo_auto:'by car', mezzo_aereo:'by plane', mezzo_nave:'by boat', mezzo_trek:'at full impulse', millesimi:'thousandths of a second', aggiungi_foto:'Add photos', tag_lbl:'Tags', dove_lbl:'Where it is', chi_ama_lbl:'Who loves it', fa_parte_lbl:'Part of', da_te:'from you', da_dove_sei:'from where you are', dove_no_pos:'Turn on location to know the distance', creato_il:'Created on ', aggiornato_il:'updated on ', claim_mappa:'the map made by people', segui:'Follow', act_naviga:'Go', act_aggiungi:'Add', act_condividi:'Share', act_salva:'Save', act_modifica:'Edit', act_cancella:'Delete', aggiungi_video:'Add a video', video_solo_tuo:'The video is added by who created the place', video_invio:'Sending the video (', video_ok:'Video uploaded: from ', video_err:'I could not upload the video', illi_error:'ILLI has a technical problem, try again shortly',}
 };
 
 /* Helper: t('key', fallback) — usato in JS dinamico */
@@ -8897,7 +8942,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='4.78';
+const APP_VERSION='4.80';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
@@ -10960,15 +11005,191 @@ async function sharePlaceToContact(){
 }
 
 // Apre profilo pubblico dell'autore del POI corrente nel detail sheet
-function openAuthorProfile(){
-  const authorName = document.getElementById('detailAuthor')?.textContent?.trim();
-  if(!authorName || authorName==='—' || authorName==='Anonimo'){
-    showToast?.('Profilo autore non disponibile');
-    return;
-  }
-  // Chiudi il detail sheet prima di aprire il popup profilo
+
+/* ═══ IL PROFILO PUBBLICO, riempito con dati veri ═══════════════════════ */
+const _PP_NASTRO = {
+  sostenitore:        {t:'Sostenitore di POI-LOVE', b:'linear-gradient(135deg,#1e3a8a,#2b56b8)', i:'ph-hand-heart', c:'lb-sos', n:'Sostenitore'},
+  mecenate:           {t:'Mecenate di POI-LOVE',    b:'linear-gradient(135deg,#6d28d9,#8b5cf6)', i:'ph-crown',      c:'lb-mec', n:'Mecenate'},
+  influencer:         {t:'Consigliato da POI-LOVE', b:'linear-gradient(135deg,#be185d,#ec4899)', i:'ph-megaphone',  c:'lb-inf', n:'Influencer'},
+  professionista:     {t:'Professionista verificato', b:'linear-gradient(135deg,#0b1220,#3b4a63)', i:'ph-briefcase', c:'lb-pro', n:'Professionista'},
+  professionista_plus:{t:'Locale Plus',             b:'linear-gradient(135deg,#0f766e,#14b8a6)', i:'ph-storefront', c:'lb-plus',n:'Plus'},
+  plus:               {t:'Locale Plus',             b:'linear-gradient(135deg,#0f766e,#14b8a6)', i:'ph-storefront', c:'lb-plus',n:'Plus'}
+};
+const _PP_PUNTI_SEGUI = {influencer:30, professionista:50, professionista_plus:100, plus:100};
+let _ppUtente = null;
+
+function _ppNum(n){
+  n=Number(n||0);
+  if(n>=1000) return (n/1000).toFixed(n>=10000?0:1).replace('.',',')+'k';
+  return String(n);
+}
+async function apriProfiloDi(userId){
+  if(!userId) return;
   if(typeof closeDetail==='function') closeDetail();
-  setTimeout(()=>openPublicProfile(authorName, 'still', 'author'), 200);
+  setTimeout(()=>{ togglePublicProfile(true); _pittaProfiloPubblico(userId); }, 180);
+}
+async function _pittaProfiloPubblico(userId){
+  const g=id=>document.getElementById(id);
+  try{
+    const { data } = await sb.from('profiles')
+      .select('id,username,display_name,avatar_url,cover_url,cover_type,bio,points,special_tier,citta,created_at,is_demo')
+      .eq('id', userId).limit(1);
+    const u = data && data[0]; if(!u) return;
+    _ppUtente = u;
+    try{ currentViewedUser = { id:u.id, username:u.username, display_name:u.display_name }; }catch(_){}
+    // dice la verita' su quello che hai gia' fatto
+    try{
+      if(currentUser && currentUser.id!==u.id){
+        const { data: f } = await sb.from('follows').select('following_id')
+          .eq('follower_id',currentUser.id).eq('following_id',u.id).limit(1);
+        pubFollowing = !!(f && f.length);
+        const lbl=document.getElementById('pubFollowLbl');
+        if(lbl) lbl.textContent = pubFollowing ? t('segui_gia','Segui gia') : t('segui','Segui');
+        const b=document.getElementById('pubFollowBtn');
+        if(b) b.style.background = pubFollowing ? '#0B7A38' : 'var(--red)';
+      }
+    }catch(_){}
+    const nome = u.display_name || u.username || '—';
+    const tier = (u.special_tier||'').toLowerCase();
+    const nas = _PP_NASTRO[tier];
+
+    // copertina e viso
+    const cop=g('ppCop');
+    if(cop) cop.style.background = (u.cover_type==='image' && u.cover_url)
+      ? "url('"+String(u.cover_url).replace(/'/g,'')+"') center/cover no-repeat"
+      : (u.cover_url || 'linear-gradient(135deg,#D42B2B,#8f1c1c)');
+    const av=g('pubAvatarImg');
+    if(av) av.src = u.avatar_url || ('https://ui-avatars.com/api/?name='+encodeURIComponent(nome)+'&background=D42B2B&color=fff&size=240');
+
+    // nastro del livello
+    const nn=g('ppNastro');
+    if(nn){
+      if(nas){ nn.style.display='inline-flex'; nn.style.background=nas.b;
+               nn.innerHTML='<i class="ph-fill '+nas.i+'"></i>'+nas.t; }
+      else nn.style.display='none';
+    }
+    // nome, spunta, badge
+    g('pubProfileName').firstChild.textContent = nome;
+    g('ppSpunta').style.display = nas ? '' : 'none';
+    const bd=g('pubProfileBadge');
+    if(nas){ bd.style.display='inline-flex'; bd.className='liv-badge '+nas.c;
+             g('pubProfileBadgeIco').className='ph-fill '+nas.i; g('pubProfileBadgeTxt').textContent=nas.n; }
+    else bd.style.display='none';
+    g('pubVanityTxt').textContent = '@'+(u.username||'');
+    g('ppCitta').textContent = u.citta || '';
+
+    // il segno del profilo dimostrativo: sempre dichiarato
+    let dm=document.getElementById('ppDemo');
+    if(u.is_demo){
+      if(!dm){ dm=document.createElement('div'); dm.id='ppDemo';
+        dm.style.cssText='margin:12px 16px 0;background:#FFF7E6;border:1px dashed #E8C169;color:#8A6100;border-radius:12px;padding:9px 12px;font-size:12.5px;font-weight:800;text-align:center';
+        g('ppBio').parentNode.insertBefore(dm, g('ppBio')); }
+      dm.textContent=t('profilo_dimostrativo','Profilo dimostrativo di POI-LOVE');
+    } else if(dm) dm.remove();
+
+    // presentazione, al massimo 250 caratteri
+    const bio=g('ppBio');
+    if(u.bio){ bio.textContent=String(u.bio).slice(0,250); bio.style.display='block'; } else bio.style.display='none';
+
+    // il pulsante Segui con i punti che vale
+    const pt=_PP_PUNTI_SEGUI[tier];
+    g('ppPunti').textContent = pt ? ('+'+pt+' '+t('punti','punti')) : '';
+
+    // i numeri, contati davvero
+    const [luoghi, love, seguaci] = await Promise.all([
+      sb.from('pois').select('id',{count:'exact',head:true}).eq('author_id',userId).eq('is_public',true),
+      sb.from('pois').select('love_count').eq('author_id',userId),
+      sb.from('follows').select('follower_id',{count:'exact',head:true}).eq('following_id',userId)
+    ]);
+    const loveTot=(love.data||[]).reduce((a,x)=>a+Number(x.love_count||0),0);
+    g('ppNumeri').innerHTML =
+      '<div><b>'+_ppNum(luoghi.count||0)+'</b><span>'+t('n_luoghi','luoghi')+'</span></div>'+
+      '<div><b>'+_ppNum(loveTot)+'</b><span>love</span></div>'+
+      '<div><b>'+_ppNum(seguaci.count||0)+'</b><span>'+t('n_seguaci','seguaci')+'</span></div>'+
+      '<div><b>'+_ppNum(u.points||0)+'</b><span>'+t('n_punti','punti')+'</span></div>';
+
+    // muro dei sostenitori
+    const muroSez=g('ppMuroSez');
+    if(tier==='sostenitore' || tier==='mecenate'){
+      const { count } = await sb.from('profiles').select('id',{count:'exact',head:true})
+        .in('special_tier',['sostenitore','mecenate']);
+      g('ppMuro').innerHTML='<i class="ph-fill ph-hand-heart" style="font-size:20px"></i>'+
+        (nome.split(' ')[0])+' '+t('muro_testo','sostiene attivamente il progetto POI-LOVE assieme a')+' '+
+        Math.max(0,(count||1)-1)+' '+t('persone','persone');
+      muroSez.style.display='block';
+    } else muroSez.style.display='none';
+
+    // i suoi luoghi piu' votati
+    const { data: top } = await sb.from('pois')
+      .select('id,title,photos,love_count').eq('author_id',userId).eq('is_public',true)
+      .order('love_count',{ascending:false}).limit(4);
+    const lg=g('ppLuoghi'), lgS=g('ppLuoghiSez');
+    if(top && top.length){
+      lg.innerHTML = top.map(x=>{
+        const f=(Array.isArray(x.photos)&&x.photos[0])?x.photos[0]:'';
+        return '<button onclick="apriLuogoDaProfilo(\''+x.id+'\')">'+
+          '<div class="im"'+(f?(' style="background-image:url(\''+String(f).replace(/'/g,'')+'\')"'):'')+'></div>'+
+          '<div class="tx"><b>'+_escHtml(x.title||'')+'</b>'+
+          '<span><i class="ph-fill ph-heart"></i>'+_ppNum(x.love_count||0)+'</span></div></button>';
+      }).join('');
+      lgS.style.display='block';
+    } else lgS.style.display='none';
+
+    // itinerari pubblici
+    const { data: itin } = await sb.from('trips')
+      .select('id,name,description,visibility,is_published').eq('owner_id',userId).limit(8);
+    const pub=(itin||[]).filter(x=>x.is_published || x.visibility==='public');
+    const itS=g('ppItinSez');
+    if(pub.length){
+      g('ppItin').innerHTML=pub.slice(0,5).map(x=>
+        '<div class="riga"><i class="ph-duotone ph-path"></i><div><b>'+_escHtml(x.name||'')+'</b>'+
+        (x.description?'<br><span style="color:var(--muted);font-weight:600">'+_escHtml(String(x.description).slice(0,70))+'</span>':'')+
+        '</div></div>').join('');
+      itS.style.display='block';
+    } else itS.style.display='none';
+
+    // compagnie pubbliche
+    const { data: comp } = await sb.from('companions')
+      .select('id,name,type,is_public').eq('owner_id',userId).eq('is_public',true).limit(5);
+    const cS=g('ppCompSez');
+    if(comp && comp.length){
+      g('ppComp').innerHTML=comp.map(x=>
+        '<div class="riga"><i class="ph-duotone ph-users-three"></i><div><b>'+_escHtml(x.name||'')+'</b>'+
+        '<br><span style="color:var(--muted);font-weight:600">'+_escHtml(x.type||'')+'</span></div></div>').join('');
+      cS.style.display='block';
+    } else cS.style.display='none';
+
+    // il piedino, come sulla scheda del luogo
+    const pd=g('ppPiede');
+    if(pd){
+      let da='';
+      try{ da=t('su_poilove_dal','Su POI-LOVE dal ')+new Date(u.created_at).toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'}); }catch(_){}
+      pd.innerHTML='<div class="pf-righe"><img class="pf-logo" src="img/logo-steso.svg" alt="POI-LOVE">'+
+                   '<span class="pf-claim">'+t('claim_mappa','la mappa fatta dalle persone')+'</span>'+
+                   '<span class="pf-date">'+da+'</span></div>';
+    }
+    // il pulsante "torna al tuo profilo" solo se sto guardando me stesso
+    const tb=g('ppTornaBtn');
+    if(tb) tb.style.display = (currentUser && currentUser.id===userId) ? 'flex' : 'none';
+  }catch(e){ console.warn('[poilove] profilo pubblico:', e && e.message); }
+}
+function apriLuogoDaProfilo(id){
+  togglePublicProfile(false);
+  setTimeout(()=>{ if(typeof apriPoiPerId==='function') apriPoiPerId(id); else location.hash='#poi='+id; }, 200);
+}
+function condividiProfilo(){
+  const u=_ppUtente; if(!u) return;
+  const url='https://poilove.com/@'+(u.username||'');
+  if(navigator.share){ navigator.share({title:u.display_name||u.username, url}).catch(()=>{}); return; }
+  navigator.clipboard?.writeText(url);
+  showToast(t('link_copiato','Indirizzo copiato'));
+}
+
+function openAuthorProfile(){
+  // si apre per identita', non per nome scritto: il nome puo' ripetersi
+  const id = currentPOI && currentPOI.author_id;
+  if(id) return apriProfiloDi(id);
+  showToast?.(t('profilo_non_disp','Profilo dell autore non disponibile'));
 }
 
 /* ══════════════════════════════════════════
