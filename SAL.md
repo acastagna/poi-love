@@ -1,6 +1,16 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
-## Sessione 19/08/2026 (14) — La schermata del POI: nomi veri, indirizzi intelligenti, punti a tempo (v4.33 → 4.36)
+## Sessione 19/08/2026 (14) — La schermata del POI: nomi veri, indirizzi intelligenti, punti a tempo (v4.33 → 4.38)
+
+**4.37-4.38 — testata in ordine e ricerca per distanza.**
+La testata era in disordine: freccia sopra da sola, targhette impilate, nome del livello giallo su
+giallo. Ora **una riga sola** (freccia · titolo · cronometro · chiudi) e **sotto, allineate al
+titolo**, le due targhette su una riga: livello (col suo colore scuro, leggibile) e punti.
+La ricerca indirizzi ora mostra **il nome del posto** in grande e sotto **via, citta', provincia,
+regione, paese**, con la **distanza da dove sei** a destra, e i risultati sono **in ordine di
+vicinanza**. Provato da piazza Skanderbeg cercando "bar": Bar Kafe Living Room 702 m, Bar & Restorant
+Colombo 952 m, Bar Kruja 1,5 km, Bar Iris 1,5 km, Bar (Zall-Herr) 7,9 km.
+
 
 **4.36 — anche la schermata finale tiene il colore del traguardo**: bordo e riquadro dei punti
 **verdi** sotto i 60 secondi (con la coppa), **oro** sopra (col cappello da laureato), e il numero
