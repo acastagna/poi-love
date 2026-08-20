@@ -18,6 +18,7 @@ Bozza grafica: `scratchpad/schede2/mock.html`, immagine `schede6.jpg`. Dopo il v
 - Il POI si apre sempre in popup, versione pubblica.
 - La prima foto e' la **Copertina**: sta in cima, e' quella letta dai codici di geolocalizzazione e **non si ripete** nella galleria sotto.
 - **Mai scrivere nella scheda** il numero di foto ne' i secondi di scorrimento: sono regolazioni del pannello di amministrazione (testata 3 foto ogni 3000 ms, galleria sei alla volta con salto di quattro, tempi modificabili).
+- **QR**: ce l'hanno **Locale, Professionista e Influencer**. Si mostra o si nasconde dal proprio pannello. Inquadrarlo o cliccarlo porta allo **stesso indirizzo**: salva la scheda nei contatti del telefono, col rimando al profilo POI•LOVE (per il locale porta anche alla sua scheda e si stampa per la vetrina).
 - Le gallerie hanno sempre un numero di foto **multiplo di tre**: l'ultima riga non resta mai monca. Quindi l'allowance e' sempre **copertina piu' un multiplo di 3**.
 - Le tipologie di scheda si organizzano dall'amministrazione.
 - Posizione della persona visibile nella community solo con la levetta accesa nel suo profilo.
@@ -46,7 +47,7 @@ Le audioguide caricate diventano subito **MP3 192**.
 - Punti: recensire **+200**.
 
 **Professionista, ordine del biglietto da visita**
-1. Nome con etichetta subito dopo l'ultima parola, anche quando il nome va a capo. 2. Chiama e Scrivi (Scrivi passa dalla **posta del sistema**, con tutte le protezioni: nessun indirizzo esposto, invio server-side, antiabuso). 3. Sito. 4. Vieni a trovarmi, indirizzo confermato con navigazione. 5. Fino a 4 social autoadattivi. 6. Inquadra e salva i miei contatti (QR che scrive la scheda in rubrica).
+1. Nome con etichetta subito dopo l'ultima parola, anche quando il nome va a capo. 2. Chiama e Scrivi (Scrivi passa dalla **posta del sistema**, con tutte le protezioni: nessun indirizzo esposto, invio server-side, antiabuso). 3. Sito. 4. Vieni a trovarmi, indirizzo confermato con navigazione. 5. Fino a 4 social autoadattivi. 6. Il **QR vero** dentro il biglietto: si inquadra o si clicca, stesso indirizzo, scrive la scheda in rubrica.
 - Sotto la scheda restano **Condividi e Salva**; **Naviga scende sotto** e vale per chi condivide la propria posizione di adesso.
 - In fondo resta solo il riquadro privato. Il riquadro di chiusura con la sua foto e' stato buttato il 20/08.
 
@@ -56,7 +57,8 @@ Le audioguide caricate diventano subito **MP3 192**.
 - Menu: doppia valuta automatica (lek/euro) col cambio della **Banca d'Albania preso una volta al giorno e tenuto in memoria**; se la banca non risponde resta l'ultimo cambio noto con la sua data.
 - Ogni piatto si apre con foto e spiegazione. Serve l'**area menu nell'amministrazione**: compilazione a mano con form e caricamento **CSV**, foto caricate o scattate col telefono.
 - Tre piatti in evidenza: **Consigli dello Chef**, e sotto **raccontato dal proprietario**.
-- Chiusura della scheda: Naviga, poi il **QR del locale salvabile e stampabile**, poi le foto del locale.
+- Le **foto del locale** stanno **sotto la descrizione e sopra gli orari**: due righe da tre che scorrono da sole da sinistra a destra.
+- Chiusura della scheda: Naviga, poi il **QR del locale salvabile e stampabile**.
 - La categoria (ristorante, bar, ...) si personalizza dall'amministrazione dell'utente.
 
 **Rapporto notarizzato (direttiva 20/08)**
