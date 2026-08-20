@@ -1,5 +1,21 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
+## Sessione 19/08/2026 (15) — Chi migliora un luogo prende punti e viene ringraziato (v4.57)
+
+Ordine del founder: "quando vado a modificare acquisisco altri punti e vengo ringraziato, perche' ho
+migliorato un posto del cuore e quindi tutta la community, sia in mobile che in desktop".
+
+- **Migrazione 092**: nuovo accredito `poi_improved`, valore **5 punti**, regolabile dal pannello
+  admin come tutti gli altri. La funzione `award_poi_improvement` controlla che il luogo sia tuo,
+  accredita **una volta al giorno per ogni luogo** (rientrare dieci volte non moltiplica i punti) e
+  ha un tetto di 20 miglioramenti premiati al giorno.
+- **Nell'app**: appena il salvataggio della modifica va a buon fine si chiede il punto al server; se
+  arriva, si apre la finestra **al centro, verde**, con la mano che tiene il cuore, "+5 punti",
+  **"Grazie! Hai migliorato un luogo del cuore: ci guadagna chi lo trovera' dopo di te."** e il
+  pulsante "Vai al POI". Se il premio non spetta (gia' preso oggi per quel luogo) resta il semplice
+  avviso di aggiornamento, senza finestre inutili.
+- Stessa finestra su telefono e computer: e' la stessa del salvataggio, quindi e' gia' centrata.
+
 ## Sessione 19/08/2026 (14) — La schermata del POI e la ricerca (v4.33 → 4.56)
 
 **4.55-4.56 — guasto mio, trovato e chiuso.** Con un livello di sostegno o professionale
