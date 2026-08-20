@@ -1312,14 +1312,31 @@ body.kb-open #lang-strip,body.kb-open #brand-strip{opacity:0;pointer-events:none
 .pdm-share-link span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pdm-share-link button{border:none;background:none;cursor:pointer;color:var(--orange);font-size:14px;padding:0;flex-shrink:0}
 /* Love */
-.pdm-love-row{padding:16px 18px 10px;display:flex;justify-content:center;background:var(--card)}
+.pdm-love-row{padding:14px 16px 6px;display:block;background:var(--card)}
 .love-btn{height:38px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px;padding:0 14px;color:var(--muted);transition:all .2s;flex-shrink:0}
 .love-btn.loved{background:#FFF0F0;border-color:var(--red);color:var(--red)}
-.love-btn-big{height:52px;border-radius:18px;font-size:18px;padding:0 44px;gap:10px;border-width:2px;box-shadow:0 2px 12px rgba(212,43,43,.1);transition:all .22s}
+.love-btn-big{width:100%;height:58px;border-radius:26px;font-size:19px;font-weight:900;gap:10px;padding:0;
+    background:var(--red);color:#fff;border:none;display:flex;align-items:center;justify-content:center;
+    box-shadow:0 6px 18px rgba(212,43,43,.28);transition:transform .16s}
+.love-btn-big i{color:#fff;font-size:22px}
+.love-btn-big .love-cnt{color:#fff}
+.love-btn-big:active{transform:scale(.985)}
+.love-btn-big.loved{background:#8f1c1c}
 .love-btn-big.loved{box-shadow:0 4px 22px rgba(212,43,43,.3)}
 .love-btn-big:active{transform:scale(.95)}
 /* Autore */
-.pdm-author{display:flex;align-items:center;gap:12px;padding:14px 18px 18px;background:var(--card);cursor:pointer;transition:background .15s;border-top:1px solid var(--border)}
+.pdm-author{display:flex;align-items:center;gap:11px;margin:14px 16px 0;padding:11px 13px;background:#FBF8F2;
+    border:1px solid var(--border);border-radius:16px;cursor:pointer;transition:background .15s}
+.pdm-author .pdm-author-handle{font-size:15px;font-weight:800}
+.pdm-author .pdm-author-meta{font-size:12px;color:var(--muted);font-weight:600}
+.liv-badge{display:inline-flex;align-items:center;gap:4px;border-radius:20px;padding:3px 9px;font-size:10.5px;
+    font-weight:900;border:1.5px solid;margin-left:6px;white-space:nowrap;vertical-align:1px}
+.lb-liv{background:rgba(5,150,105,.14);color:#047857;border-color:#04785755}
+.lb-sos{background:rgba(30,58,138,.12);color:#1e3a8a;border-color:#1e3a8a55}
+.lb-mec{background:linear-gradient(135deg,#6d28d9,#7c3aed);color:#fff;border-color:#c4b5fd}
+.lb-inf{background:linear-gradient(135deg,#be185d,#ec4899);color:#fff;border-color:#f9a8d4}
+.lb-pro{background:linear-gradient(135deg,#334155,#0b1220);color:#e2e8f0;border-color:#94a3b8}
+.lb-plus{background:linear-gradient(135deg,#0f766e,#14b8a6);color:#ccfbf1;border-color:#5eead4}
 .pdm-author:hover{background:#f7f2ea}
 .pdm-author:active{background:#ede7dc}
 .pdm-author-avatar{width:42px;height:42px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid var(--border)}
@@ -3895,6 +3912,47 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
   <div class="sheet" id="detailSheet">
     <!-- 1. Foto -->
     <div class="pdm-photos" id="detailPhotos"></div>
+    <!-- 5. HERO ROSSO: titolo grande + tag bianchi -->
+    <div class="pdm-hero">
+      <h2 class="pdm-hero-title" id="detailName">—<button class="pdm-hero-desc-edit" id="heroTitleEditBtn" style="display:none;vertical-align:middle;margin-left:10px" onclick="startHeroTitleEdit()" title="Rinomina"><i class="ph-duotone ph-pencil-simple"></i></button></h2>
+      <div id="detailHeroTitleEditor" style="display:none"></div>
+      <div class="pdm-hero-tags" id="detailTagsStrip">
+        <span class="pdm-hero-tag" id="detailTag"><i class="ph-duotone ph-tag"></i> Luogo</span>
+        <button class="pdm-hero-desc-edit" id="heroDescEditBtn" style="display:none" onclick="startHeroDescEdit()" title="Modifica descrizione"><i class="ph-duotone ph-pencil-simple"></i></button>
+      </div>
+      <!-- La descrizione VIVE QUI, nella fascia rossa: un POI senza descrizione non esiste -->
+      <p class="pdm-hero-desc" id="detailHeroDesc" style="display:none"></p>
+      <div id="detailHeroDescEditor" style="display:none"></div>
+    </div>
+    <!-- 4. Indirizzo + Coordinate -->
+    <div class="pdm-white-section">
+      <div class="pdm-meta-row">
+        <i class="ph-duotone ph-map-pin"></i>
+        <span id="detailAddress">—</span>
+      </div>
+      <div class="pdm-meta-row coords">
+        <i class="ph-duotone ph-crosshair-simple"></i>
+        <span id="detailCoordsText">—</span>
+      </div>
+    </div>
+    <!-- 8. Autore -->
+    <div class="pdm-author" onclick="openAuthorProfile()">
+      <div class="pdm-author-avatar">
+        <img src="https://ui-avatars.com/api/?name=A&background=D42B2B&color=fff&size=80" alt="" id="detailAuthorAvatar"/>
+      </div>
+      <div class="pdm-author-info">
+        <span class="pdm-author-handle" id="detailAuthor">—</span>
+        <span class="pdm-author-meta" id="detailAuthorMeta"></span>
+      </div>
+      <i class="ph-duotone ph-caret-right pdm-author-arrow"></i>
+    </div>
+    <!-- 7. Love -->
+    <div class="pdm-love-row">
+      <button class="love-btn love-btn-big" id="loveBtn" onclick="toggleLove()">
+        <i class="ph-duotone ph-heart" id="loveHeart"></i>
+        <span class="love-cnt" id="loveCnt">0</span>
+      </button>
+    </div>
     <!-- 2. Azioni -->
     <div class="pdm-actions" id="detailQuickActions">
       <button class="pdm-act pdm-act-nav" onclick="openNavigation()">
@@ -3918,38 +3976,15 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
         <span>Cancella</span>
       </button>
     </div>
-    <!-- 3. Itinerari pubblici (se presenti) -->
-    <div class="pdm-itin-section" id="detailItinSection" style="display:none">
-      <div class="pdm-section-lbl"><i class="ph-duotone ph-path" style="font-size:11px"></i> In itinerari</div>
-      <div class="pdm-itin-chips" id="detailItinChips"></div>
-    </div>
-    <!-- 4. Indirizzo + Coordinate -->
-    <div class="pdm-white-section">
-      <div class="pdm-meta-row">
-        <i class="ph-duotone ph-map-pin"></i>
-        <span id="detailAddress">—</span>
-      </div>
-      <div class="pdm-meta-row coords">
-        <i class="ph-duotone ph-crosshair-simple"></i>
-        <span id="detailCoordsText">—</span>
-      </div>
-    </div>
-    <!-- 5. HERO ROSSO: titolo grande + tag bianchi -->
-    <div class="pdm-hero">
-      <h2 class="pdm-hero-title" id="detailName">—<button class="pdm-hero-desc-edit" id="heroTitleEditBtn" style="display:none;vertical-align:middle;margin-left:10px" onclick="startHeroTitleEdit()" title="Rinomina"><i class="ph-duotone ph-pencil-simple"></i></button></h2>
-      <div id="detailHeroTitleEditor" style="display:none"></div>
-      <div class="pdm-hero-tags" id="detailTagsStrip">
-        <span class="pdm-hero-tag" id="detailTag"><i class="ph-duotone ph-tag"></i> Luogo</span>
-        <button class="pdm-hero-desc-edit" id="heroDescEditBtn" style="display:none" onclick="startHeroDescEdit()" title="Modifica descrizione"><i class="ph-duotone ph-pencil-simple"></i></button>
-      </div>
-      <!-- La descrizione VIVE QUI, nella fascia rossa: un POI senza descrizione non esiste -->
-      <p class="pdm-hero-desc" id="detailHeroDesc" style="display:none"></p>
-      <div id="detailHeroDescEditor" style="display:none"></div>
-    </div>
     <!-- 5-bis. Le foto del posto (la Copertina e' gia' in cima e non si ripete) -->
     <div class="pdm-gallery" id="detailGallery" style="display:none">
       <div class="pdm-gallery-lbl"><i class="ph-duotone ph-images"></i> <span data-t="foto_del_posto">Le foto del posto</span></div>
       <div class="pdm-gallery-grid" id="detailGalleryGrid"></div>
+    </div>
+    <!-- 3. Itinerari pubblici (se presenti) -->
+    <div class="pdm-itin-section" id="detailItinSection" style="display:none">
+      <div class="pdm-section-lbl"><i class="ph-duotone ph-path" style="font-size:11px"></i> In itinerari</div>
+      <div class="pdm-itin-chips" id="detailItinChips"></div>
     </div>
     <!-- 6. Link condivisione -->
     <div class="pdm-share-link" id="detailShareLink" onclick="copyDetailLink()">
@@ -3973,24 +4008,6 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
     <button class="pdm-transfer-btn" id="detailClaimBtn" style="display:none;border-color:var(--gold,#B8862F);color:var(--gold,#B8862F)" onclick="openClaimModal()">
       <i class="ph-duotone ph-storefront"></i> <span data-t="claim_btn">Reclama questo luogo</span>
     </button>
-    <!-- 7. Love -->
-    <div class="pdm-love-row">
-      <button class="love-btn love-btn-big" id="loveBtn" onclick="toggleLove()">
-        <i class="ph-duotone ph-heart" id="loveHeart"></i>
-        <span class="love-cnt" id="loveCnt">0</span>
-      </button>
-    </div>
-    <!-- 8. Autore -->
-    <div class="pdm-author" onclick="openAuthorProfile()">
-      <div class="pdm-author-avatar">
-        <img src="https://ui-avatars.com/api/?name=A&background=D42B2B&color=fff&size=80" alt="" id="detailAuthorAvatar"/>
-      </div>
-      <div class="pdm-author-info">
-        <span class="pdm-author-handle" id="detailAuthor">—</span>
-        <span class="pdm-author-meta" id="detailAuthorMeta"></span>
-      </div>
-      <i class="ph-duotone ph-caret-right pdm-author-arrow"></i>
-    </div>
     <div id="detailDesc" style="display:none"></div>
   </div>
 </div>
@@ -8789,7 +8806,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='4.68';
+const APP_VERSION='4.69';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
@@ -12360,6 +12377,38 @@ async function scegliVideoDelPosto(){
   };
   inp.click();
 }
+
+/* Il livello di chi ha creato il luogo, come nel disegno: il badge accanto al nome. */
+const _LIV_BADGE = {
+  sostenitore:        {c:'lb-sos',  i:'ph-hand-heart',   n:'Sostenitore'},
+  mecenate:           {c:'lb-mec',  i:'ph-crown',        n:'Mecenate'},
+  influencer:         {c:'lb-inf',  i:'ph-megaphone',    n:'Influencer'},
+  professionista:     {c:'lb-pro',  i:'ph-briefcase',    n:'Professionista'},
+  professionista_plus:{c:'lb-plus', i:'ph-storefront',   n:'Plus'},
+  plus:               {c:'lb-plus', i:'ph-storefront',   n:'Plus'}
+};
+async function mostraLivelloAutore(poi){
+  const el=document.getElementById('detailAuthor'), meta=document.getElementById('detailAuthorMeta');
+  if(!el || !poi || !poi.author_id) return;
+  const idAtteso = poi.id;
+  try{
+    const { data } = await sb.from('profiles')
+      .select('username,display_name,avatar_url,points,special_tier')
+      .eq('id', poi.author_id).limit(1);
+    const pr = data && data[0]; if(!pr) return;
+    if(!currentPOI || currentPOI.id !== idAtteso) return;   // la scheda e' cambiata mentre leggevo
+    const nome = pr.display_name || pr.username || '—';
+    const t=(pr.special_tier||'').toLowerCase();
+    const b=_LIV_BADGE[t];
+    el.innerHTML = _escHtml(nome) + (b
+      ? ' <span class="liv-badge '+b.c+'"><i class="ph-fill '+b.i+'"></i>'+b.n+'</span>'
+      : '');
+    if(meta) meta.textContent = (pr.points!=null ? (pr.points+' punti') : '');
+    const av=document.getElementById('detailAuthorAvatar');
+    if(av && pr.avatar_url) av.src=pr.avatar_url;
+  }catch(_){}
+}
+function _escHtml(x){ const d=document.createElement('div'); d.textContent=x==null?'':x; return d.innerHTML; }
 function renderPhotoStrip(container, photos, name, address, category){
   container._meta = { name, address, category };
   // Solo le foto REALI: niente linguette vuote nella scheda.
@@ -12574,6 +12623,7 @@ function openDetail(idx){
   const ph=document.getElementById('detailPhotos'); ph.innerHTML='';
   renderPhotoStrip(ph, p.photos||[], p.name, p.address||'Tiranë, Albania', p.cat||'Luogo');
   mostraGalleria(p.photos||[], p);
+  mostraLivelloAutore(p);
   // Hero: tag
   const tag=document.getElementById('detailTag');
   const cat=p.cat||'Luogo';
