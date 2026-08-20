@@ -137,19 +137,32 @@ async function leggi(){
   const giorniLav = new Set(righe.filter(x=>x.stato==='fatto' && x.aggiornato)
                                  .map(x=>x.aggiornato.slice(0,10))).size;
   const ritmo = giorniLav ? (gFatte/giorniLav) : 1;
+  /* La data in vetrina resta PRUDENTE (una giornata al giorno) finche' il ritmo
+     non e' misurato su almeno una settimana di lavoro vero. Un pomeriggio buono
+     sui blocchi piccoli non e' un ritmo: e' un caso. */
+  const GIORNI_PER_FIDARSI = 7;
   const giorniAlRitmo = Math.ceil(restano / (ritmo || 1));
-  const fine=new Date(); fine.setDate(fine.getDate()+giorniAlRitmo);
+  const fineRitmo=new Date(); fineRitmo.setDate(fineRitmo.getDate()+giorniAlRitmo);
   const finePiano=new Date(); finePiano.setDate(finePiano.getDate()+Math.ceil(restano));
+  const fidarsi = giorniLav >= GIORNI_PER_FIDARSI;
+  const fine = fidarsi ? fineRitmo : finePiano;
   const eF=document.getElementById('nFine');
   eF.textContent=fine.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit'});
-  eF.title='al ritmo tenuto finora: '+(Math.round(ritmo*100)/100).toString().replace('.',',')+' giornate al giorno';
+  eF.title = fidarsi ? 'calcolata sul ritmo misurato su '+giorniLav+' giorni'
+                     : 'calcolata prudente, una giornata al giorno';
+  const rt=(Math.round(ritmo*100)/100).toString().replace('.',',');
   const eR=document.getElementById('ritmo');
-  if(eR) eR.innerHTML = giorniLav
-    ? 'Calcolata sul ritmo che stiamo tenendo: <b>'+(Math.round(ritmo*100)/100).toString().replace('.',',')+
-      ' giornate al giorno</b> su '+giorniLav+(giorniLav===1?' giorno di lavoro':' giorni di lavoro')+
-      '. Se rallentiamo, la data si allontana da sola. A una giornata al giorno sarebbe il '+
-      finePiano.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'})+'.'
-    : 'Ancora nessuna giornata chiusa: la data e&#39; calcolata a una giornata al giorno.';
+  if(eR) eR.innerHTML = !giorniLav
+    ? 'Ancora nessuna giornata chiusa: la data e&#39; calcolata a una giornata al giorno.'
+    : (fidarsi
+      ? 'Calcolata sul ritmo vero: <b>'+rt+' giornate al giorno</b> misurate su '+giorniLav+
+        ' giorni di lavoro. Se rallentiamo si allontana da sola. A una giornata al giorno sarebbe il '+
+        finePiano.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'})+'.'
+      : 'Data <b>prudente</b>, una giornata al giorno. Finora il ritmo e&#39; di '+rt+' giornate al giorno, ma '+
+        'misurato su '+giorniLav+(giorniLav===1?' giorno solo':' giorni')+' e sui blocchi piu&#39; piccoli: '+
+        'non basta per fidarsene. Se quel ritmo tenesse, la fine sarebbe il '+
+        fineRitmo.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'})+
+        '. La data qui sopra cambia solo dopo '+GIORNI_PER_FIDARSI+' giorni di lavoro veri.');
   const ora=new Date();
   document.getElementById('quando').textContent='aggiornato alle '+ora.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
   /* quanto si e' chiuso oggi: e' il numero che fa vedere il movimento */
