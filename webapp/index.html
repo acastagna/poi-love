@@ -1263,8 +1263,9 @@ body.kb-open #lang-strip,body.kb-open #brand-strip{opacity:0;pointer-events:none
 .pdm-tag-riga{display:flex;flex-wrap:wrap;gap:7px}
 .pdm-tag-riga span{background:#FBF8F2;border:1px solid var(--border);border-radius:20px;padding:6px 12px;
                    font-size:12.5px;font-weight:700;color:var(--text)}
-.pdm-mappina{height:170px;border-radius:16px;background:#2b3a2b center/cover no-repeat;border:1px solid var(--border);
+.pdm-mappina{height:170px;border-radius:16px;background:#2b3a2b;border:1px solid var(--border);
              position:relative;cursor:pointer;overflow:hidden}
+.pdm-mappina img.sat{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 .pdm-mappina .fonte{position:absolute;right:7px;bottom:6px;font-size:8.5px;font-weight:700;color:rgba(255,255,255,.85);
              background:rgba(0,0,0,.35);padding:2px 6px;border-radius:6px;letter-spacing:.2px}
 .pdm-mappina .segno{position:absolute;left:50%;top:50%;transform:translate(-50%,-72%);font-size:34px;
@@ -8896,7 +8897,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='4.76';
+const APP_VERSION='4.77';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
@@ -12562,12 +12563,26 @@ function _pittaViaggio(){
   sez.style.display='block';
   // la mappina: una piastrella di OpenStreetMap centrata sul luogo
   if(map && currentPOI.lat!=null){
-    const z=14, n=Math.pow(2,z);
-    const x=Math.floor((currentPOI.lng+180)/360*n);
-    const la=currentPOI.lat*Math.PI/180;
-    const y=Math.floor((1-Math.log(Math.tan(la)+1/Math.cos(la))/Math.PI)/2*n);
-    // satellite, la stessa fonte gia' usata dalla mappa grande
-    map.style.backgroundImage="url('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/"+z+"/"+y+"/"+x+"')";
+    // Una fotografia dal satellite inquadrata sul punto: si vedono i tetti e il
+    // quartiere, non una casa sola. La chiediamo gia' della misura giusta, cosi'
+    // il segnaposto al centro sta davvero sopra il luogo.
+    const dlat=0.0016, dlng=dlat/Math.cos(currentPOI.lat*Math.PI/180);
+    const bbox=[(currentPOI.lng-dlng).toFixed(6),(currentPOI.lat-dlat).toFixed(6),
+                (currentPOI.lng+dlng).toFixed(6),(currentPOI.lat+dlat).toFixed(6)].join(',');
+    const r=Math.min(2, window.devicePixelRatio||1);
+    const w=Math.round(Math.min(map.clientWidth||360,420)*r), h=Math.round(170*r);
+    const url='https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/export'+
+              '?bbox='+bbox+'&bboxSR=4326&imageSR=3857&size='+w+','+h+'&format=jpg&f=image';
+    let im=map.querySelector('img.sat');
+    if(!im){ im=document.createElement('img'); im.className='sat'; im.alt=''; map.insertBefore(im, map.firstChild); }
+    im.onerror=()=>{ // se il satellite non risponde, si torna alla mappa disegnata
+      const z=16, n=Math.pow(2,z);
+      const x=Math.floor((currentPOI.lng+180)/360*n);
+      const la=currentPOI.lat*Math.PI/180;
+      const y=Math.floor((1-Math.log(Math.tan(la)+1/Math.cos(la))/Math.PI)/2*n);
+      im.onerror=null; im.src='https://tile.openstreetmap.org/'+z+'/'+x+'/'+y+'.png';
+    };
+    im.src=url;
     if(!map.querySelector('.segno')) map.insertAdjacentHTML('beforeend','<i class="ph-fill ph-map-pin segno"></i>');
     if(!map.querySelector('.fonte')) map.insertAdjacentHTML('beforeend','<span class="fonte">Esri, Maxar</span>');
   }
