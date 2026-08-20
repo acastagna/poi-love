@@ -1210,6 +1210,8 @@ body.kb-open #lang-strip,body.kb-open #brand-strip{opacity:0;pointer-events:none
 .pdm-gallery-grid > button{grid-column:span 2;aspect-ratio:1;border:none;padding:0;border-radius:11px;overflow:hidden;
                            background:#e6e0d6;cursor:pointer;position:relative}
 .pdm-gallery-grid > button.larga{aspect-ratio:16/9}
+.pdm-gallery-grid > button::after{content:'';position:absolute;inset:0;border-radius:11px;pointer-events:none;
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,.10), inset 0 2px 12px rgba(0,0,0,.30)}
 .pdm-gallery-grid .cartellino{position:absolute;left:6px;top:6px;background:var(--red,#D42B2B);color:#fff;
     font-size:8.5px;font-weight:900;letter-spacing:.3px;border-radius:6px;padding:3px 6px;pointer-events:none}
 .pdm-gallery-grid .gioca{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
@@ -1272,8 +1274,8 @@ body.kb-open #lang-strip,body.kb-open #brand-strip{opacity:0;pointer-events:none
 .pdm-piede{margin:22px 16px 0;padding-top:14px;border-top:1px solid var(--border);display:flex;align-items:center;
            gap:9px;font-size:11.5px;color:var(--muted);line-height:1.5}
 .pdm-piede img{height:22px;width:auto;opacity:.9;flex-shrink:0}
-.pdm-act-save .pdm-act-icon{background:#F3F0FF;color:#6D28D9;border-color:#C4B5FD}
-.pdm-act-save span{color:#6D28D9}
+.pdm-act-save .pdm-act-icon{background:#F4F0EB;color:var(--text);border-color:var(--border)}
+.pdm-act-save span{color:var(--muted)}
 /* la pastiglia dei chilometri sulla copertina, semitrasparente come quella delle foto */
 .pdm-km{position:absolute;bottom:8px;left:10px;background:rgba(0,0,0,.52);color:#fff;font-size:9px;font-weight:800;
         padding:3px 8px;border-radius:10px;letter-spacing:.3px;z-index:4;pointer-events:none;display:flex;
@@ -1327,12 +1329,12 @@ body.kb-open #lang-strip,body.kb-open #brand-strip{opacity:0;pointer-events:none
 .pdm-act-icon{width:46px;height:46px;border-radius:14px;background:#F4F0EB;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:21px;color:var(--text);transition:transform .13s,box-shadow .13s}
 .pdm-act:active .pdm-act-icon{transform:scale(.88)}
 .pdm-act span{font-size:11.5px;font-weight:800;color:var(--muted);white-space:nowrap;letter-spacing:.15px}
-.pdm-act-nav .pdm-act-icon{background:var(--blue);color:#fff;border-color:var(--blue);box-shadow:0 4px 12px rgba(40,94,167,.3)}
-.pdm-act-nav span{color:var(--blue)}
-.pdm-act-add .pdm-act-icon{background:#F0FAF4;color:#059669;border-color:#6EE7B7}
-.pdm-act-add span{color:#059669}
-.pdm-act-share .pdm-act-icon{background:#FFF7F0;color:#D97706;border-color:#FCD28A}
-.pdm-act-share span{color:#D97706}
+.pdm-act-nav .pdm-act-icon{background:#F4F0EB;color:var(--text);border-color:var(--border)}
+.pdm-act-nav span{color:var(--muted)}
+.pdm-act-add .pdm-act-icon{background:#F4F0EB;color:var(--text);border-color:var(--border)}
+.pdm-act-add span{color:var(--muted)}
+.pdm-act-share .pdm-act-icon{background:#F4F0EB;color:var(--text);border-color:var(--border)}
+.pdm-act-share span{color:var(--muted)}
 .pdm-act-edit .pdm-act-icon{background:#EBF2FC;color:var(--blue);border-color:#93C5FD}
 .pdm-act-edit span{color:var(--blue)}
 .pdm-act-del .pdm-act-icon{background:#FFF0F0;color:var(--red);border-color:#FCA5A5}
@@ -5782,10 +5784,16 @@ function openDBDetail(p) {
   const ph = document.getElementById('detailPhotos');
   ph.innerHTML = '';
   renderPhotoStrip(ph, photos, p.name, p.address||'Tiranë, Albania', p.category||'Luogo');
+  // le parti nuove della scheda (tag, dove si trova, chi lo ama, piede, azioni):
+  // prima stavano solo sull'altra strada di apertura, e cosi' non si vedevano mai
+  mostraGalleria(photos, p);
+  mostraLivelloAutore(p);
+  _pittaTag(p); _pittaViaggio(); _pittaKmSullaCopertina(); _pittaAmanti(p); _pittaPiede(p);
+  _sistemaAzioni(); _avviaScorrimentoCopertina({...p, photos});
   // Hero: tag bianco su rosso
   const cat = p.category || 'Luogo';
   const tag = document.getElementById('detailTag');
-  tag.className = 'pdm-hero-tag';
+  tag.className = 'pdm-cat';
   const _subLbl = (p.subcategory && typeof catLabelByKey==='function') ? catLabelByKey(p.subcategory) : '';
   const _catTxt = String(_subLbl || cat).replace(/</g,'&lt;');
   const _authorTier = (p.profiles && p.profiles.special_tier) || null;
@@ -8870,7 +8878,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='4.72';
+const APP_VERSION='4.73';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
@@ -12383,7 +12391,7 @@ function _renderAllSlots(container){
     _fillUserSlot(el, s.url, i);
     container.appendChild(el);
   });
-  if(nUser > 0){
+  if(false){
     const ctr = document.createElement('div');
     ctr.className = 'pdm-photo-counter';
     const quante = (typeof currentPOI!=='undefined' && currentPOI && Array.isArray(currentPOI.photos))
@@ -12510,17 +12518,14 @@ function _mezziPer(km){
   v.push({i:'ph-car', t:_durata(km/60*60)});
   if(km>=150) v.push({i:'ph-airplane-tilt', t:_durata(60 + km/800*60)});
   if(km>=30)  v.push({i:'ph-boat', t:_durata(km/40*60)});
+  // A tutto impulso, non in curvatura: un quarto della velocita' della luce,
+  // cioe' 74.948 km al secondo. Il conto e' vero, il mezzo un po' meno.
+  const sec = km / 74948.1149;
+  v.push({i:'ph-flying-saucer', t:(sec < 1 ? (sec*1000).toFixed(sec*1000<1?3:1).replace('.',',')+' millesimi di secondo'
+                                           : _durata(sec/60)), trek:true});
   return v;
 }
-function _apriAltriMezzi(){
-  // l'ammiccamento resta nascosto: si vede solo se lo cerchi
-  const e=document.getElementById('detailViaggio'); if(!e) return;
-  if(e.dataset.trek==='1'){ e.dataset.trek='0'; _pittaViaggio(); return; }
-  e.dataset.trek='1';
-  const ex=e.querySelector('.mezzi');
-  if(ex) ex.insertAdjacentHTML('beforeend',
-    '<span style="color:#6D28D9"><i class="ph-duotone ph-rocket-launch" style="color:#6D28D9"></i>teletrasporto: 6 secondi</span>');
-}
+function _apriAltriMezzi(){ if(typeof openNavigation==='function') openNavigation(); }
 function _pittaViaggio(){
   const box=document.getElementById('detailViaggio'), sez=document.getElementById('detailDoveSez');
   const map=document.getElementById('detailMappina');
@@ -12541,7 +12546,7 @@ function _pittaViaggio(){
   }
   const km=_kmTra(da.lat, da.lng, currentPOI.lat, currentPOI.lng);
   box.innerHTML='<div class="km">'+_quantoDista(km)+' '+t('da_dove_sei','da dove sei ora')+'</div>'+
-    '<div class="mezzi">'+_mezziPer(km).map(m=>'<span><i class="ph-duotone '+m.i+'"></i>'+m.t+'</span>').join('')+'</div>';
+    '<div class="mezzi">'+_mezziPer(km).map(m=>'<span'+(m.trek?' style="color:#6D28D9"':'')+'><i class="ph-duotone '+m.i+'"'+(m.trek?' style="color:#6D28D9"':'')+'></i>'+m.t+'</span>').join('')+'</div>';
 }
 
 /* i chilometri sulla copertina, semitrasparenti come il cartellino delle foto */
@@ -12604,6 +12609,8 @@ function _pittaPiede(p){
 
 /* tre azioni se il luogo non e' tuo, cinque se e' tuo */
 function _sistemaAzioni(){
+  // Se il luogo e' mio: Naviga, Aggiungi (dentro itinerari e liste), Condividi, Modifica, Cancella.
+  // Se non e' mio, anche da ospite: Naviga, Condividi, Salva (nei preferiti).
   const mio=(typeof _canEditCurrentPoi==='function') && _canEditCurrentPoi();
   const m=(id,vedi)=>{ const b=document.getElementById(id); if(b) b.style.display = vedi ? '' : 'none'; };
   m('detailAddBtn',    mio);
