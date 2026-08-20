@@ -81,12 +81,13 @@
 <div class="grosso">
   <div><b id="nPerc">—</b><span>completato</span></div>
   <div><b id="nFatte">—</b><span>giornate fatte</span></div>
-  <div><b id="nTotali">—</b><span>giornate in tutto</span></div>
+  <div><b id="nRestano">—</b><span>giornate che restano</span></div>
   <div><b id="nAttesa">—</b><span>da rispondere adesso</span></div>
   <div style="background:#16130f;border-color:#16130f;color:#fff"><b id="nFine">—</b><span style="color:#cfc6b8">fine prevista</span></div>
 </div>
 <div class="totale"><i id="barraTotale" style="width:0%"></i></div>
 <div class="quando" id="quando">lettura in corso…</div>
+<div id="oggi" style="font-size:13.5px;font-weight:800;color:var(--verde);margin-top:8px"></div>
 <p style="font-size:13px;color:var(--tenue);margin-top:6px">La fine prevista si sposta da sola: e' oggi piu' le giornate che restano, contando di lavorare tutti i giorni. Ogni blocco che chiudo la avvicina.</p>
 
 <div id="attesa"></div>
@@ -126,7 +127,7 @@ async function leggi(){
 
   document.getElementById('nPerc').textContent=perc+'%';
   document.getElementById('nFatte').textContent=gFatte.toString().replace('.',',');
-  document.getElementById('nTotali').textContent=gTot.toString().replace('.',',');
+  document.getElementById('nRestano').textContent=(Math.round((gTot-gFatte)*10)/10).toString().replace('.',',');
   /* nAttesa lo scrive il blocco delle domande qui sotto */
   document.getElementById('barraTotale').style.width=perc+'%';
   const restano=Math.ceil(gTot-gFatte);
@@ -135,6 +136,14 @@ async function leggi(){
   document.getElementById('nFine').title=restano+' giornate ancora, lavorando tutti i giorni';
   const ora=new Date();
   document.getElementById('quando').textContent='aggiornato alle '+ora.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+  /* quanto si e' chiuso oggi: e' il numero che fa vedere il movimento */
+  const oggiStr=new Date().toISOString().slice(0,10);
+  const oggiG=righe.filter(x=>x.stato==='fatto' && (x.aggiornato||'').slice(0,10)===oggiStr)
+                   .reduce((a,x)=>a+Number(x.giornate||0),0);
+  const eOggi=document.getElementById('oggi');
+  if(eOggi) eOggi.textContent = oggiG
+    ? 'Oggi ne abbiamo chiuse '+String(oggiG).replace('.',',')+' su '+String(gTot).replace('.',',')+' totali.'
+    : 'Oggi ancora nessun blocco chiuso. Totale del programma: '+String(gTot).replace('.',',')+' giornate.';
 
   /* Una domanda si fa al punto giusto: appena finito il blocco che viene prima di lei.
      Se davanti non c'e' piu' niente da fare, allora serve adesso. */
