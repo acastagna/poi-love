@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<!--
+  © Alessandro Castagna — 321.al / EVOLAB
+  Tutti i diritti riservati. Uso non autorizzato vietato.
+  info@321.it · https://321.al
+-->
+<html lang="it"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>POI•LOVE · Progetto globale</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{--rosso:#D42B2B;--blu:#285EA7;--testo:#16130f;--tenue:#6b6560;--bordo:#dcd6cc;--carta:#faf8f4;--verde:#0B7A38;--oro:#8A6100;--viola:#6D28D9}
+  body{background:#fff;color:var(--testo);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,Helvetica,Arial,sans-serif;
+       font-size:16px;line-height:1.55;padding:0 0 80px}
+  .foglio{max-width:1080px;margin:0 auto;padding:0 28px}
+  header{border-bottom:3px solid var(--rosso);padding:34px 0 20px;margin-bottom:30px;display:flex;align-items:flex-end;gap:20px;flex-wrap:wrap}
+  header h1{font-size:34px;font-weight:900;letter-spacing:-.6px;line-height:1.1}
+  header .sub{color:var(--tenue);font-size:15px;font-weight:600;margin-top:6px}
+  .stampa{margin-left:auto;background:var(--rosso);color:#fff;border:none;border-radius:24px;padding:12px 22px;
+          font-size:14px;font-weight:800;cursor:pointer;font-family:inherit}
+  .stampa:hover{background:#b02222}
+  h2{font-size:23px;font-weight:900;margin:38px 0 12px;padding-top:16px;border-top:1px solid var(--bordo);letter-spacing:-.3px}
+  h2 .n{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;
+        background:var(--rosso);color:#fff;font-size:15px;margin-right:9px;vertical-align:2px}
+  h3{font-size:17px;font-weight:900;margin:22px 0 8px}
+  p{margin:9px 0}
+  ul,ol{margin:9px 0 9px 22px}
+  li{margin:4px 0}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:14.5px}
+  th{background:#f2ede4;text-align:left;font-weight:900;font-size:12.5px;text-transform:uppercase;letter-spacing:.4px;
+     padding:9px 10px;border:1px solid var(--bordo)}
+  td{padding:9px 10px;border:1px solid var(--bordo);vertical-align:top}
+  tr:nth-child(even) td{background:var(--carta)}
+  .ok{color:var(--verde);font-weight:900}
+  .no{color:var(--rosso);font-weight:900}
+  .forse{color:var(--oro);font-weight:900}
+  .nota{background:var(--carta);border-left:4px solid var(--blu);padding:12px 16px;margin:14px 0;font-size:15px}
+  .attenzione{background:#FFF7E6;border-left:4px solid #E8C169;padding:12px 16px;margin:14px 0;font-size:15px}
+  .grave{background:#FFF3F3;border-left:4px solid var(--rosso);padding:12px 16px;margin:14px 0;font-size:15px}
+  .fatto{background:#EDF7F0;border-left:4px solid var(--verde);padding:12px 16px;margin:14px 0;font-size:15px}
+  .todo{list-style:none;margin-left:0}
+  .todo li{padding-left:28px;position:relative;margin:5px 0}
+  .todo li::before{content:'';position:absolute;left:0;top:4px;width:16px;height:16px;border:2px solid var(--bordo);border-radius:4px}
+  .todo li.v::before{content:'✓';background:var(--verde);border-color:var(--verde);color:#fff;font-size:12px;
+                     display:flex;align-items:center;justify-content:center;font-weight:900}
+  .gantt td.b{padding:0;position:relative;height:26px}
+  .barra{position:absolute;top:50%;transform:translateY(-50%);height:16px;border-radius:4px;background:var(--rosso);opacity:.9}
+  .barra.g{background:var(--blu)} .barra.v{background:var(--verde)} .barra.o{background:#B45309} .barra.p{background:var(--viola)}
+  .gantt th{font-size:11px;padding:6px 3px;text-align:center}
+  .gantt td:first-child{width:230px;font-weight:700;font-size:13.5px}
+  svg{max-width:100%;height:auto;display:block;margin:16px 0}
+  .piede{margin-top:44px;padding-top:16px;border-top:1px solid var(--bordo);color:var(--tenue);font-size:13px}
+  code{background:#f2ede4;padding:1px 5px;border-radius:4px;font-size:13.5px}
+  @media print{
+    .stampa{display:none}
+    body{font-size:11.5pt;padding:0}
+    .foglio{max-width:100%;padding:0}
+    h2{page-break-after:avoid;break-after:avoid}
+    table,svg,.nota,.attenzione,.grave,.fatto{page-break-inside:avoid;break-inside:avoid}
+    header{padding-top:0}
+  }
+</style></head>
+<body>
+<div class="foglio">
+
+<header>
+  <div>
+    <h1>POI•LOVE · Progetto globale</h1>
+    <div class="sub">Dalla webapp di oggi al prodotto completo con app sugli store · versione del 20/08/2026</div>
+  </div>
+  <button class="stampa" onclick="window.print()">Stampa</button>
+</header>
+
+<p>Questo documento tiene insieme tutto: cosa esiste, cosa manca, in che ordine si costruisce, quanto costa in giornate
+e cosa serve da Alessandro. Comprende la trasformazione in app collegata alla parte browser, con
+<b>una sola sorgente di dati</b> per tutte e due.</p>
+
+<div class="fatto"><b>Fondamento verificato oggi sul sistema vero, non sulle carte.</b> Database interrogato dal vivo,
+codice letto riga per riga, siti chiamati, leggi controllate alla fonte. Quattro indagini indipendenti, ognuna con un
+secondo controllore che l'ha contestata. Dove il controllo mi ha smentito, il documento riporta la smentita.</p>
+
+<h2><span class="n">1</span>Come è fatto il sistema</h2>
+
+<svg viewBox="0 0 1000 470" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,Segoe UI,Helvetica,Arial" role="img" aria-label="Architettura di POI-LOVE">
+  <rect x="0" y="0" width="1000" height="470" fill="#fff"/>
+  <!-- persone -->
+  <text x="14" y="22" font-size="12" font-weight="800" fill="#6b6560">CHI LO USA</text>
+  <g font-size="13" font-weight="700">
+    <rect x="14" y="30" width="150" height="34" rx="8" fill="#faf8f4" stroke="#dcd6cc"/><text x="30" y="52">Visitatore</text>
+    <rect x="180" y="30" width="150" height="34" rx="8" fill="#faf8f4" stroke="#dcd6cc"/><text x="196" y="52">Persona iscritta</text>
+    <rect x="346" y="30" width="150" height="34" rx="8" fill="#faf8f4" stroke="#dcd6cc"/><text x="362" y="52">Influencer</text>
+    <rect x="512" y="30" width="150" height="34" rx="8" fill="#faf8f4" stroke="#dcd6cc"/><text x="528" y="52">Professionista</text>
+    <rect x="678" y="30" width="150" height="34" rx="8" fill="#faf8f4" stroke="#dcd6cc"/><text x="694" y="52">Locale Plus</text>
+    <rect x="844" y="30" width="142" height="34" rx="8" fill="#faf8f4" stroke="#dcd6cc"/><text x="860" y="52">Amministratore</text>
+  </g>
+  <!-- superfici -->
+  <text x="14" y="100" font-size="12" font-weight="800" fill="#6b6560">DA DOVE ENTRANO</text>
+  <g font-size="14" font-weight="800">
+    <rect x="14" y="108" width="228" height="56" rx="10" fill="#FFF3F3" stroke="#D42B2B" stroke-width="2"/>
+    <text x="30" y="132" fill="#D42B2B">Webapp nel browser</text><text x="30" y="152" font-size="11.5" font-weight="600" fill="#6b6560">poilove.com, una pagina sola</text>
+    <rect x="256" y="108" width="228" height="56" rx="10" fill="#EEF3FF" stroke="#285EA7" stroke-width="2"/>
+    <text x="272" y="132" fill="#285EA7">App iPhone e Android</text><text x="272" y="152" font-size="11.5" font-weight="600" fill="#6b6560">notifiche e avvisi sul posto</text>
+    <rect x="498" y="108" width="228" height="56" rx="10" fill="#faf8f4" stroke="#dcd6cc" stroke-width="2"/>
+    <text x="514" y="132">Pagine per i motori</text><text x="514" y="152" font-size="11.5" font-weight="600" fill="#6b6560">poi, viaggio, rotta, esplora</text>
+    <rect x="740" y="108" width="246" height="56" rx="10" fill="#faf8f4" stroke="#dcd6cc" stroke-width="2"/>
+    <text x="756" y="132">Pannello di amministrazione</text><text x="756" y="152" font-size="11.5" font-weight="600" fill="#6b6560">contenuti, moderazione, livelli</text>
+  </g>
+  <!-- frecce verso api -->
+  <g stroke="#b9b2a8" stroke-width="2" fill="none">
+    <path d="M128 164 L128 196"/><path d="M370 164 L370 196"/><path d="M612 164 L612 196"/><path d="M863 164 L863 196"/>
+  </g>
+  <!-- api -->
+  <rect x="14" y="196" width="972" height="58" rx="10" fill="#16130f"/>
+  <text x="30" y="222" font-size="15" font-weight="900" fill="#fff">UNA SOLA PORTA DEI DATI</text>
+  <text x="30" y="242" font-size="12" font-weight="600" fill="#cfc6b8">PostgREST su /db/rest · GoTrue per gli accessi · le stesse regole per browser e app, in tempo reale</text>
+  <!-- dati -->
+  <rect x="14" y="286" width="470" height="168" rx="10" fill="#faf8f4" stroke="#dcd6cc" stroke-width="2"/>
+  <text x="30" y="310" font-size="13" font-weight="900">I DATI · PostgreSQL sulla nostra macchina</text>
+  <g font-size="12.5" font-weight="700" fill="#16130f">
+    <text x="30" y="336">persone · livelli · punti · amicizie · bloccati</text>
+    <text x="30" y="358">luoghi · foto con licenza · viaggi · tappe · rotte</text>
+    <text x="30" y="380">recensioni · compagnie · itinerari · avvisi</text>
+    <text x="30" y="402">abbonamenti · media · audioguide</text>
+    <text x="30" y="428" fill="#D42B2B">da creare: recensioni, menu, orari, abbonamenti, bloccati</text>
+  </g>
+  <!-- servizi -->
+  <rect x="500" y="286" width="486" height="168" rx="10" fill="#faf8f4" stroke="#dcd6cc" stroke-width="2"/>
+  <text x="516" y="310" font-size="13" font-weight="900">I SERVIZI</text>
+  <g font-size="12.5" font-weight="700">
+    <text x="516" y="336">ILLI · consiglia i viaggi e i luoghi veri vicini</text>
+    <text x="516" y="358">POI•VOICE · audioguide ufficiali, streaming</text>
+    <text x="516" y="380">Moderazione AI · recensioni, inviti, foto</text>
+    <text x="516" y="402">Catena contenuti · OSM, Wikidata, foto, volti sfocati</text>
+    <text x="516" y="428">Marcatura su blockchain · prova di data</text>
+  </g>
+</svg>
+
+<div class="nota"><b>Il punto che regge tutto:</b> browser e app non sono due prodotti. Sono due finestre sulla stessa
+porta dei dati. Quello che si costruisce per il browser vale per l'app, e viceversa. È questo che rende possibile fare
+l'app in trenta giornate invece che in cento.</div>
+
+<h2><span class="n">2</span>Cosa c'è già, verificato oggi</h2>
+
+<table>
+  <tr><th>Pronto e in uso</th><th>Dove</th></tr>
+  <tr><td>Persone, punti, livelli, avatar, copertina</td><td>tabella <code>profiles</code></td></tr>
+  <tr><td>Luoghi con foto, tag, categorie, love, bollini</td><td>tabella <code>pois</code>, 35 colonne</td></tr>
+  <tr><td>Chi segue chi, love, liste, itinerari, compagnie con messaggi vocali</td><td>7 tabelle</td></tr>
+  <tr><td>Rotte storiche e adozione, punteggi, badge, moderazione, segnalazioni</td><td>funzioni già scritte</td></tr>
+  <tr><td>Avvisi, email, consensi, pixel, pagine di comunicazione</td><td>zona media, attiva dall'11/07</td></tr>
+  <tr><td>Pagine pubbliche per i motori di ricerca</td><td>poi, trip, route, esplora, sitemap</td></tr>
+  <tr><td>Amministrazione a moduli</td><td>12 moduli</td></tr>
+  <tr><td>Tre lingue con tabella unica</td><td>915 voci, allineate</td></tr>
+</table>
+<p><b>92 migrazioni</b> applicate. La base c'è: non si riparte da zero.</p>
+
+<h2><span class="n">3</span>Cosa manca, e cosa il controllo ha smentito</h2>
+
+<div class="grave"><b>Quattro cose che avevo scritto e che non stavano in piedi.</b> Le riporto perché un piano che
+nasconde i propri errori non serve a niente.</div>
+
+<table>
+  <tr><th>Avevo scritto</th><th>Come stanno le cose</th><th>Effetto</th></tr>
+  <tr><td>L'app si aggancia al nostro impianto cambiando solo l'indirizzo</td>
+      <td>Il protocollo è compatibile, ma l'app cerca colonne che non esistono più. Ed è ferma a una versione di novembre 2024, tre indietro</td>
+      <td>Da 2 a 5 giornate: è una riscrittura del livello dati</td></tr>
+  <tr><td>Rapporto notarizzato con data certa</td>
+      <td>In POI•LOVE non c'è nessuna marcatura. Il certificato scaricabile oggi da poilove.com <b>dichiara un'impronta diversa</b> da quella del PDF pubblicato</td>
+      <td>Va rigenerato o tolto. Vedi capitolo 6</td></tr>
+  <tr><td>Le foto le cerchiamo già con licenza utilizzabile</td>
+      <td>La ricerca su Wikimedia non filtra nessuna licenza, e <b>nessuna riga di codice salva autore e licenza</b></td>
+      <td>Le foto esterne di oggi sono già fuori norma</td></tr>
+  <tr><td>Cinque giornate per 200 luoghi</td>
+      <td>Nel database ci sono 18 luoghi e zero Ufficiali. Ma per i 200 luoghi scelti bene la copertura fotografica misurata è <b>185 su 200</b>, non il 32 per cento del campo lungo</td>
+      <td>La catena automatica regge. Restano circa 15 luoghi da fare a mano</td></tr>
+</table>
+
+<h3>Buchi trovati che nessuno aveva nominato</h3>
+<ul>
+  <li><b>La tabella dei luoghi non ha campi lingua.</b> Le tre lingue non hanno dove atterrare: prima di generare
+      qualsiasi contenuto serve la migrazione (titolo e descrizione per lingua).</li>
+  <li><b>La porta dei dati risponde anche senza chiave</b> ed espone chi è amministratore e le note di moderazione.
+      Scrivere è bloccato, i luoghi privati non escono, ma quelle colonne vanno chiuse. <span class="forse">In attesa del sì.</span></li>
+  <li><b>La regola sui volti è già scritta</b> nelle condizioni e nell'informativa, ma <b>nessuna riga di codice la fa rispettare</b>.</li>
+  <li><b>Le immagini generate dall'AI</b> per illustrare luoghi veri sono contemporaneamente contro la regola interna
+      del progetto e contro le regole degli store.</li>
+  <li><b>La caduta di lingua è sull'albanese</b>: un tedesco che arriva oggi legge albanese. Deve cadere sull'inglese.</li>
+  <li><b>Undici punti del codice</b> chiamano il geocodificatore pubblico in modo che viola le sue regole d'uso.
+      Aprendo altre città il blocco arriva.</li>
+</ul>
+
+<h2><span class="n">4</span>I cantieri</h2>
+
+<table>
+  <tr><th>#</th><th>Cantiere</th><th>Cosa comprende</th><th>Giornate</th></tr>
+  <tr><td>A</td><td><b>Web, il prodotto completo</b></td>
+      <td>schede dei luoghi nelle sei tipologie, profili nelle cinque, livelli veri, recensioni con moderazione AI,
+          locale Plus con menu e orari, audio della persona, audioguide ufficiali, QR, abbonamenti</td><td>40</td></tr>
+  <tr><td>B</td><td><b>Amministrazione al massimo</b></td>
+      <td>persone, luoghi, moderazione, menu, abbonamenti, media con licenze, livelli, statistiche, ruoli,
+          direttive della moderazione AI</td><td>7</td></tr>
+  <tr><td>C</td><td><b>Contenuti: 15 viaggi, 210 luoghi Ufficiali</b></td>
+      <td>catena automatica: dati aperti, foto con licenza e autore, volti sfocati, descrizioni nelle tre lingue,
+          controllo, bollino Ufficiale</td><td>9</td></tr>
+  <tr><td>D</td><td><b>App iPhone e Android</b></td>
+      <td>riscrittura del livello dati, versione attuale, mappa, luoghi, profili, notifiche vere,
+          avviso quando arrivi vicino, invio agli store</td><td>30</td></tr>
+  <tr><td>E</td><td><b>Fase due del web</b></td>
+      <td>mercato professionisti e influencer, rapporto con marcatura vera, promemoria di scadenza</td><td>6</td></tr>
+  <tr><td>F</td><td><b>Uscita dai confini</b></td>
+      <td>caduta su inglese, impianto lingue parametrico, categorie per lingua, geocodificatore nostro,
+          formati locali</td><td>5</td></tr>
+  <tr><td></td><td colspan="2"><b>Totale</b></td><td><b>97</b></td></tr>
+</table>
+
+<div class="attenzione"><b>Novantasette giornate non vuol dire novantasette giorni di calendario.</b> Molte cose si
+sovrappongono: mentre una banca risponde o uno store revisiona, si lavora ad altro. Il calendario del capitolo 8
+è costruito su questo.</div>
+
+<h2><span class="n">5</span>La catena dei contenuti, passo per passo</h2>
+
+<svg viewBox="0 0 1000 300" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,Segoe UI,Helvetica,Arial" role="img" aria-label="Catena di produzione dei luoghi ufficiali">
+  <rect x="0" y="0" width="1000" height="300" fill="#fff"/>
+  <g font-size="12.5" font-weight="800">
+    <rect x="8" y="20" width="132" height="70" rx="9" fill="#EEF3FF" stroke="#285EA7" stroke-width="2"/>
+    <text x="22" y="46">1 · Il viaggio</text><text x="22" y="64" font-size="11" font-weight="600">tema, ordine,</text><text x="22" y="78" font-size="11" font-weight="600">dodici prefetture</text>
+
+    <rect x="156" y="20" width="132" height="70" rx="9" fill="#faf8f4" stroke="#dcd6cc" stroke-width="2"/>
+    <text x="170" y="46">2 · I dati</text><text x="170" y="64" font-size="11" font-weight="600">OpenStreetMap,</text><text x="170" y="78" font-size="11" font-weight="600">Wikidata, Wikipedia</text>
+
+    <rect x="304" y="20" width="132" height="70" rx="9" fill="#faf8f4" stroke="#dcd6cc" stroke-width="2"/>
+    <text x="318" y="46">3 · La foto</text><text x="318" y="64" font-size="11" font-weight="600">Commons, Openverse</text><text x="318" y="78" font-size="11" font-weight="600">licenza e autore salvati</text>
+
+    <rect x="452" y="20" width="132" height="70" rx="9" fill="#FFF7E6" stroke="#E8C169" stroke-width="2"/>
+    <text x="466" y="46">4 · I volti</text><text x="466" y="64" font-size="11" font-weight="600">sfocati in automatico,</text><text x="466" y="78" font-size="11" font-weight="600">i bambini sempre</text>
+
+    <rect x="600" y="20" width="132" height="70" rx="9" fill="#faf8f4" stroke="#dcd6cc" stroke-width="2"/>
+    <text x="614" y="46">5 · Il testo</text><text x="614" y="64" font-size="11" font-weight="600">AI in tre lingue,</text><text x="614" y="78" font-size="11" font-weight="600">solo su fatti veri</text>
+
+    <rect x="748" y="20" width="132" height="70" rx="9" fill="#faf8f4" stroke="#dcd6cc" stroke-width="2"/>
+    <text x="762" y="46">6 · Il controllo</text><text x="762" y="64" font-size="11" font-weight="600">confronto con Wikidata,</text><text x="762" y="78" font-size="11" font-weight="600">occhio umano</text>
+
+    <rect x="896" y="20" width="96" height="70" rx="9" fill="#EDF7F0" stroke="#0B7A38" stroke-width="2"/>
+    <text x="910" y="46" fill="#0B7A38">7 · Bollino</text><text x="910" y="64" font-size="11" font-weight="600">Ufficiale</text><text x="910" y="78" font-size="11" font-weight="600">e pubblicazione</text>
+  </g>
+  <g stroke="#b9b2a8" stroke-width="2" fill="none">
+    <path d="M140 55 L156 55"/><path d="M288 55 L304 55"/><path d="M436 55 L452 55"/>
+    <path d="M584 55 L600 55"/><path d="M732 55 L748 55"/><path d="M880 55 L896 55"/>
+  </g>
+  <!-- esiti misurati -->
+  <rect x="8" y="120" width="984" height="70" rx="9" fill="#faf8f4" stroke="#dcd6cc"/>
+  <text x="24" y="144" font-size="12.5" font-weight="900">MISURATO SUL CAMPO, NON STIMATO</text>
+  <g font-size="12.5" font-weight="700">
+    <text x="24" y="166">185 luoghi su 200 hanno una foto libera · monumenti e natura si fanno a macchina · bar e ristoranti no, lì la foto la dà il gestore</text>
+    <text x="24" y="182" font-size="12" font-weight="600" fill="#6b6560">Costo delle descrizioni in tre lingue per 200 luoghi: fra 2 e 9 dollari. Il costo vero è il controllo, non l'AI.</text>
+  </g>
+  <rect x="8" y="206" width="984" height="76" rx="9" fill="#FFF3F3" stroke="#D42B2B" stroke-width="2"/>
+  <text x="24" y="230" font-size="12.5" font-weight="900" fill="#D42B2B">DUE COSE DA FARE PRIMA DI GENERARE ANCHE UN SOLO LUOGO</text>
+  <g font-size="12.5" font-weight="700">
+    <text x="24" y="252">1 · La tabella dei luoghi non ha i campi per le tre lingue: senza migrazione il testo generato non ha dove atterrare.</text>
+    <text x="24" y="272">2 · Licenza, autore e fonte della foto oggi non si salvano: vanno aggiunte le colonne prima, non dopo.</text>
+  </g>
+</svg>
+
+<h2><span class="n">6</span>La prova di data: come stanno le cose davvero</h2>
+
+<p>Alessandro chiede: Themeli la marcatura la fa già in blockchain sul filone bitcoin, qual è la verità?
+La verità, verificata riproducendo la prova dal vivo:</p>
+
+<table>
+  <tr><th>Livello</th><th>Cosa prova</th><th>Valore davanti a terzi</th></tr>
+  <tr><td><b>Impronta SHA-256 scritta da noi</b><br>è quello che POI•LOVE ha oggi</td>
+      <td>Solo che il file non è cambiato. La data la scriviamo noi e possiamo riscriverla</td>
+      <td class="no">Dichiarazione di parte. Non si può chiamare data certa</td></tr>
+  <tr><td><b>Ancoraggio su Bitcoin</b><br>Themeli ce l'ha davvero e funziona</td>
+      <td>Che il documento esisteva prima di quel blocco e non è cambiato. Lo verifica chiunque senza fidarsi di noi</td>
+      <td class="ok">Prova solida di anteriorità, precisione di circa dieci minuti</td></tr>
+  <tr><td><b>Marca temporale qualificata</b><br>non ce l'abbiamo</td>
+      <td>Lo stesso, ma con un ente riconosciuto che ci mette la firma</td>
+      <td class="ok">È l'unica con presunzione legale in Europa</td></tr>
+</table>
+
+<div class="fatto"><b>Il motore esiste già dentro casa.</b> È scritto in PHP nella piattaforma Top Market, usa i calendari
+pubblici di OpenTimestamps e ancora davvero su Bitcoin: la prova di luglio è stata riaperta e confermata al blocco
+961131 del 5 agosto. Per POI•LOVE non si inventa niente: si riusa quel motore.</div>
+
+<div class="grave"><b>Due correzioni da fare subito, e non sono di POI•LOVE soltanto.</b>
+<ul>
+  <li>Il certificato che oggi si scarica da poilove.com dichiara un'impronta e un peso che <b>non corrispondono</b> al
+      PDF pubblicato: chi verifica trova un risultato che non torna. Va rigenerato o tolto il pulsante.</li>
+  <li>Nell'archivio di Themeli la data scritta nel foglio di accompagnamento è l'ora del nostro sistema, non l'ora del
+      blocco. Su un documento consegnato a terzi va scritta l'ora del blocco.</li>
+</ul></div>
+
+<p><b>La parola giusta</b> per il documento che influencer e professionisti scaricheranno:
+<i>rapporto con marcatura temporale su blockchain Bitcoin</i>. Non "notarizzato", che evoca il notaio e non è vero.</p>
+
+<h2><span class="n">7</span>Foto, volti e persone finte: cosa dice la legge</h2>
+
+<h3>I volti nelle foto</h3>
+<p>Licenza libera e diritto della persona sono due cose diverse: una foto può essere liberamente riusabile e
+contenere lo stesso il volto di qualcuno che non ha mai acconsentito a finire dentro POI•LOVE.</p>
+<table>
+  <tr><th>Dove</th><th>Regola</th></tr>
+  <tr><td>Europa e Albania</td><td>Il volto riconoscibile è un dato personale: serve una base giuridica per pubblicarlo</td></tr>
+  <tr><td>Italia</td><td>Scattare in strada è lecito, pubblicare per uso promozionale senza consenso no</td></tr>
+  <tr><td><b>Albania, il nostro mercato di lancio</b></td><td>La legge 124/2024 è la più severa sui minori. Soglia a 16 anni, più alta di quella italiana</td></tr>
+  <tr><td>Wikimedia Commons</td><td>Per luoghi privati serve il consenso della persona ritratta: meglio esterni, insegne, piatti, panorami</td></tr>
+  <tr><td>Apple e Google</td><td>Serve un pulsante "questa foto mi ritrae, rimuovila" con presa in carico tracciata. E l'AI non deve generare volti realistici né bambini</td></tr>
+</table>
+<div class="nota"><b>Regola unica, semplice da far rispettare:</b> volto riconoscibile senza consenso, si sfoca. Il volto
+di un minore si sfoca sempre. Lo strumento consigliato è <code>deface</code>, licenza libera, gira sulla nostra macchina.
+Lavora in memoria e non conserva né volti né misure.</div>
+
+<h3>Le persone finte</h3>
+<p>Profili e recensioni falsi sono vietati per legge, non solo dalle regole degli store: in Italia dal codice del consumo
+e dalla legge sulle recensioni in vigore dal 7 aprile 2026, in Albania dalla legge sulla tutela del consumatore.</p>
+<div class="fatto"><b>La regola decisa da Alessandro chiude il problema.</b> Le persone dimostrative portano una
+<b>scritta visibile</b> dovunque compaiano e un segno nel database. <b>Nessuna recensione finta su un locale vero</b>:
+lì scrive lui, e sono vere. I locali dimostrativi sono inventati.</div>
+<p>Tre cose da rispettare perché la regola tenga davvero: i profili con la scritta <b>non entrano</b> nelle classifiche,
+nei conteggi pubblici e nelle pagine per i motori; ILLI non li propone come consigli veri; prima di aprire una città
+nuova si elenca tutto quello che ha il segno e si decide cosa resta.</p>
+
+<h2><span class="n">8</span>Da Tirana al mondo</h2>
+
+<p>POI•LOVE nasce a Tirana per ragioni personali del fondatore, ma il prodotto è pensato per uscire dai confini.
+Cosa serve davvero, misurato sul codice di oggi:</p>
+
+<table>
+  <tr><th>Cosa</th><th>Come sta</th><th>Da fare</th></tr>
+  <tr><td>Tabella delle tre lingue</td><td class="ok">Sana, 915 voci allineate</td><td>Aggiungere una lingua è riempire un blocco</td></tr>
+  <tr><td>Caduta di lingua</td><td class="no">Chi non è riconosciuto legge albanese</td><td>Cadere su inglese. Una riga, sblocca il mondo</td></tr>
+  <tr><td>Testi fuori dalla tabella</td><td class="no">Oltre 250 punti scritti a mano in italiano</td><td>Portarli dentro la tabella prima di aggiungere lingue</td></tr>
+  <tr><td>Categorie</td><td class="no">Una colonna per lingua</td><td>Tabella figlia: con dieci lingue l'attuale non regge</td></tr>
+  <tr><td>Geocodificatore</td><td class="no">Undici punti violano le regole d'uso del servizio pubblico</td><td>Un solo punto di accesso, nostro</td></tr>
+  <tr><td>Traduzione automatica</td><td class="ok">Costo irrilevante: meno di un dollaro per lingua intera</td><td>Salvarla a fianco dell'originale, con l'etichetta "tradotto a macchina"</td></tr>
+  <tr><td>Informativa e Condizioni</td><td class="no">Solo in italiano e dichiarate bozze</td><td>Chiuderle con un legale prima di aprire fuori dall'Albania</td></tr>
+  <tr><td>Formati locali</td><td class="no">Numeri, date e valute non seguono la lingua</td><td>Da sistemare con l'apertura</td></tr>
+</table>
+
+<p><b>La strada in tre passi.</b> Prima l'Albania, fatta bene, con i quindici viaggi e i duecento luoghi.
+Poi l'Italia, perché il fondatore è lì e la lingua c'è già. Poi l'inglese come lingua del mondo, aprendo città
+una alla volta e solo quando c'è qualcuno che le cura. Il criterio per aprire una città non è la traduzione:
+è avere contenuti veri e una persona che risponde.</p>
+
+<h2><span class="n">9</span>Calendario</h2>
+
+<table class="gantt">
+  <tr><th></th><th>ago</th><th>set&nbsp;1</th><th>set&nbsp;2</th><th>set&nbsp;3</th><th>set&nbsp;4</th><th>ott&nbsp;1</th><th>ott&nbsp;2</th><th>ott&nbsp;3</th><th>ott&nbsp;4</th><th>nov&nbsp;1</th><th>nov&nbsp;2</th><th>nov&nbsp;3</th></tr>
+  <tr><td>A · Schede e profili</td><td class="b" colspan="12"><div class="barra" style="left:1%;width:24%"></div></td></tr>
+  <tr><td>A · Livelli, recensioni, moderazione</td><td class="b" colspan="12"><div class="barra" style="left:17%;width:22%"></div></td></tr>
+  <tr><td>A · Locale Plus, audio, QR</td><td class="b" colspan="12"><div class="barra" style="left:33%;width:20%"></div></td></tr>
+  <tr><td>B · Amministrazione</td><td class="b" colspan="12"><div class="barra g" style="left:50%;width:12%"></div></td></tr>
+  <tr><td>C · Viaggi e 210 luoghi</td><td class="b" colspan="12"><div class="barra v" style="left:58%;width:15%"></div></td></tr>
+  <tr><td>E · Mercato e rapporto</td><td class="b" colspan="12"><div class="barra o" style="left:70%;width:10%"></div></td></tr>
+  <tr><td>F · Uscita dai confini</td><td class="b" colspan="12"><div class="barra p" style="left:76%;width:9%"></div></td></tr>
+  <tr><td>D · App iPhone e Android</td><td class="b" colspan="12"><div class="barra g" style="left:56%;width:40%"></div></td></tr>
+  <tr><td>D · Revisione degli store</td><td class="b" colspan="12"><div class="barra" style="left:93%;width:7%;background:#6b6560"></div></td></tr>
+</table>
+
+<table>
+  <tr><th>Traguardo</th><th>Quando</th></tr>
+  <tr><td>Schede dei luoghi e profili, veri e in linea</td><td><b>10/09/2026</b></td></tr>
+  <tr><td>Livelli, recensioni con moderazione AI, amicizie</td><td><b>22/09/2026</b></td></tr>
+  <tr><td>Locale Plus completo, audio, QR</td><td><b>02/10/2026</b></td></tr>
+  <tr><td>Amministrazione al massimo</td><td><b>09/10/2026</b></td></tr>
+  <tr><td>Quindici viaggi e 210 luoghi Ufficiali in linea</td><td><b>18/10/2026</b></td></tr>
+  <tr><td>Mercato, rapporto con marcatura, uscita dai confini</td><td><b>28/10/2026</b></td></tr>
+  <tr><td>App inviata agli store</td><td><b>23/11/2026</b></td></tr>
+  <tr><td>App pubblicata</td><td>fine novembre, inizio dicembre</td></tr>
+</table>
+
+<h2><span class="n">10</span>Le cose da fare, in ordine</h2>
+
+<h3>Subito, prima di qualunque altra cosa</h3>
+<ul class="todo">
+  <li>Chiudere al pubblico la lettura di chi è amministratore e delle note di moderazione <span class="forse">(in attesa del sì di Alessandro)</span></li>
+  <li>Rigenerare o togliere il certificato scaricabile da poilove.com, che oggi non torna</li>
+  <li>Aggiungere alla tabella dei luoghi i campi per le tre lingue</li>
+  <li>Aggiungere alle foto le colonne di licenza, autore e fonte</li>
+  <li>Far cadere la lingua sconosciuta sull'inglese</li>
+</ul>
+
+<h3>Cantiere A · il prodotto sul web</h3>
+<ul class="todo">
+  <li>Scheda del luogo: copertina separata, galleria a multipli di tre, video compresso, sezioni per livello</li>
+  <li>Profilo pubblico nelle cinque tipologie, più la pagina per i motori</li>
+  <li>Amicizia come doppio seguito, elenco dei bloccati, invito a ricambiare con testo modificabile</li>
+  <li>Recensioni: sui luoghi e ricevute da influencer e professionisti, con la regola asimmetrica</li>
+  <li>Moderazione AI su direttive scritte, con la coda e il motivo</li>
+  <li>Livelli veri: limiti di foto, badge, muro dei sostenitori, quindici luoghi in omaggio, evidenze</li>
+  <li>Controllo automatico delle condizioni, ogni notte</li>
+  <li>Locale Plus: orari a tendina, menu con caricamento da file, doppia valuta, consigli dello chef, statistiche</li>
+  <li>Cambio della Banca d'Albania, una volta al giorno, con ricaduta sull'ultimo noto</li>
+  <li>Audio della persona: un minuto ai professionisti, tre ai locali, in MP3 192</li>
+  <li>Audioguide ufficiali POI•VOICE: durata libera, tre lingue, gestite dall'amministrazione</li>
+  <li>QR veri per locale, professionista e influencer</li>
+  <li>Abbonamenti: registrazione dentro, pagamento fuori</li>
+</ul>
+
+<h3>Cantiere B · amministrazione</h3>
+<ul class="todo">
+  <li>Direttive della moderazione AI, modificabili senza toccare il codice</li>
+  <li>Coda delle segnalazioni con intervento entro 24 ore, come pretende Apple</li>
+  <li>Menu dei locali: compilazione a mano e caricamento da file</li>
+  <li>Media con licenza, autore e attribuzione visibile</li>
+  <li>Abbonamenti, livelli, ruoli, statistiche</li>
+</ul>
+
+<h3>Cantiere C · contenuti</h3>
+<ul class="todo">
+  <li>Disegnare i quindici viaggi, tutte e dodici le prefetture</li>
+  <li>Costruire la catena automatica e farla girare</li>
+  <li>Sfocatura dei volti sulla macchina, prima della pubblicazione</li>
+  <li>Controllo e bollino Ufficiale</li>
+  <li>Portare gli script di misura dentro il repository, non nella cartella temporanea</li>
+</ul>
+
+<h3>Cantiere D · app</h3>
+<ul class="todo">
+  <li>Riscrivere il livello dati sullo schema vero e portare l'impianto alla versione attuale</li>
+  <li>Accesso, mappa, luoghi, creazione con posizione e foto, profili</li>
+  <li>Notifiche vere e avviso quando arrivi vicino a un luogo, anche con l'app chiusa</li>
+  <li>Cancellazione dell'account dentro l'app, segnalazione e blocco utenti</li>
+  <li>Abbonamenti con il sistema di Apple e di Google</li>
+  <li>Immagini per gli store, tre lingue, invio e correzioni</li>
+</ul>
+
+<h2><span class="n">11</span>Cosa serve da Alessandro</h2>
+
+<table>
+  <tr><th>Cosa</th><th>Quando</th><th>Stato</th></tr>
+  <tr><td>Sì alla chiusura delle colonne di amministrazione sulla porta dei dati</td><td>oggi</td><td class="forse">in attesa</td></tr>
+  <tr><td>Come si consegnano i quindici luoghi in omaggio: raccolta a suo nome o luoghi intestati</td><td>prima del cantiere A</td><td class="forse">in attesa</td></tr>
+  <tr><td>Pulizia dei 18 luoghi di prova oggi nel database</td><td>quando vuole</td><td class="forse">lo fa lui</td></tr>
+  <tr><td>Cosa vuol dire amico</td><td>fatto</td><td class="ok">doppio seguito</td></tr>
+  <tr><td>Foto del locale</td><td>fatto</td><td class="ok">copertina più 21 e un video</td></tr>
+  <tr><td>Abbonamenti venduti dal sito</td><td>fatto</td><td class="ok">no, per ora</td></tr>
+  <tr><td>Account Apple Developer e Google Play</td><td>entro fine ottobre</td><td class="no">li apre lui</td></tr>
+  <tr><td>Chiave per le notifiche dal suo account Apple</td><td>a novembre</td><td class="no">serve il suo account</td></tr>
+  <tr><td>Legale per informativa e condizioni, prima di uscire dall'Albania</td><td>prima del cantiere F</td><td class="no">non lo posso fare io</td></tr>
+</table>
+
+<h2><span class="n">12</span>I rischi veri</h2>
+<ol>
+  <li><b>Gli store.</b> L'app ha tre punti delicati insieme: contenuti scritti dagli utenti, posizione in sottofondo e
+      abbonamenti. Un giro di rifiuto è lo scenario normale, non quello sfortunato.</li>
+  <li><b>Le foto dei luoghi minori.</b> Sui duecento scelti bene la copertura è alta, ma se si scende nei villaggi
+      crolla. Meglio un luogo senza foto che una foto sbagliata.</li>
+  <li><b>La lingua albanese controllata dall'AI.</b> È la scelta del fondatore ed è praticabile, ma su duecento schede
+      pubbliche un errore di lingua si vede. Conviene almeno una lettura umana a campione.</li>
+  <li><b>Il collaudo del fondatore</b> è l'unico punto stretto del calendario: se salta un blocco, slitta tutto quello dopo.</li>
+  <li><b>Le dipendenze esterne</b> (mappe, geocodifica, calendari della marcatura) hanno quote e regole d'uso.
+      Aprendo altre città vanno gestite prima, non quando arriva il blocco.</li>
+</ol>
+
+<div class="piede">
+  POI•LOVE è un prodotto 321, ingegnerizzato da Alessandro Castagna.<br>
+  NIPT M52411017N · Tiranë · documento interno di lavoro, aggiornato al 20/08/2026
+</div>
+
+</div>
+</body></html>

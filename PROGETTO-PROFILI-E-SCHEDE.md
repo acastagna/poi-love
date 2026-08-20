@@ -705,3 +705,65 @@ Deciso dal fondatore, e chiude il problema legale:
   cosi' si decide cosa resta e cosa sparisce.
 
 Cosi' la vetrina si riempie senza raccontare bugie a nessuno, e senza rischi con la legge sulle recensioni.
+
+
+---
+
+## 16. Il progetto globale, e cosa hanno trovato le quattro verifiche (20/08/2026)
+
+Il documento da leggere e stampare e' `docs/PROGETTO-GLOBALE.html`: architettura, catena dei contenuti,
+calendario, cose da fare, rischi. Quello che segue e' il verbale delle verifiche indipendenti.
+
+### 16.1 Marcatura temporale: la verita'
+
+- **Themeli la fa davvero.** Il motore e' un'implementazione OpenTimestamps in PHP dentro la piattaforma Top Market
+  (`Projects/TopMarket/platform/inc/ots.php`, 713 righe). L'ancoraggio e' stato **riprodotto dal vivo**: la prova di
+  luglio risale al blocco Bitcoin 961131 del 05/08/2026. Regge.
+- **POI•LOVE non ha niente.** Il pulsante "Scarica notarizzazione" su poilove.com consegna un file di testo scritto
+  a mano nel sorgente, e **dichiara un'impronta diversa** da quella del PDF pubblicato. Chi verifica trova che non torna.
+- **La parola giusta**: rapporto con **marcatura temporale su blockchain Bitcoin**. Non "notarizzato".
+- Due correzioni fuori da POI•LOVE: il file di prova archiviato in Themeli va riscaricato aggiornato,
+  e la data scritta nel foglio di accompagnamento e' l'ora del nostro sistema, non l'ora del blocco.
+
+### 16.2 Volti e persone finte
+
+- Licenza libera **non e'** liberatoria della persona ritratta: la sfocatura serve comunque.
+- **Albania, legge 124/2024**: la piu' severa sui minori, soglia a 16 anni. E' il mercato di lancio.
+- Italia: pubblicare per uso promozionale senza consenso non si puo' (art. 96-97 L. 633/1941).
+- Strumento consigliato: **deface**, licenza MIT. Da escludere componenti con licenza AGPL.
+- Apple e Google pretendono il pulsante "questa foto mi ritrae, rimuovila" con presa in carico tracciata,
+  e vietano di generare con l'AI volti realistici e bambini.
+- **Recensioni e profili falsi sono vietati per legge**, non solo dalle regole degli store: Italia, legge 34/2026
+  in vigore dal 07/04/2026; Albania, legge sul consumatore. La regola decisa (scritta visibile, mai recensioni finte
+  su locali veri) chiude il problema.
+- Il controllore ha corretto l'indagine su tre punti: la tabella dei media **esiste gia'** (migrazione 076,
+  vanno aggiunte colonne, non creata una tabella), la regola sui volti **e' gia' scritta** in informativa e condizioni
+  ma nessuna riga di codice la fa rispettare, e in Albania esiste anche un'esposizione **penale**, non solo civile.
+
+### 16.3 Uscita dai confini
+
+- La tabella delle tre lingue e' sana (915 voci allineate), ma **oltre 250 punti** di testo sono scritti a mano
+  fuori dalla tabella, e 26 segnaposto su 42 non sono tradotti: un albanese oggi vede gia' campi in italiano.
+- **La lingua sconosciuta cade sull'albanese**: un tedesco legge albanese. Va portata sull'inglese, una riga.
+- Le categorie hanno **una colonna per lingua**: con dieci lingue non regge, serve una tabella figlia.
+- **Undici punti** del codice chiamano il geocodificatore pubblico violandone le regole d'uso.
+- Tradurre costa nulla (meno di un dollaro per lingua intera). Il costo vero e' l'impianto.
+- Informativa e Condizioni esistono **solo in italiano** e sono dichiarate bozze: vanno chiuse con un legale
+  prima di aprire fuori dall'Albania.
+
+### 16.4 I duecento luoghi
+
+- **Overpass funziona** (verificato dal vivo su Rozafa dal controllore, che ha smentito la prima indagine).
+- Sui **200 luoghi scelti bene** la copertura fotografica misurata e' **185 su 200**, non il 32 per cento:
+  quel numero vale per il campo lungo, cioe' villaggi e chiesette. Restano circa 15 luoghi da fare a mano.
+- **Bar e ristoranti**: dai dati aperti non esce niente. Gli Ufficiali devono essere monumenti e natura,
+  non locali. Le foto dei locali le da' il gestore.
+- **La tabella dei luoghi non ha campi lingua**: senza migrazione il testo generato non ha dove atterrare.
+- Costo delle descrizioni in tre lingue per 200 luoghi: fra 2 e 9 dollari. Il costo vero e' il controllo.
+- Falsi positivi sulle foto: nelle citta' arrivano al 100 per cento con la sola distanza.
+  Serve un filtro a piu' regole, e comunque un occhio umano. Meglio nessuna foto che una foto sbagliata.
+
+### 16.5 Stima finale
+
+Sei cantieri, **97 giornate**. App inviata agli store il **23/11/2026**, pubblicata fra fine novembre e inizio dicembre.
+Il calendario del documento HTML tiene conto delle sovrapposizioni: le giornate non sono giorni di calendario.
