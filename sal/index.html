@@ -979,6 +979,15 @@ body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); 
       <figcaption style="font-size:12px;color:var(--muted);margin-top:6px;font-weight:600" data-t="prog_cap2">Il profilo pubblico dell'utente, cinque tipologie</figcaption>
     </figure>
   </div>
+  <div id="progLive" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:#16130f;color:#fff;border-radius:14px;padding:14px 18px;margin-bottom:16px">
+    <span style="font-size:26px;font-weight:900" id="plPerc">—</span>
+    <span style="font-size:12px;font-weight:800;color:#cfc6b8;text-transform:uppercase;letter-spacing:.5px">completato</span>
+    <span style="width:1px;height:26px;background:rgba(255,255,255,.25)"></span>
+    <span style="font-size:13.5px;font-weight:700">fine prevista <b id="plFine">—</b></span>
+    <span style="width:1px;height:26px;background:rgba(255,255,255,.25)"></span>
+    <span style="font-size:13.5px;font-weight:700" id="plOra">—</span>
+    <span style="margin-left:auto;font-size:11.5px;color:#cfc6b8;font-weight:700">letto dal database, non scritto a mano</span>
+  </div>
   <div style="margin-top:18px;text-align:center">
     <a href="/avanzamento.html" style="display:inline-flex;align-items:center;gap:8px;background:#D42B2B;color:#fff;text-decoration:none;border-radius:99px;padding:13px 26px;font-size:14.5px;font-weight:800" data-t="prog_btn">Dove siamo adesso →</a>
     <a href="/progetto.html" style="display:inline-flex;align-items:center;gap:8px;background:#1C1C1C;color:#fff;text-decoration:none;border-radius:99px;padding:13px 26px;font-size:14.5px;font-weight:800;margin-left:10px" data-t="prog_btn2">Il progetto per intero</a>
@@ -1533,6 +1542,24 @@ window.addEventListener('load', ()=>{
   wrap.addEventListener('pointerup', release);
   wrap.addEventListener('pointercancel', release);
   wrap.addEventListener('pointerleave', function(e){ if (isDown) release(); });
+})();
+</script>
+
+<script>
+/* la riga viva del programma: legge la tabella vera, cosi' il SAL non mente mai */
+(async function(){
+  try{
+    const r=await fetch('https://poilove.com/db/rest/v1/programma?select=giornate,stato',{cache:'no-store'});
+    if(!r.ok) return;
+    const d=await r.json();
+    const tot=d.reduce((a,x)=>a+Number(x.giornate||0),0);
+    const fat=d.filter(x=>x.stato==='fatto').reduce((a,x)=>a+Number(x.giornate||0),0);
+    const restano=Math.ceil(tot-fat);
+    const fine=new Date(); fine.setDate(fine.getDate()+restano);
+    document.getElementById('plPerc').textContent=(tot?Math.round(fat/tot*100):0)+'%';
+    document.getElementById('plFine').textContent=fine.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'});
+    document.getElementById('plOra').textContent=String(fat).replace('.',',')+' giornate su '+String(tot).replace('.',',');
+  }catch(e){}
 })();
 </script>
 </body>

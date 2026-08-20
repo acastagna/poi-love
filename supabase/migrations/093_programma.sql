@@ -26,8 +26,10 @@ drop policy if exists programma_lettura_pubblica on public.programma;
 create policy programma_lettura_pubblica on public.programma for select using (true);
 
 drop trigger if exists programma_tocca on public.programma;
+create or replace function public.tg_programma_tocca() returns trigger language plpgsql as $$
+begin new.aggiornato := now(); return new; end $$;
 create trigger programma_tocca before update on public.programma
-  for each row execute function public.set_updated_at();
+  for each row execute function public.tg_programma_tocca();
 
 grant select on public.programma to anon, authenticated;
 grant usage, select on sequence public.programma_id_seq to authenticated;

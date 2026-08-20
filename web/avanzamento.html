@@ -23,7 +23,7 @@
        cursor:pointer;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;gap:7px}
   .btn.scuro{background:#16130f}
   .btn:hover{opacity:.9}
-  .grosso{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-bottom:8px}
+  .grosso{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:8px}
   .grosso>div{background:var(--carta);border:1px solid var(--bordo);border-radius:14px;padding:14px 16px}
   .grosso b{display:block;font-size:30px;font-weight:900;line-height:1.1}
   .grosso span{font-size:11.5px;font-weight:800;color:var(--tenue);text-transform:uppercase;letter-spacing:.5px}
@@ -56,6 +56,7 @@
   .eti.c{background:#FFF7E6;color:var(--oro);border:1px solid #E8C169}
   .vuoto{color:var(--tenue);font-style:italic}
   .piede{margin-top:40px;padding-top:14px;border-top:1px solid var(--bordo);color:var(--tenue);font-size:12.5px}
+  @media(max-width:900px){.grosso{grid-template-columns:1fr 1fr 1fr}}
   @media(max-width:640px){.grosso{grid-template-columns:1fr 1fr}header h1{font-size:25px}}
   @media print{.comandi{display:none}body{font-size:11pt}}
 </style></head>
@@ -78,9 +79,11 @@
   <div><b id="nFatte">—</b><span>giornate fatte</span></div>
   <div><b id="nTotali">—</b><span>giornate in tutto</span></div>
   <div><b id="nAttesa">—</b><span>aspettano te</span></div>
+  <div style="background:#16130f;border-color:#16130f;color:#fff"><b id="nFine">—</b><span style="color:#cfc6b8">fine prevista</span></div>
 </div>
 <div class="totale"><i id="barraTotale" style="width:0%"></i></div>
 <div class="quando" id="quando">lettura in corso…</div>
+<p style="font-size:13px;color:var(--tenue);margin-top:6px">La fine prevista si sposta da sola: e' oggi piu' le giornate che restano, contando di lavorare tutti i giorni. Ogni blocco che chiudo la avvicina.</p>
 
 <div id="attesa"></div>
 <div id="adesso"></div>
@@ -121,6 +124,10 @@ async function leggi(){
   document.getElementById('nTotali').textContent=gTot.toString().replace('.',',');
   document.getElementById('nAttesa').textContent=attesa.length;
   document.getElementById('barraTotale').style.width=perc+'%';
+  const restano=Math.ceil(gTot-gFatte);
+  const fine=new Date(); fine.setDate(fine.getDate()+restano);
+  document.getElementById('nFine').textContent=fine.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit'});
+  document.getElementById('nFine').title=restano+' giornate ancora, lavorando tutti i giorni';
   const ora=new Date();
   document.getElementById('quando').textContent='aggiornato alle '+ora.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
 
