@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="it"><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{--rosso:#D42B2B;--blu:#285EA7;--sfondo:#EAE4D8;--carta:#FBF8F2;--testo:#1C1C1C;--tenue:#77706A;--bordo:#DCD4C6;--oro:#CA8A04;--viola:#7C3AED}
+  body{background:#2a2522;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,Helvetica,Arial,sans-serif;
+       color:var(--testo);padding:34px 28px 44px}
+  .titolone{color:#fff;font-size:29px;font-weight:900;margin-bottom:5px;letter-spacing:-.5px}
+  .sottotitolone{color:#c9bfb4;font-size:14.5px;margin-bottom:26px;max-width:1240px;line-height:1.5}
+  .fila{display:flex;gap:26px;align-items:flex-start}
+  .col{width:390px;flex-shrink:0}
+  .etichetta{color:#fff;font-size:15px;font-weight:900;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+  .etichetta .n{width:24px;height:24px;border-radius:50%;background:var(--rosso);color:#fff;font-size:13px;
+       display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .spiega{color:#c9bfb4;font-size:12.5px;margin-bottom:12px;min-height:62px;line-height:1.4}
+  .tel{width:390px;background:var(--sfondo);border-radius:34px;overflow:hidden;border:9px solid #16130f;
+       box-shadow:0 24px 60px rgba(0,0,0,.5)}
+  .foto{height:250px;background:#cfc6b8 center/cover no-repeat;position:relative}
+  .foto::after{content:'';position:absolute;inset:0;background:linear-gradient(transparent 55%,rgba(0,0,0,.45))}
+  .fbtn{position:absolute;top:14px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.92);
+        display:flex;align-items:center;justify-content:center;font-size:20px;z-index:2}
+  .fbtn.sx{left:14px}.fbtn.dx{right:14px}
+  .fcont{position:absolute;left:14px;bottom:12px;z-index:2;display:flex;gap:6px;flex-wrap:wrap;max-width:300px}
+  .pill{background:rgba(0,0,0,.55);color:#fff;border-radius:20px;padding:5px 11px;font-size:11.5px;font-weight:800;
+        display:inline-flex;align-items:center;gap:5px}
+  .puntini{position:absolute;right:14px;bottom:16px;z-index:2;display:flex;gap:5px}
+  .puntini span{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.45)}
+  .puntini span.on{background:#fff;width:18px;border-radius:4px}
+  .corpo{padding:16px 16px 22px;background:var(--sfondo)}
+  h1{font-size:26px;font-weight:900;line-height:1.12;letter-spacing:-.4px}
+  .cat{display:inline-flex;align-items:center;gap:5px;background:var(--rosso);color:#fff;border-radius:20px;
+       padding:4px 11px;font-size:11.5px;font-weight:800;vertical-align:6px;margin-left:6px}
+  .zona{color:var(--tenue);font-size:14.5px;font-weight:700;margin-top:4px;display:flex;align-items:flex-start;gap:6px;line-height:1.35}
+  .autore{display:flex;align-items:center;gap:10px;background:var(--carta);border:1px solid var(--bordo);
+          border-radius:16px;padding:11px 13px;margin-top:14px}
+  .av{width:44px;height:44px;border-radius:50%;background:var(--rosso);color:#fff;display:flex;align-items:center;
+      justify-content:center;font-weight:900;font-size:15px;flex-shrink:0;background-size:cover;background-position:center}
+  .anome{font-size:15px;font-weight:800;line-height:1.35}
+  .badge{display:inline-flex;align-items:center;gap:4px;border-radius:20px;padding:3px 9px;font-size:10.5px;font-weight:900;
+         border:1.5px solid;white-space:nowrap;vertical-align:1px}
+  .b-liv{background:rgba(5,150,105,.14);color:#047857;border-color:#04785755}
+  .b-sos{background:rgba(30,58,138,.12);color:#1e3a8a;border-color:#1e3a8a55}
+  .b-mec{background:linear-gradient(135deg,#6d28d9,#7c3aed);color:#fff;border-color:#c4b5fd}
+  .b-inf{background:linear-gradient(135deg,#be185d,#ec4899);color:#fff;border-color:#f9a8d4}
+  .b-pro{background:linear-gradient(135deg,#334155,#0b1220);color:#e2e8f0;border-color:#94a3b8}
+  .b-plus{background:linear-gradient(135deg,#0f766e,#14b8a6);color:#ccfbf1;border-color:#5eead4}
+  .ameta{font-size:12px;color:var(--tenue);font-weight:600;margin-top:3px;line-height:1.35}
+  .segui{margin-left:auto;background:var(--rosso);color:#fff;border-radius:20px;padding:8px 14px;font-size:12.5px;font-weight:900;
+         flex-shrink:0;text-align:center;line-height:1.15}
+  .segui small{display:block;font-size:9.5px;font-weight:800;opacity:.9;margin-top:1px}
+  .racconto{font-size:16px;line-height:1.5;margin-top:15px}
+  .love{display:flex;align-items:center;justify-content:center;gap:9px;background:var(--rosso);color:#fff;
+        border-radius:26px;height:56px;font-size:19px;font-weight:900;margin-top:16px}
+  .tre{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:10px}
+  .tre.duee{grid-template-columns:repeat(2,1fr)}
+  .tre>div{background:var(--carta);border:1px solid var(--bordo);border-radius:16px;padding:13px 6px;text-align:center;
+           font-size:12.5px;font-weight:800}
+  .tre i{display:block;font-size:23px;margin-bottom:5px;color:var(--testo)}
+  .sez{font-size:11px;font-weight:900;letter-spacing:.6px;text-transform:uppercase;color:var(--tenue);
+       margin:22px 0 9px;display:flex;align-items:center;gap:6px}
+  .sez .conta{margin-left:auto;color:var(--blu);font-weight:900;letter-spacing:0;text-transform:none;font-size:12px}
+  .galleria{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+  .galleria>div{height:82px;border-radius:11px;background:#cfc6b8 center/cover no-repeat;position:relative}
+  .video{position:relative}
+  .video>i{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+           color:#fff;font-size:30px;text-shadow:0 2px 10px rgba(0,0,0,.75)}
+  .mappina{height:150px;border-radius:16px;background:#dfe6d8 center/cover no-repeat;position:relative;border:1px solid var(--bordo)}
+  .mappina i{position:absolute;left:50%;top:50%;transform:translate(-50%,-60%);font-size:30px;color:var(--rosso)}
+  .riga{display:flex;align-items:flex-start;gap:10px;background:var(--carta);border:1px solid var(--bordo);
+        border-radius:14px;padding:12px 13px;font-size:14px;font-weight:600;margin-bottom:8px;line-height:1.4}
+  .riga i{font-size:19px;color:var(--rosso);flex-shrink:0}
+  .riga b{font-weight:900}
+  .riga .dx{margin-left:auto;font-weight:900;color:var(--blu);white-space:nowrap;align-self:center}
+  .tag{display:flex;flex-wrap:wrap;gap:7px}
+  .tag span{background:var(--carta);border:1px solid var(--bordo);border-radius:20px;padding:6px 12px;font-size:12.5px;font-weight:700}
+  .amanti{display:flex;align-items:center}
+  .amanti div{width:34px;height:34px;border-radius:50%;margin-left:-9px;border:2px solid var(--sfondo);
+              background:var(--blu);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800}
+  .amanti div:first-child{margin-left:0}
+  .piede{margin-top:20px;padding-top:14px;border-top:1px solid var(--bordo);font-size:11.5px;color:var(--tenue);line-height:1.6}
+  .due{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+  .quattro{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .cta{display:flex;align-items:center;justify-content:center;gap:8px;border-radius:20px;height:50px;font-size:15px;font-weight:900}
+  .cta.pieno{background:var(--rosso);color:#fff}
+  .cta.vuoto{background:var(--carta);border:1.5px solid var(--bordo)}
+  .social{height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff}
+  .orario{display:flex;align-items:center;gap:9px;background:#E9F7EE;border:1px solid #A7E0BC;border-radius:14px;
+          padding:12px 13px;font-size:14px;font-weight:800;color:#0B7A38}
+  .orario.apri{border-radius:14px 14px 0 0;border-bottom:none}
+  .giorni{background:var(--carta);border:1px solid #A7E0BC;border-top:none;border-radius:0 0 14px 14px;overflow:hidden}
+  .giorni>div{display:flex;align-items:center;gap:8px;padding:9px 13px;font-size:13px;border-bottom:1px solid var(--bordo)}
+  .giorni>div:last-child{border-bottom:none}
+  .giorni b{font-weight:900;width:78px;flex-shrink:0}
+  .giorni span{margin-left:auto;font-weight:700;color:var(--tenue)}
+  .giorni .oggi{background:#E9F7EE}
+  .giorni .oggi b,.giorni .oggi span{color:#0B7A38}
+  .menu{background:var(--carta);border:1px solid var(--bordo);border-radius:16px;overflow:hidden}
+  .menu .voce{display:flex;align-items:center;gap:10px;padding:12px 13px;border-bottom:1px solid var(--bordo);font-size:14px}
+  .menu .voce:last-child{border-bottom:none}
+  .menu .voce .prezzi{margin-left:auto;text-align:right;line-height:1.25}
+  .menu .voce .prezzi b{font-weight:900;font-size:14.5px;display:block}
+  .menu .voce .prezzi span{font-size:11.5px;color:var(--tenue);font-weight:700}
+  .piatto{background:var(--carta);border:1.5px solid var(--rosso);border-radius:16px;padding:12px;margin-top:8px}
+  .piatto .fotopiatto{height:120px;border-radius:12px;background:#cfc6b8 center/cover no-repeat;margin-bottom:9px}
+  .chef{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .chef>div{background:var(--carta);border:1px solid var(--bordo);border-radius:14px;overflow:hidden}
+  .chef .im{height:70px;background:#cfc6b8 center/cover no-repeat}
+  .chef .tx{padding:8px 9px}
+  .chef b{font-size:12.5px;font-weight:900;display:block;line-height:1.25}
+  .chef span{font-size:11px;color:var(--tenue);font-weight:800}
+  .chef-nota{font-size:13.5px;line-height:1.45;background:#FFF7E6;border:1px solid #E8C169;border-radius:14px;
+             padding:11px 13px;margin-top:8px;color:#6b4e00}
+  .cambio{font-size:11.5px;color:var(--tenue);font-weight:700;margin-top:7px;display:flex;align-items:flex-start;gap:6px;line-height:1.4}
+  .rec{background:var(--carta);border:1px solid var(--bordo);border-radius:16px;padding:13px;margin-bottom:9px}
+  .rec .cima{display:flex;align-items:center;gap:9px}
+  .rec .cuori{margin-left:auto;color:var(--rosso);font-size:14px;letter-spacing:1px}
+  .rec .testo{font-size:14px;line-height:1.45;margin-top:8px}
+  .rec .quando{font-size:11.5px;color:var(--tenue);font-weight:700;margin-top:6px}
+  .scorr{display:flex;gap:9px;overflow-x:hidden;padding-bottom:2px;
+         -webkit-mask-image:linear-gradient(to right,#000 84%,rgba(0,0,0,.15));mask-image:linear-gradient(to right,#000 84%,rgba(0,0,0,.15))}
+  .scorr .rec{min-width:236px;max-width:236px;margin-bottom:0}
+  .scorr .rec .testo{font-size:13px}
+  .frecce{display:flex;align-items:center;gap:5px;margin-left:auto;color:var(--tenue);font-size:15px}
+  .media{display:flex;align-items:center;gap:12px;background:#FFF3F3;border:1px solid #F3C9C9;border-radius:16px;padding:13px 15px;margin-bottom:10px}
+  .media .num{font-size:34px;font-weight:900;color:var(--rosso);line-height:1}
+  .paga{display:flex;gap:8px;flex-wrap:wrap}
+  .paga span{background:var(--carta);border:1px solid var(--bordo);border-radius:10px;padding:7px 11px;font-size:12px;font-weight:800;
+             display:inline-flex;align-items:center;gap:5px}
+  .solo-tuo{display:flex;align-items:flex-start;gap:8px;background:#FFF7E6;border:1px dashed #E8C169;border-radius:14px;
+            padding:11px 13px;font-size:12.5px;font-weight:700;color:#8A6100;margin-top:10px;line-height:1.4}
+  .rotta{background:linear-gradient(135deg,#F3EEFF,#E9E0FF);border:1.5px solid #C4B5FD;border-radius:16px;padding:13px;display:flex;gap:11px;align-items:flex-start}
+  .rotta i{font-size:24px;color:var(--viola);flex-shrink:0}
+  .rotta b{font-weight:900;color:#4C1D95}
+  .rotta span{font-size:12.5px;color:#6D28D9;font-weight:700}
+  .muro{display:flex;align-items:center;gap:9px;background:#EEF3FF;border:1px solid #B9CBF0;border-radius:14px;padding:12px 13px;
+        font-size:13.5px;font-weight:800;color:#1e3a8a;line-height:1.4}
+  .marchio-voice{height:13px;margin-left:auto;opacity:.95}
+  .rvoice{border-color:#9FBBE0;background:#F2F7FF}
+  .rvoice i{color:var(--blu)}
+  .rvoice .dx{color:var(--blu)}
+  .bonus{font-size:10px;font-weight:900;letter-spacing:.3px;background:#0f766e;color:#fff;border-radius:20px;padding:3px 8px;margin-left:6px}
+  .qrbox{background:var(--carta);border:1px solid var(--bordo);border-radius:18px;padding:16px;text-align:center}
+  .qrbox img{width:132px;height:132px;display:block;margin:0 auto 10px}
+  .qrbox b{font-size:14.5px;font-weight:900;display:block}
+  .qrbox span{font-size:12.5px;color:var(--tenue);font-weight:700;display:block;margin-top:3px;line-height:1.4}
+  .qrbox .salva{display:inline-flex;align-items:center;gap:7px;background:var(--testo);color:#fff;border-radius:20px;
+                padding:9px 16px;font-size:12.5px;font-weight:900;margin-top:11px}
+  .qrbox .levetta{display:flex;align-items:center;justify-content:center;gap:8px;font-size:11.5px;font-weight:800;
+                  color:var(--tenue);margin-top:11px;padding-top:11px;border-top:1px solid var(--bordo)}
+  .lev{width:34px;height:20px;border-radius:20px;background:#16A34A;position:relative;flex-shrink:0}
+  .lev::after{content:'';position:absolute;right:2px;top:2px;width:16px;height:16px;border-radius:50%;background:#fff}
+  .qrriga{display:flex;align-items:center;gap:11px;background:var(--carta);border:1px solid var(--bordo);border-radius:14px;padding:11px 12px}
+  .qrriga img{width:76px;height:76px;flex-shrink:0}
+  .qrriga b{font-size:14px;font-weight:900;display:block}
+  .qrriga span{font-size:12px;color:var(--tenue);font-weight:700;display:block;margin-top:3px;line-height:1.35}
+  .puntini-gal{display:flex;justify-content:center;gap:5px;margin-top:9px}
+  .puntini-gal span{width:6px;height:6px;border-radius:50%;background:#c4bcae}
+  .puntini-gal span.on{background:var(--rosso);width:16px;border-radius:4px}
+  .biglietto{background:var(--carta);border:1px solid var(--bordo);border-radius:18px;padding:14px;display:flex;gap:12px;align-items:center}
+  .biglietto .av{width:58px;height:58px}
+  .accento{display:inline-flex;align-items:center;gap:6px;background:#111;color:#fff;border-radius:20px;padding:4px 10px;
+           font-size:10px;font-weight:800;margin-left:auto}
+  .pastiglia{width:13px;height:13px;border-radius:50%;display:inline-block;border:2px solid #fff}
+</style></head>
+<body>
+<div class="titolone">La scheda del luogo · sei tipologie</div>
+<div class="sottotitolone">Stessa struttura per tutti: cambia la fascia dell'autore e quello che ha diritto di mostrare. La prima foto è la <b style="color:#fff">Copertina</b>, sta in cima e non si ripete nella galleria sotto. Numero di foto e tempi di scorrimento <b style="color:#fff">non si scrivono mai nella scheda</b>: si regolano nel pannello di amministrazione. Le <b style="color:#fff">recensioni</b> non esistono sulle schede delle persone: le ricevono Influencer, Professionisti e Locali, e scorrono di lato. L'<b style="color:#fff">audioguida POI•VOICE</b>: Mecenate e Influencer ascoltano quella del luogo ovunque, Professionista carica la propria fino a 1 minuto, Locale fino a 3 minuti (convertite subito in MP3 192). Immagini <b style="color:#fff">e colore d'accento</b> si personalizzano dall'utente. Le gallerie hanno sempre un numero di foto <b style="color:#fff">multiplo di tre</b>: l'ultima riga non resta mai monca.</div>
+<div class="fila"><div class="col"><div class="etichetta"><span class="n">1</span> Persona · livello a punti</div><div class="spiega">La base. Copertina in cima, le altre foto sotto senza ripeterla. Niente conteggi, niente tempi: sono cose del pannello. <b>Nessuna recensione</b>: sulle persone non esistono.</div><div class="tel"><div class="foto" style="background-image:url('f/14aa276da0.jpg')"><div class="fbtn sx"><i class="ph-duotone ph-arrow-left"></i></div><div class="fbtn dx"><i class="ph-duotone ph-share-network"></i></div><div class="fcont"><span class="pill"><i class="ph-duotone ph-navigation-arrow"></i>2,3 km da te</span></div><div class="puntini"><span class="on"></span><span></span><span></span></div></div>
+      <div class="corpo">
+        <h1>Uji i Ftohte<span class="cat"><i class="ph-fill ph-mountains"></i>panorama</span></h1>
+        <div class="zona"><i class="ph-duotone ph-map-pin"></i><span>Rruga Uji i Ftohte · Valona · Qarku i Vlores · Albania</span></div>
+        <div class="autore">
+          <div class="av" style="background-image:url('f/260adfd45c.jpg')"></div>
+          <div><div class="anome">Marco B. <span class="badge b-liv"><i class="ph-fill ph-airplane-tilt"></i>Viaggiatore</span></div>
+            <div class="ameta">128 luoghi · 4.512 punti · <i class="ph-fill ph-map-pin" style="color:#16A34A"></i> posizione visibile</div></div>
+          <div class="segui">Segui</div></div>
+        <div class="racconto">La terrazza sul mare piu amata della Riviera. Ci si arriva a piedi dal centro, e al tramonto l'acqua diventa arancione.</div>
+        <div class="love"><i class="ph-fill ph-heart"></i>Love · 2.331</div>
+        <div class="tre"><div><i class="ph-duotone ph-navigation-arrow"></i>Naviga</div><div><i class="ph-duotone ph-share-network"></i>Condividi</div><div><i class="ph-duotone ph-bookmark-simple"></i>Salva</div></div><div class="sez"><i class="ph-duotone ph-images"></i>Le foto del posto</div><div class="galleria"><div class="" style="background-image:url('f/27da8daddb.jpg')"></div><div class="" style="background-image:url('f/3280b13079.jpg')"></div><div class="" style="background-image:url('f/53e83d26c4.jpg')"></div></div><div class="sez"><i class="ph-duotone ph-tag"></i>Tag</div>
+        <div class="tag"><span>tramonto</span><span>mare</span><span>terrazza</span><span>a piedi dal centro</span></div>
+        <div class="sez"><i class="ph-duotone ph-path"></i>Fa parte di</div>
+        <div class="riga"><i class="ph-duotone ph-path"></i><div><b>Riviera del sud in 5 giorni</b><br><span style="color:var(--tenue);font-weight:600">itinerario pubblico · 12 tappe</span></div></div>
+        <div class="riga"><i class="ph-duotone ph-users-three"></i><div><b>Estate 2026 in Riviera</b><br><span style="color:var(--tenue);font-weight:600">compagnia pubblica · 8 persone</span></div></div><div class="sez"><i class="ph-duotone ph-map-trifold"></i>Dove si trova</div><div class="mappina" style="background-image:url('https://tile.openstreetmap.org/12/2216/1531.png')"><i class="ph-fill ph-map-pin"></i></div><div class="riga" style="margin-top:9px"><i class="ph-duotone ph-path"></i><div><b>2,3 km</b> da dove sei ora<br><span style="color:var(--tenue);font-weight:600">7 minuti in auto</span></div><span class="dx">Vai</span></div><div class="sez"><i class="ph-duotone ph-users-three"></i>Chi lo ama</div><div class="amanti"><div>AC</div><div>MB</div><div>EL</div><div>GR</div><div>+2.3k</div></div><div class="piede">Creato il 12/06/2026 · aggiornato il 03/08/2026<br>POI-LOVE · la mappa fatta dalle persone</div></div></div></div><div class="col"><div class="etichetta"><span class="n">2</span> Sostenitore</div><div class="spiega">Come la persona: spunta di verifica, badge, e il Muro dei Sostenitori dentro la scheda. Anche qui nessuna recensione.</div><div class="tel"><div class="foto" style="background-image:url('f/1f43ef2975.jpg')"><div class="fbtn sx"><i class="ph-duotone ph-arrow-left"></i></div><div class="fbtn dx"><i class="ph-duotone ph-share-network"></i></div><div class="fcont"><span class="pill" style="background:#1e3a8a"><i class="ph-fill ph-hand-heart"></i>Sostenitore</span></div><div class="puntini"><span class="on"></span><span></span><span></span></div></div>
+      <div class="corpo">
+        <h1>Lago di Koman<span class="cat"><i class="ph-fill ph-tree"></i>natura</span></h1>
+        <div class="zona"><i class="ph-duotone ph-map-pin"></i><span>Koman · Fierze · Qarku i Shkodres · Albania</span></div>
+        <div class="autore" style="border-color:#B9CBF0;background:#F7F9FF">
+          <div class="av" style="background:linear-gradient(135deg,#1e3a8a,#1d4ed8)">SB</div>
+          <div><div class="anome">Sara B. <i class="ph-fill ph-seal-check" style="color:#1e3a8a;font-size:16px"></i>
+            <span class="badge b-sos"><i class="ph-fill ph-hand-heart"></i>Sostenitore</span></div>
+            <div class="ameta">Sostiene POI-LOVE da 8 mesi · 74 luoghi</div></div>
+          <div class="segui" style="background:#1e3a8a">Segui</div></div>
+        <div class="racconto">Il traghetto parte alle 9 da Koman: due ore dentro un canyon che sembra Norvegia. Portatevi il pranzo, a bordo non c'e niente.</div>
+        <div class="love"><i class="ph-fill ph-heart"></i>Love · 3.980</div>
+        <div class="tre"><div><i class="ph-duotone ph-navigation-arrow"></i>Naviga</div><div><i class="ph-duotone ph-share-network"></i>Condividi</div><div><i class="ph-duotone ph-bookmark-simple"></i>Salva</div></div><div class="sez"><i class="ph-duotone ph-images"></i>Le foto del posto</div><div class="galleria"><div class="" style="background-image:url('f/27da8daddb.jpg')"></div><div class="" style="background-image:url('f/3280b13079.jpg')"></div><div class="" style="background-image:url('f/53e83d26c4.jpg')"></div><div class="" style="background-image:url('f/2bfcc9130b.jpg')"></div><div class="" style="background-image:url('f/3ca65a977c.jpg')"></div><div class="" style="background-image:url('f/vino.jpg')"></div></div><div class="sez"><i class="ph-duotone ph-cards-three"></i>Muro dei Sostenitori</div>
+        <div class="muro"><i class="ph-fill ph-hand-heart" style="font-size:20px"></i>Sara sostiene attivamente il progetto POI-LOVE assieme a 214 persone</div>
+        <div class="sez"><i class="ph-duotone ph-tag"></i>Tag</div>
+        <div class="tag"><span>traghetto</span><span>canyon</span><span>silenzio</span></div>
+        <div class="sez"><i class="ph-duotone ph-path"></i>Fa parte di</div>
+        <div class="riga"><i class="ph-duotone ph-path"></i><div><b>Il nord che non ti aspetti</b><br><span style="color:var(--tenue);font-weight:600">itinerario pubblico · 7 tappe</span></div></div><div class="sez"><i class="ph-duotone ph-map-trifold"></i>Dove si trova</div><div class="mappina" style="background-image:url('https://tile.openstreetmap.org/12/2216/1531.png')"><i class="ph-fill ph-map-pin"></i></div><div class="riga" style="margin-top:9px"><i class="ph-duotone ph-path"></i><div><b>121 km</b> da dove sei ora<br><span style="color:var(--tenue);font-weight:600">2 ore e 40 in auto</span></div><span class="dx">Vai</span></div><div class="sez"><i class="ph-duotone ph-users-three"></i>Chi lo ama</div><div class="amanti"><div>AC</div><div>MB</div><div>EL</div><div>GR</div><div>+3.9k</div></div><div class="piede">Creato il 04/05/2026 · aggiornato il 21/07/2026<br>POI-LOVE · la mappa fatta dalle persone</div></div></div></div><div class="col"><div class="etichetta"><span class="n">3</span> Mecenate</div><div class="spiega">Itinerario in evidenza subito in alto. Ascolta l'audioguida del luogo ovunque, anche lontano dal posto: la scheda gliela offre perche' e' un luogo che ha visitato. Nessuna recensione.</div><div class="tel"><div class="foto" style="background-image:url('f/525029b70f.jpg')"><div class="fbtn sx"><i class="ph-duotone ph-arrow-left"></i></div><div class="fbtn dx"><i class="ph-duotone ph-share-network"></i></div><div class="fcont"><span class="pill" style="background:linear-gradient(135deg,#6d28d9,#7c3aed)"><i class="ph-fill ph-crown"></i>Mecenate</span></div><div class="puntini"><span class="on"></span><span></span><span></span></div></div>
+      <div class="corpo">
+        <h1>Piazza Skanderbeg<span class="cat"><i class="ph-fill ph-building-columns"></i>cultura</span></h1>
+        <div class="zona"><i class="ph-duotone ph-map-pin"></i><span>Sheshi Skenderbej · Tirana · Qarku i Tiranes · Albania</span></div>
+        <div class="autore" style="border-color:#C4B5FD;background:#F8F5FF">
+          <div class="av" style="background:linear-gradient(135deg,#6d28d9,#7c3aed)">AL</div>
+          <div><div class="anome">Altin L. <i class="ph-fill ph-seal-check" style="color:#7C3AED;font-size:16px"></i>
+            <span class="badge b-mec"><i class="ph-fill ph-crown"></i>Mecenate</span></div>
+            <div class="ameta">Mecenate dal 2026 · 189 luoghi · 3 rotte adottate</div></div>
+          <div class="segui" style="background:#7C3AED">Segui</div></div>
+        <div class="sez"><i class="ph-duotone ph-push-pin"></i>Il suo itinerario in evidenza</div>
+        <div class="rotta"><i class="ph-fill ph-push-pin"></i><div><b>Tirana in un giorno, a piedi</b><br><span>in evidenza su POI-LOVE · 11 tappe · 2.140 salvataggi</span></div></div>
+        <div class="racconto">La piazza si guarda due volte: di giorno per le facciate, alle undici di sera quando le fontane si spengono e resta solo la luce dell'Et'hem Bey.</div>
+        <div class="love"><i class="ph-fill ph-heart"></i>Love · 6.402</div>
+        <div class="tre"><div><i class="ph-duotone ph-navigation-arrow"></i>Naviga</div><div><i class="ph-duotone ph-share-network"></i>Condividi</div><div><i class="ph-duotone ph-bookmark-simple"></i>Salva</div></div><div class="sez"><i class="ph-duotone ph-headphones"></i>Audioguida<img class="marchio-voice" src="logo-poivoice.svg"></div><div class="riga rvoice"><i class="ph-duotone ph-headphones"></i><div><b>Ascolta la guida di Piazza Skanderbeg</b><br><span style="color:var(--tenue);font-weight:600">6 minuti · italiano, albanese, inglese · la sente ovunque, anche lontano dal posto, perche e un luogo che ha visitato</span></div><span class="dx">Ascolta</span></div><div class="sez"><i class="ph-duotone ph-images"></i>Le foto del posto</div><div class="galleria"><div class="" style="background-image:url('f/27da8daddb.jpg')"></div><div class="" style="background-image:url('f/3280b13079.jpg')"></div><div class="" style="background-image:url('f/53e83d26c4.jpg')"></div><div class="" style="background-image:url('f/2bfcc9130b.jpg')"></div><div class="" style="background-image:url('f/3ca65a977c.jpg')"></div><div class="" style="background-image:url('f/vino.jpg')"></div><div class="" style="background-image:url('f/a91173340b.jpg')"></div><div class="" style="background-image:url('f/accf28c420.jpg')"></div><div class="" style="background-image:url('f/b204bbd27f.jpg')"></div></div><div class="sez"><i class="ph-duotone ph-tag"></i>Tag</div>
+        <div class="tag"><span>centro</span><span>sera</span><span>fontane</span><span>moschea</span></div><div class="sez"><i class="ph-duotone ph-map-trifold"></i>Dove si trova</div><div class="mappina" style="background-image:url('https://tile.openstreetmap.org/12/2216/1531.png')"><i class="ph-fill ph-map-pin"></i></div><div class="riga" style="margin-top:9px"><i class="ph-duotone ph-path"></i><div><b>1,1 km</b> da dove sei ora<br><span style="color:var(--tenue);font-weight:600">14 minuti a piedi</span></div><span class="dx">Vai</span></div><div class="sez"><i class="ph-duotone ph-users-three"></i>Chi lo ama</div><div class="amanti"><div>AC</div><div>MB</div><div>EL</div><div>GR</div><div>+6.4k</div></div><div class="piede">Creato il 18/03/2026 · aggiornato ieri<br>POI-LOVE · la mappa fatta dalle persone</div></div></div></div><div class="col"><div class="etichetta"><span class="n">4</span> Influencer</div><div class="spiega">Fino a tre itinerari e una compagnia in evidenza. Riceve recensioni sue, che scorrono di lato. Ascolta l'audioguida del luogo. Il riquadro privato col rapporto notarizzato sta in fondo.</div><div class="tel"><div class="foto" style="background-image:url('f/5f6b75656d.jpg')"><div class="fbtn sx"><i class="ph-duotone ph-arrow-left"></i></div><div class="fbtn dx"><i class="ph-duotone ph-share-network"></i></div><div class="fcont"><span class="pill" style="background:linear-gradient(135deg,#be185d,#ec4899)"><i class="ph-fill ph-megaphone"></i>Consigliato</span><span class="pill"><i class="ph-fill ph-play-circle"></i>video</span></div><div class="puntini"><span class="on"></span><span></span><span></span></div></div>
+      <div class="corpo">
+        <h1>Dhermi Beach<span class="cat"><i class="ph-fill ph-umbrella"></i>spiaggia</span></h1>
+        <div class="zona"><i class="ph-duotone ph-map-pin"></i><span>Dhermi · Himare · Qarku i Vlores · Albania</span></div>
+        <div class="autore" style="border-color:#f9a8d4;background:#fff5fa">
+          <div class="av" style="background-image:url('f/p5.jpg')"></div>
+          <div><div class="anome">Elira <i class="ph-fill ph-seal-check" style="color:#ec4899;font-size:16px"></i>
+            <span class="badge b-inf"><i class="ph-fill ph-megaphone"></i>Influencer</span></div>
+            <div class="ameta">18.400 follower · 214 luoghi · 46 questo mese</div></div>
+          <div class="segui" style="background:#ec4899">Segui<small>+30 punti</small></div></div>
+        <div class="racconto">Arrivate presto: alle sette la spiaggia e ancora vuota e l'acqua e vetro. Il chiosco in fondo fa il caffe migliore.</div>
+        <div class="love"><i class="ph-fill ph-heart"></i>Love · 8.902</div>
+        <div class="tre"><div><i class="ph-duotone ph-navigation-arrow"></i>Naviga</div><div><i class="ph-duotone ph-share-network"></i>Condividi</div><div><i class="ph-duotone ph-bookmark-simple"></i>Salva</div></div><div class="sez"><i class="ph-duotone ph-images"></i>Foto e video</div><div class="galleria"><div class="video" style="background-image:url('f/27da8daddb.jpg')"><i class="ph-fill ph-play-circle"></i></div><div class="" style="background-image:url('f/3280b13079.jpg')"></div><div class="" style="background-image:url('f/53e83d26c4.jpg')"></div><div class="" style="background-image:url('f/2bfcc9130b.jpg')"></div><div class="" style="background-image:url('f/3ca65a977c.jpg')"></div><div class="" style="background-image:url('f/vino.jpg')"></div></div><div class="sez"><i class="ph-duotone ph-push-pin"></i>In evidenza</div>
+        <div class="riga"><i class="ph-duotone ph-path"></i><div><b>Riviera segreta, 4 giorni</b><br><span style="color:var(--tenue);font-weight:600">9 tappe · 1.204 salvataggi</span></div></div>
+        <div class="riga"><i class="ph-duotone ph-path"></i><div><b>Le spiagge senza ombrelloni</b><br><span style="color:var(--tenue);font-weight:600">7 tappe · 856 salvataggi</span></div></div>
+        <div class="riga"><i class="ph-duotone ph-path"></i><div><b>Sud in moto, senza fretta</b><br><span style="color:var(--tenue);font-weight:600">11 tappe · 640 salvataggi</span></div></div>
+        <div class="riga"><i class="ph-duotone ph-users-three"></i><div><b>Riviera Crew</b><br><span style="color:var(--tenue);font-weight:600">compagnia in evidenza · 42 persone</span></div></div><div class="sez"><i class="ph-duotone ph-headphones"></i>Audioguida<img class="marchio-voice" src="logo-poivoice.svg"></div><div class="riga rvoice"><i class="ph-duotone ph-headphones"></i><div><b>Ascolta la guida di Dhermi</b><br><span style="color:var(--tenue);font-weight:600">3 minuti · italiano e inglese</span></div><span class="dx">Ascolta</span></div><div class="sez"><i class="ph-duotone ph-chat-circle-text"></i>Recensioni ricevute da Elira<div class="frecce"><i class="ph-bold ph-caret-left"></i><i class="ph-bold ph-caret-right"></i></div></div><div class="media"><div class="num">4,7</div><div><div style="color:var(--rosso);font-size:16px;letter-spacing:2px"><i class="ph-fill ph-heart"></i><i class="ph-fill ph-heart"></i><i class="ph-fill ph-heart"></i><i class="ph-fill ph-heart"></i><i class="ph-fill ph-heart"></i></div><div style="font-size:12.5px;color:var(--tenue);font-weight:700;margin-top:3px">su 312 recensioni ricevute</div></div></div><div class="scorr"><div class="rec"><div class="cima"><div class="av" style="width:34px;height:34px;font-size:12px;background-image:url('f/p1.jpg')"></div><div><b style="font-size:14px">Klara B.</b><div style="font-size:11.5px;color:var(--tenue);font-weight:700">ha seguito i suoi consigli</div></div><div class="cuori"><i class="ph-fill ph-heart"></i><i class="ph-fill ph-heart"></i><i class="ph-fill ph-heart"></i><i class="ph-fill ph-heart"></i><i class="ph-fill ph-heart"></i></div></div><div class="testo">Ho fatto tre suoi posti in un giorno: nessuno sbagliato. Le indicazioni sono precise.</div><div class="quando">19/08/2026</div></div><div class="rec"><div class="cima"><div class="av" style="width:34px;height:34px;font-size:12px;background-image:url('f/p2.jpg')"></div><div><b style="font-size:14px">Ergi S.</b><div style="font-size:11.5px;color:var(--tenue);font-weight:700">ha seguito i suoi consigli</div></div><div class="cuori"><i class="ph-fill ph-heart"></i><i class="ph-fill ph-heart"></i><i class="ph-fill ph-heart"></i><i class="ph-fill ph-heart"></i><i class="ph-duotone ph-heart"></i></div></div><div class="testo">Bravissima sui posti di mare, meno sui ristoranti. Ma consiglia sempre con onesta.</div><div class="quando">12/08/2026</div></div><div class="rec"><div class="cima"><div class="av" style="width:34px;height:34px;font-size:12px;background-image:url('f/p3.jpg')"></div><div><b style="font-size:14px">Nora T.</b><div style="font-size:11.5px;color:var(--tenue);font-weight:700">ha seguito i suoi consigli</div></div><div class="cuori"><i class="ph-fill ph-heart"></i><i class="ph-fill ph-heart"></i><i class="ph-fill ph-heart"></i><i class="ph-fill ph-heart"></i><i class="ph-fill ph-heart"></i></div></div><div class="testo">Il suo itinerario della Riviera e diventato la nostra vacanza. Grazie davvero.</div><div class="quando">04/08/2026</div></div></div><div class="sez"><i class="ph-duotone ph-tag"></i>Tag</div>
+        <div class="tag"><span>alba</span><span>acqua vetro</span><span>caffe</span></div><div class="sez"><i class="ph-duotone ph-map-trifold"></i>Dove si trova</div><div class="mappina" style="background-image:url('https://tile.openstreetmap.org/12/2216/1531.png')"><i class="ph-fill ph-map-pin"></i></div><div class="riga" style="margin-top:9px"><i class="ph-duotone ph-path"></i><div><b>34 km</b> da dove sei ora<br><span style="color:var(--tenue);font-weight:600">48 minuti in auto</span></div><span class="dx">Vai</span></div><div class="sez"><i class="ph-duotone ph-users-three"></i>Chi lo ama</div><div class="amanti"><div>AC</div><div>MB</div><div>EL</div><div>GR</div><div>+8.9k</div></div><div class="sez"><i class="ph-duotone ph-qr-code"></i>Il QR di Elira</div><div class="qrbox"><img src="f/qr-elira.png"><b>Inquadralo o cliccalo</b><span>Porta allo stesso indirizzo: si salva nei contatti del telefono, col rimando al suo profilo POI-LOVE.</span><div class="salva"><i class="ph-fill ph-download-simple"></i>Salva il QR</div></div><div class="solo-tuo" style="background:#F3F0FF;border-color:#C4B5FD;color:#4C1D95"><i class="ph-duotone ph-seal-check"></i><span><b>Solo Elira vede:</b> dal suo profilo scarica il <b>rapporto notarizzato</b> (PDF con impronta SHA-256 e data certa): 18.400 follower, 214 luoghi, 2.060 salvataggi di itinerari, 312 recensioni ricevute, media 4,7. Vale come referenza verso terzi, anche per la cessione del marchio.</span></div><div class="piede">Creato il 02/07/2026 · aggiornato ieri<br>POI-LOVE · la mappa fatta dalle persone</div></div></div></div><div class="col"><div class="etichetta"><span class="n">5</span> Professionista</div><div class="spiega">Il biglietto da visita completo: Chiama, Scrivi (posta protetta del sistema), Sito, Vieni a trovarmi, i social, il QR dei contatti. Naviga scende sotto e vale per chi condivide la posizione di adesso. Audioguida sua, fino a 1 minuto.</div><div class="tel"><div class="foto" style="background-image:url('f/25736c1fea.jpg')"><div class="fbtn sx"><i class="ph-duotone ph-arrow-left"></i></div><div class="fbtn dx"><i class="ph-duotone ph-share-network"></i></div><div class="fcont"><span class="pill" style="background:linear-gradient(135deg,#334155,#0b1220)"><i class="ph-fill ph-seal-check"></i>Professionista</span><span class="pill"><i class="ph-fill ph-play-circle"></i>video</span></div><div class="puntini"><span class="on"></span><span></span><span></span></div></div>
+      <div class="corpo">
+        <h1>Castello di Kruja<span class="cat"><i class="ph-fill ph-castle-turret"></i>storia</span></h1>
+        <div class="zona"><i class="ph-duotone ph-map-pin"></i><span>Kalaja e Krujes · Kruje · Qarku i Durresit · Albania</span></div>
+        <div class="autore" style="border-color:#94a3b8;background:#f4f6f8;flex-direction:column;align-items:stretch;gap:11px">
+          <div style="display:flex;align-items:center;gap:11px">
+            <div class="av" style="width:52px;height:52px;background-image:url('f/p4.jpg')"></div>
+            <div style="flex:1;min-width:0">
+              <div class="anome">Genc Kola <i class="ph-fill ph-seal-check" style="color:#334155;font-size:15px"></i>
+                <span class="badge b-pro"><i class="ph-fill ph-briefcase"></i>Professionista</span></div>
+              <div class="ameta">Guida culturale · dal 2019</div></div>
+            <div class="segui" style="background:#334155;align-self:center">Segui<small>+50 punti</small></div></div>
+          <div class="due">
+            <div class="cta pieno" style="height:44px;font-size:14px"><i class="ph-fill ph-phone"></i>Chiama</div>
+            <div class="cta vuoto" style="height:44px;font-size:14px"><i class="ph-duotone ph-envelope-simple"></i>Scrivi</div></div>
+          <div class="riga" style="margin:0"><i class="ph-duotone ph-globe"></i><div><b>genckola.al</b><br><span style="color:var(--tenue);font-weight:600">visite guidate · italiano, inglese</span></div></div>
+          <div class="riga" style="margin:0"><i class="ph-duotone ph-storefront"></i><div><b>Vieni a trovarmi: Studio Kola</b><br><span style="color:var(--tenue);font-weight:600">Rruga Kastrioti 14 · Kruje · indirizzo confermato</span></div><span class="dx">Naviga</span></div>
+          <div class="quattro">
+            <div class="social" style="background:linear-gradient(135deg,#833AB4,#E1306C)"><i class="ph-fill ph-instagram-logo"></i></div>
+            <div class="social" style="background:#1877F2"><i class="ph-fill ph-facebook-logo"></i></div>
+            <div class="social" style="background:#0A66C2"><i class="ph-fill ph-linkedin-logo"></i></div>
+            <div class="social" style="background:#000"><i class="ph-fill ph-x-logo"></i></div></div>
+        <div class="qrriga"><img src="f/qr-contatti.png"><div><b>Inquadra e salva i miei contatti</b><span>Inquadralo o cliccalo, e lo stesso indirizzo: nome, telefono, email, sito e profilo POI-LOVE finiscono in rubrica.</span></div></div>
+        </div>
+        <div class="racconto">Il castello si legge dall'alto: salite prima al bastione ovest, poi scendete al museo. Vi racconto la storia di Scanderbeg dove e successa.</div>
+        <div class="love"><i class="ph-fill ph-heart"></i>Love · 4.117</div>
+        <div class="tre duee"><div><i class="ph-duotone ph-share-network"></i>Condividi</div><div><i class="ph-duotone ph-bookmark-simple"></i>Salva</div></div>
+        <div class="riga rvoice" style="margin-top:9px"><i class="ph-duotone ph-navigation-arrow"></i><div><b>Naviga verso Genc, adesso</b><br><span style="color:var(--tenue);font-weight:600">condivide la sua posizione attuale: e alla biglietteria del castello</span></div><span class="dx">Vai</span></div>
+        <div class="sez"><i class="ph-duotone ph-images"></i>Foto e video</div><div class="galleria"><div class="video" style="background-image:url('f/27da8daddb.jpg')"><i class="ph-fill ph-play-circle"></i></div><div class="" style="background-image:url('f/3280b13079.jpg')"></div><div class="" style="background-image:url('f/53e83d26c4.jpg')"></div><div class="" style="background-image:url('f/2bfcc9130b.jpg')"></div><div class="" style="background-image:url('f/3ca65a977c.jpg')"></div><div class="" style="background-image:url('f/vino.jpg')"></div></div><div class="sez"><i class="ph-duotone ph-headphones"></i>Audioguida<img class="marchio-voice" src="logo-poivoice.svg"></div><div class="riga rvoice"><i class="ph-duotone ph-headphones"></i><div><b>La presentazione di Genc, con la sua voce</b><br><span style="color:var(--tenue);font-weight:600">52 secondi · massimo un minuto per i professionisti · diventa subito MP3 192</span></div><span class="dx">Ascolta</span></div><div class="sez"><i class="ph-duotone ph-scroll"></i>Rotta adottata</div>
+        <div class="rotta"><i class="ph-fill ph-scroll"></i><div><b>La via di Scanderbeg</b><br><span>adottata da Genc Kola · "a mio nonno, che me la raccontava"</span></div></div><div class="sez"><i class="ph-duotone ph-chat-circle-text"></i>Recensioni ricevute da Genc<div class="frecce"><i class="ph-bold ph-caret-left"></i><i class="ph-bold ph-caret-right"></i></div></div><div class="media"><div class="num">4,9</div><div><div style="color:var(--rosso);font-size:16px;letter-spacing:2px"><i class="ph-fill ph-heart"></i><i class="ph-fill ph-heart"></i><i class="ph-fill ph-heart"></i><i class="ph-fill ph-heart"></i><i class="ph-fill ph-heart"></i></div><div style="font-size:12.5px;color:var(--tenue);font-weight:700;margin-top:3px">su 37 recensioni ricevute</div></div></div><div class="scorr"><div class="rec"><div class="cima"><div class="av" style="width:34px;height:34px;font-size:12px;background-image:url('f/8219fe4294.jpg')"></div><div><b style="font-size:14px">Marta D.</b><div style="font-size:11.5px;color:var(--tenue);font-weight:700">ha fatto una visita con lui</div></div><div class="cuori"><i class="ph-fill ph-heart"></i><i class="ph-fill ph-heart"></i><i class="ph-fill ph-heart"></i><i class="ph-fill ph-heart"></i><i class="ph-fill ph-heart"></i></div></div><div class="testo">Il consiglio del bastione ovest prima del museo cambia la visita. Fatelo.</div><div class="quando">07/08/2026</div></div><div class="rec"><div class="cima"><div class="av" style="width:34px;height:34px;font-size:12px;background-image:url('f/p6.jpg')"></div><div><b style="font-size:14px">Paolo V.</b><div style="font-size:11.5px;color:var(--tenue);font-weight:700">ha fatto una visita con lui</div></div><div class="cuori"><i class="ph-fill ph-heart"></i><i class="ph-fill ph-heart"></i><i class="ph-fill ph-heart"></i><i class="ph-fill ph-heart"></i><i class="ph-fill ph-heart"></i></div></div><div class="testo">Tre ore passate come venti minuti. Sa raccontare senza recitare.</div><div class="quando">29/07/2026</div></div><div class="rec"><div class="cima"><div class="av" style="width:34px;height:34px;font-size:12px;background-image:url('f/489a56cf0a.jpg')"></div><div><b style="font-size:14px">Ana K.</b><div style="font-size:11.5px;color:var(--tenue);font-weight:700">ha fatto una visita con lui</div></div><div class="cuori"><i class="ph-fill ph-heart"></i><i class="ph-fill ph-heart"></i><i class="ph-fill ph-heart"></i><i class="ph-fill ph-heart"></i><i class="ph-duotone ph-heart"></i></div></div><div class="testo">Molto preparato. Portate acqua, la salita al bastione e vera.</div><div class="quando">16/07/2026</div></div></div><div class="sez"><i class="ph-duotone ph-map-trifold"></i>Dove si trova</div><div class="mappina" style="background-image:url('https://tile.openstreetmap.org/12/2216/1531.png')"><i class="ph-fill ph-map-pin"></i></div><div class="riga" style="margin-top:9px"><i class="ph-duotone ph-path"></i><div><b>31 km</b> da dove sei ora<br><span style="color:var(--tenue);font-weight:600">42 minuti in auto</span></div><span class="dx">Vai</span></div><div class="sez"><i class="ph-duotone ph-users-three"></i>Chi lo ama</div><div class="amanti"><div>AC</div><div>MB</div><div>EL</div><div>GR</div><div>+4.1k</div></div><div class="solo-tuo" style="background:#F3F0FF;border-color:#C4B5FD;color:#4C1D95"><i class="ph-duotone ph-seal-check"></i><span><b>Solo Genc vede:</b> dal suo profilo scarica il <b>rapporto notarizzato</b> (PDF con impronta SHA-256 e data certa): 1.204 visite alla scheda, 312 navigazioni avviate, 89 QR letti, 37 recensioni, media 4,9. Vale come referenza verso terzi, anche per la cessione del marchio.</span></div><div class="piede">Creato il 21/04/2026 · aggiornato il 14/08/2026<br>POI-LOVE · la mappa fatta dalle persone</div></div></div></div><div class="col"><div class="etichetta"><span class="n">6</span> Plus · Locale — 250 euro/anno</div><div class="spiega"><b>Questa scheda E il profilo del locale.</b> Aperto/chiuso si apre a tendina con tutti i giorni. Menu con doppia valuta e piatti che si aprono, Consigli dello Chef, recensioni con media. In fondo: Naviga, il QR salvabile, poi le foto del locale.</div><div class="tel"><div class="foto" style="background-image:url('f/fe726c037c.jpg')"><div class="fbtn sx"><i class="ph-duotone ph-arrow-left"></i></div><div class="fbtn dx"><i class="ph-duotone ph-share-network"></i></div><div class="fcont"><span class="pill" style="background:linear-gradient(135deg,#0f766e,#14b8a6)"><i class="ph-fill ph-storefront"></i>Plus</span><span class="pill" style="background:#0B7A38"><i class="ph-fill ph-clock"></i>Aperto</span></div><div class="puntini"><span class="on"></span><span></span><span></span></div></div>
+      <div class="corpo">
+        <h1>Mullixhiu<span class="cat"><i class="ph-fill ph-fork-knife"></i>ristorante</span></h1>
+        <div class="zona"><i class="ph-duotone ph-map-pin"></i><span>Lek Dukagjini 1 · Tirana · Qarku i Tiranes · Albania</span></div>
+        <div class="autore" style="border-color:#5eead4;background:#f0fdfa">
+          <div class="av" style="background:linear-gradient(135deg,#0f766e,#14b8a6)">MU</div>
+          <div><div class="anome">Mullixhiu <i class="ph-fill ph-seal-check" style="color:#0f766e;font-size:16px"></i>
+            <span class="badge b-plus"><i class="ph-fill ph-storefront"></i>Locale</span></div>
+            <div class="ameta">Cucina albanese · dal 2016 · <b>questa scheda e il suo profilo</b></div></div>
+          <div class="segui" style="background:#0f766e">Segui<small>+100 punti</small></div></div>
+        <div class="racconto">Il mulino in mezzo al parco: cucina albanese di campagna, tavoli sotto le canne. Meglio prenotare per la sera.</div>
+        <div class="sez"><i class="ph-duotone ph-images"></i>Le foto del locale</div><div class="galleria"><div class="video" style="background-image:url('f/27da8daddb.jpg')"><i class="ph-fill ph-play-circle"></i></div><div class="" style="background-image:url('f/3280b13079.jpg')"></div><div class="" style="background-image:url('f/53e83d26c4.jpg')"></div><div class="" style="background-image:url('f/2bfcc9130b.jpg')"></div><div class="" style="background-image:url('f/3ca65a977c.jpg')"></div><div class="" style="background-image:url('f/vino.jpg')"></div></div>
+        <div class="puntini-gal"><span class="on"></span><span></span><span></span><span></span></div>
+        <div class="orario apri" style="margin-top:18px"><i class="ph-fill ph-clock"></i>Aperto ora · chiude alle 23:30<i class="ph-bold ph-caret-up" style="margin-left:auto"></i></div>
+        <div class="giorni"><div class=""><b>Lunedi</b><span>12:00-15:00 · 19:00-23:30</span></div><div class=""><b>Martedi</b><span>12:00-15:00 · 19:00-23:30</span></div><div class="oggi"><b>Mercoledi</b><span>12:00-15:00 · 19:00-23:30</span></div><div class=""><b>Giovedi</b><span>12:00-15:00 · 19:00-23:30</span></div><div class=""><b>Venerdi</b><span>12:00-15:00 · 19:00-23:30</span></div><div class=""><b>Sabato</b><span>12:00-23:30</span></div><div class=""><b>Domenica</b><span>12:00-23:30</span></div></div>
+        <div class="due" style="margin-top:14px">
+          <div class="cta pieno"><i class="ph-fill ph-calendar-check"></i>Prenota</div>
+          <div class="cta vuoto"><i class="ph-fill ph-phone"></i>Chiama</div></div>
+        <div class="love" style="margin-top:10px"><i class="ph-fill ph-heart"></i>Love · 1.204</div>
+        <div class="tre duee"><div><i class="ph-duotone ph-share-network"></i>Condividi</div><div><i class="ph-duotone ph-bookmark-simple"></i>Salva</div></div><div class="sez"><i class="ph-duotone ph-list-numbers"></i>Il menu</div>
+        <div class="menu">
+          <div class="voce"><i class="ph-duotone ph-bowl-food" style="color:var(--rosso)"></i>Jani me fasule<div class="prezzi"><b>450 L</b><span>circa 4,50 euro</span></div></div>
+          <div class="voce"><i class="ph-duotone ph-fish" style="color:var(--rosso)"></i>Trota del Drin<div class="prezzi"><b>1.200 L</b><span>circa 12,00 euro</span></div></div>
+          <div class="voce"><i class="ph-duotone ph-wine" style="color:var(--rosso)"></i>Kallmet, calice<div class="prezzi"><b>350 L</b><span>circa 3,50 euro</span></div></div>
+        </div>
+        <div class="cambio"><i class="ph-duotone ph-arrows-left-right"></i><span>Cambio Banca d'Albania del 20/08/2026 · 1 euro = 100,2 L. Si aggiorna una volta al giorno; se la banca non risponde resta l'ultimo cambio, con la sua data.</span></div>
+        <div class="piatto">
+          <div class="fotopiatto" style="background-image:url('f/f3e6d188a8.jpg')"></div>
+          <div style="display:flex;align-items:center;gap:8px"><b style="font-size:15px">Trota del Drin</b>
+            <div class="prezzi" style="margin-left:auto;text-align:right"><b style="font-weight:900">1.200 L</b><br><span style="font-size:11.5px;color:var(--tenue);font-weight:700">circa 12,00 euro</span></div></div>
+          <div style="font-size:13.5px;color:var(--tenue);margin-top:5px;line-height:1.4">Alla griglia, con limone e erbe del parco. Cosi si apre il piatto quando ci clicchi sopra: foto e spiegazione, caricate dal locale o scattate sul momento.</div>
+        </div>
+        <div class="sez"><i class="ph-duotone ph-chef-hat"></i>Consigli dello Chef</div><div class="chef"><div><div class="im" style="background-image:url('f/pi1.jpg')"></div><div class="tx"><b>Tave kosi</b><span>780 L · circa 7,80 euro</span></div></div><div><div class="im" style="background-image:url('f/pi2.jpg')"></div><div class="tx"><b>Trota del Drin</b><span>1.200 L · circa 12,00 euro</span></div></div><div><div class="im" style="background-image:url('f/pi3.jpg')"></div><div class="tx"><b>Petulla dolci</b><span>390 L · circa 3,90 euro</span></div></div></div>
+        <div class="chef-nota"><b>Raccontato dal proprietario:</b> "Il tave kosi lo fa mia madre da quarant'anni, la trota arriva dal Drin il mattino stesso e le petulla si mangiano solo di domenica."</div>
+        <div class="sez"><i class="ph-duotone ph-headphones"></i>Audioguida<span class="bonus">BONUS PLUS</span><img class="marchio-voice" src="logo-poivoice.svg"></div><div class="riga rvoice"><i class="ph-duotone ph-headphones"></i><div><b>Il mulino raccontato dal proprietario</b><br><span style="color:var(--tenue);font-weight:600">2 minuti e 40 · massimo tre minuti per i locali · diventa subito MP3 192</span></div><span class="dx">Ascolta</span></div><div class="sez"><i class="ph-duotone ph-chat-circle-text"></i>Recensioni<span class="conta">solo amici · una a testa</span></div>
+        <div class="media"><div class="num">4,6</div><div><div style="color:var(--rosso);font-size:16px;letter-spacing:2px"><i class="ph-fill ph-heart"></i><i class="ph-fill ph-heart"></i><i class="ph-fill ph-heart"></i><i class="ph-fill ph-heart"></i><i class="ph-fill ph-heart"></i></div><div style="font-size:12.5px;color:var(--tenue);font-weight:700;margin-top:3px">su 38 recensioni di amici del locale</div></div></div>
+        <div class="scorr"><div class="rec"><div class="cima"><div class="av" style="width:34px;height:34px;font-size:12px;background-image:url('f/a0190d3b85.jpg')"></div><div><b style="font-size:14px">Anna R.</b><div style="font-size:11.5px;color:var(--tenue);font-weight:700">amica del locale</div></div><div class="cuori"><i class="ph-fill ph-heart"></i><i class="ph-fill ph-heart"></i><i class="ph-fill ph-heart"></i><i class="ph-fill ph-heart"></i><i class="ph-fill ph-heart"></i></div></div><div class="testo">Il jani me fasule e quello di mia nonna. Tavolo fuori, sotto le canne, e il conto onesto.</div><div class="quando">14/08/2026 · <b style="color:var(--rosso)">+200 punti</b></div></div><div class="rec"><div class="cima"><div class="av" style="width:34px;height:34px;font-size:12px;background-image:url('f/29ab4e360a.jpg')"></div><div><b style="font-size:14px">Dritan K.</b><div style="font-size:11.5px;color:var(--tenue);font-weight:700">amico del locale</div></div><div class="cuori"><i class="ph-fill ph-heart"></i><i class="ph-fill ph-heart"></i><i class="ph-fill ph-heart"></i><i class="ph-fill ph-heart"></i><i class="ph-duotone ph-heart"></i></div></div><div class="testo">Cucina seria. Di sabato sera senza prenotazione non si entra, avvisati.</div><div class="quando">02/08/2026</div></div><div class="rec"><div class="cima"><div class="av" style="width:34px;height:34px;font-size:12px;background-image:url('f/p1.jpg')"></div><div><b style="font-size:14px">Ledia H.</b><div style="font-size:11.5px;color:var(--tenue);font-weight:700">amica del locale</div></div><div class="cuori"><i class="ph-fill ph-heart"></i><i class="ph-fill ph-heart"></i><i class="ph-fill ph-heart"></i><i class="ph-fill ph-heart"></i><i class="ph-fill ph-heart"></i></div></div><div class="testo">Il posto piu bello di Tirana per una cena lunga. Chiedete il tavolo in fondo.</div><div class="quando">27/07/2026</div></div></div>
+        <div class="cambio"><i class="ph-duotone ph-info"></i><span>Se togli l'amicizia al locale, la tua recensione sparisce. Il locale puo bandirti, ma quello che hai scritto resta.</span></div>
+        <div class="sez"><i class="ph-duotone ph-credit-card"></i>Pagamenti accettati</div>
+        <div class="paga"><span><i class="ph-fill ph-credit-card"></i>Carte</span><span><i class="ph-fill ph-device-mobile"></i>Apple Pay</span><span><i class="ph-fill ph-money"></i>Contanti</span></div>
+        <div class="sez"><i class="ph-duotone ph-map-trifold"></i>Dove si trova</div><div class="mappina" style="background-image:url('https://tile.openstreetmap.org/12/2216/1531.png')"><i class="ph-fill ph-map-pin"></i></div><div class="riga" style="margin-top:9px"><i class="ph-duotone ph-path"></i><div><b>1,1 km</b> da dove sei ora<br><span style="color:var(--tenue);font-weight:600">14 minuti a piedi</span></div><span class="dx">Vai</span></div><div class="cta pieno" style="margin-top:4px"><i class="ph-fill ph-navigation-arrow"></i>Naviga</div>
+        <div class="qrbox"><img src="f/qr-locale.png"><b>Il QR del locale</b><span>Inquadralo o cliccalo, e lo stesso indirizzo: porta a questa scheda e salva il locale nei contatti. Si stampa per la vetrina.</span><div class="salva"><i class="ph-fill ph-download-simple"></i>Salva il QR</div></div>
+        </div>
+        <div class="sez"><i class="ph-duotone ph-users-three"></i>Chi lo ama</div>
+        <div class="amanti"><div>AC</div><div>MB</div><div>EL</div><div>GR</div><div>+1.2k</div></div>
+        <div class="solo-tuo"><i class="ph-duotone ph-chart-line-up"></i><span>Solo il proprietario vede: 2.140 visite · 312 navigazioni · 89 QR letti · 38 recensioni · media 4,6</span></div>
+        <div class="piede">Scheda verificata il 09/08/2026 · aggiornata oggi · Plus 250 euro/anno<br>POI-LOVE · la mappa fatta dalle persone</div></div></div></div></div>
+</body></html>
