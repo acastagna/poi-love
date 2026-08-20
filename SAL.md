@@ -1,5 +1,48 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
+## Sessione 20/08/2026 (pomeriggio e sera) — La scheda del luogo diventa il disegno approvato (v4.62 → 4.78)
+
+**Dove si guarda lo stato, da oggi**: https://sal.poilove.com/avanzamento.html
+Si aggiorna da sola: legge la tabella `programma` (migrazione 093) e ricalcola percentuale,
+giornate che restano e data di fine. Il SAL e il sito di presentazione hanno la stessa riga viva.
+Il progetto per intero, stampabile: https://sal.poilove.com/progetto.html
+
+### Prima parte: disegni, programma, verifiche
+
+- **Sei schede del luogo e sei profili pubblici** disegnati e approvati (`docs/mockup-schede-profili/`),
+  con le regole scritte in TODO.md: copertina, gallerie a righe piene, recensioni solo dove servono,
+  audioguide, QR, mercato delle collaborazioni.
+- **Pagina pubblica dei livelli** aggiornata: Plus locali a **250 euro l'anno**, foto del locale
+  **copertina + 21 e un video**, in tre lingue, su project e sal.
+- **Programma di lavoro dentro il database** (`programma`, `programma_ritmo`): 97 giornate, sei cantieri,
+  data di fine calcolata sul ritmo di ciascuno.
+- **Controllo avversariale indipendente** (agente certificatore + quattro indagini con revisore):
+  ha smentito quattro mie affermazioni. In sintesi: l'impianto dell'app Expo **non** parla con lo schema
+  vero (e' una riscrittura, non un aggancio); il "rapporto notarizzato" non prova nessuna data;
+  le foto esterne si prendevano **senza salvare licenza e autore**; i 200 luoghi partivano da 18.
+  Correzioni e prove in `PROGETTO-PROFILI-E-SCHEDE.md`, capitolo 9 e 16.
+
+### Seconda parte: lavoro vero, otto giornate di programma chiuse
+
+| Blocco | Cosa e' cambiato |
+|---|---|
+| Migrazioni di base (094) | i luoghi hanno i campi per le tre lingue; le foto hanno licenza, autore, fonte e attribuzione, con una **guardia**: una foto da Commons o Openverse senza licenza viene rifiutata dal database |
+| Sicurezza (095) | la tabella delle persone non espone piu' a chiunque `is_admin`, `admin_role` e le note di moderazione. Restano pubbliche solo le colonne pubbliche |
+| Impronta del documento | il certificato scaricabile da poilove.com dichiarava numeri di un altro file: rigenerato, e ora dice cosa prova e cosa non prova. Via la parola "notarizzazione" |
+| Lingua | chi non e' riconosciuto legge **inglese**, non piu' albanese. Vale anche per le pagine dei motori |
+| Video (096, video.php) | un video per luogo: ffmpeg sulla macchina, 83 MB diventano 3, lato lungo 1080, MP3/AAC, copertina presa dal video, dati nascosti del telefono rimossi |
+| Scheda del luogo | rifatta sul disegno: copertina che scorre, chilometri sulla copertina, titolo con pastiglia della categoria, indirizzo, fascia dell'autore col badge del livello e **Segui vero**, Love bianco a zero e rosso da uno in su, azioni **tre se non e' tuo / cinque se e' tuo**, foto incassate a righe piene con la Copertina marcata, tag, fa parte di, **mappina satellitare inquadrata sul punto**, sei tempi di viaggio uno per riga (a piedi, bici, auto, aereo, nave, e a tutto impulso), chi lo ama, piedino col logo steso centrato, freccia che pulsa al posto della barra di scorrimento |
+| Luoghi di prova | **Pizzeria Aurora** (luogo vero da OpenStreetMap, profilo dimostrativo Marta B., senza foto) e **Opa (copia di prova)** intestato a Patrizia, a 362 m da casa: servono a vedere la scheda di un luogo che non e' tuo |
+
+**Guasti trovati e chiusi mentre si lavorava**: sostituire o cancellare la copertina cancellava tutte
+le altre foto del luogo; le sezioni nuove erano collegate a una sola delle due strade di apertura della
+scheda, quindi non si vedevano mai; il segnaposto della mappina usciva come una cornetta del telefono.
+
+**Regola nuova, scritta**: ogni pezzo finito si segna subito nel programma; le domande si fanno al
+momento giusto, cioe' appena finisce il blocco che le precede, mai tutte insieme.
+
+---
+
 ## Sessione 20/08/2026 — Revisione sulla scheda POI: due guasti seri chiusi (v4.59 → 4.61)
 
 **SALVA POI in alto** (richiesta del founder, col disegno): pulsante rosso in alto a destra nella

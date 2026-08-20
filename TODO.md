@@ -139,6 +139,19 @@ Paga il **Professionista (100 euro/anno)** e paga il **Plus locale (250 euro/ann
 
 ---
 
+## ✅ CHIUSO IL 20/08/2026 (sera)
+
+La scheda del luogo e' il disegno approvato, in linea dalla **4.78**. Chiuse 8 giornate di programma su 97.
+Il dettaglio sta in SAL.md; lo stato vivo su https://sal.poilove.com/avanzamento.html
+
+**Resta aperto sulla scheda, e va nel blocco dei livelli:**
+- le sei tipologie di scheda (Persona, Sostenitore, Mecenate, Influencer, Professionista, Plus locale):
+  oggi la scheda e' una sola per tutti, cambia solo il badge dell'autore;
+- il numero di foto e il video **secondo il livello** di chi ha creato il luogo (ora il tetto e' 22 per tutti);
+- le sezioni che compaiono solo per certi livelli (audioguida, rotta adottata, menu, recensioni).
+
+---
+
 ## ⚡ SUBITO (aggiornato 18/08 dopo il cutover)
 
 - [ ] **POI Prova: love a 2330 solo per collaudo grafico** — riportare al valore vero (o cancellare il POI) prima del lancio.
