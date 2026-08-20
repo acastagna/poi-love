@@ -66,14 +66,17 @@ if (!defined('SEO_LIB')) {
   /** Escape HTML sicuro. */
   function e($s) { return htmlspecialchars($s === null ? '' : (string)$s, ENT_QUOTES, 'UTF-8'); }
 
-  /** Lingua richiesta: ?lang= (it/sq/en), poi Accept-Language, default it. */
+  /** Lingua richiesta: ?lang= (it/sq/en), poi Accept-Language, default inglese.
+   *  Dal 20/08/2026 la ricaduta e' l'inglese, la stessa dell'app: prima le pagine
+   *  cadevano sull'italiano e l'app sull'albanese, e lo stesso visitatore leggeva
+   *  due lingue diverse a seconda di dove entrava. */
   function seo_lang() {
     $l = isset($_GET['lang']) ? strtolower(substr($_GET['lang'], 0, 2)) : '';
     if (in_array($l, array('it', 'sq', 'en'), true)) return $l;
     $al = isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? strtolower($_SERVER['HTTP_ACCEPT_LANGUAGE']) : '';
     if (strpos($al, 'sq') === 0) return 'sq';
-    if (strpos($al, 'en') === 0) return 'en';
-    return 'it';
+    if (strpos($al, 'it') === 0) return 'it';
+    return 'en';
   }
 
   /** Codice ISO 639-1 completo per l'attributo lang dell'HTML. */
@@ -96,7 +99,7 @@ if (!defined('SEO_LIB')) {
     }
     // x-default = versione italiana canonica (self-canonical): evita che l'x-default punti a un URL
     // che poi si canonicalizza altrove (antipattern che fa scartare l'annotazione a Google).
-    $out .= '<link rel="alternate" hreflang="x-default" href="' . e($mk('it')) . '">' . "\n";
+    $out .= '<link rel="alternate" hreflang="x-default" href="' . e($mk('en')) . '">' . "\n";
     return $out;
   }
 
