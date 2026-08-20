@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<!--
+  © Alessandro Castagna — 321.al / EVOLAB
+  Tutti i diritti riservati. Uso non autorizzato vietato.
+  info@321.it · https://321.al
+-->
+<html lang="it"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>POI•LOVE · Dove siamo adesso</title>
+<meta name="description" content="Avanzamento dei lavori di POI-LOVE, aggiornato da solo: cosa e' fatto, cosa e' in corso, cosa aspetta una risposta.">
+<link rel="icon" href="/img/favicon.svg">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{--rosso:#D42B2B;--blu:#285EA7;--testo:#16130f;--tenue:#6b6560;--bordo:#dcd6cc;--carta:#faf8f4;--verde:#0B7A38;--oro:#B45309}
+  body{background:#fff;color:var(--testo);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,Helvetica,Arial,sans-serif;
+       font-size:16px;line-height:1.55;padding:0 0 70px}
+  .foglio{max-width:960px;margin:0 auto;padding:0 24px}
+  header{border-bottom:3px solid var(--rosso);padding:30px 0 18px;margin-bottom:26px;display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap}
+  header h1{font-size:31px;font-weight:900;letter-spacing:-.6px;line-height:1.1}
+  header .sub{color:var(--tenue);font-size:14px;font-weight:600;margin-top:5px}
+  .comandi{margin-left:auto;display:flex;gap:9px;flex-wrap:wrap}
+  .btn{background:var(--rosso);color:#fff;border:none;border-radius:24px;padding:11px 20px;font-size:13.5px;font-weight:800;
+       cursor:pointer;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;gap:7px}
+  .btn.scuro{background:#16130f}
+  .btn:hover{opacity:.9}
+  .grosso{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-bottom:8px}
+  .grosso>div{background:var(--carta);border:1px solid var(--bordo);border-radius:14px;padding:14px 16px}
+  .grosso b{display:block;font-size:30px;font-weight:900;line-height:1.1}
+  .grosso span{font-size:11.5px;font-weight:800;color:var(--tenue);text-transform:uppercase;letter-spacing:.5px}
+  .totale{height:16px;border-radius:10px;background:#eee7dc;overflow:hidden;margin:18px 0 4px}
+  .totale i{display:block;height:100%;background:linear-gradient(90deg,var(--verde),#12a04d)}
+  .quando{font-size:12.5px;color:var(--tenue);font-weight:700;text-align:right}
+  h2{font-size:20px;font-weight:900;margin:32px 0 10px;padding-top:14px;border-top:1px solid var(--bordo)}
+  .avviso{background:#FFF7E6;border-left:4px solid #E8C169;border-radius:8px;padding:14px 16px;margin:16px 0}
+  .avviso b{color:#7C3A00}
+  .avviso ul{margin:8px 0 0 20px}
+  .ora{background:#EDF7F0;border-left:4px solid var(--verde);border-radius:8px;padding:14px 16px;margin:16px 0}
+  .cant{border:1px solid var(--bordo);border-radius:14px;margin:14px 0;overflow:hidden}
+  .cant .cima{display:flex;align-items:center;gap:12px;padding:13px 16px;background:var(--carta);border-bottom:1px solid var(--bordo)}
+  .cant .lett{width:30px;height:30px;border-radius:8px;background:#16130f;color:#fff;display:flex;align-items:center;
+              justify-content:center;font-weight:900;font-size:14px;flex-shrink:0}
+  .cant .nome{font-weight:900;font-size:16px}
+  .cant .gg{margin-left:auto;font-size:12.5px;font-weight:800;color:var(--tenue);white-space:nowrap}
+  .barra{height:8px;background:#eee7dc}
+  .barra i{display:block;height:100%;background:var(--verde)}
+  .riga{display:flex;align-items:flex-start;gap:11px;padding:10px 16px;border-bottom:1px solid #eee7dc;font-size:14.5px}
+  .riga:last-child{border-bottom:none}
+  .pallina{width:13px;height:13px;border-radius:50%;flex-shrink:0;margin-top:4px;border:2px solid var(--bordo);background:#fff}
+  .pallina.fatto{background:var(--verde);border-color:var(--verde)}
+  .pallina.in_corso{background:var(--oro);border-color:var(--oro);box-shadow:0 0 0 4px rgba(180,83,9,.16)}
+  .pallina.in_attesa{background:#fff;border-color:var(--rosso);border-style:dashed}
+  .riga .det{font-size:12.5px;color:var(--tenue);font-weight:600;line-height:1.4;margin-top:2px}
+  .riga .n{margin-left:auto;font-size:12px;font-weight:800;color:var(--tenue);white-space:nowrap;padding-left:10px}
+  .eti{display:inline-block;font-size:10px;font-weight:900;border-radius:20px;padding:2px 8px;margin-left:7px;vertical-align:1px}
+  .eti.a{background:#FFF3F3;color:var(--rosso);border:1px solid #f3c9c9}
+  .eti.c{background:#FFF7E6;color:var(--oro);border:1px solid #E8C169}
+  .vuoto{color:var(--tenue);font-style:italic}
+  .piede{margin-top:40px;padding-top:14px;border-top:1px solid var(--bordo);color:var(--tenue);font-size:12.5px}
+  @media(max-width:640px){.grosso{grid-template-columns:1fr 1fr}header h1{font-size:25px}}
+  @media print{.comandi{display:none}body{font-size:11pt}}
+</style></head>
+<body>
+<div class="foglio">
+
+<header>
+  <div>
+    <h1>Dove siamo adesso</h1>
+    <div class="sub">POI•LOVE · questa pagina si aggiorna da sola, legge il programma vero dal database</div>
+  </div>
+  <div class="comandi">
+    <a class="btn scuro" href="/progetto.html">Il progetto per intero</a>
+    <button class="btn" onclick="window.print()">Stampa</button>
+  </div>
+</header>
+
+<div class="grosso">
+  <div><b id="nPerc">—</b><span>completato</span></div>
+  <div><b id="nFatte">—</b><span>giornate fatte</span></div>
+  <div><b id="nTotali">—</b><span>giornate in tutto</span></div>
+  <div><b id="nAttesa">—</b><span>aspettano te</span></div>
+</div>
+<div class="totale"><i id="barraTotale" style="width:0%"></i></div>
+<div class="quando" id="quando">lettura in corso…</div>
+
+<div id="attesa"></div>
+<div id="adesso"></div>
+
+<h2>I cantieri</h2>
+<div id="cantieri"><p class="vuoto">Sto leggendo il programma…</p></div>
+
+<div class="piede">
+  POI•LOVE è un prodotto 321, ingegnerizzato da Alessandro Castagna.<br>
+  NIPT M52411017N · Tiranë · la pagina si ricarica da sola ogni minuto
+</div>
+
+</div>
+<script>
+const API='https://poilove.com/db/rest/v1/programma?select=*&order=ordine';
+const NOMI={fatto:'fatto',in_corso:'in corso',da_fare:'da fare',in_attesa:'aspetta una risposta'};
+
+function testo(s){const d=document.createElement('div');d.textContent=s==null?'':s;return d.innerHTML}
+
+async function leggi(){
+  let righe;
+  try{
+    const r=await fetch(API,{headers:{'Accept':'application/json'},cache:'no-store'});
+    if(!r.ok) throw new Error(r.status);
+    righe=await r.json();
+  }catch(e){
+    document.getElementById('quando').textContent='non riesco a leggere il programma adesso, riprovo fra un minuto';
+    return;
+  }
+  const gTot=righe.reduce((a,x)=>a+Number(x.giornate||0),0);
+  const gFatte=righe.filter(x=>x.stato==='fatto').reduce((a,x)=>a+Number(x.giornate||0),0);
+  const perc=gTot?Math.round(gFatte/gTot*100):0;
+  const attesa=righe.filter(x=>x.stato==='in_attesa');
+  const corso=righe.filter(x=>x.stato==='in_corso');
+
+  document.getElementById('nPerc').textContent=perc+'%';
+  document.getElementById('nFatte').textContent=gFatte.toString().replace('.',',');
+  document.getElementById('nTotali').textContent=gTot.toString().replace('.',',');
+  document.getElementById('nAttesa').textContent=attesa.length;
+  document.getElementById('barraTotale').style.width=perc+'%';
+  const ora=new Date();
+  document.getElementById('quando').textContent='aggiornato alle '+ora.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+
+  document.getElementById('attesa').innerHTML = attesa.length
+    ? '<div class="avviso"><b>Aspettano una tua risposta ('+attesa.length+')</b><ul>'+
+      attesa.map(x=>'<li><b>'+testo(x.blocco)+'</b>'+(x.dettaglio?' · '+testo(x.dettaglio):'')+'</li>').join('')+
+      '</ul></div>'
+    : '';
+
+  document.getElementById('adesso').innerHTML = corso.length
+    ? '<div class="ora"><b>Adesso sto facendo:</b> '+corso.map(x=>testo(x.blocco)).join(' · ')+'</div>'
+    : '<div class="ora"><b>Adesso:</b> nessun blocco aperto. Il prossimo è <b>'+
+      testo((righe.find(x=>x.stato==='da_fare')||{}).blocco||'—')+'</b>.</div>';
+
+  const per={};
+  righe.forEach(x=>{(per[x.cantiere]=per[x.cantiere]||{nome:x.cantiere_nome,righe:[]}).righe.push(x)});
+  document.getElementById('cantieri').innerHTML = Object.keys(per).sort().map(k=>{
+    const c=per[k], t=c.righe.reduce((a,x)=>a+Number(x.giornate||0),0);
+    const f=c.righe.filter(x=>x.stato==='fatto').reduce((a,x)=>a+Number(x.giornate||0),0);
+    const p=t?Math.round(f/t*100):0;
+    return '<div class="cant"><div class="cima"><div class="lett">'+testo(k)+'</div>'+
+      '<div class="nome">'+testo(c.nome)+'</div>'+
+      '<div class="gg">'+p+'% · '+String(t).replace('.',',')+' giornate</div></div>'+
+      '<div class="barra"><i style="width:'+p+'%"></i></div>'+
+      c.righe.map(x=>'<div class="riga"><span class="pallina '+x.stato+'"></span><div><b>'+testo(x.blocco)+'</b>'+
+        (x.stato==='in_attesa'?'<span class="eti a">aspetta te</span>':'')+
+        (x.stato==='in_corso'?'<span class="eti c">in corso</span>':'')+
+        (x.dettaglio?'<div class="det">'+testo(x.dettaglio)+'</div>':'')+
+        '</div><span class="n">'+(Number(x.giornate)?String(x.giornate).replace('.',',')+' gg':'—')+'</span></div>').join('')+
+      '</div>';
+  }).join('');
+}
+leggi();
+setInterval(leggi,60000);
+</script>
+</body></html>

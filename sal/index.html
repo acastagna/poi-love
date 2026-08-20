@@ -419,7 +419,7 @@ body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); 
       <button class="lang-btn" data-lang="en" title="English" onclick="switchLang('en')">🇬🇧</button>
     </div>
     <a href="https://project.poilove.com" class="speed-btn2" data-t="btn_project" style="display:inline-flex;align-items:center;background:#1C1C1C;color:#fff;text-decoration:none;border-radius:99px;padding:7px 15px;font-size:12.5px;font-weight:700;white-space:nowrap">Progetto</a>
-    <a href="/progetto.html" class="speed-btn2" data-t="btn_globale" style="display:inline-flex;align-items:center;gap:6px;background:#D42B2B;color:#fff;text-decoration:none;border-radius:99px;padding:7px 15px;font-size:12.5px;font-weight:800;white-space:nowrap">Progetto globale</a>
+    <a href="/avanzamento.html" class="speed-btn2" data-t="btn_globale" style="display:inline-flex;align-items:center;gap:6px;background:#D42B2B;color:#fff;text-decoration:none;border-radius:99px;padding:7px 15px;font-size:12.5px;font-weight:800;white-space:nowrap">Progetto globale</a>
     <span class="hdr-date" data-t="updated_date">Aggiornato: 20 Agosto 2026</span>
     <div class="status-pill"><div class="sdot"></div><span data-t="status_pill">MVP in sviluppo</span></div>
   </div>
@@ -980,7 +980,8 @@ body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); 
     </figure>
   </div>
   <div style="margin-top:18px;text-align:center">
-    <a href="/progetto.html" style="display:inline-flex;align-items:center;gap:8px;background:#D42B2B;color:#fff;text-decoration:none;border-radius:99px;padding:13px 26px;font-size:14.5px;font-weight:800" data-t="prog_btn">Apri il progetto globale →</a>
+    <a href="/avanzamento.html" style="display:inline-flex;align-items:center;gap:8px;background:#D42B2B;color:#fff;text-decoration:none;border-radius:99px;padding:13px 26px;font-size:14.5px;font-weight:800" data-t="prog_btn">Dove siamo adesso →</a>
+    <a href="/progetto.html" style="display:inline-flex;align-items:center;gap:8px;background:#1C1C1C;color:#fff;text-decoration:none;border-radius:99px;padding:13px 26px;font-size:14.5px;font-weight:800;margin-left:10px" data-t="prog_btn2">Il progetto per intero</a>
   </div>
 </div>
 
@@ -1088,7 +1089,7 @@ function rebuildPieLegend() {
 
 const T = {
   it: {
-    btn_globale:'Progetto globale', prog_title:'Il progetto globale', prog_btn:'Apri il progetto globale →', prog_cap1:'La scheda pubblica del luogo, sei tipologie', prog_cap2:'Il profilo pubblico dell\'utente, cinque tipologie', link4_name:'Progetto globale', prog_desc:'Il documento di riferimento, tenuto aggiornato: cosa esiste, cosa manca, in che ordine si costruisce, quanto costa e cosa serve. Comprende l\'app collegata alla parte browser, con una sola porta dei dati per tutte e due.', sal_badge:'SAL — Stato Avanzamento Lavori', updated_date:'Aggiornato: 20 Agosto 2026',
+    btn_globale:'Dove siamo adesso', prog_title:'Il progetto globale', prog_btn:'Dove siamo adesso →', prog_btn2:'Il progetto per intero', prog_cap1:'La scheda pubblica del luogo, sei tipologie', prog_cap2:'Il profilo pubblico dell\'utente, cinque tipologie', link4_name:'Progetto globale', prog_desc:'Il documento di riferimento, tenuto aggiornato: cosa esiste, cosa manca, in che ordine si costruisce, quanto costa e cosa serve. Comprende l\'app collegata alla parte browser, con una sola porta dei dati per tutte e due.', sal_badge:'SAL — Stato Avanzamento Lavori', updated_date:'Aggiornato: 20 Agosto 2026',
     status_pill:'MVP in sviluppo', hero_sub:'Stato del Progetto',
     hero_desc:'Mappa comunitaria dei luoghi amati. Prima istanza: Albania · Tirana. Lancio tecnico FATTO il 18 agosto 2026: database e accessi propri, sulla macchina dedicata. Framework open source Cultural Bridge OS — Licenza MIT.',
     kpi_speed:'Test velocità', btn_project:'Progetto ↗', kpi_done:'Completamento', kpi_weeks:'Lancio tecnico: fatto', kpi_tables:'Tabelle database', kpi_license:'Licenza',
@@ -1158,7 +1159,7 @@ const T = {
   },
   en: {
     sal_badge:'Project Status Report', updated_date:'Updated: August 18, 2026',
-    btn_globale:'Full project', prog_title:'The full project', prog_btn:'Open the full project →', prog_cap1:'The public place card, six kinds', prog_cap2:'The public user profile, five kinds', link4_name:'Full project', prog_desc:'The reference document, kept up to date: what exists, what is missing, in which order it gets built, what it costs and what is needed. It includes the app connected to the browser side, with a single data gate for both.', status_pill:'MVP in development', hero_sub:'Project Status',
+    btn_globale:'Where we are now', prog_title:'The full project', prog_btn:'Where we are now →', prog_btn2:'The full project', prog_cap1:'The public place card, six kinds', prog_cap2:'The public user profile, five kinds', link4_name:'Full project', prog_desc:'The reference document, kept up to date: what exists, what is missing, in which order it gets built, what it costs and what is needed. It includes the app connected to the browser side, with a single data gate for both.', status_pill:'MVP in development', hero_sub:'Project Status',
     hero_desc:'Community map of beloved places. First instance: Albania · Tirana. Technical launch DONE on 18 August 2026: own database and sign-ins, on the dedicated machine. Open source framework Cultural Bridge OS — MIT License.',
     kpi_speed:'Speed test', btn_project:'Project ↗', kpi_done:'Completion', kpi_weeks:'Technical launch: done', kpi_tables:'Database tables', kpi_license:'License',
     area_title:'Progress by Area', area_sub:'Current status of the 4 main project areas',
@@ -1227,7 +1228,7 @@ const T = {
   },
   sq: {
     sal_badge:'Raport i Progresit të Projektit', updated_date:'Përditësuar: 20 Gusht 2026',
-    btn_globale:'Projekti i plotë', prog_title:'Projekti i plotë', prog_btn:'Hap projektin e plotë →', prog_cap1:'Skeda publike e vendit, gjashtë tipologji', prog_cap2:'Profili publik i përdoruesit, pesë tipologji', link4_name:'Projekti i plotë', prog_desc:'Dokumenti i referencës, i përditësuar: çfarë ekziston, çfarë mungon, me çfarë radhe ndërtohet, sa kushton dhe çfarë duhet. Përfshin aplikacionin e lidhur me pjesën e shfletuesit, me një portë të vetme të dhënash për të dyja.', status_pill:'MVP në zhvillim', hero_sub:'Gjendja e Projektit',
+    btn_globale:'Ku jemi tani', prog_title:'Projekti i plotë', prog_btn:'Ku jemi tani →', prog_btn2:'Projekti i plotë', prog_cap1:'Skeda publike e vendit, gjashtë tipologji', prog_cap2:'Profili publik i përdoruesit, pesë tipologji', link4_name:'Projekti i plotë', prog_desc:'Dokumenti i referencës, i përditësuar: çfarë ekziston, çfarë mungon, me çfarë radhe ndërtohet, sa kushton dhe çfarë duhet. Përfshin aplikacionin e lidhur me pjesën e shfletuesit, me një portë të vetme të dhënash për të dyja.', status_pill:'MVP në zhvillim', hero_sub:'Gjendja e Projektit',
     hero_desc:'Hartë komunitare e vendeve të dashura. Rasti i parë: Shqipëri · Tiranë. Lansimi teknik U KRYE më 18 gusht 2026: bazë të dhënash dhe hyrje tona, në makinën e dedikuar. Kornizë me burim të hapur Cultural Bridge OS — Licencë MIT.',
     kpi_speed:'Test shpejtësie', btn_project:'Projekti ↗', kpi_done:'Përfundim', kpi_weeks:'Lansimi teknik: kryer', kpi_tables:'Tabela DB', kpi_license:'Licencë',
     area_title:'Progres sipas Zonës', area_sub:'Gjendja aktuale e 4 zonave kryesore të projektit',

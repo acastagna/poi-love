@@ -1,9 +1,11 @@
 # TODO — POI•LOVE
 
-> 📘 **Documento di riferimento, in linea e da tenere aggiornato**: https://sal.poilove.com/progetto.html
-> (stessa pagina anche su https://project.poilove.com/progetto.html). Sorgente: `docs/PROGETTO-GLOBALE.html`,
-> si pubblica copiandolo in `sal/progetto.html` e `web/progetto.html`.
-> **Ogni volta che cambia il piano, si aggiorna quella pagina e si ripubblica.**
+> **Dove si guarda lo stato dei lavori, in ordine di utilita':**
+> 1. **https://sal.poilove.com/avanzamento.html** — dove siamo adesso. Si aggiorna da sola, legge il programma vero dal database (tabella `programma`, migrazione 093). E' il posto da guardare tutti i giorni.
+> 2. **https://sal.poilove.com/progetto.html** — il progetto per intero: architettura, disegni approvati, calendario, rischi. Sorgente `docs/PROGETTO-GLOBALE.html`.
+> 3. Questo file e `PROGETTO-PROFILI-E-SCHEDE.md` — il dettaglio scritto, per chi deve costruire.
+>
+> Quando un blocco cambia stato si scrive nel database, non nei file: la pagina si aggiorna da sola.
 
 - [ ] **Profilo Plus dei locali** (prossimo lavoro): 20 foto, listino/menu, sistemi di pagamento, orari di apertura, QR del locale, statistiche avanzate. Da costruire uno alla volta.
 - [ ] **Controllo automatico dei livelli**: oggi la condizione (30 POI al mese per Influencer, rinnovo per Professionista e Plus) e' scritta nella pagina ma non la verifica nessuno. Serve un lavoro automatico che tolga i vantaggi a chi non la rispetta.

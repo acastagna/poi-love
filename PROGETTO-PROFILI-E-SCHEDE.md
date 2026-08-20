@@ -1,5 +1,9 @@
 # Progetto: schede dei luoghi e profili veri, funzionanti
 
+> **Questo file e' il dettaglio scritto, il verbale delle decisioni.** Non e' il posto da guardare per sapere a che punto siamo.
+> Dove si guarda lo stato: **https://sal.poilove.com/avanzamento.html** (si aggiorna da sola).
+> La sintesi con architettura, disegni e calendario: **https://sal.poilove.com/progetto.html**.
+
 Documento del 20/08/2026. Nasce dalla domanda: cosa serve per rendere **vere** le sei schede del luogo
 e i profili pubblici, non un disegno navigabile ma funzioni collegate a tutto POI•LOVE.
 

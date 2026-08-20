@@ -70,3 +70,9 @@ media/poi/
 *.HEIC
 PIANO-ACCESSI-INDIPENDENTI.md
 RITORNO-INDIETRO.md
+
+# Copie di sicurezza: MAI su GitHub, questo repository e' pubblico.
+# Contengono i dati degli utenti e le fotografie.
+backup/
+*.dump
+*.tar.gz
