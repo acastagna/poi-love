@@ -1,6 +1,12 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
-## Sessione 19/08/2026 (14) — La schermata del POI: nomi veri, indirizzi intelligenti, punti a tempo (v4.33 → 4.35)
+## Sessione 19/08/2026 (14) — La schermata del POI: nomi veri, indirizzi intelligenti, punti a tempo (v4.33 → 4.36)
+
+**4.36 — anche la schermata finale tiene il colore del traguardo**: bordo e riquadro dei punti
+**verdi** sotto i 60 secondi (con la coppa), **oro** sopra (col cappello da laureato), e il numero
+dei punti presi davvero, quelli che il server ha accreditato. Misurato: 42 secondi → verde, +16 punti;
+95 secondi → oro, +10 punti.
+
 
 **I quattro modi di dire dove sei**, chiamati con parole vere (titolo grande + sigla piccola):
 
