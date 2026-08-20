@@ -1,6 +1,15 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
-## Sessione 19/08/2026 (14) — La schermata del POI e la ricerca (v4.33 → 4.54)
+## Sessione 19/08/2026 (14) — La schermata del POI e la ricerca (v4.33 → 4.56)
+
+**4.55-4.56 — guasto mio, trovato e chiuso.** Con un livello di sostegno o professionale
+(Mecenate, Professionista…) la testata si rompeva: la targhetta usava il colore SCURO del livello
+sopra il fondo scuro del distintivo, quindi il nome spariva, e la barra dava "livello massimo" con
+la scritta vuota perche' i livelli di sostegno non hanno una soglia a punti.
+Ora: con un livello speciale la targhetta tiene i **suoi** colori (chiaro su fondo scuro) e la barra
+legge **sempre** la scala a punti, che continua a esistere. Provati e misurati i quattro casi:
+ospite 0 punti, 340 punti, **Mecenate con 340 punti**, 30k punti (livello massimo).
+
 
 **4.46-4.54 — ricerca e testata, chiuse**
 - **Ricerca principale**: prima i tuoi POI, poi un solo elenco di luoghi **dal piu' vicino al piu'
