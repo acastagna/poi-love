@@ -79,10 +79,23 @@ Nessuna delle sue funzioni esiste oggi. Serve:
 Presa una volta al giorno dal sito della banca, tenuta in memoria con la data.
 Se la banca non risponde resta l'ultimo cambio noto, con la sua data scritta.
 
-### Blocco 8 · Audioguide POI•VOICE
-- caricamento dell'audio dal telefono, limiti veri: **1 minuto** al professionista, **3 minuti** al locale;
+### Blocco 8 · Audio: due cose diverse, non una
+
+**8a. La voce di chi ha il profilo** (professionista, locale, e domani chiunque altro glielo diamo).
+E' un messaggio vocale suo, registrato col telefono:
+- limiti veri: **1 minuto** al professionista, **3 minuti** al locale;
 - conversione immediata in MP3 192 sulla macchina;
-- ascolto dentro la scheda e scaffale delle audioguide del Mecenate.
+- si ascolta dentro la sua scheda. Non e' una guida: e' la sua presentazione.
+
+**8b. Le audioguide ufficiali POI•VOICE**, che mette **POI•VOICE**, non l'utente.
+Sono contenuto editoriale nostro:
+- **nessun limite di durata**: dura quanto serve al luogo;
+- caricate e gestite dall'amministrazione, con testo, lingua e voce;
+- in albanese, italiano e inglese, con il marchio POI•VOICE in vista;
+- legate al luogo o alla rotta storica, non alla persona;
+- sono quelle che il Mecenate e l'Influencer ascoltano **ovunque**, anche lontano dal posto,
+  e che il Mecenate raccoglie nel suo scaffale;
+- servono elenco, ricerca, ordine e stato (bozza, pubblicata, ritirata) nell'amministrazione.
 
 ### Blocco 9 · QR veri
 Scheda contatto vera (vCard) generata dal sistema, immagine del QR, stessa destinazione se lo inquadri o lo clicchi,
@@ -126,17 +139,18 @@ Non comprende il tempo di collaudo di Alessandro.
 | 5 | Controllo automatico delle condizioni | 1 |
 | 6 | Locale Plus (orari, menu, CSV, Chef, statistiche) | 4 |
 | 7 | Cambio Banca d'Albania | 0,5 |
-| 8 | Audioguide POI•VOICE | 2,5 |
+| 8a | Audio della persona (professionista, locale) | 1,5 |
+| 8b | Audioguide ufficiali POI•VOICE, gestite dall'amministrazione | 2 |
 | 9 | QR veri | 1 |
 | 10 | Rapporto notarizzato | 1,5 |
 | 11 | Abbonamenti in amministrazione (fase 1) | 2,5 |
 | 12 | Mercato professionisti e influencer (fase 1) | 3 |
 | 13 | Amministrazione trasversale | 2 |
 | 14 | Tre lingue, motori di ricerca, collaudo | 2,5 |
-| | **Totale fase 1** | **32,5** |
+| | **Totale fase 1** | **34,5** |
 | 15 | Incasso con carta (dipende dall'incassatore) | 2 |
 | 16 | Pagamento trattenuto e commissione del mercato | 2,5 |
-| | **Totale con la fase 2** | **37** |
+| | **Totale con la fase 2** | **39** |
 
 A una giornata al giorno lavorativo: **circa sette settimane** per la fase 1, otto con la fase 2.
 
@@ -193,7 +207,7 @@ Ci sta questo, che e' il prodotto vendibile e completo per l'utente:
 | 28-30/08 | Recensioni, sui luoghi e ricevute da influencer e professionisti | 2,5 |
 | 31/08-03/09 | Locale Plus: orari a tendina, menu con CSV, doppia valuta, Consigli dello Chef, pagamenti, statistiche | 3,5 |
 | 03-04/09 | Cambio Banca d'Albania, QR veri, controllo automatico delle condizioni | 1,5 |
-| 05-06/09 | Audioguide POI•VOICE, versione essenziale (caricamento, limiti, conversione, ascolto) | 1,5 |
+| 05-06/09 | Audio della persona e audioguide ufficiali POI•VOICE | 1,5 |
 | 06-07/09 | Abbonamenti in amministrazione, versione minima, e amministrazione trasversale | 2 |
 | 08-09/09 | Tre lingue, pagine nei motori di ricerca, collaudo end-to-end | 1,5 |
 | | **Totale** | **20** |
@@ -228,12 +242,12 @@ e **200 luoghi veri in tutta l'Albania, 50 dei quali Ufficiali**. I tempi si all
 
 | Cantiere | Cosa comprende | Giornate |
 |---|---|---|
-| **A · Web, fase 1** | i 14 blocchi del capitolo 2: schede, profili, livelli, recensioni, locale Plus, audioguide, QR, abbonamenti | 32,5 |
+| **A · Web, fase 1** | i blocchi del capitolo 2: schede, profili, livelli, recensioni, locale Plus, audio della persona, audioguide ufficiali, QR, abbonamenti | 34,5 |
 | **B · Amministrazione al massimo** | persone, luoghi, moderazione recensioni, menu dei locali, abbonamenti, media, livelli, statistiche, ruoli | 6 |
 | **C · Contenuti: 200 luoghi, 50 Ufficiali** | raccolta dai dati aperti, scrittura, foto con licenza, verifica, bollino Ufficiale | 5 |
 | **D · App iOS e Android** | dall'impianto esistente fino agli store | 24,5 |
 | **E · Fase 2 web** | mercato professionisti-influencer, rapporto notarizzato, promemoria di scadenza | 5,5 |
-| | **Totale** | **73,5** |
+| | **Totale** | **75,5** |
 
 L'incasso con carta (2 giornate) resta fuori conteggio: dipende da quale incassatore accetta una societa' albanese.
 
@@ -364,22 +378,22 @@ Due cose da sapere:
 
 | Cantiere | Prima | Adesso | Perche' |
 |---|---|---|---|
-| Web fase 1 | 32,5 | **36,5** | locale Plus +2, licenze e attribuzione foto +1, anti abuso recensioni +0,5, cambio +0,5 |
+| Web fase 1 | 34,5 | **38,5** | locale Plus +2, licenze e attribuzione foto +1, anti abuso recensioni +0,5, cambio +0,5. Comprende l'audio della persona e le audioguide ufficiali, separate il 20/08 |
 | Amministrazione | 6 | **7** | moderazione entro 24 ore e blocco utenti, richiesti da Apple |
 | 200 luoghi, 50 Ufficiali | 5 | **9** | si parte da 18 luoghi e zero Ufficiali |
 | App iOS e Android | 24,5 | **30** | riscrittura del livello dati, porto alla versione attuale, tre punti delicati in revisione |
 | Fase 2 web | 5,5 | **6** | marcatura temporale vera per il rapporto |
-| | **73,5** | **88,5** | |
+| | **75,5** | **90,5** | |
 
-Calendario aggiornato, una giornata al giorno da venerdi 21/08:
+Calendario aggiornato, una giornata al giorno da venerdi 21/08 (90,5 giornate):
 
 | Traguardo | Prima | Adesso |
 |---|---|---|
-| Web fase 1 completo | 22/09 | **26/09** |
-| Amministrazione perfezionata | 28/09 | **03/10** |
-| 200 luoghi in linea | 03/10 | **12/10** |
-| Fase 2 web | 09/10 | **18/10** |
-| App inviata agli store | 03/11 | **17/11** |
+| Web fase 1 completo | 22/09 | **28/09** |
+| Amministrazione perfezionata | 28/09 | **05/10** |
+| 200 luoghi in linea | 03/10 | **14/10** |
+| Fase 2 web | 09/10 | **20/10** |
+| App inviata agli store | 03/11 | **19/11** |
 | App pubblicata | meta' novembre | **fine novembre, inizio dicembre** |
 
 ### 9.6 Le cinque domande da sciogliere prima del via
