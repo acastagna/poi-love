@@ -1320,9 +1320,10 @@ body.kb-open #lang-strip,body.kb-open #brand-strip{opacity:0;pointer-events:none
              font-size:14px;cursor:pointer}
 .pdm-viaggio .km{font-size:16px;font-weight:900;color:var(--text)}
 .pdm-viaggio .mezzi{display:flex;flex-direction:column;gap:7px;margin-top:10px;font-size:13.5px}
-.pdm-viaggio .mezzi span{display:flex;align-items:center;gap:9px;color:var(--text);font-weight:700}
-.pdm-viaggio .mezzi i{font-size:18px;color:var(--red);width:20px;text-align:center;flex-shrink:0}
-.pdm-viaggio .mezzi b{font-weight:900}
+.pdm-viaggio .mezzi span{display:flex;align-items:baseline;gap:9px;color:var(--text);font-weight:700}
+.pdm-viaggio .mezzi i{font-size:18px;color:var(--red);width:20px;text-align:center;flex-shrink:0;
+                      position:relative;top:3px}
+.pdm-viaggio .mezzi b{font-weight:900;min-width:112px;flex-shrink:0}
 .pdm-viaggio .mezzi em{font-style:normal;color:var(--muted);font-weight:600}
 .pdm-viaggio .mezzi span.trek{color:#6D28D9}
 .pdm-viaggio .mezzi span.trek i{color:#6D28D9}
@@ -8993,7 +8994,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='4.98';
+const APP_VERSION='4.99';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
@@ -12930,7 +12931,9 @@ function _durata(min){
   if(min < 60) return Math.round(min)+' '+t('minuti','minuti');
   const oreTot=min/60;
   if(oreTot < 24){
-    const h=Math.floor(oreTot), m=Math.round(min%60);
+    const h=Math.floor(oreTot);
+    let m=Math.round(min%60);
+    if(h>=3 || m<5) m=0;                    // sopra le tre ore i minuti non contano
     return h+(h===1?' '+t('ora','ora'):' '+t('ore','ore'))+(m?' e '+m:'');
   }
   const g=Math.floor(oreTot/24), h=Math.round(oreTot%24);
@@ -13097,7 +13100,7 @@ async function _viaggioVero(da, a, idAtteso){
       // Si dice che e' un conto, con "circa", partendo dai chilometri di strada.
       const base = kmAuto!=null ? kmAuto : aria;
       const v = prof==='piedi' ? 5 : 18;
-      righe.push({i:ico, n:nome, t:t('circa','circa')+' '+_durata(base/v*60), d:''});
+      righe.push({i:ico, n:nome, t:t('circa','circa')+' '+_durata(base/v*60), d:'('+_quantoDista(base)+')'});
       continue;
     }
     try{
@@ -13106,7 +13109,7 @@ async function _viaggioVero(da, a, idAtteso){
       righe.push({i:ico, n:nome, t:_durata(r.min), d:_quantoDista(r.km)});
     }catch(_){
       const v=prof==='piedi'?5:(prof==='bici'?18:60);
-      righe.push({i:ico, n:nome, t:t('circa','circa')+' '+_durata(aria/v*60), d:''});
+      righe.push({i:ico, n:nome, t:t('circa','circa')+' '+_durata(aria/v*60), d:'('+_quantoDista(aria)+')'});
     }
   }
   // aereo: si parte dall'aeroporto piu' vicino a te
@@ -13121,7 +13124,7 @@ async function _viaggioVero(da, a, idAtteso){
       const volo=_kmTra(ap1.lat,ap1.lng,ap2.lat,ap2.lng);
       righe.push({i:'ph-airplane-tilt',
                   n:t('mezzo_aereo','in aereo')+' · '+t('imbarco_a','imbarco a')+' '+ap1.n+' ('+ap1.c+')',
-                  t:t('circa','circa')+' '+_durata(volo/750*60), d:''});
+                  t:t('circa','circa')+' '+_durata(volo/750*60), d:_quantoDista(volo)});
     }
   }
   // nave: dal porto piu' vicino a te
@@ -13132,7 +13135,7 @@ async function _viaggioVero(da, a, idAtteso){
     } else {
       const mare=_kmTra(po1.lat,po1.lng,po2.lat,po2.lng);
       righe.push({i:'ph-boat', n:t('mezzo_nave','in nave')+' · '+t('da_porto','da')+' '+po1.n,
-                  t:t('circa','circa')+' '+_durata(mare/35*60), d:''});
+                  t:t('circa','circa')+' '+_durata(mare/35*60), d:_quantoDista(mare)});
     }
   }
   // a tutto impulso, sulla linea d'aria: nello spazio non ci sono strade
