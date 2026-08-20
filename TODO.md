@@ -77,12 +77,18 @@ Bozza grafica: `scratchpad/schede2/profili.html`, immagine `profili.jpg`. Il **l
 - Quattro numeri in fila, poi la presentazione, poi Segui e Condividi.
 - **I suoi luoghi piu' votati**, **itinerari pubblici**, **compagnie pubbliche**. Niente di privato.
 
+**Regole di forma (20/08)**
+- I due bottoni in fila hanno **sempre la stessa dimensione**: quello colorato non e' piu' grande di quello vuoto.
+- Sul bottone Segui i punti vanno **sotto la parola**, scritti per intero: "+30 punti", non "+30".
+- Punti a chi segue: locale +100, **professionista +50**, influencer +30. Il professionista ha il suo bottone Segui.
+- **Colore di base dell'influencer**: rosa per le donne, **azzurro per gli uomini**. In ogni caso resta personalizzabile dall'utente, come la copertina.
+
 **Cosa aggiunge ogni tipologia**
 
 | Tipologia | Aggiunge |
 |---|---|
 | Persona | niente, e' la base |
-| Sostenitore | pastiglia sulla copertina, spunta, badge, Muro dei Sostenitori |
+| Sostenitore | pastiglia sulla copertina, spunta, badge, Muro dei Sostenitori, **15 luoghi in omaggio** preparati dal sistema: in riga con l'immagine e il bollino **Ufficiale, per <nome>** (solo il nome, mai il cognome) |
 | Mecenate | pastiglia oro-viola, itinerario in evidenza, scaffale delle audioguide che ascolta, rotte adottate |
 | Influencer | pastiglia Consigliata, tre itinerari e una compagnia in evidenza, recensioni ricevute a scorrimento, QR, **mercato delle collaborazioni**, rapporto notarizzato (privato) |
 | Professionista | biglietto da visita completo (Chiama, Scrivi, sito, Vieni a trovarmi, social, QR), audiopresentazione fino a 1 minuto, rotta adottata, recensioni ricevute, **mercato delle collaborazioni**, abbonamento e rapporto notarizzato (privati) |
