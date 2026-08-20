@@ -10,43 +10,56 @@
 
 ---
 
-## 🗂️ SCHEDA PUBBLICA DEL LUOGO, sei tipologie (specifica del 20/08, mockup approvato in cosmesi)
+## 🗂️ SCHEDA PUBBLICA DEL LUOGO, sei tipologie (specifica del 20/08, seconda passata di cosmesi)
 
-Bozza grafica: `scratchpad/schede2/mock.html` (immagine `schede6.jpg`). Dopo il via libera si costruisce tutto vero.
+Bozza grafica: `scratchpad/schede2/mock.html`, immagine `schede6.jpg`. Dopo il via libera si costruisce tutto vero.
 
 **Regole comuni**
 - Il POI si apre sempre in popup, versione pubblica.
-- La prima foto si chiama **Copertina** ed e' quella letta dai codici di geolocalizzazione.
-- Testata: tre foto che scorrono da sole ogni 3000 ms. Galleria: sei alla volta, salto di quattro, 3000 ms. Tempi regolabili dall'admin.
-- Le tipologie di scheda si organizzano dal pannello di amministrazione.
+- La prima foto e' la **Copertina**: sta in cima, e' quella letta dai codici di geolocalizzazione e **non si ripete** nella galleria sotto.
+- **Mai scrivere nella scheda** il numero di foto ne' i secondi di scorrimento: sono regolazioni del pannello di amministrazione (testata 3 foto ogni 3000 ms, galleria sei alla volta con salto di quattro, tempi modificabili).
+- Le tipologie di scheda si organizzano dall'amministrazione.
 - Posizione della persona visibile nella community solo con la levetta accesa nel suo profilo.
 - Per il **locale** questa scheda E' il suo profilo. Per tutti gli altri il profilo resta quello tradizionale e queste sono le schede dei loro luoghi.
+- Oltre alle immagini, anche il **colore d'accento** si personalizza dall'utente.
+- Punti a chi segue: **locale +100, professionista +50, influencer +30**.
 
 **Cosa cambia per tipologia**
 
-| Tipologia | Foto | Video | Audioguida POI•VOICE | In piu' |
-|---|---|---|---|---|
-| Persona a punti | 4 | no | no | itinerari e compagnie pubbliche in "Fa parte di" |
-| Sostenitore | 6 | no | no | spunta, badge, nome nel Muro dei Sostenitori |
-| Mecenate | 8 | no | si | badge, un itinerario in evidenza |
-| Influencer | 6 | 1 | si | spunta rosa, follower, bollino Consigliato, i suoi itinerari |
-| Professionista | 6 | 1 | si | Chiama, Scrivi, Sito, fino a 4 social autoadattivi, "Vieni a trovarmi" con indirizzo confermato e navigazione, rotta adottata, QR che salva i suoi dati in rubrica |
-| Plus locale (250 euro/anno) | 20 | si | si (bonus) | menu, recensioni, orari, pagamenti, QR del locale, statistiche private |
+| Tipologia | Foto | Video | Audioguida POI•VOICE | Recensioni | In piu' |
+|---|---|---|---|---|---|
+| Persona a punti | 4 | no | no | nessuna | itinerari e compagnie pubbliche in "Fa parte di" |
+| Sostenitore | 6 | no | no | nessuna | spunta, badge, Muro dei Sostenitori: "<nome> sostiene attivamente il progetto POI•LOVE assieme a N persone" |
+| Mecenate | 8 | no | ascolta quella del luogo ovunque, anche lontano dal posto | nessuna | itinerario in evidenza in alto nella scheda |
+| Influencer | 6 | 1 | ascolta quella del luogo | riceve recensioni sue, scorrono di lato | spunta rosa, follower, bollino Consigliato, fino a 3 itinerari e 1 compagnia in evidenza, riquadro privato col rapporto notarizzato in fondo |
+| Professionista | 6 | 1 | carica la sua, massimo 1 minuto | riceve recensioni sue, scorrono di lato | biglietto da visita completo, rotta adottata, QR dei contatti, riquadro privato |
+| Plus locale (250 euro/anno) | 20 | si | carica la sua, massimo 3 minuti (bonus) | solo amici, una a testa | menu, Consigli dello Chef, orari a tendina, pagamenti, QR del locale, statistiche private |
+
+Le audioguide caricate diventano subito **MP3 192**.
 
 **Recensioni**
-- Valgono per i **luoghi**, mai per le persone.
-- Le scrive solo chi ha tra gli amici chi ha creato il luogo (per i locali: chi e' amico del locale). Una a testa.
-- Da 0 a 5 love, la media ha i decimali. Portano nome e avatar di chi scrive, che deve essere iscritto.
+- Sulle schede delle persone (Persona, Sostenitore, Mecenate) **non esistono**: se anche l'utente ne scrive, non vengono riportate.
+- Influencer e Professionista **ricevono recensioni personali**, mostrate a scorrimento orizzontale con la media.
+- Locale: le scrive solo chi e' amico del locale, una a testa, da 0 a 5 love, media con i decimali, nome e avatar di chi scrive, che deve essere iscritto.
 - Il locale puo' bandire una persona: le sue recensioni restano. Se la persona toglie l'amicizia, le sue recensioni di quel locale spariscono.
-- Punti: salvare un locale **+100**, recensire **+200**.
+- Punti: recensire **+200**.
 
-**Menu del locale**
-- Doppia valuta automatica: scritto in lek mostra anche l'euro e viceversa.
-- Cambio della Banca d'Albania preso **una volta al giorno** e tenuto in memoria. Se la banca non risponde resta l'ultimo cambio noto, con la sua data.
-- I piatti si aprono: si apre una tendina con la foto, caricata dal locale o scattata sul momento col telefono.
+**Professionista, ordine del biglietto da visita**
+1. Nome con etichetta subito dopo l'ultima parola, anche quando il nome va a capo. 2. Chiama e Scrivi (Scrivi passa dalla **posta del sistema**, con tutte le protezioni: nessun indirizzo esposto, invio server-side, antiabuso). 3. Sito. 4. Vieni a trovarmi, indirizzo confermato con navigazione. 5. Fino a 4 social autoadattivi. 6. Inquadra e salva i miei contatti (QR che scrive la scheda in rubrica).
+- Sotto la scheda restano **Condividi e Salva**; **Naviga scende sotto** e vale per chi condivide la propria posizione di adesso.
+- In fondo, il riquadro con il suo viso e i suoi dati, piu' il riquadro privato.
+
+**Locale**
+- Pastiglia **Aperto / Chiuso** per tutti; cliccandoci si apre a tendina l'orario di **tutti i giorni**.
+- La descrizione sta **sotto la fascia dell'autore e sopra gli orari**. Gli orari non si ripetono piu' in fondo.
+- Menu: doppia valuta automatica (lek/euro) col cambio della **Banca d'Albania preso una volta al giorno e tenuto in memoria**; se la banca non risponde resta l'ultimo cambio noto con la sua data.
+- Ogni piatto si apre con foto e spiegazione. Serve l'**area menu nell'amministrazione**: compilazione a mano con form e caricamento **CSV**, foto caricate o scattate col telefono.
+- Tre piatti in evidenza: **Consigli dello Chef**, e sotto **raccontato dal proprietario**.
+- Chiusura della scheda: Naviga, poi il **QR del locale salvabile e stampabile**, poi le foto del locale.
+- La categoria (ristorante, bar, ...) si personalizza dall'amministrazione dell'utente.
 
 **Rapporto notarizzato (direttiva 20/08)**
-- Influencer e Professionista scaricano dal **proprio profilo** un rapporto completo dei numeri (volume della community, follower, luoghi, salvataggi, visite, navigazioni, QR letti, recensioni, media).
+- Influencer e Professionista scaricano dal **proprio profilo** un rapporto completo dei numeri: volume della community, follower, luoghi, salvataggi, visite, navigazioni, QR letti, recensioni, media.
 - PDF con impronta SHA-256 e data certa, vale come referenza verso terzi, anche per la cessione del marchio.
 
 ---
