@@ -1445,10 +1445,23 @@ body.kb-open #lang-strip,body.kb-open #brand-strip{opacity:0;pointer-events:none
 .love-btn-big.loved{box-shadow:0 4px 22px rgba(212,43,43,.3)}
 .love-btn-big:active{transform:scale(.95)}
 /* Autore */
-.pdm-author{display:flex;align-items:center;gap:11px;margin:14px 16px 0;padding:11px 13px;background:#FBF8F2;
-    border:1px solid var(--border);border-radius:16px;cursor:pointer;transition:background .15s}
-.pdm-author .pdm-author-handle{font-size:15px;font-weight:800}
-.pdm-author .pdm-author-meta{font-size:12px;color:var(--muted);font-weight:600}
+.pdm-author{display:flex;align-items:center;gap:10px;margin:14px 16px 0;padding:10px 12px;background:#FAF6EC;
+    border:1px solid #EDE4D2;border-radius:16px;cursor:pointer;transition:box-shadow .15s,transform .15s;
+    box-shadow:0 3px 10px rgba(93,76,44,.10), 0 1px 2px rgba(93,76,44,.08)}
+.pdm-author:active{transform:scale(.995)}
+.pdm-author .pdm-author-avatar{width:40px;height:40px;flex-shrink:0}
+.pdm-author .pdm-author-avatar img{width:40px;height:40px}
+.pdm-author .pdm-author-info{min-width:0;flex:1}
+.pdm-author .pdm-author-handle{font-size:15px;font-weight:800;display:flex;align-items:center;gap:7px;
+    flex-wrap:wrap;line-height:1.25}
+.pdm-author .pdm-author-meta{font-size:12.5px;color:var(--muted);font-weight:600;line-height:1.35;margin-top:2px;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pdm-author .liv-badge{margin-left:0}
+.pdm-segui{margin-left:auto;background:var(--red);color:#fff;border:none;border-radius:20px;padding:8px 14px;
+    font-size:12.5px;font-weight:900;font-family:inherit;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.pdm-segui.gia{background:#0B7A38;padding:0;width:34px;height:34px;display:flex;align-items:center;
+    justify-content:center;font-size:16px}
+.pdm-segui.gia span{display:none}
 .liv-badge{display:inline-flex;align-items:center;gap:4px;border-radius:20px;padding:3px 9px;font-size:10.5px;
     font-weight:900;border:1.5px solid;margin-left:6px;white-space:nowrap;vertical-align:1px}
 .lb-liv{background:rgba(5,150,105,.14);color:#047857;border-color:#04785755}
@@ -8969,7 +8982,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='4.84';
+const APP_VERSION='4.85';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
@@ -12769,6 +12782,19 @@ const _LIV_BADGE = {
   professionista_plus:{c:'lb-plus', i:'ph-storefront',   n:'Plus'},
   plus:               {c:'lb-plus', i:'ph-storefront',   n:'Plus'}
 };
+/* Il nome come lo direbbe una persona: "patrizia.landini" diventa "Patrizia Landini".
+   L'indirizzo del profilo resta quello, ma nella fascia si legge un nome vero. */
+function _nomeVero(pr){
+  let n=(pr.display_name||'').trim();
+  if(!n || /[._]/.test(n) && !/\s/.test(n)) n=(pr.display_name||pr.username||'').trim();
+  n=n.replace(/_[a-z0-9]{4,}$/i,'');            // via la coda tecnica tipo _a8eb
+  if(/^[a-z0-9._-]+$/i.test(n) && !/\s/.test(n)){
+    n=n.replace(/[._-]+/g,' ').trim()
+       .split(/\s+/).map(x=>x.charAt(0).toUpperCase()+x.slice(1)).join(' ');
+  }
+  return n || '—';
+}
+
 /* Il livello a punti: ce l'hanno tutti, anche chi non e' Sostenitore o Professionista. */
 function _livelloDaPunti(p){
   const n=Number(p||0);
@@ -12781,11 +12807,11 @@ async function mostraLivelloAutore(poi){
   const idAtteso = poi.id;
   try{
     const { data } = await sb.from('profiles')
-      .select('username,display_name,avatar_url,points,special_tier,professione,is_demo')
+      .select('username,display_name,avatar_url,points,special_tier,professione,is_demo,bio')
       .eq('id', poi.author_id).limit(1);
     const pr = data && data[0]; if(!pr) return;
     if(!currentPOI || currentPOI.id !== idAtteso) return;   // la scheda e' cambiata mentre leggevo
-    const nome = pr.display_name || pr.username || '—';
+    const nome = _nomeVero(pr);
     const tier = (pr.special_tier||'').toLowerCase();
     const b = _LIV_BADGE[tier];
     // il livello si vede SEMPRE: se non ha un livello speciale, si mostra quello a punti
@@ -12800,11 +12826,13 @@ async function mostraLivelloAutore(poi){
     el.innerHTML = _escHtml(nome) + etichetta +
       (pr.is_demo ? ' <span class="liv-badge" style="background:#FFF7E6;color:#8A6100;border-color:#E8C169">'+
                     t('dimostrativo','dimostrativo')+'</span>' : '');
-    // sotto il nome: il mestiere se c'e', e i punti
-    const pezzi=[];
-    if(pr.professione) pezzi.push(_escHtml(pr.professione));
-    if(pr.points!=null) pezzi.push(pr.points+' '+t('punti','punti'));
-    if(meta) meta.innerHTML = pezzi.join(' · ');
+    // sotto il nome: come si racconta lei, al massimo cento caratteri.
+    // Se non ha scritto niente, il mestiere; se non ha nemmeno quello, i punti.
+    let sotto='';
+    if(pr.bio)               sotto=String(pr.bio).slice(0,100);
+    else if(pr.professione)  sotto=pr.professione;
+    else if(pr.points!=null) sotto=pr.points+' '+t('punti','punti');
+    if(meta) meta.textContent = sotto;
     const av=document.getElementById('detailAuthorAvatar');
     if(av && pr.avatar_url) av.src=pr.avatar_url;
   }catch(_){}
@@ -13020,13 +13048,13 @@ async function seguiAutore(){
     if(gia){
       const r=await sb.from('follows').delete().eq('follower_id',currentUser.id).eq('following_id',chi);
       if(r.error) throw r.error;
-      if(b){ b.dataset.segue='0'; b.querySelector('span').textContent=t('segui','Segui'); b.style.background='var(--red)'; }
+      if(b){ b.dataset.segue='0'; b.classList.remove('gia'); b.innerHTML='<span>'+t('segui','Segui')+'</span>'; }
       _aggiornaSeguiti(chi, false);
       showToast(t('non_segui_piu','Non lo segui piu'));
     } else {
       const r=await sb.from('follows').insert({follower_id:currentUser.id, following_id:chi});
       if(r.error && !/duplicate|unique/i.test(r.error.message||'')) throw r.error;
-      if(b){ b.dataset.segue='1'; b.querySelector('span').textContent=t('segui_gia','Segui gia'); b.style.background='#0B7A38'; }
+      if(b){ b.dataset.segue='1'; b.classList.add('gia'); b.innerHTML='<i class="ph-bold ph-check"></i><span>'+t('segui_gia','Segui gia')+'</span>'; }
       _aggiornaSeguiti(chi, true);
       showToast(t('ora_segui','Adesso lo segui'));
     }
@@ -13039,12 +13067,12 @@ async function _sistemaSegui(poi){
   const chi=poi && poi.author_id;
   if(!chi || !currentUser || chi===currentUser.id){ b.style.display='none'; return; }
   b.style.display=''; b.dataset.segue='0';
-  b.querySelector('span').textContent=t('segui','Segui'); b.style.background='var(--red)';
+  b.classList.remove('gia'); b.innerHTML='<span>'+t('segui','Segui')+'</span>';
   try{
     const { data } = await sb.from('follows').select('following_id')
       .eq('follower_id',currentUser.id).eq('following_id',chi).limit(1);
     if(data && data.length && currentPOI && currentPOI.author_id===chi){
-      b.dataset.segue='1'; b.querySelector('span').textContent=t('segui_gia','Segui gia'); b.style.background='#0B7A38';
+      b.dataset.segue='1'; b.classList.add('gia'); b.innerHTML='<i class="ph-bold ph-check"></i><span>'+t('segui_gia','Segui gia')+'</span>';
     }
   }catch(_){}
 }
