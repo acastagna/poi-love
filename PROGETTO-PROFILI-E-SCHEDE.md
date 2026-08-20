@@ -515,3 +515,49 @@ Lavoro nostro, non della banca. Si fa mentre la banca risponde:
 - registro degli abbonamenti gia' previsto nel Blocco 11, con stato pagato, scaduto, rimborsato;
 - ricevuta o fattura all'utente, con i dati fiscali giusti;
 - riconciliazione: ogni incasso legato al suo abbonamento, per non impazzire a fine anno.
+
+
+---
+
+## 11. Il mercato: chi prende cosa (deciso il 20/08/2026)
+
+**Gli abbonamenti sono interamente nostri.** Professionista 100 euro l'anno e Plus locale 250 euro l'anno
+li paga il cliente a POI•LOVE: non c'e' niente da dividere.
+
+**Sulle trattative dentro il mercato POI•LOVE trattiene il 33% netto.**
+Netto vuol dire che il 33% resta pulito: il costo dell'incasso non lo mangia.
+
+### 11.1 Come tornano i conti
+
+Esempio su una collaborazione da 300 euro, con incasso al 3%:
+
+| Voce | Importo |
+|---|---|
+| Paga il professionista | 300,00 |
+| Costo dell'incasso (3%) | 9,00 |
+| **Resta a POI•LOVE, netto** | **99,00** (il 33% di 300) |
+| Va all'influencer | 192,00 |
+
+Chi si prende il costo dell'incasso e' una scelta: **consiglio di scalarlo dalla quota dell'influencer**,
+cosi' il professionista vede un prezzo pulito e il nostro 33% resta netto per davvero.
+L'alternativa e' aggiungerlo al totale che paga il professionista: piu' trasparente, meno elegante nel prezzo esposto.
+
+### 11.2 Un avvertimento serio, prima di costruire
+
+"Trattenere il pagamento fino alla consegna e poi girarlo all'influencer" vuol dire **tenere soldi di terzi**.
+In molti paesi e' un'attivita' regolata, con licenza. Questo va chiesto al commercialista **prima** di scrivere una riga.
+
+C'e' una strada che evita del tutto il problema e porta allo stesso risultato:
+
+| Modello | Come funziona | Conseguenza |
+|---|---|---|
+| **Consigliato: POI•LOVE vende la collaborazione** | il professionista compra da POI•LOVE, l'influencer fattura a POI•LOVE il 67% | nessun soldo di terzi da custodire, il 33% e' semplicemente il nostro margine, un solo documento per parte |
+| Mercato con soldi trattenuti | POI•LOVE incassa per conto dell'influencer e glieli gira dopo la consegna | possibile obbligo di licenza per servizi di pagamento, da verificare con il commercialista |
+
+Il primo modello si puo' costruire subito. Il secondo va verificato prima.
+
+### 11.3 Cosa resta da decidere
+
+- Chi assorbe il costo dell'incasso: l'influencer (consigliato) o il professionista.
+- Quale dei due modelli sopra, da confermare con il commercialista.
+- L'IVA sulla commissione e la forma dei documenti: sempre commercialista.

@@ -116,7 +116,9 @@ Paga il **Professionista (100 euro/anno)** e paga il **Plus locale (250 euro/ann
 
 - L'influencer mette la levetta **Disponibile per collaborazioni** e il proprio listino.
 - Il professionista e il locale cercano per zona, tema, numeri veri e recensioni ricevute.
-- La proposta passa **dentro POI•LOVE**: messaggio, accordo, consegna, pagamento trattenuto fino alla consegna, commissione a POI•LOVE.
+- La proposta passa **dentro POI•LOVE**: messaggio, accordo, consegna, pagamento.
+- **POI•LOVE trattiene il 33% netto sulle trattative** (deciso il 20/08). Gli abbonamenti restano interi a POI•LOVE.
+- Il listino di un influencer lo vedono **solo professionisti e locali**, mai un altro influencer, e la regola sta sul server.
 - L'influencer non paga mai la piattaforma: incassa.
 
 ---
