@@ -1,6 +1,15 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
-## Sessione 19/08/2026 (14) — La schermata del POI: nomi veri, indirizzi intelligenti, punti a tempo (v4.33 → 4.43)
+## Sessione 19/08/2026 (14) — La schermata del POI: nomi veri, indirizzi intelligenti, punti a tempo (v4.33 → 4.45)
+
+**4.44-4.45**
+- In testa torna **lo stato del profilo**: livello, punti che stai per prendere e **barra di
+  avanzamento** col traguardo scritto ("340 punti · al prossimo livello Giramondo: 660"), coi punti
+  veri del profilo.
+- I quattro modi di dire dove sei sono **quattro pulsanti tutti in vista** (due per riga sul telefono,
+  quattro in fila su schermo largo): niente piu' carrello che scorre di lato. Ogni pulsante mostra il
+  **nome intero**, va a capo invece di tagliare le parole.
+
 
 **4.39-4.43 — le ultime richieste, una per una**
 - Il **cronometro non si ferma piu' al minuto**: corre finche' non salvi (misurato 0:59 → 1:05 e oltre).
