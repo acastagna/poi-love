@@ -88,7 +88,7 @@
 <div class="totale"><i id="barraTotale" style="width:0%"></i></div>
 <div class="quando" id="quando">lettura in corso…</div>
 <div id="oggi" style="font-size:13.5px;font-weight:800;color:var(--verde);margin-top:8px"></div>
-<p style="font-size:13px;color:var(--tenue);margin-top:6px">La fine prevista si sposta da sola: e' oggi piu' le giornate che restano, contando di lavorare tutti i giorni. Ogni blocco che chiudo la avvicina.</p>
+<p style="font-size:13px;color:var(--tenue);margin-top:6px" id="ritmo"></p>
 
 <div id="attesa"></div>
 <div id="dopo"></div>
@@ -130,10 +130,26 @@ async function leggi(){
   document.getElementById('nRestano').textContent=(Math.round((gTot-gFatte)*10)/10).toString().replace('.',',');
   /* nAttesa lo scrive il blocco delle domande qui sotto */
   document.getElementById('barraTotale').style.width=perc+'%';
-  const restano=Math.ceil(gTot-gFatte);
-  const fine=new Date(); fine.setDate(fine.getDate()+restano);
-  document.getElementById('nFine').textContent=fine.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit'});
-  document.getElementById('nFine').title=restano+' giornate ancora, lavorando tutti i giorni';
+  /* La fine prevista non e' piu' "una giornata al giorno": e' calcolata sul ritmo
+     che stiamo tenendo davvero. Il ritmo sono le giornate chiuse diviso i giorni
+     in cui si e' lavorato. Se rallentiamo la data si allontana da sola. */
+  const restano = Math.round((gTot-gFatte)*10)/10;
+  const giorniLav = new Set(righe.filter(x=>x.stato==='fatto' && x.aggiornato)
+                                 .map(x=>x.aggiornato.slice(0,10))).size;
+  const ritmo = giorniLav ? (gFatte/giorniLav) : 1;
+  const giorniAlRitmo = Math.ceil(restano / (ritmo || 1));
+  const fine=new Date(); fine.setDate(fine.getDate()+giorniAlRitmo);
+  const finePiano=new Date(); finePiano.setDate(finePiano.getDate()+Math.ceil(restano));
+  const eF=document.getElementById('nFine');
+  eF.textContent=fine.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit'});
+  eF.title='al ritmo tenuto finora: '+(Math.round(ritmo*100)/100).toString().replace('.',',')+' giornate al giorno';
+  const eR=document.getElementById('ritmo');
+  if(eR) eR.innerHTML = giorniLav
+    ? 'Calcolata sul ritmo che stiamo tenendo: <b>'+(Math.round(ritmo*100)/100).toString().replace('.',',')+
+      ' giornate al giorno</b> su '+giorniLav+(giorniLav===1?' giorno di lavoro':' giorni di lavoro')+
+      '. Se rallentiamo, la data si allontana da sola. A una giornata al giorno sarebbe il '+
+      finePiano.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'})+'.'
+    : 'Ancora nessuna giornata chiusa: la data e&#39; calcolata a una giornata al giorno.';
   const ora=new Date();
   document.getElementById('quando').textContent='aggiornato alle '+ora.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
   /* quanto si e' chiuso oggi: e' il numero che fa vedere il movimento */
