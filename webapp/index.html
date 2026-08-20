@@ -1273,7 +1273,7 @@ body.kb-open #lang-strip,body.kb-open #brand-strip{opacity:0;pointer-events:none
 /* fade gradiente verso card */
 .pdm-photos::after{content:'';position:absolute;bottom:0;left:0;right:0;height:40px;background:linear-gradient(transparent,var(--card));pointer-events:none;z-index:2}
 /* counter */
-.pdm-photo-counter{position:absolute;bottom:8px;right:10px;background:rgba(0,0,0,.52);color:#fff;font-size:9px;font-weight:800;padding:3px 8px;border-radius:10px;letter-spacing:.3px;z-index:3;pointer-events:none;display:flex;align-items:center;gap:4px}
+.pdm-photo-counter{position:absolute;bottom:8px;left:10px;background:rgba(0,0,0,.52);color:#fff;font-size:9px;font-weight:800;padding:3px 8px;border-radius:10px;letter-spacing:.3px;z-index:3;pointer-events:none;display:flex;align-items:center;gap:4px}
 /* Barra azioni */
 .pdm-actions{display:flex;padding:14px 10px 14px;border-bottom:1px solid var(--border);background:var(--card);justify-content:space-evenly;flex-shrink:0}
 .pdm-act{display:flex;flex-direction:column;align-items:center;gap:5px;border:none;background:none;cursor:pointer;font-family:inherit;min-width:52px;flex-shrink:0;-webkit-tap-highlight-color:transparent;padding:0}
@@ -8808,7 +8808,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='4.70';
+const APP_VERSION='4.71';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
@@ -12324,11 +12324,15 @@ function _renderAllSlots(container){
   if(nUser > 0){
     const ctr = document.createElement('div');
     ctr.className = 'pdm-photo-counter';
-    ctr.innerHTML = `<i class="ph-duotone ph-camera"></i> ${nUser} foto`;
+    const quante = (typeof currentPOI!=='undefined' && currentPOI && Array.isArray(currentPOI.photos))
+                 ? Math.max(currentPOI.photos.length, nUser) : nUser;
+    ctr.innerHTML = `<i class="ph-duotone ph-camera"></i> ${quante} ${quante===1?'foto':'foto'}`;
     container.appendChild(ctr);
   }
   // + nel cerchio bianco finche' c'e' posto (max 3 foto), solo se puoi modificare
-  if(nUser < 3 && _stripEditable()){
+  const totFoto = (typeof currentPOI!=='undefined' && currentPOI && Array.isArray(currentPOI.photos))
+                ? currentPOI.photos.length : nUser;
+  if(totFoto < 22 && _stripEditable()){
     const add = document.createElement('button');
     add.type = 'button';
     add.className = 'pdm-add-circle';
@@ -12530,11 +12534,12 @@ function _pickPhotoForSlot(idx, container){
         }
         const realIdx = Math.min(idx, container._slots.length-1);
         container._slots[realIdx] = { type:'user', url: urls[0] };
-        currentPOI.photos = container._slots.map(sl=>sl.url);
+        currentPOI.photos = _fotoComplete(container);
         _renderAllSlots(container);
         await _autosavePoiPatch({ photos: currentPOI.photos });
+        mostraGalleria(currentPOI.photos, currentPOI);
       } else if(typeof currentPOI!=='undefined'){
-        currentPOI.photos = container._slots.map(sl=>sl.url); // POI locale demo: solo in memoria
+        currentPOI.photos = _fotoComplete(container); // POI locale demo: solo in memoria
       }
     };
     reader.readAsDataURL(file);
@@ -12586,12 +12591,22 @@ function _pickPhotosMulti(container){
 
 function _deleteSlot(idx, container){
   if(!container) return;
-  // Niente slot vuoti: la foto tolta sparisce e le altre si allargano
+  // In cima c'e' la sola copertina: qui si tocca lei, il resto dell'album
+  // resta dov'e'. Una foto non si perde mai per un effetto collaterale.
   container._slots.splice(idx, 1);
-  if(typeof currentPOI!=='undefined')
-    currentPOI.photos = container._slots.map(s=>s.url);
+  if(typeof currentPOI!=='undefined'){
+    const altre=(currentPOI.photos||[]).slice(1);
+    currentPOI.photos = container._slots.map(s=>s.url).concat(altre);
+  }
   _renderAllSlots(container);
-  if(_canEditCurrentPoi()) _autosavePoiPatch({ photos: currentPOI.photos }); // autosave anche qui
+  if(_canEditCurrentPoi()) _autosavePoiPatch({ photos: currentPOI.photos });
+  mostraGalleria(currentPOI?currentPOI.photos:[], currentPOI);
+}
+
+/* L'elenco vero delle foto del luogo: la copertina che sta in cima piu' le altre. */
+function _fotoComplete(container){
+  const altre=(currentPOI&&currentPOI.photos)?currentPOI.photos.slice(1):[];
+  return container._slots.map(s=>s.url).concat(altre);
 }
 
 // Mappa il nome categoria → classe CSS colore tag
