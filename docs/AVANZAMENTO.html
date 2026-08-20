@@ -34,6 +34,10 @@
   .avviso{background:#FFF7E6;border-left:4px solid #E8C169;border-radius:8px;padding:14px 16px;margin:16px 0}
   .avviso b{color:#7C3A00}
   .avviso ul{margin:8px 0 0 20px}
+  .dopo{background:var(--carta);border-left:4px solid var(--bordo);border-radius:8px;padding:14px 16px;margin:16px 0;font-size:14.5px}
+  .dopo b{color:var(--testo)}
+  .dopo ul{margin:8px 0 0 20px;color:var(--tenue)}
+  .dopo .fra{font-weight:800;color:var(--oro)}
   .ora{background:#EDF7F0;border-left:4px solid var(--verde);border-radius:8px;padding:14px 16px;margin:16px 0}
   .cant{border:1px solid var(--bordo);border-radius:14px;margin:14px 0;overflow:hidden}
   .cant .cima{display:flex;align-items:center;gap:12px;padding:13px 16px;background:var(--carta);border-bottom:1px solid var(--bordo)}
@@ -78,7 +82,7 @@
   <div><b id="nPerc">—</b><span>completato</span></div>
   <div><b id="nFatte">—</b><span>giornate fatte</span></div>
   <div><b id="nTotali">—</b><span>giornate in tutto</span></div>
-  <div><b id="nAttesa">—</b><span>aspettano te</span></div>
+  <div><b id="nAttesa">—</b><span>da rispondere adesso</span></div>
   <div style="background:#16130f;border-color:#16130f;color:#fff"><b id="nFine">—</b><span style="color:#cfc6b8">fine prevista</span></div>
 </div>
 <div class="totale"><i id="barraTotale" style="width:0%"></i></div>
@@ -86,6 +90,7 @@
 <p style="font-size:13px;color:var(--tenue);margin-top:6px">La fine prevista si sposta da sola: e' oggi piu' le giornate che restano, contando di lavorare tutti i giorni. Ogni blocco che chiudo la avvicina.</p>
 
 <div id="attesa"></div>
+<div id="dopo"></div>
 <div id="adesso"></div>
 
 <h2>I cantieri</h2>
@@ -122,7 +127,7 @@ async function leggi(){
   document.getElementById('nPerc').textContent=perc+'%';
   document.getElementById('nFatte').textContent=gFatte.toString().replace('.',',');
   document.getElementById('nTotali').textContent=gTot.toString().replace('.',',');
-  document.getElementById('nAttesa').textContent=attesa.length;
+  /* nAttesa lo scrive il blocco delle domande qui sotto */
   document.getElementById('barraTotale').style.width=perc+'%';
   const restano=Math.ceil(gTot-gFatte);
   const fine=new Date(); fine.setDate(fine.getDate()+restano);
@@ -131,10 +136,31 @@ async function leggi(){
   const ora=new Date();
   document.getElementById('quando').textContent='aggiornato alle '+ora.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
 
-  document.getElementById('attesa').innerHTML = attesa.length
-    ? '<div class="avviso"><b>Aspettano una tua risposta ('+attesa.length+')</b><ul>'+
-      attesa.map(x=>'<li><b>'+testo(x.blocco)+'</b>'+(x.dettaglio?' · '+testo(x.dettaglio):'')+'</li>').join('')+
+  /* Una domanda si fa al punto giusto: quando manca poco al blocco che la usa.
+     "Quanto manca" e' la somma delle giornate ancora da fare che vengono prima. */
+  const quanto = d => righe.filter(x=>x.stato!=='fatto' && x.stato!=='in_attesa' && x.ordine < d.ordine)
+                           .reduce((a,x)=>a+Number(x.giornate||0),0);
+  const SOGLIA = 3;
+  const adesso = attesa.filter(x=>quanto(x) <= SOGLIA);
+  const dopo   = attesa.filter(x=>quanto(x) >  SOGLIA)
+                       .map(x=>({...x, fra: quanto(x)}))
+                       .sort((a,b)=>a.fra-b.fra);
+
+  document.getElementById('nAttesa').textContent=adesso.length;
+  document.getElementById('attesa').innerHTML = adesso.length
+    ? '<div class="avviso"><b>Serve una tua risposta adesso ('+adesso.length+')</b><ul>'+
+      adesso.map(x=>'<li><b>'+testo(x.blocco)+'</b>'+(x.dettaglio?' · '+testo(x.dettaglio):'')+'</li>').join('')+
       '</ul></div>'
+    : '<div class="ora"><b>Niente da rispondere adesso.</b> Le domande arrivano quando serve, non tutte insieme.</div>';
+
+  document.getElementById('dopo').innerHTML = dopo.length
+    ? '<div class="dopo"><b>Te lo chiedero&#39; piu&#39; avanti ('+dopo.length+')</b><ul>'+
+      dopo.map(x=>{
+        const g=new Date(); g.setDate(g.getDate()+Math.ceil(x.fra));
+        return '<li><b>'+testo(x.blocco)+'</b> · <span class="fra">fra circa '+
+               Math.ceil(x.fra)+' giornate, verso il '+g.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit'})+'</span>'+
+               (x.dettaglio?'<br>'+testo(x.dettaglio):'')+'</li>';
+      }).join('')+'</ul></div>'
     : '';
 
   document.getElementById('adesso').innerHTML = corso.length
