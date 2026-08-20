@@ -1191,7 +1191,7 @@ body.kb-open #lang-strip,body.kb-open #brand-strip{opacity:0;pointer-events:none
 
 /* ── POI DETAIL MODAL ── */
 #detailBg.vis{background:rgba(0,0,0,.52);}
-#detailSheet{position:absolute;border-radius:26px;bottom:auto;left:50%;top:50%;width:min(400px,94vw);max-height:88vh;padding:0;transform:translate(-50%,calc(-50% + 28px));opacity:0;pointer-events:none;transition:transform .36s cubic-bezier(.32,.72,0,1),opacity .28s;overflow-y:auto;overflow-x:hidden;box-shadow:0 24px 64px rgba(0,0,0,.32),0 4px 16px rgba(0,0,0,.16)}
+#detailSheet{position:absolute;border-radius:26px;bottom:auto;left:50%;top:50%;width:min(400px,94vw);max-height:88vh;padding:0 0 18px;transform:translate(-50%,calc(-50% + 28px));opacity:0;pointer-events:none;transition:transform .36s cubic-bezier(.32,.72,0,1),opacity .28s;overflow-y:auto;overflow-x:hidden;box-shadow:0 24px 64px rgba(0,0,0,.32),0 4px 16px rgba(0,0,0,.16)}
 #detailSheet.open{transform:translate(-50%,-50%);opacity:1;pointer-events:all}
 /* X chiudi — fuori dalla card, posizionato via JS */
 .pdm-close-outer{position:fixed;z-index:600;width:34px;height:34px;border-radius:50%;background:#fff;border:none;cursor:pointer;display:none;align-items:center;justify-content:center;font-size:15px;color:#444;box-shadow:0 2px 14px rgba(0,0,0,.26),0 0 0 1px rgba(0,0,0,.07);transition:transform .15s;-webkit-tap-highlight-color:transparent}
@@ -1316,12 +1316,14 @@ body.kb-open #lang-strip,body.kb-open #brand-strip{opacity:0;pointer-events:none
 .love-btn{height:38px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px;padding:0 14px;color:var(--muted);transition:all .2s;flex-shrink:0}
 .love-btn.loved{background:#FFF0F0;border-color:var(--red);color:var(--red)}
 .love-btn-big{width:100%;height:58px;border-radius:26px;font-size:19px;font-weight:900;gap:10px;padding:0;
-    background:var(--red);color:#fff;border:none;display:flex;align-items:center;justify-content:center;
-    box-shadow:0 6px 18px rgba(212,43,43,.28);transition:transform .16s}
-.love-btn-big i{color:#fff;font-size:22px}
-.love-btn-big .love-cnt{color:#fff}
+    background:#fff;color:var(--red);border:2px solid var(--red);display:flex;align-items:center;
+    justify-content:center;transition:transform .16s,background .18s,color .18s}
+.love-btn-big i{font-size:22px}
 .love-btn-big:active{transform:scale(.985)}
-.love-btn-big.loved{background:#8f1c1c}
+/* appena arriva il primo love diventa rosso pieno, lo stesso rosso della fascia */
+.love-btn-big.ha-love{background:var(--red);color:#fff;border-color:var(--red);
+    box-shadow:0 6px 18px rgba(212,43,43,.28)}
+.love-btn-big.ha-love i,.love-btn-big.ha-love .love-cnt{color:#fff}
 .love-btn-big.loved{box-shadow:0 4px 22px rgba(212,43,43,.3)}
 .love-btn-big:active{transform:scale(.95)}
 /* Autore */
@@ -5763,7 +5765,7 @@ function openDBDetail(p) {
   const coordEl = document.getElementById('detailCoordsText');
   if (coordEl && p.lat && p.lng) coordEl.textContent = `${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}`;
   // Love — reset UI poi controlla stato reale dal DB
-  document.getElementById('loveCnt').textContent = p.love_count || 0;
+  document.getElementById('loveCnt').textContent = p.love_count || 0; _pittaLove(p.love_count || 0);
   document.getElementById('loveBtn').classList.remove('loved');
   document.getElementById('loveHeart').className = 'ph-duotone ph-heart';
   if(currentUser && p.id) _checkUserLove(p.id);
@@ -8806,7 +8808,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='4.69';
+const APP_VERSION='4.70';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
@@ -12409,6 +12411,12 @@ async function mostraLivelloAutore(poi){
   }catch(_){}
 }
 function _escHtml(x){ const d=document.createElement('div'); d.textContent=x==null?'':x; return d.innerHTML; }
+
+/* Il pulsante Love: bianco quando e' a zero, rosso appena arriva il primo. */
+function _pittaLove(n){
+  const b=document.getElementById('loveBtn'); if(!b) return;
+  b.classList.toggle('ha-love', Number(n||0) > 0);
+}
 function renderPhotoStrip(container, photos, name, address, category){
   container._meta = { name, address, category };
   // Solo le foto REALI: niente linguette vuote nella scheda.
@@ -12635,7 +12643,7 @@ function openDetail(idx){
   document.getElementById('detailAddress').textContent=p.address||'Tiranë, Albania';
   document.getElementById('detailCoordsText').textContent=`${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}`;
   document.getElementById('detailDesc').textContent=p.desc||'';
-  document.getElementById('loveCnt').textContent=p.love||0;
+  document.getElementById('loveCnt').textContent=p.love||0; _pittaLove(p.love||0);
   document.getElementById('loveBtn').classList.remove('loved');
   document.getElementById('loveHeart').className='ph-duotone ph-heart';
   document.getElementById('detailAuthor').textContent=p.author||'—';
@@ -12725,7 +12733,7 @@ async function toggleLove(){
   const r=(typeof data==='string')?JSON.parse(data):data;
   btn.classList.toggle('loved',!!(r&&r.loved));
   heart.className=(r&&r.loved)?'ph-fill ph-heart':'ph-duotone ph-heart';
-  if(r&&r.love_count!=null){ cnt.textContent=r.love_count; currentPOI.love_count=r.love_count; }
+  if(r&&r.love_count!=null){ cnt.textContent=r.love_count; currentPOI.love_count=r.love_count; _pittaLove(r.love_count); }
   showToast(r&&r.loved?t('love_on','❤️ LOVE!'):t('love_off','💔 LOVE rimosso'));
   if(r&&r.loved) loadUserLovesCount(); // i punti li accredita il trigger DB (love_given)
 }
