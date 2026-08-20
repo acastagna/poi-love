@@ -1210,6 +1210,8 @@ body.kb-open #lang-strip,body.kb-open #brand-strip{opacity:0;pointer-events:none
 .pdm-gallery-grid > button{grid-column:span 2;aspect-ratio:1;border:none;padding:0;border-radius:11px;overflow:hidden;
                            background:#e6e0d6;cursor:pointer;position:relative}
 .pdm-gallery-grid > button.larga{aspect-ratio:16/9}
+.pdm-gallery-grid .cartellino{position:absolute;left:6px;top:6px;background:var(--red,#D42B2B);color:#fff;
+    font-size:8.5px;font-weight:900;letter-spacing:.3px;border-radius:6px;padding:3px 6px;pointer-events:none}
 .pdm-gallery-grid .gioca{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
                          color:#fff;font-size:44px;text-shadow:0 3px 14px rgba(0,0,0,.6);background:rgba(0,0,0,.18)}
 .pdm-gallery-grid > button.aggiungi-video{aspect-ratio:auto;height:54px;background:var(--card,#fff);
@@ -8787,7 +8789,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='4.67';
+const APP_VERSION='4.68';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
@@ -12376,8 +12378,8 @@ function mostraGalleria(tutte, poi){
   const sez=document.getElementById('detailGallery');
   const gr=document.getElementById('detailGalleryGrid');
   if(!sez||!gr) return;
-  const altre=(tutte||[]).slice(1);
-  _FOTO_APERTE = tutte||[];
+  const altre=(tutte||[]);          // dal 20/08 sera: la copertina sta anche qui sotto,
+  _FOTO_APERTE = tutte||[];         // con il suo cartellino, com'era nel disegno
   _VIDEO = (poi && poi.video_url) ? {url:poi.video_url, poster:poi.video_poster} : null;
   const puoiCaricare = (typeof _canEditCurrentPoi==='function') && _canEditCurrentPoi();
   if(!altre.length && !_VIDEO && !puoiCaricare){ sez.style.display='none'; gr.innerHTML=''; return; }
@@ -12386,8 +12388,9 @@ function mostraGalleria(tutte, poi){
     const ultimaRiga = i >= altre.length - (resto||3) && resto!==0;
     let span=2, larga='';
     if(ultimaRiga){ span = resto===1 ? 6 : 3; larga=' larga'; }
-    return '<button class="'+larga.trim()+'" style="grid-column:span '+span+'" onclick="apriVisore('+(i+1)+')">'+
-           '<img src="'+u.replace(/"/g,'&quot;')+'" loading="lazy" alt=""></button>';
+    const cart = (i===0) ? '<span class="cartellino">COPERTINA</span>' : '';
+    return '<button class="'+larga.trim()+'" style="grid-column:span '+span+'" onclick="apriVisore('+i+')">'+
+           '<img src="'+u.replace(/"/g,'&quot;')+'" loading="lazy" alt="">'+cart+'</button>';
   }).join('');
   // il video sta davanti a tutto, con il triangolo sopra; se non c'e' e il luogo
   // e' tuo, al suo posto compare il riquadro per aggiungerlo
