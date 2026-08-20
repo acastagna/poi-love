@@ -1367,7 +1367,7 @@ body.kb-open #lang-strip,body.kb-open #brand-strip{opacity:0;pointer-events:none
    e un respiro lento sull'inquadratura (Ken Burns). */
 .pdm-photo-slot img.kb{position:absolute;inset:0;transition:opacity 1.1s ease-in-out;
                        animation:respiro 9s ease-in-out infinite alternate;will-change:transform,opacity}
-@keyframes respiro{from{transform:scale(1)}to{transform:scale(1.07)}}
+@keyframes respiro{from{transform:scale(1)}to{transform:scale(1.10)}}
 /* slot AI (nero mentre carica) */
 .pdm-photo-slot.ps-ai{background:#111;display:flex;align-items:center;justify-content:center}
 .pdm-photo-slot.ps-ai img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .5s}
@@ -4137,7 +4137,7 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
       <i class="ph-duotone ph-qr-code"></i> <span data-t="qr_biz_btn">QR business</span>
     </button>
     <!-- 6c. Reclamo proprieta' (per chi NON e' il proprietario, livelli a pagamento) -->
-    <button class="pdm-transfer-btn" id="detailClaimBtn" style="display:none !important;border-color:var(--gold,#B8862F);color:var(--gold,#B8862F)" onclick="openClaimModal()">
+    <button class="pdm-transfer-btn" id="detailClaimBtn" style="display:none;border-color:var(--gold,#B8862F);color:var(--gold,#B8862F)" onclick="openClaimModal()">
       <i class="ph-duotone ph-storefront"></i> <span data-t="claim_btn">Reclama questo luogo</span>
     </button>
     <div id="detailDesc" style="display:none"></div>
@@ -5964,8 +5964,14 @@ function openDBDetail(p) {
   if(trBtn) trBtn.style.display=isOwner?'flex':'none';
   _updateFeaturedBtn(isOwner, p);
   { const qb=document.getElementById('detailQrBizBtn'); if(qb) qb.style.display=(isOwner && p && p.id && _QR_BIZ_TIERS[window._userSpecialTier])?'flex':'none'; }
+  // Reclamare un luogo e' cosa da professionisti e locali: gli altri non vedono
+  // nemmeno il pulsante. (Deciso il 20/08/2026.)
   const clBtn=document.getElementById('detailClaimBtn');
-  if(clBtn) clBtn.style.display=(currentUser&&!isOwner&&p.id)?'flex':'none';
+  if(clBtn){
+    const mio=(window._userSpecialTier||'').toLowerCase();
+    const puo=['professionista','professionista_plus','plus'].includes(mio);
+    clBtn.style.display=(currentUser && !isOwner && p.id && puo)?'flex':'none';
+  }
   openSheet('detailOv', 'detailBg', 'detailSheet');
   // Posiziona X fuori dalla card dopo l'animazione
   setTimeout(positionDetailClose, 380);
@@ -8947,7 +8953,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='4.81';
+const APP_VERSION='4.82';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
@@ -11031,7 +11037,16 @@ function _ppNum(n){
 async function apriProfiloDi(userId){
   if(!userId) return;
   if(typeof closeDetail==='function') closeDetail();
-  setTimeout(()=>{ togglePublicProfile(true); _pittaProfiloPubblico(userId); }, 180);
+  setTimeout(()=>{
+    // prima si va nella scheda Profilo, altrimenti la vista resta dietro la mappa
+    try{ if(typeof showTab==='function') showTab('profile'); }catch(_){}
+    try{ currentViewedUser = { id:userId }; }catch(_){}
+    togglePublicProfile(true);
+    _pittaProfiloPubblico(userId);
+    const pv=document.getElementById('publicProfile');
+    if(pv) pv.scrollTop=0;
+    try{ window.scrollTo(0,0); }catch(_){}
+  }, 180);
 }
 async function _pittaProfiloPubblico(userId){
   const g=id=>document.getElementById(id);
