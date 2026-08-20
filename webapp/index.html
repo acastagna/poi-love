@@ -1454,7 +1454,7 @@ body.kb-open #lang-strip,body.kb-open #brand-strip{opacity:0;pointer-events:none
 .pdm-author:hover{box-shadow:0 3px 9px rgba(93,76,44,.13);transform:translateY(1px)}
 .pdm-author:active{box-shadow:0 1px 4px rgba(93,76,44,.16);transform:translateY(2px)}
 .pdm-author .pdm-author-avatar{width:60px;height:60px;flex-shrink:0;align-self:center}
-.pdm-author .pdm-author-avatar img{width:60px;height:60px}
+.pdm-author .pdm-author-avatar img{width:60px;height:60px;object-fit:cover;object-position:50% 38%}
 .pdm-author .pdm-author-info{min-width:0;flex:1}
 .pdm-author .pdm-author-handle{font-size:15px;font-weight:800;display:block;line-height:1.3}
 .pdm-author .pdm-author-handle .nm{display:inline}
@@ -8989,7 +8989,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='4.91';
+const APP_VERSION='4.92';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
