@@ -1160,7 +1160,7 @@ body.kb-open #lang-strip,body.kb-open #brand-strip{opacity:0;pointer-events:none
 .poi-badge{position:absolute;top:-6px;right:-6px;background:#fff;color:var(--red);font-size:8px;font-weight:900;border-radius:6px;padding:1px 4px;border:1px solid var(--red)}
 .poi-tail{width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:8px solid var(--red);margin-top:-1px}
 /* Tre livelli (18/08): seguiti verdi leggeri, community grigia e discreta. Trasparenze regolabili (in futuro dall'admin). */
-:root{--mk-friend:.85;--mk-comm:.55}
+:root{--mk-friend:.5;--mk-comm:.55}
 .leaflet-marker-icon{overflow:visible!important}
 .poi-marker{display:flex;flex-direction:column;align-items:center;color:var(--red)}
 .poi-pin{position:relative;display:flex}
@@ -1363,6 +1363,11 @@ body.kb-open #lang-strip,body.kb-open #brand-strip{opacity:0;pointer-events:none
 /* slot con foto utente */
 .pdm-photo-slot.ps-user{background:#111}
 .pdm-photo-slot.ps-user img{width:100%;height:100%;object-fit:cover;display:block}
+/* Il cambio foto della copertina: dissolvenza incrociata, mai un fotogramma vuoto,
+   e un respiro lento sull'inquadratura (Ken Burns). */
+.pdm-photo-slot img.kb{position:absolute;inset:0;transition:opacity 1.1s ease-in-out;
+                       animation:respiro 9s ease-in-out infinite alternate;will-change:transform,opacity}
+@keyframes respiro{from{transform:scale(1)}to{transform:scale(1.07)}}
 /* slot AI (nero mentre carica) */
 .pdm-photo-slot.ps-ai{background:#111;display:flex;align-items:center;justify-content:center}
 .pdm-photo-slot.ps-ai img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .5s}
@@ -8942,7 +8947,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='4.80';
+const APP_VERSION='4.81';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
@@ -11185,6 +11190,13 @@ function condividiProfilo(){
   showToast(t('link_copiato','Indirizzo copiato'));
 }
 
+
+/* Chi segui ha i luoghi verdi sulla mappa: appena cambi idea, la mappa lo sa. */
+function _aggiornaSeguiti(userId, adesso){
+  if(!window._followedIds) window._followedIds = new Set();
+  if(adesso) window._followedIds.add(userId); else window._followedIds.delete(userId);
+  try{ if(typeof loadPOIsFromDB==='function') loadPOIsFromDB(); }catch(_){}
+}
 function openAuthorProfile(){
   // si apre per identita', non per nome scritto: il nome puo' ripetersi
   const id = currentPOI && currentPOI.author_id;
@@ -12946,11 +12958,13 @@ async function seguiAutore(){
       const r=await sb.from('follows').delete().eq('follower_id',currentUser.id).eq('following_id',chi);
       if(r.error) throw r.error;
       if(b){ b.dataset.segue='0'; b.querySelector('span').textContent=t('segui','Segui'); b.style.background='var(--red)'; }
+      _aggiornaSeguiti(chi, false);
       showToast(t('non_segui_piu','Non lo segui piu'));
     } else {
       const r=await sb.from('follows').insert({follower_id:currentUser.id, following_id:chi});
       if(r.error && !/duplicate|unique/i.test(r.error.message||'')) throw r.error;
       if(b){ b.dataset.segue='1'; b.querySelector('span').textContent=t('segui_gia','Segui gia'); b.style.background='#0B7A38'; }
+      _aggiornaSeguiti(chi, true);
       showToast(t('ora_segui','Adesso lo segui'));
     }
   }catch(e){ showToast(t('error_generic','Qualcosa e andato storto, riprova')); }
@@ -12980,13 +12994,26 @@ function _avviaScorrimentoCopertina(p){
   const foto=(p&&Array.isArray(p.photos))?p.photos.filter(Boolean):[];
   if(!c || foto.length<2) return;
   if((typeof _canEditCurrentPoi==='function') && _canEditCurrentPoi()) return; // sul tuo luogo no: i tasti agiscono sulla copertina
-  let i=0;
+  const slot=c.querySelector('.pdm-photo-slot'); if(!slot) return;
+  const prima=slot.querySelector('img'); if(!prima) return;
+  // Due immagini sovrapposte: mentre una svanisce l'altra e' gia' li'.
+  // Cosi' non si passa mai dal nero, e intanto l'inquadratura respira piano.
+  prima.classList.add('kb');
+  let sotto=slot.querySelector('img.kb2');
+  if(!sotto){
+    sotto=prima.cloneNode(false); sotto.classList.remove('kb'); sotto.classList.add('kb','kb2');
+    sotto.style.opacity='0'; slot.insertBefore(sotto, prima);
+  }
+  let i=0, sopra=prima, dietro=sotto;
   _scorriTimer=setInterval(()=>{
-    const img=c.querySelector('.pdm-photo-slot img');
-    if(!img || !document.getElementById('detailSheet').classList.contains('open')){ clearInterval(_scorriTimer); return; }
+    const sh=document.getElementById('detailSheet');
+    if(!sh || !sh.classList.contains('open')){ clearInterval(_scorriTimer); return; }
     i=(i+1)%foto.length;
-    img.style.transition='opacity .45s'; img.style.opacity='0';
-    setTimeout(()=>{ img.src=foto[i]; img.style.opacity='1'; }, 450);
+    dietro.src=foto[i];
+    dietro.style.animation='none'; void dietro.offsetWidth;   // riparte il respiro
+    dietro.style.animation='';
+    dietro.style.opacity='1'; sopra.style.opacity='0';
+    const x=sopra; sopra=dietro; dietro=x;
   }, 3000);
 }
 function _fermaScorrimento(){ clearInterval(_scorriTimer); _scorriTimer=null; }
@@ -16021,6 +16048,7 @@ async function togglePublicFollow(){
       }
     }catch(e){ salvataggioFallito(t('sf_segui','Segui'), e); }
   }
+  if(currentViewedUser?.id) _aggiornaSeguiti(currentViewedUser.id, pubFollowing);
   showToast(pubFollowing
     ?(lang==='it'?`Stai seguendo ${targetName}`:lang==='sq'?`Po ndjek ${targetName}`:`Now following ${targetName}`)
     :(lang==='it'?`Non segui più ${targetName}`:lang==='sq'?'Nuk ndjek më':`Unfollowed ${targetName}`));
