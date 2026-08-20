@@ -18,6 +18,7 @@ Bozza grafica: `scratchpad/schede2/mock.html`, immagine `schede6.jpg`. Dopo il v
 - Il POI si apre sempre in popup, versione pubblica.
 - La prima foto e' la **Copertina**: sta in cima, e' quella letta dai codici di geolocalizzazione e **non si ripete** nella galleria sotto.
 - **Mai scrivere nella scheda** il numero di foto ne' i secondi di scorrimento: sono regolazioni del pannello di amministrazione (testata 3 foto ogni 3000 ms, galleria sei alla volta con salto di quattro, tempi modificabili).
+- Le gallerie hanno sempre un numero di foto **multiplo di tre**: l'ultima riga non resta mai monca. Quindi l'allowance e' sempre **copertina piu' un multiplo di 3**.
 - Le tipologie di scheda si organizzano dall'amministrazione.
 - Posizione della persona visibile nella community solo con la levetta accesa nel suo profilo.
 - Per il **locale** questa scheda E' il suo profilo. Per tutti gli altri il profilo resta quello tradizionale e queste sono le schede dei loro luoghi.
@@ -28,12 +29,12 @@ Bozza grafica: `scratchpad/schede2/mock.html`, immagine `schede6.jpg`. Dopo il v
 
 | Tipologia | Foto | Video | Audioguida POI•VOICE | Recensioni | In piu' |
 |---|---|---|---|---|---|
-| Persona a punti | 4 | no | no | nessuna | itinerari e compagnie pubbliche in "Fa parte di" |
-| Sostenitore | 6 | no | no | nessuna | spunta, badge, Muro dei Sostenitori: "<nome> sostiene attivamente il progetto POI•LOVE assieme a N persone" |
-| Mecenate | 8 | no | ascolta quella del luogo ovunque, anche lontano dal posto | nessuna | itinerario in evidenza in alto nella scheda |
-| Influencer | 6 | 1 | ascolta quella del luogo | riceve recensioni sue, scorrono di lato | spunta rosa, follower, bollino Consigliato, fino a 3 itinerari e 1 compagnia in evidenza, riquadro privato col rapporto notarizzato in fondo |
-| Professionista | 6 | 1 | carica la sua, massimo 1 minuto | riceve recensioni sue, scorrono di lato | biglietto da visita completo, rotta adottata, QR dei contatti, riquadro privato |
-| Plus locale (250 euro/anno) | 20 | si | carica la sua, massimo 3 minuti (bonus) | solo amici, una a testa | menu, Consigli dello Chef, orari a tendina, pagamenti, QR del locale, statistiche private |
+| Persona a punti | copertina + 3 | no | no | nessuna | itinerari e compagnie pubbliche in "Fa parte di" |
+| Sostenitore | copertina + 6 | no | no | nessuna | spunta, badge, Muro dei Sostenitori: "<nome> sostiene attivamente il progetto POI•LOVE assieme a N persone" |
+| Mecenate | copertina + 9 | no | ascolta quella del luogo ovunque, anche lontano dal posto | nessuna | itinerario in evidenza in alto nella scheda |
+| Influencer | copertina + 6 | 1 | ascolta quella del luogo | riceve recensioni sue, scorrono di lato | spunta rosa, follower, bollino Consigliato, fino a 3 itinerari e 1 compagnia in evidenza, riquadro privato col rapporto notarizzato in fondo |
+| Professionista | copertina + 6 | 1 | carica la sua, massimo 1 minuto | riceve recensioni sue, scorrono di lato | biglietto da visita completo, rotta adottata, QR dei contatti, riquadro privato |
+| Plus locale (250 euro/anno) | copertina + 21 (da confermare: era "fino a 20", ma 20 lascerebbe un buco nell'ultima riga) | si | carica la sua, massimo 3 minuti (bonus) | solo amici, una a testa | menu, Consigli dello Chef, orari a tendina, pagamenti, QR del locale, statistiche private |
 
 Le audioguide caricate diventano subito **MP3 192**.
 
@@ -47,7 +48,7 @@ Le audioguide caricate diventano subito **MP3 192**.
 **Professionista, ordine del biglietto da visita**
 1. Nome con etichetta subito dopo l'ultima parola, anche quando il nome va a capo. 2. Chiama e Scrivi (Scrivi passa dalla **posta del sistema**, con tutte le protezioni: nessun indirizzo esposto, invio server-side, antiabuso). 3. Sito. 4. Vieni a trovarmi, indirizzo confermato con navigazione. 5. Fino a 4 social autoadattivi. 6. Inquadra e salva i miei contatti (QR che scrive la scheda in rubrica).
 - Sotto la scheda restano **Condividi e Salva**; **Naviga scende sotto** e vale per chi condivide la propria posizione di adesso.
-- In fondo, il riquadro con il suo viso e i suoi dati, piu' il riquadro privato.
+- In fondo resta solo il riquadro privato. Il riquadro di chiusura con la sua foto e' stato buttato il 20/08.
 
 **Locale**
 - Pastiglia **Aperto / Chiuso** per tutti; cliccandoci si apre a tendina l'orario di **tutti i giorni**.
