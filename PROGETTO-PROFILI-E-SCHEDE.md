@@ -561,3 +561,65 @@ Il primo modello si puo' costruire subito. Il secondo va verificato prima.
 - Chi assorbe il costo dell'incasso: l'influencer (consigliato) o il professionista.
 - Quale dei due modelli sopra, da confermare con il commercialista.
 - L'IVA sulla commissione e la forma dei documenti: sempre commercialista.
+
+
+---
+
+## 12. I contenuti: i tour di ILLI (direttiva del 20/08/2026)
+
+I 200-400 luoghi **non sono un elenco piatto**. Sono le tappe dei **viaggi che inventiamo noi**,
+quelli che ILLI propone a chi arriva in Albania. Prima il viaggio, poi le tappe, poi i luoghi ufficiali lungo la strada.
+
+### 12.1 La forma
+
+| Livello | Cosa e' | Quanti |
+|---|---|---|
+| **Viaggio (tour)** | un percorso con un tema, una durata e un ordine: "Il nord che non ti aspetti", "La Riviera senza ombrelloni", "La via di Scanderbeg", "I laghi", "Le mani della cucina albanese" | 15 |
+| **Tappa** | una fermata del viaggio, in ordine, con la distanza dalla precedente | 12-20 per viaggio |
+| **Luogo Ufficiale** | il POI vero e proprio sotto la tappa, con il bollino Ufficiale | circa 210 in tutto |
+
+Quindici viaggi da quattordici tappe fanno duecentodieci luoghi: e' li' che arrivano i 200.
+Se vogliamo salire a 400 si aggiungono viaggi, non si allunga un elenco.
+
+Copertura: tutte e dodici le prefetture. Non solo Tirana e la Riviera.
+
+### 12.2 Cosa contiene un luogo Ufficiale
+
+- nome giusto, coordinate verificate a mano, indirizzo completo, categoria e tag;
+- **descrizione originale nelle tre lingue**, scritta da noi, non copiata;
+- **almeno tre foto** con licenza utilizzabile, **autore e fonte salvati** (vedi capitolo 9.1: oggi non lo facciamo);
+- **bollino Ufficiale** (`badge_official`, la colonna esiste gia');
+- il viaggio a cui appartiene e la posizione nell'ordine;
+- piu' avanti, l'**audioguida ufficiale POI•VOICE** (Blocco 8b), che su questi luoghi ha piu' senso che altrove.
+
+### 12.3 Chi li prepara
+
+Li preparo io: raccolta dai dati aperti (OpenStreetMap, Wikidata, Wikipedia, Wikimedia Commons, Openverse),
+scrittura, verifica a mano di posizione e nome, foto con licenza.
+**ILLI scrive le prime stesure**, io controllo e correggo: e' il modo per farne duecento senza inventare niente.
+
+Resta aperta una cosa sola, e non la posso risolvere io: **chi controlla la qualita' dell'albanese**.
+Serve un nome. Erion e' commercialista, non revisore di lingua.
+
+### 12.4 I quindici luoghi in omaggio al Sostenitore
+
+Vengono da qui: sono luoghi **Ufficiali** presi dai viaggi di ILLI. Come si consegnano, pero', va deciso.
+
+| Modo | Cosa succede | Giudizio |
+|---|---|---|
+| **Consigliato: una raccolta personale** | il Sostenitore riceve una selezione di 15 luoghi Ufficiali, raccolta a suo nome, visibile nel profilo, con il bollino Ufficiale e la dicitura "per <nome>" | un solo esemplare di ogni luogo, niente doppioni, funziona anche con mille Sostenitori |
+| Luoghi intestati a lui | i 15 luoghi diventano suoi, come se li avesse creati | con 210 luoghi ufficiali bastano quattordici Sostenitori a esaurirli, e il secondo Sostenitore non puo' ricevere gli stessi |
+
+Con la raccolta personale, a ogni Sostenitore si puo' dare un mazzo diverso, cucito sui suoi interessi,
+e lo stesso luogo puo' comparire nella raccolta di piu' persone senza diventare un doppione nel database.
+**Serve il tuo ok su quale dei due.**
+
+### 12.5 Effetto sulla stima
+
+| Voce | Prima | Adesso |
+|---|---|---|
+| Contenuti (viaggi e luoghi) | 9 | **11** (i 15 viaggi vanno disegnati, non solo le tappe) |
+| ILLI che conosce i viaggi e li propone | - | **0,5** |
+| **Totale programma** | 92,5 | **95** |
+
+Traguardo dei contenuti spostato dal 15/10 al **18/10**; app agli store dal 20/11 al **23/11**.

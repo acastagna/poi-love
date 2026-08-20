@@ -88,7 +88,7 @@ Bozza grafica: `scratchpad/schede2/profili.html`, immagine `profili.jpg`. Il **l
 | Tipologia | Aggiunge |
 |---|---|
 | Persona | niente, e' la base |
-| Sostenitore | pastiglia sulla copertina, spunta, badge, Muro dei Sostenitori, **15 luoghi in omaggio** preparati dal sistema: in riga con l'immagine e il bollino **Ufficiale, per <nome>** (solo il nome, mai il cognome) |
+| Sostenitore | pastiglia sulla copertina, spunta, badge, Muro dei Sostenitori, **15 luoghi in omaggio** presi dai luoghi Ufficiali dei viaggi di ILLI: in riga con l'immagine e il bollino **Ufficiale, per <nome>** (solo il nome, mai il cognome) |
 | Mecenate | pastiglia oro-viola, itinerario in evidenza, scaffale delle audioguide che ascolta, rotte adottate |
 | Influencer | pastiglia Consigliata, tre itinerari e una compagnia in evidenza, recensioni ricevute a scorrimento, QR, **mercato delle collaborazioni**, rapporto notarizzato (privato) |
 | Professionista | biglietto da visita completo (Chiama, Scrivi, sito, Vieni a trovarmi, social, QR), audiopresentazione fino a 1 minuto, rotta adottata, recensioni ricevute, **mercato delle collaborazioni**, abbonamento e rapporto notarizzato (privati) |
