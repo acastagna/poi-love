@@ -301,3 +301,91 @@ Una giornata al giorno, sette giorni su sette, a partire da venerdi 21/08/2026.
 2. Il collaudo di Alessandro avviene strada facendo, blocco per blocco.
 3. Funzioni nuove che entrano in corsa spostano la data: lo dico subito, con il conto.
 4. Le date degli store non sono nostre: la revisione di Apple e Google puo' aggiungere giorni.
+
+
+---
+
+## 9. Correzioni dopo il controllo avversariale (20/08/2026)
+
+Il capitolo 8 e' stato passato al setaccio da un controllore indipendente, con verifica sul database vero,
+sul codice e sul web. Quello che ha trovato, e come cambia il piano.
+
+### 9.1 Errori miei, corretti
+
+| Cosa avevo scritto | Come stanno le cose | Effetto |
+|---|---|---|
+| "L'app si aggancia al nostro stack cambiando solo l'indirizzo" | Il protocollo e' compatibile, ma le richieste dell'app usano nomi di colonne che **non esistono piu'** (`user_id, name, latitude, longitude, tag, photo_urls` contro `author_id, title, lat, lng, tags, photos`). Ogni richiesta fallisce. In piu' l'impianto e' fermo a Expo 52 di novembre 2024, tre versioni indietro. | Non e' un cambio di indirizzo: e' una riscrittura del livello dati piu' il porto alla versione attuale. Da 2 a 5 giornate |
+| "Rapporto notarizzato con data certa" | L'impronta e la data le scrive il nostro sistema. Nessun ente terzo. Nel repo non c'e' nessuna marcatura temporale di terze parti | Si chiama **impronta digitale con data dichiarata dal sistema**, oppure si aggancia davvero un servizio di marcatura temporale terzo. Non si scrive "notarizzato" a un professionista che lo useta' verso terzi |
+| "Foto con licenza utilizzabile, il gestore dei media le cerca gia'" | La ricerca Openverse filtra il commerciale ma **non** i divieti di modifica. La ricerca Wikimedia **non filtra nessuna licenza**. E soprattutto: **nessuna riga di codice salva autore, licenza e fonte** | Le foto esterne usate oggi sono gia' fuori norma. Prima di arrivare a 200 luoghi serve la cattura obbligatoria di autore, licenza e fonte, e l'attribuzione visibile in scheda |
+| "5 giornate per 200 luoghi" | Oggi nel database ci sono **18 luoghi e zero Ufficiali**. Solo i 50 Ufficiali, a mezz'ora l'uno, fanno 25 ore | Prima si misurano 10 schede vere, poi si fissa il numero. Stima portata a 9 giornate |
+| "Il cambio si legge dalla pagina della Banca d'Albania" | Il numero **non e' nell'HTML**: la pagina lo carica con una chiamata separata e un gettone di sessione. Con una lettura semplice non si trova, non per un cambio di grafica ma perche' il dato non c'e' | Serve la chiamata vera o un browser senza finestra. Da mezza giornata a una |
+| "Chi incassa con carta e' da verificare" | La decisione **esiste gia'**, luglio 2026, in `• THEMELI pay/studi/DECISIONE-incasso-carte-Albania.md`: RaiAccept (Raiffeisen, conto gia' aperto) piu' BKT, sotto il 4%. Stripe e' segnato NO-GO per l'Albania | La domanda vera non e' chi accetta l'Albania, ma se quel conto si puo' usare anche per POI•LOVE o serve un contratto separato |
+
+### 9.2 Cose che il piano non nominava
+
+- **Apple e gli abbonamenti**: venduti dentro l'app, passano dal sistema di Apple con la sua percentuale. Alessandro ha detto che gli sta bene: i numeri sono nel capitolo 9.4.
+- **Moderazione entro 24 ore**: Apple pretende segnalazione dei contenuti e intervento entro un giorno, con espulsione dell'utente. Oggi la moderazione e' tutta a mano. Serve il giro completo segnalazione, coda, blocco.
+- **Posizione in sottofondo**: e' il punto piu' delicato della revisione degli store, non una voce come le altre.
+- **Recensioni**: nessun tempo minimo fra "ti seguo" e "ti recensisco", nessun tetto giornaliero, nessuna procedura di contestazione per il gestore. Vanno messi prima di aprire le recensioni.
+- **Chi controlla l'albanese** delle 50 schede Ufficiali. Serve un nome. Erion e' commercialista, non revisore di lingua.
+- **Le bozze grafiche stavano solo nella cartella temporanea**: spostate in `docs/mockup-schede-profili/`.
+
+### 9.3 Sicurezza, trovata durante il controllo
+
+L'accesso ai dati pubblici risponde **anche senza chiave** e con una chiave inventata. Verificato:
+- scrittura senza accesso: **bloccata** (401), i luoghi privati **non escono** (la protezione per riga funziona);
+- ma la tabella delle persone espone a chiunque le colonne **`is_admin`, `admin_role`, `moderation_status`,
+  `moderation_reason`, `moderation_until`, `moderation_updated_by`, `referred_by`**.
+  Con una riga di comando si scopre chi e' l'amministratore e cosa e' stato scritto nelle note di moderazione.
+
+Correzione: togliere al ruolo pubblico la lettura di quelle colonne (o esporre una vista ridotta).
+Lavoro da mezz'ora, tocca il database vivo: si fa con l'ok di Alessandro e si verifica subito dopo.
+
+### 9.4 Quanto prende Apple, e quanto Google
+
+Numeri da confermare al momento dell'iscrizione, cambiano nel tempo.
+
+| Caso | Percentuale | Su 100 euro (Professionista) | Su 250 euro (Plus locale) |
+|---|---|---|---|
+| Apple, con il programma per piccole imprese (sotto 1 milione di dollari l'anno) | **15%** | restano 85 euro | restano 212,50 euro |
+| Apple, senza quel programma, primo anno di abbonamento | 30% | restano 70 euro | restano 175 euro |
+| Apple, dal secondo anno dello stesso abbonamento | 15% | restano 85 euro | restano 212,50 euro |
+| Google Play, abbonamenti | **15%** | restano 85 euro | restano 212,50 euro |
+| Venduto dal sito, non dall'app | 0% agli store, solo il costo dell'incassatore | restano circa 96-97 euro | restano circa 241-242 euro |
+
+Due cose da sapere:
+1. Il programma per piccole imprese di Apple **va chiesto**, non e' automatico. POI•LOVE rientra ampiamente.
+2. Apple e Google incassano al posto nostro e in molti paesi versano loro l'IVA. E' un fastidio in meno,
+   non solo una percentuale in piu'.
+3. Conviene comunque vendere anche dal sito: la stessa cosa costa meno. Nell'app le regole su come
+   rimandare al sito sono strette fuori da Stati Uniti ed Europa.
+
+### 9.5 Stima aggiornata
+
+| Cantiere | Prima | Adesso | Perche' |
+|---|---|---|---|
+| Web fase 1 | 32,5 | **36,5** | locale Plus +2, licenze e attribuzione foto +1, anti abuso recensioni +0,5, cambio +0,5 |
+| Amministrazione | 6 | **7** | moderazione entro 24 ore e blocco utenti, richiesti da Apple |
+| 200 luoghi, 50 Ufficiali | 5 | **9** | si parte da 18 luoghi e zero Ufficiali |
+| App iOS e Android | 24,5 | **30** | riscrittura del livello dati, porto alla versione attuale, tre punti delicati in revisione |
+| Fase 2 web | 5,5 | **6** | marcatura temporale vera per il rapporto |
+| | **73,5** | **88,5** | |
+
+Calendario aggiornato, una giornata al giorno da venerdi 21/08:
+
+| Traguardo | Prima | Adesso |
+|---|---|---|
+| Web fase 1 completo | 22/09 | **26/09** |
+| Amministrazione perfezionata | 28/09 | **03/10** |
+| 200 luoghi in linea | 03/10 | **12/10** |
+| Fase 2 web | 09/10 | **18/10** |
+| App inviata agli store | 03/11 | **17/11** |
+| App pubblicata | meta' novembre | **fine novembre, inizio dicembre** |
+
+### 9.6 Le cinque domande da sciogliere prima del via
+
+1. Il conto RaiAccept e BKT gia' aperto per 321.al si puo' usare anche per POI•LOVE, o serve un contratto separato?
+2. Chi controlla la qualita' dell'albanese sulle 50 schede Ufficiali?
+3. Gli abbonamenti si vendono anche dal sito oltre che dall'app? (dal sito restano 12-15 euro in piu' su ogni Professionista)
+4. Chi si prende la responsabilita' legale della parola scelta per il rapporto, prima che un professionista lo mostri a terzi?
+5. Prima di fissare 9 giornate per 200 luoghi: faccio 10 schede complete e misuro il tempo vero?
