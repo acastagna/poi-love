@@ -8989,7 +8989,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='4.92';
+const APP_VERSION='4.93';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
@@ -12866,7 +12866,10 @@ function _quantoDista(km){
   return (km<10 ? km.toFixed(1).replace('.',',') : Math.round(km))+' km';
 }
 function _durata(min){
-  if(min < 1) return 'meno di un minuto';
+  if(min < 1){
+    const sec=Math.max(1, Math.round(min*60));
+    return sec+' '+(sec===1?t('secondo','secondo'):t('secondi','secondi'));
+  }
   if(min < 60) return Math.round(min)+' minuti';
   const h=Math.floor(min/60), m=Math.round(min%60);
   return h+(h===1?' ora':' ore')+(m?' e '+m:'');
@@ -12879,7 +12882,7 @@ function _mezziPer(km){
     {i:'ph-person-simple-walk', n:t('mezzo_piedi','a piedi'),      t:_durata(km/5*60)},
     {i:'ph-bicycle',            n:t('mezzo_bici','in bicicletta'), t:_durata(km/18*60)},
     {i:'ph-car',                n:t('mezzo_auto','in auto'),       t:_durata(km/60*60)},
-    {i:'ph-airplane-tilt',      n:t('mezzo_aereo','in aereo'),     t:_durata(60 + km/800*60)},
+    {i:'ph-airplane-tilt',      n:t('mezzo_aereo','in aereo'),     t:_durata(km/800*60)},
     {i:'ph-boat',               n:t('mezzo_nave','in nave'),       t:_durata(km/40*60)},
     {i:'ph-flying-saucer',      n:t('mezzo_trek','a tutto impulso'),
      t:(sec < 1 ? (sec*1000).toFixed(sec*1000<1?3:1).replace('.',',')+' '+t('millesimi','millesimi di secondo') : _durata(sec/60)),
