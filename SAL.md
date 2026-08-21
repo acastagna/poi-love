@@ -1,5 +1,46 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
+## 21/08/2026 notte — L'app parla col database vero, l'accesso funziona, e il mercato delle collaborazioni e' vivo
+
+Programma da 70,5 a **80 giornate su 113**. Controllo 19 su 19. Webapp **v5.47** live.
+
+### Blocco 31: il livello dati dell'app (fatto)
+Lo scaffold di maggio cercava colonne morte (name, latitude, user_id, photo_urls).
+Riscritto sullo schema vero contro il nostro PostgREST, sei interrogazioni provate
+vive prima di darle per buone. Trovato portando: il caricamento foto non aveva
+mai funzionato (id nell'intestazione, il server lo legge dal modulo), la
+cancellazione parlava un contratto inesistente, react 18.3.2 e un pacchetto di
+tipi **non esistono sul registro** (npm install non era mai potuto riuscire).
+La catena della card compositiva scriveva su colonne mai nate: in `_archivio/`.
+Revisione /code-quality: 0 bloccanti, 13 maggiori, tutti chiusi. tsc: 0 errori.
+L'app si impacchetta con Metro: 4,36 MB pronti per iOS.
+
+### Blocco 32: l'accesso (fatto)
+Email e password, Google col browser di sistema, sessione che si rinnova legata
+alla vita dell'app. GoTrue ammette il rientro `poilove://` (copia in
+/root/gotrue-copie prima del cambio). Provato vivo a livello protocollo:
+registrazione, entrata, rinnovo del biglietto; utente di prova cancellato.
+Il tocco Google end-to-end si prova sul primo giro su dispositivo.
+
+### Blocco 45: il mercato delle collaborazioni (fatto, mig 160-161)
+La direttiva del 20/08 intera: vetrina con la levetta, listino, proposta,
+trattativa dentro POI•LOVE col 33% stampato alla nascita, influencer che non
+paga mai. **La regola sta sul server**: il listino lo vedono professionista,
+locale e proprietario; misurato dai quattro punti di vista (2 voci / 0 / 0 / 2).
+Revisione avversariale: verdetto BLOCCATO, tutti i rilievi chiusi, i piu' seri:
+la corsa fra due risposte simultanee sulla stessa trattativa, la levetta spenta
+che non spegneva per chi conosceva gia' l'id (ora: 2 voci → 0 → 2, misurato),
+i numeri della vetrina che contavano i luoghi privati, gli indici mancanti su
+pois e loves. Giro completo provato dall'interfaccia vera con i profili demo:
+proposta dal professionista, accettazione dall'influencer, chat, tre lingue.
+
+### Resta ad Alessandro (domani)
+1. Chiave di Google (aistudio.google.com/apikey → segreto GOOGLE_TTS_KEY): sblocca le audioguide audio.
+2. Account Apple e Google Play: sblocca la pubblicazione dell'app.
+3. I 15 luoghi del Sostenitore: raccolta a suo nome o luoghi intestati.
+4. Per vedere l'app sul telefono: installare Xcode sul Mac oppure Expo Go sull'iPhone.
+
+
 ## 21/08/2026 notte — I documenti riservati hanno una pagina, con la chat sulla coda
 
 Il repository e' pubblico, quindi i documenti di lavoro riservati non possono
