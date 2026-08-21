@@ -150,6 +150,11 @@
     // ── luoghi creati (lista) ──
     var poiSec = h('div', { class: 'uc-sec', text: 'Luoghi creati', style: 'display:none' });
     var poiList = h('div', { class: 'uc-poi' });
+    // Le segnalazioni erano il pezzo che mancava di piu': si poteva sospendere
+    // qualcuno senza vedere perche', e leggere una segnalazione senza sapere se
+    // quella persona ne aveva gia' altre dieci addosso.
+    var segnSec = h('div', { class: 'uc-sec', text: 'Segnalazioni', style: 'display:none' });
+    var segnList = h('div', { class: 'uc-poi' });
 
     // ── azioni admin ──
     var actions = h('div', { class: 'uc-actions' });
@@ -177,8 +182,33 @@
       actions.appendChild(roleRow);
     }
     if (stt === 'active') {
-      actions.appendChild(h('button', { class: 'uc-btn gold', text: t('a_suspend', 'Sospendi'), onclick: function () { if (window.moderateUser) { window.moderateUser(u.id, 'suspended', 'from_card', new Date(Date.now() + 7 * 864e5).toISOString()); close(); } } }));
-      actions.appendChild(h('button', { class: 'uc-btn red', text: t('a_ban', 'Banna'), onclick: function () { if (window.adminConfirm) window.adminConfirm(t('confirm_ban', 'Bannare definitivamente questo utente?')).then(function (ok) { if (ok && window.moderateUser) { window.moderateUser(u.id, 'banned', 'from_card', null); close(); } }); } }));
+      // Prima erano sempre sette giorni e il motivo lo scriveva il programma
+      // ("from_card"). Una sospensione senza motivo scritto non si puo'
+      // spiegare a nessuno, nemmeno a chi la subisce.
+      actions.appendChild(h('button', { class: 'uc-btn gold', text: t('a_suspend', 'Sospendi'), onclick: function () {
+        var giorni = prompt('Per quanti giorni la sospendo?\n\nScrivi un numero. Vuoto = sette giorni.', '7');
+        if (giorni === null) { return; }
+        var n = parseInt(giorni || '7', 10);
+        if (!isFinite(n) || n < 1) { n = 7; }
+        if (n > 3650) { n = 3650; }
+        var motivo = prompt('Perche la sospendi?\n\nResta scritto nel registro e si puo rileggere.', '');
+        if (motivo === null) { return; }
+        motivo = (motivo || '').trim();
+        if (!motivo) { alert('Serve un motivo: senza, una sospensione non si spiega.'); return; }
+        if (window.moderateUser) {
+          window.moderateUser(u.id, 'suspended', motivo, new Date(Date.now() + n * 864e5).toISOString());
+          close();
+        }
+      } }));
+      actions.appendChild(h('button', { class: 'uc-btn red', text: t('a_ban', 'Banna'), onclick: function () {
+        var motivo = prompt('Perche blocchi per sempre questa persona?\n\nResta scritto nel registro.', '');
+        if (motivo === null) { return; }
+        motivo = (motivo || '').trim();
+        if (!motivo) { alert('Serve un motivo: un blocco definitivo senza motivo non si difende.'); return; }
+        if (window.adminConfirm) window.adminConfirm(t('confirm_ban', 'Bannare definitivamente questo utente?')).then(function (ok) {
+          if (ok && window.moderateUser) { window.moderateUser(u.id, 'banned', motivo, null); close(); }
+        });
+      } }));
     } else {
       actions.appendChild(h('button', { class: 'uc-btn green', text: t('a_reactivate', 'Riattiva'), onclick: function () { if (window.moderateUser) { window.moderateUser(u.id, 'active', 'from_card', null); close(); } } }));
     }
@@ -186,8 +216,80 @@
 
     var drawer = h('div', { class: 'uc-drawer' }, [
       h('div', null, [cover, closeBtn, avatarWrap]),
-      head, stats, bioEl, poiSec, poiList, admin
+      head, stats, bioEl, segnSec, segnList, poiSec, poiList, admin
     ]);
+    // ── Le segnalazioni: ricevute e fatte, e lo stato vero della moderazione ──
+    (function caricaSegnalazioni(){
+      var db = sb();
+      if (!db) { return; }
+      // I motivi nel database sono parole in codice: qui si dicono in italiano.
+      var MOTIVI = {
+        spam: 'pubblicita indesiderata', abuse: 'abuso', offensive: 'offensivo',
+        wrong_info: 'informazione sbagliata', duplicate: 'doppione',
+        illegal: 'contenuto illecito', other: 'altro',
+      };
+      var quando = function (t) {
+        if (!t) { return ''; }
+        try { return new Date(t).toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' }); }
+        catch (e) { return String(t).slice(0, 10); }
+      };
+      Promise.all([
+        db.rpc('persona_stato', { p_persona: u.id }),
+        db.rpc('persona_segnalazioni', { p_persona: u.id }),
+      ]).then(function (r) {
+        var st = (r[0] && r[0].data && r[0].data[0]) || null;
+        var righe = (r[1] && r[1].data) || [];
+
+        // se e' sospesa o bloccata, si dice fino a quando, da chi e perche'
+        if (st && st.stato && st.stato !== 'active') {
+          var testo = (st.stato === 'suspended' ? 'Sospesa' : 'Bloccata');
+          if (st.fino_a) { testo += ' fino al ' + quando(st.fino_a); }
+          if (st.deciso_da) { testo += ' · deciso da ' + st.deciso_da; }
+          if (st.quando) { testo += ' il ' + quando(st.quando); }
+          var box = h('div', { class: 'uc-empty', style: 'background:rgba(224,106,106,.12);color:#E06A6A;border-radius:9px;padding:9px 11px;font-weight:700;text-align:left' });
+          box.textContent = testo + (st.motivo ? (' — ' + st.motivo) : ' — senza motivo scritto');
+          segnSec.style.display = 'block';
+          segnList.appendChild(box);
+        }
+
+        if (!righe.length) {
+          if (segnSec.style.display === 'block') {
+            var v = h('div', { class: 'uc-empty', text: 'Nessuna segnalazione.' });
+            segnList.appendChild(v);
+          }
+          return;
+        }
+        segnSec.style.display = 'block';
+        segnSec.textContent = 'Segnalazioni · ' + (st ? st.ricevute : '?') + ' ricevute, ' +
+                              (st ? st.fatte : '?') + ' fatte' +
+                              (st && st.aperte ? (' · ' + st.aperte + ' ancora aperte') : '');
+        righe.slice(0, 20).forEach(function (x) {
+          var ricevuta = x.verso === 'ricevuta';
+          var riga = h('div', { class: 'uc-poi-row', style: 'align-items:flex-start' });
+          var col = h('div', { style: 'flex:1;min-width:0' });
+          var t1 = h('div', { style: 'font-weight:800;font-size:13px' });
+          t1.textContent = (ricevuta ? '← ricevuta' : '→ fatta') + ' · ' + (MOTIVI[x.motivo] || x.motivo || 'senza motivo');
+          var t2 = h('div', { style: 'font-size:12px;opacity:.7;margin-top:2px' });
+          t2.textContent = (x.su_cosa === 'poi' ? 'sul luogo ' : 'sul profilo ') + (x.cosa_nome || '') +
+                           (ricevuta ? (' · da ' + (x.altra_persona || '')) : '') +
+                           ' · ' + quando(x.quando);
+          col.appendChild(t1); col.appendChild(t2);
+          if (x.dettaglio) {
+            var t3 = h('div', { style: 'font-size:12px;opacity:.6;margin-top:3px' });
+            t3.textContent = x.dettaglio;
+            col.appendChild(t3);
+          }
+          var stato = h('span', { style: 'font-size:11px;font-weight:800;padding:2px 9px;border-radius:999px;white-space:nowrap;' +
+            (x.stato === 'open' || x.stato === 'reviewing'
+              ? 'background:rgba(216,169,59,.18);color:#D8A93B'
+              : 'background:rgba(91,190,126,.16);color:#5BBE7E') });
+          stato.textContent = (x.stato === 'open' ? 'aperta' : x.stato === 'reviewing' ? 'in esame' : 'chiusa');
+          riga.appendChild(col); riga.appendChild(stato);
+          segnList.appendChild(riga);
+        });
+      }).catch(function (e) { console.warn('segnalazioni persona:', e); });
+    })();
+
     var ov = h('div', { class: 'uc-ov', id: 'uc-ov', onclick: function (e) { if (e.target === ov) close(); } }, [drawer]);
     document.body.appendChild(ov);
     requestAnimationFrame(function () { ov.classList.add('on'); });
