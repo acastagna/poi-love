@@ -7977,6 +7977,12 @@ const LANG_FLAGS={it:'IT',sq:'SQ',en:'EN'};
 function applyLang(l){
   lang=l;
   try{ localStorage.setItem('poilove_lang', l); }catch(_){}
+  // Se il biglietto di un luogo condiviso e' a schermo, si ridipinge: altrimenti
+  // l'interfaccia cambia lingua e il nome del luogo resta in quella di prima.
+  try{
+    const bg=document.getElementById('poiTeaser');
+    if(bg && bg.classList.contains('show') && window._teaserPoi){ showPoiTeaser(window._teaserPoi); }
+  }catch(_){}
   try{ _mostraBandiera(l); }catch(_){}
   const tx=T[l];
   const crTop=document.getElementById('cr-top');
@@ -9214,12 +9220,13 @@ function _teaserZone(addr){
 function showPoiTeaser(p){
   try{
     const el=document.getElementById('poiTeaser'); if(!el) return;
+    window._teaserPoi = p;
     const img=document.getElementById('ptPhoto');
     const ph=(p.photos&&p.photos[0])||null;
     if(ph){ img.src=ph; img.style.display='block'; } else { img.style.display='none'; }
     document.getElementById('ptKicker').textContent=t('teaser_kicker','Qualcuno ha condiviso con te un posto del cuore');
     // Il nome si vede (è una raccomandazione); il punto esatto resta dietro l'accesso
-    document.getElementById('ptTitle').textContent=(p.name&&String(p.name).trim())||t('teaser_title','Un luogo misterioso ti aspetta');
+    document.getElementById('ptTitle').textContent=(_nomeNellaLingua(p)||'').trim()||t('teaser_title','Un luogo misterioso ti aspetta');
     const cat=_TEASER_CATS[p.category]; const catLbl=cat?(cat[lang]||cat.it):'';
     document.getElementById('ptZone').textContent=(catLbl?catLbl+' · ':'')+_teaserZone(p.address);
     const lv=p.love_count|0, lvBox=document.getElementById('ptLoves');
@@ -9257,7 +9264,7 @@ function openPendingSharedPoi(){
   try{ localStorage.removeItem('pl_pending_poi'); }catch(_){}
   hidePoiTeaser();
   _deepLinkActive=true;   // il POI condiviso vince sul GPS anche dopo il giro OAuth (URL senza ?poi=)
-  sb.from('pois').select('id,name:title,description,lat,lng,category,subcategory,categories,love_count,photos,author_id,address,profiles!pois_author_id_fkey(username,avatar_url)')
+  sb.from('pois').select('id,name:title,title_sq,title_it,title_en,description,description_sq,description_it,description_en,badge_official,lat,lng,category,subcategory,categories,love_count,photos,author_id,address,profiles!pois_author_id_fkey(username,avatar_url)')
     .eq('id',id).single().then(({data,error})=>{
       if(error||!data) return;
       if(map){ _vistaDellUtente(); map.setView([data.lat,data.lng],16); }
@@ -9395,9 +9402,10 @@ function handleDeepLink(){
     // coordinate o descrizione in Network); da loggato la scheda completa.
     // Regola condivisione: la STORIA (nome, foto, racconto) è visibile anche da sloggato,
     // il PUNTO ESATTO (lat/lng) e le azioni restano dietro l'accesso.
+    const tre = 'title_sq,title_it,title_en,description_sq,description_it,description_en,badge_official';
     const cols = currentUser
-      ? 'id,name:title,description,lat,lng,category,love_count,photos,author_id,address,profiles!pois_author_id_fkey(username,avatar_url)'
-      : 'id,name:title,description,category,love_count,photos,address';
+      ? 'id,name:title,'+tre+',description,lat,lng,category,love_count,photos,author_id,address,profiles!pois_author_id_fkey(username,avatar_url)'
+      : 'id,name:title,'+tre+',description,category,love_count,photos,address';
     sb.from('pois')
       .select(cols)
       .eq('id', poiId)
@@ -9427,7 +9435,7 @@ function handleDeepLink(){
     // Cerca il POI più vicino a quelle coordinate nel DB
     if(sb){
       sb.from('pois')
-        .select('id,name:title,description,lat,lng,category,subcategory,categories,love_count,photos,author_id,address,profiles!pois_author_id_fkey(username,avatar_url)')
+        .select('id,name:title,title_sq,title_it,title_en,description,description_sq,description_it,description_en,badge_official,lat,lng,category,subcategory,categories,love_count,photos,author_id,address,profiles!pois_author_id_fkey(username,avatar_url)')
         .eq('visibility','community')
         .limit(500)
         .then(({data})=>{
@@ -9458,7 +9466,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='5.35';
+const APP_VERSION='5.38';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
@@ -10556,7 +10564,7 @@ async function renderPoiTab(){
     if(currentUser && typeof sb !== 'undefined') {
       list.innerHTML = '<div class="poi-list-empty" style="padding:24px 0"><i class="ph-duotone ph-spinner" style="font-size:24px;animation:spin 1s linear infinite"></i></div>';
       const { data, error } = await sb.from('pois')
-        .select('id,name:title,description,lat,lng,category,subcategory,categories,tags,love_count,photos,author_id,visibility,created_at')
+        .select('id,name:title,title_sq,title_it,title_en,description,description_sq,description_it,description_en,badge_official,lat,lng,category,subcategory,categories,tags,love_count,photos,author_id,visibility,created_at')
         .eq('author_id', currentUser.id)
         .order('created_at', { ascending: false });
       if(!error && Array.isArray(data)) items = data;

@@ -20,7 +20,18 @@ import json, sys, time, urllib.parse, urllib.request, unicodedata
 
 REST = 'https://poilove.com/db/rest/v1'
 CHIAVE = open('/opt/poilove/service.jwt').read().strip()
-OVERPASS = 'https://overpass-api.de/api/interpreter'
+# Overpass e' un servizio gratuito di altri: quando e' carico chiude la porta.
+# Si prova su piu' specchi, con pause crescenti, invece di perdere il viaggio.
+SPECCHI = ['https://overpass-api.de/api/interpreter',
+           'https://overpass.kumi.systems/api/interpreter',
+           'https://overpass.private.coffee/api/interpreter']
+
+# Alcune cose nei dati aperti hanno un nome ma non sono luoghi: un aereo in
+# mostra, un carro armato, una locomotiva. Peggio ancora, chi le segna ci mette
+# la scheda del MODELLO, cosi' il testo che torna parla del MiG-21 in generale
+# e non di quel pezzo li'. Non entrano.
+NON_LUOGHI = {'aircraft', 'aeroplane', 'tank', 'locomotive', 'train', 'ship',
+              'vehicle', 'cannon', 'artillery'}
 
 TEMI = {
     'montagna e paesi': '["tourism"~"viewpoint|attraction"],["natural"~"peak"],["place"~"village"]',
@@ -91,6 +102,24 @@ def foto_da_wikidata(qid, nome):
     except Exception:
         return None
     return None
+
+def overpass(query):
+    """Chiede a OpenStreetMap. Se uno specchio non risponde si passa al
+       prossimo, e si aspetta un po' di piu' ogni volta: e' roba di altri."""
+    ultimo = None
+    for giro in range(3):
+        for indirizzo in SPECCHI:
+            try:
+                testo = chiedi(indirizzo, dati=query.encode('utf-8'), secondi=180,
+                               testa={'Content-Type': 'text/plain',
+                                      'User-Agent': 'POILOVE/1.0 (https://poilove.com; info@321.al)'})
+                return json.loads(testo).get('elements', [])
+            except Exception as ex:
+                ultimo = ex
+                time.sleep(3 + giro * 12)
+    print('OpenStreetMap non ha risposto:', ultimo)
+    return []
+
 
 def testi_da_wikidata(qid):
     """Nomi e testo nelle tre lingue. Il testo e' la prima parte della voce di
@@ -165,9 +194,7 @@ def cerca(viaggio, quanti):
     # Chiedendo stretto si finiva con dieci candidati su quattordici chiesti.
     tetto = max(300, quanti * 20)
     q = '[out:json][timeout:90];%s(%s);out center %d;' % (zone, ''.join(corpi), tetto)
-    testo = chiedi(OVERPASS, dati=q.encode('utf-8'), secondi=120,
-                   testa={'Content-Type': 'text/plain', 'User-Agent': 'POILOVE/1.0 (info@321.al)'})
-    trovati = json.loads(testo).get('elements', [])
+    trovati = overpass(q)
     if len(trovati) >= quanti * 2:
         return trovati
     # Se il tema ha pescato poco, si allarga a quello che una guida chiamerebbe
@@ -179,11 +206,7 @@ def cerca(viaggio, quanti):
             f = f.strip('[]')
             corpi2.append('node[%s]["name"](area.z%d);way[%s]["name"](area.z%d);' % (f, i, f, i))
     q2 = '[out:json][timeout:90];%s(%s);out center %d;' % (zone, ''.join(corpi2), tetto)
-    try:
-        trovati += json.loads(chiedi(OVERPASS, dati=q2.encode('utf-8'), secondi=120,
-                              testa={'Content-Type': 'text/plain', 'User-Agent': 'POILOVE/1.0 (info@321.al)'})).get('elements', [])
-    except Exception:
-        pass
+    trovati += overpass(q2)
     return trovati
 
 def main():
@@ -219,6 +242,8 @@ def main():
         # I lapidar (le stele della memoria) sono centinaia e si somigliano tutti:
         # hanno senso nel viaggio della memoria, non in quello dell'architettura.
         if v['tema'] != 'memoria' and normale(nome).startswith('lapidar'):
+            continue
+        if (tag.get('historic') or tag.get('tourism') or '') in NON_LUOGHI or tag.get('aeroway'):
             continue
         visti.add(normale(nome))
         lat = e.get('lat') or (e.get('center') or {}).get('lat')
