@@ -1,0 +1,334 @@
+<!--
+  © Alessandro Castagna — 321.al / EVOLAB
+  Tutti i diritti riservati. Uso non autorizzato vietato.
+  info@321.it · https://321.al
+
+  Visore dei documenti riservati (tabella admin_documenti) con la chat sulla
+  coda AI. Il testo del documento NON sta in questo file: il repository e'
+  pubblico, il contenuto vive nel database dietro le regole admin.
+  Le domande vanno in ai_coda e risponde chi sta girando sul Mac di
+  Alessandro, a costo zero (stesso giro della chat dei vantaggi).
+
+  Uso: /documento.html?doc=piano-roi-rapido  (slug di admin_documenti)
+-->
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>POI•LOVE · Documento riservato</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+<style>
+:root{
+  --red:#D42B2B; --gold:#E8B04B;
+  --bg:#141110; --panel:#1d1917; --line:#3a3430; --ink:#f0e9df; --dim:rgba(240,233,223,.62);
+}
+@media (prefers-color-scheme: light){
+  :root{ --bg:#f2ece2; --panel:#fbf7f0; --line:#d8cfc2; --ink:#241d17; --dim:rgba(36,29,23,.6); }
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  background:var(--bg); color:var(--ink); -webkit-font-smoothing:antialiased;
+  line-height:1.55; padding:26px 16px 80px;
+}
+.wrap{max-width:880px;margin:0 auto}
+.top{display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.top .logo{font-weight:900;font-size:18px;color:var(--red);letter-spacing:.3px}
+.top .tag{font-size:11.5px;font-weight:800;background:rgba(212,43,43,.14);color:var(--red);
+  padding:3px 10px;border-radius:999px}
+.top .quando{font-size:12px;color:var(--dim);margin-left:auto}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:26px 28px}
+.gate{opacity:.7;font-size:14px;padding:40px;text-align:center}
+.btn{display:inline-flex;align-items:center;gap:7px;background:transparent;color:inherit;
+  border:1.5px solid var(--line);border-radius:10px;padding:8px 14px;font-family:inherit;
+  font-size:13px;font-weight:700;cursor:pointer}
+.btn:hover{border-color:var(--gold)}
+.btn.gold{background:var(--gold);border-color:var(--gold);color:#241d17}
+.btn:disabled{opacity:.45;cursor:default}
+
+/* ── il documento ── */
+.doc h1{font-size:26px;margin:22px 0 12px;line-height:1.25}
+.doc h2{font-size:20px;margin:26px 0 10px;padding-top:14px;border-top:1px solid var(--line)}
+.doc h3{font-size:16px;margin:20px 0 8px}
+.doc p{margin:9px 0;font-size:14.5px}
+.doc ul,.doc ol{margin:9px 0 9px 24px;font-size:14.5px}
+.doc li{margin:4px 0}
+.doc blockquote{border-left:3px solid var(--gold);padding:6px 14px;margin:12px 0;
+  background:rgba(232,176,75,.07);border-radius:0 10px 10px 0;font-size:14px}
+.doc code{background:rgba(128,128,128,.15);border-radius:5px;padding:1px 6px;font-size:13px}
+.doc pre{background:rgba(128,128,128,.12);border-radius:10px;padding:12px;overflow-x:auto;margin:10px 0}
+.doc pre code{background:none;padding:0}
+.doc hr{border:0;border-top:1px solid var(--line);margin:20px 0}
+.doc .tbl{overflow-x:auto;margin:12px 0}
+.doc table{border-collapse:collapse;width:100%;font-size:13.5px}
+.doc th,.doc td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+.doc th{background:rgba(232,176,75,.10);font-weight:800}
+.doc strong{font-weight:800}
+
+/* ── la chat ── */
+.chat{margin-top:26px}
+.chat h2{font-size:18px;margin-bottom:4px}
+.chat .sotto{font-size:12.5px;color:var(--dim);margin-bottom:12px}
+.chat textarea{width:100%;background:var(--bg);color:inherit;border:1.5px solid var(--line);
+  border-radius:12px;padding:12px;font-family:inherit;font-size:14px;resize:vertical;min-height:64px}
+.chat textarea:focus{outline:none;border-color:var(--gold)}
+.pronte{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.pronte .btn{font-size:12px;padding:6px 11px;font-weight:600}
+.riga-invio{display:flex;gap:10px;align-items:center;margin-top:10px;flex-wrap:wrap}
+.attesa{font-size:12.5px;font-weight:800;color:var(--gold)}
+.qa{border-top:1px solid var(--line);margin-top:16px;padding-top:14px}
+.qa .dom{font-size:13px;font-weight:800;display:flex;gap:8px;align-items:flex-start}
+.qa .dom i{color:var(--red);font-size:17px;flex:0 0 auto;margin-top:1px}
+.qa .risp{margin:10px 0 0 25px;font-size:14px}
+.qa .risp.doc p{font-size:14px}
+.qa .meta{font-size:11px;color:var(--dim);margin:6px 0 0 25px}
+.qa .in-corso{margin:8px 0 0 25px;font-size:12.5px;color:var(--gold);font-weight:700}
+.qa .fallita{margin:8px 0 0 25px;font-size:12.5px;color:#E06A6A;font-weight:700}
+.esito{font-size:12.5px;font-weight:700;margin-top:8px}
+.esito.male{color:#E06A6A}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <span class="logo">POI•LOVE</span>
+    <span class="tag"><i class="ph-duotone ph-lock-key"></i> documento riservato</span>
+    <span class="quando" id="quando"></span>
+  </div>
+  <div class="panel">
+    <div class="gate" id="gate">Controllo dell'accesso in corso&hellip;</div>
+    <div class="doc" id="doc" hidden></div>
+    <div class="chat" id="chat" hidden>
+      <h2><i class="ph-duotone ph-chats-circle" style="color:var(--gold)"></i> Domande su questo documento</h2>
+      <div class="sotto">La domanda va nella coda e risponde chi sta girando sul Mac: non costa niente.
+        La risposta compare qui sotto appena pronta.</div>
+      <div class="pronte" id="pronte"></div>
+      <textarea id="dom" rows="2" placeholder="Scrivi la tua domanda sul piano&hellip;"></textarea>
+      <div class="riga-invio">
+        <button class="btn gold" id="invia"><i class="ph-duotone ph-paper-plane-tilt"></i> Metti in coda</button>
+        <button class="btn" id="aggiorna"><i class="ph-duotone ph-arrows-clockwise"></i> Aggiorna</button>
+        <span class="attesa" id="attesa" hidden></span>
+      </div>
+      <div class="esito" id="esito"></div>
+      <div id="lista"></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+'use strict';
+/* Stessa connessione del pannello: solo chiave pubblica, mai service_role. */
+const SUPABASE_URL  = 'https://poilove.com/db';
+const SUPABASE_ANON = 'sb_publishable_PC1xQ8XiQK9jpzwsAlFLxw_E-PKN40V';
+const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON) : null;
+
+const SLUG = (new URLSearchParams(location.search).get('doc') || 'piano-roi-rapido')
+  .replace(/[^a-z0-9-]/g, '');
+
+const DOMANDE_PRONTE = [
+  'Qual e il primo passo operativo di questo piano?',
+  'Quali sono i rischi principali e come li riduco?',
+  'Cosa succede se non trovo il commerciale entro il 31/08?',
+  'Riassumi il piano in cinque righe per un partner.',
+];
+
+let DOCUMENTO = null, CODA = [], POLL = null;
+
+function esc(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+    return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
+  });
+}
+
+/* ── markdown essenziale: titoli, tabelle, liste, citazioni, grassetto ──
+   Prima si fa l'escape di TUTTO, poi si aggiungono i tag nostri: cosi'
+   dal database non puo' entrare nessun HTML. */
+function inlineMd(t){
+  return t
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/(^|[\s(])\*([^*\n]+)\*(?=[\s).,;:]|$)/g, '$1<em>$2</em>');
+}
+function md(testo){
+  const src = String(testo || '').replace(/<!--[\s\S]*?-->/g, '').replace(/\r/g, '');
+  const righe = src.split('\n');
+  const out = [];
+  let i = 0, lista = null, citazione = false, pre = false;
+  function chiudi(){
+    if(lista){ out.push(lista === 'ul' ? '</ul>' : '</ol>'); lista = null; }
+    if(citazione){ out.push('</blockquote>'); citazione = false; }
+  }
+  while(i < righe.length){
+    const r = righe[i];
+    if(/^```/.test(r)){ chiudi(); pre = !pre; out.push(pre ? '<pre><code>' : '</code></pre>'); i++; continue; }
+    if(pre){ out.push(esc(r) + '\n'); i++; continue; }
+    /* tabella: riga con | seguita da riga di trattini */
+    if(/^\s*\|/.test(r) && i + 1 < righe.length && /^\s*\|[\s:|-]+\|?\s*$/.test(righe[i+1])){
+      chiudi();
+      const celle = function(x){ return x.replace(/^\s*\|/, '').replace(/\|\s*$/, '').split('|').map(function(c){ return inlineMd(esc(c.trim())); }); };
+      let t = '<div class="tbl"><table><thead><tr>' + celle(r).map(function(c){ return '<th>'+c+'</th>'; }).join('') + '</tr></thead><tbody>';
+      i += 2;
+      while(i < righe.length && /^\s*\|/.test(righe[i])){
+        t += '<tr>' + celle(righe[i]).map(function(c){ return '<td>'+c+'</td>'; }).join('') + '</tr>';
+        i++;
+      }
+      out.push(t + '</tbody></table></div>');
+      continue;
+    }
+    let m;
+    if((m = r.match(/^(#{1,4})\s+(.*)$/))){ chiudi(); const n = m[1].length; out.push('<h'+n+'>'+inlineMd(esc(m[2]))+'</h'+n+'>'); }
+    else if(/^\s*---+\s*$/.test(r)){ chiudi(); out.push('<hr>'); }
+    else if((m = r.match(/^\s*>\s?(.*)$/))){
+      if(!citazione){ chiudi(); out.push('<blockquote>'); citazione = true; }
+      out.push('<p>'+inlineMd(esc(m[1]))+'</p>');
+    }
+    else if((m = r.match(/^\s*[-*]\s+(.*)$/))){
+      if(citazione){ out.push('</blockquote>'); citazione = false; }
+      if(lista !== 'ul'){ if(lista) out.push('</ol>'); out.push('<ul>'); lista = 'ul'; }
+      out.push('<li>'+inlineMd(esc(m[1]))+'</li>');
+    }
+    else if((m = r.match(/^\s*\d+[.)]\s+(.*)$/))){
+      if(citazione){ out.push('</blockquote>'); citazione = false; }
+      if(lista !== 'ol'){ if(lista) out.push('</ul>'); out.push('<ol>'); lista = 'ol'; }
+      out.push('<li>'+inlineMd(esc(m[1]))+'</li>');
+    }
+    else if(r.trim() === ''){ chiudi(); }
+    else { chiudi(); out.push('<p>'+inlineMd(esc(r))+'</p>'); }
+    i++;
+  }
+  chiudi();
+  if(pre) out.push('</code></pre>');
+  return out.join('\n');
+}
+
+/* ── stesso cancello del pannello: sessione + admin + secondo fattore ── */
+async function gate(){
+  const g = document.getElementById('gate');
+  if(!sb){ location.href = '/index.html'; return false; }
+  const { data:{ session } } = await sb.auth.getSession();
+  if(!session || !session.user){ location.href = '/index.html?poi=' + encodeURIComponent('/documento.html?doc=' + SLUG); return false; }
+  const { data, error } = await sb.from('profiles')
+    .select('id,is_admin,moderation_status').eq('id', session.user.id).single();
+  if(error || !data || data.is_admin !== true || data.moderation_status !== 'active'){
+    try{ await sb.auth.signOut(); }catch(e){}
+    location.href = '/index.html'; return false;
+  }
+  try{
+    const { data: aal } = await sb.auth.mfa.getAuthenticatorAssuranceLevel();
+    if(!aal || aal.currentLevel !== 'aal2'){ location.href = '/index.html'; return false; }
+  }catch(e){ location.href = '/index.html'; return false; }
+  g.textContent = 'Carico il documento…';
+  return true;
+}
+
+async function caricaDoc(){
+  const g = document.getElementById('gate');
+  const { data, error } = await sb.from('admin_documenti').select('*').eq('slug', SLUG).single();
+  if(error || !data){
+    g.innerHTML = 'Documento <b>' + esc(SLUG) + '</b> non trovato nel database.' +
+      '<div style="font-size:12px;margin-top:8px;opacity:.7">Si carica dal Mac, mai nel repository: il repo e pubblico.</div>';
+    return false;
+  }
+  DOCUMENTO = data;
+  document.title = 'POI•LOVE · ' + data.titolo;
+  document.getElementById('quando').textContent = 'aggiornato il ' +
+    new Date(data.aggiornato_il).toLocaleDateString('it-IT');
+  document.getElementById('doc').innerHTML = md(data.corpo);
+  g.remove();
+  document.getElementById('doc').hidden = false;
+  document.getElementById('chat').hidden = false;
+  return true;
+}
+
+/* ── la coda: domande e risposte di QUESTO documento ── */
+async function caricaCoda(){
+  try{
+    const q = await sb.from('ai_coda')
+      .select('id,domanda,risposta,stato,motivo,chiesto_il,finita_il,contesto')
+      .eq('fase', 'altro').order('chiesto_il', { ascending:false }).limit(80);
+    CODA = (q.data || []).filter(function(c){
+      return c.contesto && c.contesto.argomento === 'documento' && c.contesto.documento === SLUG;
+    });
+  }catch(e){ CODA = []; }
+  disegnaCoda();
+}
+
+function disegnaCoda(){
+  const attive = CODA.filter(function(c){ return c.stato === 'in_attesa' || c.stato === 'in_corso'; });
+  const at = document.getElementById('attesa');
+  at.hidden = attive.length === 0;
+  at.textContent = attive.length === 1
+    ? '1 domanda in coda: risponde chi sta girando sul Mac.'
+    : attive.length + ' domande in coda: risponde chi sta girando sul Mac.';
+  document.getElementById('lista').innerHTML = CODA.map(function(c){
+    const chiesto = (c.contesto && c.contesto.chiesto) || String(c.domanda || '').split('\n').pop();
+    let corpo = '';
+    if(c.stato === 'fatta'){
+      corpo = '<div class="risp doc">' + md(c.risposta || '') + '</div>' +
+        '<div class="meta">risposta del ' + new Date(c.finita_il).toLocaleString('it-IT') + '</div>';
+    } else if(c.stato === 'fallita'){
+      corpo = '<div class="fallita">Non ha risposto: ' + esc(c.motivo || 'motivo non scritto') + '</div>';
+    } else {
+      corpo = '<div class="in-corso"><i class="ph-duotone ph-hourglass-medium"></i> in coda, la pagina controlla da sola&hellip;</div>';
+    }
+    return '<div class="qa">' +
+      '<div class="dom"><i class="ph-duotone ph-question"></i><span>' + esc(chiesto) + '</span></div>' +
+      corpo + '</div>';
+  }).join('');
+  /* finche' c'e' qualcosa in attesa la pagina ricontrolla da sola */
+  if(attive.length && !POLL){ POLL = setInterval(caricaCoda, 15000); }
+  if(!attive.length && POLL){ clearInterval(POLL); POLL = null; }
+}
+
+function esito(msg, ok){
+  const e = document.getElementById('esito');
+  e.textContent = msg; e.className = 'esito' + (ok ? '' : ' male');
+  if(msg) setTimeout(function(){ e.textContent = ''; }, 6000);
+}
+
+async function invia(){
+  const area = document.getElementById('dom');
+  const b = document.getElementById('invia');
+  const testo = (area.value || '').trim();
+  if(!testo){ esito('Scrivi prima la domanda.', false); return; }
+  b.disabled = true;
+  try{
+    /* La domanda porta con se tutto il documento: chiunque la prenda dalla
+       coda risponde con il testo davanti, senza dover cercare niente. */
+    const domanda =
+      'Sei l\'assistente del pannello POI•LOVE. Qui sotto un documento riservato ' +
+      'e una domanda. Rispondi in italiano, asciutto e concreto, basandoti sul ' +
+      'documento e sul progetto POI•LOVE. Mai trattini lunghi.\n\n' +
+      '=== DOCUMENTO: ' + DOCUMENTO.titolo + ' ===\n' + DOCUMENTO.corpo +
+      '\n=== FINE DOCUMENTO ===\n\nDOMANDA: ' + testo;
+    const { error } = await sb.rpc('coda_chiedi', {
+      p_fase: 'altro', p_domanda: domanda,
+      p_contesto: { argomento: 'documento', documento: SLUG, chiesto: testo },
+    });
+    if(error) throw error;
+    area.value = '';
+    esito('In coda. La risposta comparira qui sotto.', true);
+    await caricaCoda();
+  }catch(e){ esito('Non sono riuscito: ' + (e.message || ''), false); }
+  b.disabled = false;
+}
+
+(async function(){
+  if(!(await gate())) return;
+  if(!(await caricaDoc())) return;
+  document.getElementById('pronte').innerHTML = DOMANDE_PRONTE.map(function(q){
+    return '<button class="btn" data-q="' + esc(q) + '">' + esc(q) + '</button>';
+  }).join('');
+  document.querySelectorAll('[data-q]').forEach(function(b){
+    b.onclick = function(){ const a = document.getElementById('dom'); a.value = b.dataset.q; a.focus(); };
+  });
+  document.getElementById('invia').onclick = invia;
+  document.getElementById('aggiorna').onclick = caricaCoda;
+  await caricaCoda();
+})();
+</script>
+</body>
+</html>

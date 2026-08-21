@@ -43,6 +43,8 @@ case "${1:-guarda}" in
     echo "id:   $id"
     echo "fase: $fase"
     [ -n "$poi" ] && echo "luogo: $poi"
+    contesto=$(sql "select contesto::text from public.ai_coda where id='$id' and contesto <> '{}'::jsonb")
+    [ -n "$contesto" ] && echo "contesto: $contesto"
     echo "── domanda ──"
     sql "select domanda from public.ai_coda where id='$id'"
     ;;

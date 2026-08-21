@@ -1,5 +1,22 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
+## 21/08/2026 notte — I documenti riservati hanno una pagina, con la chat sulla coda
+
+Il repository e' pubblico, quindi i documenti di lavoro riservati non possono
+stare nei file. Adesso vivono nel database (`admin_documenti`, migrazione 160)
+e si leggono da **admin.poilove.com/documento.html**: stesso cancello del
+pannello (admin + secondo fattore), testo reso dalla pagina, e sotto una chat
+per fare domande sul documento. La domanda porta con se' tutto il testo e va
+nella coda (`ai_coda`), risponde chi sta girando sul Mac a costo zero, la
+pagina ricontrolla da sola finche' la risposta non arriva. `scripts/coda.sh
+prendi` adesso mostra anche il contesto della domanda.
+
+Provato dal vivo: giro completo della coda (domanda inserita, presa, risposta,
+stato `fatta`), resa del documento (12 tabelle, 11 titoli), pagina servita.
+Il primo documento caricato e' il piano di marketing, che resta solo nel
+database e in `_marketing/` (fuori dal repo). Nel passaggio svuotata anche la
+coda vera: quattro ricerche di luoghi rimaste in attesa hanno avuto risposta.
+
 ## 21/08/2026 sera — I comandi diventano nostri, i livelli si creano, i documenti entrano in testa agli assistenti
 
 Programma da 68,5 a 70,5 giornate su 113. Controllo: 19 su 19.
