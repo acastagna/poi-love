@@ -101,9 +101,11 @@ $outPos  = $dir . '/' . $nome . '.jpg';
 
 // ── La compressione vera ───────────────────────────────────────────────────
 // scale: lato lungo 1080, l'altro si adegua e resta pari (i codificatori lo pretendono)
-$scale = 'scale=\'if(gt(iw,ih),min(' . VIDEO_LATO_LUNGO . ',iw),-2)\':\'if(gt(iw,ih),-2,min(' . VIDEO_LATO_LUNGO . ',ih))\'';
+// Il filtro va passato COME UN PEZZO SOLO: con le virgolette messe a mano la
+// shell le toglieva e ffmpeg riceveva un filtro spezzato ("Filter not found").
+$scale = 'scale=if(gt(iw\,ih)\,min(' . VIDEO_LATO_LUNGO . '\,iw)\,-2):if(gt(iw\,ih)\,-2\,min(' . VIDEO_LATO_LUNGO . '\,ih))';
 $cmd = $ffmpeg . ' -y -i ' . escapeshellarg($tmp)
-     . ' -vf ' . $scale
+     . ' -vf ' . escapeshellarg($scale)
      . ' -c:v libx264 -preset veryfast -crf 23'
      . ' -maxrate ' . VIDEO_BITRATE . ' -bufsize 5000k'
      . ' -pix_fmt yuv420p -movflags +faststart'
@@ -121,7 +123,7 @@ if (!file_exists($outVid) || filesize($outVid) < 1024) {
 // ── L'immagine di copertina, presa dal video stesso ────────────────────────
 $sec = $durata > 2 ? 1 : 0;
 shell_exec($ffmpeg . ' -y -ss ' . $sec . ' -i ' . escapeshellarg($outVid)
-         . ' -frames:v 1 -vf ' . $scale . ' -q:v 4 ' . escapeshellarg($outPos) . ' 2>&1');
+         . ' -frames:v 1 -vf ' . escapeshellarg($scale) . ' -q:v 4 ' . escapeshellarg($outPos) . ' 2>&1');
 
 $url    = STORAGE_BASE_URL . '/' . $poi_id . '/' . $nome . '.mp4';
 $poster = file_exists($outPos) ? (STORAGE_BASE_URL . '/' . $poi_id . '/' . $nome . '.jpg') : null;
