@@ -17,6 +17,7 @@
  *    regole per-utente hanno scartato tutto, e zero righe = rifiuto, non successo.
  */
 import 'react-native-url-polyfill/auto';
+import { AppState } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient } from '@supabase/supabase-js';
 import { Config } from '@/constants/config';
@@ -33,6 +34,17 @@ export const db = createClient(Config.dbUrl, Config.dbKey, {
 
 /** Compatibilita' con il codice che importava `supabase`: stesso client. */
 export const supabase = db;
+
+// ── La sessione che dura ────────────────────────────────────────────────────
+// Sul telefono il rinnovo automatico del biglietto va acceso e spento a mano:
+// acceso quando l'app e' davanti, spento quando va in tasca. Senza questo, chi
+// riapre l'app dopo qualche ora si ritrova col biglietto scaduto e viene
+// buttato fuori senza motivo.
+AppState.addEventListener('change', (stato) => {
+  if (stato === 'active') db.auth.startAutoRefresh();
+  else db.auth.stopAutoRefresh();
+});
+db.auth.startAutoRefresh();
 
 // ─── Chi sono ───────────────────────────────────────────────────────────────
 export async function getCurrentUser() {
