@@ -578,6 +578,7 @@ html[data-theme="light"] .chip.green{color:#236b39}
 <script src="js/direttive-admin.js?v=357"></script>
 <script src="js/livelli-admin.js?v=357"></script>
 <script src="js/livelli-editor.js?v=357"></script>
+<script src="js/conoscenza-pdf.js?v=357"></script>
 <script src="js/catena-admin.js?v=357"></script>
 <script src="js/itinerari-admin.js?v=357"></script>
 <script src="js/compagnie-admin.js?v=357"></script>
@@ -1027,6 +1028,8 @@ html[data-theme="light"] .chip.green{color:#236b39}
 
     <!-- 8d) KNOWLEDGE ILLI -->
     <section class="section" id="sec-knowledge">
+      <!-- I documenti in PDF: decine di pagine che diventano cercabili per senso -->
+      <div id="conoscenzaPdfBox" style="margin-bottom:16px"></div>
       <div class="panel" style="margin-bottom:16px">
         <div class="card-h"><span class="ic"><i class="ph-duotone ph-brain"></i></span><span data-t="kb_new_title">Nuova conoscenza / modifica</span></div>
         <div class="sm" style="margin-bottom:10px" data-t="kb_help">Voci che ILLI usa quando la domanda contiene una delle parole chiave. Solo fatti veri: diventano whitelist per l'AI.</div>
@@ -1726,7 +1729,9 @@ function runSection(sec){
     case 'direttive': if(window.DirettiveAdmin) window.DirettiveAdmin.load(document.getElementById('direttiveBox')); break;
     case 'livelli': if(window.LivelliEditor) window.LivelliEditor.load(document.getElementById('livelliEditorBox')); break;
     case 'catena': if(window.CatenaAdmin) window.CatenaAdmin.load(document.getElementById('catenaBox')); break;
-    case 'knowledge': loadKnowledgeAdmin(); break;
+    case 'knowledge': loadKnowledgeAdmin();
+      if(window.ConoscenzaPdf) ConoscenzaPdf.load(document.getElementById('conoscenzaPdfBox'));
+      break;
     case 'audit': loadAudit(); break;
     case 'media': initMedia(); break;
     case 'landing': if(window.LandingAdmin) LandingAdmin.load(); renderMediaEmail(); break;
