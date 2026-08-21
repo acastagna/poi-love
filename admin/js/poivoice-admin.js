@@ -323,6 +323,35 @@
       '</div>'+
       '<div id="pvLottiBox" style="margin-top:10px"></div>'+
 
+      // ── lo studio: dal copione all audio ──
+      '<div style="margin-top:16px;border-top:1px solid var(--line,#3a3a3a);padding-top:13px">'+
+        '<div style="font-size:13px;font-weight:900;margin-bottom:5px">Fai l\'audio</div>'+
+        (haCopioneScelto()
+          ? '<div class="sm" style="margin-bottom:9px">Il copione scelto in '+nomeLingua(lingua)+
+            ' diventa un file da ascoltare. Ogni prova si paga, anche quella che poi butti: '+
+            'per questo compare qui sotto col suo costo.</div>'+
+            '<button class="btn sm gold" id="pvFaiAudio"><i class="ph-duotone ph-waveform"></i> Dai la voce al copione</button>'
+          : '<div class="sm" style="opacity:.6">Prima serve un copione scelto in '+nomeLingua(lingua)+'.</div>')+
+        '<div id="pvAudioEsito" style="margin-top:8px;font-size:12.5px;font-weight:700"></div>'+
+        (function(){
+          const vo = materiale.filter(function(m){ return m.fase==='voce' && m.lingua===lingua; });
+          if(!vo.length) return '';
+          return '<div style="margin-top:12px">'+vo.map(function(m){
+            return '<div style="background:rgba(255,255,255,.03);border-radius:10px;padding:11px;margin-bottom:8px'+
+              (m.scelto?';border:1.5px solid #5BBE7E':'')+'">'+
+              '<div style="font-size:11.5px;opacity:.6;margin-bottom:6px">'+quando(m.creato)+
+                ' · '+mmss(m.secondi)+' · '+euro(m.costo_eur)+
+                (m.scelto?' · <b style="color:#5BBE7E">pubblicata: si sente nell app</b>':'')+'</div>'+
+              (m.audio_url ? '<audio controls preload="none" src="'+esc(m.audio_url)+'" style="width:100%"></audio>' : '')+
+              '<div class="btn-row" style="margin-top:8px">'+
+                (m.scelto ? '' : '<button class="btn sm gold" data-usa-voce="'+esc(m.id)+'">'+
+                  '<i class="ph-duotone ph-broadcast"></i> Pubblica questa</button>')+
+                '<button class="btn sm" data-butta-voce="'+esc(m.id)+'">Butta</button>'+
+              '</div></div>';
+          }).join('')+'</div>';
+        })()+
+      '</div>'+
+
       '<div class="btn-row" style="margin-top:12px">'+
         '<button class="btn sm gold" id="pvSalvaVoce"><i class="ph-duotone ph-floppy-disk"></i> Salva le impostazioni</button>'+
         '<a class="btn sm" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">'+
@@ -420,6 +449,9 @@
     });
     box.querySelectorAll('[data-ascolta]').forEach(function(b){ b.onclick = function(){ ascolta(b.dataset.ascolta); }; });
     montaComandi();
+    const fa = document.getElementById('pvFaiAudio'); if(fa) fa.onclick = faiAudio;
+    box.querySelectorAll('[data-usa-voce]').forEach(function(b){ b.onclick = function(){ usaVoce(b.dataset.usaVoce, b); }; });
+    box.querySelectorAll('[data-butta-voce]').forEach(function(b){ b.onclick = function(){ buttaVoce(b.dataset.buttaVoce, b); }; });
     const sv = document.getElementById('pvSalvaVoce'); if(sv) sv.onclick = salvaVoce;
   }
 
@@ -609,6 +641,128 @@
     // vuole la chiave. Meglio dirlo che far premere un tasto muto.
     e.textContent = 'Per sentire ' + sel.value + ' serve la chiave di Google: e un audio, e va generato.';
     e.style.color = '#D8A93B';
+  }
+
+  function haCopioneScelto(){
+    return materiale.some(function(m){ return m.fase==='copione' && m.lingua===lingua && m.scelto; });
+  }
+  async function biglietto(){
+    const s = await sb.auth.getSession();
+    return (s.data && s.data.session && s.data.session.access_token) || '';
+  }
+  function dettaglio(t, testo, bene){
+    if(!t) return;
+    t.textContent = testo;
+    t.style.color = bene === null ? 'inherit' : (bene ? '#5BBE7E' : '#E06A6A');
+  }
+
+  // Dal copione all audio, in tre passi: Google fa la voce, il server delle
+  // immagini tiene il file, il database segna quello che e costato. La riga di
+  // spesa si scrive comunque, anche se poi la prova non piace: e gia pagata.
+  async function faiAudio(){
+    const b = document.getElementById('pvFaiAudio');
+    const e = document.getElementById('pvAudioEsito');
+    b.disabled = true;
+    dettaglio(e, 'Google sta leggendo il copione: su dieci minuti di audio ci vogliono minuti, non secondi…', null);
+    try{
+      const tok = await biglietto();
+      const r = await fetch('https://poilove.com/db/functions/v1/poivoice-genera', {
+        method:'POST', headers:{ 'Content-Type':'application/json', Authorization:'Bearer '+tok },
+        body: JSON.stringify({ poi: scelto.id, lingua: lingua }),
+      });
+      const j = await r.json();
+      if(!r.ok || j.errore){
+        throw new Error((j.errore || ('errore '+r.status)) + (j.spiegazione ? ' — '+j.spiegazione : ''));
+      }
+
+      dettaglio(e, 'Voce pronta, '+mmss(j.secondi)+'. La sto mettendo al sicuro…', null);
+      const grezzo = atob(j.wav);
+      const bytes = new Uint8Array(grezzo.length);
+      for(let i=0;i<grezzo.length;i++) bytes[i] = grezzo.charCodeAt(i);
+      const fd = new FormData();
+      fd.append('casa','poi'); fd.append('id', scelto.id); fd.append('lingua', lingua);
+      fd.append('audio', new File([bytes], 'audioguida.wav', { type:'audio/wav' }));
+      const u = await fetch('https://media.poilove.com/audioguida.php', {
+        method:'POST', headers:{ Authorization:'Bearer '+tok }, body: fd,
+      });
+      const uj = await u.json();
+      if(!u.ok || uj.error) throw new Error(uj.error || ('il file non si e salvato, errore '+u.status));
+
+      const ins = await sb.from('poi_materiale').insert({
+        poi_id: scelto.id, fase:'voce', lingua: lingua, testo:'(audio)',
+        audio_url: uj.url, secondi: uj.secondi || j.secondi,
+        voce: j.voce_f + (j.due_voci ? (' + '+j.voce_m) : ''),
+        modello: j.modello, costo_eur: j.costo_stimato, scelto: false,
+      }).select('id');
+      if(ins.error) throw ins.error;
+
+      // il conto: si segna sempre, anche prima di sapere se piacera
+      const sp = await sb.rpc('voce_segna_spesa', {
+        p_poi: scelto.id, p_lingua: lingua, p_secondi: j.secondi,
+        p_gettoni_in: j.gettoni_in, p_gettoni_out: j.gettoni_out,
+        p_costo: j.costo_stimato, p_voce_f: j.voce_f, p_voce_m: j.voce_m,
+        p_esito: 'tenuta', p_motivo: null,
+        p_materiale: (ins.data && ins.data[0] && ins.data[0].id) || null,
+      });
+      if(sp.error) console.warn('la spesa non si e segnata:', sp.error.message);
+
+      dettaglio(e, 'Fatto: '+mmss(uj.secondi || j.secondi)+', costo stimato '+euro(j.costo_stimato)+'.', true);
+      await datiLuogo(); await dati(); disegna();
+    }catch(err){ dettaglio(e, 'Non sono riuscito: '+(err.message||''), false); b.disabled = false; }
+  }
+
+  // Scegliere una prova non basta: finche non finisce nella tabella che l app
+  // legge, quella voce non la sente nessuno. Qui si pubblica davvero.
+  async function usaVoce(id, bottone){
+    bottone.disabled = true;
+    try{
+      const { error } = await sb.rpc('pubblica_audioguida', { p_materiale: id });
+      if(error) throw error;
+      dettaglio(document.getElementById('pvAudioEsito'),
+        'Pubblicata: da adesso si sente nell app, sul luogo e nella sua pagina.', true);
+      await datiLuogo(); disegna();
+    }catch(e){ bottone.disabled = false; dettaglio(document.getElementById('pvAudioEsito'), 'Non sono riuscito: '+(e.message||''), false); }
+  }
+
+  // Niente finestrelle del browser: la domanda si apre qui dentro, coi motivi
+  // gia pronti. Il motivo resta scritto nel conto, perche la prova e gia pagata.
+  function buttaVoce(id, bottone){
+    if(bottone.dataset.aperto) return;
+    bottone.dataset.aperto = '1';
+    const MOTIVI = ['non mi piace come suona','troppo lunga','troppo corta','sbaglia le parole','voce sbagliata'];
+    const riga = document.createElement('div');
+    riga.style.cssText = 'margin-top:8px;padding:9px;background:rgba(224,106,106,.08);border-radius:9px';
+    riga.innerHTML = '<div style="font-size:12px;font-weight:800;margin-bottom:6px">Perche la butti? '+
+      'Il costo resta nel conto: e gia pagata.</div>'+
+      '<div class="btn-row" style="flex-wrap:wrap">'+
+      MOTIVI.map(function(m){ return '<button class="btn sm" data-motivo="'+m+'">'+m+'</button>'; }).join('')+
+      '<button class="btn sm" data-motivo="">annulla</button></div>';
+    bottone.parentNode.appendChild(riga);
+    riga.querySelectorAll('[data-motivo]').forEach(function(b){
+      b.onclick = function(){
+        const motivo = b.dataset.motivo;
+        riga.remove(); delete bottone.dataset.aperto;
+        if(motivo) buttaDavvero(id, bottone, motivo);
+      };
+    });
+  }
+
+  async function buttaDavvero(id, bottone, motivo){
+    bottone.disabled = true;
+    try{
+      // se stava suonando nell app, prima la si toglie di li
+      const rit = await sb.rpc('ritira_audioguida', { p_materiale: id });
+      if(rit.error) console.warn('non ritirata dalla mappa:', rit.error.message);
+      // poi il conto: la riga di spesa passa a "scartata" ma il costo resta
+      const righe = await sb.from('voce_spesa').select('id').eq('materiale_id', id);
+      for(const r of (righe.data || [])){
+        const b = await sb.rpc('voce_butta', { p_id: r.id, p_motivo: motivo });
+        if(b.error) throw b.error;
+      }
+      const d = await sb.from('poi_materiale').delete().eq('id', id).select('id');
+      if(d.error) throw d.error;
+      await datiLuogo(); await dati(); disegna();
+    }catch(e){ bottone.disabled = false; dettaglio(document.getElementById('pvAudioEsito'), 'Non sono riuscito: '+(e.message||''), false); }
   }
 
   async function salvaVoce(){
