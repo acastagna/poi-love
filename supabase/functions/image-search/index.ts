@@ -36,8 +36,11 @@ async function openverse(q: string): Promise<Img[]> {
 }
 async function wikimedia(q: string): Promise<Img[]> {
   // extmetadata porta autore e licenza: senza quelli la foto non serve a niente.
+  // Wikimedia respinge (403) chi non dice chi e': il nome del programma va messo
+  // sempre, anche qui, altrimenti un giorno le foto smettono di arrivare in silenzio.
   const r = await fetch("https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch=" + encodeURIComponent(q) +
-    "&gsrnamespace=6&gsrlimit=15&prop=imageinfo&iiprop=url|extmetadata&iiurlwidth=500&format=json&origin=*");
+    "&gsrnamespace=6&gsrlimit=15&prop=imageinfo&iiprop=url|extmetadata&iiurlwidth=500&format=json&origin=*",
+    { headers: { "User-Agent": "POILOVE/1.0 (https://poilove.com; info@321.al)" } });
   const d = await r.json();
   const pg = (d.query && d.query.pages) || {};
   const pulisci = (x: string) => String(x || "").replace(/<[^>]+>/g, "").trim();
