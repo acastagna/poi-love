@@ -139,12 +139,16 @@
     const b=document.getElementById('qrSalva'); if(b) b.disabled=true;
     e.textContent='Salvo…'; e.style.color='inherit';
     try{
-      const { error } = await sb.from('qr_stile').update({
+      const { data: toccate, error } = await sb.from('qr_stile').update({
         colore:S.colore, colore_angoli:S.colore_angoli, sfondo:S.sfondo,
         forma_punti:S.forma_punti, forma_angoli:S.forma_angoli,
         logo:S.logo, logo_quota:S.logo_quota, margine:S.margine, aggiornato:new Date().toISOString()
-      }).eq('id',1);
+      }).eq('id',1).select('id');
+      // Si chiede indietro la riga toccata: se una regola del database rifiuta,
+      // non arriva nessun errore ma non cambia niente. Senza questo controllo
+      // il pannello direbbe "salvato" a vuoto.
       if(error) throw error;
+      if(!toccate || !toccate.length) throw new Error('il database non ha accettato la modifica: se la sessione non ha il secondo fattore, esci e rientra col codice a sei cifre');
       e.textContent='Salvato: da adesso tutti i QR nascono cosi\'.'; e.style.color='#5BBE7E';
     }catch(err){ e.textContent='Non sono riuscito a salvare: '+(err.message||''); e.style.color='#E06A6A'; }
     finally{ if(b) b.disabled=false; }

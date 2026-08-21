@@ -33,15 +33,18 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Hel
 .wrap th{background:var(--soft);font-weight:800;white-space:nowrap}
 .wrap hr{border:none;border-top:1px solid var(--border);margin:24px 0}
 .wrap code{background:var(--soft);padding:1px 6px;border-radius:5px;font-size:13px}
+.lingue{display:flex;gap:7px;justify-content:flex-end;margin:0 0 14px}
+.lingue button{border:1.5px solid var(--border);background:#fff;color:var(--muted);font-family:inherit;font-weight:800;font-size:12px;letter-spacing:.5px;padding:6px 13px;border-radius:999px;cursor:pointer}
+.lingue button.on{background:var(--red);border-color:var(--red);color:#fff}
 .foot{max-width:780px;margin:0 auto;padding:22px;color:var(--muted);font-size:12px;border-top:1px solid var(--border);display:flex;gap:14px;flex-wrap:wrap}
 .foot a{color:var(--muted)}
 </style>
 </head>
 <body>
 <div class="topbar"><a class="brand" href="/">POI<span class="h">•</span>LOVE</a><a class="back" href="/">Torna all'app</a></div>
-<div class="wrap" id="content"></div>
+<div class="wrap"><div class="lingue" id="lingue"><button data-lg="it" onclick="setLingua('it')">IT</button><button data-lg="sq" onclick="setLingua('sq')">SQ</button><button data-lg="en" onclick="setLingua('en')">EN</button></div><div id="content"></div></div>
 <div class="foot"><span>© POI•LOVE · 321.AL / EVOLAB</span><a href="/privacy">Privacy</a><a href="/terms">Condizioni</a><a href="/">App</a></div>
-<script type="text/plain" id="md"># Informativa sulla privacy di POI•LOVE
+<script type="text/plain" id="md-it"># Informativa sulla privacy di POI•LOVE
 
 *Ultimo aggiornamento: 21/08/2026*
 
@@ -345,10 +348,628 @@ In Albania è il **Commissario per il diritto all'informazione e la protezione d
 Se ti trovi nell'Unione Europea, puoi rivolgerti anche all'autorità di controllo del tuo Paese di residenza.
 
 Prima di rivolgerti all'Autorità, se vuoi, scrivici a **it@altrostile.app**: proveremo a risolvere insieme ogni problema nel modo più rapido possibile.</script>
+<script type="text/plain" id="md-sq"># Njoftimi i privatësisë i POI•LOVE
+
+*Përditësimi i fundit: 21/08/2026*
+
+> Këtë njoftim e kemi shkruar ne, nuk është një model i blerë. Është në fuqi ashtu siç është. Nëse diçka nuk të duket në rregull, na shkruaj: e korrigjojmë.
+
+POI•LOVE është harta e bashkësisë me vendet e dashura: një hapësirë ku njerëzit shënojnë, tregojnë dhe ndajnë vendet për të cilat kujdesen. Që kjo të funksionojë, ne përpunojmë disa nga të dhënat e tua personale. Ky njoftim të shpjegon, ndershmërisht dhe qartë, cilat të dhëna mbledhim, pse, mbi çfarë baze ligjore, me kë i ndajmë, sa gjatë i ruajmë dhe cilat të drejta ke.
+
+POI•LOVE nis publikisht në Shqipëri dhe i nënshtrohet ligjit shqiptar nr. 124/2024 për mbrojtjen e të dhënave personale, i përafruar me Rregulloren e BE-së 2016/679 (GDPR). Nëse je përdorues në Bashkimin Evropian, zbatohet edhe GDPR. I përpunojmë të dhënat e tua në respekt të të dyjave.
+
+---
+
+## 1. Kush i përpunon të dhënat e tua (kontrolluesi dhe kontaktet)
+
+Kontrolluesi i të dhënave është:
+
+**Alessandro Castagna, 321.AL / EVOLAB**
+Kontakt për çdo çështje lidhur me të dhënat dhe për të ushtruar të drejtat e tua: **it@altrostile.app**
+
+Për çdo pyetje, kërkesë ose ankesë mbi privatësinë mund të na shkruash në këtë adresë. Përgjigjemi brenda afateve të parashikuara nga ligji (shih pikën 8).
+
+Shënim transparence: po vlerësojmë emërimin e një Përgjegjësi për mbrojtjen e të dhënave (DPO) dhe të një përfaqësuesi në Shqipëri, siç kërkon ligji nr. 124/2024 për përpunimet në shkallë të gjerë. Sapo të emërohen, kontaktet e tyre do të publikohen këtu dhe do t'i njoftohen Autoritetit.
+
+---
+
+## 2. Cilat të dhëna mbledhim dhe pse
+
+Mbledhim vetëm të dhënat që duhen për ta bërë aplikacionin të punojë. Ja lista e plotë, kategori pas kategorie.
+
+### 2.1 Të dhënat e regjistrimit dhe të llogarisë
+- **Email** dhe, në rast regjistrimi klasik, **fjalëkalimi** (i ruajtur vetëm i koduar, kurrë i hapur).
+- Nëse regjistrohesh me një ofrues të jashtëm (**Google, Facebook, Apple, X (Twitter) ose LinkedIn**), marrim prej tij: email, emrin ose pseudonimin, figurën e profilit. Nëse nuk plotëson një emër përdoruesi, e krijojmë ne nga pjesa e parë e email-it tënd (pjesa para @): mund ta ndryshosh në çdo kohë nga profili.
+
+*Pse:* për të krijuar llogarinë tënde, për të të futur brenda, për të të lejuar ta rikthesh hyrjen dhe për ta mbajtur shërbimin në këmbë. Pa këto të dhëna nuk mund të të japim një llogari.
+
+### 2.2 Të dhënat e profilit publik
+- **Emri i përdoruesit** (i detyrueshëm), **emri i shfaqur**, **figura**, **biografia e shkurtër**, **gjuha e preferuar**.
+
+*Pse:* për të të identifikuar publikisht në aplikacion, për t'u treguar profilin tënd të tjerëve dhe për të të dhënë një adresë personale (@emri). Emri, figura dhe biografia janë vullnetare: ti vendos çfarë tregon.
+
+### 2.3 Vendndodhja (GPS)
+- **Koordinatat** (gjerësia dhe gjatësia gjeografike) kur e ndez vendndodhjen, si dhe adresa, qyteti dhe shteti që nxirren prej tyre.
+
+*Pse:* për të të treguar vendet pranë teje, për të të lejuar të krijosh një POI pikërisht aty ku je, dhe që të punojnë kërkimi "pranë meje" dhe navigimi drejt një vendi.
+
+Vendndodhja është një nga të dhënat më të ndjeshme që trajtojmë, sepse mund të tregojë zakonet e tua. Prandaj:
+- e ndezim **vetëm kur duhet** (kur krijon ose kërkon një POI, ose kur navigon), kurrë vazhdimisht në sfond;
+- të kërkojmë gjithmonë leje nëpërmjet shfletuesit ose pajisjes;
+- mund ta refuzosh ose ta tërheqësh në çdo kohë nga cilësimet e shfletuesit a të pajisjes, dhe nga cilësimet e aplikacionit.
+
+### 2.4 Fotot që ngarkon
+- **Fotot e vendeve (POI)** dhe **fotot e profilit** që zgjedh të ngarkosh.
+
+*Pse:* për të dokumentuar dhe ilustruar vendet, dhe për ta personalizuar profilin tënd.
+
+Lexo me kujdes **pikën 4** për pëlqimin dhe fotot: fotot mund të paraqesin njerëz, dhe këtu ka rregulla e përgjegjësi të sakta.
+
+Fotot që ngarkon përpunohen dhe ruhen nëpërmjet serverit tonë media.poilove.com (shih pikën 5). Për të ulur rrezikun, kur ngarkon një foto ne **heqim të dhënat EXIF** (që përmbajnë GPS të saktë, datën, modelin e pajisjes) para se ta publikojmë. Nëse përdor një foto për të krijuar një POI, mund të lexojmë vendndodhjen GPS brenda saj vetëm për të propozuar pikën në hartë: ajo e dhënë nuk ripublikohet me foton.
+
+### 2.5 Përmbajtja që krijon
+- **POI** (vendet që ruan), **"love" dhe të preferuarat**, **listat**, **itineraret e udhëtimit** me ndalesat e tyre, **shoqëritë e udhëtimit** (grupe me përdorues të tjerë), dhe lidhjet e **ndjekjes** (kë ndjek dhe kush të ndjek).
+
+*Pse:* janë zemra e aplikacionit. Shërbejnë për të ndërtuar hartën tënde, për të ndarë vendet, për të organizuar udhëtimet dhe për të ndjekur njerëz të tjerë.
+
+**Etiketat e lira mbi POI-të.** Kur krijon një POI mund të shtosh etiketa teksti të lira (deri në 10). Etiketat e POI-ve publike janë të dukshme për gjithë bashkësinë dhe përdoren si sugjerime plotësimi edhe për ata që nuk kanë hyrë. Mos vendos në etiketa të dhëna personale, as të tuat as të të tjerëve.
+
+**Sinjalizimi i një kategorie që mungon.** Nëse na sinjalizon se mungon një kategori, regjistrojmë termin e kërkuar bashkë me identifikuesin tënd, për të përditësuar e kujdesur kategoritë e platformës.
+
+**Kalimi dhe pretendimi i një POI-je.** Nëse kalon një POI me anë të një kodi ose kërkon pronësinë e një vendi, përpunojmë identitetin e atij që kalon dhe të atij që merr (identifikuesit dhe emrin publik) si dhe mesazhet e lira që shkruan në kërkesë: këto të dhëna janë të dukshme për administrimin, për të trajtuar e vërtetuar veprimin.
+
+Disa nga këto përmbajtje mund të përfshijnë të dhëna të **personave të tjerë** (për shembull anëtarët e një shoqërie udhëtimi, ose email-i i atij që fton). Shih pikën 4.4.
+
+### 2.6 Ftesat dhe shoqëritë
+- Kur fton dikë në një shoqëri udhëtimi, përpunojmë **email-in e marrësit** dhe një **kod ftese** për t'i çuar lidhjen.
+
+*Pse:* që të mund të ftosh persona të tjerë. I ftuari mund ta pranojë ose ta shpërfillë. Dërgojmë një ftesë të vetme, me mundësinë të mos marrë mesazhe të tjera.
+
+### 2.7 Pikët dhe ftesat që sjellin njerëz
+- **Pikët**, ngjarjet që i prodhojnë (për shembull krijimi i një POI-je, dhënia e një "love", ndarja), dhe **ftesat** që sjellin regjistrime të reja.
+
+*Pse:* për të bërë të punojë sistemi me pikë, për të njohur kontributet e tua dhe për të parandaluar abuzimet e mashtrimet. Regjistrojmë vetëm veprimet që prodhojnë pikë, jo çdo klikim.
+
+### 2.8 Raportimet dhe moderimi
+- Kur **raporton** një përmbajtje ose një profil, regjistrojmë **raportimin** (çfarë ke raportuar, arsyen, datën) dhe kush e dërgoi.
+- Kur ndërhyjmë për moderim, regjistrojmë **veprimet e moderimit** (për shembull pezullim, bllokim, heqje përmbajtjeje) dhe arsyen e tyre.
+
+*Pse:* për ta mbajtur platformën të sigurt, për të trajtuar raportimet, për të mbrojtur njerëzit dhe për të përmbushur detyrimet ligjore. I ruajmë këto të dhëna edhe si provë në raste abuzimi ose kundërshtimi.
+
+### 2.9 Mesazhet e ndihmës dhe komunikimet nga ekipi
+- Për të të ndihmuar dhe informuar, një **administrator ose moderator** mund të të dërgojë **mesazhe të drejtpërdrejta** që shfaqen në bisedën tënde me ILLI•AI, të shënuara qartë si të shkruara nga një **person i ekipit** (etiketa "Njeri") dhe të dallueshme nga përgjigjet automatike të asistentit. Mund të **përgjigjesh**: biseda (teksti i mesazheve, data dhe ora, gjendja e leximit) është e dukshme **vetëm për ty dhe ekipin**, kurrë për përdorues të tjerë.
+
+*Pse:* për të të dhënë ndihmë, për t'iu përgjigjur pyetjeve të tua dhe për të të njoftuar mbi shërbimin (për shembull risi, oferta ose fitime të lidhura me aplikacionin). Baza ligjore: **zbatimi i kontratës** dhe **interesi ynë legjitim** për të të ofruar mbështetje. Nuk i përdorim këto mesazhe për profilizim reklamash dhe mund të na kërkosh në çdo çast t'i ndalim.
+
+### 2.10 Abonimet me pagesë
+- Nëse aktivizon një **abonim** në një nga nivelet me pagesë (**Profesionist, Profesionist Plus, Mbështetës, Mecenat**, dhe profile të posaçme si **Influencer**), përpunojmë të dhënat e nevojshme për ta menaxhuar: nivelin e zgjedhur, gjendjen e abonimit, datat e aktivizimit dhe të rinovimit a ndërprerjes, dhe përfitimet e lidhura.
+- **Të dhënat e pagesës** (për shembull të dhënat e kartës) përpunohen drejtpërdrejt nga ofruesi i pagesave që do të përdorim në çastin e aktivizimit, sipas njoftimit të tij: ne nuk i ruajmë numrat e kartës.
+
+*Pse:* për të aktivizuar e menaxhuar abonimin, për të të njohur përfitimet e nivelit, për të nxjerrë dokumentet kontabël dhe për të përmbushur detyrimet tatimore e ligjore.
+
+### 2.11 Çfarë NUK ruajmë
+- **Historiku i kërkimeve** të adresave nuk ruhet në bazën tonë të të dhënave: mbetet brenda sesionit.
+- **Diktimi me zë**, nëse e përdor, kthehet në tekst nga pajisja ose shfletuesi yt: **nuk e regjistrojmë dhe nuk e ruajmë audion**.
+
+---
+
+## 3. Bazat ligjore të përpunimit
+
+Çdo përpunim ka një bazë ligjore të saktë (neni 13 i ligjit 124/2024, neni 6 i GDPR):
+
+| E dhëna | Baza ligjore |
+|---------|--------------|
+| Email, fjalëkalim, të dhëna hyrjeje | **Zbatimi i kontratës**: pa to nuk mund të të japim shërbimin |
+| Emri i përdoruesit, emri, figura, biografia | **Zbatimi i kontratës** dhe **interesi ynë legjitim** për të mbajtur platformën dhe parandaluar abuzimet |
+| Vendndodhja GPS | **Pëlqim i shprehur**, që mund ta tërheqësh në çdo çast |
+| Fotot që ngarkon | **Pëlqim i shprehur** për ngarkimin; për fotot me njerëz shih pikën 4 |
+| Përmbajtja (POI, lista, itinerare, ndjekje, shoqëri) | **Zbatimi i kontratës** |
+| Email-et e ftesave në shoqëri | **Pëlqimi** yt për dërgimin dhe deklarata jote se ke pëlqimin e marrësit |
+| Pikët, ngjarjet, ftesat | **Interes legjitim** për të bërë të punojë sistemi me pikë dhe për të parandaluar mashtrimet |
+| Mesazhet për asistentin AI (ILLI dhe kopiloti i administrimit) | **Zbatimi i kontratës** për të të dhënë funksionin që kërkove, dhe **interesi ynë legjitim** për ta bërë të punojë e për ta përmirësuar asistentin |
+| Raportimet dhe veprimet e moderimit | **Interes legjitim** për sigurinë e platformës dhe të përdoruesve, dhe **detyrim ligjor** kur duhet t'i ruajmë ose të veprojmë |
+| Të dhënat e menaxhimit të abonimit | **Zbatimi i kontratës** së abonimit dhe **detyrim ligjor** për detyrimet kontabël e tatimore |
+| Statistikat e përmbledhura të përdorimit | **Interes legjitim**, në formë anonime ose me pseudonim |
+
+Shkurt, bazat mbi të cilat mbështetemi janë **pëlqimi** (për vendndodhjen, fotot dhe ftesat), **zbatimi i kontratës** (për llogarinë, përmbajtjen, asistentin AI dhe abonimet), **interesi legjitim** (për sigurinë, parandalimin e abuzimeve e mashtrimeve, pikët dhe statistikat e përmbledhura) dhe **detyrimi ligjor** (për moderimin, kontabilitetin e tatimet kur e kërkon ligji).
+
+Kur baza është **pëlqimi** ose **interesi legjitim**, ke gjithmonë të drejtën ta tërheqësh pëlqimin ose të kundërshtosh (shih pikën 8).
+
+---
+
+## 4. Pëlqimi, vendndodhja dhe fotot: lexo këtu
+
+Kjo është pika më e rëndësishme për mbrojtjen tënde dhe të personave të tjerë.
+
+### 4.1 Si funksionon pëlqimi
+Pëlqimi që të kërkojmë është **i lirë, i informuar, i posaçëm dhe i qartë**: e jep me një veprim të dukshëm (për shembull duke ndezur një funksion ose duke shënuar një kuti), kurrë me kuti të shënuara paraprakisht dhe kurrë me heshtje. Kërkojmë pëlqime **të ndara** për gjëra të ndryshme: një për vendndodhjen, një për ngarkimin e fotove. Mund të pranosh njërin dhe jo tjetrin.
+
+Mund **ta tërheqësh pëlqimin në çdo kohë**, dhe është po aq e lehtë sa ta japësh: nga cilësimet e aplikacionit, të shfletuesit ose të pajisjes. Tërheqja vlen për të ardhmen dhe nuk e bën të paligjshëm atë që kemi përpunuar më parë, ligjshëm, sa ishte pëlqimi në fuqi.
+
+### 4.2 Vendndodhja
+E ndezim GPS-in vetëm kur të duhet një funksion që e kërkon, dhe ta themi. Kur e mbyll atë funksion, ndalojmë ta përdorim. Nëse vendos ta bësh publike një listë ose një shoqëri, mbaj mend se vendndodhja e lidhur mund të bëhet e dukshme për të tjerët: mendo mirë çfarë ndan.
+
+### 4.3 Fotot: çfarë mund dhe çfarë NUK duhet të ngarkosh
+Fotot që ngarkon mbi një POI janë, nga natyra e tyre, të destinuara **t'i shohin të tjerët**. Para se të ngarkosh një foto, lexo këto rregulla. Duke ngarkuar një foto, deklaron se i respekton dhe merr përgjegjësinë.
+
+**Çfarë NUK duhet të ngarkosh:**
+- Foto që paraqesin **persona të njohshëm** (fytyra të identifikueshme) **pa pëlqimin e tyre**. Kjo vlen edhe për njerëzit në sfond, jo vetëm për subjektin kryesor.
+- Foto të **të miturve** pa pëlqimin e atij që ushtron përgjegjësinë prindërore.
+- Foto që lejojnë **njohjen ose identifikimin e vetëm** të një personi nga fytyra (të dhëna biometrike): ky lloj përpunimi është i ndaluar pa një pëlqim të shprehur e të posaçëm të personit.
+- Foto që cenojnë **privatësinë, dinjitetin ose të drejtat** e dikujt, përmbajtje të paligjshme, fyese, seksualisht të hapura, ose për të cilat nuk ke të drejta.
+- Dokumente, targa, të dhëna shëndetësore ose informacione të tjera të ndjeshme të të tretëve.
+
+**Çfarë të këshillojmë:**
+- Parapëlqe foto të **vendit pa njerëz të njohshëm**: janë më të sigurtat për të gjithë.
+- Nëse ka njerëz, sigurohu që ke pëlqimin e tyre, ose bëji fytyrat të panjohshme.
+
+**Përgjegjësia jote.** Kur ngarkon një foto që paraqet persona të tjerë, ndaj atyre personave je ti përgjegjës për marrjen e pëlqimit. POI•LOVE vë në dispozicion mjetin, por zgjedhja se çfarë ngarkon është e jotja. Nëse marrim një raportim ose një kërkesë të ligjshme, e heqim menjëherë përmbajtjen problematike (shih pikën 8 për raportimet).
+
+### 4.4 Të dhënat e personave të tjerë brenda përmbajtjes sate
+Kur fton dikë në një shoqëri udhëtimi ose fut persona të tjerë në përmbajtjen tënde, na jep të dhëna që i përkasin atyre (për shembull një email). Duhet ta bësh vetëm nëse ke një bazë të ligjshme për t'i ndarë, dhe deklaron se e ke. Kush ftohet mund gjithmonë të refuzojë dhe të kërkojë heqjen e të dhënave të veta.
+
+### 4.5 Dukshmëria dhe cilësimet paraprake
+Punojmë që cilësimet më të kujdesshme të jenë ato paraprake (për shembull shoqëritë private në nisje, dhe rrjeti i ndjekjeve jo i shfletueshëm lirisht nga kushdo). Kur zgjedh ta bësh diçka publike, ta themi.
+
+---
+
+## 5. Me kë i ndajmë të dhënat (shërbime të treta dhe marrës)
+
+Për ta bërë POI•LOVE të punojë mbështetemi te disa ofrues të jashtëm, që i përpunojnë të dhënat si përpunues në emrin tonë ose si marrës të pavarur. Ligji nr. 124/2024 dhe GDPR na detyrojnë të jemi transparentë se kush janë, çfarë marrin dhe ku përpunohen të dhënat. Ja lista e plotë.
+
+| Ofruesi | Çfarë merr | Për çfarë shërben | Ku |
+|---------|------------|-------------------|-----|
+| **Makina jonë** (srv.poilove.com, Hetzner) | E gjithë baza e të dhënave: profilet, vendet, përmbajtja, pikët, abonimet, raportimet. Dhe hyrjet: email dhe fjalëkalim i koduar, sesionet | Është zemra e shërbimit, dhe që nga gushti 2026 është **e jona**: nuk i besohet më një ofruesi të jashtëm | **Gjermani**, Bashkimi Evropian |
+| **Supabase** | Jashtë mbeten vetëm gjashtë programe shërbimi (asistenti ILLI, moderimi i vlerësimeve, kërkimi i imazheve, dërgimi i email-eve, transkriptimet, pasurimi i vendeve) dhe fotot e ngarkuara para gushtit 2026 | Programe që ende punojnë jashtë shtëpisë dhe do të zhvendosen më vonë | Bashkimi Evropian, me pjesë të mundshme në **Shtetet e Bashkuara** |
+| **Google (hyrje OAuth)** | Email, emri, figura e llogarisë tënde Google | Hyrje me Google | **Shtetet e Bashkuara** |
+| **Google (Google Places API)** | Teksti i kërkimit të një vendi dhe koordinatat e zonës | Marrja e informacioneve të vërteta për vendet: emri, vlerësimet, lloji i vendit | **Shtetet e Bashkuara** (dhe serverë të tjerë Google jashtë BE-së), me garanci të përshtatshme |
+| **X (Twitter)** dhe **LinkedIn** (hyrje OAuth) | Email, emri/pseudonimi, figura | Hyrje me llogarinë tënde | **Shtetet e Bashkuara** |
+| **OpenAI** | **Mesazhet** që i dërgon asistentit ILLI dhe kopilotit të administrimit, që mund të përmbajnë qytetin ose zonën për të cilën flet | Përpunimi i përgjigjeve të asistentit | **Shtetet e Bashkuara**, me garanci të përshtatshme |
+| **Anthropic** | **Mesazhet** që i dërgon asistentit ILLI dhe kopilotit të administrimit, që mund të përmbajnë qytetin ose zonën për të cilën flet | Përpunimi i përgjigjeve të asistentit | **Shtetet e Bashkuara**, me garanci të përshtatshme |
+| **OpenStreetMap / Nominatim / Overpass** | Koordinatat dhe teksti i adresës së kërkuar, përfshirë koordinatat e çastit kur kërkon vende të vërteta pranë teje | Kërkimi i vendeve, kthimi mes adresave dhe koordinatave, lista e vendeve të vërteta afër | Serverë në **Evropë** |
+| **media.poilove.com** (serveri ynë i medias) | Fotot që ngarkon (POI dhe figura profili) dhe një çelës që njeh sesionin tënd | Ruajtja dhe shërbimi i fotove të vendeve dhe të profilit | **Gjermani** (serveri i projektit) |
+| **api.qrserver.com** (goQR) | Adresa publike e profilit tënd (që përmban emrin tënd të përdoruesit) | Krijimi i kodit QR të profilit | Jashtë vendit |
+| **ui-avatars.com** | Inicialet ose emri që shfaqen në profilin tënd | Krijimi i një figure zëvendësuese | Jashtë vendit |
+| **image.pollinations.ai** | Teksti që shkruan për të krijuar një imazh ose një figurë me AI | Krijimi i imazheve me AI me kërkesën tënde | Jashtë vendit |
+| **Pllakat e hartës (OpenStreetMap, ESRI ArcGIS) dhe CDN/shkronjat (jsDelivr, unpkg, Google Fonts)** | Zona e hartës që po shikon, dhe përgjithësisht adresa jote IP dhe lloji i pajisjes | Shfaqja e hartave dhe ngarkimi i bibliotekave e shkronjave | BE / SHBA |
+| **Aplikacionet e navigimit (Google Maps, Waze, Apple Maps)** | Koordinatat e vendit për të cilin kërkon udhëzime | Hapja e navigimit rrugor me kërkesën tënde | SHBA |
+
+Sipas funksionit dhe konfigurimit, mesazhet e dërguara asistentit AI mund të përpunohen nga **OpenAI** ose nga **Anthropic**. Funksioni i lentes, që tregon vendet e vërteta afër, ua dërgon koordinatat e tua të çastit Google Places edhe kur nuk ke hyrë: përdore vetëm nëse e pranon këtë. Kopiloti i administrimit (Anthropic) mund të marrë, nga ana e administrimit, mostra të dhënash të vërteta të platformës (për shembull emrin e përdoruesit, nivelin, gjendjen e moderimit) për të ndihmuar menaxhimin. Në të dyja rastet serverët janë në **Shtetet e Bashkuara** dhe përpunimi bëhet sipas njoftimit të ofruesit. **Mos vendos të dhëna të ndjeshme ose konfidenciale** (për shembull të dhëna shëndetësore, të dhëna të personave të tjerë, fjalëkalime ose dokumente) në bisedat me asistentin AI.
+
+Nuk i shesim të dhënat e tua dhe nuk ua japim të tretëve për qëllime reklamash.
+
+Me ofruesit që përpunojnë të dhëna në emrin tonë lidhim, aty ku parashikohet, marrëveshje për përpunimin e të dhënave (DPA), dhe mbajmë të përditësuar një regjistër të përpunimeve dhe të marrësve, siç kërkon ligji.
+
+### 5.1 Transferimet jashtë Shqipërisë dhe Bashkimit Evropian
+Disa ofrues (veçanërisht **OpenAI**, **Anthropic** dhe **Google**) kanë serverë në **Shtetet e Bashkuara**, dhe edhe **Supabase** mund të ketë pjesë atje. Dërgimi i të dhënave të tua atje përbën një transferim drejt një vendi të tretë, ndërsa Shtetet e Bashkuara, në përgjithësi, nuk konsiderohen të përshtatshme as nga Shqipëria as nga BE-ja.
+
+Për ta bërë të ligjshëm këtë transferim mbështetemi, sipas rastit, në:
+- **garanci kontraktore të përshtatshme** (për shembull klauzola standarde për mbrojtjen e të dhënave) të ofruara nga këta ofrues, dhe, aty ku e kërkon legjislacioni shqiptar, në **autorizimin paraprak të Autoritetit (Komisionerit)**;
+- në mungesë të këtyre garancive, në **pëlqimin tënd të shprehur dhe të informuar mbi rreziqet** e transferimit, për shembull kur zgjedh të përdorësh asistentin ILLI ose kërkimin e vendeve që i kërkojnë këto shërbime.
+
+Transferimi i të dhënave në Shtetet e Bashkuara do të thotë se autoritetet e atij vendi mund, në raste të caktuara, të kenë qasje me mbrojtje të ndryshme nga ato evropiane e shqiptare. Përpiqemi t'i **pakësojmë** të dhënat e dërguara: për shembull te asistenti AI (OpenAI ose Anthropic) shkojnë mesazhet e tua dhe zona për të cilën flet, jo emri yt e as llogaria; dhe te Google Places shkojnë teksti i kërkimit dhe zona, jo identiteti yt. Nëse nuk dëshiron që disa të dhëna të dalin nga zona BE/Shqipëri, mund të mos i përdorësh funksionet që mbështeten te këta ofrues (asistenti ILLI, kopiloti i administrimit, kërkimi nëpërmjet Google Places). Dhe sidoqoftë, siç u tha më lart, mos vendos të dhëna të ndjeshme në bisedat me asistentin AI.
+
+### 5.2 Çfarë ndryshoi në gusht 2026
+
+Deri në gusht 2026 baza e të dhënave, hyrjet dhe fotot qëndronin te Supabase, një ofrues i jashtëm. Që nga 18 gushti 2026 qëndrojnë **në një makinë tonën në Gjermani**: të dhënat e tua nuk kalojnë më nëpër duart e një pale të tretë thjesht për t'u ruajtur. Jashtë mbeten vetëm gjashtë programe shërbimi, të listuara në tabelën më sipër, dhe fotot e ngarkuara para asaj date.
+
+---
+
+## 5bis. Përpunime të shtuara pas korrikut 2026
+
+Që nga korriku 2026 shërbimi bën disa gjëra më shumë. I rendisim këtu sepse kanë të bëjnë me të dhënat e tua.
+
+**Fytyrat në foto.** Kur ngarkon foton e një vendi, një program në makinën tonë kërkon fytyrat dhe i turbullon automatikisht, me buzë të zbutura. Shërben për të mbrojtur njerëzit që kanë përfunduar në kuadër rastësisht dhe nuk të kanë dhënë asnjë pëlqim. Nëse programi nuk ia del, **fotoja nuk publikohet**: preferojmë të humbasim një foto sesa të publikojmë fytyrën e një të panjohuri. Nga paneli i administrimit mund të zgjidhet nëse turbullohen fytyrat e të gjithëve apo vetëm ato të fëmijëve. Fotot mbërrijnë të turbulluara në server: origjinali me fytyrat e hapura nuk ruhet.
+
+**Vlerësimet.** Mund të shkruash një vlerësim për vendin e një personi me të cilin je i lidhur. Para se të shfaqet, teksti lexohet nga një program inteligjence artificiale që kontrollon nëse respekton rregullat e shkruara në panel (pa fyerje, pa të dhëna të personave të tjerë, pa reklama). Teksti i vlerësimit i dërgohet pra OpenAI-t ose Anthropic-ut, si për asistentin ILLI. Nëse programi nuk është i sigurt, vlerësimi mbetet në pritje dhe e shikon një person.
+
+**Të dhënat e lokalit.** Nëse je një biznes, mund të publikosh oraret, menynë, telefonin, mënyrat e pagesës. Janë të dhëna që ti vendos t'i bësh publike. Numërojmë edhe sa herë hapet skeda jote dhe sa herë skanohet kodi yt QR: janë numra që i sheh vetëm ti, dhe nuk lidhen me identitetin e atij që shikon.
+
+**Zëri dhe videoja.** Mund të regjistrosh zërin tënd mbi një vend dhe të ngarkosh një video. Qëndrojnë në makinën tonë në Gjermani. Zëri në shoqëritë e udhëtimit transkriptohet edhe në tekst, dhe për këtë skedari i audios i dërgohet OpenAI-t.
+
+**Abonimet.** Nëse ke një nivel me pagesë, mbajmë datën e skadimit, referencën e pagesës që na komunikon dhe historikun e rinovimeve. Nuk përpunojmë të dhënat e kartës sate: pagesa bëhet jashtë platformës.
+
+**Raportimet.** Kushdo mund të raportojë një përmbajtje. Raportimi ruan kush e bëri, çfarë ka të bëjë dhe arsyen, dhe shihet brenda njëzet e katër orëve.
+
+**Email-i.** Email-et e shërbimit (lidhjet e hyrjes, njoftimet) nisen nëpërmjet **AcumbaMail**, që merr adresën tënde dhe përmbajtjen e mesazhit. Serverët janë në **Spanjë**, Bashkimi Evropian.
+
+---
+
+## 6. Sa gjatë i ruajmë të dhënat
+
+| E dhëna | Ruajtja |
+|---------|---------|
+| Llogaria, profili, përmbajtja (POI, lista, itinerare, ndjekje) | Sa kohë e mban aktive llogarinë. Me fshirjen e llogarisë, i fshijmë ose i bëjmë anonime |
+| Fotot e ngarkuara | Sa kohë mbeten në përmbajtjen tënde ose deri në fshirjen e llogarisë, ose më parë me kërkesën tënde |
+| Vendndodhja GPS | Ruhet vetëm nëse e ruan brenda një përmbajtjeje (një POI, një ndalesë). Nuk mbajmë një historik të vazhdueshëm të lëvizjeve të tua |
+| Ngjarjet e pikëve dhe të ftesave | Për kohën e nevojshme për funksionimin e sistemit me pikë dhe parandalimin e mashtrimeve, me fshirje periodike të të dhënave më të vjetra |
+| Email-et e ftesave në shoqëri | Për kohën e nevojshme për të trajtuar ftesën |
+| Mesazhet për asistentin AI | Koha e nevojshme për të të dhënë përgjigjen dhe për të bërë të punojë asistenti. Ruajtja nga ana e ofruesit (OpenAI, Anthropic) ndjek njoftimet e tyre |
+| Raportimet dhe veprimet e moderimit | Për kohën e nevojshme për sigurinë e platformës dhe, aty ku kërkohet, për të përmbushur detyrime ligjore ose për të mbrojtur një të drejtë |
+| Të dhënat e menaxhimit të abonimit | Për kohëzgjatjen e abonimit dhe, për dokumentet kontabël e tatimore, për periudhën e parashikuar nga ligji |
+| Të dhënat e hyrjes | Sa kohë ekziston llogaria |
+
+Kur një e dhënë nuk është më e nevojshme për qëllimet për të cilat u mblodh, e fshijmë ose e bëjmë anonime. Disa të dhëna mund të ruhen më gjatë nëse duhet për të përmbushur detyrime ligjore ose për të mbrojtur një të drejtë në gjykatë.
+
+---
+
+## 7. Si i mbrojmë të dhënat e tua (siguria)
+
+Marrim masa teknike dhe organizative për të mbrojtur të dhënat e tua, ndër to:
+- **Rregulla sigurie rresht pas rreshti (RLS)** në bazën e të dhënave: secili mund të arrijë vetëm te të dhënat për të cilat ka të drejtë.
+- **Çelësat API mbahen nga ana e serverit**, pas funksioneve të mbrojtura: nuk udhëtojnë kurrë në shfletues dhe nuk u ekspozohen përdoruesve.
+- **HTTPS** në të gjitha lidhjet: të dhënat udhëtojnë të koduara.
+- **Skedarët e brendshëm të projektit të bllokuar** nga ana publike e faqes, që të mos arrihen nga jashtë.
+- **Fjalëkalime të koduara** dhe menaxhim i hyrjeve me programe të posaçme.
+- **Heqja e të dhënave EXIF** nga fotot para publikimit.
+
+Asnjë sistem nuk është 100% i sigurt. Nëse ndodh një shkelje e të dhënave me rrezik për të drejtat e tua, do t'ia njoftojmë Autoritetit (Komisionerit) brenda **72 orëve** dhe, në rastet me rrezik të lartë, edhe ty pa vonesë të pajustifikuar, siç parashikon ligji.
+
+---
+
+## 8. Të drejtat e tua dhe si i ushtron
+
+Ke kontroll të plotë mbi të dhënat e tua. Sipas ligjit 124/2024 dhe GDPR mund:
+
+- Të **kesh qasje** te të dhënat e tua dhe të marrësh një kopje (e para është falas).
+- Të **korrigjosh** të dhëna të pasakta ose të paplota.
+- Të **fshish** të dhënat e tua dhe **të mbyllësh llogarinë**: në cilësimet e profilit gjendet fshirja e llogarisë, që i fshin ose i bën anonime të dhënat e tua. Mund ta kërkosh edhe duke na shkruar.
+- Të **kundërshtosh** një përpunim të bazuar në interesin legjitim, dhe në veçanti të kundërshtosh në mënyrë absolute çdo komunikim marketingu të drejtpërdrejtë.
+- Të **kufizosh** përpunimin në raste të caktuara.
+- **Transferueshmëri**: të marrësh të dhënat e tua në një format të strukturuar e të lexueshëm dhe, aty ku është teknikisht e mundur, t'i transferosh te të tjerët.
+- Të **tërheqësh pëlqimin** në çdo kohë, për vendndodhjen, fotot ose çdo përpunim të bazuar në pëlqim.
+
+Për t'i ushtruar këto të drejta, ose për të raportuar një foto a përmbajtje që të përket, shkruaj te **it@altrostile.app**. Përgjigjemi **brenda 30 ditëve** nga kërkesa. Përgjigjet janë falas; për kopje të mëtejshme mund të kërkojmë një kontribut të arsyeshëm për kostot.
+
+Nuk i përdorim të dhënat e tua për të marrë **vendime vetëm të automatizuara** që prodhojnë efekte juridike mbi ty ose që të prekin ndjeshëm. Nëse kjo do të ndryshonte, do të të informojmë dhe do të të shpjegojmë logjikën e pasojat.
+
+---
+
+## 9. Të miturit
+
+POI•LOVE nuk është menduar për fëmijë. Për ta përdorur, dhe për përpunimet e bazuara në pëlqim, duhet të kesh **të paktën 16 vjeç**. Nëse je nën 16 vjeç, mund ta përdorësh vetëm me pëlqimin e atij që ushtron përgjegjësinë prindërore.
+
+Nuk mbledhim me vetëdije të dhëna të të miturve nën këtë prag pa pëlqimin e kërkuar. Nëse je prind ose kujdestar dhe mendon se një i mitur na ka dhënë të dhëna pa pëlqimin e duhur, na shkruaj te **it@altrostile.app**: do t'i heqim menjëherë ato të dhëna.
+
+---
+
+## 10. Ndryshimet e këtij njoftimi
+
+Mund ta përditësojmë këtë njoftim, për shembull nëse shtojmë funksione ose ndryshojmë ofrues. Kur ndryshimi është i rëndësishëm, ta themi në aplikacion ose me email dhe përditësojmë datën lart. Të ftojmë ta rilexosh herë pas here. Përdorimi i vazhduar i aplikacionit pas një përditësimi vlen si njohje e versionit më të fundit.
+
+Ky njoftim është i disponueshëm në **italisht, shqip dhe anglisht**. Në rast dyshimi interpretues, mbizotëron versioni që do të përdorim si referencë zyrtare në nisje.
+
+---
+
+## 11. Ankesa te Autoriteti
+
+Nëse mendon se përpunimi i të dhënave të tua shkel ligjin, mund të paraqesësh gjithmonë një ankesë te autoriteti mbikëqyrës kompetent.
+
+Në Shqipëri është **Komisioneri për të Drejtën e Informimit dhe Mbrojtjen e të Dhënave Personale (IDP)**, faqja **idp.al**.
+</script>
+<script type="text/plain" id="md-en"># POI•LOVE Privacy Policy
+
+*Last updated: 21/08/2026*
+
+> We wrote this policy ourselves, it is not a bought template. It is in force as it stands. If something does not look right to you, write to us: we will correct it.
+
+POI•LOVE is the community map of beloved places: a space where people mark, tell and share the places they care about. To make that work we process some of your personal data. This policy explains, honestly and readably, what data we collect, why, on what legal basis, who we share it with, how long we keep it and what rights you have.
+
+POI•LOVE launches publicly in Albania and is subject to Albanian law no. 124/2024 on the protection of personal data, aligned with EU Regulation 2016/679 (GDPR). If you are a user in the European Union, the GDPR also applies to you. We process your data in compliance with both.
+
+---
+
+## 1. Who processes your data (controller and contacts)
+
+The data controller is:
+
+**Alessandro Castagna, 321.AL / EVOLAB**
+Contact for anything to do with data and for exercising your rights: **it@altrostile.app**
+
+For any question, request or complaint about privacy you can write to that address. We answer within the times set by law (see section 8).
+
+A note of transparency: we are considering appointing a Data Protection Officer (DPO) and a representative in Albania, as law no. 124/2024 requires for large-scale processing. As soon as they are appointed, their contact details will be published here and notified to the Authority.
+
+---
+
+## 2. What data we collect and why
+
+We collect only the data needed to run the app. Here is the complete list, category by category.
+
+### 2.1 Registration and account data
+- **Email** and, for classic registration, a **password** (kept only in encrypted form, never in the clear).
+- If you register through an external provider (**Google, Facebook, Apple, X (Twitter) or LinkedIn**), we receive from the provider you choose: email, name or handle, profile picture. If you do not fill in a username, we generate a default one from the first part of your email (the part before the @): you can change it at any time from your profile.
+
+*Why:* to create your account, sign you in, let you recover access and run the service. Without this data we cannot give you an account.
+
+### 2.2 Public profile data
+- **Username** (required), **display name**, **avatar**, **bio**, **preferred language**.
+
+*Why:* to identify you publicly in the app, show your profile to other people, and give you a personal address (@username). Name, avatar and bio are optional: you decide what to show.
+
+### 2.3 Location (GPS)
+- **Coordinates** (latitude and longitude) when you turn location on, plus any address, city and country derived from those coordinates.
+
+*Why:* to show you places near you, let you create a POI at the exact point where you are, and make "near me" search and navigation to a place work.
+
+Location is one of the most delicate pieces of data we handle, because it can reveal your habits. Therefore:
+- we turn it on **only when needed** (when you create or search for a POI, or navigate), never continuously in the background;
+- we always ask permission through the browser or the device;
+- you can refuse it or withdraw it at any time from the browser or device settings, and from the app settings.
+
+### 2.4 Photos you upload
+- **Photos of places (POIs)** and **profile photos** that you choose to upload.
+
+*Why:* to document and illustrate places, and to personalise your profile.
+
+Read **section 4** carefully, on consent and photos: photos can portray people, and there are precise rules and responsibilities here.
+
+The photos you upload are processed and stored through our media server media.poilove.com (see section 5). To reduce risk, when you upload a photo we **remove the EXIF metadata** (which includes precise GPS, date, device model) before publishing it. If you use a photo to create a POI, we may read the GPS position in its metadata for the sole purpose of proposing the point on the map: that data is not republished with the photo.
+
+### 2.5 Content you create
+- **POIs** (places you save), **loves and favourites**, **lists**, **travel itineraries** with their stops, **travel companion groups**, and **follow** relationships (who you follow and who follows you).
+
+*Why:* this is the heart of the app. It builds your map, shares places, organises trips and follows other people.
+
+**Free tags on POIs.** When you create a POI you can add free text tags (up to 10). Tags on public POIs are visible to the whole community and are used as autocomplete suggestions, including for people who are not signed in. Do not put personal data, yours or anyone else's, in tags.
+
+**Reporting a missing category.** If you report that a category is missing, we record the term you searched for along with your user identifier, so we can update and curate the platform's categories.
+
+**Transferring and claiming a POI.** If you transfer a POI through a code or claim ownership of a place, we process the identity of the person transferring and of the person receiving (identifiers and public name) and any free text messages you write in the request: this data is visible to the administration in order to handle and validate the operation.
+
+Some of this content may include data about **other people** (for example the members of a travel companion group, or the email of someone you invite). See section 4.4.
+
+### 2.6 Invitations and companion groups
+- When you invite someone to a travel companion group, we process the **recipient's email** and an **invitation code** to deliver the link.
+
+*Why:* to let you invite other people. The invited person can accept or ignore. We send a single invitation, with the option not to receive further messages.
+
+### 2.7 Gamification and referrals
+- **Points**, the events that generate them (for example creating a POI, giving a love, sharing), and **referrals** (invitations that lead to new sign-ups).
+
+*Why:* to run the points system, recognise your contributions and prevent abuse and fraud. We record only the actions that generate points, not every single click.
+
+### 2.8 Reports and moderation
+- When you **report** content or a profile, we record the **report** (what you reported, the reason, the date) and who sent it.
+- When we act for moderation purposes, we record the **moderation actions** (for example suspension, block, removal of content) and their reason.
+
+*Why:* to keep the platform safe, handle reports, protect people and comply with legal obligations. We also keep this data as evidence in cases of abuse or dispute.
+
+### 2.9 Support messages and communications from the team
+- To assist and inform you, an **administrator or moderator** can send you **direct messages** that appear in your chat with ILLI•AI, clearly marked as written by a **person from the team** (label "Human") and distinct from the assistant's automatic replies. You can **reply**: the conversation (message text, date and time, read status) is visible **only to you and the team**, never to other users.
+
+*Why:* to give you support, answer your questions and tell you about the service (for example news, offers or any prizes connected with the app). Legal basis: **performance of the contract** and our **legitimate interest** in offering you support. We do not use these messages for advertising profiling and you can ask us at any time to stop them.
+
+### 2.10 Paid subscriptions
+- If you take out a **subscription** to one of the paid tiers (**Professional, Professional Plus, Supporter, Patron**, and dedicated profiles such as **Influencer**), we process the data needed to manage it: chosen tier, subscription status, activation and renewal or termination dates, and the connected benefits.
+- The **payment data** itself (for example card details) is processed directly by the payment provider we use at the time of activation, under its own policy: we do not keep card numbers.
+
+*Why:* to activate and manage the subscription, grant you the tier's benefits, issue any accounting documents and comply with tax and legal obligations.
+
+### 2.11 What we do NOT save
+- The **history of address searches** is not kept in our database: it stays in the session.
+- **Voice dictation**, if you use it, is converted to text by your device or browser: **we neither record nor keep the audio**.
+
+---
+
+## 3. Legal bases for processing
+
+Every processing operation has a precise legal basis (art. 13 of law 124/2024, art. 6 GDPR):
+
+| Data | Legal basis |
+|------|-------------|
+| Email, password, login data | **Performance of the contract**: without it we cannot give you the service |
+| Username, name, avatar, bio | **Performance of the contract** and our **legitimate interest** in running the platform and preventing abuse |
+| GPS location | **Explicit consent**, which you can withdraw at any time |
+| Photos you upload | **Explicit consent** to the upload; for photos portraying people see section 4 |
+| Content (POIs, lists, itineraries, follows, companion groups) | **Performance of the contract** |
+| Invitation emails to companion groups | Your **consent** to sending, and your declaration that you have the recipient's consent |
+| Points, events, referrals | **Legitimate interest** in running gamification and preventing fraud |
+| Messages to the AI assistant (ILLI and the administrative copilot) | **Performance of the contract** to provide the feature you asked for, and our **legitimate interest** in running and improving the assistant |
+| Reports and moderation actions | **Legitimate interest** in the safety of the platform and of its users, and **legal obligation** where we must keep them or act |
+| Paid subscription management data | **Performance of the subscription contract** and **legal obligation** for accounting and tax purposes |
+| Aggregated usage statistics | **Legitimate interest**, in anonymous or pseudonymised form |
+
+In short, the bases we rely on are **consent** (for location, photos and invitations), **performance of the contract** (for account, content, AI assistant and subscriptions), **legitimate interest** (for safety, prevention of abuse and fraud, gamification and aggregated statistics) and **legal obligation** (for moderation, accounting and tax where the law requires it).
+
+Where the basis is **consent** or **legitimate interest**, you always have the right to withdraw consent or to object (see section 8).
+
+---
+
+## 4. Consent, location and photos: read this
+
+This is the most important section for your protection and for other people's.
+
+### 4.1 How consent works
+The consent we ask for is **free, informed, specific and unambiguous**: you give it by a clear action (for example by turning on a feature or ticking a box), never by pre-ticked boxes or by silence. We ask for **separate** consents for different things: one for location, one for uploading photos. You can accept one and not the other.
+
+You can **withdraw consent at any time**, and it is as easy as giving it: from the app, browser or device settings. Withdrawal applies to the future and does not make unlawful what we processed before, lawfully, while the consent was active.
+
+### 4.2 Location
+We turn on GPS only when you need a feature that requires it, and we tell you. When you close that feature, we stop using it. If you decide to make a list or a companion group public, remember that the connected location can become visible to others: think carefully about what you share.
+
+### 4.3 Photos: what you may and what you must NOT upload
+Photos you upload to a POI are, by their nature, meant to be **seen by other people**. Before uploading a photo, read these rules. By uploading a photo you declare that you respect them and you take responsibility for it.
+
+**What you must NOT upload:**
+- Photos portraying **recognisable people** (identifiable faces) **without their consent**. This applies to people in the background too, not only the main subject.
+- Photos of **minors** without the consent of whoever holds parental responsibility.
+- Photos that allow a person to be **recognised or uniquely identified** by their face (biometric data): this kind of processing is forbidden without the explicit and specific consent of the person concerned.
+- Photos that infringe someone's **privacy, dignity or rights**, unlawful, offensive or sexually explicit content, or content you do not hold the rights to.
+- Documents, number plates, health data or other sensitive information about other people.
+
+**What we recommend:**
+- Prefer photos of the **place without recognisable people**: they are the safest for everyone.
+- If people are present, make sure you have their consent, or make the faces unrecognisable.
+
+**Your responsibility.** When you upload a photo portraying other people, you are the one responsible, towards those people, for collecting their consent. POI•LOVE provides the tool, but the choice of what to upload is yours. If we receive a report or a legitimate request, we promptly remove the problematic content (see section 8 for reports).
+
+### 4.4 Other people's data in your content
+When you invite someone to a travel companion group or include other people in your content, you give us data about them (for example an email address). You must do so only if you have a legitimate basis for sharing it, and you declare that you have. Anyone invited can always refuse and ask for their data to be removed.
+
+### 4.5 Visibility and default settings
+We work so that the most prudent settings are the default ones (for example companion groups private to begin with, and the follow graph not freely browsable by anyone). When you choose to make something public, we tell you.
+
+---
+
+## 5. Who we share data with (third-party services and recipients)
+
+To run POI•LOVE we rely on some external suppliers, which process data as our processors (sub-processors) or as independent recipients. Law no. 124/2024 and the GDPR require us to be transparent about who they are, what they receive and where the data is processed. Here is the complete list.
+
+| Supplier | What it receives | What for | Where |
+|----------|------------------|----------|-------|
+| **Our own machine** (srv.poilove.com, Hetzner) | The whole database: profiles, places, content, points, subscriptions, reports. And sign-in: email and encrypted password, sessions | It is the heart of the service, and since August 2026 it is **ours**: it is no longer entrusted to an external supplier | **Germany**, European Union |
+| **Supabase** | Only six service programs remain outside (the ILLI assistant, review moderation, image search, email sending, transcriptions, place enrichment) and photos uploaded before August 2026 | Programs that still run outside the house and will move later | European Union, with possible components in the **United States** |
+| **Google (OAuth sign-in)** | Email, name, avatar of your Google account | Sign in with Google | **United States** |
+| **Google (Google Places API)** | The text of a place search and the coordinates of the area | Getting real information about places: name, ratings, type of place | **United States** (and other Google servers outside the EU), with adequate safeguards |
+| **X (Twitter)** and **LinkedIn** (OAuth sign-in) | Email, name/handle, avatar | Sign in with your account | **United States** |
+| **OpenAI** | The **messages** you send to the **ILLI** AI assistant and to the **administrative copilot**, which may include the city or area you are talking about | Producing the AI assistant's answers | **United States**, with adequate safeguards |
+| **Anthropic** | The **messages** you send to the **ILLI** AI assistant and to the **administrative copilot**, which may include the city or area you are talking about | Producing the AI assistant's answers | **United States**, with adequate safeguards |
+| **OpenStreetMap / Nominatim / Overpass** | Coordinates and the text of the address searched, including live coordinates when you look for real places near you | Place search, conversion between addresses and coordinates, list of real places nearby | Servers in **Europe** |
+| **media.poilove.com** (our media server) | The photos you upload (POIs and avatars) and a token identifying your session | Storing and serving photos of places and profiles | **Germany** (the project's server) |
+| **api.qrserver.com** (goQR) | The public address of your profile (which contains your username) | Generating your profile's QR code | Abroad |
+| **ui-avatars.com** | The initials or the name shown on your profile | Generating a placeholder avatar | Abroad |
+| **image.pollinations.ai** | The text you write to generate an image or avatar with AI | Generating images with AI at your request | Abroad |
+| **Map tiles (OpenStreetMap, ESRI ArcGIS) and CDN/fonts (jsDelivr, unpkg, Google Fonts)** | The area of the map you are looking at, and generally your IP address and device type | Showing maps and loading libraries and fonts | EU / US |
+| **Navigation apps (Google Maps, Waze, Apple Maps)** | The coordinates of the place you ask directions to | Opening road navigation at your request | US |
+
+Depending on the feature and the configuration, messages sent to the AI assistant may be processed by **OpenAI** or by **Anthropic**. The magnifier feature, which shows real places nearby, sends your live coordinates to Google Places even when you are not signed in: use it only if you accept that. The administrative copilot (Anthropic) may receive, on the administration side, samples of real platform data (for example username, tier, moderation status) to assist management. In both cases the servers are in the **United States** and processing follows the supplier's own policy. **Do not put sensitive or confidential data** (for example health data, other people's data, passwords or documents) in chats with the AI assistant.
+
+We do not sell your data and we do not pass it to third parties for advertising purposes.
+
+With suppliers that process data on our behalf we enter into data processing agreements (DPAs) where required, and we keep a record of processing activities and recipients up to date, as the law requires.
+
+### 5.1 Transfers outside Albania and the European Union
+Some suppliers (in particular **OpenAI**, **Anthropic** and **Google**) have servers in the **United States**, and **Supabase** too may have components there. Sending your data there is a transfer to a third country, which the United States, in general, is not considered adequate by either Albania or the EU.
+
+To make that transfer lawful we rely, depending on the case, on:
+- **adequate contractual safeguards** (for example standard data protection clauses) offered by those suppliers, and, where Albanian law requires it, on the **prior authorisation of the Authority (Commissioner)**;
+- failing such safeguards, your **explicit consent, informed about the risks** of the transfer, for example when you choose to use the ILLI assistant or place searches that need those services.
+
+Transferring data to the United States means that authorities of that country may, in certain cases, access it with protections different from the European and Albanian ones. We try to **minimise** the data sent: for example the AI assistant (OpenAI or Anthropic) receives your messages and the area you are talking about, not your name or your account; and Google Places receives the search text and the area, not your identity. If you do not want certain data to leave the EU/Albania area, you can avoid using the features that rely on those suppliers (the ILLI assistant, the administrative copilot, searches through Google Places). And in any case, as noted above, do not put sensitive data in chats with the AI assistant.
+
+### 5.2 What changed in August 2026
+
+Until August 2026 the database, sign-in and photos lived on Supabase, an external supplier. Since 18 August 2026 they live **on a machine of ours in Germany**: your data no longer passes through the hands of a third party simply to be stored. Only six service programs remain outside, listed in the table above, and photos uploaded before that date.
+
+---
+
+## 5bis. Processing added after July 2026
+
+Since July 2026 the service does a few more things. We list them here because they concern your data.
+
+**Faces in photos.** When you upload a photo of a place, a program on our machine looks for faces and blurs them automatically, with feathered edges. It protects people who ended up in the frame by chance and gave you no consent. If the program cannot do its job, **the photo is not published**: we would rather lose a photo than publish a stranger's face. From the administration panel we can choose whether to blur everyone's faces or only children's. Photos arrive on the server already blurred: the original with faces in the clear is not kept.
+
+**Reviews.** You can write a review of a place belonging to someone you are connected with. Before it appears, the text is read by an artificial intelligence program that checks whether it respects the rules written in the panel (no insults, no other people's data, no advertising). The text of the review is therefore sent to OpenAI or Anthropic, as with the ILLI assistant. If the program is not sure, the review waits and a person looks at it.
+
+**Venue data.** If you run a business, you can publish opening hours, menu, telephone and payment methods. This is data you choose to make public. We also count how many times your card is opened and how many times your QR code is scanned: those numbers are visible only to you, and are not tied to the identity of whoever is looking.
+
+**Voice and video.** You can record your voice on a place and upload a video. They stay on our machine in Germany. Voice messages in travel companion groups are also transcribed into text, and for that the audio file is sent to OpenAI.
+
+**Subscriptions.** If you have a paid tier we keep the expiry date, the payment reference you give us and the history of renewals. We do not process your card data: payment happens outside the platform.
+
+**Reports.** Anyone can report content. A report keeps who made it, what it concerns and the reason, and is looked at within twenty-four hours.
+
+**Email.** Service emails (sign-in links, notices) go out through **AcumbaMail**, which receives your address and the content of the message. Its servers are in **Spain**, European Union.
+
+---
+
+## 6. How long we keep data
+
+| Data | Retention |
+|------|-----------|
+| Account, profile, content (POIs, lists, itineraries, follows) | As long as your account is active. When the account is deleted we erase or anonymise it |
+| Uploaded photos | As long as they stay in your content or until the account is deleted, or earlier at your request |
+| GPS location | Kept only if you save it inside content (a POI, a stop). We do not keep a continuous history of your movements |
+| Gamification and referral events | For as long as the points system and fraud prevention need it, with periodic deletion of older data |
+| Companion invitation emails | For as long as handling the invitation requires |
+| Messages to the AI assistant | As long as needed to give you the answer and run the assistant. Retention on the supplier's side (OpenAI, Anthropic) follows their own policies |
+| Reports and moderation actions | For as long as platform safety requires and, where required, to comply with legal obligations or defend a right |
+| Subscription management data | For the duration of the subscription and, for accounting and tax documents, for the period set by law |
+| Authentication data | As long as the account exists |
+
+When data is no longer necessary for the purposes it was collected for, we delete it or make it anonymous. Some data may be kept longer if needed to comply with legal obligations or to defend a right in legal proceedings.
+
+---
+
+## 7. How we protect your data (security)
+
+We adopt technical and organisational measures to protect your data, including:
+- **Row Level Security (RLS)** on the database: each person can reach only the data they are entitled to.
+- **API keys kept on the server side**, behind protected functions (Edge Functions): they never travel in the browser and are not exposed to users.
+- **HTTPS** on all connections: data travels encrypted.
+- **Internal project files blocked** from the public side of the site, so they cannot be reached from outside.
+- **Encrypted passwords** and authentication handled by specialised software.
+- **Removal of EXIF metadata** from photos before publication.
+
+No system is 100% secure. If a data breach occurred with risk to your rights, we would notify the Authority (Commissioner) within **72 hours** and, in high-risk cases, you too without undue delay, as the law provides.
+
+---
+
+## 8. Your rights and how to exercise them
+
+You have full control over your data. Under law 124/2024 and the GDPR you can:
+
+- **Access** your data and obtain a copy (the first one is free).
+- **Rectify** inaccurate or incomplete data.
+- **Erase** your data and **close your account**: account deletion is in your profile settings, and it erases or anonymises your data. You can also ask us in writing.
+- **Object** to processing based on legitimate interest, and in particular object absolutely to any direct marketing communication.
+- **Restrict** processing in certain cases.
+- **Portability**: receive your data in a structured, readable format and, where technically possible, have it transferred to others.
+- **Withdraw consent** at any time, for location, photos or any processing based on consent.
+
+To exercise these rights, or to report a photo or content concerning you, write to **it@altrostile.app**. We answer **within 30 days** of the request. Answers are free; for further copies we may ask a reasonable contribution towards costs.
+
+We do not use your data to take **decisions based solely on automated processing** producing legal effects on you or significantly affecting you. Should that change, we will tell you and explain the logic and the consequences.
+
+---
+
+## 9. Minors
+
+POI•LOVE is not designed for children. To use it, and for processing based on consent, you must be **at least 16 years old**. If you are under 16, you may use it only with the consent of whoever holds parental responsibility.
+
+We do not knowingly collect data from minors below that threshold without the required consent. If you are a parent or guardian and believe a minor has given us data without the proper consent, write to us at **it@altrostile.app**: we will promptly remove that data.
+
+---
+
+## 10. Changes to this policy
+
+We may update this policy, for example if we add features or change suppliers. When a change is significant we tell you in the app or by email and we update the date at the top. We invite you to reread it from time to time. Continued use of the app after an update counts as having seen the most recent version.
+
+This policy is available in **Italian, Albanian and English**. In case of interpretative doubt, the version we use as the official reference at launch prevails.
+
+---
+
+## 11. Complaint to the Authority
+
+If you believe the processing of your data breaches the law, you can always lodge a complaint with the competent supervisory authority.
+
+In Albania this is the **Commissioner for the Right to Information and Protection of Personal Data (Komisioneri për të Drejtën e Informimit dhe Mbrojtjen e të Dhënave Personale, IDP)**, website **idp.al**.
+</script>
 <script src="https://cdn.jsdelivr.net/npm/marked@12/marked.min.js"></script>
 <script>
-try{ marked.setOptions({gfm:true,breaks:false}); document.getElementById('content').innerHTML=marked.parse(document.getElementById('md').textContent); }
-catch(e){ document.getElementById('content').innerHTML='<pre style="white-space:pre-wrap">'+document.getElementById('md').textContent+'</pre>'; }
+/* Tre lingue: si parte da quella del dispositivo, la scelta resta. */
+var TITOLI = {"it": "Informativa sulla privacy", "sq": "Njoftimi i privatësisë", "en": "Privacy Policy"};
+var TORNA  = {"it": "Torna all"app", "sq": "Kthehu te aplikacioni", "en": "Back to the app"};
+function setLingua(lg){
+  if(['it','sq','en'].indexOf(lg) < 0) lg = 'en';
+  try{ localStorage.setItem('poilove_legale_lang', lg); }catch(e){}
+  var testo = (document.getElementById('md-' + lg) || document.getElementById('md-it')).textContent;
+  var dove  = document.getElementById('content');
+  try{ marked.setOptions({gfm:true, breaks:false}); dove.innerHTML = marked.parse(testo); }
+  catch(e){ dove.innerHTML = '<pre style="white-space:pre-wrap"></pre>'; dove.firstChild.textContent = testo; }
+  document.documentElement.lang = lg;
+  document.title = TITOLI[lg] + ' · POI•LOVE';
+  var back = document.querySelector('.topbar .back'); if(back) back.textContent = TORNA[lg];
+  var bb = document.querySelectorAll('#lingue button');
+  for(var i=0;i<bb.length;i++){ bb[i].className = (bb[i].getAttribute('data-lg')===lg) ? 'on' : ''; }
+}
+(function(){
+  var salvata = null;
+  try{ salvata = localStorage.getItem('poilove_legale_lang'); }catch(e){}
+  var nav = (navigator.language || 'en').slice(0,2).toLowerCase();
+  setLingua(salvata || (nav==='it' ? 'it' : nav==='sq' ? 'sq' : 'en'));
+})();
 </script>
 </body>
 </html>

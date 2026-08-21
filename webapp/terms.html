@@ -33,15 +33,18 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Hel
 .wrap th{background:var(--soft);font-weight:800;white-space:nowrap}
 .wrap hr{border:none;border-top:1px solid var(--border);margin:24px 0}
 .wrap code{background:var(--soft);padding:1px 6px;border-radius:5px;font-size:13px}
+.lingue{display:flex;gap:7px;justify-content:flex-end;margin:0 0 14px}
+.lingue button{border:1.5px solid var(--border);background:#fff;color:var(--muted);font-family:inherit;font-weight:800;font-size:12px;letter-spacing:.5px;padding:6px 13px;border-radius:999px;cursor:pointer}
+.lingue button.on{background:var(--red);border-color:var(--red);color:#fff}
 .foot{max-width:780px;margin:0 auto;padding:22px;color:var(--muted);font-size:12px;border-top:1px solid var(--border);display:flex;gap:14px;flex-wrap:wrap}
 .foot a{color:var(--muted)}
 </style>
 </head>
 <body>
 <div class="topbar"><a class="brand" href="/">POI<span class="h">•</span>LOVE</a><a class="back" href="/">Torna all'app</a></div>
-<div class="wrap" id="content"></div>
+<div class="wrap"><div class="lingue" id="lingue"><button data-lg="it" onclick="setLingua('it')">IT</button><button data-lg="sq" onclick="setLingua('sq')">SQ</button><button data-lg="en" onclick="setLingua('en')">EN</button></div><div id="content"></div></div>
 <div class="foot"><span>© POI•LOVE · 321.AL / EVOLAB</span><a href="/privacy">Privacy</a><a href="/terms">Condizioni</a><a href="/">App</a></div>
-<script type="text/plain" id="md">
+<script type="text/plain" id="md-it">
 # Condizioni d'uso di POI•LOVE
 
 **Ultimo aggiornamento: 21/08/2026**
@@ -326,10 +329,596 @@ Per domande su queste Condizioni, segnalazioni di contenuti o richieste relative
 - **Titolare**: Alessandro Castagna / 321.AL / EVOLAB
 
 Per le richieste relative ai tuoi dati personali (accesso, rettifica, cancellazione, opposizione, portabilità, revoca del consenso) consulta l'Informativa sulla privacy su poilove.com/privacy.</script>
+<script type="text/plain" id="md-sq"># Kushtet e përdorimit të POI•LOVE
+
+**Përditësimi i fundit: 21/08/2026**
+
+> Këto kushte i kemi shkruar ne, nuk janë një model i blerë. Janë në fuqi pikërisht ashtu siç i lexon.
+
+Mirë se vjen në POI•LOVE. Këto Kushte përdorimi (“Kushtet”) rregullojnë hyrjen dhe përdorimin e aplikacionit web POI•LOVE, të faqes së tij dhe të të gjitha shërbimeve të lidhura (së bashku, “Shërbimi”). Të lutemi lexoji me kujdes: duke përdorur POI•LOVE i pranon plotësisht ato që vijojnë.
+
+POI•LOVE përpunon të dhëna personale, përfshirë vendndodhjen tënde dhe fotot që ngarkon. Mënyra si mblidhen dhe përdoren këto të dhëna përshkruhet te **Njoftimi i privatësisë** në poilove.com/privacy, që është pjesë përbërëse e këtyre Kushteve.
+
+---
+
+## 1. Pranimi i Kushteve
+
+Duke krijuar një llogari, duke hyrë ose duke përdorur Shërbimin në çfarëdo mënyre, deklaron se i ke lexuar, kuptuar dhe pranuar këto Kushte dhe Njoftimin e privatësisë.
+
+Nëse nuk pranon qoftë edhe një pjesë të Kushteve, nuk mund ta përdorësh Shërbimin.
+
+Nëse e përdor POI•LOVE në emër të një organizate, deklaron se ke tagrin ta detyrosh atë me këto Kushte.
+
+---
+
+## 2. Kush jemi ne (ofruesi i Shërbimit)
+
+Shërbimi ofrohet nga:
+
+- **Alessandro Castagna**, që vepron si **321.AL / EVOLAB**
+- Kontakt: **it@altrostile.app**
+
+Në këto Kushte, “ne” dhe “jonë” i referohen ofruesit të përmendur më sipër.
+
+---
+
+## 3. Çfarë bën Shërbimi
+
+POI•LOVE është një **hartë e bashkësisë me vendet e dashura**. Shërbimi të lejon, ndër të tjera:
+
+- të **zbulosh dhe të krijosh POI** (pika interesi): vende në hartë me emër, përshkrim, kategori dhe foto;
+- të shprehësh dashurinë për një vend (“**love**”) dhe të ndjekësh njerëz të tjerë;
+- të krijosh dhe të ndash **lista** dhe **itinerare** vendesh;
+- të gjesh **shoqërues udhëtimi** dhe të lidhesh me anëtarë të tjerë të bashkësisë;
+- të përdorësh **ILLI**, një asistent të bazuar në inteligjencë artificiale, për sugjerime mbi vende dhe zona;
+- të kërkosh vende “**pranë meje**” me anë të vendndodhjes së pajisjes;
+- të mbledhësh **pikë** dhe të marrësh pjesë në mekanizmat e lojës dhe të ftesave;
+- nëse dëshiron, të marrësh një **abonim me pagesë** për përfitime shtesë (shih pikën 11);
+- të shkruash **vlerësime** për vendet e njerëzve me të cilët je i lidhur: kalojnë nga një moderim automatik para se të shfaqen (shih pikën 6);
+- nëse ke një biznes, të publikosh **oraret, menynë, telefonin dhe mënyrat e pagesës** të lokalit tënd, dhe të kesh një **kod QR** për ta shtypur;
+- të regjistrosh **zërin** tënd mbi një vend, dhe të dëgjosh **audioguidat** e vendeve zyrtare;
+- të lësh **mesazhe zanore** në tabelën e një shoqërie udhëtimi, të cilat transkriptohen edhe në tekst;
+- të **raportosh** një përmbajtje që nuk shkon: raportimi shihet brenda njëzet e katër orëve.
+
+Shërbimi është në zhvillim të vazhdueshëm: mund të shtojmë, ndryshojmë ose heqim funksione në çdo kohë, duke u përpjekur të kufizojmë ndikimin mbi përvojën tënde.
+
+---
+
+## 4. Kush mund të regjistrohet (mosha minimale)
+
+Për të përdorur POI•LOVE duhet të kesh **të paktën 16 vjeç**.
+
+Ky kufi pasqyron ligjin shqiptar për mbrojtjen e të dhënave personale (Ligji nr. 124/2024) dhe GDPR-në e BE-së, sipas të cilëve përpunimi i të dhënave të një të mituri për shërbime online të bazuara në pëlqim është i ligjshëm vetëm nga mosha 16 vjeç. Nëse je nën 16 vjeç nuk mund të krijosh llogari e as ta përdorësh Shërbimin.
+
+Nëse je prind ose kujdestar dhe mendon se një fëmijë nën 16 vjeç ka krijuar një llogari, na shkruaj te **it@altrostile.app** dhe do ta mbyllim llogarinë e do të fshijmë të dhënat përkatëse.
+
+Për të përdorur Shërbimin duhet gjithashtu të japësh të dhëna të vërteta në regjistrim dhe t’i mbash të fshehta kredencialet e llogarisë. Je përgjegjës për çdo veprim të kryer nëpërmjet llogarisë sate.
+
+---
+
+## 5. Llogaria dhe hyrja
+
+Mund të regjistrohesh me email ose me ofrues të jashtëm (Google, Facebook, Apple, X, LinkedIn). Që nga 18 gushti 2026 hyrjet menaxhohen nga një program **i yni**, në një makinë tonën në Gjermani: adresa jote e email-it dhe fjalëkalimi yt i koduar nuk qëndrojnë më te një ofrues i jashtëm. Kur hyn me një ofrues të jashtëm, autorizon POI•LOVE të marrë prej tij të dhënat bazë të profilit tënd (për shembull email, emrin e përdoruesit dhe figurën), sipas Njoftimit të privatësisë.
+
+Je përgjegjës për sigurinë e kredencialeve të tua. Na njofto menjëherë te **it@altrostile.app** nëse dyshon për një hyrje të paautorizuar në llogarinë tënde.
+
+---
+
+## 6. Përmbajtja e ngarkuar nga përdoruesit
+
+Shërbimi të lejon të ngarkosh dhe të publikosh përmbajtje: foto, tekste, përshkrime vendesh, lista, itinerare, komente dhe material tjetër (“**Përmbajtja e përdoruesit**”). Ti mbetesh pronar i Përmbajtjes sate, por je plotësisht përgjegjës për atë që publikon.
+
+### 6.1 Çfarë garanton për përmbajtjen tënde
+
+Duke ngarkuar Përmbajtje, deklaron dhe garanton se:
+
+- ke **të drejtat** e nevojshme ose ke marrë çdo autorizim të kërkuar për ta publikuar dhe për të na dhënë licencën e përshkruar në pikën 6.4;
+- përmbajtja **nuk cenon** të drejtat e të tretëve, përfshirë të drejtat e autorit, markat, të drejtën mbi figurën, privatësinë dhe mbrojtjen e të dhënave personale;
+- informacionet që jep për vendet janë, sa di ti, të sakta dhe të dhëna në mirëbesim.
+
+**Etiketat** dhe tekstet e lira që u shton POI-ve publike janë të dukshme për bashkësinë dhe mund t’u sugjerohen të tjerëve: mos vendos aty të dhëna personale, as të tuat as të të tjerëve.
+
+### 6.2 Fotot e personave të identifikueshëm
+
+Fotot mund të përmbajnë njerëz, dhe një fytyrë e identifikueshme është e dhënë personale (në disa raste e dhënë e kategorisë së veçantë, “e ndjeshme”). Prandaj:
+
+- **nuk duhet të ngarkosh foto që paraqesin persona të identifikueshëm pa pëlqimin e tyre**;
+- nëse fotoja paraqet një të mitur, të duhet pëlqimi i atij që ushtron përgjegjësinë prindërore;
+- nuk duhet të ngarkosh figura që mund të përdoren për të identifikuar në mënyrë të vetme një person (për shembull për njohje fytyre) pa një pëlqim të shprehur dhe të posaçëm të tij;
+- kur është e mundur, parapëlqe foto të vendit që **nuk** përmbajnë njerëz të njohshëm.
+
+Ti je përgjegjës që i ke marrë këto pëlqime. Nëse një person i fotografuar na kërkon heqjen e një fotoje, mund ta heqim pa njoftim paraprak.
+
+### 6.3 Përmbajtje e ndaluar
+
+Nuk mund të ngarkosh, publikosh ose transmetosh përmbajtje që:
+
+- është e paligjshme, shpifëse, fyese, e turpshme, diskriminuese, e dhunshme ose që nxit urrejtje;
+- ngacmon, kërcënon ose cenon dinjitetin dhe privatësinë e personave të tjerë;
+- cenon të drejtat e pronësisë intelektuale ose industriale të të tretëve;
+- përmban të dhëna personale të të tjerëve të përhapura pa bazë ligjore;
+- përmban programe dëmtuese, spam, reklama të paautorizuara ose lidhje mashtruese;
+- shënon si “vende të dashura” pozicione që vënë në rrezik sigurinë ose privatësinë e personave (për shembull banesa private të të tretëve të treguara pa pëlqim);
+- është në çdo rast në kundërshtim me këto Kushte, me ligjin e zbatueshëm ose me moralin publik.
+
+### 6.4 Licenca që na jep
+
+Që të mund ta shfaqim përmbajtjen tënde publike brenda Shërbimit, i jep POI•LOVE një licencë **jo-ekskluzive, falas, të vlefshme në gjithë botën, të transferueshme dhe të nënlicencueshme te ofruesit tanë teknikë** (për shembull për strehimin), të kufizuar në qëllimet e **funksionimit, shfaqjes, promovimit dhe përmirësimit të Shërbimit**.
+
+Kjo licencë ka të bëjë me përmbajtjen që zgjedh ta bësh **publike** (për shembull një POI publike me foton e saj, një listë ose një itinerar të ndarë) dhe zgjat sa kohë ajo përmbajtje qëndron në Shërbim. Kur fshin një përmbajtje ose llogarinë tënde, licenca pushon për përmbajtjen e hequr, përveç kohës teknike që i duhet fshirjes për të mbërritur kudo, përmbajtjes që të tjerët mund ta kenë kopjuar ose ruajtur ndërkohë, dhe kopjeve rezervë që mbishkruhen sipas cikleve të tyre normale.
+
+Licenca shërben vetëm për të ofruar Shërbimin: nuk pretendojmë pronësinë e Përmbajtjes sate dhe nuk do ta shesim te të tretët.
+
+### 6.5 Moderimi dhe heqja
+
+Nuk jemi të detyruar ta kontrollojmë paraprakisht Përmbajtjen e përdoruesve, por mund të **heqim ose të fshehim** çdo përmbajtje që, sipas gjykimit tonë të arsyeshëm, shkel këto Kushte ose ligjin, edhe pa njoftim paraprak. Mund të **raportosh** përmbajtje ose profile të papërshtatshme me mjetet e raportimit brenda Shërbimit, ose duke shkruar te **it@altrostile.app**.
+
+Për arsye sigurie dhe për të përmbushur detyrimet ligjore, **regjistrojmë raportimet** që marrim dhe **veprimet e moderimit** që ndërmarrim (për shembull heqjen e një përmbajtjeje, pezullimin ose bllokimin e një profili), siç përshkruhet te Njoftimi i privatësisë. I përdorim këto të dhëna për të trajtuar raportimet, për të mbrojtur njerëzit dhe, kur duhet, si provë në raste abuzimi ose kundërshtimi.
+
+### 6.6 Fytyrat e turbulluara
+
+Nëse në foton që ngarkon shfaqen njerëz që nuk kanë dhënë pëlqim, një program automatik **ua turbullon fytyrat**, me buzë të zbutura, para se fotoja të publikohet. Kjo nuk është leje për të fotografuar këdo: pika 6.2 mbetet në fuqi dhe ti mbetesh përgjegjës për atë që ngarkon. Nëse programi nuk ia del, fotoja **nuk publikohet**: preferojmë të humbasim një foto sesa të publikojmë fytyrën e një të panjohuri. Nga paneli i administrimit zgjidhet nëse turbullohen fytyrat e të gjithëve apo vetëm ato të fëmijëve.
+
+---
+
+## 7. Vendndodhja
+
+Disa funksione (kërkimi “pranë meje”, krijimi i një POI-je aty ku ndodhesh, sugjerimet e vendeve afër) kërkojnë hyrje te **vendndodhja e pajisjes sate**.
+
+Vendndodhja përdoret vetëm me **pëlqimin tënd**, që e jep nga cilësimet e shfletuesit ose të pajisjes dhe që mund ta **tërheqësh në çdo kohë** nga po ato cilësime. Nëse e tërheq pëlqimin, disa funksione të bazuara në vendndodhje mund të mos punojnë. Hollësitë për përpunimin e vendndodhjes janë te Njoftimi i privatësisë.
+
+---
+
+## 8. Asistenti ILLI (inteligjenca artificiale)
+
+ILLI është një asistent që përdor modele **inteligjence artificiale** (të ofruara nga **OpenAI** dhe/ose **Anthropic**) për të krijuar sugjerime mbi vende dhe zona, dhe që merr informacione për vendet nga burime të jashtme si **Google Places** dhe **OpenStreetMap**. E njëjta gjë vlen për **kopilotin e administrimit** me inteligjencë artificiale, i rezervuar për funksionet e menaxhimit.
+
+Kur përdor ILLI, mbaj parasysh se:
+
+- përgjigjet **krijohen automatikisht** dhe mund të përmbajnë **pasaktësi, gabime ose informacione jo të përditësuara**;
+- informacionet për vendet vijnë nga baza të dhënash të të tretëve dhe mund të jenë **të vjetruara, të paplota ose të gabuara** (orare, adresa, madje edhe vetë ekzistenca e vendit);
+- sugjerimet e ILLI-t **nuk përbëjnë këshillë profesionale** (ligjore, mjekësore, financiare, sigurie apo tjetër) dhe nuk duhen përdorur si burim i vetëm për vendime të rëndësishme;
+- para se të shkosh në një vend ose të marrësh vendime udhëtimi, të ftojmë t’i **verifikosh** informacionet vetë.
+
+Për të dhënë përgjigjet, mesazhet që i dërgon ILLI-t ose kopilotit të administrimit (që mund të përmbajnë qytetin ose zonën tënde) u dërgohen ofruesve të tretë (**OpenAI** dhe/ose **Anthropic**), me serverë edhe jashtë Shqipërisë dhe Bashkimit Evropian, siç shpjegohet te Njoftimi i privatësisë. Të lutemi **mos vendos të dhëna të ndjeshme ose konfidenciale** në bisedat me asistentin. Duke përdorur ILLI, e pranon këtë mënyrë funksionimi.
+
+---
+
+## 9. Pronësia intelektuale dhe kodi me burim të hapur
+
+### 9.1 Marka dhe përmbajtja e Shërbimit
+
+Emri “POI•LOVE”, logoja, maskota ILLI•AI, grafika dhe elementet e tjera dalluese të Shërbimit i përkasin ofruesit dhe mbrohen nga rregullat për markat dhe të drejtën e autorit. Nuk mund t’i përdorësh pa autorizimin tonë me shkrim, përveç asaj që lejon licenca me burim të hapur për pjesët e kodit.
+
+### 9.2 Kodi me burim të hapur (licenca MIT)
+
+Kodi burimor i projektit POI•LOVE është lëshuar me **licencën MIT**. Kjo do të thotë se **kodi** mund të përdoret, kopjohet, ndryshohet dhe rishpërndahet sipas kushteve të licencës MIT që shoqëron depon e projektit.
+
+Licenca MIT zbatohet për **kodin**: **nuk** shtrihet te Përmbajtja e përdoruesve, te të dhënat e bashkësisë, te marka “POI•LOVE”, te logoja, te maskota dhe te elementet e tjera grafike e dalluese, që mbeten të mbrojtura sipas pikës 9.1.
+
+---
+
+## 10. Përdorimi i drejtë i Shërbimit
+
+Zotohesh të mos:
+
+- e përdorësh Shërbimin për qëllime të paligjshme ose në cenim të të drejtave të të tjerëve;
+- nxjerrësh masivisht të dhëna (scraping), të kopjosh ose të ripërdorësh bazën e të dhënave të bashkësisë përtej asaj që lejon ligji ose këto Kushte;
+- mbingarkosh, dëmtosh ose komprometosh funksionimin e Shërbimit apo të infrastrukturës së tij, dhe as të anashkalosh masat e sigurisë;
+- përdorësh robotë, skripte ose mjete të automatizuara për të krijuar llogari a përmbajtje të rreme, për të manipuluar pikët, “love”-t, ndjekjet ose mekanizmat e lojës;
+- imitosh persona të tjerë ose të mashtrosh përdoruesit e tjerë.
+
+### 10.1 Kalimi dhe pretendimi i një POI-je
+
+Shërbimi lejon kalimin e një POI-je me anë të një kodi të transferueshëm dhe, për disa nivele, lejon të kërkosh pronësinë e një vendi ekzistues. Ai që kalon ose pretendon një vend deklaron se ka të drejtë ta bëjë. Këto veprime regjistrojnë identitetin e atij që kalon dhe të atij që merr, si dhe mesazhet që shkruan, të cilat shqyrtohen nga administrimi, siç përshkruhet te Njoftimi i privatësisë. Ruajmë të drejtën të refuzojmë ose të anulojmë kalime e pretendime abuzive, në keqbesim ose që cenojnë të drejtat e të tretëve.
+
+---
+
+## 11. Abonimet me pagesë
+
+Disa funksione dhe përfitime të Shërbimit mund të ofrohen me **abonime me pagesë**, të organizuara në nivele (**Profesionist, Profesionist Plus, Mbështetës, Mecenat**, dhe profile të posaçme si **Influencer**). Duke iu bashkuar një niveli:
+
+- pranon **çmimin, kohëzgjatjen dhe kushtet e rinovimit** të treguara në çastin e aktivizimit;
+- na autorizon të përpunojmë të dhënat e nevojshme për të menaxhuar abonimin (niveli i zgjedhur, gjendja, datat e aktivizimit dhe të rinovimit), siç përshkruhet te Njoftimi i privatësisë;
+- merr dijeni se **të dhënat e pagesës** përpunohen nga ofruesi i pagesave që do të përdorim, sipas njoftimit të tij, dhe se ne nuk i ruajmë të dhënat e kartës sate.
+
+**Përfitimet** e lidhura me çdo nivel tregohen në aplikacion dhe mund të ndryshojnë me kohën: do të përpiqemi të mos ulim përfitime thelbësore tashmë aktive pa një njoftim të arsyeshëm paraprak. Të drejtat e heqjes dorë dhe të rimbursimit të parashikuara nga legjislacioni për mbrojtjen e konsumatorit mbeten të paprekura. Mund ta ndërpresësh abonimin sipas mënyrave të treguara në aplikacion ose duke shkruar te **it@altrostile.app**; përveçse kur ligji parashikon ndryshe, ndërprerja ka efekt në fund të periudhës tashmë të paguar.
+
+---
+
+## 11bis. Vendet zyrtare dhe burimet e tyre
+
+Disa vende në hartë mbajnë **shenjën Zyrtare**: nuk i ka krijuar një përdorues, i kemi ndërtuar ne duke nisur nga **të dhënat e hapura të OpenStreetMap**, me foto të marra nga **Wikimedia Commons** dhe tekste nga zërat e **Wikipedia-s** në të tri gjuhët.
+
+Për çdo foto janë shkruar **autori dhe licenca**, dhe asnjë foto pa licencë nuk hyn në hartë. Tekstet e Wikipedia-s përdoren sipas licencës **CC BY-SA 4.0**, e treguar në skedën e vendit bashkë me adresën e zërit.
+
+Nëse je autor i një fotoje ose i një teksti dhe mendon se atribuimi është i gabuar ose mungon, na shkruaj te **it@altrostile.app**: e korrigjojmë ose e heqim.
+
+---
+
+## 12. Shërbimet dhe lidhjet e të tretëve
+
+Shërbimi bashkëpunon me ofrues dhe burime të treta (ndër to Supabase, OpenAI, Anthropic, Google, OpenStreetMap) dhe mund të përmbajë lidhje drejt faqeve të jashtme. Nuk i kontrollojmë këto shërbime dhe nuk jemi përgjegjës për përmbajtjen, disponueshmërinë apo kushtet e njoftimet e tyre. Përdorimi i shërbimeve të treta i nënshtrohet kushteve të ofruesve përkatës.
+
+---
+
+## 13. Kufizimi i përgjegjësisë
+
+Shërbimi ofrohet “**ashtu siç është**” dhe “**sipas disponueshmërisë**”, pa garanci të asnjë lloji, të shprehura a të nënkuptuara, për vazhdimësinë, mungesën e gabimeve, saktësinë e të dhënave për vendet ose përshtatshmërinë për një qëllim të caktuar.
+
+Brenda kufijve më të gjerë të lejuar nga ligji i zbatueshëm:
+
+- **nuk jemi përgjegjës** për Përmbajtjen e publikuar nga të tjerët, as për saktësinë e informacioneve për vendet të dhëna nga burime të treta ose nga ILLI;
+- **nuk jemi përgjegjës** për dëme të tërthorta, rastësore ose pasojore që rrjedhin nga përdorimi ose mospërdorimi i Shërbimit, përfshirë dëme të lidhura me vendime udhëtimi, lëvizje drejt vendeve ose takime me përdorues të tjerë;
+- ti merr përsipër përgjegjësinë e zgjedhjeve të tua kur shkon në një vend ose takohesh me anëtarë të tjerë të bashkësisë, duke treguar kujdesin e zakonshëm.
+
+Asgjë në këto Kushte nuk përjashton ose kufizon përgjegjësinë tonë atje ku ligji i zbatueshëm nuk e lejon (për shembull në rast dashjeje ose faji të rëndë, ose përgjegjësish që nuk përjashtohen ndaj konsumatorëve).
+
+Brenda kufijve të lejuar, **mjeti yt i vetëm** në rast pakënaqësie ndaj Shërbimit është **të ndalosh përdorimin e tij** dhe të mbyllësh llogarinë.
+
+---
+
+## 14. Pezullimi dhe mbyllja e llogarisë
+
+### 14.1 Mbyllja nga ana jote
+
+Mund të ndalosh përdorimin e Shërbimit dhe **të mbyllësh llogarinë** në çdo kohë nga cilësimet e aplikacionit ose duke shkruar te **it@altrostile.app**. Mbyllja sjell fshirjen e të dhënave sipas asaj që përshkruhet te Njoftimi i privatësisë dhe në respekt të të drejtave të tua ligjore (përfshirë të drejtën e fshirjes).
+
+### 14.2 Pezullimi ose mbyllja nga ana jonë
+
+Mund ta **pezullojmë ose ta mbyllim** llogarinë tënde, tërësisht ose pjesërisht, nëse:
+
+- shkel këto Kushte ose ligjin e zbatueshëm;
+- publikon përmbajtje të ndaluar ose që cenon të drejtat e të tretëve;
+- e përdor Shërbimin në mënyrë mashtruese, abuzive ose të tillë që dëmton përdoruesit e tjerë a infrastrukturën.
+
+Kur është arsyeshmërisht e mundur do të të njoftojmë paraprakisht dhe do të të japim mundësi ta ndreqësh; në raste të rënda ose urgjente mund të ndërhyjmë **pa njoftim**. Mbyllja nuk të heq të drejtat që legjislacioni për mbrojtjen e të dhënave të njeh mbi të dhënat e tua personale.
+
+---
+
+## 15. Ndryshimet e Kushteve
+
+Mund t’i ndryshojmë këto Kushte, për shembull për t’i përshtatur me funksione të reja ose me detyrime ligjore. Në rast ndryshimesh të rëndësishme do të të njoftojmë me mjete të përshtatshme (për shembull një njoftim në aplikacion ose me email) dhe do të përditësojmë datën e “Përditësimit të fundit” në krye të dokumentit.
+
+Duke vazhduar ta përdorësh Shërbimin pasi ndryshimet hyjnë në fuqi, i pranon Kushtet e përditësuara. Nëse nuk i pranon, mund ta mbyllësh llogarinë.
+
+---
+
+## 16. Ligji i zbatueshëm dhe gjykata kompetente
+
+Këto Kushte rregullohen nga **ligji i Republikës së Shqipërisë**, përfshirë **Ligjin nr. 124/2024 për mbrojtjen e të dhënave personale**. Për përdoruesit me banim në Bashkimin Evropian mbeten të paprekura të drejtat e panegociueshme të parashikuara nga **GDPR (Rregullorja BE 2016/679)** dhe nga normat urdhëruese të vendit të banimit.
+
+Për çdo mosmarrëveshje lidhur me Shërbimin është kompetente **gjykata e Tiranës (Shqipëri)**, përveç gjykatës së panegociueshme të parashikuar nga ligji për mbrojtjen e konsumatorit, kur zbatohet.
+
+Çështjet lidhur me përpunimin e të dhënave të tua personale rregullohen nga Njoftimi i privatësisë. Ke gjithmonë të drejtë të paraqitësh **ankesë te Autoriteti shqiptar për mbrojtjen e të dhënave (Komisioneri / IDP, idp.al)** ose, nëse banon në BE, te autoriteti mbikëqyrës i vendit tënd.
+
+---
+
+## 17. Dispozita të ndryshme
+
+- **Pavlefshmëria e pjesshme**: nëse një klauzolë e këtyre Kushteve del e pavlefshme ose pa efekt, klauzolat e mbetura mbeten në fuqi.
+- **Tolerimi**: mosushtrimi i një të drejte nuk përbën heqje dorë prej saj.
+- **Marrëveshja e plotë**: këto Kushte dhe Njoftimi i privatësisë përbëjnë marrëveshjen e plotë mes teje dhe ofruesit lidhur me Shërbimin.
+- **Gjuhët**: Shërbimi ofrohet në italisht, shqip dhe anglisht. Në rast mospërputhjeje mes versioneve, mbizotëron versioni që do të tregojmë si zyrtar, në respekt të legjislacionit të zbatueshëm për mbrojtjen e konsumatorit.
+
+---
+
+## 18. Kontaktet
+
+Për pyetje mbi këto Kushte, raportime përmbajtjeje ose kërkesa lidhur me llogarinë tënde shkruaj te:
+
+- **Email**: it@altrostile.app
+- **Ofruesi**: Alessandro Castagna / 321.AL / EVOLAB
+
+Për kërkesat lidhur me të dhënat e tua personale (qasje, korrigjim, fshirje, kundërshtim, transferueshmëri, tërheqje e pëlqimit) shih Njoftimin e privatësisë në poilove.com/privacy.
+</script>
+<script type="text/plain" id="md-en"># POI•LOVE Terms of Use
+
+**Last updated: 21/08/2026**
+
+> We wrote these terms ourselves, they are not a bought template. They are in force exactly as you read them.
+
+Welcome to POI•LOVE. These Terms of Use (the "Terms") govern access to and use of the POI•LOVE web application, its website and all connected services (together, the "Service"). Please read them carefully: by using POI•LOVE you accept everything below in full.
+
+POI•LOVE processes personal data, including your location and the photos you upload. How that data is collected and used is described in the **Privacy Policy** at poilove.com/privacy, which forms an integral part of these Terms.
+
+---
+
+## 1. Acceptance of the Terms
+
+By creating an account, signing in or using the Service in any way, you declare that you have read, understood and accepted these Terms and the Privacy Policy.
+
+If you do not accept even one part of the Terms, you may not use the Service.
+
+If you use POI•LOVE on behalf of an organisation, you declare that you have the authority to bind it to these Terms.
+
+---
+
+## 2. Who we are (Service provider)
+
+The Service is provided by:
+
+- **Alessandro Castagna**, trading as **321.AL / EVOLAB**
+- Contact: **it@altrostile.app**
+
+In these Terms, "we", "us" and "our" refer to the provider named above.
+
+---
+
+## 3. What the Service does
+
+POI•LOVE is a **community map of beloved places**. The Service lets you, among other things:
+
+- **discover and create POIs** (points of interest): places on the map with a name, description, category and photos;
+- express appreciation for places ("**love**") and follow other people;
+- create and share **lists** and **itineraries** of places;
+- find **travel companions** and connect with other members of the community;
+- use **ILLI**, an assistant based on artificial intelligence, for suggestions about places and areas;
+- search for places "**near me**" using your device's location;
+- collect **points** and take part in gamification and referral mechanics;
+- if you want, take out a **paid subscription** for additional benefits (see section 11);
+- write **reviews** of places belonging to people you are connected with: they pass through automatic moderation before appearing (see section 6);
+- if you run a business, publish your venue's **opening hours, menu, telephone and payment methods**, and get a **QR code** to print;
+- record your **voice** on a place, and listen to the **audio guides** of official places;
+- leave **voice messages** on a travel companion group's board, which are also transcribed into text;
+- **report** content that is wrong: a report is looked at within twenty-four hours.
+
+The Service keeps evolving: we may add, change or remove features at any time, trying to limit the impact on your experience.
+
+---
+
+## 4. Who can sign up (minimum age)
+
+To use POI•LOVE you must be **at least 16 years old**.
+
+This limit reflects Albanian personal data protection law (Law no. 124/2024) and the EU GDPR, under which processing a minor's data for consent-based online services is lawful only from the age of 16. If you are under 16 you may not create an account or use the Service.
+
+If you are a parent or guardian and believe a child under 16 has created an account, contact us at **it@altrostile.app** and we will close the account and delete the related data.
+
+To use the Service you must also give truthful information when registering and keep your account credentials confidential. You are responsible for every activity carried out through your account.
+
+---
+
+## 5. Account and sign-in
+
+You can register by email or through external providers (Google, Facebook, Apple, X, LinkedIn). Since 18 August 2026 sign-in is handled by a program of **ours**, on a machine of ours in Germany: your email address and your encrypted password no longer sit with an external supplier. When you sign in with an external provider you authorise POI•LOVE to receive from that service the basic data of your profile (for example email, username and picture), as described in the Privacy Policy.
+
+You are responsible for the security of your credentials. Tell us immediately at **it@altrostile.app** if you suspect unauthorised access to your account.
+
+---
+
+## 6. Content uploaded by users
+
+The Service lets you upload and publish content: photos, texts, descriptions of places, lists, itineraries, comments and other material ("**User Content**"). You remain the owner of your User Content, but you are fully responsible for what you publish.
+
+### 6.1 What you guarantee about your content
+
+By uploading User Content you declare and guarantee that:
+
+- you hold the necessary **rights** or have obtained every authorisation required to publish it and to grant us the licence described in 6.4;
+- the content **does not infringe** third-party rights, including copyright, trademarks, image rights, privacy and personal data protection;
+- the information you give about places is, as far as you know, accurate and given in good faith.
+
+The **tags** and other free text you add to public POIs are visible to the community and may be suggested to other people: do not put personal data, yours or anyone else's, in them.
+
+### 6.2 Photos of identifiable people
+
+Photos can portray people, and an identifiable face is personal data (in some cases a special category of data, "sensitive"). Therefore:
+
+- **you must not upload photos portraying identifiable people without their consent**;
+- if the photo portrays a minor, you need the consent of whoever holds parental responsibility;
+- you must not upload images that could be used to uniquely identify a person (for example for facial recognition) without that person's explicit and specific consent;
+- where possible, prefer photos of the place that do **not** contain recognisable people.
+
+You are responsible for having obtained those consents. If a person portrayed asks us to remove a photo, we may remove it without notice.
+
+### 6.3 Forbidden content
+
+You may not upload, publish or transmit content that:
+
+- is unlawful, defamatory, offensive, obscene, discriminatory, violent or incites hatred;
+- harasses, threatens or harms the dignity or privacy of other people;
+- infringes third-party intellectual or industrial property rights;
+- contains other people's personal data disclosed without a legal basis;
+- contains malware, spam, unauthorised advertising or deceptive links;
+- marks as "beloved places" positions that put people's safety or privacy at risk (for example other people's private homes indicated without consent);
+- is in any case contrary to these Terms, to applicable law or to public decency.
+
+### 6.4 The licence you grant us
+
+So that we can show your public content inside the Service, you grant POI•LOVE a **non-exclusive, free, worldwide licence, transferable and sub-licensable to our technical suppliers** (for example for hosting), limited to the purposes of **running, showing, promoting and improving the Service**.
+
+This licence covers the content you choose to make **public** (for example a public POI with its photo, a shared list or itinerary) and lasts as long as that content stays on the Service. When you delete content or your account, the licence ends for the removed content, save for the technical time it takes for deletion to propagate, any content other people may have copied or saved in the meantime, and backup copies that are overwritten on their normal cycle.
+
+The licence exists solely to run the Service: we do not claim ownership of your User Content and we will not sell it to third parties.
+
+### 6.5 Moderation and removal
+
+We are not obliged to check User Content in advance, but we may **remove or hide** any content that, in our reasonable judgement, breaches these Terms or the law, even without notice. You can **report** inappropriate content or profiles through the reporting tools in the Service, or by writing to **it@altrostile.app**.
+
+For security reasons and to comply with legal obligations, we **record the reports** we receive and the **moderation actions** we take (for example removing content, suspending or blocking a profile), as described in the Privacy Policy. We use this data to handle reports, protect people and, where necessary, as evidence in cases of abuse or dispute.
+
+### 6.6 Blurred faces
+
+If people who have not consented appear in the photo you upload, an automatic program **blurs their faces**, with feathered edges, before the photo is published. This is not permission to photograph anyone: point 6.2 still stands and you remain responsible for what you upload. If the program cannot do its job, the photo **is not published**: we would rather lose a photo than publish a stranger's face. From the administration panel we choose whether to blur everyone's faces or only children's.
+
+---
+
+## 7. Location
+
+Some features (searching "near me", creating a POI at your position, suggestions of nearby places) need access to your **device's location**.
+
+Location is used only with your **consent**, which you give through your browser or device settings and which you can **withdraw at any time** in those same settings. If you withdraw consent, some location-based features may stop working. Details on how location is processed are in the Privacy Policy.
+
+---
+
+## 8. The ILLI assistant (artificial intelligence)
+
+ILLI is an assistant that uses **artificial intelligence** models (supplied by **OpenAI** and/or **Anthropic**) to generate suggestions about places and areas, and that draws information about places from external sources such as **Google Places** and **OpenStreetMap**. The same applies to the AI-based **administrative copilot**, reserved for management functions.
+
+When you use ILLI, bear in mind that:
+
+- answers are **generated automatically** and may contain **inaccuracies, errors or out-of-date information**;
+- information about places comes from third-party databases and may be **dated, incomplete or wrong** (opening hours, addresses, even whether the place still exists);
+- ILLI's suggestions **are not professional advice** (legal, medical, financial, safety or otherwise) and must not be used as the only source for important decisions;
+- before going to a place or making travel decisions, please **check** the information independently.
+
+To produce answers, the messages you send to ILLI or to the administrative copilot (which may include your city or area) are sent to third-party suppliers (**OpenAI** and/or **Anthropic**), with servers also outside Albania and the European Union, as explained in the Privacy Policy. Please **do not put sensitive or confidential data** in chats with the assistant. By using ILLI you accept how it works.
+
+---
+
+## 9. Intellectual property and open source code
+
+### 9.1 Trademark and Service content
+
+The name "POI•LOVE", the logo, the ILLI•AI mascot, the graphics and the other distinctive elements of the Service belong to the provider and are protected by trademark and copyright law. You may not use them without our written authorisation, except as allowed by the open source licence for the code.
+
+### 9.2 Open source code (MIT licence)
+
+The source code of the POI•LOVE project is released under the **MIT licence**. This means the **code** may be used, copied, modified and redistributed under the terms of the MIT licence that accompanies the project repository.
+
+The MIT licence applies to the **code**: it does **not** extend to User Content, community data, the "POI•LOVE" trademark, the logo, the mascot and the other graphic and distinctive elements, which remain protected as stated in 9.1.
+
+---
+
+## 10. Fair use of the Service
+
+You undertake not to:
+
+- use the Service for unlawful purposes or in breach of other people's rights;
+- mass-extract data (scraping), copy or reuse the community database beyond what the law or these Terms allow;
+- overload, damage or compromise the working of the Service or its infrastructure, or circumvent its security measures;
+- use bots, scripts or automated means to create fake accounts or content, or to manipulate points, "loves", follows or the gamification mechanics;
+- impersonate other people or mislead other users.
+
+### 10.1 Transferring and claiming a POI
+
+The Service allows a POI to be transferred through a transferable code and, for some tiers, allows the ownership of an existing place to be claimed. Whoever transfers or claims a place declares that they are entitled to do so. These operations record the identity of the person transferring and of the person receiving, and any messages you write, which are examined by the administration, as described in the Privacy Policy. We reserve the right to refuse or cancel transfers and claims that are abusive, in bad faith, or harmful to third-party rights.
+
+---
+
+## 11. Paid subscriptions
+
+Some features and benefits of the Service may be offered through **paid subscriptions**, organised in tiers (**Professional, Professional Plus, Supporter, Patron**, and dedicated profiles such as **Influencer**). By joining a tier:
+
+- you accept the **price, duration and renewal conditions** shown when you activate it;
+- you authorise us to process the data needed to manage the subscription (chosen tier, status, activation and renewal dates), as described in the Privacy Policy;
+- you acknowledge that **payment data** is processed by the payment provider we use, under its own policy, and that we do not keep your card details.
+
+The **benefits** attached to each tier are shown in the app and may change over time: we will try not to reduce essential benefits already active without reasonable notice. Any rights of withdrawal and refund provided by consumer protection law remain unaffected. You can cancel the subscription as indicated in the app or by writing to **it@altrostile.app**; unless the law provides otherwise, cancellation takes effect at the end of the period already paid for.
+
+---
+
+## 11bis. Official places and their sources
+
+Some places on the map carry the **Official badge**: they were not created by a user, we built them from the **open data of OpenStreetMap**, with photos taken from **Wikimedia Commons** and texts from **Wikipedia** entries in the three languages.
+
+Every photo carries its **author and licence**, and no photo without a licence enters the map. Wikipedia texts are used under the **CC BY-SA 4.0** licence, shown on the place's card together with the address of the entry.
+
+If you are the author of a photo or a text and believe the attribution is wrong or missing, write to us at **it@altrostile.app**: we correct it or take it down.
+
+---
+
+## 12. Third-party services and links
+
+The Service integrates with third-party suppliers and sources (among them Supabase, OpenAI, Anthropic, Google, OpenStreetMap) and may contain links to external sites. We do not control those services and we are not responsible for their content, their availability or their terms and policies. Use of third-party services is subject to the terms of the respective suppliers.
+
+---
+
+## 13. Limitation of liability
+
+The Service is provided "**as is**" and "**as available**", without warranties of any kind, express or implied, as to continuity, absence of errors, accuracy of the data about places, or fitness for a particular purpose.
+
+To the fullest extent permitted by applicable law:
+
+- **we are not responsible** for User Content published by others, nor for the accuracy of information about places supplied by third-party sources or by ILLI;
+- **we are not responsible** for indirect, incidental or consequential damage arising from use or non-use of the Service, including damage connected with travel decisions, journeys to places, or meetings with other users;
+- you take responsibility for your own choices when you go to a place or meet other members of the community, using ordinary care.
+
+Nothing in these Terms excludes or limits our liability where applicable law does not allow it (for example in cases of wilful misconduct or gross negligence, or liabilities towards consumers that cannot be excluded).
+
+Within the limits allowed, your **sole remedy** if you are unhappy with the Service is to **stop using it** and close your account.
+
+---
+
+## 14. Suspension and closure of the account
+
+### 14.1 Closure by you
+
+You can stop using the Service and **close your account** at any time from the app settings or by writing to **it@altrostile.app**. Closure entails the deletion of data as described in the Privacy Policy and in accordance with your rights under the law (including the right to erasure).
+
+### 14.2 Suspension or closure by us
+
+We may **suspend or close** your account, in whole or in part, if:
+
+- you breach these Terms or applicable law;
+- you publish forbidden content or content harmful to third-party rights;
+- you use the Service fraudulently, abusively, or in a way that damages other users or the infrastructure.
+
+Where reasonably possible we will give you notice and a chance to put things right; in serious or urgent cases we may act **without notice**. Closure does not deprive you of the rights that data protection law gives you over your personal data.
+
+---
+
+## 15. Changes to the Terms
+
+We may change these Terms, for example to align them with new features or legal obligations. In case of significant changes we will notify you by suitable means (for example a notice in the app or by email) and we will update the "Last updated" date at the top of the document.
+
+By continuing to use the Service after the changes take effect, you accept the updated Terms. If you do not accept them, you can close your account.
+
+---
+
+## 16. Governing law and jurisdiction
+
+These Terms are governed by the **law of the Republic of Albania**, including **Law no. 124/2024 on the protection of personal data**. For users resident in the European Union, the non-derogable rights under the **GDPR (EU Regulation 2016/679)** and the mandatory rules of the country of residence remain unaffected.
+
+For any dispute concerning the Service the **court of Tirana (Albania)** has jurisdiction, save for the non-derogable forum provided by consumer protection law, where applicable.
+
+Matters concerning the processing of your personal data are governed by the Privacy Policy. You always have the right to lodge a **complaint with the Albanian data protection authority (Komisioneri / IDP, idp.al)** or, if you live in the EU, with the supervisory authority of your country.
+
+---
+
+## 17. Miscellaneous
+
+- **Partial invalidity**: if a clause of these Terms is invalid or ineffective, the remaining clauses stay valid.
+- **Forbearance**: failure to exercise a right does not amount to a waiver of it.
+- **Entire agreement**: these Terms and the Privacy Policy constitute the entire agreement between you and the provider regarding the Service.
+- **Languages**: the Service is offered in Italian, Albanian and English. In case of divergence between the versions, the version we indicate as official prevails, in compliance with applicable consumer protection law.
+
+---
+
+## 18. Contacts
+
+For questions about these Terms, reports of content, or requests concerning your account write to:
+
+- **Email**: it@altrostile.app
+- **Provider**: Alessandro Castagna / 321.AL / EVOLAB
+
+For requests concerning your personal data (access, rectification, erasure, objection, portability, withdrawal of consent) see the Privacy Policy at poilove.com/privacy.
+</script>
 <script src="https://cdn.jsdelivr.net/npm/marked@12/marked.min.js"></script>
 <script>
-try{ marked.setOptions({gfm:true,breaks:false}); document.getElementById('content').innerHTML=marked.parse(document.getElementById('md').textContent); }
-catch(e){ document.getElementById('content').innerHTML='<pre style="white-space:pre-wrap">'+document.getElementById('md').textContent+'</pre>'; }
+/* Tre lingue: si parte da quella del dispositivo, la scelta resta. */
+var TITOLI = {"it": "Condizioni d"uso", "sq": "Kushtet e përdorimit", "en": "Terms of Use"};
+var TORNA  = {"it": "Torna all"app", "sq": "Kthehu te aplikacioni", "en": "Back to the app"};
+function setLingua(lg){
+  if(['it','sq','en'].indexOf(lg) < 0) lg = 'en';
+  try{ localStorage.setItem('poilove_legale_lang', lg); }catch(e){}
+  var testo = (document.getElementById('md-' + lg) || document.getElementById('md-it')).textContent;
+  var dove  = document.getElementById('content');
+  try{ marked.setOptions({gfm:true, breaks:false}); dove.innerHTML = marked.parse(testo); }
+  catch(e){ dove.innerHTML = '<pre style="white-space:pre-wrap"></pre>'; dove.firstChild.textContent = testo; }
+  document.documentElement.lang = lg;
+  document.title = TITOLI[lg] + ' · POI•LOVE';
+  var back = document.querySelector('.topbar .back'); if(back) back.textContent = TORNA[lg];
+  var bb = document.querySelectorAll('#lingue button');
+  for(var i=0;i<bb.length;i++){ bb[i].className = (bb[i].getAttribute('data-lg')===lg) ? 'on' : ''; }
+}
+(function(){
+  var salvata = null;
+  try{ salvata = localStorage.getItem('poilove_legale_lang'); }catch(e){}
+  var nav = (navigator.language || 'en').slice(0,2).toLowerCase();
+  setLingua(salvata || (nav==='it' ? 'it' : nav==='sq' ? 'sq' : 'en'));
+})();
 </script>
 </body>
 </html>

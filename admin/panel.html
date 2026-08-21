@@ -569,11 +569,12 @@ html[data-theme="light"] .chip.green{color:#236b39}
 <script src="js/image-editor.js?v=326"></script>
 <script src="js/poi-frontend.js?v=327"></script>
 <script src="js/badge-admin.js?v=326"></script>
-<script src="js/qr-editor.js?v=346"></script>
-<script src="js/volti-admin.js?v=346"></script>
-<script src="js/direttive-admin.js?v=346"></script>
+<script src="js/qr-editor.js?v=348"></script>
+<script src="js/volti-admin.js?v=348"></script>
+<script src="js/direttive-admin.js?v=348"></script>
 <script src="js/livelli-admin.js?v=346"></script>
 <script src="js/catena-admin.js?v=347"></script>
+<script src="js/itinerari-admin.js?v=348"></script>
 </head>
 <body>
 <div class="grain"></div>
@@ -893,15 +894,7 @@ html[data-theme="light"] .chip.green{color:#236b39}
 
     <!-- 8b-bis) ITINERARI (viaggi degli utenti, is_historic=false) -->
     <section class="section" id="sec-itineraries">
-      <div class="panel">
-        <div class="card-h"><span class="ic"><i class="ph-duotone ph-navigation-arrow"></i></span><span data-t="nav_itineraries">Itinerari</span></div>
-        <div class="sm" style="margin-bottom:10px" data-t="sub_itineraries">Gli itinerari di viaggio creati dagli utenti (diversi dalle rotte storiche). Puoi vederli, metterli in evidenza o rimuoverli.</div>
-        <div class="btn-row" style="margin-bottom:12px">
-          <button class="btn sm gold" id="itinTabActive" onclick="_setItinView(false)"><i class="ph-duotone ph-list-checks"></i> <span data-t="itin_view_active">Attivi</span></button>
-          <button class="btn sm" id="itinTabArchived" onclick="_setItinView(true)"><i class="ph-duotone ph-archive-box"></i> <span data-t="itin_view_archived">Archiviati</span></button>
-        </div>
-        <div id="itinTable"></div>
-      </div>
+      <div id="itinerariBox"></div>
     </section>
 
     <!-- 8c) CATEGORIE (tassonomia data-driven) -->
@@ -1097,6 +1090,20 @@ let aiBusy = false;       // richiesta al copilota in volo: blocca invii concorr
 /* ─────────────────────────── i18n (pattern T del login) ─────────────────────────── */
 const T = {
   it:{
+    nav_livelli:"Livelli",
+    sub_livelli:"I livelli, i vantaggi di ognuno e gli abbonamenti: chi ce l'ha, fino a quando, e la registrazione di un pagamento.",
+    nav_catena:"Catena contenuti",
+    sub_catena:"I luoghi proposti dai dati aperti: la macchina propone, tu decidi. Approvare crea il luogo Ufficiale con la sua foto e la sua licenza.",
+    nav_direttive:"Direttive moderazione",
+    sub_direttive:"Le regole con cui l'AI legge le recensioni. Le scrivi qui, e le puoi provare senza pubblicare niente.",
+    nav_qr:"Codici QR",
+    sub_qr:"Lo stile dei nostri QR: logo al centro, forma dei punti, angoli, colori. E quante volte vengono inquadrati.",
+    nav_volti:"Volti nelle foto",
+    sub_volti:"La sfocatura automatica dei volti: quanto sfoca, quanto sfuma, e se coprire tutti o solo i bambini.",
+    sub_itineraries:"Gli itinerari: quelli Ufficiali che facciamo noi (Rotte Storiche e Itinerari Culturali) e quelli personali delle persone.",
+    sub_punti:"I punti: quanto vale ogni azione e le soglie dei livelli.",
+    sub_landing:"Le pagine di comunicazione e le email.",
+    sub_messages:"I messaggi diretti fra il team e le persone.",
     nav_dashboard:'Dashboard', nav_moderation:'Moderazione', nav_users:'Utenti', nav_ailimits:'Limiti AI',
     nav_copilot:'Copilota AI', nav_create:'Crea', nav_audit:'Audit log', nav_media:'Media', sub_media:'Email, OpenGraph, deep link dhe pixel social', nav_landing:'Landing dhe Mail', lm_tab_landing:'Landing', lm_tab_mail:'Mail', sub_landing:'Mjete komunikimi te lidhura me veprimet.', landing_new:'Landing e re', nav_punti:'Pike', sub_punti:'Pike per veprim dhe pragjet e niveleve.', media_tab_images:'Immagini', media_tab_email:'Email', media_tab_og:'OpenGraph', media_tab_deeplink:'Deep link', media_tab_pixel:'Pixel social', nav_media:'Media', sub_media:'Immagini degli utenti, email, OpenGraph, deep link e pixel social', nav_landing:'Landing e Mail', lm_tab_landing:'Landing', lm_tab_mail:'Mail', sub_landing:'Strumenti di comunicazione legati alle azioni: POI, itinerari, rotte, eventi.', landing_new:'Nuova landing', nav_punti:'Punti', sub_punti:'Punti per azione e soglie dei livelli: regolali da qui, l\'app li usa subito.', media_tab_images:'Immagini', media_tab_email:'Email', media_tab_og:'OpenGraph', media_tab_deeplink:'Deep link', media_tab_pixel:'Pixel social',
     sub_dashboard:'Panoramica della piattaforma in tempo reale.',
@@ -1198,6 +1205,20 @@ const T = {
     f_coords:'Coordinate', f_address:'Indirizzo', f_city:'Città'
   },
   sq:{
+    nav_livelli:"Nivelet",
+    sub_livelli:"Nivelet, perfitimet e secilit dhe abonimet: kush e ka, deri kur, dhe regjistrimi i nje pagese.",
+    nav_catena:"Zinxhiri i permbajtjes",
+    sub_catena:"Vendet e propozuara nga te dhenat e hapura: makina propozon, ti vendos.",
+    nav_direttive:"Direktivat e moderimit",
+    sub_direttive:"Rregullat me te cilat AI lexon vleresimet. I shkruan ketu dhe mund t'i provosh pa publikuar asgje.",
+    nav_qr:"Kodet QR",
+    sub_qr:"Stili i QR-ve tona: logoja ne mes, forma e pikave, qoshet, ngjyrat. Dhe sa here skanohen.",
+    nav_volti:"Fytyrat ne foto",
+    sub_volti:"Turbullimi automatik i fytyrave: sa turbullon, sa zbut, dhe nese mbulon te gjithe apo vetem femijet.",
+    sub_itineraries:"Itineraret: ato Zyrtare qe i bejme ne (Rrugetime Historike dhe Itinerare Kulturore) dhe ato personale te njerezve.",
+    sub_punti:"Piket: sa vlen cdo veprim dhe pragjet e niveleve.",
+    sub_landing:"Faqet e komunikimit dhe email-et.",
+    sub_messages:"Mesazhet e drejtperdrejta mes ekipit dhe njerezve.",
     nav_dashboard:'Paneli', nav_moderation:'Moderimi', nav_users:'Përdoruesit', nav_ailimits:'Limitet AI',
     nav_copilot:'Kopiloti AI', nav_create:'Krijo', nav_audit:'Regjistri',
     sub_dashboard:'Pamje e platformës në kohë reale.',
@@ -1295,6 +1316,20 @@ const T = {
     f_coords:'Koordinatat', f_address:'Adresa', f_city:'Qyteti'
   },
   en:{
+    nav_livelli:"Levels",
+    sub_livelli:"Levels, the benefits of each and subscriptions: who has one, until when, and recording a payment.",
+    nav_catena:"Content chain",
+    sub_catena:"Places proposed from open data: the machine proposes, you decide.",
+    nav_direttive:"Moderation directives",
+    sub_direttive:"The rules the AI reads reviews with. You write them here and can try them without publishing anything.",
+    nav_qr:"QR codes",
+    sub_qr:"The style of our QR codes: centre logo, dot shape, corners, colours. And how often they are scanned.",
+    nav_volti:"Faces in photos",
+    sub_volti:"Automatic face blurring: how much it blurs, how soft the edge, and whether to cover everyone or only children.",
+    sub_itineraries:"Itineraries: the Official ones we build (Historic Routes and Cultural Routes) and people's personal ones.",
+    sub_punti:"Points: what each action is worth and the level thresholds.",
+    sub_landing:"Communication pages and emails.",
+    sub_messages:"Direct messages between the team and people.",
     nav_dashboard:'Dashboard', nav_moderation:'Moderation', nav_users:'Users', nav_ailimits:'AI limits',
     nav_copilot:'AI copilot', nav_create:'Create', nav_audit:'Audit log', nav_media:'Media', sub_media:'Email, OpenGraph, deep links and social pixels', nav_landing:'Landing & Mail', lm_tab_landing:'Landing', lm_tab_mail:'Mail', sub_landing:'Communication tools tied to actions: POIs, itineraries, routes, events.', landing_new:'New landing', nav_punti:'Points', sub_punti:'Points per action and level thresholds.', media_tab_images:'Immagini', media_tab_email:'Email', media_tab_og:'OpenGraph', media_tab_deeplink:'Deep links', media_tab_pixel:'Social pixels',
     sub_dashboard:'Real-time overview of the platform.',
@@ -1574,9 +1609,11 @@ async function doLogout(){
 
 /* ─────────────────────────── Navigazione sezioni (lazy) ─────────────────────────── */
 const SUBKEY = { dashboard:'sub_dashboard', moderation:'sub_moderation', users:'sub_users',
-  ailimits:'sub_ailimits', copilot:'sub_copilot', create:'sub_create', pois:'sub_pois', routes:'sub_routes', audit:'sub_audit', categories:'sub_categories' , tags:'sub_tags', badges:'sub_badges', knowledge:'sub_knowledge', media:'sub_media' };
+  ailimits:'sub_ailimits', copilot:'sub_copilot', create:'sub_create', pois:'sub_pois', routes:'sub_routes', audit:'sub_audit', categories:'sub_categories' , tags:'sub_tags', badges:'sub_badges', knowledge:'sub_knowledge', media:'sub_media', itineraries:'sub_itineraries', punti:'sub_punti', landing:'sub_landing',
+  livelli:'sub_livelli', catena:'sub_catena', direttive:'sub_direttive', qr:'sub_qr', volti:'sub_volti', messages:'sub_messages' };
 const TITLEKEY = { dashboard:'nav_dashboard', moderation:'nav_moderation', users:'nav_users',
-  ailimits:'nav_ailimits', copilot:'nav_copilot', create:'nav_create', pois:'nav_pois', routes:'nav_routes', itineraries:'nav_itineraries', categories:'nav_categories', tags:'nav_tags', badges:'nav_badges', knowledge:'nav_knowledge', audit:'nav_audit', media:'nav_media', landing:'nav_landing', punti:'nav_punti' };
+  ailimits:'nav_ailimits', copilot:'nav_copilot', create:'nav_create', pois:'nav_pois', routes:'nav_routes', itineraries:'nav_itineraries', categories:'nav_categories', tags:'nav_tags', badges:'nav_badges', knowledge:'nav_knowledge', audit:'nav_audit', media:'nav_media', landing:'nav_landing', punti:'nav_punti',
+  livelli:'nav_livelli', catena:'nav_catena', direttive:'nav_direttive', qr:'nav_qr', volti:'nav_volti', messages:'nav_messages' };
 
 function updateHeader(sec){
   document.getElementById('secTitle').textContent = t(TITLEKEY[sec]);
@@ -1610,7 +1647,7 @@ function runSection(sec){
     case 'create': initCreate(); break;
     case 'pois': loadPois(); break;
     case 'routes': loadRoutesAdmin(); break;
-    case 'itineraries': loadItinerariesAdmin(); break;
+    case 'itineraries': if(window.ItinerariAdmin) window.ItinerariAdmin.load(document.getElementById('itinerariBox')); break;
     case 'categories': loadCategoriesAdmin(); break;
     case 'tags': loadTagsAdmin(); break;
     case 'badges': if(window.BadgeAdmin) window.BadgeAdmin.load(document.getElementById('badgesBox')); break;
@@ -4305,7 +4342,9 @@ function _setItinView(arch){ _itinShowArchived=!!arch;
   if(a) a.className='btn sm'+(arch?'':' gold'); if(b) b.className='btn sm'+(arch?' gold':'');
   loadItinerariesAdmin();
 }
-async function loadItinerariesAdmin(){
+/* Sostituita dal modulo itinerari-admin.js il 21/08/2026: resta qui
+   finche non e certo che il modulo nuovo copra tutto. */
+async function loadItinerariesAdminVecchia(){
   const box=document.getElementById('itinTable'); loadingBox(box);
   try{
     const { data, error } = await sb.from('trips')

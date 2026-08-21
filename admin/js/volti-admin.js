@@ -81,10 +81,14 @@
     const b=document.getElementById('vfSalva'); if(b) b.disabled=true;
     e.textContent='Salvo…'; e.style.color='inherit';
     try{
-      const { error } = await sb.from('impostazioni_volti').update({
+      const { data: toccate, error } = await sb.from('impostazioni_volti').update({
         attiva:S.attiva, chi:S.chi, intensita:S.intensita, margine:S.margine, aggiornato:new Date().toISOString()
-      }).eq('id',1);
+      }).eq('id',1).select('id');
+      // Si chiede indietro la riga toccata: se una regola del database rifiuta,
+      // non arriva nessun errore ma non cambia niente. Senza questo controllo
+      // il pannello direbbe "salvato" a vuoto.
       if(error) throw error;
+      if(!toccate || !toccate.length) throw new Error('il database non ha accettato la modifica: se la sessione non ha il secondo fattore, esci e rientra col codice a sei cifre');
       e.textContent='Salvato: vale dalla prossima foto caricata.'; e.style.color='#5BBE7E';
     }catch(err){ e.textContent='Non sono riuscito a salvare: '+(err.message||''); e.style.color='#E06A6A'; }
     finally{ if(b) b.disabled=false; }

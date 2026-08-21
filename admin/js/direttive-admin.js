@@ -89,8 +89,12 @@
     if(!dati.regola){ alert('La direttiva non puo restare vuota'); return; }
     const b=c.querySelector('[data-azione=salva]'); const prima=b.textContent; b.textContent='…';
     try{
-      const { error } = await sb.from('direttive_moderazione').update(dati).eq('id', Number(id));
+      const { data: toccate, error } = await sb.from('direttive_moderazione').update(dati).eq('id', Number(id)).select('id');
+      // Si chiede indietro la riga toccata: se una regola del database rifiuta,
+      // non arriva nessun errore ma non cambia niente. Senza questo controllo
+      // il pannello direbbe "salvato" a vuoto.
       if(error) throw error;
+      if(!toccate || !toccate.length) throw new Error('il database non ha accettato la modifica: se la sessione non ha il secondo fattore, esci e rientra col codice a sei cifre');
       b.textContent='Salvata'; setTimeout(()=>{ b.textContent=prima; },1400);
     }catch(e){ b.textContent=prima; alert('Non sono riuscito a salvare: '+(e.message||'')); }
   }
