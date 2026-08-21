@@ -1,47 +1,4 @@
-<!--
-  © Alessandro Castagna — 321.al / EVOLAB
-  Tutti i diritti riservati. Uso non autorizzato vietato.
-  info@321.al · https://321.al
--->
-<!DOCTYPE html>
-<html lang="it">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Condizioni d'uso · POI•LOVE</title>
-<meta name="robots" content="index,follow">
-<style>
-:root{--red:#D42B2B;--ink:#1b1b1b;--muted:#6b6b6b;--bg:#fff;--soft:#FBF7EF;--border:#ECE3D4}
-*{box-sizing:border-box}
-body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.65;-webkit-text-size-adjust:100%}
-.topbar{background:#0d0d0d;color:#fff;padding:13px 20px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:10}
-.topbar a.brand{color:#fff;text-decoration:none;font-weight:900;letter-spacing:.5px;font-size:16px}
-.topbar a.brand .h{color:var(--red)}
-.topbar .back{margin-left:auto;color:#cdbfae;text-decoration:none;font-size:13px;font-weight:600}
-.wrap{max-width:780px;margin:0 auto;padding:34px 22px 70px}
-.wrap h1{font-size:30px;line-height:1.18;margin:0 0 4px;letter-spacing:-.3px}
-.wrap h2{font-size:20px;margin:34px 0 10px;padding-top:14px;border-top:1px solid var(--border)}
-.wrap h3{font-size:15.5px;margin:20px 0 4px}
-.wrap p,.wrap li{font-size:15px;color:#2c2c2c}
-.wrap em{color:var(--muted);font-style:italic}
-.wrap a{color:var(--red)}
-.wrap ul{padding-left:20px}
-.wrap blockquote{background:#FFF6F6;border-left:4px solid var(--red);margin:16px 0;padding:11px 16px;border-radius:0 10px 10px 0;font-size:14px;color:#8a2f2f}
-.wrap blockquote p{margin:0;color:#8a2f2f}
-.wrap table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px;display:block;overflow-x:auto}
-.wrap th,.wrap td{border:1px solid var(--border);padding:9px 11px;text-align:left;vertical-align:top}
-.wrap th{background:var(--soft);font-weight:800;white-space:nowrap}
-.wrap hr{border:none;border-top:1px solid var(--border);margin:24px 0}
-.wrap code{background:var(--soft);padding:1px 6px;border-radius:5px;font-size:13px}
-.foot{max-width:780px;margin:0 auto;padding:22px;color:var(--muted);font-size:12px;border-top:1px solid var(--border);display:flex;gap:14px;flex-wrap:wrap}
-.foot a{color:var(--muted)}
-</style>
-</head>
-<body>
-<div class="topbar"><a class="brand" href="/">POI<span class="h">•</span>LOVE</a><a class="back" href="/">Torna all'app</a></div>
-<div class="wrap" id="content"></div>
-<div class="foot"><span>© POI•LOVE · 321.AL / EVOLAB</span><a href="/privacy">Privacy</a><a href="/terms">Condizioni</a><a href="/">App</a></div>
-<script type="text/plain" id="md">
+
 # Condizioni d'uso di POI•LOVE
 
 **Ultimo aggiornamento: 21/08/2026**
@@ -325,11 +282,4 @@ Per domande su queste Condizioni, segnalazioni di contenuti o richieste relative
 - **Email**: it@altrostile.app
 - **Titolare**: Alessandro Castagna / 321.AL / EVOLAB
 
-Per le richieste relative ai tuoi dati personali (accesso, rettifica, cancellazione, opposizione, portabilità, revoca del consenso) consulta l'Informativa sulla privacy su poilove.com/privacy.</script>
-<script src="https://cdn.jsdelivr.net/npm/marked@12/marked.min.js"></script>
-<script>
-try{ marked.setOptions({gfm:true,breaks:false}); document.getElementById('content').innerHTML=marked.parse(document.getElementById('md').textContent); }
-catch(e){ document.getElementById('content').innerHTML='<pre style="white-space:pre-wrap">'+document.getElementById('md').textContent+'</pre>'; }
-</script>
-</body>
-</html>
+Per le richieste relative ai tuoi dati personali (accesso, rettifica, cancellazione, opposizione, portabilità, revoca del consenso) consulta l'Informativa sulla privacy su poilove.com/privacy.

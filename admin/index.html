@@ -48,7 +48,9 @@ body{
   animation:rise .7s cubic-bezier(.2,.8,.2,1) .25s both;
 }
 @keyframes rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
-.brand{display:flex;align-items:center;justify-content:center;gap:9px;font-weight:900;letter-spacing:.5px;font-size:20px}
+.brand{display:flex;align-items:center;justify-content:center;gap:11px;font-weight:900;letter-spacing:.5px;font-size:20px}
+.brand .logo{height:24px;width:auto;display:block;opacity:.95}
+@media(max-width:420px){.brand .logo{height:22px}}
 .brand .h{color:var(--red)}
 .brand .tag{font-size:9px;font-weight:800;letter-spacing:2px;color:var(--gold);border:1px solid var(--gold);
   border-radius:20px;padding:3px 9px;margin-left:4px;text-transform:uppercase}
@@ -143,7 +145,7 @@ body{
 
 <div class="wrap">
   <div class="card">
-    <div class="brand">POI<span class="h">•</span>LOVE<span class="tag">Admin</span></div>
+    <div class="brand"><img src="/img/logo-bianco.png" alt="POI•LOVE" class="logo"><span class="tag">Admin</span></div>
 
    <!-- ── Vista login (Google / biometria / email) ── -->
    <div id="loginView">
@@ -215,7 +217,9 @@ body{
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const SUPABASE_URL='https://ptppxwlafswfhbueakjt.supabase.co';
+// Dal 18/08/2026 accessi e dati stanno sulla nostra macchina: il pannello
+// parlava ancora con Supabase e non faceva entrare nessuno.
+const SUPABASE_URL='https://poilove.com/db';
 const SUPABASE_ANON='sb_publishable_PC1xQ8XiQK9jpzwsAlFLxw_E-PKN40V';
 const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON) : null;
 

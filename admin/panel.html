@@ -1076,9 +1076,10 @@ html[data-theme="light"] .chip.green{color:#236b39}
    Un solo createClient. Solo anon key. Niente service_role qui.
    ═══════════════════════════════════════════════════════════════ */
 
-const SUPABASE_URL  = 'https://ptppxwlafswfhbueakjt.supabase.co';
+// Dal 18/08/2026 accessi e dati stanno sulla nostra macchina.
+const SUPABASE_URL  = 'https://poilove.com/db';
 const SUPABASE_ANON = 'sb_publishable_PC1xQ8XiQK9jpzwsAlFLxw_E-PKN40V';
-const ADMIN_AI_URL  = SUPABASE_URL + '/functions/v1/admin-ai';
+const ADMIN_AI_URL  = SUPABASE_URL + '/functions/v1/admin-ai';   // il ponte nginx porta a Supabase
 const MEDIA_SERVER_URL = 'https://media.poilove.com';   // upload foto tappe (JWT admin)
 
 // Un solo client per tutta la pagina
