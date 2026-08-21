@@ -520,6 +520,9 @@ html[data-theme="light"] .chip.green{color:#236b39}
 .poied-full .row2{grid-template-columns:260px 1fr;align-items:start}
 .btn.recording{background:var(--red,#D42B2B)!important;color:#fff!important;border-color:var(--red,#D42B2B)!important;animation:admPulse 1s ease-in-out infinite}
 @keyframes admPulse{0%,100%{box-shadow:0 0 0 0 rgba(212,43,43,.5)}50%{box-shadow:0 0 0 6px rgba(212,43,43,0)}}
+.poied-cats{max-height:132px;overflow-y:auto;align-content:flex-start;padding:2px}
+.poied-cats::-webkit-scrollbar{width:7px}
+.poied-cats::-webkit-scrollbar-thumb{background:var(--line);border-radius:9px}
 .poied-slots{display:flex;gap:10px}
 .poied-slot{flex:1;aspect-ratio:1;max-width:150px;border-radius:14px;border:1.5px dashed var(--line);background:#00000022 center/cover no-repeat;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;overflow:hidden;transition:border-color .15s,transform .1s}
 .poied-slot:hover{border-color:var(--gold)}.poied-slot:active{transform:scale(.97)}
@@ -556,29 +559,30 @@ html[data-theme="light"] .chip.green{color:#236b39}
 <!-- A6 — palette (dopo lo <style> inline così i suoi override vincono) + controller tema modulare -->
 <link rel="stylesheet" href="css/palette.css">
 <link rel="stylesheet" href="css/poi-card.css">
-<script src="js/theme.js?v=326"></script>
-<script src="js/badge-picker.js?v=326"></script>
-<script src="js/user-card.js?v=353"></script>
-<script src="js/poi-card.js?v=326"></script>
+<script src="js/theme.js?v=357"></script>
+<script src="js/ui-controls.js?v=357"></script>
+<script src="js/badge-picker.js?v=357"></script>
+<script src="js/user-card.js?v=357"></script>
+<script src="js/poi-card.js?v=357"></script>
 <script src="https://unpkg.com/exifr@7.1.3/dist/lite.umd.js" onerror="(function(){var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/exifr@7.1.3/dist/lite.umd.js';document.head.appendChild(s);})()"></script>
-<script src="js/color-picker.js?v=326"></script>
-<script src="js/media-manager.js?v=332"></script>
-<script src="js/evolab-builder.js?v=344"></script>
-<script src="js/mail-builder.js?v=341"></script>
-<script src="js/landing-admin.js?v=344"></script>
-<script src="js/image-editor.js?v=326"></script>
-<script src="js/poi-frontend.js?v=327"></script>
-<script src="js/badge-admin.js?v=326"></script>
-<script src="js/qr-editor.js?v=351"></script>
-<script src="js/volti-admin.js?v=348"></script>
-<script src="js/direttive-admin.js?v=348"></script>
-<script src="js/livelli-admin.js?v=346"></script>
-<script src="js/livelli-editor.js?v=351"></script>
-<script src="js/catena-admin.js?v=349"></script>
-<script src="js/itinerari-admin.js?v=349"></script>
-<script src="js/compagnie-admin.js?v=350"></script>
-<script src="js/ai-connessione.js?v=350"></script>
-<script src="js/poivoice-admin.js?v=353"></script>
+<script src="js/color-picker.js?v=357"></script>
+<script src="js/media-manager.js?v=357"></script>
+<script src="js/evolab-builder.js?v=357"></script>
+<script src="js/mail-builder.js?v=357"></script>
+<script src="js/landing-admin.js?v=357"></script>
+<script src="js/image-editor.js?v=357"></script>
+<script src="js/poi-frontend.js?v=357"></script>
+<script src="js/badge-admin.js?v=357"></script>
+<script src="js/qr-editor.js?v=357"></script>
+<script src="js/volti-admin.js?v=357"></script>
+<script src="js/direttive-admin.js?v=357"></script>
+<script src="js/livelli-admin.js?v=357"></script>
+<script src="js/livelli-editor.js?v=357"></script>
+<script src="js/catena-admin.js?v=357"></script>
+<script src="js/itinerari-admin.js?v=357"></script>
+<script src="js/compagnie-admin.js?v=357"></script>
+<script src="js/ai-connessione.js?v=357"></script>
+<script src="js/poivoice-admin.js?v=357"></script>
 </head>
 <body>
 <div class="grain"></div>
@@ -1227,7 +1231,7 @@ const T = {
     c_poi:'POI', c_cat:'Categoria', c_state:'Stato',
     st_draft:'Bozza', st_published:'Pubblico', st_official:'Ufficiale', st_removed:'Rimosso',
     a_view:'Vedi', a_edit:'Modifica', a_publish:'Pubblica', a_delete:'Elimina', a_remove:'Rimuovi', a_restore:'Ripristina', a_delete_hard:'Elimina per sempre',
-    view_poi:'Dettagli POI', edit_poi:'Modifica POI',
+    view_poi:'Dettagli POI', edit_poi:'Modifica POI', f_state:'Stato', cat_filter:'Filtra le categorie…', cat_one:'scelta', cat_many:'scelte', f_pub_on:'Visibile a tutti', f_pub_hint:'Spento resta in attesa e non compare sulla mappa',
     f_title:'Titolo', f_approved:'Pubblico (approvato e visibile)',
     need_title:'Il titolo è obbligatorio', save_btn:'Salva', cancel_btn:'Annulla',
     confirm_del_poi:'Eliminare definitivamente questo POI?', poi_deleted:'POI eliminato',
@@ -1343,7 +1347,7 @@ const T = {
     c_poi:'POI', c_cat:'Kategoria', c_state:'Statusi',
     st_draft:'Draft', st_published:'Publik', st_official:'Zyrtar', st_removed:'I hequr',
     a_view:'Shiko', a_edit:'Modifiko', a_publish:'Boto', a_delete:'Fshi', a_remove:'Hiq', a_restore:'Rikthe', a_delete_hard:'Fshi përgjithmonë',
-    view_poi:'Detajet e POI', edit_poi:'Modifiko POI',
+    view_poi:'Detajet e POI', edit_poi:'Modifiko POI', f_state:'Gjendja', cat_filter:'Filtro kategorite…', cat_one:'zgjedhur', cat_many:'te zgjedhura', f_pub_on:'I dukshem per te gjithe', f_pub_hint:'I fikur rri ne pritje dhe nuk shfaqet ne harte',
     f_title:'Titulli', f_approved:'Publik (miratuar dhe i dukshëm)',
     need_title:'Titulli është i detyrueshëm', save_btn:'Ruaj', cancel_btn:'Anulo',
     confirm_del_poi:'Të fshihet përgjithmonë ky POI?', poi_deleted:'POI u fshi',
@@ -1459,7 +1463,7 @@ const T = {
     c_poi:'POI', c_cat:'Category', c_state:'State',
     st_draft:'Draft', st_published:'Public', st_official:'Official', st_removed:'Removed',
     a_view:'View', a_edit:'Edit', a_publish:'Publish', a_delete:'Delete', a_remove:'Remove', a_restore:'Restore', a_delete_hard:'Delete forever',
-    view_poi:'POI details', edit_poi:'Edit POI',
+    view_poi:'POI details', edit_poi:'Edit POI', f_state:'State', cat_filter:'Filter categories…', cat_one:'chosen', cat_many:'chosen', f_pub_on:'Visible to everyone', f_pub_hint:'Off means pending, not shown on the map',
     f_title:'Title', f_approved:'Public (approved and visible)',
     need_title:'Title is required', save_btn:'Save', cancel_btn:'Cancel',
     confirm_del_poi:'Permanently delete this POI?', poi_deleted:'POI deleted',
@@ -3525,7 +3529,30 @@ function _famSelectOptions(sel, current){
   if(current && !_ADM_FAMS[current]){ sel.appendChild(el('option',{value:current}, _admFamLbl(current)+' ('+current+')')); }
   if(current) sel.value=current;
 }
+// Icona per ogni famiglia: nella tendina nostra ogni voce ha la sua faccia.
+const _ADM_FAM_ICON={cibo:'fork-knife',cibo_gourmet:'wine',fast_food:'hamburger',lavoro:'briefcase',
+  pernottare:'bed',acquisti:'shopping-bag',vacanze:'sun-horizon',festa:'confetti',cultura:'bank',
+  utilita:'wrench',benessere:'heartbeat',audioguida:'headphones',altro:'dots-three-circle'};
+// La tendina delle famiglie, disegnata da noi (AdminUI.pick), non quella del sistema.
+function _famPick(current){
+  const voci=Object.keys(_ADM_FAMS).map(fid=>({v:fid,label:_ADM_FAMS[fid][lang]||_ADM_FAMS[fid].it,
+    icon:_ADM_FAM_ICON[fid]||'tag',colore:_ADM_FAMS[fid].color}));
+  // valore storico non-famiglia (es. natura): lo mostro mappato ma conservo il value reale
+  if(current && !_ADM_FAMS[current]) voci.push({v:current,label:_admFamLbl(current)+' ('+current+')',icon:'tag'});
+  return AdminUI.pick(voci, current||'cibo', {icon:'folders',cerca:true});
+}
 const POI_VIS  = ['private','community','suggested_google','official'];
+// Chi lo vede: in parole, non con l'enum crudo del database.
+const _VIS_LBL={
+  private:{it:'Solo io',sq:'Vetem une',en:'Only me',icon:'lock-simple'},
+  community:{it:'Tutta la community',sq:'Gjithe komuniteti',en:'The whole community',icon:'users-three'},
+  suggested_google:{it:'Proposto dalla mappa',sq:'Propozuar nga harta',en:'Suggested by the map',icon:'map-trifold'},
+  official:{it:'Ufficiale POI•LOVE',sq:'Zyrtar POI•LOVE',en:'Official POI•LOVE',icon:'seal-check'}
+};
+function _visPick(current){
+  return AdminUI.pick(POI_VIS.map(v=>({v:v,label:(_VIS_LBL[v]&&(_VIS_LBL[v][lang]||_VIS_LBL[v].it))||v,
+    icon:(_VIS_LBL[v]&&_VIS_LBL[v].icon)||'eye'})), current||'community', {icon:'eye',cerca:false});
+}
 let poiSearchTm = null;
 let poisSeq = 0; // token di generazione: vince l'ultima richiesta lanciata, non l'ultima che risolve
 function debouncePois(){ clearTimeout(poiSearchTm); poiSearchTm=setTimeout(reloadPois, 300); }
@@ -3723,13 +3750,19 @@ async function editPoi(p){
   _colL.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_desc')}), f.description, descBar, descAiRow ]));
 
   // ── CATEGORIA MACRO + fino a 3 CATEGORIE (tassonomia ricca) ──
-  const catSel=el('select');
-  _famSelectOptions(catSel, p.category||'cibo');
+  const catSel=_famPick(p.category||'cibo');
   f.category=catSel;
-  const catChips=el('div',{class:'poiph-cats'});
+  const catChips=el('div',{class:'poiph-cats poied-cats'});
+  const catFiltro=el('input',{placeholder:t('cat_filter','Filtra le categorie…'),autocomplete:'off',
+    style:'margin-bottom:7px',oninput:()=>drawCats()});
+  const catConta=el('div',{class:'sm',style:'margin-bottom:6px'});
   function drawCats(){
     catChips.textContent='';
-    allCats.forEach(c=>{
+    catConta.textContent=selCats.length+' '+(selCats.length===1?t('cat_one','scelta'):t('cat_many','scelte'))+' su 3';
+    const q=(catFiltro.value||'').trim().toLowerCase();
+    // prima le scelte, poi il resto: cosi non si perdono in fondo al muro
+    const ordinate=allCats.slice().sort((a,b)=>(selCats.includes(b.key)?1:0)-(selCats.includes(a.key)?1:0));
+    ordinate.filter(c=>!q||String(c.label_it||c.key).toLowerCase().includes(q)).forEach(c=>{
       const on=selCats.includes(c.key);
       const chip=el('button',{class:'cat-mini'+(on?' on':''),onclick:()=>{
         if(on){ selCats=selCats.filter(k=>k!==c.key); }
@@ -3747,7 +3780,7 @@ async function editPoi(p){
   drawCats();
   const catRow=el('div',{class:'row2'});
   catRow.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_family','Famiglia genitore')}), catSel ]));
-  catRow.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_cats3')}), catChips ]));
+  catRow.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_cats3')}), catFiltro, catConta, catChips ]));
   _full.appendChild(catRow);
 
   // ── TAG (chips, max 10) ──
@@ -3821,16 +3854,12 @@ async function editPoi(p){
   window.__editPoiExif=_setCoordsFromExif;
 
   // ── VISIBILITÀ + APPROVATO ──
-  const visSel=el('select');
-  POI_VIS.forEach(v=> visSel.appendChild(el('option',{value:v}, v)) );
-  if(p.visibility) visSel.value=p.visibility;
+  const visSel=_visPick(p.visibility||'community');
   f.visibility=visSel;
-  const apprWrap=el('label',{style:'display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer'});
-  f.is_approved=el('input',{type:'checkbox'}); if(p.is_approved!==false) f.is_approved.checked=true;
-  apprWrap.appendChild(f.is_approved); apprWrap.appendChild(document.createTextNode(t('f_approved')));
+  f.is_approved=AdminUI.toggle({titolo:t('f_pub_on','Visibile a tutti'),nota:t('f_pub_hint','Spento resta in attesa e non compare sulla mappa')}, p.is_approved!==false);
   const visRow=el('div',{class:'row2'});
   visRow.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_vis')}), visSel ]));
-  visRow.appendChild(el('div',{class:'field'},[ el('label',{text:' '}), apprWrap ]));
+  visRow.appendChild(el('div',{class:'field'},[ el('label',{text:t('f_state','Stato')}), el('div',{style:'padding-top:5px'},[f.is_approved]) ]));
   _colR.appendChild(visRow);
 
   // ── BADGE + ASSEGNAZIONE UTENTE (@handle) — come nell'app ──
