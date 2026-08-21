@@ -1,0 +1,84 @@
+<!doctype html>
+<!--
+  © Alessandro Castagna — 321.al / EVOLAB
+  Tutti i diritti riservati. Uso non autorizzato vietato.
+  info@321.it · https://321.al
+-->
+<html lang="it"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>I quindici viaggi · POI•LOVE</title>
+<style>
+  :root{ --rosso:#D42B2B; --blu:#285EA7; --riga:#E4DED2; --testo:#1B1B1B; --tenue:#6B6257; }
+  *{box-sizing:border-box}
+  body{margin:0;background:#fff;color:var(--testo);
+       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,system-ui,sans-serif;line-height:1.55}
+  .foglio{max-width:900px;margin:0 auto;padding:34px 22px 60px}
+  h1{font-size:30px;margin:0 0 6px;letter-spacing:-.5px}
+  .sotto{color:var(--tenue);font-size:15px;margin-bottom:22px}
+  .numeri{display:flex;gap:26px;flex-wrap:wrap;padding:16px 0;border-top:2px solid var(--riga);border-bottom:2px solid var(--riga);margin-bottom:26px}
+  .n b{display:block;font-size:26px;line-height:1.1}
+  .n span{font-size:12.5px;color:var(--tenue);font-weight:600}
+  .viaggio{border:1.5px solid var(--riga);border-radius:16px;padding:16px 18px;margin-bottom:12px;page-break-inside:avoid}
+  .testa{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .ord{font-size:13px;font-weight:900;color:var(--rosso);min-width:26px}
+  .nome{font-size:18px;font-weight:900}
+  .tema{font-size:12px;font-weight:700;color:var(--blu);text-transform:uppercase;letter-spacing:.5px}
+  .descr{margin:7px 0 9px;font-size:14.5px}
+  .altre{font-size:13px;color:var(--tenue);margin-bottom:9px}
+  .pref{display:flex;gap:6px;flex-wrap:wrap}
+  .pref span{border:1.2px solid var(--riga);border-radius:9px;padding:3px 9px;font-size:12px;font-weight:700}
+  .stato{margin-left:auto;font-size:11.5px;font-weight:900;border-radius:9px;padding:3px 9px;background:#FDF0D5;color:#8A6300}
+  .stato.approvato{background:#EAF7EE;color:#1E6B37}
+  .stato.pubblicato{background:#E7EFFA;color:#285EA7}
+  .stampa{position:fixed;right:18px;top:18px;background:var(--rosso);color:#fff;border:none;border-radius:12px;
+          padding:11px 17px;font-family:inherit;font-weight:900;font-size:14px;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.18)}
+  .piede{margin-top:30px;padding-top:16px;border-top:2px solid var(--riga);font-size:12.5px;color:var(--tenue)}
+  @media print{ .stampa{display:none} body{font-size:12px} .foglio{padding:0} }
+</style></head>
+<body>
+<button class="stampa" onclick="window.print()">Stampa</button>
+<div class="foglio">
+  <h1>I quindici viaggi</h1>
+  <div class="sotto">L'ossatura dei contenuti di POI•LOVE: quindici percorsi con un tema e un ordine,
+    quattordici tappe ciascuno, tutte e dodici le prefetture. Questa pagina si aggiorna da sola: legge il piano dal database.</div>
+  <div class="numeri" id="numeri"></div>
+  <div id="elenco">Carico…</div>
+  <div class="piede">
+    Nessun viaggio diventa pubblico finche' resta in bozza. I luoghi Ufficiali arrivano dopo, uno per tappa,
+    con descrizione originale nelle tre lingue e foto con licenza.
+  </div>
+</div>
+<script>
+const API='https://poilove.com/db/rest/v1/viaggi_piano?select=*&order=ordine';
+(async function(){
+  try{
+    const r=await fetch(API,{cache:'no-store'});
+    const d=await r.json();
+    if(!Array.isArray(d) || !d.length){ document.getElementById('elenco').textContent='Piano non disponibile.'; return; }
+    const tappe=d.reduce((a,x)=>a+(x.tappe_previste||0),0);
+    const pref=new Set(); d.forEach(x=>(x.prefetture||[]).forEach(p=>pref.add(p)));
+    const stati={};
+    d.forEach(x=>{ stati[x.stato]=(stati[x.stato]||0)+1; });
+    document.getElementById('numeri').innerHTML=
+      '<div class="n"><b>'+d.length+'</b><span>viaggi</span></div>'+
+      '<div class="n"><b>'+tappe+'</b><span>tappe previste</span></div>'+
+      '<div class="n"><b>'+pref.size+'</b><span>prefetture coperte</span></div>'+
+      '<div class="n"><b>'+(stati.bozza||0)+'</b><span>ancora in bozza</span></div>';
+    document.getElementById('elenco').innerHTML=d.map(function(v){
+      return '<div class="viaggio"><div class="testa">'+
+        '<span class="ord">'+v.ordine+'</span>'+
+        '<span class="nome">'+esc(v.nome_it)+'</span>'+
+        '<span class="tema">'+esc(v.tema||'')+'</span>'+
+        '<span class="stato '+esc(v.stato)+'">'+esc(v.stato)+'</span></div>'+
+        '<div class="descr">'+esc(v.descr_it||'')+'</div>'+
+        '<div class="altre">'+esc(v.nome_sq)+' · '+esc(v.nome_en)+'</div>'+
+        '<div class="pref">'+(v.prefetture||[]).map(function(p){ return '<span>'+esc(p)+'</span>'; }).join('')+
+        '<span style="border:none;color:#6B6257">'+ (v.tappe_previste||0) +' tappe</span></div></div>';
+    }).join('');
+  }catch(e){ document.getElementById('elenco').textContent='Non riesco a leggere il piano.'; }
+})();
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); }
+</script>
+</body></html>
