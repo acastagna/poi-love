@@ -30,6 +30,8 @@
   const DURATE = [[60,'un minuto'], [180,'tre minuti'], [360,'sei minuti'], [600,'dieci minuti']];
 
   let box=null, luoghi=[], modelli=[], scelto=null, materiale=[], coda=[], lingua='it';
+  let voci=[], imp={}, conto={};
+  function euro(v){ return v==null ? '—' : Number(v).toFixed(2)+' $'; }
 
   async function dati(){
     try{
@@ -40,6 +42,14 @@
       ]);
       luoghi = p.data || [];
       modelli = m.data || [];
+      const [v, i, c] = await Promise.all([
+        sb.from('voci').select('*').order('ordine'),
+        sb.from('voce_impostazioni').select('*').eq('id',1).maybeSingle(),
+        sb.rpc('voce_conto'),
+      ]);
+      voci = v.data || [];
+      imp = i.data || {};
+      conto = (c.data && c.data[0]) || {};
     }catch(e){ console.warn('poivoice:', e); }
   }
 
@@ -185,12 +195,60 @@
       // ── fase tre ──
       '<div class="panel">'+
         '<div style="font-size:14px;font-weight:900;margin-bottom:4px">3 · La voce</div>'+
-        '<div class="sm">Serve la chiave di Google. Quando c\'e\', da qui si sceglie la voce, si sente e si rifa\' '+
-        'finche\' non piace. Il modello scelto e\' gemini-2.5-pro-tts: una voce femminile e una maschile valgono '+
-        'per tutte e tre le lingue.</div>'+
-        '<div class="btn-row" style="margin-top:10px">'+
+        '<div class="sm" style="margin-bottom:10px">Una voce femminile e una maschile bastano per tutte e tre le '+
+        'lingue: il modello riconosce la lingua dal testo, non dalla voce. Il modello e\' '+
+        '<b>'+esc(imp.modello||'gemini-2.5-pro-tts')+'</b>.</div>'+
+
+        '<div style="display:flex;gap:14px;flex-wrap:wrap">'+
+          ['femminile','maschile'].map(function(g){
+            const usate = voci.filter(function(v){ return v.genere===g; });
+            const ora = usate.find(function(v){ return v.scelta_per===g; });
+            return '<div class="field" style="flex:1;min-width:220px"><label>Voce '+g+'</label>'+
+              '<select data-voce="'+g+'">'+usate.map(function(v){
+                return '<option value="'+esc(v.nome)+'"'+(ora&&ora.nome===v.nome?' selected':'')+'>'+
+                       esc(v.nome)+(v.carattere?(' · '+esc(v.carattere)):'')+'</option>';
+              }).join('')+'</select></div>';
+          }).join('')+
+        '</div>'+
+
+        '<div class="field" style="margin-top:8px"><label>La regia: come deve recitare</label>'+
+          '<textarea id="pvRegia" rows="4" style="width:100%;box-sizing:border-box">'+esc(imp.regia||'')+'</textarea>'+
+          '<div style="font-size:11.5px;opacity:.55;margin-top:3px">Questo campo e\' separato dal testo: Google lo '+
+          'legge come istruzione a chi recita, non come parole da leggere.</div></div>'+
+
+        '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:8px">'+
+          '<div class="field"><label>Luoghi famosi, secondi</label><input id="pvSecFam" type="number" min="30" max="900" value="'+Number(imp.secondi_famoso||360)+'"></div>'+
+          '<div class="field"><label>Medi, secondi</label><input id="pvSecMed" type="number" min="30" max="900" value="'+Number(imp.secondi_medio||180)+'"></div>'+
+          '<div class="field"><label>Normali, secondi</label><input id="pvSecNor" type="number" min="30" max="900" value="'+Number(imp.secondi_normale||60)+'"></div>'+
+          '<div class="field"><label>Credito caricato, dollari</label><input id="pvCredito" type="number" step="0.01" min="0" value="'+(imp.credito_caricato==null?'':imp.credito_caricato)+'" placeholder="quanto hai messo"></div>'+
+        '</div>'+
+        '<label style="font-size:12.5px;font-weight:700;display:block;margin-top:6px">'+
+          '<input type="checkbox" id="pvLotti"'+(imp.a_lotti?' checked':'')+'> a lotti: meta prezzo, consegna entro un giorno</label>'+
+
+        '<div class="btn-row" style="margin-top:12px">'+
+          '<button class="btn sm gold" id="pvSalvaVoce"><i class="ph-duotone ph-floppy-disk"></i> Salva le impostazioni</button>'+
           '<a class="btn sm" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">'+
             '<i class="ph-duotone ph-key"></i> Prendi la chiave di Google</a>'+
+          '<a class="btn sm" href="https://aistudio.google.com/usage" target="_blank" rel="noopener">'+
+            '<i class="ph-duotone ph-chart-line"></i> Il saldo vero, su Google</a>'+
+        '</div>'+
+        '<div id="pvVoceEsito" style="margin-top:8px;font-size:12.5px;font-weight:700"></div>'+
+
+        '<div style="margin-top:14px;border-top:1px solid var(--line,#3a3a3a);padding-top:11px">'+
+          '<div style="font-size:13px;font-weight:900;margin-bottom:5px">Quanto abbiamo speso</div>'+
+          '<div class="sm" style="margin-bottom:8px">Google non ha nessuna chiamata che dica quanto credito resta: '+
+          'quel numero sta solo sulla sua pagina. Questo conto lo teniamo noi, coi gettoni che ogni generazione riporta.</div>'+
+          '<div style="display:flex;gap:18px;flex-wrap:wrap;font-size:13px">'+
+            '<span>oggi <b>'+euro(conto.oggi_eur)+'</b></span>'+
+            '<span>questo mese <b>'+euro(conto.mese_eur)+'</b></span>'+
+            '<span>in tutto <b>'+euro(conto.totale_eur)+'</b></span>'+
+            '<span><b>'+(conto.quante_totale||0)+'</b> audioguide</span>'+
+            (conto.resta_stimato!=null ? '<span>resta circa <b>'+euro(conto.resta_stimato)+'</b></span>' : '')+
+          '</div>'+
+        '</div>'+
+
+        '<div style="margin-top:12px;font-size:12.5px;opacity:.7">'+
+          'Manca solo la chiave: appena c\'e\', da qui si genera, si ascolta e si rifa\' finche\' non piace.'+
         '</div>'+
       '</div>';
   }
@@ -217,6 +275,8 @@
     box.querySelectorAll('[data-scegli]').forEach(function(b){
       b.onclick = function(){ scegli(b.dataset.scegli, b); };
     });
+    const sv = document.getElementById('pvSalvaVoce');
+    if(sv) sv.onclick = salvaVoce;
   }
 
   async function chiedi(modelloId){
@@ -294,6 +354,37 @@
       if(error) throw error;
       await datiLuogo(); disegna();
     }catch(e){ bottone.disabled = false; alert('Non sono riuscito: ' + (e.message||'')); }
+  }
+
+  async function salvaVoce(){
+    const e = document.getElementById('pvVoceEsito');
+    e.textContent = 'Salvo…'; e.style.color = 'inherit';
+    try{
+      // prima le due voci scelte: una per genere, e si toglie la scelta all'altra
+      for(const g of ['femminile','maschile']){
+        const sel = box.querySelector('[data-voce="'+g+'"]');
+        if(!sel) continue;
+        const via = await sb.from('voci').update({ scelta_per: null }).eq('scelta_per', g).select('nome');
+        if(via.error) throw via.error;
+        const messa = await sb.from('voci').update({ scelta_per: g }).eq('nome', sel.value).select('nome');
+        if(messa.error) throw messa.error;
+        if(!messa.data || !messa.data.length) throw new Error('il database non ha accettato la voce '+g);
+      }
+      const credito = document.getElementById('pvCredito').value.trim();
+      const { data, error } = await sb.from('voce_impostazioni').update({
+        regia: document.getElementById('pvRegia').value.trim() || null,
+        secondi_famoso: Number(document.getElementById('pvSecFam').value) || 360,
+        secondi_medio: Number(document.getElementById('pvSecMed').value) || 180,
+        secondi_normale: Number(document.getElementById('pvSecNor').value) || 60,
+        a_lotti: document.getElementById('pvLotti').checked,
+        credito_caricato: credito === '' ? null : Number(credito),
+        aggiornato: new Date().toISOString(),
+      }).eq('id', 1).select('id');
+      if(error) throw error;
+      if(!data || !data.length) throw new Error('il database non ha accettato: se la sessione non ha il secondo fattore, esci e rientra col codice a sei cifre');
+      e.textContent = 'Salvato.'; e.style.color = '#5BBE7E';
+      await dati();
+    }catch(err){ e.textContent = 'Non sono riuscito: '+(err.message||''); e.style.color = '#E06A6A'; }
   }
 
   async function load(contenitore){
