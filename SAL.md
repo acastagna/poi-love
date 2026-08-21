@@ -1,5 +1,47 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
+## 21/08/2026 mattina — Revisione del codice della notte (5.34)
+
+Cinque revisioni indipendenti, in sola lettura, su tutto quello che era stato scritto fra le 00:15 e
+le 09:00: app, server delle foto, funzioni AI, pannello di amministrazione, migrazioni del database.
+Tre revisioni su cinque hanno dato esito **bloccato**. Tutto quello che hanno trovato e' stato
+riparato, pubblicato e verificato dal vivo. Controlli 18 su 18.
+
+### Database (migrazione 131)
+| Buco trovato | Chiuso cosi' |
+|---|---|
+| Una recensione gia' pubblicata si poteva spostare su un altro luogo con una sola richiesta: stesso voto, stesso testo, ancora pubblicata, senza amicizia e senza moderazione | La regola di correzione ripete le condizioni della scrittura; se cambia il luogo la recensione torna in coda |
+| `stato_condizione` accettava l'identificativo di chiunque: si leggeva il livello e la scadenza dell'abbonamento di un altro | Risponde solo sull'interessato, o all'amministrazione |
+| `segnalazioni_da_guardare` e `candidati_conto` erano leggibili da qualunque persona collegata | Solo amministrazione |
+| La voce del luogo accettava tre minuti per tutti | Il tetto del livello e' imposto dal database |
+| I quindici viaggi in bozza erano pubblici da subito | Si vedono solo da approvati; un viaggio per posizione |
+| La foto non si poteva correggere ne' togliere da chi l'aveva messa | Ora si' |
+| Gli orari si cancellavano e poi si riscrivevano: se la seconda meta' non partiva, il locale restava senza orari | Una sola chiamata, `sostituisci_orari`: o tutto o niente |
+| Un itinerario si poteva legare a una compagnia di cui non si fa parte | Vincolo sul database |
+
+### App
+- Il pannello del locale controlla la proprieta' all'apertura e a ogni scrittura.
+- Gli indirizzi delle foto dentro gli attributi di stile toglievano solo l'apice singolo: con un
+  doppio apice l'attributo si chiudeva prima del previsto. Ora passano tutti da `_escAttr`.
+- Il menu chiede con le nostre finestre, non con quelle del browser.
+- Tutte le chiavi delle tre lingue verificate: ne mancava una sola (`loc_non_tuo`), aggiunta.
+
+### Pannello di amministrazione
+- `esc()` in tutti e cinque i moduli nuovi, ogni campo che arriva dai dati aperti passa di li'.
+- Registrare un abbonamento chiede conferma coi numeri sotto gli occhi e spegne il bottone: due clic
+  facevano due abbonamenti e una scadenza sbagliata.
+
+### Lavori automatici della macchina
+- Il controllo della notte scrive **NON FATTO** se il database risponde male, invece di una riga che
+  sembra a posto.
+- Il cambio della Banca d'Albania controlla moneta e numero prima che finiscano in una istruzione SQL.
+- I registri si tengono otto settimane, poi si buttano (`/etc/logrotate.d/poilove`).
+
+### Profili dimostrativi
+La parola d'accesso scritta sul foglio non funzionava. Rimessa, e provata dal vivo su tutti e sette:
+entrano. Il foglio resta valido, la parola e' la stessa.
+
+
 ## Notte fra 20 e 21/08/2026 — Recensioni, vantaggi dei livelli, controllo delle condizioni (5.04 → 5.07)
 
 Lavoro in autonomia, tre blocchi del programma chiusi e in linea. Stato sempre aggiornato su
