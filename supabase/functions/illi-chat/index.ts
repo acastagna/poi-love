@@ -26,7 +26,6 @@
 // scartati qui e non arrivano mai al provider.
 
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { createClient } from "jsr:@supabase/supabase-js@2";
 
 // ── CORS ──────────────────────────────────────────────────────────────────────
 const CORS: Record<string, string> = {
@@ -42,10 +41,51 @@ function json(obj: unknown, status = 200): Response {
   });
 }
 
+// ── Il database di casa nostra, via HTTP ──────────────────────────────────────
+function testaServizio(): Record<string, string> {
+  return {
+    apikey: SERVICE_ROLE_KEY,
+    Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
+    "Content-Type": "application/json",
+  };
+}
+async function leggi(q: string): Promise<any[]> {
+  try {
+    const r = await fetch(`${REST}/${q}`, { headers: testaServizio(), signal: AbortSignal.timeout(12000) });
+    if (!r.ok) {
+      console.error("illi-chat: lettura fallita", q, r.status, (await r.text()).slice(0, 200));
+      return [];
+    }
+    return await r.json();
+  } catch (e) {
+    console.error("illi-chat: lettura non riuscita", q, String(e));
+    return [];
+  }
+}
+async function chiama(nome: string, corpo: unknown): Promise<{ dato: unknown; errore: string | null }> {
+  try {
+    const r = await fetch(`${REST}/rpc/${nome}`, {
+      method: "POST", headers: testaServizio(), body: JSON.stringify(corpo),
+      signal: AbortSignal.timeout(12000),
+    });
+    const t = await r.text();
+    if (!r.ok) return { dato: null, errore: `${r.status} ${t.slice(0, 200)}` };
+    return { dato: t.trim() ? JSON.parse(t) : null, errore: null };
+  } catch (e) {
+    return { dato: null, errore: String(e) };
+  }
+}
+
+// ── Dove vivono davvero i dati ────────────────────────────────────────────────
+// Dal 18/08 gli accessi e il database sono sulla nostra macchina: questa funzione
+// parlava ancora con Supabase e rifiutava chiunque, perche' il biglietto d'entrata
+// non lo aveva firmato Supabase.
+const REST = "https://poilove.com/db/rest/v1";
+const AUTH = "https://poilove.com/db/auth/v1";
+
 // ── Env (solo segreti da Deno.env, mai hardcoded) ─────────────────────────────
-const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
 const ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
-const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+const SERVICE_ROLE_KEY = Deno.env.get("POILOVE_SERVICE_JWT") ?? Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 const OPENAI_KEY = Deno.env.get("OPENAI_KEY") ?? "";
 const ANTHROPIC_KEY = Deno.env.get("ANTHROPIC_KEY") ?? "";
 
@@ -162,8 +202,8 @@ Deno.serve(async (req: Request) => {
   if (req.method !== "POST") return json({ error: "method_not_allowed" }, 405);
 
   try {
-    if (!SUPABASE_URL || !ANON_KEY || !SERVICE_ROLE_KEY) {
-      console.error("illi-chat: env supabase mancante (url/anon/service_role)");
+    if (!SERVICE_ROLE_KEY) {
+      console.error("illi-chat: manca POILOVE_SERVICE_JWT");
       return json({ error: "internal" }, 503);
     }
 
@@ -174,18 +214,14 @@ Deno.serve(async (req: Request) => {
       : "";
     if (!jwt) return json({ error: "auth_required" }, 401);
 
-    const userClient = createClient(SUPABASE_URL, ANON_KEY, {
-      global: { headers: { Authorization: `Bearer ${jwt}` } },
-      auth: { persistSession: false, autoRefreshToken: false },
-    });
-    const { data: userData, error: userErr } = await userClient.auth.getUser();
-    const user = userData?.user;
-    if (userErr || !user) return json({ error: "auth_required" }, 401);
-
-    // Client service_role: la chiave non esce mai da qui.
-    const svc = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
-      auth: { persistSession: false, autoRefreshToken: false },
-    });
+    // Chi sei lo dice il nostro GoTrue, non piu' quello di Supabase.
+    const chi = await fetch(`${AUTH}/user`, {
+      headers: { Authorization: `Bearer ${jwt}`, apikey: ANON_KEY },
+      signal: AbortSignal.timeout(12000),
+    }).catch(() => null);
+    if (!chi || !chi.ok) return json({ error: "auth_required" }, 401);
+    const user = await chi.json().catch(() => null);
+    if (!user?.id) return json({ error: "auth_required" }, 401);
 
     const body = await req.json().catch(() => ({}));
 
@@ -193,10 +229,10 @@ Deno.serve(async (req: Request) => {
     // Serve al pannello per mostrare quali chiavi sono configurate e quale motore
     // e' attivo, senza mai esporre le chiavi.
     if (body?.mode === "engine_status") {
-      const { data: prof } = await svc.from("profiles").select("is_admin").eq("id", user.id).maybeSingle();
-      if (!(prof as { is_admin?: boolean } | null)?.is_admin) return json({ error: "forbidden" }, 403);
-      const { data: eng } = await svc.from("gamification_config").select("value").eq("key", "illi_engine").maybeSingle();
-      const active = resolveEngine((eng as { value?: unknown } | null)?.value);
+      const prof = (await leggi(`profiles?select=is_admin&id=eq.${user.id}`))[0];
+      if (!prof?.is_admin) return json({ error: "forbidden" }, 403);
+      const eng = (await leggi("gamification_config?select=value&key=eq.illi_engine"))[0];
+      const active = resolveEngine(eng?.value);
       return json({
         providers: { openai: !!OPENAI_KEY, anthropic: !!ANTHROPIC_KEY },
         active,
@@ -208,18 +244,16 @@ Deno.serve(async (req: Request) => {
     if (!messages.length) return json({ error: "bad_request" }, 400);
 
     // ── 3) Tier, limiti e motore con service_role ─────────────────────────────
-    const [profileRes, configRes, engineRes] = await Promise.all([
-      svc.from("profiles").select("special_tier").eq("id", user.id).maybeSingle(),
-      svc.from("gamification_config").select("value").eq("key", "ai_limits_per_tier").maybeSingle(),
-      svc.from("gamification_config").select("value").eq("key", "illi_engine").maybeSingle(),
+    const [profRows, limitRows, engineRows] = await Promise.all([
+      leggi(`profiles?select=special_tier&id=eq.${user.id}`),
+      leggi("gamification_config?select=value&key=eq.ai_limits_per_tier"),
+      leggi("gamification_config?select=value&key=eq.illi_engine"),
     ]);
-    if (profileRes.error) console.error("illi-chat: lettura profilo fallita:", profileRes.error.message);
-    if (configRes.error) console.error("illi-chat: lettura config fallita:", configRes.error.message);
 
-    const rawTier = (profileRes.data as { special_tier?: unknown } | null)?.special_tier;
+    const rawTier = profRows[0]?.special_tier;
     const tier = typeof rawTier === "string" && rawTier.trim() ? rawTier.trim() : "free";
-    const limits = resolveTierLimits((configRes.data as { value?: unknown } | null)?.value, tier);
-    const engine = resolveEngine((engineRes.data as { value?: unknown } | null)?.value);
+    const limits = resolveTierLimits(limitRows[0]?.value, tier);
+    const engine = resolveEngine(engineRows[0]?.value);
     // provider dal motore globale; modello = override per-tier se valido, altrimenti motore
     const model = pickModel(engine, limits.model);
 
@@ -228,20 +262,18 @@ Deno.serve(async (req: Request) => {
     if (engine.provider === "anthropic" && !ANTHROPIC_KEY) return json({ error: "no_key" }, 503);
 
     // ── 4) Contatore giornaliero via RPC: oltre soglia si rifiuta con 429 ──────
-    const { data: usageData, error: usageErr } = await svc.rpc("increment_ai_usage", {
-      p_user: user.id,
-    });
-    if (usageErr) {
-      console.error("illi-chat: increment_ai_usage non disponibile (fail-open):", usageErr.message);
+    const uso = await chiama("increment_ai_usage", { p_user: user.id });
+    if (uso.errore) {
+      console.error("illi-chat: increment_ai_usage non disponibile (fail-open):", uso.errore);
     } else {
-      const count = typeof usageData === "number" ? usageData : Number(usageData);
+      const count = Number(uso.dato);
       if (Number.isFinite(count) && count > limits.messages) {
         return json({ error: "daily_limit", limit: limits.messages }, 429);
       }
       refundQuota = async () => {
         refundQuota = null; // idempotente
-        const { error: refundErr } = await svc.rpc("decrement_ai_usage", { p_user: user.id });
-        if (refundErr) console.error("illi-chat: rimborso quota fallito:", refundErr.message);
+        const r = await chiama("decrement_ai_usage", { p_user: user.id });
+        if (r.errore) console.error("illi-chat: rimborso quota fallito:", r.errore);
       };
     }
 
