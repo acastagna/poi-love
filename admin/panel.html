@@ -2100,7 +2100,16 @@ async function moderateUser(targetId, status, reason, until){
 }
 
 /* ═════════════════════════ 4) LIMITI AI ═════════════════════════ */
-const TIER_ORDER = ['free','professionista','sostenitore','mecenate'];
+let TIER_ORDER = ['free','professionista','professionista_plus','sostenitore','mecenate','influencer'];
+// L'elenco vero arriva dalla tabella `livelli`: cosi' un livello nuovo compare
+// da solo anche qui, invece di restare senza limiti.
+async function caricaOrdineLivelli(){
+  try{
+    const { data } = await sb.from('livelli').select('chiave,ordine').order('ordine');
+    if(data && data.length) TIER_ORDER = data.map(function(x){ return x.chiave; });
+  }catch(_){}
+  return TIER_ORDER;
+}
 let aiLimitsDraft = null; // copia modificabile in memoria
 
 /* ── Motore di ILLI (multi-provider, scelto dall'admin) ──────────────────────
@@ -2169,6 +2178,7 @@ async function saveIlliEngine(){
 
 async function loadAiLimits(){
   loadIlliEngine();
+  await caricaOrdineLivelli();
   const box=document.getElementById('aiLimitsTable'); loadingBox(box);
   try{
     const { data, error } = await sb.from('gamification_config').select('key,value').eq('key','ai_limits_per_tier').single();
@@ -2177,7 +2187,7 @@ async function loadAiLimits(){
     // value è jsonb: { tier: { messages, max_tokens, model } }
     let cfg = (data && data.value) ? data.value : {};
     // assicura tutti i tier presenti con default sensati
-    const defaults={ messages:20, max_tokens:1024, model:'sonnet' };
+    const defaults={ messages_per_day:20, max_tokens:1024, model:'sonnet' };
     TIER_ORDER.forEach(tr=>{ if(!cfg[tr]) cfg[tr]=Object.assign({},defaults); });
     aiLimitsDraft = JSON.parse(JSON.stringify(cfg));
 
@@ -2190,8 +2200,14 @@ async function loadAiLimits(){
     const tb=el('tbody');
     TIER_ORDER.forEach(tr=>{
       const v=aiLimitsDraft[tr];
-      const inMsg=el('input',{type:'number',min:'0',value:(v.messages!=null?v.messages:''),style:'max-width:120px'});
-      inMsg.addEventListener('input',()=>{ aiLimitsDraft[tr].messages=parseInt(inMsg.value||'0',10); });
+      // il nome vero della chiave e' messages_per_day; `messages` resta letto
+      // solo per le configurazioni vecchie, ma non si riscrive piu'.
+      const quanti=(v.messages_per_day!=null?v.messages_per_day:(v.messages!=null?v.messages:''));
+      const inMsg=el('input',{type:'number',min:'0',value:quanti,style:'max-width:120px'});
+      inMsg.addEventListener('input',()=>{
+        aiLimitsDraft[tr].messages_per_day=parseInt(inMsg.value||'0',10);
+        delete aiLimitsDraft[tr].messages;
+      });
       const inTok=el('input',{type:'number',min:'0',value:(v.max_tokens!=null?v.max_tokens:''),style:'max-width:140px'});
       inTok.addEventListener('input',()=>{ aiLimitsDraft[tr].max_tokens=parseInt(inTok.value||'0',10); });
       const inMod=el('input',{type:'text',value:(v.model||''),placeholder:'sonnet',style:'max-width:180px'});
