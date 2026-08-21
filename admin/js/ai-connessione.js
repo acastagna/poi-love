@@ -47,6 +47,13 @@
   }
 
   function pallino(f){
+    // Quello che gira sulla nostra macchina non ha nessuna chiave da avere:
+    // dirgli "senza chiave" era falso e faceva sembrare rotto quello che funziona.
+    if(f.locale){
+      return f.acceso
+        ? { colore:'#5BBE7E', testo:'acceso, gira sulla nostra macchina' }
+        : { colore:'#8a8a8a', testo:'pronto sulla nostra macchina, spento' };
+    }
     const haChiave = chiavi[f.chiave] === true;
     if(haChiave && f.acceso) return { colore:'#5BBE7E', testo:'connesso e acceso' };
     if(haChiave && !f.acceso) return { colore:'#8a8a8a', testo:'chiave presente, spento' };

@@ -88,6 +88,7 @@ const ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
 const SERVICE_ROLE_KEY = Deno.env.get("POILOVE_SERVICE_JWT") ?? Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 const OPENAI_KEY = Deno.env.get("OPENAI_KEY") ?? "";
 const ANTHROPIC_KEY = Deno.env.get("ANTHROPIC_KEY") ?? "";
+const LOCALE_TOKEN = Deno.env.get("LOCALE_TOKEN") ?? "";
 
 // ── Costanti ──────────────────────────────────────────────────────────────────
 const DEFAULT_MODEL = "gpt-4o-mini";
@@ -294,6 +295,47 @@ Deno.serve(async (req: Request) => {
 
     const temperature = typeof body?.temperature === "number" ? body.temperature : 0.7;
     const maxTokens = Math.min(Number(body?.max_completion_tokens) || 512, limits.maxTokens);
+
+    // ── 4-bis) Prima si prova in casa ─────────────────────────────────────────
+    // Il modello sulla nostra macchina non costa niente. Non e bravo come gli
+    // altri e in albanese sbaglia, per questo la tabella dice in quali lingue si
+    // puo usare e il pannello lo accende o lo spegne. Se non risponde entro il
+    // tempo dato, si passa oltre senza far aspettare nessuno.
+    const linguaChiesta = (typeof body?.lang === "string" && /^(it|sq|en)$/.test(body.lang)) ? body.lang : "it";
+    if (LOCALE_TOKEN) {
+      const inCasa = (await leggi(
+        `ai_fornitori?select=modello,indirizzo,lingue&chiave=eq.locale&acceso=is.true`,
+      ))[0];
+      const parlaQuestaLingua = Array.isArray(inCasa?.lingue) && inCasa.lingue.includes(linguaChiesta);
+      if (inCasa?.indirizzo && parlaQuestaLingua) {
+        const sistema = messages.filter((m) => m.role === "system").map((m) => m.content).join("\n\n");
+        const domanda = messages.filter((m) => m.role !== "system")
+          .map((m) => (m.role === "user" ? "Domanda: " : "Risposta: ") + m.content).join("\n\n");
+        try {
+          const r = await fetch(inCasa.indirizzo, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${LOCALE_TOKEN}` },
+            body: JSON.stringify({
+              prompt: domanda, sistema, modello: inCasa.modello,
+              massimo: Math.min(maxTokens, 600), calore: temperature,
+            }),
+            signal: AbortSignal.timeout(25000),
+          });
+          if (r.ok) {
+            const j = await r.json();
+            const testo = String(j?.testo ?? "").trim();
+            if (testo.length > 20) {
+              return json({
+                reply: testo, provider: "locale", model: inCasa.modello,
+                secondi: j.secondi, costo: 0,
+              });
+            }
+          }
+        } catch (e) {
+          console.log("illi-chat: la macchina di casa non ce l'ha fatta, passo agli altri:", String(e));
+        }
+      }
+    }
 
     // ── 5) Dispatch al provider scelto ────────────────────────────────────────
     if (engine.provider === "anthropic") {

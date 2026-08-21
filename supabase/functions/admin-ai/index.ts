@@ -58,6 +58,7 @@ const ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
 const SERVICE_ROLE_KEY = Deno.env.get("POILOVE_SERVICE_JWT") ?? Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 
 const ANTHROPIC_KEY = Deno.env.get("ANTHROPIC_KEY") ?? "";
+const LOCALE_TOKEN = Deno.env.get("LOCALE_TOKEN") ?? "";
 const OPENAI_KEY = Deno.env.get("OPENAI_KEY") ?? "";
 
 const ANTHROPIC_MODEL = Deno.env.get("ANTHROPIC_MODEL") ?? "claude-sonnet-4-6";
@@ -280,7 +281,7 @@ class Inserimento implements PromiseLike<Esito<any>> {
 // Chi e' acceso, in che ordine, con quale modello: lo dice il pannello.
 async function leggiFornitori(): Promise<Array<Record<string, unknown>>> {
   try {
-    const r = await fetch(`${REST}/ai_fornitori?select=chiave,modello,acceso,ordine&order=ordine`, {
+    const r = await fetch(`${REST}/ai_fornitori?select=chiave,modello,acceso,ordine,indirizzo,lingue&order=ordine`, {
       headers: { apikey: SERVICE_ROLE_KEY, Authorization: `Bearer ${SERVICE_ROLE_KEY}` },
       signal: AbortSignal.timeout(8000),
     });
@@ -1823,6 +1824,7 @@ Deno.serve(async (req: Request) => {
     for (const f of righe) {
       if (!f?.acceso) continue;
       const chi = String(f.chiave || "");
+      if (chi === "locale") continue;                          // gia provato sopra, e solo per le domande semplici
       if (chi !== "anthropic" && chi !== "openai") continue;   // gli altri non sanno ancora usare gli strumenti
       if (!chiavi[chi]) continue;
       scelto = { chiave: chi, modello: String(f.modello || "") };
@@ -1844,6 +1846,39 @@ Deno.serve(async (req: Request) => {
     model = OPENAI_ALLOWED.has(OPENAI_MODEL) ? OPENAI_MODEL : "gpt-4o";
   } else {
     return json({ error: "no_ai_key", detail: "no AI provider configured" }, 503);
+  }
+
+  // ── Prima si prova in casa, ma solo per le domande semplici ──────────────────
+  // Il modello sulla nostra macchina non costa niente. Non sa pero usare gli
+  // strumenti del copilota: quando c'e da scrivere sul database o costruire una
+  // rotta serve un modello vero. Per questo qui entra solo in modo "chat", che
+  // e una domanda con una risposta e basta.
+  if (LOCALE_TOKEN && mode === "chat") {
+    try {
+      const righe = await leggiFornitori();
+      const casa = righe.filter((f: any) => f?.acceso && String(f.chiave) === "locale")[0] as any;
+      if (casa?.indirizzo) {
+        const sistema = messages.filter((m: any) => m.role === "system").map((m: any) => m.content).join("\n\n");
+        const domanda = messages.filter((m: any) => m.role !== "system")
+          .map((m: any) => (m.role === "user" ? "Domanda: " : "Risposta: ") + m.content).join("\n\n");
+        const r = await fetch(String(casa.indirizzo), {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${LOCALE_TOKEN}` },
+          body: JSON.stringify({ prompt: domanda, sistema, modello: String(casa.modello || ""), massimo: 600 }),
+          signal: AbortSignal.timeout(25000),
+        });
+        if (r.ok) {
+          const j = await r.json();
+          const testo = String(j?.testo ?? "").trim();
+          if (testo.length > 20) {
+            return json({ reply: testo, provider: "locale", model: String(casa.modello || ""),
+                          cost_eur: 0, secondi: j.secondi });
+          }
+        }
+      }
+    } catch (e) {
+      console.log("copilota: la macchina di casa non ce l'ha fatta, passo agli altri:", String(e));
+    }
   }
 
   // ── Tetto di spesa: blocca prima di chiamare l'AI ─────────────────────────────
