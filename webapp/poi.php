@@ -20,15 +20,40 @@ $rows = $id ? seo_get('pois?id=eq.' . rawurlencode($id)
 $poi = count($rows) ? $rows[0] : null;
 $isPublic = ($poi !== null);
 
+// ── Quello che il luogo ha in piu', se ce l'ha ────────────────────────────────
+// Recensioni pubblicate, orari e menu del locale, audioguida ufficiale: sono le
+// cose che rendono una pagina utile a chi cerca, e che i motori sanno leggere.
+$recensioni = array(); $mediaVoti = null;
+$locale = null; $orari = array(); $piatti = array(); $guida = null; $creditiFoto = array();
+if ($isPublic) {
+  $rs = seo_get('recensioni?poi_id=eq.' . rawurlencode($id) . '&stato=eq.pubblicata&select=voto,testo,created_at,autore_id&limit=20');
+  if (is_array($rs) && count($rs)) {
+    $recensioni = $rs;
+    $somma = 0; foreach ($rs as $r) { $somma += (float)$r['voto']; }
+    $mediaVoti = round($somma / count($rs), 1);
+  }
+  $lo = seo_get('locali?poi_id=eq.' . rawurlencode($id) . '&select=telefono,sito,prenotazione_url,pagamenti,categoria_propria,valuta_base');
+  if (is_array($lo) && count($lo)) $locale = $lo[0];
+  $or = seo_get('locale_orari?poi_id=eq.' . rawurlencode($id) . '&select=giorno,apre,chiude,chiuso,ordine&order=giorno,ordine');
+  if (is_array($or)) $orari = $or;
+  $pi = seo_get('locale_piatti?poi_id=eq.' . rawurlencode($id) . '&select=nome,descrizione,prezzo,valuta,chef&order=ordine&limit=40');
+  if (is_array($pi)) $piatti = $pi;
+  $ag = seo_get('audioguide?poi_id=eq.' . rawurlencode($id) . '&lingua=eq.' . $lang . '&select=titolo,testo,url,secondi');
+  if (!is_array($ag) || !count($ag)) $ag = seo_get('audioguide?poi_id=eq.' . rawurlencode($id) . '&select=titolo,testo,url,secondi&limit=1');
+  if (is_array($ag) && count($ag)) $guida = $ag[0];
+  $cf = seo_get('media_assets?poi_id=eq.' . rawurlencode($id) . '&select=autore,licenza,fonte_url,source');
+  if (is_array($cf)) { foreach ($cf as $c) { if (!empty($c['source']) && $c['source'] !== 'utente' && !empty($c['autore'])) $creditiFoto[] = $c; } }
+}
+
 // Upstream Supabase giù → 503 (Google ritenta senza deindicizzare); 0 righe/4xx → 404 pulito, non soft-404.
 if (seo_upstream_down()) seo_send_503();
 if (!$isPublic) http_response_code(404);
 
 // ── Etichette UI trilingui ─────────────────────────────────────────────────────
 $T = array(
-  'it' => array('kick'=>'Luogo su POI•LOVE','addr'=>'Indirizzo','coords'=>'Coordinate','openmap'=>'Apri sulla mappa','directions'=>'Come arrivare','category'=>'Categoria','tags'=>'Tag','hearts'=>'cuori','nearby'=>'Luoghi vicini','faq'=>'Domande frequenti','updated'=>'Aggiornato il','cta'=>'Entra in POI•LOVE','foot'=>'La mappa comunitaria dei luoghi amati','home'=>'Home','notfound'=>'Luogo non trovato','notfound_sub'=>'Questo luogo non è pubblico o non esiste più. Scopri gli altri luoghi amati.'),
-  'sq' => array('kick'=>'Vend në POI•LOVE','addr'=>'Adresa','coords'=>'Koordinatat','openmap'=>'Hape në hartë','directions'=>'Si të shkosh','category'=>'Kategoria','tags'=>'Etiketa','hearts'=>'zemra','nearby'=>'Vende afër','faq'=>'Pyetje të shpeshta','updated'=>'Përditësuar më','cta'=>'Hyr në POI•LOVE','foot'=>'Harta e komunitetit e vendeve të dashura','home'=>'Home','notfound'=>'Vendi nuk u gjet','notfound_sub'=>'Ky vend nuk është publik ose nuk ekziston më. Zbulo vendet e tjera të dashura.'),
-  'en' => array('kick'=>'Place on POI•LOVE','addr'=>'Address','coords'=>'Coordinates','openmap'=>'Open on the map','directions'=>'Get directions','category'=>'Category','tags'=>'Tags','hearts'=>'hearts','nearby'=>'Nearby places','faq'=>'Frequently asked questions','updated'=>'Updated on','cta'=>'Enter POI•LOVE','foot'=>'The community map of beloved places','home'=>'Home','notfound'=>'Place not found','notfound_sub'=>'This place is not public or no longer exists. Discover other beloved places.'),
+  'it' => array('kick'=>'Luogo su POI•LOVE','addr'=>'Indirizzo','coords'=>'Coordinate','openmap'=>'Apri sulla mappa','directions'=>'Come arrivare','category'=>'Categoria','tags'=>'Tag','hearts'=>'cuori','nearby'=>'Luoghi vicini','faq'=>'Domande frequenti','updated'=>'Aggiornato il','cta'=>'Entra in POI•LOVE','foot'=>'La mappa comunitaria dei luoghi amati','home'=>'Home','notfound'=>'Luogo non trovato','notfound_sub'=>'Questo luogo non è pubblico o non esiste più. Scopri gli altri luoghi amati.','orari'=>'Orari','menu'=>'Menu','chef'=>'Consigli dello Chef','recensioni'=>'Recensioni','ascolta'=>'Audioguida','crediti'=>'Foto di','chiuso'=>'chiuso','paga'=>'Come si paga','telefono'=>'Telefono','su5'=>'su 5'),
+  'sq' => array('kick'=>'Vend në POI•LOVE','addr'=>'Adresa','coords'=>'Koordinatat','openmap'=>'Hape në hartë','directions'=>'Si të shkosh','category'=>'Kategoria','tags'=>'Etiketa','hearts'=>'zemra','nearby'=>'Vende afër','faq'=>'Pyetje të shpeshta','updated'=>'Përditësuar më','cta'=>'Hyr në POI•LOVE','foot'=>'Harta e komunitetit e vendeve të dashura','home'=>'Home','notfound'=>'Vendi nuk u gjet','notfound_sub'=>'Ky vend nuk është publik ose nuk ekziston më. Zbulo vendet e tjera të dashura.','orari'=>'Orari','menu'=>'Menu','chef'=>'Këshillat e Chef-it','recensioni'=>'Vlerësime','ascolta'=>'Audioguidë','crediti'=>'Foto nga','chiuso'=>'mbyllur','paga'=>'Si paguhet','telefono'=>'Telefoni','su5'=>'nga 5'),
+  'en' => array('kick'=>'Place on POI•LOVE','addr'=>'Address','coords'=>'Coordinates','openmap'=>'Open on the map','directions'=>'Get directions','category'=>'Category','tags'=>'Tags','hearts'=>'hearts','nearby'=>'Nearby places','faq'=>'Frequently asked questions','updated'=>'Updated on','cta'=>'Enter POI•LOVE','foot'=>'The community map of beloved places','home'=>'Home','notfound'=>'Place not found','notfound_sub'=>'This place is not public or no longer exists. Discover other beloved places.','orari'=>'Opening hours','menu'=>'Menu','chef'=>'Chef recommends','recensioni'=>'Reviews','ascolta'=>'Audioguide','crediti'=>'Photo by','chiuso'=>'closed','paga'=>'How to pay','telefono'=>'Phone','su5'=>'out of 5'),
 );
 $L = $T[$lang];
 
@@ -146,6 +171,59 @@ if ($poi) {
   if (!empty($poi['updated_at'])) $place['dateModified'] = gmdate('c', strtotime($poi['updated_at']));
   if ((int)$poi['love_count'] > 0) $place['interactionStatistic'] = array(
     '@type'=>'InteractionCounter', 'interactionType'=>array('@type'=>'LikeAction'), 'userInteractionCount'=>(int)$poi['love_count']);
+  // La media dei voti e le recensioni: e' quello che fa comparire le stelline
+  // nei risultati di ricerca, e viene dai voti veri, non da un numero inventato.
+  if ($mediaVoti !== null && count($recensioni)) {
+    $place['aggregateRating'] = array('@type'=>'AggregateRating',
+      'ratingValue'=>$mediaVoti, 'reviewCount'=>count($recensioni), 'bestRating'=>5, 'worstRating'=>0);
+    $rev = array();
+    foreach (array_slice($recensioni, 0, 5) as $r) {
+      if (trim((string)$r['testo']) === '') continue;
+      $rev[] = array('@type'=>'Review',
+        'reviewRating'=>array('@type'=>'Rating','ratingValue'=>(float)$r['voto'],'bestRating'=>5),
+        'reviewBody'=>mb_substr(trim($r['testo']), 0, 400),
+        'datePublished'=>gmdate('c', strtotime($r['created_at'])));
+    }
+    if (count($rev)) $place['review'] = $rev;
+  }
+  // Il locale: orari giorno per giorno, telefono, come si paga, il menu.
+  if ($locale || count($orari)) {
+    if (!empty($locale['telefono'])) $place['telephone'] = $locale['telefono'];
+    if (!empty($locale['sito']))     $place['sameAs'] = array($locale['sito']);
+    if (!empty($locale['pagamenti']) && is_array($locale['pagamenti'])) $place['paymentAccepted'] = implode(', ', $locale['pagamenti']);
+    if (!empty($locale['prenotazione_url'])) $place['potentialAction'] = array('@type'=>'ReserveAction',
+      'target'=>array('@type'=>'EntryPoint','urlTemplate'=>$locale['prenotazione_url']));
+    $giorniSchema = array('Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday');
+    $spec = array();
+    foreach ($orari as $o) {
+      if (!empty($o['chiuso']) || empty($o['apre']) || empty($o['chiude'])) continue;
+      $g = (int)$o['giorno']; if ($g < 0 || $g > 6) continue;
+      $spec[] = array('@type'=>'OpeningHoursSpecification', 'dayOfWeek'=>$giorniSchema[$g],
+        'opens'=>substr($o['apre'],0,5), 'closes'=>substr($o['chiude'],0,5));
+    }
+    if (count($spec)) $place['openingHoursSpecification'] = $spec;
+    if (count($piatti)) {
+      $voci = array();
+      foreach ($piatti as $pt) {
+        $v = array('@type'=>'MenuItem', 'name'=>$pt['nome']);
+        if (!empty($pt['descrizione'])) $v['description'] = mb_substr($pt['descrizione'], 0, 300);
+        if ($pt['prezzo'] !== null) $v['offers'] = array('@type'=>'Offer',
+          'price'=>(string)(float)$pt['prezzo'], 'priceCurrency'=>($pt['valuta'] ? $pt['valuta'] : 'ALL'));
+        $voci[] = $v;
+      }
+      $place['hasMenu'] = array('@type'=>'Menu', 'hasMenuItem'=>$voci);
+    }
+  }
+  // L'audioguida ufficiale: il copione e' testo vero, e per chi cerca vale piu'
+  // di dieci parole chiave.
+  if ($guida && !empty($guida['url'])) {
+    $place['subjectOf'] = array('@type'=>'AudioObject',
+      'name'=>$guida['titolo'], 'contentUrl'=>$guida['url'],
+      'encodingFormat'=>'audio/mpeg',
+      'duration'=>'PT' . (int)round((float)$guida['secondi']) . 'S',
+      'transcript'=>($guida['testo'] ? mb_substr($guida['testo'], 0, 3000) : null));
+    if ($place['subjectOf']['transcript'] === null) unset($place['subjectOf']['transcript']);
+  }
   $graph[] = $place;
 }
 $faqNode = seo_faq($faq); if ($faqNode) $graph[] = $faqNode;
@@ -211,6 +289,58 @@ $placeOg = ($lat !== null) ? ('<meta property="place:location:latitude" content=
         <?php endif; ?>
 
         <a class="cta" href="<?php echo e($appUrl); ?>"><?php echo e($L['cta']); ?></a>
+
+        <?php if (count($orari)):
+          $giorniNomi = array('it'=>array('lunedì','martedì','mercoledì','giovedì','venerdì','sabato','domenica'),
+                              'sq'=>array('e hënë','e martë','e mërkurë','e enjte','e premte','e shtunë','e diel'),
+                              'en'=>array('Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'));
+          $gn = $giorniNomi[$lang]; ?>
+        <h2><?php echo e($L['orari']); ?></h2>
+        <ul class="facts">
+          <?php for ($g=0; $g<7; $g++):
+            $turni = array();
+            foreach ($orari as $o) { if ((int)$o['giorno']===$g && empty($o['chiuso']) && !empty($o['apre'])) $turni[] = substr($o['apre'],0,5).'-'.substr($o['chiude'],0,5); } ?>
+          <li><span class="k"><?php echo e($gn[$g]); ?></span><span><?php echo e($turni ? implode(' · ', $turni) : $L['chiuso']); ?></span></li>
+          <?php endfor; ?>
+          <?php if (!empty($locale['telefono'])): ?><li><span class="k"><?php echo e($L['telefono']); ?></span><a href="tel:<?php echo e(preg_replace('/[^0-9+]/','',$locale['telefono'])); ?>"><?php echo e($locale['telefono']); ?></a></li><?php endif; ?>
+          <?php if (!empty($locale['pagamenti']) && is_array($locale['pagamenti'])): ?><li><span class="k"><?php echo e($L['paga']); ?></span><span><?php echo e(implode(', ', $locale['pagamenti'])); ?></span></li><?php endif; ?>
+        </ul>
+        <?php endif; ?>
+
+        <?php if (count($piatti)): ?>
+        <h2><?php echo e($L['menu']); ?></h2>
+        <ul class="facts">
+          <?php foreach (array_slice($piatti,0,25) as $pt): ?>
+          <li><span class="k"><?php echo e($pt['nome']); ?><?php if (!empty($pt['chef'])): ?> · <?php echo e($L['chef']); ?><?php endif; ?></span><span><?php
+            if ($pt['prezzo'] !== null) echo e(round((float)$pt['prezzo']) . ' ' . ($pt['valuta']==='EUR' ? '€' : 'Lek'));
+            if (!empty($pt['descrizione'])) echo '<br><small style="opacity:.7">' . e(mb_substr($pt['descrizione'],0,140)) . '</small>';
+          ?></span></li>
+          <?php endforeach; ?>
+        </ul>
+        <?php endif; ?>
+
+        <?php if ($guida && !empty($guida['testo'])): ?>
+        <h2><?php echo e($L['ascolta']); ?><?php if (!empty($guida['titolo'])): ?>: <?php echo e($guida['titolo']); ?><?php endif; ?></h2>
+        <p style="line-height:1.6"><?php echo e(mb_substr($guida['testo'], 0, 1500)); ?></p>
+        <?php endif; ?>
+
+        <?php if ($mediaVoti !== null): ?>
+        <h2><?php echo e($L['recensioni']); ?> · <?php echo e(str_replace('.', ',', (string)$mediaVoti)); ?> <?php echo e($L['su5']); ?></h2>
+        <ul class="facts">
+          <?php foreach (array_slice($recensioni,0,6) as $r): if (trim((string)$r['testo'])===''): continue; endif; ?>
+          <li><span class="k"><?php echo e(str_replace('.', ',', (string)(float)$r['voto'])); ?>/5</span><span><?php echo e(mb_substr(trim($r['testo']),0,300)); ?></span></li>
+          <?php endforeach; ?>
+        </ul>
+        <?php endif; ?>
+
+        <?php if (count($creditiFoto)): $viste=array(); ?>
+        <p style="font-size:12px;opacity:.65;line-height:1.5"><?php echo e($L['crediti']); ?>
+          <?php foreach ($creditiFoto as $c): $k=$c['autore'].'|'.$c['licenza']; if (isset($viste[$k])) continue; $viste[$k]=1; ?>
+            <?php if (!empty($c['fonte_url'])): ?><a href="<?php echo e($c['fonte_url']); ?>" rel="nofollow noopener" target="_blank"><?php echo e($c['autore']); ?></a><?php else: ?><?php echo e($c['autore']); ?><?php endif; ?>
+            · <?php echo e($c['licenza']); ?>
+          <?php endforeach; ?>
+        </p>
+        <?php endif; ?>
 
         <?php if (count($nearby)): ?>
         <h2><?php echo e($L['nearby']); ?></h2>
