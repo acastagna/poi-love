@@ -296,6 +296,60 @@ Deno.serve(async (req: Request) => {
     const temperature = typeof body?.temperature === "number" ? body.temperature : 0.7;
     const maxTokens = Math.min(Number(body?.max_completion_tokens) || 512, limits.maxTokens);
 
+    // ── 4-ter) Quello che sta nei nostri documenti ────────────────────────────
+    // I documenti caricati nella Conoscenza non servono a niente se ILLI non li
+    // legge. Qui, prima di rispondere, si cerca fra i pezzi quello che parla
+    // della domanda e glielo si mette davanti come fatto nostro. La ricerca non
+    // e' per parole uguali ma per significato: la domanda e il pezzo possono
+    // usare parole diverse e trovarsi lo stesso.
+    let messaggi = messages;
+    try {
+      const ultima = [...messages].reverse().filter((m) => m.role === "user")[0]?.content ?? "";
+      if (ultima.trim().length > 6 && OPENAI_KEY) {
+        const em = await fetch("https://api.openai.com/v1/embeddings", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${OPENAI_KEY}`, "Content-Type": "application/json" },
+          body: JSON.stringify({ model: "text-embedding-3-small", input: ultima.slice(0, 2000) }),
+          signal: AbortSignal.timeout(9000),
+        });
+        if (em.ok) {
+          const v = (await em.json())?.data?.[0]?.embedding;
+          if (Array.isArray(v)) {
+            const r = await chiama("conoscenza_cerca", {
+              p_vettore: JSON.stringify(v), p_ambito: "illi", p_quanti: 5,
+            });
+            const pezzi = (Array.isArray(r.dato) ? r.dato : [])
+              // sotto una certa vicinanza il pezzo parla d'altro: darlo a ILLI
+              // la porterebbe fuori strada invece che aiutarla
+              .filter((p: any) => Number(p?.vicinanza) >= 0.35);
+            if (pezzi.length) {
+              const fatti = pezzi.map((p: any) =>
+                `[${p.documento}, pagina ${p.pagina}]\n${String(p.testo).slice(0, 1200)}`
+              ).join("\n\n");
+              // I fatti vanno attaccati alla domanda: messi in cima, le istruzioni
+              // di sistema che vengono dopo li coprono e il modello risponde di
+              // testa sua. Misurato: il copilota aveva i pezzi e inventava lo stesso.
+              const bloccoFatti = {
+                role: "system" as const,
+                content:
+                  "DOCUMENTI UFFICIALI DI POI-LOVE che parlano di quello che ti e' appena stato chiesto. " +
+                  "Sono fatti nostri e valgono piu' di quello che credi di sapere: se rispondono alla " +
+                  "domanda, rispondi con questi e non con altro.\n\n" + fatti +
+                  "\n\nDi' sempre da quale documento e pagina viene la risposta. " +
+                  "Se non c'entrano niente, ignorali e non nominarli.",
+              };
+              const ultimoUser = messages.map((m) => m.role).lastIndexOf("user");
+              messaggi = ultimoUser >= 0
+                ? [...messages.slice(0, ultimoUser), bloccoFatti, ...messages.slice(ultimoUser)]
+                : [...messages, bloccoFatti];
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.log("illi-chat: conoscenza non consultata, vado avanti lo stesso:", String(e));
+    }
+
     // ── 4-bis) Prima si prova in casa ─────────────────────────────────────────
     // Il modello sulla nostra macchina non costa niente. Non e bravo come gli
     // altri e in albanese sbaglia, per questo la tabella dice in quali lingue si
@@ -308,8 +362,8 @@ Deno.serve(async (req: Request) => {
       ))[0];
       const parlaQuestaLingua = Array.isArray(inCasa?.lingue) && inCasa.lingue.includes(linguaChiesta);
       if (inCasa?.indirizzo && parlaQuestaLingua) {
-        const sistema = messages.filter((m) => m.role === "system").map((m) => m.content).join("\n\n");
-        const domanda = messages.filter((m) => m.role !== "system")
+        const sistema = messaggi.filter((m) => m.role === "system").map((m) => m.content).join("\n\n");
+        const domanda = messaggi.filter((m) => m.role !== "system")
           .map((m) => (m.role === "user" ? "Domanda: " : "Risposta: ") + m.content).join("\n\n");
         try {
           const r = await fetch(inCasa.indirizzo, {
@@ -340,8 +394,8 @@ Deno.serve(async (req: Request) => {
     // ── 5) Dispatch al provider scelto ────────────────────────────────────────
     if (engine.provider === "anthropic") {
       // Anthropic vuole il system separato e solo ruoli user/assistant nei messages.
-      const systemPrompt = messages.filter((m) => m.role === "system").map((m) => m.content).join("\n\n");
-      const amsgs = messages
+      const systemPrompt = messaggi.filter((m) => m.role === "system").map((m) => m.content).join("\n\n");
+      const amsgs = messaggi
         .filter((m) => m.role !== "system")
         .map((m) => ({ role: m.role, content: m.content }));
       if (!amsgs.length) { if (refundQuota) await refundQuota(); return json({ error: "bad_request" }, 400); }
@@ -391,7 +445,7 @@ Deno.serve(async (req: Request) => {
     // ── OpenAI (default) ──────────────────────────────────────────────────────
     const payload = {
       model,
-      messages,
+      messages: messaggi,          // con davanti i fatti presi dai nostri documenti
       temperature,
       max_completion_tokens: maxTokens,
     };

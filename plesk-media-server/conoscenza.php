@@ -62,40 +62,94 @@ if (empty($_FILES['file']) || $_FILES['file']['error'] !== UPLOAD_ERR_OK) {
     error_response('serve un file');
 }
 $tmp = $_FILES['file']['tmp_name'];
-if (filesize($tmp) > MAX_PDF) { error_response('il PDF supera i 25 MB'); }
+if (filesize($tmp) > MAX_PDF) { error_response('il file supera i 25 MB'); }
 
 $fi   = finfo_open(FILEINFO_MIME_TYPE);
 $mime = finfo_file($fi, $tmp);
 finfo_close($fi);
-if ($mime !== 'application/pdf') { error_response('per ora si caricano solo PDF, questo e ' . $mime); }
+$nomeFile = (string)($_FILES['file']['name'] ?? '');
+$est = strtolower((string)pathinfo($nomeFile, PATHINFO_EXTENSION));
 
-$titolo = trim($_POST['titolo'] ?? '') ?: preg_replace('/\.pdf$/i', '', (string)$_FILES['file']['name']);
+// PDF, Word e testo semplice. Il vecchio .doc di Word 97 no: e un formato
+// chiuso e diverso, e aprirlo a mano non vale la pena. Si riapre in Word e si
+// salva come .docx, poi si carica.
+$TIPI = [
+    'pdf'  => 'application/pdf',
+    'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'txt'  => 'text/plain',
+    'md'   => 'text/plain',
+];
+if (!isset($TIPI[$est])) {
+    error_response('si caricano PDF, Word (.docx) e testo semplice. Questo e un .' . ($est ?: '?') .
+                   '. Un .doc vecchio si riapre in Word e si salva come .docx.');
+}
+if ($est === 'pdf' && $mime !== 'application/pdf') { error_response('il file dice .pdf ma non lo e: ' . $mime); }
+if ($est === 'docx' && strpos($mime, 'zip') === false && strpos($mime, 'openxml') === false) {
+    error_response('il file dice .docx ma non lo e: ' . $mime);
+}
+
+$titolo = trim($_POST['titolo'] ?? '') ?: preg_replace('/\.[a-z0-9]+$/i', '', $nomeFile);
 $ambito = in_array($_POST['ambito'] ?? '', ['illi', 'copilota', 'entrambi'], true) ? $_POST['ambito'] : 'entrambi';
 $lingua = in_array($_POST['lingua'] ?? '', ['it', 'sq', 'en'], true) ? $_POST['lingua'] : 'it';
 
-// ── 2. il testo, pagina per pagina ──────────────────────────────────────────
-// pdftotext con -f e -l una pagina alla volta: cosi si sa da quale pagina
-// viene ogni pezzo, e chi legge la risposta puo andare a controllare.
-$quante = 0;
-$out = [];
-exec('pdfinfo ' . escapeshellarg($tmp) . ' 2>&1', $out);
-foreach ($out as $riga) { if (preg_match('/^Pages:\s+(\d+)/', $riga, $m)) { $quante = (int)$m[1]; } }
-if ($quante < 1) { error_response('non riesco a leggere questo PDF'); }
-if ($quante > 400) { error_response('il PDF ha ' . $quante . ' pagine: oltre le 400 va diviso'); }
+// ── 2. il testo ─────────────────────────────────────────────────────────────
+// Le parole spezzate a fine riga col trattino tornano intere: senza questo,
+// "esperienza" scritta "esper-\nienza" diventa due parole che non esistono e la
+// ricerca per senso non le riconosce piu.
+function ripulisci(string $t): string {
+    $t = preg_replace('/(\p{L})-\n(\p{Ll})/u', '$1$2', $t);
+    return trim(preg_replace('/[ \t]+/', ' ', preg_replace('/\n{3,}/', "\n\n", $t)));
+}
+
+/** Word .docx: dentro e una cartella compressa, il testo sta in word/document.xml. */
+function testoDaWord(string $file): string {
+    if (!class_exists('ZipArchive')) { return ''; }
+    $zip = new ZipArchive();
+    if ($zip->open($file) !== true) { return ''; }
+    $xml = $zip->getFromName('word/document.xml');
+    $zip->close();
+    if ($xml === false) { return ''; }
+    // ogni fine paragrafo e ogni a capo diventano un a capo vero, poi via i tag
+    $xml = preg_replace('#</w:p>#', "\n", $xml);
+    $xml = preg_replace('#<w:br[^>]*/>#', "\n", $xml);
+    $xml = preg_replace('#<w:tab[^>]*/>#', ' ', $xml);
+    $xml = strip_tags($xml);
+    return html_entity_decode($xml, ENT_QUOTES | ENT_XML1, 'UTF-8');
+}
 
 $pagine = [];
-for ($p = 1; $p <= $quante; $p++) {
-    $t = shell_exec('pdftotext -f ' . $p . ' -l ' . $p . ' -enc UTF-8 -nopgbrk ' .
-                    escapeshellarg($tmp) . ' - 2>/dev/null');
-    // Le parole spezzate a fine riga con il trattino tornano intere: senza
-    // questo, "esperienza" scritta "esper-\nienza" diventa due parole che non
-    // esistono, e la ricerca per senso non le riconosce piu.
-    $t = preg_replace('/(\p{L})-\n(\p{Ll})/u', '$1$2', (string)$t);
-    $t = trim(preg_replace('/[ \t]+/', ' ', preg_replace('/\n{3,}/', "\n\n", $t)));
-    if ($t !== '') { $pagine[$p] = $t; }
-}
-if (!$pagine) {
-    error_response('questo PDF non ha testo: e fatto di immagini. Serve prima passarlo a un lettore ottico.');
+if ($est === 'pdf') {
+    // pdftotext una pagina alla volta: cosi si sa da quale pagina viene ogni
+    // pezzo, e chi legge la risposta puo andare a controllare.
+    $quante = 0;
+    $out = [];
+    exec('pdfinfo ' . escapeshellarg($tmp) . ' 2>&1', $out);
+    foreach ($out as $riga) { if (preg_match('/^Pages:\s+(\d+)/', $riga, $m)) { $quante = (int)$m[1]; } }
+    if ($quante < 1) { error_response('non riesco a leggere questo PDF'); }
+    if ($quante > 400) { error_response('il PDF ha ' . $quante . ' pagine: oltre le 400 va diviso'); }
+    for ($p = 1; $p <= $quante; $p++) {
+        $t = ripulisci((string)shell_exec('pdftotext -f ' . $p . ' -l ' . $p . ' -enc UTF-8 -nopgbrk ' .
+                                          escapeshellarg($tmp) . ' - 2>/dev/null'));
+        if ($t !== '') { $pagine[$p] = $t; }
+    }
+    if (!$pagine) {
+        error_response('questo PDF non ha testo: e fatto di immagini. Serve prima passarlo a un lettore ottico.');
+    }
+} else {
+    // Word e testo semplice non hanno pagine vere: si finge una pagina ogni
+    // tremila caratteri, cosi il riferimento resta comunque utile a chi cerca.
+    $tutto = ($est === 'docx') ? testoDaWord($tmp) : (string)file_get_contents($tmp);
+    if ($est !== 'docx' && !mb_check_encoding($tutto, 'UTF-8')) {
+        $tutto = mb_convert_encoding($tutto, 'UTF-8', 'Windows-1252, ISO-8859-1');
+    }
+    $tutto = ripulisci($tutto);
+    if ($tutto === '') { error_response('in questo file non ho trovato testo'); }
+    if (mb_strlen($tutto) > 900000) { error_response('il file e troppo lungo: va diviso'); }
+    $p = 1;
+    foreach (str_split($tutto, 3000) as $fetta) {
+        $fetta = trim($fetta);
+        if ($fetta !== '') { $pagine[$p++] = $fetta; }
+    }
 }
 
 // ── 3. i pezzi ──────────────────────────────────────────────────────────────
@@ -168,7 +222,7 @@ if ($scritti === 0) {
 // ── 5. il file resta, cosi si puo rileggere ─────────────────────────────────
 $dir = __DIR__ . '/conoscenza';
 if (!is_dir($dir)) { @mkdir($dir, 0755, true); }
-$nome = $docId . '.pdf';
+$nome = $docId . '.' . $est;
 @move_uploaded_file($tmp, $dir . '/' . $nome);
 db('PATCH', '/conoscenza_documenti?id=eq.' . urlencode($docId),
    ['file_url' => 'https://media.poilove.com/conoscenza/' . $nome]);

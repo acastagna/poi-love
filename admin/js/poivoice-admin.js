@@ -315,11 +315,18 @@
         '<div style="font-size:11.5px;opacity:.55;margin-top:3px">Campo separato dal testo: Google lo legge come '+
         'istruzione a chi recita, non come parole da leggere.</div></div>'+
 
-      '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:8px">'+
-        '<div class="field"><label>Luoghi famosi, secondi</label><input id="pvSecFam" type="number" min="30" max="900" value="'+Number(imp.secondi_famoso||360)+'"></div>'+
-        '<div class="field"><label>Medi, secondi</label><input id="pvSecMed" type="number" min="30" max="900" value="'+Number(imp.secondi_medio||180)+'"></div>'+
-        '<div class="field"><label>Normali, secondi</label><input id="pvSecNor" type="number" min="30" max="900" value="'+Number(imp.secondi_normale||60)+'"></div>'+
-        '<div class="field"><label>Credito caricato, dollari</label><input id="pvCredito" type="number" step="0.01" min="0" value="'+(imp.credito_caricato==null?'':imp.credito_caricato)+'" placeholder="quanto hai messo"></div>'+
+      '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:8px">'+
+        '<div class="field"><label>Credito caricato, dollari</label>'+
+          '<input id="pvCredito" type="number" step="0.01" min="0" value="'+(imp.credito_caricato==null?'':imp.credito_caricato)+'" placeholder="quanto hai messo">'+
+          '<div style="font-size:11px;opacity:.5;margin-top:3px">Serve solo a stimare quanto resta: '+
+          'Google non lo dice a nessuno.</div></div>'+
+        '<div class="field"><label>La durata</label>'+
+          '<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--line,#3a3a3a);'+
+            'border-radius:11px;background:rgba(255,255,255,.02);font-size:12.5px;line-height:1.5">'+
+            '<i class="ph-duotone ph-timer" style="font-size:19px;color:var(--gold,#E8B04B);flex-shrink:0"></i>'+
+            '<span>Non si imposta. Esce dal copione: sopra ogni testo c\'e scritto quanto dura, '+
+            'e da li si accorcia o si allunga.</span>'+
+          '</div></div>'+
       '</div>'+
       '<div id="pvLottiBox" style="margin-top:10px"></div>'+
 
@@ -527,16 +534,16 @@
                  || modelli.find(function(m){ return m.fase==='copione' && m.predefinito; })
                  || modelli.find(function(m){ return m.fase==='copione'; });
     if(!modello){ alert('Manca il modello di prompt per il copione.'); return; }
-    const secondi = scelto.ufficiale ? Number(imp.secondi_medio||180) : Number(imp.secondi_normale||60);
-    const parole = Math.round(secondi * 140 / 60);
+    // Niente durata da rispettare: la lunghezza la decide il materiale, e poi
+    // si legge nella pastiglia sopra il copione. Prima qui si passava un numero
+    // di secondi preso da tre caselle, ed era il contrario di come deve andare.
     const testo = riempi(modello.testo, {
-      durata: secondi, parole: parole,
       materiale: ric.map(function(m){ return m.testo; }).join('\n\n───\n\n'),
     });
     try{
       const { error } = await sb.rpc('coda_chiedi', {
         p_fase: 'copione', p_domanda: testo, p_poi: scelto.id, p_modello: modello.id,
-        p_contesto: { lingua: lingua, secondi: secondi },
+        p_contesto: { lingua: lingua },
       });
       if(error) throw error;
       await datiLuogo(); disegna();
@@ -816,9 +823,6 @@
       const credito = document.getElementById('pvCredito').value.trim();
       const { data, error } = await sb.from('voce_impostazioni').update({
         regia: document.getElementById('pvRegia').value.trim() || null,
-        secondi_famoso: Number(document.getElementById('pvSecFam').value) || 360,
-        secondi_medio: Number(document.getElementById('pvSecMed').value) || 180,
-        secondi_normale: Number(document.getElementById('pvSecNor').value) || 60,
         a_lotti: !!(lottiSw && lottiSw.checked),
         credito_caricato: credito === '' ? null : Number(credito),
         aggiornato: new Date().toISOString(),

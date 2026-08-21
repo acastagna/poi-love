@@ -1848,6 +1848,53 @@ Deno.serve(async (req: Request) => {
     return json({ error: "no_ai_key", detail: "no AI provider configured" }, 503);
   }
 
+  // ── Quello che sta nei nostri documenti ─────────────────────────────────────
+  // Stesso principio di ILLI: prima di rispondere si guarda se un documento
+  // caricato nella Conoscenza parla di quello che e' stato chiesto.
+  let fattiDaiDocumenti = "";
+  try {
+    const ultima = [...messages].reverse().filter((m: any) => m.role === "user")[0]?.content ?? "";
+    if (String(ultima).trim().length > 6 && OPENAI_KEY) {
+      const em = await fetch("https://api.openai.com/v1/embeddings", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${OPENAI_KEY}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ model: "text-embedding-3-small", input: String(ultima).slice(0, 2000) }),
+        signal: AbortSignal.timeout(9000),
+      });
+      if (em.ok) {
+        const v = (await em.json())?.data?.[0]?.embedding;
+        if (Array.isArray(v)) {
+          const rr = await fetch(`${REST}/rpc/conoscenza_cerca`, {
+            method: "POST",
+            headers: { apikey: SERVICE_ROLE_KEY, Authorization: `Bearer ${SERVICE_ROLE_KEY}`, "Content-Type": "application/json" },
+            body: JSON.stringify({ p_vettore: JSON.stringify(v), p_ambito: "copilota", p_quanti: 5 }),
+            signal: AbortSignal.timeout(12000),
+          });
+          if (rr.ok) {
+            const pezzi = ((await rr.json()) as any[]).filter((p) => Number(p?.vicinanza) >= 0.35);
+            if (pezzi.length) {
+              const fatti = pezzi.map((p) =>
+                `[${p.documento}, pagina ${p.pagina}]\n${String(p.testo).slice(0, 1200)}`
+              ).join("\n\n");
+              // I fatti vanno attaccati alla domanda: messi in cima, le istruzioni
+              // di sistema che vengono dopo li coprono e il modello risponde di
+              // testa sua. Misurato: il copilota aveva i pezzi e inventava lo stesso.
+              fattiDaiDocumenti =
+                "\n\n═══ DOCUMENTI UFFICIALI DI POI-LOVE ═══\n" +
+                "Questi passaggi vengono dai documenti caricati nella Conoscenza e parlano di quello " +
+                "che ti e' appena stato chiesto. Sono fatti nostri e valgono piu' di quello che credi " +
+                "di sapere: se rispondono alla domanda, rispondi con questi e non con altro. " +
+                "Di' sempre da quale documento e pagina viene la risposta. " +
+                "Se non c'entrano niente, ignorali e non nominarli.\n\n" + fatti;
+            }
+          }
+        }
+      }
+    }
+  } catch (e) {
+    console.log("copilota: conoscenza non consultata, vado avanti:", String(e));
+  }
+
   // ── Prima si prova in casa, ma solo per le domande semplici ──────────────────
   // Il modello sulla nostra macchina non costa niente. Non sa pero usare gli
   // strumenti del copilota: quando c'e da scrivere sul database o costruire una
@@ -1858,7 +1905,7 @@ Deno.serve(async (req: Request) => {
       const righe = await leggiFornitori();
       const casa = righe.filter((f: any) => f?.acceso && String(f.chiave) === "locale")[0] as any;
       if (casa?.indirizzo) {
-        const sistema = messages.filter((m: any) => m.role === "system").map((m: any) => m.content).join("\n\n");
+        const sistema = messages.filter((m: any) => m.role === "system").map((m: any) => m.content).join("\n\n") + fattiDaiDocumenti;
         const domanda = messages.filter((m: any) => m.role !== "system")
           .map((m: any) => (m.role === "user" ? "Domanda: " : "Risposta: ") + m.content).join("\n\n");
         const r = await fetch(String(casa.indirizzo), {
@@ -1919,7 +1966,7 @@ Deno.serve(async (req: Request) => {
   }
 
   const systemPrompt =
-    baseSystemPrompt(mode) + "\n\n" + statsToSystemMessage(stats);
+    baseSystemPrompt(mode) + "\n\n" + statsToSystemMessage(stats) + fattiDaiDocumenti;
 
   // ── Loop agentico con fallback provider ───────────────────────────────────────
   let agent: AgentResult | null = null;
