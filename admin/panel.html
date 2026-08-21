@@ -578,6 +578,7 @@ html[data-theme="light"] .chip.green{color:#236b39}
 <script src="js/itinerari-admin.js?v=349"></script>
 <script src="js/compagnie-admin.js?v=350"></script>
 <script src="js/ai-connessione.js?v=350"></script>
+<script src="js/poivoice-admin.js?v=352"></script>
 </head>
 <body>
 <div class="grain"></div>
@@ -649,6 +650,9 @@ html[data-theme="light"] .chip.green{color:#236b39}
     </div>
     <div class="nav-item" data-sec="livelli" onclick="openSection('livelli')">
       <span class="ic"><i class="ph-duotone ph-crown-simple"></i></span> Livelli
+    </div>
+    <div class="nav-item" data-sec="poivoice" onclick="openSection('poivoice')">
+      <span class="ic"><i class="ph-duotone ph-headphones"></i></span> POI•VOICE
     </div>
     <div class="nav-item" data-sec="connessioni" onclick="openSection('connessioni')">
       <span class="ic"><i class="ph-duotone ph-plugs-connected"></i></span> Connessioni AI
@@ -916,6 +920,11 @@ html[data-theme="light"] .chip.green{color:#236b39}
       <div id="connessioniBox"></div>
     </section>
 
+    <!-- Le audioguide: cerca, scrivi, leggi -->
+    <section class="section" id="sec-poivoice">
+      <div id="poivoiceBox"></div>
+    </section>
+
     <!-- 8c) CATEGORIE (tassonomia data-driven) -->
     <section class="section" id="sec-categories">
       <div class="panel" style="margin-bottom:16px">
@@ -1114,6 +1123,8 @@ let aiBusy = false;       // richiesta al copilota in volo: blocca invii concorr
 /* ─────────────────────────── i18n (pattern T del login) ─────────────────────────── */
 const T = {
   it:{
+    nav_poivoice:"POI•VOICE",
+    sub_poivoice:"Le audioguide, in tre fasi: si cerca, si scrive il copione, si da la voce.",
     nav_connessioni:"Connessioni AI",
     sub_connessioni:"Quale intelligenza risponde a ILLI e al copilota: chi e' acceso, dove si prende la chiave, e in che ordine si prova.",
     nav_compagnie:"Compagnie",
@@ -1232,6 +1243,8 @@ const T = {
     f_coords:'Coordinate', f_address:'Indirizzo', f_city:'Città'
   },
   sq:{
+    nav_poivoice:"POI•VOICE",
+    sub_poivoice:"Audioguidat, ne tri faza: kerkohet, shkruhet teksti, i jepet zeri.",
     nav_connessioni:"Lidhjet AI",
     sub_connessioni:"Cila inteligjence i pergjigjet ILLI-t dhe kopilotit: kush eshte ndezur, ku merret celesi, dhe me cfare radhe provohet.",
     nav_compagnie:"Shoqerite",
@@ -1346,6 +1359,8 @@ const T = {
     f_coords:'Koordinatat', f_address:'Adresa', f_city:'Qyteti'
   },
   en:{
+    nav_poivoice:"POI•VOICE",
+    sub_poivoice:"The audio guides, in three phases: research, script, voice.",
     nav_connessioni:"AI connections",
     sub_connessioni:"Which intelligence answers ILLI and the copilot: what is on, where the key comes from, and in what order they are tried.",
     nav_compagnie:"Companion groups",
@@ -1643,10 +1658,10 @@ async function doLogout(){
 /* ─────────────────────────── Navigazione sezioni (lazy) ─────────────────────────── */
 const SUBKEY = { dashboard:'sub_dashboard', moderation:'sub_moderation', users:'sub_users',
   ailimits:'sub_ailimits', copilot:'sub_copilot', create:'sub_create', pois:'sub_pois', routes:'sub_routes', audit:'sub_audit', categories:'sub_categories' , tags:'sub_tags', badges:'sub_badges', knowledge:'sub_knowledge', media:'sub_media', itineraries:'sub_itineraries', punti:'sub_punti', landing:'sub_landing',
-  livelli:'sub_livelli', catena:'sub_catena', compagnie:'sub_compagnie', connessioni:'sub_connessioni', direttive:'sub_direttive', qr:'sub_qr', volti:'sub_volti', messages:'sub_messages' };
+  livelli:'sub_livelli', catena:'sub_catena', compagnie:'sub_compagnie', connessioni:'sub_connessioni', poivoice:'sub_poivoice', direttive:'sub_direttive', qr:'sub_qr', volti:'sub_volti', messages:'sub_messages' };
 const TITLEKEY = { dashboard:'nav_dashboard', moderation:'nav_moderation', users:'nav_users',
   ailimits:'nav_ailimits', copilot:'nav_copilot', create:'nav_create', pois:'nav_pois', routes:'nav_routes', itineraries:'nav_itineraries', categories:'nav_categories', tags:'nav_tags', badges:'nav_badges', knowledge:'nav_knowledge', audit:'nav_audit', media:'nav_media', landing:'nav_landing', punti:'nav_punti',
-  livelli:'nav_livelli', catena:'nav_catena', compagnie:'nav_compagnie', connessioni:'nav_connessioni', direttive:'nav_direttive', qr:'nav_qr', volti:'nav_volti', messages:'nav_messages' };
+  livelli:'nav_livelli', catena:'nav_catena', compagnie:'nav_compagnie', connessioni:'nav_connessioni', poivoice:'nav_poivoice', direttive:'nav_direttive', qr:'nav_qr', volti:'nav_volti', messages:'nav_messages' };
 
 function updateHeader(sec){
   document.getElementById('secTitle').textContent = t(TITLEKEY[sec]);
@@ -1698,6 +1713,7 @@ function runSection(sec){
     case 'itineraries': if(window.ItinerariAdmin) window.ItinerariAdmin.load(document.getElementById('itinerariBox')); break;
     case 'compagnie': if(window.CompagnieAdmin) window.CompagnieAdmin.load(document.getElementById('compagnieBox')); break;
     case 'connessioni': if(window.AiConnessione) window.AiConnessione.load(document.getElementById('connessioniBox')); break;
+    case 'poivoice': if(window.PoiVoiceAdmin) window.PoiVoiceAdmin.load(document.getElementById('poivoiceBox')); break;
     case 'categories': loadCategoriesAdmin(); break;
     case 'tags': loadTagsAdmin(); break;
     case 'badges': if(window.BadgeAdmin) window.BadgeAdmin.load(document.getElementById('badgesBox')); break;
