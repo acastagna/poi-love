@@ -15,7 +15,8 @@
 *{box-sizing:border-box}
 body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.65;-webkit-text-size-adjust:100%}
 .topbar{background:#0d0d0d;color:#fff;padding:13px 20px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:10}
-.topbar a.brand{color:#fff;text-decoration:none;font-weight:900;letter-spacing:.5px;font-size:16px}
+.topbar a.brand{display:flex;align-items:center;text-decoration:none}
+.topbar a.brand img{height:22px;width:auto;display:block}
 .topbar a.brand .h{color:var(--red)}
 .topbar .back{margin-left:auto;color:#cdbfae;text-decoration:none;font-size:13px;font-weight:600}
 .wrap{max-width:780px;margin:0 auto;padding:34px 22px 70px}
@@ -41,7 +42,7 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Hel
 </style>
 </head>
 <body>
-<div class="topbar"><a class="brand" href="/">POI<span class="h">•</span>LOVE</a><a class="back" href="/">Torna all'app</a></div>
+<div class="topbar"><a class="brand" href="/"><img src="/img/logo-bianco.png" alt="POI•LOVE"></a><a class="back" href="/">Torna all'app</a></div>
 <div class="wrap"><div class="lingue" id="lingue"><button data-lg="it" onclick="setLingua('it')">IT</button><button data-lg="sq" onclick="setLingua('sq')">SQ</button><button data-lg="en" onclick="setLingua('en')">EN</button></div><div id="content"></div></div>
 <div class="foot"><span>© POI•LOVE · 321.AL / EVOLAB</span><a href="/privacy">Privacy</a><a href="/terms">Condizioni</a><a href="/">App</a></div>
 <script type="text/plain" id="md-it"># Informativa sulla privacy di POI•LOVE

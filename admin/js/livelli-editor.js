@@ -75,7 +75,8 @@
         '<div style="flex:1;min-width:0">'+
           '<div style="font-size:16px;font-weight:900">'+esc(l.nome)+
             '<span style="font-family:ui-monospace,monospace;font-size:11.5px;opacity:.5;margin-left:9px">'+esc(l.chiave)+'</span>'+
-            (l.visibile ? '' : '<span style="font-size:11px;opacity:.6;margin-left:9px">nascosto</span>')+
+            (l.visibile ? '' : '<span style="font-size:11px;font-weight:800;margin-left:9px;color:#E0A54A">'+
+              'nascosto: non lo vede nessuno finche non lo accendi</span>')+
           '</div>'+
           '<div style="font-size:12.5px;opacity:.72;margin-top:3px">'+esc(prezzo)+
             ' · '+v.filter(function(x){ return x.attivo; }).length+' vantaggi'+
@@ -83,7 +84,11 @@
             (l.audioguide_max ? (', '+l.audioguide_max+' audioguide') : '')+
           '</div>'+
         '</div>'+
-        '<button class="btn sm" data-azione="apri"><i class="ph-duotone ph-sliders-horizontal"></i> Regola</button>'+
+        '<div class="btn-row" style="flex-shrink:0">'+
+          '<button class="btn sm" data-azione="copia" title="Un livello nuovo con le stesse regole di questo">'+
+            '<i class="ph-duotone ph-copy"></i> Copia</button>'+
+          '<button class="btn sm" data-azione="apri"><i class="ph-duotone ph-sliders-horizontal"></i> Regola</button>'+
+        '</div>'+
       '</div>'+
       '<div class="liv-ed" hidden style="margin-top:12px;border-top:1px solid var(--line,#3a3a3a);padding-top:12px"></div>'+
     '</div>';
@@ -110,8 +115,30 @@
     box.querySelectorAll('[data-liv]').forEach(function(c){
       const l = livelli.find(function(x){ return x.chiave === c.dataset.liv; });
       c.querySelector('[data-azione=apri]').onclick = function(){ apri(c, l); };
+      c.querySelector('[data-azione=copia]').onclick = function(){ copia(c, l); };
       if(aperto === l.chiave) apri(c, l);
     });
+  }
+
+  // ── COPIARE UN LIVELLO ───────────────────────────────────────────────────
+  // Un modello di guadagno nuovo quasi mai parte da zero: parte da uno che gia
+  // funziona e cambia due cose. La copia nasce nascosta e si apre subito, cosi
+  // la prima cosa che si fa e darle il nome giusto.
+  async function copia(c, l){
+    const b = c.querySelector('[data-azione=copia]');
+    b.disabled = true;
+    try{
+      const { data, error } = await sb.rpc('duplica_livello', { p_chiave: l.chiave, p_nome: null });
+      if(error) throw error;
+      aperto = data; creaAperto = false;
+      await dati(); disegna();
+      // porta subito il nome sotto gli occhi: e la prima cosa da cambiare
+      const nuovo = box.querySelector('[data-liv="'+data+'"] .f-nome');
+      if(nuovo){ nuovo.focus(); nuovo.select(); nuovo.scrollIntoView({ block:'center' }); }
+    }catch(e){
+      b.disabled = false;
+      alert('Non sono riuscito a copiare: ' + (e.message||''));
+    }
   }
 
   // ── CREARE UN LIVELLO ────────────────────────────────────────────────────

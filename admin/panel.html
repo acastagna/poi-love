@@ -117,7 +117,13 @@ body{
   border-right:1px solid var(--line);
   display:flex;flex-direction:column;padding:22px 16px;gap:6px;
 }
-.s-brand{display:flex;align-items:center;gap:8px;font-weight:900;letter-spacing:.5px;font-size:18px;padding:4px 8px 16px}
+.s-brand{display:flex;align-items:center;gap:9px;padding:4px 8px 16px}
+/* Il marchio e' il marchio, non due parole scritte a mano: bianco sul fondo
+   scuro, rosso su quello chiaro. Sono lo stesso disegno in due vestiti. */
+.s-logo{height:26px;width:auto;display:block}
+.s-logo.chiaro{display:none}
+html[data-theme="light"] .s-logo.scuro{display:none}
+html[data-theme="light"] .s-logo.chiaro{display:block}
 .s-brand .h{color:var(--red)}
 .s-brand .tag{font-size:8px;font-weight:800;letter-spacing:2px;color:var(--gold);border:1px solid var(--gold);
   border-radius:20px;padding:3px 7px;margin-left:2px;text-transform:uppercase}
@@ -577,13 +583,13 @@ html[data-theme="light"] .chip.green{color:#236b39}
 <script src="js/volti-admin.js?v=357"></script>
 <script src="js/direttive-admin.js?v=357"></script>
 <script src="js/livelli-admin.js?v=357"></script>
-<script src="js/livelli-editor.js?v=357"></script>
+<script src="js/livelli-editor.js?v=362"></script>
 <script src="js/conoscenza-pdf.js?v=357"></script>
 <script src="js/catena-admin.js?v=357"></script>
 <script src="js/itinerari-admin.js?v=357"></script>
 <script src="js/compagnie-admin.js?v=357"></script>
 <script src="js/ai-connessione.js?v=358"></script>
-<script src="js/poivoice-admin.js?v=361"></script>
+<script src="js/poivoice-admin.js?v=362"></script>
 </head>
 <body>
 <div class="grain"></div>
@@ -598,7 +604,11 @@ html[data-theme="light"] .chip.green{color:#236b39}
 <div class="app" id="app">
   <!-- Sidebar -->
   <aside class="sidebar">
-    <div class="s-brand">POI<span class="h">•</span>LOVE<span class="tag">Admin</span></div>
+    <div class="s-brand">
+      <img class="s-logo scuro" src="img/logo-bianco.png" alt="POI•LOVE">
+      <img class="s-logo chiaro" src="img/logo-completo.svg" alt="POI•LOVE">
+      <span class="tag">Admin</span>
+    </div>
 
     <div class="nav-item on" data-sec="dashboard" onclick="openSection('dashboard')">
       <span class="ic"><i class="ph-duotone ph-chart-bar"></i></span><span class="label" data-t="nav_dashboard">Dashboard</span>
@@ -1167,7 +1177,7 @@ const T = {
     engine_anthropic_nokey:'Per usare Anthropic imposta ANTHROPIC_KEY nei segreti di Supabase (Edge Functions). Finché manca, ILLI resta su OpenAI.',
     save_limits:'Salva limiti', reload:'Ricarica',
     mode_chat:'Chat', mode_route:'Traccia percorso', mode_write:'Scrivi testo', send:'Invia',
-    create_poi:'Crea POI ufficiale', f_name:'Nome', f_desc:'Descrizione', f_cat:'Categoria', f_vis:'Visibilità',
+    create_poi:'Crea POI ufficiale', f_name:'Nome', f_desc:'Descrizione', f_cat:'Categoria', f_vis:'A chi si rivolge',
     use_map:'Usa la mia posizione', create_btn:'Crea POI',
     create_trip:'Crea percorso', f_trip_name:'Nome percorso', f_badge:'Badge', f_dates:'Date', f_stops:'Tappe',
     add_stop:'+ Aggiungi tappa', create_trip_btn:'Crea percorso',
@@ -1234,7 +1244,7 @@ const T = {
     c_poi:'POI', c_cat:'Categoria', c_state:'Stato',
     st_draft:'Bozza', st_published:'Pubblico', st_official:'Ufficiale', st_removed:'Rimosso',
     a_view:'Vedi', a_edit:'Modifica', a_publish:'Pubblica', a_delete:'Elimina', a_remove:'Rimuovi', a_restore:'Ripristina', a_delete_hard:'Elimina per sempre',
-    view_poi:'Dettagli POI', edit_poi:'Modifica POI', f_state:'Stato', cat_filter:'Filtra le categorie…', cat_one:'scelta', cat_many:'scelte', f_pub_on:'Visibile a tutti', f_pub_hint:'Spento resta in attesa e non compare sulla mappa',
+    view_poi:'Dettagli POI', edit_poi:'Modifica POI', f_state:'Controllo', cat_filter:'Filtra le categorie…', cat_one:'scelta', cat_many:'scelte', f_pub_on:'Pubblicato', f_pub_hint:'Spento resta in attesa: non lo vede nessuno, neanche la community',
     f_title:'Titolo', f_approved:'Pubblico (approvato e visibile)',
     need_title:'Il titolo è obbligatorio', save_btn:'Salva', cancel_btn:'Annulla',
     confirm_del_poi:'Eliminare definitivamente questo POI?', poi_deleted:'POI eliminato',
@@ -1287,7 +1297,7 @@ const T = {
     engine_anthropic_nokey:'Për të përdorur Anthropic vendos ANTHROPIC_KEY te sekretet e Supabase (Edge Functions). Deri atëherë, ILLI rri në OpenAI.',
     save_limits:'Ruaj limitet', reload:'Rifresko',
     mode_chat:'Bisedë', mode_route:'Vizato itinerar', mode_write:'Shkruaj tekst', send:'Dërgo',
-    create_poi:'Krijo POI zyrtar', f_name:'Emri', f_desc:'Përshkrimi', f_cat:'Kategoria', f_vis:'Dukshmëria',
+    create_poi:'Krijo POI zyrtar', f_name:'Emri', f_desc:'Përshkrimi', f_cat:'Kategoria', f_vis:'Kujt i drejtohet',
     use_map:'Përdor pozicionin tim', create_btn:'Krijo POI',
     create_trip:'Krijo itinerar', f_trip_name:'Emri i itinerarit', f_badge:'Stema', f_dates:'Datat', f_stops:'Ndalesat',
     add_stop:'+ Shto ndalesë', create_trip_btn:'Krijo itinerar',
@@ -1350,7 +1360,7 @@ const T = {
     c_poi:'POI', c_cat:'Kategoria', c_state:'Statusi',
     st_draft:'Draft', st_published:'Publik', st_official:'Zyrtar', st_removed:'I hequr',
     a_view:'Shiko', a_edit:'Modifiko', a_publish:'Boto', a_delete:'Fshi', a_remove:'Hiq', a_restore:'Rikthe', a_delete_hard:'Fshi përgjithmonë',
-    view_poi:'Detajet e POI', edit_poi:'Modifiko POI', f_state:'Gjendja', cat_filter:'Filtro kategorite…', cat_one:'zgjedhur', cat_many:'te zgjedhura', f_pub_on:'I dukshem per te gjithe', f_pub_hint:'I fikur rri ne pritje dhe nuk shfaqet ne harte',
+    view_poi:'Detajet e POI', edit_poi:'Modifiko POI', f_state:'Kontrolli', cat_filter:'Filtro kategorite…', cat_one:'zgjedhur', cat_many:'te zgjedhura', f_pub_on:'I publikuar', f_pub_hint:'I fikur rri ne pritje: nuk e sheh askush, as komuniteti',
     f_title:'Titulli', f_approved:'Publik (miratuar dhe i dukshëm)',
     need_title:'Titulli është i detyrueshëm', save_btn:'Ruaj', cancel_btn:'Anulo',
     confirm_del_poi:'Të fshihet përgjithmonë ky POI?', poi_deleted:'POI u fshi',
@@ -1403,7 +1413,7 @@ const T = {
     engine_anthropic_nokey:'To use Anthropic set ANTHROPIC_KEY in Supabase secrets (Edge Functions). Until then, ILLI stays on OpenAI.',
     save_limits:'Save limits', reload:'Reload',
     mode_chat:'Chat', mode_route:'Route', mode_write:'Write text', send:'Send',
-    create_poi:'Create official POI', f_name:'Name', f_desc:'Description', f_cat:'Category', f_vis:'Visibility',
+    create_poi:'Create official POI', f_name:'Name', f_desc:'Description', f_cat:'Category', f_vis:'Who it is for',
     use_map:'Use my location', create_btn:'Create POI',
     create_trip:'Create route', f_trip_name:'Route name', f_badge:'Badge', f_dates:'Dates', f_stops:'Stops',
     add_stop:'+ Add stop', create_trip_btn:'Create route',
@@ -1466,7 +1476,7 @@ const T = {
     c_poi:'POI', c_cat:'Category', c_state:'State',
     st_draft:'Draft', st_published:'Public', st_official:'Official', st_removed:'Removed',
     a_view:'View', a_edit:'Edit', a_publish:'Publish', a_delete:'Delete', a_remove:'Remove', a_restore:'Restore', a_delete_hard:'Delete forever',
-    view_poi:'POI details', edit_poi:'Edit POI', f_state:'State', cat_filter:'Filter categories…', cat_one:'chosen', cat_many:'chosen', f_pub_on:'Visible to everyone', f_pub_hint:'Off means pending, not shown on the map',
+    view_poi:'POI details', edit_poi:'Edit POI', f_state:'Review', cat_filter:'Filter categories…', cat_one:'chosen', cat_many:'chosen', f_pub_on:'Published', f_pub_hint:'Off means pending: nobody sees it, not even the community',
     f_title:'Title', f_approved:'Public (approved and visible)',
     need_title:'Title is required', save_btn:'Save', cancel_btn:'Cancel',
     confirm_del_poi:'Permanently delete this POI?', poi_deleted:'POI deleted',
