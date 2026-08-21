@@ -569,6 +569,7 @@ html[data-theme="light"] .chip.green{color:#236b39}
 <script src="js/image-editor.js?v=326"></script>
 <script src="js/poi-frontend.js?v=327"></script>
 <script src="js/badge-admin.js?v=326"></script>
+<script src="js/qr-editor.js?v=345"></script>
 </head>
 <body>
 <div class="grain"></div>
@@ -628,6 +629,9 @@ html[data-theme="light"] .chip.green{color:#236b39}
     </div>
     <div class="nav-item" data-sec="knowledge" onclick="openSection('knowledge')">
       <span class="ic"><i class="ph-duotone ph-brain"></i></span><span class="label" data-t="nav_knowledge">Knowledge ILLI</span>
+    </div>
+    <div class="nav-item" data-sec="qr" onclick="openSection('qr')">
+      <span class="ic"><i class="ph-duotone ph-qr-code"></i></span> QR
     </div>
     <div class="nav-item" data-sec="media" onclick="openSection('media')">
       <span class="ic"><i class="ph-duotone ph-share-network"></i></span><span class="label" data-t="nav_media">Media</span>
@@ -948,6 +952,11 @@ html[data-theme="light"] .chip.green{color:#236b39}
     <!-- 8c-ter) BADGE (personalizzabili come le categorie) -->
     <section class="section" id="sec-badges">
       <div id="badgesBox"></div>
+    </section>
+
+    <!-- 8c-bis) STILE DEI QR -->
+    <section class="section" id="sec-qr">
+      <div id="qrEditorBox"></div>
     </section>
 
     <!-- 8d) KNOWLEDGE ILLI -->
@@ -1568,6 +1577,7 @@ function runSection(sec){
     case 'categories': loadCategoriesAdmin(); break;
     case 'tags': loadTagsAdmin(); break;
     case 'badges': if(window.BadgeAdmin) window.BadgeAdmin.load(document.getElementById('badgesBox')); break;
+    case 'qr': if(window.QrEditor) window.QrEditor.load(document.getElementById('qrEditorBox')); break;
     case 'knowledge': loadKnowledgeAdmin(); break;
     case 'audit': loadAudit(); break;
     case 'media': initMedia(); break;
