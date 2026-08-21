@@ -4,7 +4,8 @@
  * info@321.it · https://321.al
  *
  * La catena dei contenuti.
- * La macchina pesca candidati dai dati aperti e cerca una foto con licenza;
+ * La macchina pesca candidati dalla mappa libera (OpenStreetMap) e cerca una
+ * foto con licenza su Wikimedia;
  * qui decide una persona. Approvare crea il luogo Ufficiale con la sua foto e
  * la sua licenza; scartare lo toglie di mezzo con un motivo scritto.
  */
@@ -65,7 +66,7 @@
         '</div>'+
         lingue(r)+
         '<div style="font-size:11.5px;opacity:.5;margin-top:4px">'+(r.lat||0).toFixed(5)+', '+(r.lng||0).toFixed(5)+
-          ' · <a href="https://www.openstreetmap.org/'+encodeURIComponent(r.fonte_id||'')+'" target="_blank" rel="noopener" style="color:inherit">dati aperti</a></div>'+
+          ' · <a href="https://www.openstreetmap.org/'+encodeURIComponent(r.fonte_id||'')+'" target="_blank" rel="noopener" style="color:inherit">sulla mappa libera</a></div>'+
       '</div>'+
       '<div style="display:flex;flex-direction:column;gap:6px;min-width:120px">'+
         '<button data-azione="ok" style="border:none;border-radius:10px;background:#2E7D46;color:#fff;font-family:inherit;'+
@@ -79,7 +80,7 @@
     const conFoto = righe.filter(r=>r.foto_url).length;
     box.innerHTML =
       '<div class="panel" style="margin-bottom:16px">'+
-        '<h3 style="margin:0 0 4px;font-size:17px">Candidati dai dati aperti</h3>'+
+        '<h3 style="margin:0 0 4px;font-size:17px">Luoghi trovati sulla mappa libera</h3>'+
         '<div style="font-size:12.5px;opacity:.65;line-height:1.55">'+
           'La macchina propone, tu decidi. La foto viene attaccata solo se e\' l\'immagine di QUEL luogo su Wikidata: '+
           'mai per vicinanza, perche\' nelle citta\' la vicinanza sbaglia quasi sempre. '+

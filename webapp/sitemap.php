@@ -56,7 +56,7 @@ echo xurl('/esplora.php', array(), null, null) . "\n";
 // Informativa e Condizioni: sono pagine vere e vanno indicizzate, anche perche'
 // gli store e i fornitori di accesso le pretendono raggiungibili.
 echo xurl('/privacy', array(), null, null) . "\n";
-echo xurl('/terms', array(), null, null) . "\n";
+echo xurl('/condizioni', array(), null, null) . "\n";
 
 // Pagine città
 foreach (array_keys($cities) as $c) echo xurl('/esplora.php', array('city' => $c), null, null) . "\n";

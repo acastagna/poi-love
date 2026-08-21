@@ -18,7 +18,11 @@ RewriteRule ^(poi-love-app|database|docs|plesk-deploy|plesk-media-server)/ - [F,
 
 # ── Pagine legali con URL pulito ───────────────────────
 RewriteRule ^privacy/?$ /privacy.html [L]
-RewriteRule ^terms/?$ /terms.html [L]
+# "terms" era una parola inglese rimasta per abitudine: l'indirizzo vero e'
+# /condizioni. Il vecchio manda al nuovo, cosi' i collegamenti gia' in giro
+# (e le impostazioni dei fornitori dell'accesso) non si rompono.
+RewriteRule ^condizioni/?$ /terms.html [L]
+RewriteRule ^terms/?$ /condizioni [R=301,L]
 
 # ── 1. Redirect /demo → / ──────────────────────────────
 RewriteRule ^demo/?$ / [R=301,L]

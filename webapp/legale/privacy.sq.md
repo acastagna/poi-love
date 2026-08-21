@@ -14,8 +14,8 @@ POI•LOVE nis publikisht në Shqipëri dhe i nënshtrohet ligjit shqiptar nr. 1
 
 Kontrolluesi i të dhënave është:
 
-**Alessandro Castagna, 321.AL / EVOLAB**
-Kontakt për çdo çështje lidhur me të dhënat dhe për të ushtruar të drejtat e tua: **it@altrostile.app**
+**Alessandro Castagna — 321.al di Alessandro Castagna**
+Kontakt për çdo çështje lidhur me të dhënat dhe për të ushtruar të drejtat e tua: **admin@321.al**
 
 Për çdo pyetje, kërkesë ose ankesë mbi privatësinë mund të na shkruash në këtë adresë. Përgjigjemi brenda afateve të parashikuara nga ligji (shih pikën 8).
 
@@ -269,7 +269,7 @@ Ke kontroll të plotë mbi të dhënat e tua. Sipas ligjit 124/2024 dhe GDPR mun
 - **Transferueshmëri**: të marrësh të dhënat e tua në një format të strukturuar e të lexueshëm dhe, aty ku është teknikisht e mundur, t'i transferosh te të tjerët.
 - Të **tërheqësh pëlqimin** në çdo kohë, për vendndodhjen, fotot ose çdo përpunim të bazuar në pëlqim.
 
-Për t'i ushtruar këto të drejta, ose për të raportuar një foto a përmbajtje që të përket, shkruaj te **it@altrostile.app**. Përgjigjemi **brenda 30 ditëve** nga kërkesa. Përgjigjet janë falas; për kopje të mëtejshme mund të kërkojmë një kontribut të arsyeshëm për kostot.
+Për t'i ushtruar këto të drejta, ose për të raportuar një foto a përmbajtje që të përket, shkruaj te **admin@321.al**. Përgjigjemi **brenda 30 ditëve** nga kërkesa. Përgjigjet janë falas; për kopje të mëtejshme mund të kërkojmë një kontribut të arsyeshëm për kostot.
 
 Nuk i përdorim të dhënat e tua për të marrë **vendime vetëm të automatizuara** që prodhojnë efekte juridike mbi ty ose që të prekin ndjeshëm. Nëse kjo do të ndryshonte, do të të informojmë dhe do të të shpjegojmë logjikën e pasojat.
 
@@ -279,7 +279,7 @@ Nuk i përdorim të dhënat e tua për të marrë **vendime vetëm të automatiz
 
 POI•LOVE nuk është menduar për fëmijë. Për ta përdorur, dhe për përpunimet e bazuara në pëlqim, duhet të kesh **të paktën 16 vjeç**. Nëse je nën 16 vjeç, mund ta përdorësh vetëm me pëlqimin e atij që ushtron përgjegjësinë prindërore.
 
-Nuk mbledhim me vetëdije të dhëna të të miturve nën këtë prag pa pëlqimin e kërkuar. Nëse je prind ose kujdestar dhe mendon se një i mitur na ka dhënë të dhëna pa pëlqimin e duhur, na shkruaj te **it@altrostile.app**: do t'i heqim menjëherë ato të dhëna.
+Nuk mbledhim me vetëdije të dhëna të të miturve nën këtë prag pa pëlqimin e kërkuar. Nëse je prind ose kujdestar dhe mendon se një i mitur na ka dhënë të dhëna pa pëlqimin e duhur, na shkruaj te **admin@321.al**: do t'i heqim menjëherë ato të dhëna.
 
 ---
 

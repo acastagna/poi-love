@@ -14,8 +14,8 @@ POI•LOVE launches publicly in Albania and is subject to Albanian law no. 124/2
 
 The data controller is:
 
-**Alessandro Castagna, 321.AL / EVOLAB**
-Contact for anything to do with data and for exercising your rights: **it@altrostile.app**
+**Alessandro Castagna — 321.al di Alessandro Castagna**
+Contact for anything to do with data and for exercising your rights: **admin@321.al**
 
 For any question, request or complaint about privacy you can write to that address. We answer within the times set by law (see section 8).
 
@@ -269,7 +269,7 @@ You have full control over your data. Under law 124/2024 and the GDPR you can:
 - **Portability**: receive your data in a structured, readable format and, where technically possible, have it transferred to others.
 - **Withdraw consent** at any time, for location, photos or any processing based on consent.
 
-To exercise these rights, or to report a photo or content concerning you, write to **it@altrostile.app**. We answer **within 30 days** of the request. Answers are free; for further copies we may ask a reasonable contribution towards costs.
+To exercise these rights, or to report a photo or content concerning you, write to **admin@321.al**. We answer **within 30 days** of the request. Answers are free; for further copies we may ask a reasonable contribution towards costs.
 
 We do not use your data to take **decisions based solely on automated processing** producing legal effects on you or significantly affecting you. Should that change, we will tell you and explain the logic and the consequences.
 
@@ -279,7 +279,7 @@ We do not use your data to take **decisions based solely on automated processing
 
 POI•LOVE is not designed for children. To use it, and for processing based on consent, you must be **at least 16 years old**. If you are under 16, you may use it only with the consent of whoever holds parental responsibility.
 
-We do not knowingly collect data from minors below that threshold without the required consent. If you are a parent or guardian and believe a minor has given us data without the proper consent, write to us at **it@altrostile.app**: we will promptly remove that data.
+We do not knowingly collect data from minors below that threshold without the required consent. If you are a parent or guardian and believe a minor has given us data without the proper consent, write to us at **admin@321.al**: we will promptly remove that data.
 
 ---
 

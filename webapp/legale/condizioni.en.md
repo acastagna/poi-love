@@ -24,8 +24,8 @@ If you use POI•LOVE on behalf of an organisation, you declare that you have th
 
 The Service is provided by:
 
-- **Alessandro Castagna**, trading as **321.AL / EVOLAB**
-- Contact: **it@altrostile.app**
+- **Alessandro Castagna**, owner of **321.al di Alessandro Castagna**
+- Contact: **admin@321.al**
 
 In these Terms, "we", "us" and "our" refer to the provider named above.
 
@@ -59,7 +59,7 @@ To use POI•LOVE you must be **at least 16 years old**.
 
 This limit reflects Albanian personal data protection law (Law no. 124/2024) and the EU GDPR, under which processing a minor's data for consent-based online services is lawful only from the age of 16. If you are under 16 you may not create an account or use the Service.
 
-If you are a parent or guardian and believe a child under 16 has created an account, contact us at **it@altrostile.app** and we will close the account and delete the related data.
+If you are a parent or guardian and believe a child under 16 has created an account, contact us at **admin@321.al** and we will close the account and delete the related data.
 
 To use the Service you must also give truthful information when registering and keep your account credentials confidential. You are responsible for every activity carried out through your account.
 
@@ -69,7 +69,7 @@ To use the Service you must also give truthful information when registering and 
 
 You can register by email or through external providers (Google, Facebook, Apple, X, LinkedIn). Since 18 August 2026 sign-in is handled by a program of **ours**, on a machine of ours in Germany: your email address and your encrypted password no longer sit with an external supplier. When you sign in with an external provider you authorise POI•LOVE to receive from that service the basic data of your profile (for example email, username and picture), as described in the Privacy Policy.
 
-You are responsible for the security of your credentials. Tell us immediately at **it@altrostile.app** if you suspect unauthorised access to your account.
+You are responsible for the security of your credentials. Tell us immediately at **admin@321.al** if you suspect unauthorised access to your account.
 
 ---
 
@@ -120,7 +120,7 @@ The licence exists solely to run the Service: we do not claim ownership of your 
 
 ### 6.5 Moderation and removal
 
-We are not obliged to check User Content in advance, but we may **remove or hide** any content that, in our reasonable judgement, breaches these Terms or the law, even without notice. You can **report** inappropriate content or profiles through the reporting tools in the Service, or by writing to **it@altrostile.app**.
+We are not obliged to check User Content in advance, but we may **remove or hide** any content that, in our reasonable judgement, breaches these Terms or the law, even without notice. You can **report** inappropriate content or profiles through the reporting tools in the Service, or by writing to **admin@321.al**.
 
 For security reasons and to comply with legal obligations, we **record the reports** we receive and the **moderation actions** we take (for example removing content, suspending or blocking a profile), as described in the Privacy Policy. We use this data to handle reports, protect people and, where necessary, as evidence in cases of abuse or dispute.
 
@@ -191,7 +191,7 @@ Some features and benefits of the Service may be offered through **paid subscrip
 - you authorise us to process the data needed to manage the subscription (chosen tier, status, activation and renewal dates), as described in the Privacy Policy;
 - you acknowledge that **payment data** is processed by the payment provider we use, under its own policy, and that we do not keep your card details.
 
-The **benefits** attached to each tier are shown in the app and may change over time: we will try not to reduce essential benefits already active without reasonable notice. Any rights of withdrawal and refund provided by consumer protection law remain unaffected. You can cancel the subscription as indicated in the app or by writing to **it@altrostile.app**; unless the law provides otherwise, cancellation takes effect at the end of the period already paid for.
+The **benefits** attached to each tier are shown in the app and may change over time: we will try not to reduce essential benefits already active without reasonable notice. Any rights of withdrawal and refund provided by consumer protection law remain unaffected. You can cancel the subscription as indicated in the app or by writing to **admin@321.al**; unless the law provides otherwise, cancellation takes effect at the end of the period already paid for.
 
 ---
 
@@ -201,7 +201,7 @@ Some places on the map carry the **Official badge**: they were not created by a 
 
 Every photo carries its **author and licence**, and no photo without a licence enters the map. Wikipedia texts are used under the **CC BY-SA 4.0** licence, shown on the place's card together with the address of the entry.
 
-If you are the author of a photo or a text and believe the attribution is wrong or missing, write to us at **it@altrostile.app**: we correct it or take it down.
+If you are the author of a photo or a text and believe the attribution is wrong or missing, write to us at **admin@321.al**: we correct it or take it down.
 
 ---
 
@@ -231,7 +231,7 @@ Within the limits allowed, your **sole remedy** if you are unhappy with the Serv
 
 ### 14.1 Closure by you
 
-You can stop using the Service and **close your account** at any time from the app settings or by writing to **it@altrostile.app**. Closure entails the deletion of data as described in the Privacy Policy and in accordance with your rights under the law (including the right to erasure).
+You can stop using the Service and **close your account** at any time from the app settings or by writing to **admin@321.al**. Closure entails the deletion of data as described in the Privacy Policy and in accordance with your rights under the law (including the right to erasure).
 
 ### 14.2 Suspension or closure by us
 
@@ -276,7 +276,7 @@ Matters concerning the processing of your personal data are governed by the Priv
 
 For questions about these Terms, reports of content, or requests concerning your account write to:
 
-- **Email**: it@altrostile.app
-- **Provider**: Alessandro Castagna / 321.AL / EVOLAB
+- **Email**: admin@321.al
+- **Provider**: Alessandro Castagna — 321.al di Alessandro Castagna
 
 For requests concerning your personal data (access, rectification, erasure, objection, portability, withdrawal of consent) see the Privacy Policy at poilove.com/privacy.

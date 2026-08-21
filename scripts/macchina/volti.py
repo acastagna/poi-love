@@ -80,11 +80,19 @@ def sfoca(img, riquadri, intensita=5, margine=18):
             continue
         zona = fuori[y0:y1, x0:x1]
         zh, zw = zona.shape[:2]
-        # quanto sfocare: legata alla grandezza del volto, cosi' vale sia per un
-        # primo piano sia per una faccia lontana
-        k = max(3, int(min(zw, zh) * (0.06 + 0.030 * intensita)))
+        # Una sola passata di sfocatura non basta: la forma del viso resta e la
+        # persona si riconosce lo stesso. Prima si butta via il dettaglio
+        # rimpicciolendo la zona a pochi pixel, poi la si riporta grande e la si
+        # ammorbidisce. Cosi' il volto non torna piu' indietro, e il risultato
+        # resta morbido invece che a quadretti.
+        blocchi = max(2, 12 - intensita)          # a intensita 6 restano sei blocchi
+        pw = max(2, zw // blocchi)
+        ph = max(2, zh // blocchi)
+        minuscola = cv2.resize(zona, (pw, ph), interpolation=cv2.INTER_AREA)
+        sfocata = cv2.resize(minuscola, (zw, zh), interpolation=cv2.INTER_LINEAR)
+        k = max(3, int(min(zw, zh) * (0.05 + 0.020 * intensita)))
         if k % 2 == 0: k += 1
-        sfocata = cv2.GaussianBlur(zona, (k, k), 0)
+        sfocata = cv2.GaussianBlur(sfocata, (k, k), 0)
         # maschera ovale con il bordo sfumato
         maschera = np.zeros((zh, zw), dtype=np.uint8)
         cv2.ellipse(maschera, (zw//2, zh//2), (int(zw*0.46), int(zh*0.50)), 0, 0, 360, 255, -1)

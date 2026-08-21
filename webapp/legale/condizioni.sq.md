@@ -24,8 +24,8 @@ Nëse e përdor POI•LOVE në emër të një organizate, deklaron se ke tagrin 
 
 Shërbimi ofrohet nga:
 
-- **Alessandro Castagna**, që vepron si **321.AL / EVOLAB**
-- Kontakt: **it@altrostile.app**
+- **Alessandro Castagna**, titullar i **321.al di Alessandro Castagna**
+- Kontakt: **admin@321.al**
 
 Në këto Kushte, “ne” dhe “jonë” i referohen ofruesit të përmendur më sipër.
 
@@ -59,7 +59,7 @@ Për të përdorur POI•LOVE duhet të kesh **të paktën 16 vjeç**.
 
 Ky kufi pasqyron ligjin shqiptar për mbrojtjen e të dhënave personale (Ligji nr. 124/2024) dhe GDPR-në e BE-së, sipas të cilëve përpunimi i të dhënave të një të mituri për shërbime online të bazuara në pëlqim është i ligjshëm vetëm nga mosha 16 vjeç. Nëse je nën 16 vjeç nuk mund të krijosh llogari e as ta përdorësh Shërbimin.
 
-Nëse je prind ose kujdestar dhe mendon se një fëmijë nën 16 vjeç ka krijuar një llogari, na shkruaj te **it@altrostile.app** dhe do ta mbyllim llogarinë e do të fshijmë të dhënat përkatëse.
+Nëse je prind ose kujdestar dhe mendon se një fëmijë nën 16 vjeç ka krijuar një llogari, na shkruaj te **admin@321.al** dhe do ta mbyllim llogarinë e do të fshijmë të dhënat përkatëse.
 
 Për të përdorur Shërbimin duhet gjithashtu të japësh të dhëna të vërteta në regjistrim dhe t’i mbash të fshehta kredencialet e llogarisë. Je përgjegjës për çdo veprim të kryer nëpërmjet llogarisë sate.
 
@@ -69,7 +69,7 @@ Për të përdorur Shërbimin duhet gjithashtu të japësh të dhëna të vërte
 
 Mund të regjistrohesh me email ose me ofrues të jashtëm (Google, Facebook, Apple, X, LinkedIn). Që nga 18 gushti 2026 hyrjet menaxhohen nga një program **i yni**, në një makinë tonën në Gjermani: adresa jote e email-it dhe fjalëkalimi yt i koduar nuk qëndrojnë më te një ofrues i jashtëm. Kur hyn me një ofrues të jashtëm, autorizon POI•LOVE të marrë prej tij të dhënat bazë të profilit tënd (për shembull email, emrin e përdoruesit dhe figurën), sipas Njoftimit të privatësisë.
 
-Je përgjegjës për sigurinë e kredencialeve të tua. Na njofto menjëherë te **it@altrostile.app** nëse dyshon për një hyrje të paautorizuar në llogarinë tënde.
+Je përgjegjës për sigurinë e kredencialeve të tua. Na njofto menjëherë te **admin@321.al** nëse dyshon për një hyrje të paautorizuar në llogarinë tënde.
 
 ---
 
@@ -120,7 +120,7 @@ Licenca shërben vetëm për të ofruar Shërbimin: nuk pretendojmë pronësinë
 
 ### 6.5 Moderimi dhe heqja
 
-Nuk jemi të detyruar ta kontrollojmë paraprakisht Përmbajtjen e përdoruesve, por mund të **heqim ose të fshehim** çdo përmbajtje që, sipas gjykimit tonë të arsyeshëm, shkel këto Kushte ose ligjin, edhe pa njoftim paraprak. Mund të **raportosh** përmbajtje ose profile të papërshtatshme me mjetet e raportimit brenda Shërbimit, ose duke shkruar te **it@altrostile.app**.
+Nuk jemi të detyruar ta kontrollojmë paraprakisht Përmbajtjen e përdoruesve, por mund të **heqim ose të fshehim** çdo përmbajtje që, sipas gjykimit tonë të arsyeshëm, shkel këto Kushte ose ligjin, edhe pa njoftim paraprak. Mund të **raportosh** përmbajtje ose profile të papërshtatshme me mjetet e raportimit brenda Shërbimit, ose duke shkruar te **admin@321.al**.
 
 Për arsye sigurie dhe për të përmbushur detyrimet ligjore, **regjistrojmë raportimet** që marrim dhe **veprimet e moderimit** që ndërmarrim (për shembull heqjen e një përmbajtjeje, pezullimin ose bllokimin e një profili), siç përshkruhet te Njoftimi i privatësisë. I përdorim këto të dhëna për të trajtuar raportimet, për të mbrojtur njerëzit dhe, kur duhet, si provë në raste abuzimi ose kundërshtimi.
 
@@ -191,7 +191,7 @@ Disa funksione dhe përfitime të Shërbimit mund të ofrohen me **abonime me pa
 - na autorizon të përpunojmë të dhënat e nevojshme për të menaxhuar abonimin (niveli i zgjedhur, gjendja, datat e aktivizimit dhe të rinovimit), siç përshkruhet te Njoftimi i privatësisë;
 - merr dijeni se **të dhënat e pagesës** përpunohen nga ofruesi i pagesave që do të përdorim, sipas njoftimit të tij, dhe se ne nuk i ruajmë të dhënat e kartës sate.
 
-**Përfitimet** e lidhura me çdo nivel tregohen në aplikacion dhe mund të ndryshojnë me kohën: do të përpiqemi të mos ulim përfitime thelbësore tashmë aktive pa një njoftim të arsyeshëm paraprak. Të drejtat e heqjes dorë dhe të rimbursimit të parashikuara nga legjislacioni për mbrojtjen e konsumatorit mbeten të paprekura. Mund ta ndërpresësh abonimin sipas mënyrave të treguara në aplikacion ose duke shkruar te **it@altrostile.app**; përveçse kur ligji parashikon ndryshe, ndërprerja ka efekt në fund të periudhës tashmë të paguar.
+**Përfitimet** e lidhura me çdo nivel tregohen në aplikacion dhe mund të ndryshojnë me kohën: do të përpiqemi të mos ulim përfitime thelbësore tashmë aktive pa një njoftim të arsyeshëm paraprak. Të drejtat e heqjes dorë dhe të rimbursimit të parashikuara nga legjislacioni për mbrojtjen e konsumatorit mbeten të paprekura. Mund ta ndërpresësh abonimin sipas mënyrave të treguara në aplikacion ose duke shkruar te **admin@321.al**; përveçse kur ligji parashikon ndryshe, ndërprerja ka efekt në fund të periudhës tashmë të paguar.
 
 ---
 
@@ -201,7 +201,7 @@ Disa vende në hartë mbajnë **shenjën Zyrtare**: nuk i ka krijuar një përdo
 
 Për çdo foto janë shkruar **autori dhe licenca**, dhe asnjë foto pa licencë nuk hyn në hartë. Tekstet e Wikipedia-s përdoren sipas licencës **CC BY-SA 4.0**, e treguar në skedën e vendit bashkë me adresën e zërit.
 
-Nëse je autor i një fotoje ose i një teksti dhe mendon se atribuimi është i gabuar ose mungon, na shkruaj te **it@altrostile.app**: e korrigjojmë ose e heqim.
+Nëse je autor i një fotoje ose i një teksti dhe mendon se atribuimi është i gabuar ose mungon, na shkruaj te **admin@321.al**: e korrigjojmë ose e heqim.
 
 ---
 
@@ -231,7 +231,7 @@ Brenda kufijve të lejuar, **mjeti yt i vetëm** në rast pakënaqësie ndaj Sh�
 
 ### 14.1 Mbyllja nga ana jote
 
-Mund të ndalosh përdorimin e Shërbimit dhe **të mbyllësh llogarinë** në çdo kohë nga cilësimet e aplikacionit ose duke shkruar te **it@altrostile.app**. Mbyllja sjell fshirjen e të dhënave sipas asaj që përshkruhet te Njoftimi i privatësisë dhe në respekt të të drejtave të tua ligjore (përfshirë të drejtën e fshirjes).
+Mund të ndalosh përdorimin e Shërbimit dhe **të mbyllësh llogarinë** në çdo kohë nga cilësimet e aplikacionit ose duke shkruar te **admin@321.al**. Mbyllja sjell fshirjen e të dhënave sipas asaj që përshkruhet te Njoftimi i privatësisë dhe në respekt të të drejtave të tua ligjore (përfshirë të drejtën e fshirjes).
 
 ### 14.2 Pezullimi ose mbyllja nga ana jonë
 
@@ -276,7 +276,7 @@ Për çdo mosmarrëveshje lidhur me Shërbimin është kompetente **gjykata e Ti
 
 Për pyetje mbi këto Kushte, raportime përmbajtjeje ose kërkesa lidhur me llogarinë tënde shkruaj te:
 
-- **Email**: it@altrostile.app
-- **Ofruesi**: Alessandro Castagna / 321.AL / EVOLAB
+- **Email**: admin@321.al
+- **Ofruesi**: Alessandro Castagna — 321.al di Alessandro Castagna
 
 Për kërkesat lidhur me të dhënat e tua personale (qasje, korrigjim, fshirje, kundërshtim, transferueshmëri, tërheqje e pëlqimit) shih Njoftimin e privatësisë në poilove.com/privacy.

@@ -25,8 +25,8 @@ Se utilizzi POI•LOVE per conto di un'organizzazione, dichiari di avere il pote
 
 Il Servizio è fornito da:
 
-- **Alessandro Castagna**, operante come **321.AL / EVOLAB**
-- Contatto: **it@altrostile.app**
+- **Alessandro Castagna**, titolare di **321.al di Alessandro Castagna**
+- Contatto: **admin@321.al**
 
 In queste Condizioni i termini "noi", "ci" e "nostro" si riferiscono al Titolare sopra indicato.
 
@@ -60,7 +60,7 @@ Per usare POI•LOVE devi avere **almeno 16 anni**.
 
 Questo limite riflette la normativa albanese sulla protezione dei dati personali (Legge n. 124/2024) e il GDPR UE, secondo cui il trattamento dei dati di un minore per servizi online basati sul consenso è lecito solo a partire dai 16 anni. Se hai meno di 16 anni non puoi creare un account né usare il Servizio.
 
-Se sei un genitore o tutore e ritieni che un minore di 16 anni abbia creato un account, contattaci a **it@altrostile.app** e provvederemo a chiudere l'account e cancellare i relativi dati.
+Se sei un genitore o tutore e ritieni che un minore di 16 anni abbia creato un account, contattaci a **admin@321.al** e provvederemo a chiudere l'account e cancellare i relativi dati.
 
 Per usare il Servizio devi inoltre fornire informazioni veritiere in fase di registrazione e mantenere riservate le credenziali del tuo account. Sei responsabile di ogni attività svolta tramite il tuo account.
 
@@ -70,7 +70,7 @@ Per usare il Servizio devi inoltre fornire informazioni veritiere in fase di reg
 
 Puoi registrarti tramite email oppure tramite provider esterni (Google, Facebook, Apple, X, LinkedIn). Dal 18 agosto 2026 gli accessi sono gestiti da un programma **nostro**, su una macchina nostra in Germania: la tua email e la tua password cifrata non stanno più presso un fornitore esterno. Accedendo con un provider esterno autorizzi POI•LOVE a ricevere dai relativi servizi i dati di base del tuo profilo (ad esempio email, nome utente e immagine), secondo quanto indicato nell'Informativa sulla privacy.
 
-Sei responsabile della sicurezza delle tue credenziali. Avvisaci subito a **it@altrostile.app** se sospetti un accesso non autorizzato al tuo account.
+Sei responsabile della sicurezza delle tue credenziali. Avvisaci subito a **admin@321.al** se sospetti un accesso non autorizzato al tuo account.
 
 ---
 
@@ -121,7 +121,7 @@ La licenza serve unicamente a erogare il Servizio: non rivendichiamo la propriet
 
 ### 6.5 Moderazione e rimozione
 
-Non siamo obbligati a controllare preventivamente i Contenuti utente, ma possiamo **rimuovere o rendere non visibile** qualsiasi contenuto che riteniamo, a nostro ragionevole giudizio, in violazione di queste Condizioni o della legge, anche senza preavviso. Puoi **segnalare** contenuti o profili inappropriati tramite gli strumenti di segnalazione del Servizio, oppure scrivendo a **it@altrostile.app**.
+Non siamo obbligati a controllare preventivamente i Contenuti utente, ma possiamo **rimuovere o rendere non visibile** qualsiasi contenuto che riteniamo, a nostro ragionevole giudizio, in violazione di queste Condizioni o della legge, anche senza preavviso. Puoi **segnalare** contenuti o profili inappropriati tramite gli strumenti di segnalazione del Servizio, oppure scrivendo a **admin@321.al**.
 
 Per ragioni di sicurezza e per adempiere agli obblighi di legge, **registriamo le segnalazioni** ricevute e le **azioni di moderazione** che adottiamo (ad esempio rimozione di un contenuto, sospensione o blocco di un profilo), come descritto nell'Informativa sulla privacy. Usiamo questi dati per gestire le segnalazioni, proteggere gli utenti e, se necessario, come prova in caso di abusi o contestazioni.
 
@@ -194,7 +194,7 @@ Alcune funzioni e vantaggi del Servizio possono essere offerti tramite **abbonam
 - ci autorizzi a trattare i dati necessari a gestire l'abbonamento (tier scelto, stato, date di attivazione e rinnovo), come descritto nell'Informativa sulla privacy;
 - prendi atto che i **dati di pagamento** sono trattati dal fornitore di pagamento che useremo, secondo la sua informativa, e che noi non conserviamo i dati della tua carta.
 
-I **vantaggi** collegati a ciascun tier sono indicati nell'app e possono evolvere nel tempo: cercheremo di non ridurre vantaggi essenziali già attivi senza un congruo preavviso. Eventuali diritti di recesso e rimborso previsti dalla normativa a tutela dei consumatori restano fermi. Puoi disdire l'abbonamento secondo le modalità indicate nell'app o scrivendo a **it@altrostile.app**; salvo diversa previsione di legge, la disdetta ha effetto al termine del periodo già pagato.
+I **vantaggi** collegati a ciascun tier sono indicati nell'app e possono evolvere nel tempo: cercheremo di non ridurre vantaggi essenziali già attivi senza un congruo preavviso. Eventuali diritti di recesso e rimborso previsti dalla normativa a tutela dei consumatori restano fermi. Puoi disdire l'abbonamento secondo le modalità indicate nell'app o scrivendo a **admin@321.al**; salvo diversa previsione di legge, la disdetta ha effetto al termine del periodo già pagato.
 
 ---
 
@@ -204,7 +204,7 @@ Alcuni luoghi sulla mappa portano il **bollino Ufficiale**: non li ha creati un 
 
 Di ogni foto sono scritti **autore e licenza**, e nessuna foto senza licenza entra nella mappa. I testi di Wikipedia sono usati secondo la licenza **CC BY-SA 4.0**, indicata sulla scheda del luogo insieme all'indirizzo della voce.
 
-Se sei l'autore di una foto o di un testo e ritieni che l'attribuzione sia sbagliata o mancante, scrivici a **it@altrostile.app**: correggiamo o togliamo.
+Se sei l'autore di una foto o di un testo e ritieni che l'attribuzione sia sbagliata o mancante, scrivici a **admin@321.al**: correggiamo o togliamo.
 
 ---
 
@@ -234,7 +234,7 @@ Nei limiti consentiti, la tua **unica tutela** in caso di insoddisfazione verso 
 
 ### 14.1 Chiusura da parte tua
 
-Puoi smettere di usare il Servizio e **chiudere il tuo account** in qualsiasi momento dalle impostazioni dell'app o scrivendo a **it@altrostile.app**. La chiusura comporta la cancellazione dei dati secondo quanto descritto nell'Informativa sulla privacy e nel rispetto dei tuoi diritti previsti dalla normativa (incluso il diritto alla cancellazione).
+Puoi smettere di usare il Servizio e **chiudere il tuo account** in qualsiasi momento dalle impostazioni dell'app o scrivendo a **admin@321.al**. La chiusura comporta la cancellazione dei dati secondo quanto descritto nell'Informativa sulla privacy e nel rispetto dei tuoi diritti previsti dalla normativa (incluso il diritto alla cancellazione).
 
 ### 14.2 Sospensione o chiusura da parte nostra
 
@@ -279,7 +279,7 @@ Le questioni relative al trattamento dei tuoi dati personali sono disciplinate d
 
 Per domande su queste Condizioni, segnalazioni di contenuti o richieste relative al tuo account scrivi a:
 
-- **Email**: it@altrostile.app
-- **Titolare**: Alessandro Castagna / 321.AL / EVOLAB
+- **Email**: admin@321.al
+- **Titolare**: Alessandro Castagna — 321.al di Alessandro Castagna
 
 Per le richieste relative ai tuoi dati personali (accesso, rettifica, cancellazione, opposizione, portabilità, revoca del consenso) consulta l'Informativa sulla privacy su poilove.com/privacy.

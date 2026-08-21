@@ -14,8 +14,8 @@ POI•LOVE viene lanciata pubblicamente in Albania ed è soggetta alla legge alb
 
 Il titolare del trattamento è:
 
-**Alessandro Castagna, 321.AL / EVOLAB**
-Contatto per qualsiasi questione relativa ai dati e per esercitare i tuoi diritti: **it@altrostile.app**
+**Alessandro Castagna — 321.al di Alessandro Castagna**
+Contatto per qualsiasi questione relativa ai dati e per esercitare i tuoi diritti: **admin@321.al**
 
 Per ogni domanda, richiesta o reclamo sulla privacy puoi scriverci a questo indirizzo. Rispondiamo entro i tempi previsti dalla legge (vedi sezione 8).
 
@@ -271,7 +271,7 @@ Hai pieno controllo sui tuoi dati. In base alla legge 124/2024 e al GDPR puoi:
 - **Portabilità**: ricevere i tuoi dati in un formato strutturato e leggibile, e, dove tecnicamente possibile, trasferirli ad altri.
 - **Revocare il consenso** in qualsiasi momento, per la geolocalizzazione, le foto o qualsiasi trattamento basato sul consenso.
 
-Per esercitare questi diritti, o per segnalare una foto o un contenuto che ti riguarda, scrivi a **it@altrostile.app**. Rispondiamo **entro 30 giorni** dalla richiesta. Le risposte sono gratuite; per copie ulteriori possiamo chiedere un contributo ragionevole per i costi.
+Per esercitare questi diritti, o per segnalare una foto o un contenuto che ti riguarda, scrivi a **admin@321.al**. Rispondiamo **entro 30 giorni** dalla richiesta. Le risposte sono gratuite; per copie ulteriori possiamo chiedere un contributo ragionevole per i costi.
 
 Non usiamo i tuoi dati per prendere **decisioni esclusivamente automatizzate** che producano effetti giuridici su di te o ti riguardino in modo significativo. Se questo dovesse cambiare, te ne informeremo e ti spiegheremo la logica e le conseguenze.
 
@@ -281,7 +281,7 @@ Non usiamo i tuoi dati per prendere **decisioni esclusivamente automatizzate** c
 
 POI•LOVE non è pensata per i bambini. Per usarla, e per i trattamenti basati sul consenso, devi avere **almeno 16 anni**. Se hai meno di 16 anni, puoi usarla solo con il consenso di chi esercita la responsabilità genitoriale.
 
-Non raccogliamo consapevolmente dati di minori sotto questa soglia senza il consenso richiesto. Se sei un genitore o tutore e ritieni che un minore ci abbia fornito dati senza il dovuto consenso, scrivici a **it@altrostile.app**: rimuoveremo prontamente quei dati.
+Non raccogliamo consapevolmente dati di minori sotto questa soglia senza il consenso richiesto. Se sei un genitore o tutore e ritieni che un minore ci abbia fornito dati senza il dovuto consenso, scrivici a **admin@321.al**: rimuoveremo prontamente quei dati.
 
 ---
 
@@ -301,4 +301,4 @@ In Albania è il **Commissario per il diritto all'informazione e la protezione d
 
 Se ti trovi nell'Unione Europea, puoi rivolgerti anche all'autorità di controllo del tuo Paese di residenza.
 
-Prima di rivolgerti all'Autorità, se vuoi, scrivici a **it@altrostile.app**: proveremo a risolvere insieme ogni problema nel modo più rapido possibile.
+Prima di rivolgerti all'Autorità, se vuoi, scrivici a **admin@321.al**: proveremo a risolvere insieme ogni problema nel modo più rapido possibile.

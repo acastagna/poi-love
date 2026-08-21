@@ -119,9 +119,12 @@ fi
 echo
 echo "── pagine di servizio ──"
 prova "pagina velocita del SAL" "$C -o /dev/null -w '%{http_code}' https://sal.poilove.com/velocita.html" "200"
-for u in privacy terms sitemap.php robots.txt; do
+for u in privacy condizioni sitemap.php robots.txt; do
   prova "/$u" "$C -o /dev/null -w '%{http_code}' -L https://poilove.com/$u" "200"
 done
+# Il vecchio indirizzo inglese resta vivo e manda al nuovo: e' scritto nelle
+# impostazioni dei fornitori dell'accesso e non si puo rompere.
+prova "il vecchio /terms manda a /condizioni" "$C -o /dev/null -w '%{http_code}' https://poilove.com/terms" "301"
 
 echo
 printf "═══ ESITO: "; grn "$OK superate"; printf " · "

@@ -115,7 +115,7 @@
     box.innerHTML =
       '<div class="panel" style="margin-bottom:14px">'+
         '<div style="font-size:12.5px;opacity:.7;line-height:1.55;margin-bottom:10px">'+
-          'Gli itinerari <b>Ufficiali</b> li costruiamo noi, con ILLI e i dati aperti: non appartengono a nessuna persona. '+
+          'Gli itinerari <b>Ufficiali</b> li costruiamo noi, con ILLI, la mappa libera e Wikipedia: non appartengono a nessuna persona. '+
           'Sono di due specie, le <b>Rotte Storiche</b> e gli <b>Itinerari Culturali</b>. '+
           'Gli <b>Itinerari Personali</b> sono quelli che ogni persona si costruisce per i suoi viaggi: '+
           'si guardano e si moderano, ma restano suoi.'+
