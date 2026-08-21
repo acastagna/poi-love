@@ -1,5 +1,57 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
+## 22/08/2026 notte — La prima audioguida vera, l'app sul telefono del founder, il backup che gira da solo
+
+Programma a **82,5 giornate su 113**. Lo stato vivo: https://sal.poilove.com/avanzamento.html
+
+### POI•VOICE respira (blocchi 59, 65, 66 chiusi)
+La chiave di Google e' arrivata (passata per file locale in `• chiavi/`, mai in chat,
+mai nel repo) ed e' nei segreti `GOOGLE_TTS_KEY` e `GOOGLE_AI_KEY`. **La prima
+audioguida vera esiste**: Kalaja e Beratit, 98 secondi, voce Vindemiatrix,
+**4,5 centesimi di euro**, riscritta in MP3 sul nostro server, spesa nel registro,
+**pubblicata** dove l'app la legge. Il founder l'ha ascoltata: approvata.
+Quattro difetti stanati solo dal vivo: il modello si chiama
+`gemini-2.5-pro-preview-tts`; la regia va in testa al testo (il campo `prompt`
+non esiste in generateContent); nginx tagliava le funzioni a 60 secondi (ora 300
+su quella strada); la funzione della spesa scriveva sulla colonna rinominata
+dalla 159. Proiezione misurata: tutti i 210 luoghi ufficiali in 3 lingue,
+**~28 euro** (14 a lotti).
+
+### L'app gira sul telefono del founder (Expo Go)
+Aggiornata a SDK 54 (il suo Expo Go accetta solo l'ultima): react 19.1,
+react-native 0.81.5, preset babel giusto (il 57 installato per sbaglio produceva
+byte-code che Hermes rifiutava), bottom-sheet v5, il motore animazioni 4 col suo
+nuovo `react-native-worklets`. Tre schermate rosse risolte foto-contro-foto.
+GoTrue ammette il rientro `exp://` del solo Mac di casa (sviluppo). L'app si
+accende, l'accesso email funziona coi profili demo. **Verita' detta al founder:
+esteticamente e' ancora lo scaffold di maggio: il vestito e' il lavoro dei
+blocchi 33-44**, col vantaggio nuovo che ogni schermata rifatta la vede in
+tempo reale sul suo telefono.
+
+### La sicurezza
+- **Backup completo scaricato sul Mac** (`~/Backups/poilove-macchina/2026-08-22/`):
+  database (122 tabelle, dump verificato), configurazioni, siti interi.
+- **Backup notturno automatico sulla macchina**: ogni notte alle 03:30 in
+  `/root/backup-notturni/`, tiene 7 notti, prima corsa provata. Resta per domani
+  l'interruttore dei backup Hetzner (disco intero, dalla console).
+- **Chiave vecchia di Google Maps: compromessa nella storia del repo pubblico**
+  (committata in chiaro a maggio, tolta dai file il 26/06, ma la storia resta).
+  Da eliminare nella console Google; la nuova va ristretta alla Generative
+  Language API. Spiegazione guidata rimandata a domani su sua richiesta.
+
+### Notifiche (mig 162, v5.48)
+Le icone delle colonne erano emoji a 10px illeggibili: ora legenda con icone
+Phosphor e parole (IN APP / EMAIL / BROWSER). Terzo canale **browser** vero:
+chiede il permesso di sistema, se negato la levetta resta spenta, il primo
+avviso si sente subito, gli arrivi suonano solo a scheda nascosta.
+
+### Decisioni del founder registrate
+Store: settimana del 24/08. I 15 luoghi del Sostenitore: restano fra gli
+Ufficiali, assegnazione al momento dell'abbonamento (blocco 29 tornato da_fare,
+non e' piu' una sua attesa). PWA e app nativa: due strade, un database, la
+webapp resta per sempre.
+
+
 ## 21/08/2026 notte — L'app parla col database vero, l'accesso funziona, e il mercato delle collaborazioni e' vivo
 
 Programma da 70,5 a **80 giornate su 113**. Controllo 19 su 19. Webapp **v5.47** live.
