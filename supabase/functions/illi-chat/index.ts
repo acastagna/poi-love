@@ -233,8 +233,23 @@ Deno.serve(async (req: Request) => {
       if (!prof?.is_admin) return json({ error: "forbidden" }, 403);
       const eng = (await leggi("gamification_config?select=value&key=eq.illi_engine"))[0];
       const active = resolveEngine(eng?.value);
+      // Quali chiavi ci sono davvero sulla macchina. Si dice solo SI o NO:
+      // il valore della chiave non esce da qui, mai.
+      const segreti: Record<string, string> = {
+        openai: "OPENAI_KEY",
+        anthropic: "ANTHROPIC_KEY",
+        google: "GOOGLE_AI_KEY",
+        groq: "GROQ_KEY",
+        mistral: "MISTRAL_KEY",
+        deepseek: "DEEPSEEK_KEY",
+        openrouter: "OPENROUTER_KEY",
+      };
+      const chiavi: Record<string, boolean> = {};
+      for (const [chi, nome] of Object.entries(segreti)) {
+        chiavi[chi] = !!(Deno.env.get(nome) ?? "").trim();
+      }
       return json({
-        providers: { openai: !!OPENAI_KEY, anthropic: !!ANTHROPIC_KEY },
+        providers: chiavi,
         active,
       }, 200);
     }
