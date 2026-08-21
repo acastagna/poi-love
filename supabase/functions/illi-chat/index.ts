@@ -303,6 +303,7 @@ Deno.serve(async (req: Request) => {
     // e' per parole uguali ma per significato: la domanda e il pezzo possono
     // usare parole diverse e trovarsi lo stesso.
     let messaggi = messages;
+    let quantiPezzi = 0;                 // quanti passaggi dei nostri documenti rispondono alla domanda
     try {
       const ultima = [...messages].reverse().filter((m) => m.role === "user")[0]?.content ?? "";
       if (ultima.trim().length > 6 && OPENAI_KEY) {
@@ -322,6 +323,12 @@ Deno.serve(async (req: Request) => {
               // sotto una certa vicinanza il pezzo parla d'altro: darlo a ILLI
               // la porterebbe fuori strada invece che aiutarla
               .filter((p: any) => Number(p?.vicinanza) >= 0.35);
+            // Due soglie diverse, e servono davvero. 0.35 basta per METTERE un
+            // passaggio davanti al modello: male non fa. Per lasciar rispondere
+            // la macchina di casa serve di piu: alla domanda sul byrek a Tirana
+            // i pezzi delle condizioni d'uso passavano il 0.35, non c'entravano
+            // niente, e lui si e' messo a inventare nomi di ristoranti.
+            quantiPezzi = pezzi.filter((p: any) => Number(p?.vicinanza) >= 0.45).length;
             if (pezzi.length) {
               const fatti = pezzi.map((p: any) =>
                 `[${p.documento}, pagina ${p.pagina}]\n${String(p.testo).slice(0, 1200)}`
@@ -361,7 +368,16 @@ Deno.serve(async (req: Request) => {
         `ai_fornitori?select=modello,indirizzo,lingue&chiave=eq.locale&acceso=is.true`,
       ))[0];
       const parlaQuestaLingua = Array.isArray(inCasa?.lingue) && inCasa.lingue.includes(linguaChiesta);
-      if (inCasa?.indirizzo && parlaQuestaLingua) {
+      // La regola non e' un'opinione, e' una misura del 21/08/2026 su questa macchina:
+      //  - con davanti il passaggio giusto di un nostro documento, in italiano
+      //    risponde bene e in otto secondi: "almeno 16 anni, Legge 124/2024". Gratis.
+      //  - senza nessun documento inventa, e di brutto: ha scritto che Tirana e'
+      //    la capitale della Macedonia del Nord.
+      //  - in albanese sbaglia anche col documento davanti: ha scritto "me pak
+      //    16 vjec", cioe' MENO di sedici, il contrario di quello che c'e' scritto.
+      // Quindi: parla solo quando ha le carte in mano, e mai in albanese.
+      const puoRispondere = quantiPezzi > 0 && linguaChiesta !== "sq";
+      if (inCasa?.indirizzo && parlaQuestaLingua && puoRispondere) {
         const sistema = messaggi.filter((m) => m.role === "system").map((m) => m.content).join("\n\n");
         const domanda = messaggi.filter((m) => m.role !== "system")
           .map((m) => (m.role === "user" ? "Domanda: " : "Risposta: ") + m.content).join("\n\n");

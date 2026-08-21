@@ -22,7 +22,15 @@
     try{ return new Date(t).toLocaleString('it-IT',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}); }
     catch(_){ return String(t).slice(0,16); }
   }
-  function euro(v){ return v == null ? '—' : Number(v).toFixed(2) + ' $'; }
+  function euro(v){ return v == null ? '—' : Number(v).toFixed(2).replace('.', ',') + ' €'; }
+  // Quello che Google addebita e in dollari: qui diventa euro al cambio della
+  // Banca d Albania, lo stesso che l app usa gia per i prezzi in lek.
+  function daDollari(usd){ return Number(usd || 0) * cambio; }
+  // Venticinque gettoni per ogni secondo di audio, venti dollari per milione.
+  function costoAudio(secondi, lingue, lotti){
+    const usd = Number(secondi||0) * Math.max(1, lingue||1) * 25 * 20 / 1000000;
+    return daDollari(usd) * (lotti ? 0.5 : 1);
+  }
   function mmss(sec){
     const s = Math.max(0, Math.round(Number(sec)||0));
     const m = Math.floor(s/60);
@@ -38,7 +46,7 @@
   const PASSI  = [10, 20, 30, 40];
 
   let box=null, modelli=[], scelto=null, materiale=[], coda=[], lingua='it';
-  let voci=[], imp={}, conto={};
+  let voci=[], imp={}, conto={}, cambio=0.85;   // dollari in euro, dalla Banca d Albania
   let copioneScelto=null;                  // quale taglio di copione ha scelto lui
   const vocePick = {};                     // le due tendine delle voci, montate dopo il disegno
   let lottiSw = null;                      // l'interruttore dei lotti
@@ -47,16 +55,18 @@
 
   async function dati(){
     try{
-      const [m, v, i, c] = await Promise.all([
+      const [m, v, i, c, cb] = await Promise.all([
         sb.from('prompt_modelli').select('*').eq('attivo', true).order('ordine'),
         sb.from('voci').select('*').order('ordine'),
         sb.from('voce_impostazioni').select('*').eq('id',1).maybeSingle(),
         sb.rpc('voce_conto'),
+        sb.rpc('usd_in_eur', { p_usd: 1 }),
       ]);
       modelli = m.data || [];
       voci = v.data || [];
       imp = i.data || {};
       conto = (c.data && c.data[0]) || {};
+      if(cb && !cb.error && Number(cb.data) > 0) cambio = Number(cb.data);
     }catch(e){ console.warn('poivoice:', e); }
   }
 
@@ -316,7 +326,7 @@
         'istruzione a chi recita, non come parole da leggere.</div></div>'+
 
       '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:8px">'+
-        '<div class="field"><label>Credito caricato, dollari</label>'+
+        '<div class="field"><label>Credito caricato, euro</label>'+
           '<input id="pvCredito" type="number" step="0.01" min="0" value="'+(imp.credito_caricato==null?'':imp.credito_caricato)+'" placeholder="quanto hai messo">'+
           '<div style="font-size:11px;opacity:.5;margin-top:3px">Serve solo a stimare quanto resta: '+
           'Google non lo dice a nessuno.</div></div>'+
@@ -337,6 +347,7 @@
           ? '<div class="sm" style="margin-bottom:9px">Il copione scelto in '+nomeLingua(lingua)+
             ' diventa un file da ascoltare. Ogni prova si paga, anche quella che poi butti: '+
             'per questo compare qui sotto col suo costo.</div>'+
+            preventivo()+
             '<button class="btn sm gold" id="pvFaiAudio"><i class="ph-duotone ph-waveform"></i> Dai la voce al copione</button>'
           : '<div class="sm" style="opacity:.6">Prima serve un copione scelto in '+nomeLingua(lingua)+'.</div>')+
         '<div id="pvAudioEsito" style="margin-top:8px;font-size:12.5px;font-weight:700"></div>'+
@@ -347,7 +358,7 @@
             return '<div style="background:rgba(255,255,255,.03);border-radius:10px;padding:11px;margin-bottom:8px'+
               (m.scelto?';border:1.5px solid #5BBE7E':'')+'">'+
               '<div style="font-size:11.5px;opacity:.6;margin-bottom:6px">'+quando(m.creato)+
-                ' · '+mmss(m.secondi)+' · '+euro(m.costo_eur)+
+                ' · '+mmss(m.secondi)+' · '+euro(daDollari(m.costo_usd))+
                 (m.scelto?' · <b style="color:#5BBE7E">pubblicata: si sente nell app</b>':'')+'</div>'+
               (m.audio_url ? '<audio controls preload="none" src="'+esc(m.audio_url)+'" style="width:100%"></audio>' : '')+
               '<div class="btn-row" style="margin-top:8px">'+
@@ -685,6 +696,26 @@
     }
   }
 
+  // Quanto costa fare QUESTO audio: da solo, e nelle tre lingue. Il numero non
+  // e' un listino generico, esce dalla durata del copione che hai davanti.
+  function preventivo(){
+    const c = materiale.filter(function(m){ return m.fase==='copione' && m.lingua===lingua && m.scelto; })[0];
+    if(!c) return '';
+    const sec = c.secondi_stimati || stimaSecondi(c.testo);
+    const lotti = !!(lottiSw ? lottiSw.checked : imp.a_lotti);
+    return '<div style="display:flex;gap:9px;align-items:flex-start;background:rgba(232,176,75,.08);'+
+      'border:1px solid rgba(232,176,75,.25);border-radius:11px;padding:11px;margin-bottom:10px">'+
+      '<i class="ph-duotone ph-receipt" style="font-size:19px;color:var(--gold,#E8B04B);flex-shrink:0"></i>'+
+      '<div style="font-size:12.5px;line-height:1.65">'+
+        'Questo copione dura <b>'+mmss(sec)+'</b>. Farlo dire a due voci costa circa '+
+        '<b>'+euro(costoAudio(sec,1,lotti))+'</b>.<br>'+
+        'Nelle <b>tre lingue</b>: circa <b style="color:var(--gold,#E8B04B)">'+euro(costoAudio(sec,3,lotti))+'</b>'+
+        (lotti ? ' (a lotti, meta prezzo)' : ', oppure '+euro(costoAudio(sec,3,true))+' a lotti')+'.'+
+        '<div style="opacity:.6;margin-top:3px">Al cambio della Banca d Albania: un dollaro fa '+
+        cambio.toFixed(4).replace('.',',')+' euro.</div>'+
+      '</div></div>';
+  }
+
   function haCopioneScelto(){
     return materiale.some(function(m){ return m.fase==='copione' && m.lingua===lingua && m.scelto; });
   }
@@ -734,7 +765,7 @@
         poi_id: scelto.id, fase:'voce', lingua: lingua, testo:'(audio)',
         audio_url: uj.url, secondi: uj.secondi || j.secondi,
         voce: j.voce_f + (j.due_voci ? (' + '+j.voce_m) : ''),
-        modello: j.modello, costo_eur: j.costo_stimato, scelto: false,
+        modello: j.modello, costo_usd: j.costo_stimato, scelto: false,
       }).select('id');
       if(ins.error) throw ins.error;
 

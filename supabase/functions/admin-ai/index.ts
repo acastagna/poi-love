@@ -1852,6 +1852,7 @@ Deno.serve(async (req: Request) => {
   // Stesso principio di ILLI: prima di rispondere si guarda se un documento
   // caricato nella Conoscenza parla di quello che e' stato chiesto.
   let fattiDaiDocumenti = "";
+  let quantiPezzi = 0;
   try {
     const ultima = [...messages].reverse().filter((m: any) => m.role === "user")[0]?.content ?? "";
     if (String(ultima).trim().length > 6 && OPENAI_KEY) {
@@ -1872,6 +1873,10 @@ Deno.serve(async (req: Request) => {
           });
           if (rr.ok) {
             const pezzi = ((await rr.json()) as any[]).filter((p) => Number(p?.vicinanza) >= 0.35);
+            // 0.35 per mettere il passaggio davanti al modello, 0.45 perche' la
+            // macchina di casa possa rispondere da sola: sotto quella soglia il
+            // pezzo non c'entra con la domanda e lui ricama.
+            quantiPezzi = pezzi.filter((p: any) => Number(p?.vicinanza) >= 0.45).length;
             if (pezzi.length) {
               const fatti = pezzi.map((p) =>
                 `[${p.documento}, pagina ${p.pagina}]\n${String(p.testo).slice(0, 1200)}`
@@ -1900,7 +1905,10 @@ Deno.serve(async (req: Request) => {
   // strumenti del copilota: quando c'e da scrivere sul database o costruire una
   // rotta serve un modello vero. Per questo qui entra solo in modo "chat", che
   // e una domanda con una risposta e basta.
-  if (LOCALE_TOKEN && mode === "chat") {
+  // Come per ILLI: la macchina di casa risponde solo quando ha davanti il
+  // passaggio di un documento nostro. Senza, inventa, e una risposta inventata
+  // dentro il pannello e' peggio di una risposta che costa due centesimi.
+  if (LOCALE_TOKEN && mode === "chat" && quantiPezzi > 0) {
     try {
       const righe = await leggiFornitori();
       const casa = righe.filter((f: any) => f?.acceso && String(f.chiave) === "locale")[0] as any;

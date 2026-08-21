@@ -248,6 +248,21 @@
       '<div class="f-si-box" style="display:flex;gap:18px;flex-wrap:wrap;margin:14px 0"></div>'+
 
       '<div style="font-size:13px;font-weight:900;margin:16px 0 8px">I vantaggi, uno per uno ('+v.length+')</div>'+
+      (function(){
+        if(!eGratis(l)) return '';
+        const promesse = v.filter(function(x){
+          const pr = preset.filter(function(p){ return p.chiave === x.preset; })[0];
+          return x.attivo && (!pr || pr.tipo === 'promessa');
+        });
+        if(!promesse.length) return '';
+        return '<div style="background:rgba(224,106,106,.1);border:1px solid rgba(224,106,106,.3);'+
+          'border-radius:11px;padding:11px;margin-bottom:10px;font-size:12.5px;line-height:1.6">'+
+          '<b style="color:#E06A6A">'+promesse.length+
+          (promesse.length===1?' voce di questo livello gratuito richiede lavoro nostro'
+                              :' voci di questo livello gratuito richiedono lavoro nostro')+'.</b> '+
+          'Nessun programma le fa rispettare: qualcuno le deve mantenere a mano, per tutti, senza incassare. '+
+          'O si legano a una regola vera, o vanno spostate su un livello che si paga.</div>';
+      })()+
       '<div class="liv-vant">'+v.map(vantaggioRiga).join('')+'</div>'+
       '<div class="btn-row" style="margin-top:8px">'+
         '<button class="btn sm" data-azione="nuovo"><i class="ph-duotone ph-plus"></i> Riga vuota da scrivere</button>'+
@@ -301,6 +316,11 @@
   // Ogni voce dice a chiare lettere se e una regola che il programma fa
   // rispettare oppure una promessa che manteniamo a mano. Serve a non vendere
   // una cosa che nessuno controlla.
+  // Gratuito vuol dire: prezzo zero, oppure nessun prezzo con periodo "gratis".
+  function eGratis(l){
+    return l.periodo === 'gratis' || Number(l.prezzo) === 0;
+  }
+
   function catalogo(l){
     const messi = (vantaggi[l.chiave] || []).map(function(x){ return x.preset; });
     const gruppi = {};
@@ -330,6 +350,13 @@
               '<div style="font-size:11px;margin-top:8px;line-height:1.5;opacity:.72">'+
                 '<b style="color:'+(p.tipo==='regola'?'#5BBE7E':'#E0A54A')+'">'+
                   (p.tipo==='regola'?'regola':'promessa')+'</b> · '+esc(p.cosa_fa)+'</div>'+
+              // Una promessa dentro un livello gratuito e' lavoro nostro regalato:
+              // se il modello di guadagno si sbaglia qui, restano solo le spese.
+              (p.tipo==='promessa' && eGratis(l)
+                ? '<div style="font-size:11px;margin-top:6px;line-height:1.5;color:#E06A6A;font-weight:700">'+
+                  'Attenzione: questo livello e gratuito e questa voce e lavoro nostro. '+
+                  'Regalata a tutti, e solo una spesa.</div>'
+                : '')+
               '<div style="display:flex;gap:6px;align-items:center;margin-top:9px">'+
                 (numerico ? '<input class="p-val" data-p="'+esc(p.chiave)+'" type="number" min="0" '+
                   'value="'+(ora || 3)+'" style="width:74px" title="quanti">' : '')+
