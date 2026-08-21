@@ -1,5 +1,53 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
+## 21/08/2026 pomeriggio — Il pannello diventa un pannello, e i QR rinascono
+
+Nove pezzi chiusi di fila, senza fermarsi. Programma da 59 a 67,5 giornate su 113.
+
+### I codici QR, rifatti da zero
+Erano disegnati a pixel e al posto del marchio c'era un cerchio colorato. Adesso
+il codice **nasce vettoriale**: l'SVG e' la forma vera, da li' escono PNG e JPG
+disegnati da un motore che sa fare le curve. Cinque forme di punti, cinque di
+angoli, sfumatura a due colori, colore della pupilla, il cuore POI•LOVE vero in
+mezzo, e quattro modi di scaricarlo: PNG trasparente, PNG bianco, JPG bianco,
+JPG col fondo che vuoi, piu' l'SVG che non ha dimensione.
+
+**Provate settantacinque combinazioni con un lettore vero.** Al primo giro ne
+fallivano ventisette: gli angoli tondi pieni e la foglia come l'avevo disegnata
+non si leggono, e il PNG trasparente non si leggeva perche' il buco degli angoli
+era dipinto invece che ritagliato. Riscritti come anello con riempimento a regola
+alternata: settantacinque su settantacinque.
+
+### Il pannello
+| Cosa | Prima | Adesso |
+|---|---|---|
+| Livelli | si registrava un abbonamento e basta | prezzo, periodo, tutte le manopole, e i vantaggi uno per uno nelle tre lingue |
+| Persone | si sospendeva senza sapere perche' | le segnalazioni fatte e ricevute nella scheda; sospensione con durata e motivo scritti da chi modera |
+| Copilota | fornitore e modello fissi nel codice | li sceglie il pannello, e sotto la risposta c'e' scritto chi ha risposto |
+| Compagnie | non esistevano | elenco, membri, bacheca coi vocali, moderazione |
+| Connessioni AI | due nomi scritti nel codice | sette fornitori, pallino verde solo se chiave presente E acceso, bottone per prendere la chiave, prova vera |
+
+### POI•VOICE, le prime due fasi funzionano
+Sezione nuova. Si sceglie il luogo e la lingua, sei domande gia' pronte piu' la
+chat libera, il materiale resta attaccato al luogo. Poi il copione, nella durata
+scelta. Ricerca e copione passano dalla **coda**: la domanda finisce in una
+tabella e risponde chi sta girando sul Mac, quindi non costano niente.
+
+Provata per intero sul castello di Berat: domanda con le coordinate vere, presa
+dal Mac, risposta, tenuta; poi il copione a tre minuti, scritto, tenuto e scelto.
+
+La fase tre ha le trenta voci, la regia, le tre durate e il conto della spesa
+tenuto da noi. Manca solo la chiave di Google.
+
+### Due cose trovate per strada
+- **Il copilota era morto dal 18 agosto**: chiedeva a Supabase chi fossi mentre
+  gli accessi sono nostri. L'ultima risposta riuscita era del 12 luglio.
+- **Una porta aperta nel database**: convivevano due controlli di amministratore,
+  uno che pretendeva il secondo fattore e uno che guardava solo il profilo. Tutto
+  quello scritto nelle ultime settimane usava il secondo. Misurato: con la sola
+  password si metteva una domanda in coda. Adesso chiedono la stessa cosa.
+
+
 ## 21/08/2026 mattina — Revisione del codice della notte (5.34)
 
 Cinque revisioni indipendenti, in sola lettura, su tutto quello che era stato scritto fra le 00:15 e
