@@ -573,6 +573,7 @@ html[data-theme="light"] .chip.green{color:#236b39}
 <script src="js/volti-admin.js?v=348"></script>
 <script src="js/direttive-admin.js?v=348"></script>
 <script src="js/livelli-admin.js?v=346"></script>
+<script src="js/livelli-editor.js?v=351"></script>
 <script src="js/catena-admin.js?v=349"></script>
 <script src="js/itinerari-admin.js?v=349"></script>
 <script src="js/compagnie-admin.js?v=350"></script>
@@ -998,7 +999,12 @@ html[data-theme="light"] .chip.green{color:#236b39}
 
     <!-- 8c-quinquies) LIVELLI E ABBONAMENTI -->
     <section class="section" id="sec-livelli">
-      <div id="livelliBox"></div>
+      <div class="btn-row" style="margin-bottom:12px">
+        <button class="btn sm gold" id="livTabRegola" onclick="_livVista('regola')"><i class="ph-duotone ph-sliders-horizontal"></i> Regola i livelli</button>
+        <button class="btn sm" id="livTabAbb" onclick="_livVista('abbonamenti')"><i class="ph-duotone ph-receipt"></i> Abbonamenti e persone</button>
+      </div>
+      <div id="livelliEditorBox"></div>
+      <div id="livelliBox" hidden></div>
     </section>
 
     <!-- 8c-sexies) CATENA DEI CONTENUTI -->
@@ -1661,6 +1667,21 @@ function setLmTab(tab){
   document.getElementById('lmtab-landing').style.display = tab==='landing' ? '' : 'none';
   document.getElementById('lmtab-mail').style.display = tab==='mail' ? '' : 'none';
 }
+/* La sezione dei livelli ha due facce: le manopole e gli abbonamenti gia pagati. */
+let _livCaricatiAbb = false;
+function _livVista(quale){
+  const ed = document.getElementById('livelliEditorBox');
+  const ab = document.getElementById('livelliBox');
+  ed.hidden = (quale !== 'regola');
+  ab.hidden = (quale !== 'abbonamenti');
+  document.getElementById('livTabRegola').classList.toggle('gold', quale === 'regola');
+  document.getElementById('livTabAbb').classList.toggle('gold', quale === 'abbonamenti');
+  if(quale === 'abbonamenti' && !_livCaricatiAbb){
+    _livCaricatiAbb = true;
+    if(window.LivelliAdmin) window.LivelliAdmin.load(ab);
+  }
+}
+
 function runSection(sec){
   if(loaded[sec]) return;
   loaded[sec]=true;
@@ -1683,7 +1704,7 @@ function runSection(sec){
     case 'qr': if(window.QrEditor) window.QrEditor.load(document.getElementById('qrEditorBox')); break;
     case 'volti': if(window.VoltiAdmin) window.VoltiAdmin.load(document.getElementById('voltiBox')); break;
     case 'direttive': if(window.DirettiveAdmin) window.DirettiveAdmin.load(document.getElementById('direttiveBox')); break;
-    case 'livelli': if(window.LivelliAdmin) window.LivelliAdmin.load(document.getElementById('livelliBox')); break;
+    case 'livelli': if(window.LivelliEditor) window.LivelliEditor.load(document.getElementById('livelliEditorBox')); break;
     case 'catena': if(window.CatenaAdmin) window.CatenaAdmin.load(document.getElementById('catenaBox')); break;
     case 'knowledge': loadKnowledgeAdmin(); break;
     case 'audit': loadAudit(); break;
