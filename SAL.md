@@ -1,5 +1,101 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
+## 21/08/2026 sera — I comandi diventano nostri, i livelli si creano, i documenti entrano in testa agli assistenti
+
+Programma da 68,5 a 70,5 giornate su 113. Controllo: 19 su 19.
+
+### I comandi del pannello, disegnati da noi
+Le tendine e le caselle di spunta erano quelle del sistema operativo: fondo
+bianco, azzurro di Windows, dentro una scheda scura stonavano. Adesso c'e'
+`admin/js/ui-controls.js`, con la tendina e l'interruttore nostri, che seguono
+il tema chiaro e scuro come tutto il resto. La tendina si apre in posizione
+fissa: dentro le schede che scorrono, una tendina normale veniva tagliata a
+meta'. Rifatti con questi comandi: Modifica POI, l'editor dei livelli, le voci
+di POI•VOICE, il riquadro dei badge.
+
+Il riquadro **Badge e assegnazione** era una macchia color crema su fondo scuro,
+coi colori scritti a mano dentro il codice. Adesso segue il tema, legge i livelli
+veri dal database invece di una lista scritta nel programma, e accanto al nome
+della persona mostra la sua faccia.
+
+Nel Modifica POI il muro di ventiquattro categorie si filtra, le scelte stanno
+sempre in cima e l'area non si mangia mezza scheda. Il campo "Pubblico" con la
+casella azzurra e' diventato **Visibile a tutti**, con sotto scritto cosa
+succede quando e' spento.
+
+### I livelli si creano, e i vantaggi dicono cosa fanno davvero
+Prima si potevano solo regolare. Adesso se ne creano di nuovi, anche copiando
+le regole di uno che c'e' gia', e si eliminano (solo se nessuno ce l'ha addosso:
+chi paga non resta orfano).
+
+I vantaggi hanno un **catalogo di sedici voci**, e ogni voce dice a chiare
+lettere se e' una **regola** che il programma fa rispettare da solo, o una
+**promessa** che manteniamo a mano. Dieci sono regole vere e portano il numero
+nella colonna che le fa rispettare: metti "dodici foto" e da quel momento il
+server rifiuta la tredicesima. Sei sono promesse, ed e' scritto che nessuno le
+controlla al posto tuo.
+
+C'e' anche una **chat con l'AI sui vantaggi**, che passa dalla coda e non costa
+niente: conosce prezzo, pubblico e vantaggi gia' presenti, propone righe gia'
+scritte nelle tre lingue e le mostra in anteprima prima di inserirle.
+
+Alla prima prova i vantaggi si duplicavano: le righe vecchie non sapevano da
+quale voce del catalogo venissero. Ricostruito il collegamento sul testo,
+ventidue righe su ventisei ora lo sanno, e mettere due volte lo stesso vantaggio
+aggiorna invece di duplicare.
+
+### La conoscenza: i PDF entrano davvero
+Un manuale di decine di pagine non si incolla in una scheda. Adesso si carica il
+PDF: il server delle immagini ne tira fuori il testo pagina per pagina e lo
+spezza in pezzi corti (nessuna chiave passa di li'), poi la funzione che ha la
+chiave mette accanto a ogni pezzo il numero che ne descrive il significato. Da
+li' in poi, a domanda fatta, si trova il pezzo giusto anche con parole diverse.
+
+Provato dal vivo con le condizioni d'uso, otto pagine: alla domanda "che eta'
+bisogna avere per iscriversi?" ha tirato fuori il passaggio dei sedici anni,
+con numero di pagina. Due difetti trovati dalla prova stessa: la coda di ogni
+pagina avanzava di un carattere alla volta (otto pagine facevano novecentoventi
+pezzi, ora trenta), e nginx e PHP scrivevano tutti e due la stessa intestazione
+di sicurezza: il browser rifiutava ogni chiamata. **Quel secondo difetto
+riguardava anche `upload.php` e `audio.php`**, cioe' il caricamento delle foto e
+della voce: era rotto dal passaggio alla macchina nuova e non se n'era accorto
+nessuno.
+
+### Un'intelligenza sulla nostra macchina
+Installato Ollama sulla macchina di Norimberga con qwen2.5 da sette miliardi,
+chiuso a chiave: ascolta solo se stesso, e da fuori ci si arriva solo con un
+biglietto di servizio. ILLI e il copilota lo provano per primi e, se non
+risponde in tempo, passano oltre senza far aspettare nessuno.
+
+**Misurato, non sperato**: sedici parole al secondo, costo zero. Ma alla domanda
+"cosa e' POI•LOVE" ha risposto che non lo sa, e ha tradotto "Il castello domina
+la valle" in una cosa che non e' albanese. Per questo e' **spento**, con la
+misura scritta nel pannello: si accende con un click quando conviene, e si
+spegne quando la risposta non regge. La tabella dei fornitori adesso dice anche
+in quali lingue si puo' usare ciascuno.
+
+### Lo studio di doppiaggio
+Costruito tutto: la funzione manda a Google il copione scelto con le due voci e
+la regia, rimette l'intestazione al suono grezzo che torna indietro, il pannello
+salva il file, scrive la prova e **segna la spesa prima di sapere se piacera'**.
+Buttare una prova non toglie niente dal conto: si paga anche quello che si
+scarta, e il motivo resta scritto. Anche l'assaggio di una voce e' una
+generazione pagata, e finisce nel conto come tale.
+
+Mancava il ponte piu' importante: le prove vivevano nel laboratorio, l'app suona
+da un'altra tabella, e in mezzo non c'era niente. Adesso **Pubblica questa**
+porta la voce scelta dove l'app la sente davvero.
+
+Alla prova dal vivo tutto risponde fino a Google, che dice: manca la chiave.
+E' l'unica cosa che manca, ed e' in mano a lui.
+
+### Una mina tolta dal server
+Le copie di sicurezza della configurazione di nginx fatte stamattina erano
+rimaste **dentro la cartella che nginx legge**: le caricava tutte. Vinceva
+ancora quella giusta per ordine alfabetico, ma bastava un nome diverso per far
+vincere una vecchia. Spostate in `/root/nginx-copie`, niente cancellato.
+
+
 ## 21/08/2026 pomeriggio — Il pannello diventa un pannello, e i QR rinascono
 
 Nove pezzi chiusi di fila, senza fermarsi. Programma da 59 a 67,5 giornate su 113.

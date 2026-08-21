@@ -99,6 +99,46 @@ Deno.serve(async (req) => {
   try { corpo = await req.json(); } catch { /* niente */ }
   const poi = String(corpo.poi ?? "");
   const lingua = /^(it|sq|en)$/.test(String(corpo.lingua ?? "")) ? String(corpo.lingua) : "it";
+
+  // ── Assaggio: poche parole per sentire com e una voce ─────────────────────
+  // Serve a scegliere, non a produrre. Sono tre secondi scarsi, ma si pagano
+  // come tutto il resto: chi chiama li segna nel conto come prova buttata.
+  if (corpo.assaggio) {
+    const nome = String(corpo.voce ?? "").trim();
+    if (!/^[A-Za-z]{2,24}$/.test(nome)) return risposta({ errore: "nome della voce non valido" }, 400);
+    const FRASE = {
+      it: "Benvenuto a Berat. Alza gli occhi: quelle finestre ti guardano da cinquecento anni.",
+      sq: "Miresevini ne Berat. Ngri syte: ato dritare te veshtrojne prej pesёqind vjetesh.",
+      en: "Welcome to Berat. Look up: those windows have been watching for five hundred years.",
+    }[lingua];
+    const u = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro-tts:generateContent?key=${GOOGLE_TTS_KEY}`;
+    const rr = await fetch(u, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: FRASE }] }],
+        generationConfig: {
+          responseModalities: ["AUDIO"],
+          speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: nome } } },
+        },
+      }),
+      signal: AbortSignal.timeout(90000),
+    });
+    const tt = await rr.text();
+    if (!rr.ok) return risposta({ errore: "Google ha rifiutato l'assaggio", dettaglio: tt.slice(0, 300) }, 502);
+    const pa = JSON.parse(tt)?.candidates?.[0]?.content?.parts?.[0]?.inlineData;
+    if (!pa?.data) return risposta({ errore: "Google non ha mandato audio" }, 502);
+    const gr = Uint8Array.from(atob(pa.data), (c) => c.charCodeAt(0));
+    const hz2 = Number((String(pa.mimeType || "").match(/rate=(\d+)/) || [])[1] || 24000);
+    const w = inWav(gr, hz2);
+    let b = "";
+    for (let i = 0; i < w.length; i += 0x8000) b += String.fromCharCode(...w.subarray(i, i + 0x8000));
+    const sec = gr.length / (hz2 * 2);
+    return risposta({
+      ok: true, wav: btoa(b), secondi: Number(sec.toFixed(1)), voce: nome,
+      costo_stimato: Number((sec * DOLLARI_AL_SECONDO).toFixed(4)), assaggio: true,
+    });
+  }
+
   if (!poi) return risposta({ errore: "serve il luogo" }, 400);
 
   try {

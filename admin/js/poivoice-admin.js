@@ -633,14 +633,49 @@
     }
   }
 
-  function ascolta(genere){
+  // L assaggio e audio vero: si genera sul momento, poche parole. Costa pochi
+  // millesimi, e quei millesimi finiscono nel conto come tutto il resto: si
+  // paga anche quello che serve solo per scegliere.
+  async function ascolta(genere){
     const e = document.getElementById('pvAscolto');
     const sel = vocePick[genere];
-    if(!e || !sel) return;
-    // L'anteprima e' audio: per farla sentire bisogna generarla, e generare
-    // vuole la chiave. Meglio dirlo che far premere un tasto muto.
-    e.textContent = 'Per sentire ' + sel.value + ' serve la chiave di Google: e un audio, e va generato.';
-    e.style.color = '#D8A93B';
+    if(!e || !sel || !sel.value) return;
+    e.style.color = 'inherit';
+    e.textContent = 'Faccio sentire ' + sel.value + '…';
+    try{
+      const tok = await biglietto();
+      const r = await fetch('https://poilove.com/db/functions/v1/poivoice-genera', {
+        method:'POST', headers:{ 'Content-Type':'application/json', Authorization:'Bearer '+tok },
+        body: JSON.stringify({ assaggio:true, voce: sel.value, lingua: lingua }),
+      });
+      const j = await r.json();
+      if(!r.ok || j.errore){
+        e.style.color = '#D8A93B';
+        e.textContent = (j.errore || ('errore '+r.status)) + (j.spiegazione ? ' — '+j.spiegazione : '');
+        return;
+      }
+      const grezzo = atob(j.wav);
+      const bytes = new Uint8Array(grezzo.length);
+      for(let i=0;i<grezzo.length;i++) bytes[i] = grezzo.charCodeAt(i);
+      const url = URL.createObjectURL(new Blob([bytes], { type:'audio/wav' }));
+      const suono = new Audio(url);
+      suono.onended = function(){ URL.revokeObjectURL(url); };
+      suono.play();
+      e.style.color = '#5BBE7E';
+      e.textContent = sel.value + ' · ' + j.secondi + ' secondi · ' + euro(j.costo_stimato) + ' (anche l assaggio si paga)';
+      // nel conto: e una generazione fatta e buttata, il costo resta
+      const sp = await sb.rpc('voce_segna_spesa', {
+        p_poi: scelto ? scelto.id : null, p_lingua: lingua, p_secondi: j.secondi,
+        p_gettoni_in: 0, p_gettoni_out: Math.round(j.secondi*25), p_costo: j.costo_stimato,
+        p_voce_f: genere==='femminile' ? sel.value : null,
+        p_voce_m: genere==='maschile' ? sel.value : null,
+        p_esito: 'scartata', p_motivo: 'assaggio per scegliere la voce', p_materiale: null,
+      });
+      if(sp.error) console.warn('assaggio non segnato nel conto:', sp.error.message);
+    }catch(err){
+      e.style.color = '#E06A6A';
+      e.textContent = 'Non sono riuscito: ' + (err.message||'');
+    }
   }
 
   function haCopioneScelto(){
