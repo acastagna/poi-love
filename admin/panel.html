@@ -575,6 +575,7 @@ html[data-theme="light"] .chip.green{color:#236b39}
 <script src="js/livelli-admin.js?v=346"></script>
 <script src="js/catena-admin.js?v=349"></script>
 <script src="js/itinerari-admin.js?v=349"></script>
+<script src="js/compagnie-admin.js?v=350"></script>
 </head>
 <body>
 <div class="grain"></div>
@@ -646,6 +647,9 @@ html[data-theme="light"] .chip.green{color:#236b39}
     </div>
     <div class="nav-item" data-sec="livelli" onclick="openSection('livelli')">
       <span class="ic"><i class="ph-duotone ph-crown-simple"></i></span> Livelli
+    </div>
+    <div class="nav-item" data-sec="compagnie" onclick="openSection('compagnie')">
+      <span class="ic"><i class="ph-duotone ph-users-three"></i></span> Compagnie
     </div>
     <div class="nav-item" data-sec="catena" onclick="openSection('catena')">
       <span class="ic"><i class="ph-duotone ph-graph"></i></span> Catena
@@ -897,6 +901,11 @@ html[data-theme="light"] .chip.green{color:#236b39}
       <div id="itinerariBox"></div>
     </section>
 
+    <!-- Le compagnie di viaggio: prima non si vedevano da nessuna parte -->
+    <section class="section" id="sec-compagnie">
+      <div id="compagnieBox"></div>
+    </section>
+
     <!-- 8c) CATEGORIE (tassonomia data-driven) -->
     <section class="section" id="sec-categories">
       <div class="panel" style="margin-bottom:16px">
@@ -1090,6 +1099,8 @@ let aiBusy = false;       // richiesta al copilota in volo: blocca invii concorr
 /* ─────────────────────────── i18n (pattern T del login) ─────────────────────────── */
 const T = {
   it:{
+    nav_compagnie:"Compagnie",
+    sub_compagnie:"I gruppi che viaggiano insieme: chi c'e' dentro, la bacheca vocale, i luoghi e gli itinerari. Da qui si guarda e si modera.",
     nav_livelli:"Livelli",
     sub_livelli:"I livelli, i vantaggi di ognuno e gli abbonamenti: chi ce l'ha, fino a quando, e la registrazione di un pagamento.",
     nav_catena:"Catena contenuti",
@@ -1204,6 +1215,8 @@ const T = {
     f_coords:'Coordinate', f_address:'Indirizzo', f_city:'Città'
   },
   sq:{
+    nav_compagnie:"Shoqerite",
+    sub_compagnie:"Grupet qe udhetojne bashke: kush eshte brenda, tabela me zerat, vendet dhe itineraret. Nga ketu shihet dhe moderohet.",
     nav_livelli:"Nivelet",
     sub_livelli:"Nivelet, perfitimet e secilit dhe abonimet: kush e ka, deri kur, dhe regjistrimi i nje pagese.",
     nav_catena:"Zinxhiri i permbajtjes",
@@ -1314,6 +1327,8 @@ const T = {
     f_coords:'Koordinatat', f_address:'Adresa', f_city:'Qyteti'
   },
   en:{
+    nav_compagnie:"Companion groups",
+    sub_compagnie:"The groups that travel together: who is in, the voice board, the places and the itineraries. Looked at and moderated from here.",
     nav_livelli:"Levels",
     sub_livelli:"Levels, the benefits of each and subscriptions: who has one, until when, and recording a payment.",
     nav_catena:"Content chain",
@@ -1607,10 +1622,10 @@ async function doLogout(){
 /* ─────────────────────────── Navigazione sezioni (lazy) ─────────────────────────── */
 const SUBKEY = { dashboard:'sub_dashboard', moderation:'sub_moderation', users:'sub_users',
   ailimits:'sub_ailimits', copilot:'sub_copilot', create:'sub_create', pois:'sub_pois', routes:'sub_routes', audit:'sub_audit', categories:'sub_categories' , tags:'sub_tags', badges:'sub_badges', knowledge:'sub_knowledge', media:'sub_media', itineraries:'sub_itineraries', punti:'sub_punti', landing:'sub_landing',
-  livelli:'sub_livelli', catena:'sub_catena', direttive:'sub_direttive', qr:'sub_qr', volti:'sub_volti', messages:'sub_messages' };
+  livelli:'sub_livelli', catena:'sub_catena', compagnie:'sub_compagnie', direttive:'sub_direttive', qr:'sub_qr', volti:'sub_volti', messages:'sub_messages' };
 const TITLEKEY = { dashboard:'nav_dashboard', moderation:'nav_moderation', users:'nav_users',
   ailimits:'nav_ailimits', copilot:'nav_copilot', create:'nav_create', pois:'nav_pois', routes:'nav_routes', itineraries:'nav_itineraries', categories:'nav_categories', tags:'nav_tags', badges:'nav_badges', knowledge:'nav_knowledge', audit:'nav_audit', media:'nav_media', landing:'nav_landing', punti:'nav_punti',
-  livelli:'nav_livelli', catena:'nav_catena', direttive:'nav_direttive', qr:'nav_qr', volti:'nav_volti', messages:'nav_messages' };
+  livelli:'nav_livelli', catena:'nav_catena', compagnie:'nav_compagnie', direttive:'nav_direttive', qr:'nav_qr', volti:'nav_volti', messages:'nav_messages' };
 
 function updateHeader(sec){
   document.getElementById('secTitle').textContent = t(TITLEKEY[sec]);
@@ -1645,6 +1660,7 @@ function runSection(sec){
     case 'pois': loadPois(); break;
     case 'routes': loadRoutesAdmin(); break;
     case 'itineraries': if(window.ItinerariAdmin) window.ItinerariAdmin.load(document.getElementById('itinerariBox')); break;
+    case 'compagnie': if(window.CompagnieAdmin) window.CompagnieAdmin.load(document.getElementById('compagnieBox')); break;
     case 'categories': loadCategoriesAdmin(); break;
     case 'tags': loadTagsAdmin(); break;
     case 'badges': if(window.BadgeAdmin) window.BadgeAdmin.load(document.getElementById('badgesBox')); break;
