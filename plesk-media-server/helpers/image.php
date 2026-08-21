@@ -193,6 +193,32 @@ function process_and_save_image(string $tmp_path, int $file_size, string $dest_p
 
     $saved = imagewebp($img, $output_file, IMAGE_QUALITY);
 
+    // Sotto i 100 KB, sempre. Una foto pesante la paga chi guarda: si scarica
+    // ogni volta, su una rete che magari e' quella del telefono in viaggio.
+    // Se la prima passata sfora, si riprova con meno qualita' e, se serve, con
+    // il lato lungo piu' corto. Non si accetta un file da 145 KB perche' "va bene lo stesso".
+    if ($saved && file_exists($output_file)) {
+        $tetto = 100 * 1024;
+        $qualita = IMAGE_QUALITY;
+        while (filesize($output_file) > $tetto && $qualita > 45) {
+            $qualita -= 10;
+            imagewebp($img, $output_file, $qualita);
+        }
+        if (filesize($output_file) > $tetto) {
+            // ancora pesante: si accorcia il lato lungo e si riprova
+            $lw = imagesx($img); $lh = imagesy($img);
+            $fattore = 0.8;
+            while (filesize($output_file) > $tetto && min($lw, $lh) > 400) {
+                $lw = (int)round($lw * $fattore); $lh = (int)round($lh * $fattore);
+                $piccola = imagecreatetruecolor($lw, $lh);
+                imagealphablending($piccola, false); imagesavealpha($piccola, true);
+                imagecopyresampled($piccola, $img, 0, 0, 0, 0, $lw, $lh, imagesx($img), imagesy($img));
+                imagewebp($piccola, $output_file, $qualita);
+                imagedestroy($piccola);
+            }
+        }
+    }
+
     // Cleanup memoria
     if ($img !== $src) imagedestroy($img);
     imagedestroy($src);

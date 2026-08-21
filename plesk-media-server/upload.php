@@ -224,6 +224,31 @@ for ($i = 0; $i < $file_count; $i++) {
 
     $uploaded_urls[]  = $result['url'];
     $uploaded_paths[] = $result['path'];
+
+    // Da dove viene questa foto resta scritto. Per le foto scattate da chi le
+    // carica l'autore e' lui: si segna 'utente'. Per quelle prese da fuori
+    // servono licenza e autore, e il database le rifiuta se mancano.
+    {
+        $tok_m = extract_bearer_token();
+        if ($tok_m) {
+            $riga = [
+                'owner_id' => $user['id'],
+                'poi_id'   => $poi_id,
+                'url'      => $result['url'],
+                'kind'     => 'foto',
+                'source'   => 'utente',
+                'bytes'    => (file_exists($result['path']) ? filesize($result['path']) : null),
+                'mime'     => 'image/webp',
+            ];
+            $ch = curl_init('https://poilove.com/db/rest/v1/media_assets');
+            curl_setopt_array($ch, [
+                CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 8, CURLOPT_POST => true,
+                CURLOPT_HTTPHEADER => ['Authorization: Bearer ' . $tok_m, 'Content-Type: application/json', 'Prefer: return=minimal'],
+                CURLOPT_POSTFIELDS => json_encode($riga),
+            ]);
+            curl_exec($ch); curl_close($ch);
+        }
+    }
 }
 
 // ---------------------------------------------------------------------------

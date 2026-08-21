@@ -19,41 +19,67 @@ const CORS: Record<string, string> = {
 function json(o: unknown, s = 200): Response {
   return new Response(JSON.stringify(o), { status: s, headers: { ...CORS, "Content-Type": "application/json" } });
 }
-type Img = { url: string; thumb: string; source: string };
+// Ogni foto porta con se' da dove viene e chi l'ha fatta. Senza autore e
+// licenza una foto presa da fuori non si puo' usare: il database la rifiuta,
+// e l'app non la fa nemmeno scegliere.
+type Img = { url: string; thumb: string; source: string; autore?: string; licenza?: string; pagina?: string };
 async function safe(p: Promise<Img[]>): Promise<Img[]> { try { return await p; } catch (_) { return []; } }
 
 async function openverse(q: string): Promise<Img[]> {
   const r = await fetch("https://api.openverse.org/v1/images/?q=" + encodeURIComponent(q) + "&page_size=20&license_type=commercial");
   const d = await r.json();
-  return (d.results || []).map((it: any) => ({ url: it.url, thumb: it.thumbnail || it.url, source: it.source || "openverse" }));
+  return (d.results || []).map((it: any) => ({
+    url: it.url, thumb: it.thumbnail || it.url, source: it.source || "openverse",
+    autore: it.creator || "", licenza: [it.license, it.license_version].filter(Boolean).join(" ").toUpperCase(),
+    pagina: it.foreign_landing_url || it.url,
+  }));
 }
 async function wikimedia(q: string): Promise<Img[]> {
-  const r = await fetch("https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch=" + encodeURIComponent(q) + "&gsrnamespace=6&gsrlimit=15&prop=imageinfo&iiprop=url&iiurlwidth=500&format=json&origin=*");
+  // extmetadata porta autore e licenza: senza quelli la foto non serve a niente.
+  const r = await fetch("https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch=" + encodeURIComponent(q) +
+    "&gsrnamespace=6&gsrlimit=15&prop=imageinfo&iiprop=url|extmetadata&iiurlwidth=500&format=json&origin=*");
   const d = await r.json();
   const pg = (d.query && d.query.pages) || {};
+  const pulisci = (x: string) => String(x || "").replace(/<[^>]+>/g, "").trim();
   return Object.values(pg).map((p: any) => {
     const ii = p.imageinfo && p.imageinfo[0]; if (!ii) return null;
     const u = ii.url || ""; if (!/\.(jpe?g|png|webp)$/i.test(u)) return null;
-    return { url: u, thumb: ii.thumburl || u, source: "wikipedia" };
+    const em = ii.extmetadata || {};
+    return {
+      url: u, thumb: ii.thumburl || u, source: "wikimedia",
+      autore: pulisci(em.Artist && em.Artist.value) || pulisci(em.Credit && em.Credit.value),
+      licenza: pulisci(em.LicenseShortName && em.LicenseShortName.value),
+      pagina: ii.descriptionurl || u,
+    };
   }).filter(Boolean) as Img[];
 }
 async function unsplash(q: string): Promise<Img[]> {
   const k = Deno.env.get("UNSPLASH_KEY"); if (!k) return [];
   const r = await fetch("https://api.unsplash.com/search/photos?per_page=15&query=" + encodeURIComponent(q) + "&client_id=" + k);
   const d = await r.json();
-  return (d.results || []).map((p: any) => ({ url: p.urls.regular, thumb: p.urls.small, source: "unsplash" }));
+  return (d.results || []).map((p: any) => ({
+    url: p.urls.regular, thumb: p.urls.small, source: "unsplash",
+    autore: (p.user && p.user.name) || "", licenza: "Unsplash License",
+    pagina: (p.links && p.links.html) || "",
+  }));
 }
 async function pexels(q: string): Promise<Img[]> {
   const k = Deno.env.get("PEXELS_KEY"); if (!k) return [];
   const r = await fetch("https://api.pexels.com/v1/search?per_page=15&query=" + encodeURIComponent(q), { headers: { Authorization: k } });
   const d = await r.json();
-  return (d.photos || []).map((p: any) => ({ url: p.src.large || p.src.original, thumb: p.src.medium || p.src.small, source: "pexels" }));
+  return (d.photos || []).map((p: any) => ({
+    url: p.src.large || p.src.original, thumb: p.src.medium || p.src.small, source: "pexels",
+    autore: p.photographer || "", licenza: "Pexels License", pagina: p.url || "",
+  }));
 }
 async function pixabay(q: string): Promise<Img[]> {
   const k = Deno.env.get("PIXABAY_KEY"); if (!k) return [];
   const r = await fetch("https://pixabay.com/api/?key=" + encodeURIComponent(k) + "&per_page=15&image_type=photo&q=" + encodeURIComponent(q));
   const d = await r.json();
-  return (d.hits || []).map((p: any) => ({ url: p.largeImageURL || p.webformatURL, thumb: p.webformatURL || p.previewURL, source: "pixabay" }));
+  return (d.hits || []).map((p: any) => ({
+    url: p.largeImageURL || p.webformatURL, thumb: p.webformatURL || p.previewURL, source: "pixabay",
+    autore: p.user || "", licenza: "Pixabay Content License", pagina: p.pageURL || "",
+  }));
 }
 
 Deno.serve(async (req: Request) => {
