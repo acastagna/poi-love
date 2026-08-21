@@ -111,7 +111,7 @@ Deno.serve(async (req) => {
       sq: "Miresevini ne Berat. Ngri syte: ato dritare te veshtrojne prej pesёqind vjetesh.",
       en: "Welcome to Berat. Look up: those windows have been watching for five hundred years.",
     }[lingua];
-    const u = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro-tts:generateContent?key=${GOOGLE_TTS_KEY}`;
+    const u = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro-preview-tts:generateContent?key=${GOOGLE_TTS_KEY}`;
     const rr = await fetch(u, {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -158,12 +158,9 @@ Deno.serve(async (req) => {
     const testo = String(copione.testo || "");
     const dueVoci = /^\s*Speaker\s*2\s*:/im.test(testo);
     const regia = String(impo[0]?.regia || "").trim();
-    const modello = String(impo[0]?.modello || "gemini-2.5-pro-tts");
+    const modello = String(impo[0]?.modello || "gemini-2.5-pro-preview-tts");
 
     const parlato = {
-      // La regia e un campo a parte: Google la legge come istruzione a chi
-      // recita, non come parole da leggere ad alta voce.
-      ...(regia ? { prompt: regia } : {}),
       ...(dueVoci
         ? {
           multiSpeakerVoiceConfig: {
@@ -181,7 +178,10 @@ Deno.serve(async (req) => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: testo }] }],
+        // La regia si scrive in testa al testo: generateContent non ha un campo
+        // suo per le istruzioni di recitazione (provato: "Unknown name prompt").
+        // Scritta cosi, il modello la esegue e non la legge ad alta voce.
+        contents: [{ parts: [{ text: (regia ? regia + "\n\n" : "") + testo }] }],
         generationConfig: { responseModalities: ["AUDIO"], speechConfig: parlato },
       }),
       signal: AbortSignal.timeout(300000),

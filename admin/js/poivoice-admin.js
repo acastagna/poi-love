@@ -301,7 +301,7 @@
       '<div style="font-size:14px;font-weight:900;margin-bottom:4px">3 · Le voci</div>'+
       '<div class="sm" style="margin-bottom:10px">Due voci, una femminile e una maschile: sono i due che parlano nel '+
       'copione. Valgono per tutte e tre le lingue, perche\' il modello riconosce la lingua dal testo. Il modello e\' '+
-      '<b>'+esc(imp.modello||'gemini-2.5-pro-tts')+'</b>.</div>'+
+      '<b>'+esc(imp.modello||'gemini-2.5-pro-preview-tts')+'</b>.</div>'+
 
       '<div style="display:flex;gap:14px;flex-wrap:wrap">'+
         [['femminile','Speaker 1'],['maschile','Speaker 2']].map(function(g){
