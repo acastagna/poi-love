@@ -2635,6 +2635,72 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
   .poi-list-row .pi-actions{flex:0 0 auto;margin-top:0}
 }
 
+
+/* ── Il mercato delle collaborazioni ── */
+.mercato-card{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:1px solid var(--border);
+  background:linear-gradient(135deg,rgba(212,43,43,.06),rgba(232,176,75,.08));border-radius:16px;padding:14px 16px;
+  cursor:pointer;font-family:inherit;color:var(--ink)}
+.mercato-card>i:first-child{font-size:26px;color:var(--red)}
+.mercato-card .mc-testi{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.mercato-card b{font-size:14.5px}
+.mercato-card small{font-size:11.5px;color:var(--muted);line-height:1.4}
+.mercato-ov{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:720;display:none;align-items:flex-end;justify-content:center}
+.mercato-ov.on{display:flex}
+.mercato-sheet{background:var(--bg,#EAE4D8);width:100%;max-width:560px;max-height:92vh;border-radius:22px 22px 0 0;
+  display:flex;flex-direction:column;overflow:hidden}
+@media(min-width:700px){.mercato-ov{align-items:center}.mercato-sheet{border-radius:22px;max-height:86vh}}
+.mercato-head{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+.mercato-head b{flex:1;font-size:16px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mk-icona{border:none;background:none;font-size:18px;color:var(--muted);cursor:pointer;padding:6px}
+.mercato-body{overflow-y:auto;padding:16px}
+.mk-campo{margin-bottom:11px}
+.mk-campo label{display:block;font-size:11.5px;font-weight:700;color:var(--muted);margin-bottom:5px}
+.mk-campo input,.mk-campo textarea{width:100%;box-sizing:border-box;border:1px solid var(--border);border-radius:11px;
+  padding:10px 12px;font-size:14px;font-family:inherit;background:#fff}
+.mk-switch{display:flex;align-items:center;gap:12px;cursor:pointer;margin-bottom:14px}
+.mk-switch input{display:none}
+.mk-switch .mk-track{width:44px;height:25px;border-radius:99px;background:#cfc6b6;position:relative;flex-shrink:0;transition:background .18s}
+.mk-switch .mk-track::after{content:'';position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:#fff;transition:transform .18s}
+.mk-switch input:checked+.mk-track{background:#1E7F52}
+.mk-switch input:checked+.mk-track::after{transform:translateX(19px)}
+.mk-switch span:last-child{display:flex;flex-direction:column;gap:1px}
+.mk-switch small{color:var(--muted);font-size:11.5px}
+.mk-btn{border:1px solid var(--border);background:#fff;border-radius:11px;padding:10px 16px;font-size:13.5px;
+  font-weight:700;font-family:inherit;cursor:pointer;color:var(--ink)}
+.mk-btn.oro{background:linear-gradient(135deg,#E8B04B,#D42B2B);color:#fff;border:none}
+.mk-btn:disabled{opacity:.5}
+.mk-sez{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin:18px 0 8px}
+.mk-nota{font-size:12.5px;color:var(--muted);line-height:1.55;margin-bottom:10px}
+.mk-riga{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid var(--border);border-radius:12px;
+  padding:10px 12px;margin-bottom:7px}
+.mk-riga-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.mk-riga-t b{font-size:13.5px}
+.mk-riga-t small{font-size:11.5px;color:var(--muted)}
+.mk-mini{border:1px solid var(--border);background:none;border-radius:9px;padding:5px 10px;font-size:11.5px;
+  font-weight:700;cursor:pointer;font-family:inherit;color:var(--muted);flex-shrink:0}
+.mk-nuova{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
+.mk-nuova input,.mk-nuova select{border:1px solid var(--border);border-radius:11px;padding:9px 11px;font-size:13px;font-family:inherit;background:#fff}
+.mk-vetrina{display:flex;align-items:center;gap:11px;width:100%;text-align:left;background:#fff;border:1px solid var(--border);
+  border-radius:14px;padding:11px 13px;margin-bottom:8px;cursor:pointer;font-family:inherit;color:var(--ink)}
+.mk-vetrina img,.mk-av{width:42px;height:42px;border-radius:50%;object-fit:cover;flex-shrink:0;background:var(--bg);
+  display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--muted)}
+.mk-vetrina-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.mk-vetrina-t b{font-size:14px}
+.mk-vetrina-t small{font-size:11.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mk-stato{font-size:10.5px;font-weight:800;padding:4px 9px;border-radius:99px;flex-shrink:0;text-transform:uppercase;letter-spacing:.3px}
+.mk-stato.s-inviata{background:rgba(232,176,75,.2);color:#9a6b16}
+.mk-stato.s-accettata,.mk-stato.s-consegnata{background:rgba(30,127,82,.15);color:#1E7F52}
+.mk-stato.s-pagata{background:#1E7F52;color:#fff}
+.mk-stato.s-rifiutata,.mk-stato.s-annullata{background:rgba(0,0,0,.08);color:var(--muted)}
+.mk-numeri{display:flex;gap:18px;margin-bottom:6px}
+.mk-numeri span{display:flex;flex-direction:column;font-size:11.5px;color:var(--muted)}
+.mk-numeri b{font-size:17px;color:var(--ink)}
+.mk-scegli{cursor:pointer}
+.mk-scegli input{accent-color:var(--red)}
+.mk-azioni{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.mk-chat{background:#fff;border:1px solid var(--border);border-radius:12px;padding:10px;max-height:220px;overflow-y:auto;margin-bottom:8px}
+.mk-msg{background:var(--bg);border-radius:11px;padding:8px 11px;font-size:13px;margin-bottom:6px;max-width:85%;line-height:1.45}
+.mk-msg.mio{background:rgba(212,43,43,.1);margin-left:auto}
 </style>
 </head>
 <body>
@@ -3518,6 +3584,8 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
 
       <!-- SEGUITI / BLOCCATI -->
       <div class="profile-sec">
+        <!-- Il mercato delle collaborazioni: compare solo a influencer e professionisti -->
+        <div id="mercatoCard" style="display:none;margin-bottom:14px"></div>
         <div class="prof-sec-lbl"><span data-t="foll_connections">Connessioni</span></div>
         <div class="social-tabs">
           <button class="social-tab active" onclick="showSocialTab('seguiti',this)"><span data-t="foll_following">Seguiti</span> <span id="cnt-seguiti" style="background:#EBF2FC;color:var(--blue);border-radius:8px;padding:1px 6px;font-size:10px">0</span></button>
@@ -6030,6 +6098,7 @@ function syncProfileFromAuth() {
       // Se nel DB c'è un avatar, prevale.
       if(data?.avatar_url){
         window._myAvatarUrl = data.avatar_url;
+        if (window.Mercato) Mercato.montaCard();
         if(pav) pav.src=data.avatar_url;
         if(pubAv) pubAv.src=data.avatar_url;
       } else {
@@ -9556,7 +9625,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='5.45';
+const APP_VERSION='5.47';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
@@ -21654,5 +21723,6 @@ async function confirmPhotoPicker(){
   try{ new MutationObserver(function(muts){ muts.forEach(function(m){ (m.addedNodes||[]).forEach(function(n){ if(n.nodeType===1){ patch(n); scan(n); } }); }); }).observe(document.body,{childList:true,subtree:true}); }catch(_){}
 })();
 </script>
+<script src="mercato.js?v=5.47"></script>
 </body>
 </html>
