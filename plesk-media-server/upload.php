@@ -86,8 +86,8 @@ if ($file_count === 0) {
     error_response('Nessun file ricevuto');
 }
 
-if ($file_count > MAX_PHOTOS_PER_POI) {
-    error_response('Troppi file. Massimo ' . MAX_PHOTOS_PER_POI . ' foto per POI');
+if ($file_count > 22) {   // il tetto vero lo decide il livello, piu' avanti
+    error_response('Troppi file in una volta sola');
 }
 
 // ---------------------------------------------------------------------------
@@ -113,12 +113,31 @@ if (!is_writable($poi_storage_dir)) {
 $existing_photos = glob($poi_storage_dir . '/*.webp') ?: [];
 $existing_count  = count($existing_photos);
 
-if ($existing_count + $file_count > MAX_PHOTOS_PER_POI) {
-    $remaining = MAX_PHOTOS_PER_POI - $existing_count;
-    if ($remaining <= 0) {
-        error_response("Il POI ha già il massimo di " . MAX_PHOTOS_PER_POI . " foto");
+// Quante foto puo' avere questo luogo lo dice il LIVELLO di chi lo ha creato
+// (tabella `livelli`), non piu' un numero fisso uguale per tutti: con il tetto
+// fisso a 3 i livelli superiori non avrebbero potuto caricare le loro foto.
+$tetto_foto = MAX_PHOTOS_PER_POI;
+{
+    $tok_liv = extract_bearer_token();
+    if ($tok_liv) {
+        $ch = curl_init('https://poilove.com/db/rest/v1/rpc/foto_massime');
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 8, CURLOPT_POST => true,
+            CURLOPT_HTTPHEADER => ['Authorization: Bearer ' . $tok_liv, 'Content-Type: application/json'],
+            CURLOPT_POSTFIELDS => json_encode(['p_user' => $user['id']]),
+        ]);
+        $r = curl_exec($ch); curl_close($ch);
+        $n_liv = (int)trim((string)$r, "\" \n\r\t");
+        if ($n_liv > 0) { $tetto_foto = $n_liv + 1; }   // le foto del livello, piu' la copertina
     }
-    error_response("Puoi aggiungere ancora $remaining foto (hai già $existing_count)");
+}
+
+if ($existing_count + $file_count > $tetto_foto) {
+    $remaining = $tetto_foto - $existing_count;
+    if ($remaining <= 0) {
+        error_response("Il tuo livello arriva a " . $tetto_foto . " foto per luogo");
+    }
+    error_response("Puoi aggiungere ancora $remaining foto (ne hai gia $existing_count)");
 }
 
 // ---------------------------------------------------------------------------
@@ -127,6 +146,26 @@ if ($existing_count + $file_count > MAX_PHOTOS_PER_POI) {
 $uploaded_urls   = [];
 $uploaded_paths  = []; // per rollback in caso di errore parziale
 $errors          = [];
+$volti_totali    = 0;
+
+// Come trattare i volti lo decide l'amministrazione (tabella impostazioni_volti);
+// chi carica puo' solo chiedere una sfocatura piu' forte o piu' leggera.
+$volti_attiva = true; $volti_intensita = 6; $volti_margine = 18;
+{
+    $ch = curl_init('https://poilove.com/db/rest/v1/impostazioni_volti?id=eq.1&select=*');
+    curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 6]);
+    $r = curl_exec($ch); curl_close($ch);
+    $j = json_decode((string)$r, true);
+    if (is_array($j) && isset($j[0])) {
+        $volti_attiva    = !empty($j[0]['attiva']);
+        $volti_intensita = (int)($j[0]['intensita'] ?? 6);
+        $volti_margine   = (int)($j[0]['margine'] ?? 18);
+    }
+}
+if (isset($_POST['volti_intensita'])) {
+    $v = (int)$_POST['volti_intensita'];
+    if ($v >= 0 && $v <= 10) { if ($v === 0) { $volti_attiva = false; } else { $volti_intensita = $v; } }
+}
 
 for ($i = 0; $i < $file_count; $i++) {
     $upload_error = $files['error'][$i];
@@ -159,6 +198,22 @@ for ($i = 0; $i < $file_count; $i++) {
         mkdir($dest_dir, 0755, true);
     }
 
+    // ── I volti di chi e' finito nella foto per caso ───────────────────────
+    // Si sfocano PRIMA di salvare: la foto che resta sul server e' gia' pulita,
+    // l'originale con le facce non lo conserviamo da nessuna parte.
+    if ($volti_attiva) {
+        $sfocata = $tmp_path . '-volti.jpg';
+        $cmd = 'python3 /usr/local/bin/poilove-volti.py ' . escapeshellarg($tmp_path) . ' ' .
+               escapeshellarg($sfocata) . ' ' . (int)$volti_intensita . ' ' . (int)$volti_margine . ' 2>/dev/null';
+        $out = shell_exec($cmd);
+        $esito = json_decode((string)$out, true);
+        if (is_array($esito) && !empty($esito['ok']) && file_exists($sfocata) && filesize($sfocata) > 1024) {
+            $tmp_path  = $sfocata;
+            $file_size = filesize($sfocata);
+            $volti_totali += (int)($esito['volti'] ?? 0);
+        }
+    }
+
     // Processo immagine
     $result = process_and_save_image($tmp_path, $file_size, $dest_path);
 
@@ -183,10 +238,11 @@ if (!empty($errors) && empty($uploaded_urls)) {
 // 9. Risposta successo
 // ---------------------------------------------------------------------------
 $response = [
-    'urls'     => $uploaded_urls,
-    'poi_id'   => $poi_id,
-    'user_id'  => $user['id'],
-    'count'    => count($uploaded_urls),
+    'urls'          => $uploaded_urls,
+    'poi_id'        => $poi_id,
+    'user_id'       => $user['id'],
+    'count'         => count($uploaded_urls),
+    'volti_sfocati' => $volti_totali,
 ];
 
 // Se ci sono stati errori parziali, li includiamo (non bloccanti)
