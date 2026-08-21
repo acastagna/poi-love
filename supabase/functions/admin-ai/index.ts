@@ -33,7 +33,6 @@
 // e' implementato in entrambi i dialetti (Anthropic tools / OpenAI tools).
 
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { createClient } from "jsr:@supabase/supabase-js@2";
 
 // ── CORS ──────────────────────────────────────────────────────────────────────
 const CORS: Record<string, string> = {
@@ -50,9 +49,13 @@ function json(obj: unknown, status = 200): Response {
 }
 
 // ── Env ──────────────────────────────────────────────────────────────────────
-const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
+// Dal 18/08/2026 accessi e database stanno sulla nostra macchina. Questa
+// funzione parlava ancora con Supabase e da allora non faceva entrare nessuno:
+// l'ultima risposta riuscita nel registro e' del 12/07.
+const REST = "https://poilove.com/db/rest/v1";
+const AUTH = "https://poilove.com/db/auth/v1";
 const ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
-const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+const SERVICE_ROLE_KEY = Deno.env.get("POILOVE_SERVICE_JWT") ?? Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 
 const ANTHROPIC_KEY = Deno.env.get("ANTHROPIC_KEY") ?? "";
 const OPENAI_KEY = Deno.env.get("OPENAI_KEY") ?? "";
@@ -120,7 +123,170 @@ interface ChatMessage {
 }
 type Mode = "chat" | "route" | "write";
 
-type SvcClient = ReturnType<typeof createClient>;
+/* ── Il database di casa nostra, senza librerie ────────────────────────────────
+   Questa funzione usa una manciata di comandi: leggere con qualche filtro,
+   contare, e scrivere una riga nel registro. Invece di portarsi dietro una
+   libreria intera, qui c'e' quel poco, scritto in chiaro. Si aspetta e si legge
+   come prima: const { data, error } = await tavolo.from("x").select("y")...   */
+type Esito<T> = { data: T; error: { message: string } | null; count?: number };
+
+class Query implements PromiseLike<Esito<any>> {
+  private cond: string[] = [];
+  private cols = "*";
+  private ordine = "";
+  private tetto = 0;
+  private soloUno: "uno" | "forse" | null = null;
+  private soloConto = false;
+  private soloTesta = false;
+
+  constructor(private tavola: string) {}
+
+  select(cols?: string, opz?: { count?: string; head?: boolean }) {
+    // "id, is_admin" con lo spazio non va: si tolgono gli spazi attorno alle virgole.
+    if (cols) this.cols = cols.split(",").map((x) => x.trim()).filter(Boolean).join(",");
+    if (opz && (opz.head || opz.count)) this.soloConto = true;
+    if (opz && opz.head) this.soloTesta = true;
+    return this;
+  }
+  eq(c: string, v: unknown)  { this.cond.push(`${c}=eq.${encodeURIComponent(String(v))}`); return this; }
+  neq(c: string, v: unknown) { this.cond.push(`${c}=neq.${encodeURIComponent(String(v))}`); return this; }
+  gte(c: string, v: unknown) { this.cond.push(`${c}=gte.${encodeURIComponent(String(v))}`); return this; }
+  lte(c: string, v: unknown) { this.cond.push(`${c}=lte.${encodeURIComponent(String(v))}`); return this; }
+  is(c: string, v: unknown)  { this.cond.push(`${c}=is.${encodeURIComponent(String(v))}`); return this; }
+  order(c: string, opz?: { ascending?: boolean }) {
+    this.ordine = `${c}.${opz && opz.ascending === false ? "desc" : opz && opz.ascending === true ? "asc" : "desc"}`;
+    return this;
+  }
+  limit(n: number) { this.tetto = n; return this; }
+  single()      { this.soloUno = "uno";   return this; }
+  maybeSingle() { this.soloUno = "forse"; return this; }
+
+  private indirizzo(): string {
+    const parti = [...this.cond];
+    if (this.cols && !this.soloConto) parti.push("select=" + encodeURIComponent(this.cols));
+    if (this.soloConto) parti.push("select=id");
+    if (this.ordine) parti.push("order=" + this.ordine);
+    if (this.tetto) parti.push("limit=" + this.tetto);
+    return `${REST}/${this.tavola}${parti.length ? "?" + parti.join("&") : ""}`;
+  }
+
+  async then<R1 = Esito<any>, R2 = never>(
+    ok?: ((v: Esito<any>) => R1 | PromiseLike<R1>) | null,
+    ko?: ((e: unknown) => R2 | PromiseLike<R2>) | null,
+  ): Promise<R1 | R2> {
+    try {
+      const testa: Record<string, string> = {
+        apikey: SERVICE_ROLE_KEY,
+        Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
+        Accept: "application/json",
+      };
+      // per contare basta l'intestazione: le righe non servono, e con
+      // Range 0-0 il database non le manda nemmeno.
+      if (this.soloConto) testa["Prefer"] = "count=exact";
+      // Per contare e basta si usa HEAD: il numero arriva nell'intestazione e
+      // il database non manda nemmeno una riga.
+      const r = await fetch(this.indirizzo(), {
+        method: this.soloTesta ? "HEAD" : "GET",
+        headers: testa,
+        signal: AbortSignal.timeout(15000),
+      });
+      const testo = await r.text();
+      if (!r.ok) {
+        // Senza questa riga una lettura rifiutata diventava silenziosamente
+        // "nessun dato", e il copilota lo raccontava come un fatto.
+        console.error("admin-ai: lettura fallita", this.tavola, r.status, testo.slice(0, 200));
+        const e = { data: null, error: { message: `${r.status} ${testo.slice(0, 200)}` } };
+        return ok ? ok(e as Esito<any>) : (e as unknown as R1);
+      }
+      const righe = testo.trim() ? JSON.parse(testo) : [];
+      let conto: number | undefined;
+      const cr = r.headers.get("content-range");
+      if (cr && cr.includes("/")) {
+        const n = Number(cr.split("/")[1]);
+        if (Number.isFinite(n)) conto = n;
+      }
+      if (this.soloConto) {
+        const e = { data: null, error: null, count: conto ?? (Array.isArray(righe) ? righe.length : 0) };
+        return ok ? ok(e as Esito<any>) : (e as unknown as R1);
+      }
+      if (this.soloUno) {
+        const uno = Array.isArray(righe) ? (righe[0] ?? null) : righe;
+        if (this.soloUno === "uno" && !uno) {
+          const e = { data: null, error: { message: "nessuna riga" } };
+          return ok ? ok(e as Esito<any>) : (e as unknown as R1);
+        }
+        const e = { data: uno, error: null };
+        return ok ? ok(e as Esito<any>) : (e as unknown as R1);
+      }
+      const e = { data: righe, error: null, count: conto };
+      return ok ? ok(e as Esito<any>) : (e as unknown as R1);
+    } catch (err) {
+      console.error("admin-ai: lettura non riuscita", this.tavola, String(err));
+      const e = { data: null, error: { message: String(err) } };
+      return ok ? ok(e as Esito<any>) : (e as unknown as R1);
+    }
+  }
+}
+
+/* Scrivere una riga. Si puo' aspettare cosi' com'e', oppure chiedere indietro
+   la riga scritta con .select("id").single(), come faceva la libreria. */
+class Inserimento implements PromiseLike<Esito<any>> {
+  private cols: string | null = null;
+  private soloUno = false;
+  constructor(private tavola: string, private riga: unknown) {}
+  select(cols?: string) {
+    this.cols = (cols || "*").split(",").map((x) => x.trim()).filter(Boolean).join(",");
+    return this;
+  }
+  single() { this.soloUno = true; return this; }
+  maybeSingle() { this.soloUno = true; return this; }
+
+  async then<R1 = Esito<any>, R2 = never>(
+    ok?: ((v: Esito<any>) => R1 | PromiseLike<R1>) | null,
+    _ko?: ((e: unknown) => R2 | PromiseLike<R2>) | null,
+  ): Promise<R1 | R2> {
+    const reso = (e: Esito<any>) => (ok ? ok(e) : (e as unknown as R1));
+    try {
+      const url = this.cols
+        ? `${REST}/${this.tavola}?select=${encodeURIComponent(this.cols)}`
+        : `${REST}/${this.tavola}`;
+      const r = await fetch(url, {
+        method: "POST",
+        headers: {
+          apikey: SERVICE_ROLE_KEY,
+          Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
+          "Content-Type": "application/json",
+          Prefer: this.cols ? "return=representation" : "return=minimal",
+        },
+        body: JSON.stringify(this.riga),
+        signal: AbortSignal.timeout(15000),
+      });
+      const testo = await r.text();
+      if (!r.ok) {
+        console.error("admin-ai: scrittura fallita", this.tavola, r.status, testo.slice(0, 200));
+        return reso({ data: null, error: { message: `${r.status} ${testo.slice(0, 200)}` } });
+      }
+      if (!this.cols) return reso({ data: null, error: null });
+      const righe = testo.trim() ? JSON.parse(testo) : [];
+      const uno = Array.isArray(righe) ? (righe[0] ?? null) : righe;
+      return reso({ data: this.soloUno ? uno : righe, error: null });
+    } catch (e) {
+      console.error("admin-ai: scrittura non riuscita", this.tavola, String(e));
+      return reso({ data: null, error: { message: String(e) } });
+    }
+  }
+}
+
+const tavolo = {
+  from(tavola: string) {
+    return {
+      select: (c?: string, o?: { count?: string; head?: boolean }) => new Query(tavola).select(c, o),
+      insert: (riga: unknown) => new Inserimento(tavola, riga),
+    };
+  },
+};
+
+type SvcClient = typeof tavolo;
 
 // Proposta raccolta da un tool WRITE, gia' persistita in ai_proposals.
 interface ProposalOut {
@@ -1556,11 +1722,8 @@ Deno.serve(async (req: Request) => {
   if (req.method !== "POST") return json({ error: "method_not_allowed" }, 405);
 
   // Config minima presente?
-  if (!SUPABASE_URL || !ANON_KEY) {
-    return json({ error: "server_misconfigured", detail: "missing supabase url/anon" }, 500);
-  }
   if (!SERVICE_ROLE_KEY) {
-    return json({ error: "server_misconfigured", detail: "missing service role" }, 500);
+    return json({ error: "server_misconfigured", detail: "manca POILOVE_SERVICE_JWT" }, 500);
   }
 
   // ── 1) JWT dall'header Authorization ──────────────────────────────────────────
@@ -1570,22 +1733,17 @@ Deno.serve(async (req: Request) => {
     : "";
   if (!jwt) return json({ error: "unauthorized", detail: "missing bearer token" }, 401);
 
-  // ── 2) Client ANON + JWT, getUser() ───────────────────────────────────────────
-  const userClient = createClient(SUPABASE_URL, ANON_KEY, {
-    global: { headers: { Authorization: `Bearer ${jwt}` } },
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
+  // ── 2) Chi sei lo dice il NOSTRO GoTrue, non piu' quello di Supabase ──────────
+  const chi = await fetch(`${AUTH}/user`, {
+    headers: { Authorization: `Bearer ${jwt}`, apikey: ANON_KEY },
+    signal: AbortSignal.timeout(12000),
+  }).catch(() => null);
+  if (!chi || !chi.ok) return json({ error: "unauthorized", detail: "invalid session" }, 401);
+  const user = await chi.json().catch(() => null);
+  if (!user?.id) return json({ error: "unauthorized", detail: "invalid session" }, 401);
 
-  const { data: userData, error: userErr } = await userClient.auth.getUser();
-  const user = userData?.user;
-  if (userErr || !user) {
-    return json({ error: "unauthorized", detail: "invalid session" }, 401);
-  }
-
-  // ── 3) Gate admin con service_role (la chiave non esce mai da qui) ─────────────
-  const svc = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
+  // ── 3) Il controllo di amministratore passa dal nostro database ───────────────
+  const svc = tavolo;
 
   const { data: profile, error: profErr } = await svc
     .from("profiles")
