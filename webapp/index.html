@@ -6160,7 +6160,7 @@ async function loadPOIsFromDB() {
   // NB: la colonna nel DB è 'title' (non 'name') → alias inline title→name
   const { data, error } = await sb
     .from('pois')
-    .select('id,name:title,description,lat,lng,category,subcategory,categories,tags,visibility,is_featured,love_count,photos,author_id,profiles!pois_author_id_fkey(username,avatar_url,special_tier)')
+    .select('id,name:title,title_sq,title_it,title_en,description,description_sq,description_it,description_en,badge_official,lat,lng,category,subcategory,categories,tags,visibility,is_featured,love_count,photos,author_id,profiles!pois_author_id_fkey(username,avatar_url,special_tier)')
     .order('love_count', { ascending: false })
     .limit(200);
   if (error) { console.warn('loadPOIs:', error.message); if(window._resolvePoisLoaded) window._resolvePoisLoaded(); return; }
@@ -6271,8 +6271,9 @@ function openDBDetail(p) {
   })();
   // Hero: titolo grande (renderer dedicato: mantiene la matita del proprietario)
   const _dn=document.getElementById('detailName');
-  if(_dn.childNodes.length&&_dn.childNodes[0].nodeType===3){ _dn.childNodes[0].nodeValue=p.name||p.title||'—'; }
-  else { _dn.textContent=p.name||p.title||'—'; }
+  const _nome = _nomeNellaLingua(p) || '—';
+  if(_dn.childNodes.length&&_dn.childNodes[0].nodeType===3){ _dn.childNodes[0].nodeValue=_nome; }
+  else { _dn.textContent=_nome; }
   // Indirizzo: MAI la riga vuota. Se il POI non ce l'ha, lo si ricava dal punto
   // (e se il POI e' tuo, si salva da solo cosi' la prossima volta c'e').
   const addrEl=document.getElementById('detailAddress');
@@ -6288,7 +6289,10 @@ function openDBDetail(p) {
         if(currentUser&&currentUser.id===p.author_id&&p.id){ _autosavePoiPatch({address:addr},true); }
       }).catch(()=>{ addrEl.textContent='—'; });
   }
-  document.getElementById('detailDesc').textContent = p.description || '';
+  // I luoghi che arrivano dai dati aperti hanno nome e testo in tre lingue:
+  // si mostra quella di chi guarda, e se manca si scende all'albanese, poi
+  // all'inglese, in ultimo al testo come e' stato scritto.
+  document.getElementById('detailDesc').textContent = _testoNellaLingua(p) || '';
   const coordEl = document.getElementById('detailCoordsText');
   if (coordEl && p.lat && p.lng) coordEl.textContent = `${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}`;
   // Love — reset UI poi controlla stato reale dal DB
@@ -9454,7 +9458,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='5.34';
+const APP_VERSION='5.35';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
@@ -16938,6 +16942,18 @@ window._zTop = window._zTop || 10000; window._zModalTop = window._zModalTop || 1
   (function start(){ if(!document.body){ setTimeout(start,50); return; }
     obs.observe(document.body,{attributes:true,attributeFilter:['class'],subtree:true,childList:true}); })();
 })();
+function _nellaLingua(p, campo){
+  if(!p) return '';
+  const ordine = [lang, 'sq', 'it', 'en'];
+  for(const l of ordine){
+    const v = p[campo + '_' + l];
+    if(v && String(v).trim()) return String(v);
+  }
+  return '';
+}
+function _testoNellaLingua(p){ return _nellaLingua(p, 'description') || p.description || ''; }
+function _nomeNellaLingua(p){  return _nellaLingua(p, 'title')       || p.name || p.title || ''; }
+
 function _uiModal({title='', message='', input=false, defaultValue='', okText='Ok', cancelText='Annulla', danger=false}){
   return new Promise(resolve=>{
     const ov=document.createElement('div');

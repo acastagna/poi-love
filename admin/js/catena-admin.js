@@ -19,16 +19,32 @@
     });
   }
 
-  let box=null, righe=[], viaggi=[];
+  let box=null, righe=[], viaggi=[], viaggioScelto='';
 
   async function dati(){
     try{
+      let q = sb.from('candidati').select('*').eq('stato','proposto').order('fiducia',{ascending:false}).limit(300);
+      if(viaggioScelto) q = q.eq('viaggio_id', viaggioScelto);
       const [c, v] = await Promise.all([
-        sb.from('candidati').select('*').eq('stato','proposto').order('fiducia',{ascending:false}).limit(60),
-        sb.from('viaggi_piano').select('id,ordine,nome_it').order('ordine'),
+        q,
+        sb.from('viaggi_piano').select('id,ordine,nome_it,trip_id').order('ordine'),
       ]);
       righe = c.data || []; viaggi = v.data || [];
     }catch(_){ righe=[]; viaggi=[]; }
+  }
+
+  // Il testo arriva da Wikipedia nelle tre lingue: si mostra quello che c'e',
+  // e si dice da dove viene. Dove manca, si vede che manca.
+  function lingue(r){
+    const voci = [['SQ', r.descr_sq], ['IT', r.descr_it], ['EN', r.descr_en]].filter(function(x){ return x[1]; });
+    if(!voci.length) return '<div style="font-size:11.5px;opacity:.5;margin-top:6px">nessun testo: Wikipedia non ha una voce</div>';
+    return '<div style="margin-top:6px;font-size:12px;line-height:1.5">'+
+      voci.map(function(x){
+        return '<div style="margin-top:3px"><b style="opacity:.6">'+x[0]+'</b> '+esc(String(x[1]).slice(0,150))+
+               (String(x[1]).length>150?'…':'')+'</div>';
+      }).join('')+
+      (r.descr_licenza?('<div style="font-size:11px;opacity:.5;margin-top:4px">'+esc(r.descr_licenza)+'</div>'):'')+
+      '</div>';
   }
 
   function card(r){
@@ -47,6 +63,7 @@
           (r.wikidata?('Wikidata '+esc(r.wikidata)+' · '):'')+'fiducia <b style="color:'+col+'">'+Number(r.fiducia||0)+'</b>'+
           (r.foto_autore?(' · foto di '+esc(r.foto_autore)+' · '+esc(r.foto_licenza)):' · nessuna foto con licenza')+
         '</div>'+
+        lingue(r)+
         '<div style="font-size:11.5px;opacity:.5;margin-top:4px">'+(r.lat||0).toFixed(5)+', '+(r.lng||0).toFixed(5)+
           ' · <a href="https://www.openstreetmap.org/'+encodeURIComponent(r.fonte_id||'')+'" target="_blank" rel="noopener" style="color:inherit">dati aperti</a></div>'+
       '</div>'+
@@ -69,8 +86,29 @@
           'Approvare crea il luogo col bollino Ufficiale e la foto con la sua licenza.'+
         '</div>'+
         '<div style="margin-top:10px;font-size:13px;font-weight:800">'+righe.length+' da guardare · '+conFoto+' con foto</div>'+
+        '<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">'+
+          '<select id="catViaggio" style="background:var(--bg,#181818);color:inherit;border:1.5px solid var(--line,#3a3a3a);'+
+            'border-radius:10px;padding:8px 10px;font-family:inherit;font-size:12.5px">'+
+            '<option value="">tutti i viaggi</option>'+
+            viaggi.map(function(v){
+              return '<option value="'+esc(v.id)+'"'+(viaggioScelto===v.id?' selected':'')+'>'+
+                     esc(v.ordine)+' · '+esc(v.nome_it)+'</option>';
+            }).join('')+
+          '</select>'+
+          '<label style="font-size:12.5px;opacity:.75">da fiducia '+
+            '<input id="catSoglia" type="number" min="40" max="100" step="5" value="70" style="width:64px;background:var(--bg,#181818);'+
+            'color:inherit;border:1.5px solid var(--line,#3a3a3a);border-radius:9px;padding:7px;font-family:inherit"></label>'+
+          '<button id="catTutti" style="border:none;border-radius:10px;background:#2E7D46;color:#fff;font-family:inherit;'+
+            'font-weight:800;font-size:12.5px;padding:9px 14px;cursor:pointer">Approva tutto il viaggio</button>'+
+        '</div>'+
+        '<div id="catEsito" style="margin-top:8px;font-size:12.5px;font-weight:700"></div>'+
       '</div>'+
       (righe.length ? righe.map(card).join('') : '<div class="panel">Nessun candidato in attesa.</div>');
+
+    const sel=document.getElementById('catViaggio');
+    if(sel) sel.onchange=async function(){ viaggioScelto=sel.value; await dati(); disegna(); };
+    const bt=document.getElementById('catTutti');
+    if(bt) bt.onclick=approvaViaggio;
 
     box.querySelectorAll('[data-id]').forEach(c=>{
       const id=c.dataset.id;
@@ -93,6 +131,33 @@
       c.querySelector('[data-azione=no]').remove();
     }catch(e){ b.disabled=false; b.textContent='Approva'; alert('Non sono riuscito: '+(e.message||'')); }
   }
+  // Duecentodieci luoghi non si approvano a mano uno per uno: si sceglie il
+  // viaggio, si mette la soglia di fiducia e si decide una volta sola. I luoghi
+  // approvati diventano anche le tappe dell'itinerario, nell'ordine.
+  async function approvaViaggio(){
+    const sel=document.getElementById('catViaggio');
+    const e=document.getElementById('catEsito');
+    const b=document.getElementById('catTutti');
+    if(!sel || !sel.value){ e.textContent='Prima scegli quale viaggio.'; e.style.color='#D8A93B'; return; }
+    const v = viaggi.find(function(x){ return x.id===sel.value; });
+    if(!v){ return; }
+    const soglia = Number((document.getElementById('catSoglia')||{}).value) || 70;
+    const quanti = righe.filter(function(r){ return r.viaggio_id===v.id && Number(r.fiducia||0)>=soglia; }).length;
+    if(!quanti){ e.textContent='Nessun candidato sopra '+soglia+' in questo viaggio.'; e.style.color='#D8A93B'; return; }
+    if(!confirm('Approvo '+quanti+' luoghi del viaggio "'+v.nome_it+'"?\n\nDiventano luoghi pubblici col bollino Ufficiale e le tappe di questo itinerario.')) return;
+    b.disabled=true; b.textContent='Approvo…'; e.textContent=''; e.style.color='inherit';
+    try{
+      const { data, error } = await sb.rpc('approva_viaggio',{ p_viaggio: v.ordine, p_soglia: soglia });
+      if(error) throw error;
+      const r = (data && data[0]) || {};
+      e.textContent = 'Fatti '+(r.approvati||0)+' luoghi, '+(r.tappe||0)+' tappe'+((r.saltati||0)?(', '+r.saltati+' saltati'):'')+'.';
+      e.style.color='#5BBE7E';
+      await dati(); disegna();
+    }catch(err){
+      e.textContent='Non sono riuscito: '+(err.message||''); e.style.color='#E06A6A';
+    }finally{ if(b){ b.disabled=false; b.textContent='Approva tutto il viaggio'; } }
+  }
+
   async function scarta(id, c){
     const motivo = prompt('Perche lo scarti? (resta scritto)') || null;
     try{

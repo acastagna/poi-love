@@ -92,6 +92,56 @@ def foto_da_wikidata(qid, nome):
         return None
     return None
 
+def testi_da_wikidata(qid):
+    """Nomi e testo nelle tre lingue. Il testo e' la prima parte della voce di
+       Wikipedia, non una frase scritta da noi: se la voce non c'e', si lascia
+       vuoto. La licenza di Wikipedia va scritta accanto, sempre."""
+    fuori = {'nome_sq': None, 'nome_it': None, 'nome_en': None,
+             'descr_sq': None, 'descr_it': None, 'descr_en': None,
+             'descr_fonte': None, 'descr_licenza': None}
+    if not qid:
+        return fuori
+    try:
+        d = json.loads(chiedi('https://www.wikidata.org/wiki/Special:EntityData/%s.json' % qid))
+        ent = d['entities'][qid]
+    except Exception:
+        return fuori
+    etichette = ent.get('labels', {})
+    for lg, campo in (('sq', 'nome_sq'), ('it', 'nome_it'), ('en', 'nome_en')):
+        v = etichette.get(lg)
+        if v:
+            fuori[campo] = v.get('value')
+    legami = ent.get('sitelinks', {})
+    fonti = []
+    for lg, campo in (('sq', 'descr_sq'), ('it', 'descr_it'), ('en', 'descr_en')):
+        sl = legami.get(lg + 'wiki')
+        if not sl:
+            continue
+        titolo = sl.get('title')
+        try:
+            api = ('https://%s.wikipedia.org/w/api.php?action=query&prop=extracts'
+                   '&exintro=1&explaintext=1&redirects=1&format=json&titles=%s'
+                   % (lg, urllib.parse.quote(titolo)))
+            j = json.loads(chiedi(api, secondi=30))
+            for _, pg in (j.get('query', {}).get('pages') or {}).items():
+                testo = (pg.get('extract') or '').strip()
+                if len(testo) < 40:
+                    continue
+                # due o tre frasi bastano: la scheda di un luogo non e' una voce
+                if len(testo) > 700:
+                    taglio = testo.rfind('. ', 0, 700)
+                    testo = testo[:taglio + 1] if taglio > 200 else testo[:700].rstrip() + '...'
+                fuori[campo] = testo
+                fonti.append('https://%s.wikipedia.org/wiki/%s' % (lg, urllib.parse.quote(titolo.replace(' ', '_'))))
+        except Exception:
+            pass
+        time.sleep(0.1)
+    if fonti:
+        fuori['descr_fonte'] = ' · '.join(fonti)
+        fuori['descr_licenza'] = 'CC BY-SA 4.0 · Wikipedia'
+    return fuori
+
+
 def cerca(viaggio, quanti):
     pref = viaggio['prefetture']
     tema = viaggio['tema']
@@ -111,10 +161,30 @@ def cerca(viaggio, quanti):
         for f in filtri.split('],['):
             f = f.strip('[]')
             corpi.append('node[%s]["name"](area.z%d);way[%s]["name"](area.z%d);' % (f, i, f, i))
-    q = '[out:json][timeout:60];%s(%s);out center %d;' % (zone, ''.join(corpi), quanti * 3)
-    testo = chiedi(OVERPASS, dati=q.encode('utf-8'),
+    # Si chiede largo: molti oggetti cadono dopo (doppioni, nomi vuoti, lapidar).
+    # Chiedendo stretto si finiva con dieci candidati su quattordici chiesti.
+    tetto = max(300, quanti * 20)
+    q = '[out:json][timeout:90];%s(%s);out center %d;' % (zone, ''.join(corpi), tetto)
+    testo = chiedi(OVERPASS, dati=q.encode('utf-8'), secondi=120,
                    testa={'Content-Type': 'text/plain', 'User-Agent': 'POILOVE/1.0 (info@321.al)'})
-    return json.loads(testo).get('elements', [])
+    trovati = json.loads(testo).get('elements', [])
+    if len(trovati) >= quanti * 2:
+        return trovati
+    # Se il tema ha pescato poco, si allarga a quello che una guida chiamerebbe
+    # 'da vedere': meglio piu' candidati e una persona che sceglie.
+    largo = '["tourism"~"attraction|museum|viewpoint|artwork"],["historic"]'
+    corpi2 = []
+    for i in range(len(ids)):
+        for f in largo.split('],['):
+            f = f.strip('[]')
+            corpi2.append('node[%s]["name"](area.z%d);way[%s]["name"](area.z%d);' % (f, i, f, i))
+    q2 = '[out:json][timeout:90];%s(%s);out center %d;' % (zone, ''.join(corpi2), tetto)
+    try:
+        trovati += json.loads(chiedi(OVERPASS, dati=q2.encode('utf-8'), secondi=120,
+                              testa={'Content-Type': 'text/plain', 'User-Agent': 'POILOVE/1.0 (info@321.al)'})).get('elements', [])
+    except Exception:
+        pass
+    return trovati
 
 def main():
     if len(sys.argv) < 2:
@@ -131,7 +201,7 @@ def main():
     elementi = cerca(v, quanti)
     print('dai dati aperti: %d oggetti con un nome' % len(elementi))
 
-    messi, con_foto, saltati = 0, 0, 0
+    messi, con_foto, con_testo, saltati = 0, 0, 0, 0
     visti = set()
     # Prima quelli che hanno una scheda su Wikidata o Wikipedia: sono i luoghi
     # riconosciuti, e sono anche gli unici che possono avere una foto con licenza.
@@ -157,6 +227,12 @@ def main():
             continue
         qid = tag.get('wikidata')
         foto = foto_da_wikidata(qid, nome) if qid else None
+        lingue = testi_da_wikidata(qid) if qid else {}
+        # i nomi in albanese, italiano e inglese: prima quelli dei dati aperti,
+        # poi quelli di Wikidata, in ultimo il nome come sta scritto sul posto
+        lingue['nome_sq'] = tag.get('name:sq') or lingue.get('nome_sq') or nome
+        lingue['nome_it'] = tag.get('name:it') or lingue.get('nome_it')
+        lingue['nome_en'] = tag.get('name:en') or lingue.get('nome_en')
         fiducia = 40
         if qid: fiducia += 25
         if foto: fiducia += 20
@@ -172,10 +248,16 @@ def main():
             'wikidata': qid, 'fiducia': min(100, fiducia),
             'foto_come': (foto or {}).get('come', 'nessuna'),
         }
+        riga.update({k: v2 for k, v2 in lingue.items() if v2})
+        if lingue.get('descr_sq') or lingue.get('descr_it') or lingue.get('descr_en'):
+            fiducia += 10
+            riga['fiducia'] = min(100, fiducia)
         if foto:
             riga.update({'foto_url': foto['url'], 'foto_autore': foto['autore'],
                          'foto_licenza': foto['licenza'], 'foto_fonte': foto['fonte']})
             con_foto += 1
+        if riga.get('descr_sq') or riga.get('descr_it') or riga.get('descr_en'):
+            con_testo += 1
         try:
             rest('candidati', 'POST', riga)
             messi += 1
@@ -183,7 +265,8 @@ def main():
             saltati += 1
         time.sleep(0.15)
 
-    print('candidati scritti: %d · con foto vera: %d · saltati: %d' % (messi, con_foto, saltati))
+    print('candidati scritti: %d · con foto vera: %d · con testo vero: %d · saltati: %d'
+          % (messi, con_foto, con_testo, saltati))
     return 0
 
 if __name__ == '__main__':
