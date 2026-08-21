@@ -39,49 +39,9 @@ const ANTHROPIC_KEY = Deno.env.get("ANTHROPIC_KEY") ?? "";
 const OPENAI_KEY = Deno.env.get("OPENAI_KEY") ?? "";
 const ANTHROPIC_MODEL = Deno.env.get("ANTHROPIC_MODEL") ?? "claude-sonnet-4-6";
 
-Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
-  if (req.method !== "POST") return json({ error: "Solo POST" }, 405);
-
-  // ── Chi chiede ────────────────────────────────────────────────────────────
-  const auth = req.headers.get("Authorization") ?? "";
-  if (!auth.startsWith("Bearer ")) return json({ error: "Serve il collegamento" }, 401);
-  const chi = await fetch(`${AUTH}/user`, { headers: { Authorization: auth, apikey: ANON_KEY } });
-  if (!chi.ok) return json({ error: "Serve il collegamento" }, 401);
-  const user = await chi.json();
-  if (!user?.id) return json({ error: "Serve il collegamento" }, 401);
-
-  let body: any = {};
-  try { body = await req.json(); } catch { /* niente */ }
-  const id = String(body?.recensione_id ?? "");
-  if (!/^[0-9a-f-]{36}$/i.test(id)) return json({ error: "recensione_id non valido" }, 400);
-
-  const testa = { apikey: SERVICE_ROLE_KEY, Authorization: `Bearer ${SERVICE_ROLE_KEY}`, "Content-Type": "application/json" };
-  const leggi = async (q: string) => { const r = await fetch(`${REST}/${q}`, { headers: testa }); return r.ok ? await r.json() : []; };
-  const scrivi = (id: string, campi: Record<string, unknown>) =>
-    fetch(`${REST}/recensioni?id=eq.${id}`, { method: "PATCH", headers: testa, body: JSON.stringify(campi) });
-
-  // ── La recensione: deve essere sua e ancora in coda ────────────────────────
-  const rec = (await leggi(`recensioni?id=eq.${id}&select=id,autore_id,voto,testo,stato,poi_id`))[0];
-  if (!rec) return json({ error: "Recensione non trovata" }, 404);
-  if (rec.autore_id !== user.id) return json({ error: "Non e' tua" }, 403);
-  if (rec.stato !== "in_coda") return json({ esito: rec.stato, motivo: "gia' esaminata" });
-
-  const testo = (rec.testo ?? "").trim();
-
-  // Un voto senza parole non ha niente da moderare: passa.
-  if (!testo) {
-    await scrivi(id, { stato: "pubblicata", motivo: "voto senza testo" });
-    return json({ esito: "pubblicata", motivo: "voto senza testo" });
-  }
-
-  // ── Le direttive, come sono scritte adesso nel pannello ───────────────────
-  const dir = await leggi("direttive_moderazione?ambito=eq.recensioni&attiva=eq.true&order=ordine&select=id,regola,esempio");
-  const elenco = (dir ?? []).map((d: any, i: number) =>
-    `${i + 1}. ${d.regola}${d.esempio ? `  (esempio da fermare: "${d.esempio}")` : ""}`).join("\n");
-
-  const poi = (await leggi(`pois?id=eq.${rec.poi_id}&select=title,category`))[0];
-
+/* Il giudizio. Sta in un posto solo, cosi' la prova a vuoto che fa
+   l'amministrazione e la moderazione vera usano le stesse identiche parole. */
+async function chiediAllAI(elenco: string, luogo: string, voto: number, testo: string) {
   const sistema =
 `Sei la moderazione di POI•LOVE, una mappa dei luoghi amati.
 Giudichi UNA recensione scritta da una persona su un luogo, seguendo SOLO le direttive qui sotto.
@@ -98,9 +58,7 @@ Rispondi SOLO con un oggetto JSON, senza altro testo:
 - "in_coda": caso dubbio, lo guarda una persona.`;
 
   const domanda =
-`Luogo: ${poi?.title ?? "(sconosciuto)"}${poi?.category ? ` (${poi.category})` : ""}
-Voto: ${rec.voto} su 5
-Recensione: """${testo.slice(0, 1000)}"""`;
+`Luogo: ${luogo}\nVoto: ${voto} su 5\nRecensione: """${testo}"""`;
 
   // ── Il giudizio ───────────────────────────────────────────────────────────
   let grezzo = "";
@@ -139,6 +97,75 @@ Recensione: """${testo.slice(0, 1000)}"""`;
       if (v.direttiva != null) direttiva = String(v.direttiva).slice(0, 40);
     } catch { /* resta in coda */ }
   }
+
+  return { esito, motivo, direttiva };
+}
+
+Deno.serve(async (req) => {
+  if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
+  if (req.method !== "POST") return json({ error: "Solo POST" }, 405);
+
+  // ── Chi chiede ────────────────────────────────────────────────────────────
+  const auth = req.headers.get("Authorization") ?? "";
+  if (!auth.startsWith("Bearer ")) return json({ error: "Serve il collegamento" }, 401);
+  const chi = await fetch(`${AUTH}/user`, { headers: { Authorization: auth, apikey: ANON_KEY } });
+  if (!chi.ok) return json({ error: "Serve il collegamento" }, 401);
+  const user = await chi.json();
+  if (!user?.id) return json({ error: "Serve il collegamento" }, 401);
+
+  let body: any = {};
+  try { body = await req.json(); } catch { /* niente */ }
+  const testa0 = { apikey: SERVICE_ROLE_KEY, Authorization: `Bearer ${SERVICE_ROLE_KEY}`, "Content-Type": "application/json" };
+  const leggi0 = async (q: string) => { const r = await fetch(`${REST}/${q}`, { headers: testa0 }); return r.ok ? await r.json() : []; };
+
+  // ── La prova a vuoto ──────────────────────────────────────────────────────
+  // Chi scrive le direttive puo' provarle su un testo qualsiasi e vedere cosa
+  // deciderebbe la moderazione, senza toccare nessuna recensione vera.
+  if (body?.prova === true) {
+    const io = await leggi0(`profiles?select=is_admin&id=eq.${user.id}`);
+    if (!io[0]?.is_admin) return json({ error: "La prova e' riservata all'amministrazione" }, 403);
+    const t = String(body?.testo ?? "").slice(0, 1000);
+    if (!t.trim()) return json({ error: "Scrivi un testo da provare" }, 400);
+    const dir0 = await leggi0("direttive_moderazione?ambito=eq.recensioni&attiva=eq.true&order=ordine&select=id,regola,esempio");
+    const elenco0 = (dir0 ?? []).map((d: any, i: number) =>
+      `${i + 1}. ${d.regola}${d.esempio ? `  (esempio da fermare: "${d.esempio}")` : ""}`).join("\n");
+    const verdetto = await chiediAllAI(elenco0, String(body?.luogo ?? "(prova)"), Number(body?.voto ?? 3), t);
+    return json({ ...verdetto, prova: true });
+  }
+
+  const id = String(body?.recensione_id ?? "");
+  if (!/^[0-9a-f-]{36}$/i.test(id)) return json({ error: "recensione_id non valido" }, 400);
+
+  const testa = { apikey: SERVICE_ROLE_KEY, Authorization: `Bearer ${SERVICE_ROLE_KEY}`, "Content-Type": "application/json" };
+  const leggi = async (q: string) => { const r = await fetch(`${REST}/${q}`, { headers: testa }); return r.ok ? await r.json() : []; };
+  const scrivi = (id: string, campi: Record<string, unknown>) =>
+    fetch(`${REST}/recensioni?id=eq.${id}`, { method: "PATCH", headers: testa, body: JSON.stringify(campi) });
+
+  // ── La recensione: deve essere sua e ancora in coda ────────────────────────
+  const rec = (await leggi(`recensioni?id=eq.${id}&select=id,autore_id,voto,testo,stato,poi_id`))[0];
+  if (!rec) return json({ error: "Recensione non trovata" }, 404);
+  if (rec.autore_id !== user.id) return json({ error: "Non e' tua" }, 403);
+  if (rec.stato !== "in_coda") return json({ esito: rec.stato, motivo: "gia' esaminata" });
+
+  const testo = (rec.testo ?? "").trim();
+
+  // Un voto senza parole non ha niente da moderare: passa.
+  if (!testo) {
+    await scrivi(id, { stato: "pubblicata", motivo: "voto senza testo" });
+    return json({ esito: "pubblicata", motivo: "voto senza testo" });
+  }
+
+  // ── Le direttive, come sono scritte adesso nel pannello ───────────────────
+  const dir = await leggi("direttive_moderazione?ambito=eq.recensioni&attiva=eq.true&order=ordine&select=id,regola,esempio");
+  const elenco = (dir ?? []).map((d: any, i: number) =>
+    `${i + 1}. ${d.regola}${d.esempio ? `  (esempio da fermare: "${d.esempio}")` : ""}`).join("\n");
+
+  const poi = (await leggi(`pois?id=eq.${rec.poi_id}&select=title,category`))[0];
+  const { esito, motivo, direttiva } = await chiediAllAI(
+    elenco,
+    (poi?.title ?? "(sconosciuto)") + (poi?.category ? ` (${poi.category})` : ""),
+    Number(rec.voto), testo.slice(0, 1000));
+
 
   await scrivi(id, { stato: esito, motivo, direttiva });
   return json({ esito, motivo, direttiva });

@@ -571,6 +571,7 @@ html[data-theme="light"] .chip.green{color:#236b39}
 <script src="js/badge-admin.js?v=326"></script>
 <script src="js/qr-editor.js?v=345"></script>
 <script src="js/volti-admin.js?v=345"></script>
+<script src="js/direttive-admin.js?v=345"></script>
 </head>
 <body>
 <div class="grain"></div>
@@ -636,6 +637,9 @@ html[data-theme="light"] .chip.green{color:#236b39}
     </div>
     <div class="nav-item" data-sec="volti" onclick="openSection('volti')">
       <span class="ic"><i class="ph-duotone ph-user-focus"></i></span> Volti
+    </div>
+    <div class="nav-item" data-sec="direttive" onclick="openSection('direttive')">
+      <span class="ic"><i class="ph-duotone ph-gavel"></i></span> Direttive
     </div>
     <div class="nav-item" data-sec="media" onclick="openSection('media')">
       <span class="ic"><i class="ph-duotone ph-share-network"></i></span><span class="label" data-t="nav_media">Media</span>
@@ -966,6 +970,11 @@ html[data-theme="light"] .chip.green{color:#236b39}
     <!-- 8c-ter) VOLTI DI TERZI -->
     <section class="section" id="sec-volti">
       <div id="voltiBox"></div>
+    </section>
+
+    <!-- 8c-quater) DIRETTIVE DELLA MODERAZIONE -->
+    <section class="section" id="sec-direttive">
+      <div id="direttiveBox"></div>
     </section>
 
     <!-- 8d) KNOWLEDGE ILLI -->
@@ -1588,6 +1597,7 @@ function runSection(sec){
     case 'badges': if(window.BadgeAdmin) window.BadgeAdmin.load(document.getElementById('badgesBox')); break;
     case 'qr': if(window.QrEditor) window.QrEditor.load(document.getElementById('qrEditorBox')); break;
     case 'volti': if(window.VoltiAdmin) window.VoltiAdmin.load(document.getElementById('voltiBox')); break;
+    case 'direttive': if(window.DirettiveAdmin) window.DirettiveAdmin.load(document.getElementById('direttiveBox')); break;
     case 'knowledge': loadKnowledgeAdmin(); break;
     case 'audit': loadAudit(); break;
     case 'media': initMedia(); break;
