@@ -1,8 +1,10 @@
 /**
- * POI•LOVE — Media Upload Helper
+ * © Alessandro Castagna — 321.al / EVOLAB
+ * Tutti i diritti riservati. Uso non autorizzato vietato.
+ * info@321.it · https://321.al
  *
- * Carica fino a 3 foto verso il Plesk Media Server.
- * Usato da AddPOISheet dopo aver scelto le foto con expo-image-picker.
+ * mediaUpload — le foto di un luogo verso il server delle immagini.
+ * Il server legge poi_id dal modulo: va nel FormData, non nelle intestazioni.
  */
 import { Config } from '@/constants/config';
 
@@ -30,6 +32,10 @@ export async function uploadPOIPhotos(
   }
 
   const formData = new FormData();
+  // Il server legge poi_id dal modulo, non dalle intestazioni: mandarlo solo
+  // nell'intestazione X-POI-ID (come faceva lo scaffold) falliva sempre con
+  // "poi_id obbligatorio".
+  formData.append('poi_id', poiId);
 
   for (const uri of localUris) {
     const filename  = uri.split('/').pop() ?? 'photo.jpg';
@@ -50,8 +56,7 @@ export async function uploadPOIPhotos(
     method:  'POST',
     headers: {
       'Authorization': `Bearer ${jwtToken}`,
-      'X-POI-ID':      poiId,
-      // NON impostare Content-Type — fetch lo imposta automaticamente con boundary
+      // NON impostare Content-Type: fetch mette da solo il confine del multipart
     },
     body: formData,
   });
@@ -70,25 +75,26 @@ export async function uploadPOIPhotos(
 }
 
 /**
- * Cancella le foto di un POI (es. quando il POI viene eliminato).
+ * Toglie UNA foto dal server delle immagini.
+ *
+ * delete.php vuole { _method: "DELETE", url: "https://media.poilove.com/poi/…" }:
+ * una url alla volta, niente slots. La versione vecchia mandava { slots } e
+ * sarebbe fallita sempre: mai collegata per fortuna, riscritta prima che accada.
  */
-export async function deletePOIPhotos(
-  poiId:    string,
-  slots:    number[],
+export async function deletePOIPhoto(
+  photoUrl: string,
   jwtToken: string,
 ): Promise<void> {
   const response = await fetch(`${Config.mediaServerUrl}/delete.php`, {
-    method:  'DELETE',
+    method:  'POST',
     headers: {
       'Authorization': `Bearer ${jwtToken}`,
-      'X-POI-ID':      poiId,
       'Content-Type':  'application/json',
     },
-    body: JSON.stringify({ slots }),
+    body: JSON.stringify({ _method: 'DELETE', url: photoUrl }),
   });
-
   const json = await response.json();
   if (!response.ok || !json.ok) {
-    throw new Error(json.error ?? `Delete failed (${response.status})`);
+    throw new Error(json.error ?? `Cancellazione non riuscita (${response.status})`);
   }
 }

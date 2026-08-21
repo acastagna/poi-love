@@ -82,7 +82,7 @@ export default function ShareCardSheet({ poi, photoUri, onClose, onCardSaved }: 
       }
       await Sharing.shareAsync(uri, {
         mimeType:    'image/webp',
-        dialogTitle: `Condividi ${poi.name}`,
+        dialogTitle: `Condividi ${poi.title}`,
         UTI:         'public.webp',
       });
     } catch (err: unknown) {

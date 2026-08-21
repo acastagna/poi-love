@@ -88,13 +88,13 @@ export default function StoryCardComposer({ poi, cardUri, showTitle, showSummary
         )}
         {showTitle && (
           <Text style={[styles.title, { fontSize: DISP_H * (44 / CARD_9_16.height) }]} numberOfLines={2}>
-            {poi.name}
+            {poi.title}
           </Text>
         )}
         <View style={styles.metaRow}>
           <POILoveLogoSmall size={DISP_H * (28 / CARD_9_16.height)} />
           <Text style={[styles.metaText, { fontSize: DISP_H * (22 / CARD_9_16.height) }]}>
-            {poi.name} · {date}
+            {poi.title} · {date}
           </Text>
         </View>
       </View>

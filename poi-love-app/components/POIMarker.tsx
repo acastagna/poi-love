@@ -1,7 +1,9 @@
 /**
- * POI•LOVE — Marker sulla mappa
+ * © Alessandro Castagna — 321.al / EVOLAB
+ * Tutti i diritti riservati. Uso non autorizzato vietato.
+ * info@321.it · https://321.al
  *
- * Marker custom con colore brand e indicatore "selected".
+ * POIMarker — il marcatore di un luogo sulla mappa.
  */
 import { View, Text, StyleSheet } from 'react-native';
 import { Marker } from 'react-native-maps';
@@ -17,7 +19,7 @@ interface Props {
 export default function POIMarker({ poi, onPress, selected }: Props) {
   return (
     <Marker
-      coordinate={{ latitude: poi.latitude, longitude: poi.longitude }}
+      coordinate={{ latitude: poi.lat, longitude: poi.lng }}
       onPress={onPress}
       tracksViewChanges={selected} // performance: non re-renderizza se non selezionato
     >
@@ -25,7 +27,7 @@ export default function POIMarker({ poi, onPress, selected }: Props) {
         <Text style={styles.markerIcon}>📍</Text>
         {selected && (
           <View style={styles.label}>
-            <Text style={styles.labelText} numberOfLines={1}>{poi.name}</Text>
+            <Text style={styles.labelText} numberOfLines={1}>{poi.title}</Text>
           </View>
         )}
       </View>

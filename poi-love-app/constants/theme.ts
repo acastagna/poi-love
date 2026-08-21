@@ -1,12 +1,16 @@
 /**
- * POI•LOVE — Design Tokens
- * Brand: Red #D42B2B | Blue #285EA7 | BG #EAE4D8
+ * © Alessandro Castagna — 321.al / EVOLAB
+ * Tutti i diritti riservati. Uso non autorizzato vietato.
+ * info@321.it · https://321.al
+ *
+ * theme — colori, spazi e ombre del marchio.
  */
 
 export const Colors = {
   // Brand primari
   red:        '#D42B2B',  // POI•LOVE
   blue:       '#285EA7',  // POI•VOICE
+  gold:       '#E8B04B',  // l'oro dell'amministrazione e dei badge ufficiali
   background: '#EAE4D8',  // Sfondo principale
 
   // Toni neutri derivati

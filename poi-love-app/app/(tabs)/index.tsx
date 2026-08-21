@@ -31,6 +31,7 @@ import POIDetailCard from '@/components/POIDetailCard';
 export default function MapScreen() {
   const mapRef       = useRef<MapView>(null);
   const [pois,         setPois]         = useState<POI[]>([]);
+  const [mappaErrore,  setMappaErrore]  = useState(false);
   const [selectedPOI,  setSelectedPOI]  = useState<POI | null>(null);
   const [showAddSheet, setShowAddSheet] = useState(false);
   const [loading,      setLoading]      = useState(false);
@@ -67,8 +68,12 @@ export default function MapScreen() {
         r.longitude + r.longitudeDelta / 2 + delta,
       );
       setPois(result as POI[]);
+      setMappaErrore(false);
     } catch (err) {
+      // La mappa che tace su un errore mostra un mondo vuoto e sembra vera:
+      // un avviso discreto, e i marcatori gia' scaricati restano al loro posto.
       console.warn('fetchPOIs error:', err);
+      setMappaErrore(true);
     } finally {
       setLoading(false);
     }
@@ -135,6 +140,17 @@ export default function MapScreen() {
         </View>
       )}
 
+      {/* La rete non risponde: lo si dice, non si finge una mappa vuota */}
+      {mappaErrore && !loading && (
+        <TouchableOpacity
+          style={styles.erroreBadge}
+          onPress={() => fetchPOIs(region)}
+          activeOpacity={0.85}
+        >
+          <Text style={styles.erroreBadgeText}>Luoghi non aggiornati · tocca per riprovare</Text>
+        </TouchableOpacity>
+      )}
+
       {/* Card POI selezionato */}
       {selectedPOI && (
         <POIDetailCard
@@ -193,6 +209,20 @@ const styles = StyleSheet.create({
     borderRadius:    Radius.full,
     padding:         Spacing.sm,
     ...Shadow.sm,
+  },
+  erroreBadge: {
+    position: 'absolute',
+    top: 58,
+    alignSelf: 'center',
+    backgroundColor: 'rgba(212,43,43,0.92)',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  erroreBadgeText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '700',
   },
   fab: {
     position:        'absolute',

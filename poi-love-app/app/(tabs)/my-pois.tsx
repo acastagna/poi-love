@@ -1,7 +1,9 @@
 /**
- * POI•LOVE — I miei POI
+ * © Alessandro Castagna — 321.al / EVOLAB
+ * Tutti i diritti riservati. Uso non autorizzato vietato.
+ * info@321.it · https://321.al
  *
- * Lista dei POI personali dell'utente (tutti, inclusi privati).
+ * I miei luoghi: l'elenco di quello che ho creato, con stato di visibilita'.
  */
 import { useState, useCallback } from 'react';
 import {
@@ -14,20 +16,23 @@ import { POI, POIVisibility } from '@/lib/types';
 import { Colors, Typography, Spacing, Radius, Shadow } from '@/constants/theme';
 
 const VISIBILITY_LABEL: Record<POIVisibility, string> = {
-  private:          '🔒 Privato',
-  community:        '🌍 Community',
-  suggested_google: '📍 Suggerito Google',
+  private:          'Solo io',
+  community:        'Tutta la community',
+  suggested_google: 'Proposto dalla mappa',
+  official:         'Ufficiale POI•LOVE',
 };
 
 const VISIBILITY_COLOR: Record<POIVisibility, string> = {
   private:          Colors.textMuted,
   community:        Colors.blue,
   suggested_google: Colors.red,
+  official:         Colors.gold,
 };
 
 export default function MyPOIsScreen() {
   const [pois,    setPois]    = useState<POI[]>([]);
   const [loading, setLoading] = useState(true);
+  const [errore,  setErrore]  = useState<string | null>(null);
   const [userId,  setUserId]  = useState<string | null>(null);
 
   useFocusEffect(
@@ -39,22 +44,25 @@ export default function MyPOIsScreen() {
   async function loadPOIs() {
     try {
       setLoading(true);
+      setErrore(null);
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
       setUserId(user.id);
       const data = await fetchMyPOIs(user.id);
       setPois(data as POI[]);
     } catch (err) {
-      console.warn('loadPOIs error:', err);
+      // "Vuoto" e "non ho potuto leggere" sono due cose diverse: mostrare a uno
+      // che HA dei luoghi la scritta "nessun posto ancora" e' una bugia.
+      setErrore(err instanceof Error ? err.message : 'Non riesco a leggere i tuoi luoghi');
     } finally {
       setLoading(false);
     }
   }
 
   function renderPOI({ item }: { item: POI }) {
-    const firstPhoto = item.photo_urls?.[0];
+    const firstPhoto = item.cover_photo ?? item.photos?.[0];
     return (
-      <TouchableOpacity style={styles.card} activeOpacity={0.85}>
+      <View style={styles.card}>
         {firstPhoto ? (
           <Image source={{ uri: firstPhoto }} style={styles.cardImage} />
         ) : (
@@ -63,19 +71,19 @@ export default function MyPOIsScreen() {
           </View>
         )}
         <View style={styles.cardBody}>
-          <Text style={styles.cardName} numberOfLines={1}>{item.name}</Text>
+          <Text style={styles.cardName} numberOfLines={1}>{item.title}</Text>
           {item.description && (
             <Text style={styles.cardDesc} numberOfLines={2}>{item.description}</Text>
           )}
           <View style={styles.cardMeta}>
-            {item.tag && <Text style={styles.tag}>{item.tag}</Text>}
+            {item.subcategory && <Text style={styles.tag}>{item.subcategory}</Text>}
             <Text style={[styles.visibility, { color: VISIBILITY_COLOR[item.visibility] }]}>
               {VISIBILITY_LABEL[item.visibility]}
             </Text>
             <Text style={styles.loves}>❤️ {item.love_count}</Text>
           </View>
         </View>
-      </TouchableOpacity>
+      </View>
     );
   }
 
@@ -90,7 +98,15 @@ export default function MyPOIsScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.header}>I miei POI</Text>
-      {pois.length === 0 ? (
+      {errore ? (
+        <View style={styles.center}>
+          <Text style={styles.emptyTitle}>Non riesco a leggere</Text>
+          <Text style={styles.emptyDesc}>{errore}</Text>
+          <TouchableOpacity style={styles.retryBtn} onPress={loadPOIs} activeOpacity={0.85}>
+            <Text style={styles.retryBtnText}>Riprova</Text>
+          </TouchableOpacity>
+        </View>
+      ) : pois.length === 0 ? (
         <View style={styles.center}>
           <Text style={styles.emptyIcon}>📍</Text>
           <Text style={styles.emptyTitle}>Nessun posto ancora</Text>
@@ -191,6 +207,18 @@ const styles = StyleSheet.create({
     alignItems:     'center',
     justifyContent: 'center',
     padding:        Spacing.xl,
+  },
+  retryBtn: {
+    marginTop: Spacing.md,
+    backgroundColor: Colors.red,
+    paddingHorizontal: 26,
+    paddingVertical: 11,
+    borderRadius: Radius.md,
+  },
+  retryBtnText: {
+    color: Colors.white,
+    fontWeight: '700',
+    fontSize: 14,
   },
   emptyIcon: {
     fontSize: 64,

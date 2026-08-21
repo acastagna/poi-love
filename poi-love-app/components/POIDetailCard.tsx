@@ -1,20 +1,19 @@
 /**
- * POI•LOVE — Card dettaglio POI
+ * © Alessandro Castagna — 321.al / EVOLAB
+ * Tutti i diritti riservati. Uso non autorizzato vietato.
+ * info@321.it · https://321.al
  *
- * Appare in basso quando l'utente seleziona un marker.
- * Mostra foto, nome, tag, love count, bottone LOVE e bottone Condividi.
+ * POIDetailCard — la scheda che appare in basso quando tocchi un marcatore.
  *
- * Il pulsante "Condividi" è sempre visibile se il POI ha una card_url.
- * Usa share diretto (download + native sheet) — non apre ShareCardSheet,
- * perché per i POI community non abbiamo accesso alla foto locale originale.
+ * Condividere manda il link pubblico corto (/p/<id>), lo stesso del sito:
+ * porta con se' titolo, descrizione e foto vera per le anteprime social.
  */
 import { useState } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity,
-  Image, ScrollView, Dimensions, ActivityIndicator, Alert,
+  Image, ScrollView, Dimensions, ActivityIndicator, Alert, Share,
 } from 'react-native';
 import { supabase, toggleLove } from '@/lib/supabase';
-import { shareCardFromUrl } from '@/lib/card/shareCard';
 import { POI } from '@/lib/types';
 import { Colors, Typography, Spacing, Radius, Shadow } from '@/constants/theme';
 
@@ -40,20 +39,22 @@ export default function POIDetailCard({ poi, onClose }: Props) {
       setLoved(added);
       setLoveCount(prev => added ? prev + 1 : Math.max(0, prev - 1));
     } catch (err) {
-      console.warn('toggleLove error:', err);
+      // Un fallimento muto lascia il cuore in uno stato che non e' vero:
+      // meglio dirlo e non toccare niente.
+      Alert.alert('Non sono riuscito', err instanceof Error ? err.message : 'Riprova tra poco');
     } finally {
       setLovePending(false);
     }
   }
 
   async function handleShare() {
-    if (!poi.card_url) {
-      Alert.alert('Card non disponibile', 'Questo POI non ha ancora una card generata.');
-      return;
-    }
     try {
       setSharing(true);
-      await shareCardFromUrl(poi.card_url, poi.name);
+      // Il link corto pubblico: la pagina porta titolo, descrizione e foto vera
+      await Share.share({
+        message: poi.title + '\nhttps://poilove.com/p/' + poi.id,
+        url: 'https://poilove.com/p/' + poi.id,
+      });
     } catch (err: unknown) {
       Alert.alert('Errore', err instanceof Error ? err.message : 'Errore nella condivisione');
     } finally {
@@ -69,27 +70,27 @@ export default function POIDetailCard({ poi, onClose }: Props) {
       </TouchableOpacity>
 
       {/* Foto */}
-      {poi.photo_urls?.length > 0 && (
+      {(poi.photos?.length ?? 0) > 0 && (
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
           style={styles.photosScroll}
         >
-          {poi.photo_urls.map((url, i) => (
+          {(poi.photos ?? []).map((url, i) => (
             <Image key={i} source={{ uri: url }} style={styles.photo} />
           ))}
         </ScrollView>
       )}
 
-      {/* Card preview se non ci sono foto raw ma c'è la card */}
-      {(!poi.photo_urls || poi.photo_urls.length === 0) && poi.card_url && (
-        <Image source={{ uri: poi.card_url }} style={styles.cardPreview} resizeMode="cover" />
+      {/* Copertina di riserva quando la lista foto non c'e' (campi ridotti della mappa) */}
+      {(!poi.photos || poi.photos.length === 0) && poi.cover_photo && (
+        <Image source={{ uri: poi.cover_photo }} style={styles.cardPreview} resizeMode="cover" />
       )}
 
       {/* Info */}
       <View style={styles.info}>
         <View style={styles.titleRow}>
-          <Text style={styles.name} numberOfLines={2}>{poi.name}</Text>
+          <Text style={styles.name} numberOfLines={2}>{poi.title}</Text>
           <TouchableOpacity
             style={[styles.loveBtn, loved && styles.loveBtnActive]}
             onPress={handleLove}
@@ -103,8 +104,8 @@ export default function POIDetailCard({ poi, onClose }: Props) {
           </TouchableOpacity>
         </View>
 
-        {poi.tag && (
-          <Text style={styles.tag}>{poi.tag}</Text>
+        {poi.subcategory && (
+          <Text style={styles.tag}>{poi.subcategory}</Text>
         )}
 
         {poi.description && (
@@ -122,20 +123,15 @@ export default function POIDetailCard({ poi, onClose }: Props) {
         {/* Azioni — Condividi sempre accessibile */}
         <View style={styles.actionsRow}>
           <TouchableOpacity
-            style={[
-              styles.shareBtn,
-              (!poi.card_url || sharing) && styles.shareBtnDisabled,
-            ]}
+            style={[styles.shareBtn, sharing && styles.shareBtnDisabled]}
             onPress={handleShare}
-            disabled={!poi.card_url || sharing}
+            disabled={sharing}
             activeOpacity={0.85}
           >
             {sharing ? (
               <ActivityIndicator size="small" color={Colors.white} />
             ) : (
-              <Text style={styles.shareBtnText}>
-                {poi.card_url ? 'Condividi POI' : 'Card non disponibile'}
-              </Text>
+              <Text style={styles.shareBtnText}>Condividi</Text>
             )}
           </TouchableOpacity>
         </View>

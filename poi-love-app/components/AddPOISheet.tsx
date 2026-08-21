@@ -1,13 +1,13 @@
 /**
- * POI•LOVE — AddPOISheet v2
+ * © Alessandro Castagna — 321.al / EVOLAB
+ * Tutti i diritti riservati. Uso non autorizzato vietato.
+ * info@321.it · https://321.al
  *
- * Bottom sheet per aggiungere un nuovo POI in < 90 secondi.
- * Flow: Nome → Descrizione (200c) → Tag → Foto → Visibilità → Consenso → Salva
+ * AddPOISheet — il foglio per creare un luogo dal lungo-tocco sulla mappa.
  *
- * UPLOAD CARD: obbligatorio. Al salvataggio, la card composita viene generata
- * e caricata su Plesk automaticamente. Non è opzionale.
- *
- * CONSENSO: LicenseToggle — libro annuale e NFT, entrambi default OFF.
+ * Tre passi veri: il luogo nel database (colonne attuali: title, lat, lng,
+ * author_id), le foto sul server delle immagini, gli indirizzi delle foto
+ * di nuovo sul luogo. Almeno una foto e' obbligatoria.
  */
 import { useRef, useCallback, useState } from 'react';
 import {
@@ -16,21 +16,17 @@ import {
 } from 'react-native';
 import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import * as ImagePicker from 'expo-image-picker';
-import { captureRef } from 'react-native-view-shot';
-import { supabase, insertPOI } from '@/lib/supabase';
-import { generateAndUploadCard } from '@/lib/card/generateCard';
+import { supabase, insertPOI, updatePOI, deletePOI } from '@/lib/supabase';
+import { uploadPOIPhotos } from '@/lib/mediaUpload';
 import { POI, POIVisibility } from '@/lib/types';
 import { Config } from '@/constants/config';
 import { Colors, Typography, Spacing, Radius, Shadow } from '@/constants/theme';
-import POICardRenderer, { DISPLAY_W, DISPLAY_H } from '@/components/card/POICardRenderer';
-import LicenseToggle from '@/components/card/LicenseToggle';
 
 const TAGS = ['🍕 Cibo', '🌿 Natura', '🏛️ Storia', '🎨 Arte', '☕ Caffè', '🛍️ Shopping', '🎵 Musica', '🏖️ Spiaggia'];
 
 const VISIBILITY_OPTIONS: { value: POIVisibility; label: string; desc: string }[] = [
-  { value: 'private',          label: '🔒 Solo io',        desc: 'Visibile solo a te'           },
-  { value: 'community',        label: '🌍 Community',       desc: 'Visibile a tutti su POI•LOVE' },
-  { value: 'suggested_google', label: '📍 Suggerisci a Google', desc: 'Proposto come Google Place'  },
+  { value: 'private',   label: 'Solo io',            desc: 'Lo vedi solo tu'                  },
+  { value: 'community', label: 'Tutta la community', desc: 'Visibile a tutti su POI•LOVE' },
 ];
 
 interface Props {
@@ -41,7 +37,6 @@ interface Props {
 
 export default function AddPOISheet({ coordinate, onClose, onSaved }: Props) {
   const sheetRef  = useRef<BottomSheet>(null);
-  const cardRef   = useRef<View>(null); // ref per catturare la card
   const snapPoints = ['60%', '95%'];
 
   const [name,       setName]       = useState('');
@@ -49,7 +44,6 @@ export default function AddPOISheet({ coordinate, onClose, onSaved }: Props) {
   const [tag,        setTag]        = useState('');
   const [photos,     setPhotos]     = useState<string[]>([]);
   const [visibility, setVisibility] = useState<POIVisibility>('community');
-  const [license,    setLicense]    = useState({ book: false, nft: false });
   const [saving,     setSaving]     = useState(false);
   const [saveStep,   setSaveStep]   = useState<string>('');
 
@@ -75,7 +69,7 @@ export default function AddPOISheet({ coordinate, onClose, onSaved }: Props) {
       return;
     }
     if (photos.length === 0) {
-      Alert.alert('Foto richiesta', 'Aggiungi almeno una foto per creare la card del luogo.');
+      Alert.alert('Foto richiesta', 'Aggiungi almeno una foto: un luogo senza foto non racconta niente.');
       return;
     }
 
@@ -84,55 +78,56 @@ export default function AddPOISheet({ coordinate, onClose, onSaved }: Props) {
 
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error('Utente non autenticato');
+      if (!session) throw new Error('Sessione scaduta: esci e rientra');
 
-      // ── Step 1: inserisci POI in Supabase ──────────
+      // Fino a dieci tag, separati da virgola
+      const tags = tag.split(',')
+        .map(t => t.replace(/^[\p{Emoji}\s#]+/u, '').trim().toLowerCase())
+        .filter(Boolean)
+        .slice(0, Config.maxTagsPerPOI);
+
+      // ── Passo 1: il luogo nel database, con le colonne vere ──
       setSaveStep('Salvataggio luogo…');
       const newPOI = await insertPOI({
-        user_id:     session.user.id,
-        name:        name.trim(),
-        description: desc.trim(),
-        latitude:    coordinate.latitude,
-        longitude:   coordinate.longitude,
-        tag:         tag.replace(/^[\p{Emoji}\s]+/u, '').trim(),
+        author_id:   session.user.id,
+        title:       name.trim(),
+        description: desc.trim() || null,
+        lat:         coordinate.latitude,
+        lng:         coordinate.longitude,
+        category:    'altro',           // la famiglia la si affina dalla scheda
+        tags,
         visibility,
-        photo_urls:  [], // verrà aggiornato dopo la card
+        photos:      [],                // arrivano al passo 2
       });
 
-      // ── Step 2: genera card composita e carica su Plesk ──
-      // OBBLIGATORIO — non è opzionale, non è saltabile
-      setSaveStep('Creazione card…');
-      const cardResult = await generateAndUploadCard(
-        cardRef as React.RefObject<View>,
-        newPOI.id,
-        session.access_token,
-      );
+      try {
+        // ── Passo 2: le foto sul server delle immagini ──
+        // Il biglietto si richiede QUI, non all'inizio: su una rete lenta quello
+        // preso prima puo' essere gia' scaduto quando le foto partono.
+        setSaveStep('Carico le foto…');
+        const { data: { session: fresca } } = await supabase.auth.getSession();
+        if (!fresca) throw new Error('Sessione scaduta: esci e rientra');
+        const upload = await uploadPOIPhotos(newPOI.id, photos, fresca.access_token);
 
-      // ── Step 3: aggiorna POI con card_url, hash e consenso ──
-      setSaveStep('Finalizzazione…');
-      await supabase
-        .from('pois')
-        .update({
-          card_url:           cardResult.cardUrl,
-          card_hash:          cardResult.sha256,
-          card_hashed_at:     new Date().toISOString(),
-          license_book:       license.book,
-          license_nft:        license.nft,
-          license_accepted_at: (license.book || license.nft)
-            ? new Date().toISOString()
-            : null,
-        })
-        .eq('id', newPOI.id);
+        // ── Passo 3: gli indirizzi delle foto tornano sul luogo ──
+        // Rileggendo la riga: zero righe = le regole hanno rifiutato, non successo.
+        setSaveStep('Finalizzazione…');
+        const salvato = await updatePOI(newPOI.id, {
+          photos:      upload.urls,
+          cover_photo: upload.urls[0] ?? null,
+        });
 
-      onSaved({
-        ...newPOI,
-        card_url:  cardResult.cardUrl,
-        card_hash: cardResult.sha256,
-      } as POI);
+        onSaved(salvato);
+      } catch (dentro) {
+        // Compensazione: il luogo senza foto non resta nel database come un
+        // guscio vuoto, e il prossimo tentativo non crea un doppione.
+        try { await deletePOI(newPOI.id); } catch { /* al peggio resta privato di chi l'ha creato */ }
+        throw dentro;
+      }
 
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Errore nel salvataggio';
-      Alert.alert('Errore', msg);
+      Alert.alert('Non ho salvato', msg + '\n\nIl luogo non e stato creato: riprova.');
     } finally {
       setSaving(false);
       setSaveStep('');
@@ -259,9 +254,6 @@ export default function AddPOISheet({ coordinate, onClose, onSaved }: Props) {
           ))}
         </View>
 
-        {/* Consenso uso creativo */}
-        <LicenseToggle value={license} onChange={setLicense} />
-
         {/* Salva */}
         <TouchableOpacity
           style={[styles.saveBtn, (!name.trim() || photos.length === 0 || saving) && styles.saveBtnDisabled]}
@@ -282,35 +274,6 @@ export default function AddPOISheet({ coordinate, onClose, onSaved }: Props) {
         <View style={{ height: 48 }} />
       </BottomSheetScrollView>
 
-      {/* Card nascosta per captureRef — fuori dallo scroll, posizionata off-screen */}
-      {/* Viene renderizzata con la prima foto selezionata come sfondo */}
-      {photos.length > 0 && (
-        <View
-          style={{ position: 'absolute', top: -9999, left: -9999 }}
-          collapsable={false}
-          ref={cardRef}
-        >
-          <POICardRenderer
-            poi={{
-              id:          'preview',
-              user_id:     '',
-              name:        name.trim() || 'Il mio luogo',
-              description: desc.trim() || null,
-              latitude:    coordinate.latitude,
-              longitude:   coordinate.longitude,
-              tag:         tag || null,
-              visibility,
-              photo_urls:  photos,
-              love_count:  0,
-              created_at:  new Date().toISOString(),
-              updated_at:  new Date().toISOString(),
-            }}
-            photoUri={photos[0]}
-            showTitle={true}
-            showSummary={true}
-          />
-        </View>
-      )}
     </BottomSheet>
   );
 }

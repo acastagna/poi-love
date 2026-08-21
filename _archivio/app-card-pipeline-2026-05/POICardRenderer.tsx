@@ -66,11 +66,11 @@ export default function POICardRenderer({ poi, photoUri, showTitle, showSummary 
           <Text style={styles.summary} numberOfLines={2}>{summary}</Text>
         )}
         {showTitle && (
-          <Text style={styles.title} numberOfLines={2}>{poi.name}</Text>
+          <Text style={styles.title} numberOfLines={2}>{poi.title}</Text>
         )}
         <View style={styles.footer}>
           <View style={styles.footerMeta}>
-            <Text style={styles.footerLocation} numberOfLines={1}>{poi.name}</Text>
+            <Text style={styles.footerLocation} numberOfLines={1}>{poi.title}</Text>
             <Text style={styles.footerDate}>{date}</Text>
           </View>
         </View>

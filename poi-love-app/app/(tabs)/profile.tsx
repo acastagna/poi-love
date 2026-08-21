@@ -1,10 +1,14 @@
 /**
- * POI•LOVE — Profilo Utente
+ * © Alessandro Castagna — 321.al / EVOLAB
+ * Tutti i diritti riservati. Uso non autorizzato vietato.
+ * info@321.it · https://321.al
+ *
+ * Il mio profilo: chi sono, quanti luoghi, quanti cuori ricevuti.
  */
 import { useEffect, useState } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity,
-  Image, Alert, ScrollView,
+  Image, Alert, ScrollView, Linking,
 } from 'react-native';
 import { supabase, getProfile } from '@/lib/supabase';
 import { Profile } from '@/lib/types';
@@ -20,26 +24,36 @@ export default function ProfileScreen() {
   }, []);
 
   async function loadProfile() {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-
-    setEmail(user.email ?? null);
-
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      setEmail(user.email ?? null);
+
       const p = await getProfile(user.id);
       setProfile(p);
-    } catch {}
 
-    // Statistiche
-    const [{ count: poisCount }, { count: lovesCount }] = await Promise.all([
-      supabase.from('pois').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
-      supabase.from('loves').select('*', { count: 'exact', head: true })
-        .in('poi_id',
-          (await supabase.from('pois').select('id').eq('user_id', user.id)).data?.map(p => p.id) ?? []
-        ),
-    ]);
+      // Statistiche: prima gli id dei miei luoghi, poi i due conteggi davvero
+      // in parallelo. La versione vecchia annidava un await dentro Promise.all
+      // e il parallelismo era finto.
+      const miei = await supabase.from('pois').select('id').eq('author_id', user.id);
+      if (miei.error) throw miei.error;
+      const ids = (miei.data ?? []).map(r => r.id);
 
-    setStats({ pois: poisCount ?? 0, loves: lovesCount ?? 0 });
+      const [poisCount, lovesCount] = await Promise.all([
+        Promise.resolve(ids.length),
+        ids.length
+          ? supabase.from('loves').select('*', { count: 'exact', head: true }).in('poi_id', ids)
+              .then(r => { if (r.error) throw r.error; return r.count ?? 0; })
+          : Promise.resolve(0),
+      ]);
+
+      setStats({ pois: poisCount, loves: lovesCount });
+    } catch (err) {
+      // Il profilo che non arriva non deve sembrare un profilo vuoto.
+      console.warn('profilo non caricato:', err);
+      Alert.alert('Profilo non caricato', 'Controlla la connessione e riapri questa scheda.');
+    }
   }
 
   async function handleLogout() {
@@ -55,7 +69,7 @@ export default function ProfileScreen() {
     ]);
   }
 
-  const displayName = profile?.full_name ?? profile?.username ?? email ?? 'Utente';
+  const displayName = profile?.display_name ?? profile?.username ?? email ?? 'Utente';
   const avatarUri   = profile?.avatar_url;
 
   return (
@@ -88,19 +102,15 @@ export default function ProfileScreen() {
         </View>
       </View>
 
-      {/* Azioni */}
+      {/* Azioni: solo quelle vere. Notifiche e lingua arrivano coi loro
+          blocchi del programma (37 e 43): un tasto che non fa niente e' peggio
+          di un tasto che non c'e'. */}
       <View style={styles.actionsSection}>
-        <TouchableOpacity style={styles.actionRow} activeOpacity={0.7}>
-          <Text style={styles.actionIcon}>🔔</Text>
-          <Text style={styles.actionText}>Notifiche</Text>
-          <Text style={styles.actionChevron}>›</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.actionRow} activeOpacity={0.7}>
-          <Text style={styles.actionIcon}>🌍</Text>
-          <Text style={styles.actionText}>Lingua / Gjuha</Text>
-          <Text style={styles.actionChevron}>›</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.actionRow} activeOpacity={0.7}>
+        <TouchableOpacity
+          style={styles.actionRow}
+          activeOpacity={0.7}
+          onPress={() => Linking.openURL('https://poilove.com')}
+        >
           <Text style={styles.actionIcon}>ℹ️</Text>
           <Text style={styles.actionText}>Su POI•LOVE</Text>
           <Text style={styles.actionChevron}>›</Text>
