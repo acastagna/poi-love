@@ -572,6 +572,7 @@ html[data-theme="light"] .chip.green{color:#236b39}
 <script src="js/qr-editor.js?v=345"></script>
 <script src="js/volti-admin.js?v=345"></script>
 <script src="js/direttive-admin.js?v=345"></script>
+<script src="js/livelli-admin.js?v=345"></script>
 </head>
 <body>
 <div class="grain"></div>
@@ -640,6 +641,9 @@ html[data-theme="light"] .chip.green{color:#236b39}
     </div>
     <div class="nav-item" data-sec="direttive" onclick="openSection('direttive')">
       <span class="ic"><i class="ph-duotone ph-gavel"></i></span> Direttive
+    </div>
+    <div class="nav-item" data-sec="livelli" onclick="openSection('livelli')">
+      <span class="ic"><i class="ph-duotone ph-crown-simple"></i></span> Livelli
     </div>
     <div class="nav-item" data-sec="media" onclick="openSection('media')">
       <span class="ic"><i class="ph-duotone ph-share-network"></i></span><span class="label" data-t="nav_media">Media</span>
@@ -975,6 +979,11 @@ html[data-theme="light"] .chip.green{color:#236b39}
     <!-- 8c-quater) DIRETTIVE DELLA MODERAZIONE -->
     <section class="section" id="sec-direttive">
       <div id="direttiveBox"></div>
+    </section>
+
+    <!-- 8c-quinquies) LIVELLI E ABBONAMENTI -->
+    <section class="section" id="sec-livelli">
+      <div id="livelliBox"></div>
     </section>
 
     <!-- 8d) KNOWLEDGE ILLI -->
@@ -1598,6 +1607,7 @@ function runSection(sec){
     case 'qr': if(window.QrEditor) window.QrEditor.load(document.getElementById('qrEditorBox')); break;
     case 'volti': if(window.VoltiAdmin) window.VoltiAdmin.load(document.getElementById('voltiBox')); break;
     case 'direttive': if(window.DirettiveAdmin) window.DirettiveAdmin.load(document.getElementById('direttiveBox')); break;
+    case 'livelli': if(window.LivelliAdmin) window.LivelliAdmin.load(document.getElementById('livelliBox')); break;
     case 'knowledge': loadKnowledgeAdmin(); break;
     case 'audit': loadAudit(); break;
     case 'media': initMedia(); break;
