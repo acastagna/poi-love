@@ -2354,7 +2354,7 @@ function appendInline(parent, text){
   if(last<text.length) parent.appendChild(document.createTextNode(text.slice(last)));
 }
 
-function appendBubble(role, content, usage, routeData, iconName){
+function appendBubble(role, content, usage, routeData, iconName, chi){
   const log=document.getElementById('chatLog');
   const b=el('div',{class:'bubble '+(role==='user'?'user':'ai')});
   if(role==='user'){ b.textContent=content; }   // utente: solo testo
@@ -2364,11 +2364,17 @@ function appendBubble(role, content, usage, routeData, iconName){
     b.appendChild(renderMarkdownSafe(content)); // ai: markdown sanitizzato
   }
   // usage/costo
-  if(usage){
+  if(usage || chi){
     const parts=[];
-    if(usage.in!=null) parts.push('in '+usage.in);
-    if(usage.out!=null) parts.push('out '+usage.out);
-    if(usage.cost_eur!=null) parts.push(t('cost')+' €'+Number(usage.cost_eur).toFixed(4));
+    // chi ha risposto viene per primo: e' la cosa che si vuole sapere
+    if(chi && chi.provider){
+      const nomi={openai:'OpenAI', anthropic:'Anthropic', google:'Google', groq:'Groq',
+                  mistral:'Mistral', deepseek:'DeepSeek', openrouter:'OpenRouter'};
+      parts.push((nomi[chi.provider]||chi.provider)+(chi.model?(' · '+chi.model):''));
+    }
+    if(usage && usage.in!=null) parts.push('in '+usage.in);
+    if(usage && usage.out!=null) parts.push('out '+usage.out);
+    if(usage && usage.cost_eur!=null) parts.push(t('cost')+' €'+Number(usage.cost_eur).toFixed(4));
     if(parts.length) b.appendChild(el('div',{class:'usage',text:parts.join(' · ')}));
   }
   // Le rotte del copilota passano SOLO da ai_proposals (propose_historic_route → Approva):
@@ -2442,7 +2448,7 @@ async function sendAi(){
     aiHistory.push({ role:'assistant', content:reply });
     saveChat(); // il copilota RICORDA: persiste la conversazione in ai_chats
     // se mode route, la edge function può restituire data.route con tappe
-    appendBubble('ai', reply, data.usage, null);
+    appendBubble('ai', reply, data.usage, null, null, data.data || null);
     // proposte write-tools (propose_poi / propose_historic_route / propose_project):
     // l'edge le ha già inserite in ai_proposals (status=pending). Le mostriamo come card.
     if(Array.isArray(data.proposals) && data.proposals.length){

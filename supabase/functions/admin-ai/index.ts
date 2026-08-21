@@ -277,6 +277,18 @@ class Inserimento implements PromiseLike<Esito<any>> {
   }
 }
 
+// Chi e' acceso, in che ordine, con quale modello: lo dice il pannello.
+async function leggiFornitori(): Promise<Array<Record<string, unknown>>> {
+  try {
+    const r = await fetch(`${REST}/ai_fornitori?select=chiave,modello,acceso,ordine&order=ordine`, {
+      headers: { apikey: SERVICE_ROLE_KEY, Authorization: `Bearer ${SERVICE_ROLE_KEY}` },
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!r.ok) return [];
+    return await r.json();
+  } catch (_e) { return []; }
+}
+
 const tavolo = {
   from(tavola: string) {
     return {
@@ -1797,15 +1809,36 @@ Deno.serve(async (req: Request) => {
   const mode: Mode =
     body?.mode === "route" || body?.mode === "write" ? body.mode : "chat";
 
-  // ── Scelta provider + modello (whitelist) ─────────────────────────────────────
+  // ── Chi risponde, e con quale modello ─────────────────────────────────────────
+  // Lo decide il pannello, nella tabella ai_fornitori: si prova il primo acceso
+  // in ordine, e se non ha la chiave si scende. Prima era scritto qui dentro
+  // (Anthropic se c'era la chiave, altrimenti OpenAI) e non si poteva cambiare.
   let provider: "anthropic" | "openai";
   let model: string;
 
-  if (ANTHROPIC_KEY) {
+  const chiavi: Record<string, string> = { anthropic: ANTHROPIC_KEY, openai: OPENAI_KEY };
+  let scelto: { chiave: string; modello: string } | null = null;
+  try {
+    const righe = await leggiFornitori();
+    for (const f of righe) {
+      if (!f?.acceso) continue;
+      const chi = String(f.chiave || "");
+      if (chi !== "anthropic" && chi !== "openai") continue;   // gli altri non sanno ancora usare gli strumenti
+      if (!chiavi[chi]) continue;
+      scelto = { chiave: chi, modello: String(f.modello || "") };
+      break;
+    }
+  } catch (_e) { /* se la tabella non risponde si torna al modo di prima */ }
+
+  if (scelto?.chiave === "anthropic") {
     provider = "anthropic";
-    model = ANTHROPIC_ALLOWED.has(ANTHROPIC_MODEL)
-      ? ANTHROPIC_MODEL
-      : "claude-sonnet-4-6";
+    model = ANTHROPIC_ALLOWED.has(scelto.modello) ? scelto.modello : "claude-sonnet-4-6";
+  } else if (scelto?.chiave === "openai") {
+    provider = "openai";
+    model = OPENAI_ALLOWED.has(scelto.modello) ? scelto.modello : "gpt-4o";
+  } else if (ANTHROPIC_KEY) {
+    provider = "anthropic";
+    model = ANTHROPIC_ALLOWED.has(ANTHROPIC_MODEL) ? ANTHROPIC_MODEL : "claude-sonnet-4-6";
   } else if (OPENAI_KEY) {
     provider = "openai";
     model = OPENAI_ALLOWED.has(OPENAI_MODEL) ? OPENAI_MODEL : "gpt-4o";
