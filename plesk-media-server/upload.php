@@ -43,7 +43,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 // ---------------------------------------------------------------------------
 // 2. Autenticazione JWT Supabase
 // ---------------------------------------------------------------------------
-$user = require_auth(); // termina con 401 se non valido
+$user = require_auth();
+$token = extract_bearer_token();   // uno solo per tutta la richiesta // termina con 401 se non valido
 
 // ---------------------------------------------------------------------------
 // 3. Validazione input: poi_id
@@ -113,12 +114,35 @@ if (!is_writable($poi_storage_dir)) {
 $existing_photos = glob($poi_storage_dir . '/*.webp') ?: [];
 $existing_count  = count($existing_photos);
 
+// ── Il luogo dev'essere suo ─────────────────────────────────────────────────
+// Mancava: con un collegamento valido si potevano mettere foto sul luogo di
+// chiunque altro. Adesso si chiede al database chi lo ha creato, e se non e'
+// chi sta caricando, si rifiuta. Se il database non risponde, si rifiuta lo
+// stesso: nel dubbio non si scrive sul luogo di un altro.
+{
+    $tok_pro = $token;
+    $mio = false;
+    if ($tok_pro) {
+        $ch = curl_init('https://poilove.com/db/rest/v1/pois?select=author_id&id=eq.' . urlencode($poi_id));
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 8,
+            CURLOPT_HTTPHEADER => ['Authorization: Bearer ' . $tok_pro, 'Accept: application/json'],
+        ]);
+        $r = curl_exec($ch); curl_close($ch);
+        $j = json_decode((string)$r, true);
+        $mio = (is_array($j) && isset($j[0]['author_id']) && $j[0]['author_id'] === $user['id']);
+    }
+    if (!$mio) {
+        error_response('Le foto le mette chi ha creato il luogo', 403);
+    }
+}
+
 // Quante foto puo' avere questo luogo lo dice il LIVELLO di chi lo ha creato
 // (tabella `livelli`), non piu' un numero fisso uguale per tutti: con il tetto
 // fisso a 3 i livelli superiori non avrebbero potuto caricare le loro foto.
 $tetto_foto = MAX_PHOTOS_PER_POI;
 {
-    $tok_liv = extract_bearer_token();
+    $tok_liv = $token;
     if ($tok_liv) {
         $ch = curl_init('https://poilove.com/db/rest/v1/rpc/foto_massime');
         curl_setopt_array($ch, [
@@ -201,9 +225,19 @@ for ($i = 0; $i < $file_count; $i++) {
     // ── I volti di chi e' finito nella foto per caso ───────────────────────
     // Si sfocano PRIMA di salvare: la foto che resta sul server e' gia' pulita,
     // l'originale con le facce non lo conserviamo da nessuna parte.
+    $sfocata = null;
     if ($volti_attiva) {
+        // Prima di dare il file a un altro programma si controlla che sia
+        // davvero un'immagine: il controllo vero arrivava solo dopo.
+        $fi = new finfo(FILEINFO_MIME_TYPE);
+        $tipo_vero = (string)$fi->file($tmp_path);
+        if (!in_array($tipo_vero, ALLOWED_MIME_TYPES, true)) {
+            $errors[] = 'Foto ' . ($i + 1) . ': non e\' un\'immagine';
+            continue;
+        }
         $sfocata = $tmp_path . '-volti.jpg';
-        $cmd = 'python3 /usr/local/bin/poilove-volti.py ' . escapeshellarg($tmp_path) . ' ' .
+        // 'timeout' perche' un programma che si pianta terrebbe occupato il server
+        $cmd = 'timeout 20 python3 /usr/local/bin/poilove-volti.py ' . escapeshellarg($tmp_path) . ' ' .
                escapeshellarg($sfocata) . ' ' . (int)$volti_intensita . ' ' . (int)$volti_margine . ' 2>/dev/null';
         $out = shell_exec($cmd);
         $esito = json_decode((string)$out, true);
@@ -211,6 +245,13 @@ for ($i = 0; $i < $file_count; $i++) {
             $tmp_path  = $sfocata;
             $file_size = filesize($sfocata);
             $volti_totali += (int)($esito['volti'] ?? 0);
+        } else {
+            // NON si salva la foto originale facendo finta di niente: se la
+            // sfocatura non ha funzionato, i volti resterebbero riconoscibili.
+            error_log('POI•LOVE volti: sfocatura non riuscita, foto rifiutata. ' . substr((string)$out, 0, 200));
+            if ($sfocata && file_exists($sfocata)) { @unlink($sfocata); }
+            $errors[] = 'Foto ' . ($i + 1) . ': non sono riuscito a proteggere i volti, riprova fra poco';
+            continue;
         }
     }
 
@@ -222,6 +263,8 @@ for ($i = 0; $i < $file_count; $i++) {
         continue;
     }
 
+    if ($sfocata && file_exists($sfocata)) { @unlink($sfocata); }
+
     $uploaded_urls[]  = $result['url'];
     $uploaded_paths[] = $result['path'];
 
@@ -229,7 +272,7 @@ for ($i = 0; $i < $file_count; $i++) {
     // carica l'autore e' lui: si segna 'utente'. Per quelle prese da fuori
     // servono licenza e autore, e il database le rifiuta se mancano.
     {
-        $tok_m = extract_bearer_token();
+        $tok_m = $token;
         if ($tok_m) {
             $riga = [
                 'owner_id' => $user['id'],

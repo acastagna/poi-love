@@ -72,7 +72,7 @@ $ffmpeg  = trim((string)shell_exec('command -v ffmpeg'));
 $ffprobe = trim((string)shell_exec('command -v ffprobe'));
 if ($ffmpeg === '' || $ffprobe === '') { error_response('Il server non e\' pronto a convertire l\'audio', 500); }
 
-$info = json_decode((string)shell_exec($ffprobe . ' -v error -print_format json -show_streams -show_format ' . escapeshellarg($tmp) . ' 2>/dev/null'), true);
+$info = json_decode((string)shell_exec('timeout 20 ' . $ffprobe . ' -v error -print_format json -show_streams -show_format ' . escapeshellarg($tmp) . ' 2>/dev/null'), true);
 if (!is_array($info) || empty($info['streams'])) { error_response('Questo file non e\' un audio'); }
 $haAudio = false;
 foreach ($info['streams'] as $st) { if (($st['codec_type'] ?? '') === 'audio') { $haAudio = true; } }
@@ -86,7 +86,7 @@ if (!is_dir($dir) && !mkdir($dir, 0755, true)) { error_response('Errore storage 
 $nome = $lingua . '-' . bin2hex(random_bytes(5));
 $out  = $dir . '/' . $nome . '.mp3';
 
-$log = shell_exec($ffmpeg . ' -y -i ' . escapeshellarg($tmp)
+$log = shell_exec('timeout 170 ' . $ffmpeg . ' -y -i ' . escapeshellarg($tmp)
      . ' -vn -c:a libmp3lame -b:a ' . GUIDA_BITRATE . ' -ar 44100 -map_metadata -1 '
      . escapeshellarg($out) . ' 2>&1');
 

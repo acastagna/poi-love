@@ -90,7 +90,7 @@ if ($ffmpeg === '' || $ffprobe === '') {
 }
 
 // ── E' davvero audio, e quanto dura? ───────────────────────────────────────
-$json = shell_exec($ffprobe . ' -v error -print_format json -show_streams -show_format ' . escapeshellarg($tmp) . ' 2>/dev/null');
+$json = shell_exec('timeout 20 ' . $ffprobe . ' -v error -print_format json -show_streams -show_format ' . escapeshellarg($tmp) . ' 2>/dev/null');
 $info = json_decode((string)$json, true);
 if (!is_array($info) || empty($info['streams'])) { error_response('Questo file non e\' un audio'); }
 $haAudio = false;
@@ -108,10 +108,11 @@ if (!is_dir($dir) && !mkdir($dir, 0755, true)) { error_response('Errore storage 
 $nome = 'voce-' . bin2hex(random_bytes(6));
 $out  = $dir . '/' . $nome . '.mp3';
 
-$cmd = $ffmpeg . ' -y -i ' . escapeshellarg($tmp)
+$cmd = 'timeout 170 ' . $ffmpeg . ' -y -i ' . escapeshellarg($tmp)
      . ' -vn -c:a libmp3lame -b:a ' . AUDIO_BITRATE . ' -ar 44100'
      . ' -map_metadata -1 '
      . escapeshellarg($out) . ' 2>&1';
+@set_time_limit(180);
 $log = shell_exec($cmd);
 
 if (!file_exists($out) || filesize($out) < 512) {

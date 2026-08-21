@@ -9,6 +9,16 @@
  * la sua licenza; scartare lo toglie di mezzo con un motivo scritto.
  */
 (function(){
+  // I dati che finiscono nel pannello li scrivono gli utenti, o addirittura
+  // chiunque su OpenStreetMap. Qui si puliscono SEMPRE prima di metterli nella
+  // pagina, altrimenti un nome scritto apposta esegue codice dentro la sessione
+  // di chi modera.
+  function esc(s){
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+      return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
+    });
+  }
+
   let box=null, righe=[], viaggi=[];
 
   async function dati(){
@@ -26,19 +36,19 @@
     const col = r.fiducia>=80 ? '#5BBE7E' : (r.fiducia>=60 ? '#D8A93B' : '#9A9A9A');
     return '<div class="panel" style="padding:14px;margin-bottom:10px;display:flex;gap:14px;align-items:flex-start" data-id="'+r.id+'">'+
       (r.foto_url
-        ? '<img src="'+r.foto_url.replace(/"/g,'')+'" style="width:96px;height:96px;object-fit:cover;border-radius:12px;flex:0 0 96px">'
+        ? '<img src="'+(/^https:\/\//i.test(r.foto_url||'') ? esc(r.foto_url) : '')+'" style="width:96px;height:96px;object-fit:cover;border-radius:12px;flex:0 0 96px">'
         : '<div style="width:96px;height:96px;border-radius:12px;flex:0 0 96px;border:1.5px dashed var(--line,#3a3a3a);'+
           'display:flex;align-items:center;justify-content:center;font-size:11px;opacity:.6;text-align:center;padding:6px">senza foto</div>')+
       '<div style="flex:1;min-width:0">'+
-        '<div style="font-size:16px;font-weight:900">'+(r.nome||'').replace(/</g,'&lt;')+'</div>'+
+        '<div style="font-size:16px;font-weight:900">'+esc(r.nome)+'</div>'+
         '<div style="font-size:12.5px;opacity:.7;margin-top:2px">'+
-          (v?('viaggio '+v.ordine+' · '+v.nome_it+' · '):'')+(r.categoria||'')+' · '+(r.prefettura||'')+'</div>'+
+          (v?('viaggio '+esc(v.ordine)+' · '+esc(v.nome_it)+' · '):'')+esc(r.categoria)+' · '+esc(r.prefettura)+'</div>'+
         '<div style="font-size:12px;opacity:.6;margin-top:4px">'+
-          (r.wikidata?('Wikidata '+r.wikidata+' · '):'')+'fiducia <b style="color:'+col+'">'+r.fiducia+'</b>'+
-          (r.foto_autore?(' · foto di '+String(r.foto_autore).replace(/</g,'&lt;')+' · '+String(r.foto_licenza||'').replace(/</g,'&lt;')):' · nessuna foto con licenza')+
+          (r.wikidata?('Wikidata '+esc(r.wikidata)+' · '):'')+'fiducia <b style="color:'+col+'">'+Number(r.fiducia||0)+'</b>'+
+          (r.foto_autore?(' · foto di '+esc(r.foto_autore)+' · '+esc(r.foto_licenza)):' · nessuna foto con licenza')+
         '</div>'+
         '<div style="font-size:11.5px;opacity:.5;margin-top:4px">'+(r.lat||0).toFixed(5)+', '+(r.lng||0).toFixed(5)+
-          ' · <a href="https://www.openstreetmap.org/'+(r.fonte_id||'')+'" target="_blank" rel="noopener" style="color:inherit">dati aperti</a></div>'+
+          ' · <a href="https://www.openstreetmap.org/'+encodeURIComponent(r.fonte_id||'')+'" target="_blank" rel="noopener" style="color:inherit">dati aperti</a></div>'+
       '</div>'+
       '<div style="display:flex;flex-direction:column;gap:6px;min-width:120px">'+
         '<button data-azione="ok" style="border:none;border-radius:10px;background:#2E7D46;color:#fff;font-family:inherit;'+
@@ -70,6 +80,10 @@
   }
 
   async function approva(id, c){
+    const nome = (righe.find(function(x){ return x.id===id; })||{}).nome || 'questo candidato';
+    // Approvare non e' un gesto piccolo: crea un luogo pubblico col bollino
+    // Ufficiale. Si chiede conferma, col nome davanti agli occhi.
+    if(!confirm('Approvo "'+nome+'"?\n\nDiventa un luogo pubblico col bollino Ufficiale, con la sua foto e la sua licenza.')) return;
     const b=c.querySelector('[data-azione=ok]'); b.textContent='…'; b.disabled=true;
     try{
       const { data, error } = await sb.rpc('approva_candidato',{ p_id:id });

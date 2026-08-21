@@ -29,8 +29,13 @@ declare(strict_types=1);
 
 $dato = (string)($_GET['d'] ?? '');
 if ($dato === '' || strlen($dato) > 900) { http_response_code(400); exit('indirizzo mancante'); }
-$host = parse_url($dato, PHP_URL_HOST);
-if (!$host || !preg_match('/(^|\.)poilove\.com$/i', $host)) {
+// Non basta guardare il nome del sito: va guardato anche COME comincia
+// l'indirizzo. Una cosa come javascript://poilove.com/... ha il nome giusto ma
+// non e' un indirizzo web, e passerebbe un controllo fatto solo sull'host.
+$schema = strtolower((string)parse_url($dato, PHP_URL_SCHEME));
+$host   = parse_url($dato, PHP_URL_HOST);
+if ($schema !== 'https' || !str_starts_with(strtolower($dato), 'https://')
+    || !$host || !preg_match('/(^|\.)poilove\.com$/i', $host)) {
     http_response_code(400); exit('questo QR porterebbe fuori da POI-LOVE');
 }
 
@@ -86,7 +91,7 @@ if (mb_strlen($scritta) > 60) { $scritta = mb_substr($scritta, 0, 60); }
 // ── La griglia del codice ───────────────────────────────────────────────────
 $qrencode = trim((string)shell_exec('command -v qrencode'));
 if ($qrencode === '') { http_response_code(500); exit('generatore non installato'); }
-$ascii = shell_exec($qrencode . ' -t ASCII -m 0 -l H -o - ' . escapeshellarg($dato) . ' 2>/dev/null');
+$ascii = shell_exec('timeout 15 ' . $qrencode . ' -t ASCII -m 0 -l H -o - ' . escapeshellarg($dato) . ' 2>/dev/null');
 $righe = array_values(array_filter(explode("\n", (string)$ascii), fn($r) => trim($r, " \r") !== ''));
 if (!count($righe)) { http_response_code(500); exit('non sono riuscito a disegnare il codice'); }
 

@@ -208,7 +208,9 @@ function process_and_save_image(string $tmp_path, int $file_size, string $dest_p
             // ancora pesante: si accorcia il lato lungo e si riprova
             $lw = imagesx($img); $lh = imagesy($img);
             $fattore = 0.8;
-            while (filesize($output_file) > $tetto && min($lw, $lh) > 400) {
+            $tentativi = 0;
+            while (filesize($output_file) > $tetto && min($lw, $lh) > 320 && $tentativi < 10) {
+                $tentativi++;
                 $lw = (int)round($lw * $fattore); $lh = (int)round($lh * $fattore);
                 $piccola = imagecreatetruecolor($lw, $lh);
                 imagealphablending($piccola, false); imagesavealpha($piccola, true);
@@ -216,6 +218,12 @@ function process_and_save_image(string $tmp_path, int $file_size, string $dest_p
                 imagewebp($piccola, $output_file, $qualita);
                 imagedestroy($piccola);
             }
+        }
+        // Se dopo tutto resta sopra il tetto, non si fa finta di niente: si scrive
+        // nel registro, cosi' si sa quante volte capita davvero.
+        if (filesize($output_file) > $tetto) {
+            error_log('POI•LOVE foto: non sono sceso sotto i 100 KB, il file pesa '
+                      . round(filesize($output_file) / 1024) . ' KB');
         }
     }
 

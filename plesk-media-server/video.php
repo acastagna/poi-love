@@ -52,9 +52,42 @@ $poi_id = trim($_POST['poi_id'] ?? '');
 if ($poi_id === '' || !preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i', $poi_id)) {
     error_response('poi_id non valido');
 }
-$secondi_max = (int)($_POST['secondi_max'] ?? 60);
-if ($secondi_max < 5)  { $secondi_max = 5; }
+// ── Quanto video gli spetta lo dice il suo livello, non il telefono ─────────
+// Prima si prendeva per buono il numero mandato dall'app: bastava chiedere il
+// massimo per averlo. Adesso si legge dal database, come si fa per la voce.
+const REST_DB = 'https://poilove.com/db/rest/v1';
+$token = extract_bearer_token();
+
+function chiedi_db(string $url, ?string $token): array {
+    if (!$token) { return []; }
+    $ch = curl_init($url);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 8,
+        CURLOPT_HTTPHEADER => ['Authorization: Bearer ' . $token, 'Accept: application/json'],
+    ]);
+    $r = curl_exec($ch); curl_close($ch);
+    $j = json_decode((string)$r, true);
+    return is_array($j) ? $j : [];
+}
+
+$prof = chiedi_db(REST_DB . '/profiles?select=special_tier&id=eq.' . urlencode($user['id']), $token);
+$tier = $prof[0]['special_tier'] ?? 'free';
+$liv  = chiedi_db(REST_DB . '/livelli?select=video_max,video_secondi,nome&chiave=eq.' . urlencode((string)$tier), $token);
+$quanti_video = (int)($liv[0]['video_max'] ?? 0);
+$secondi_max  = (int)($liv[0]['video_secondi'] ?? 0);
+$nome_livello = (string)($liv[0]['nome'] ?? 'Persona');
+
+if ($quanti_video <= 0 || $secondi_max <= 0) {
+    error_response('Il livello ' . $nome_livello . ' non prevede il video sul luogo', 403);
+}
 if ($secondi_max > VIDEO_SECONDI_MAX_DURO) { $secondi_max = VIDEO_SECONDI_MAX_DURO; }
+
+// Il luogo dev'essere suo: mancava, e chiunque poteva mettere un video sul
+// luogo di un altro.
+$poi = chiedi_db(REST_DB . '/pois?select=author_id&id=eq.' . urlencode($poi_id), $token);
+if (empty($poi[0]['author_id']) || $poi[0]['author_id'] !== $user['id']) {
+    error_response('Il video lo mette chi ha creato il luogo', 403);
+}
 
 if (!isset($_FILES['video']) || $_FILES['video']['error'] !== UPLOAD_ERR_OK) {
     error_response('Nessun video ricevuto');
@@ -74,7 +107,7 @@ if ($ffmpeg === '' || $ffprobe === '') {
 }
 
 // ── E' davvero un video? Lo dice ffprobe, non il nome del file ─────────────
-$json = shell_exec($ffprobe . ' -v error -print_format json -show_streams -show_format ' . escapeshellarg($tmp) . ' 2>/dev/null');
+$json = shell_exec('timeout 20 ' . $ffprobe . ' -v error -print_format json -show_streams -show_format ' . escapeshellarg($tmp) . ' 2>/dev/null');
 $info = json_decode((string)$json, true);
 if (!is_array($info) || empty($info['streams'])) {
     error_response('Questo file non e\' un video');
@@ -104,7 +137,7 @@ $outPos  = $dir . '/' . $nome . '.jpg';
 // Il filtro va passato COME UN PEZZO SOLO: con le virgolette messe a mano la
 // shell le toglieva e ffmpeg riceveva un filtro spezzato ("Filter not found").
 $scale = 'scale=if(gt(iw\,ih)\,min(' . VIDEO_LATO_LUNGO . '\,iw)\,-2):if(gt(iw\,ih)\,-2\,min(' . VIDEO_LATO_LUNGO . '\,ih))';
-$cmd = $ffmpeg . ' -y -i ' . escapeshellarg($tmp)
+$cmd = 'timeout 280 ' . $ffmpeg . ' -y -i ' . escapeshellarg($tmp)
      . ' -vf ' . escapeshellarg($scale)
      . ' -c:v libx264 -preset veryfast -crf 23'
      . ' -maxrate ' . VIDEO_BITRATE . ' -bufsize 5000k'
@@ -112,6 +145,7 @@ $cmd = $ffmpeg . ' -y -i ' . escapeshellarg($tmp)
      . ' -c:a aac -b:a 128k -ac 2'
      . ' -map_metadata -1'                    // via i dati nascosti del telefono, posizione compresa
      . ' ' . escapeshellarg($outVid) . ' 2>&1';
+@set_time_limit(300);
 $log = shell_exec($cmd);
 
 if (!file_exists($outVid) || filesize($outVid) < 1024) {
@@ -122,7 +156,7 @@ if (!file_exists($outVid) || filesize($outVid) < 1024) {
 
 // ── L'immagine di copertina, presa dal video stesso ────────────────────────
 $sec = $durata > 2 ? 1 : 0;
-shell_exec($ffmpeg . ' -y -ss ' . $sec . ' -i ' . escapeshellarg($outVid)
+shell_exec('timeout 30 ' . $ffmpeg . ' -y -ss ' . $sec . ' -i ' . escapeshellarg($outVid)
          . ' -frames:v 1 -vf ' . escapeshellarg($scale) . ' -q:v 4 ' . escapeshellarg($outPos) . ' 2>&1');
 
 $url    = STORAGE_BASE_URL . '/' . $poi_id . '/' . $nome . '.mp4';

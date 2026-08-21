@@ -9,6 +9,13 @@
 # Gira alle 03:20 ogni notte (vedi /etc/cron.d/poilove-condizioni).
 
 LOG=/var/log/poilove-condizioni.log
-RIGA=$(sudo -u postgres psql -p 5433 -d poilove -Atc \
+RIGA=$(sudo -u postgres psql -p 5433 -d poilove -v ON_ERROR_STOP=1 -Atc \
   "select 'guardati '||guardati||', avvisati '||avvisati||', persi '||persi from public.controlla_condizioni();" 2>&1)
+ESITO=$?
+if [ $ESITO -ne 0 ]; then
+  # Se il database non risponde il lavoro NON e' stato fatto: va scritto cosi',
+  # altrimenti domani il registro sembra a posto e nessuno se ne accorge.
+  echo "$(date '+%d/%m/%Y %H:%M') · NON FATTO (il database ha risposto male) · $RIGA" >> "$LOG"
+  exit 1
+fi
 echo "$(date '+%d/%m/%Y %H:%M') · $RIGA" >> "$LOG"

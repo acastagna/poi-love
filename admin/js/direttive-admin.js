@@ -9,6 +9,16 @@
  * si incolla un testo e si vede cosa deciderebbe, senza toccare niente.
  */
 (function(){
+  // I dati che finiscono nel pannello li scrivono gli utenti, o addirittura
+  // chiunque su OpenStreetMap. Qui si puliscono SEMPRE prima di metterli nella
+  // pagina, altrimenti un nome scritto apposta esegue codice dentro la sessione
+  // di chi modera.
+  function esc(s){
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+      return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
+    });
+  }
+
   let box=null, righe=[];
 
   function card(d){
@@ -16,8 +26,8 @@
       '<div style="flex:1;min-width:0">'+
         '<textarea data-campo="regola" rows="2" style="width:100%;border:1.5px solid var(--line,#3a3a3a);border-radius:10px;'+
           'background:transparent;color:inherit;font-family:inherit;font-size:13.5px;padding:9px 11px;resize:vertical">'+
-          (d.regola||'').replace(/</g,'&lt;')+'</textarea>'+
-        '<input data-campo="esempio" value="'+(d.esempio||'').replace(/"/g,'&quot;')+'" placeholder="esempio da fermare (facoltativo)" '+
+          esc(d.regola)+'</textarea>'+
+        '<input data-campo="esempio" value="'+(d.esempio||'')+'" placeholder="esempio da fermare (facoltativo)" '+
           'style="width:100%;margin-top:6px;border:1.5px solid var(--line,#3a3a3a);border-radius:10px;background:transparent;'+
           'color:inherit;font-family:inherit;font-size:12.5px;padding:8px 11px">'+
       '</div>'+
@@ -114,12 +124,12 @@
         body: JSON.stringify({ prova:true, testo:t, voto:3, luogo:'prova' })
       });
       const j=await r.json();
-      if(j.error){ e.textContent='Errore: '+j.error; e.style.color='#E06A6A'; return; }
+      if(j.error){ e.textContent='Errore: '+String(j.error||''); e.style.color='#E06A6A'; return; }
       const colori={ pubblicata:'#5BBE7E', rifiutata:'#E06A6A', in_coda:'#D8A93B' };
       const parole={ pubblicata:'Si pubblica', rifiutata:'Non si pubblica', in_coda:'La guarda una persona' };
       e.style.color=colori[j.esito]||'inherit';
-      e.innerHTML='<b>'+(parole[j.esito]||j.esito)+'</b><br><span style="font-weight:600;opacity:.85">'+
-        (j.motivo||'').replace(/</g,'&lt;')+(j.direttiva?(' · direttiva '+String(j.direttiva).replace(/</g,'&lt;')):'')+'</span>';
+      e.innerHTML='<b>'+esc(parole[j.esito]||j.esito)+'</b><br><span style="font-weight:600;opacity:.85">'+
+        esc(j.motivo)+(j.direttiva?(' · direttiva '+esc(j.direttiva)):'')+'</span>';
     }catch(err){ e.textContent='Non sono riuscito a provare: '+(err.message||''); e.style.color='#E06A6A'; }
   }
 

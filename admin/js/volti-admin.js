@@ -9,6 +9,16 @@
  * facce non lo conserva nessuno.
  */
 (function(){
+  // I dati che finiscono nel pannello li scrivono gli utenti, o addirittura
+  // chiunque su OpenStreetMap. Qui si puliscono SEMPRE prima di metterli nella
+  // pagina, altrimenti un nome scritto apposta esegue codice dentro la sessione
+  // di chi modera.
+  function esc(s){
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+      return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
+    });
+  }
+
   let S = null, box = null;
 
   function riga(titolo, dentro, sotto){
@@ -68,6 +78,7 @@
 
   async function salva(){
     const e=document.getElementById('vfEsito');
+    const b=document.getElementById('vfSalva'); if(b) b.disabled=true;
     e.textContent='Salvo…'; e.style.color='inherit';
     try{
       const { error } = await sb.from('impostazioni_volti').update({
@@ -76,6 +87,7 @@
       if(error) throw error;
       e.textContent='Salvato: vale dalla prossima foto caricata.'; e.style.color='#5BBE7E';
     }catch(err){ e.textContent='Non sono riuscito a salvare: '+(err.message||''); e.style.color='#E06A6A'; }
+    finally{ if(b) b.disabled=false; }
   }
 
   async function load(contenitore){

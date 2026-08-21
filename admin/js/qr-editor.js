@@ -10,6 +10,16 @@
  * dell'app nascono cosi'.
  */
 (function(){
+  // I dati che finiscono nel pannello li scrivono gli utenti, o addirittura
+  // chiunque su OpenStreetMap. Qui si puliscono SEMPRE prima di metterli nella
+  // pagina, altrimenti un nome scritto apposta esegue codice dentro la sessione
+  // di chi modera.
+  function esc(s){
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+      return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
+    });
+  }
+
   const QR = 'https://media.poilove.com/qr.php';
   const ESEMPIO = 'https://poilove.com/@alessandro';
   let S = null, box = null;
@@ -126,6 +136,7 @@
   }
   async function salva(){
     const e=document.getElementById('qrEsito');
+    const b=document.getElementById('qrSalva'); if(b) b.disabled=true;
     e.textContent='Salvo…'; e.style.color='inherit';
     try{
       const { error } = await sb.from('qr_stile').update({
@@ -136,6 +147,7 @@
       if(error) throw error;
       e.textContent='Salvato: da adesso tutti i QR nascono cosi\'.'; e.style.color='#5BBE7E';
     }catch(err){ e.textContent='Non sono riuscito a salvare: '+(err.message||''); e.style.color='#E06A6A'; }
+    finally{ if(b) b.disabled=false; }
   }
 
   async function load(contenitore){

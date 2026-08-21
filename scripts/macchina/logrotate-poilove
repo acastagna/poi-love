@@ -1,0 +1,15 @@
+# © Alessandro Castagna — 321.al / EVOLAB
+# Tutti i diritti riservati. Uso non autorizzato vietato.
+# info@321.it · https://321.al
+#
+# I registri dei lavori automatici di POI-LOVE: si tengono otto settimane,
+# poi si buttano. Senza questo crescono per sempre e un giorno riempiono il disco.
+/var/log/poilove-condizioni.log /var/log/poilove-cambio.log /var/log/poilove-candidati.log {
+    weekly
+    rotate 8
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 0640 root root
+}

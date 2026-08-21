@@ -62,13 +62,22 @@ fi
 
 GIORNO=${VALORI%% *}
 VALORI=${VALORI#* }
-if [ "$GIORNO" = "oggi" ]; then DATA="current_date"; else DATA="date '$GIORNO'"; fi
+if printf '%s' "$GIORNO" | grep -qE '^20[0-9]{2}-[01][0-9]-[0-3][0-9]$'; then DATA="date '$GIORNO'"; else DATA="current_date"; fi
 
 SQL=""
 for COPPIA in $VALORI; do
   V=${COPPIA%%=*}; L=${COPPIA##*=}
+  # Prima di entrare in una istruzione SQL, la moneta e il numero si controllano:
+  # la pagina della banca e' fuori casa nostra e un giorno puo' cambiare forma.
+  case "$V" in EUR|USD|GBP|CHF) ;; *) echo "$(date '+%d/%m/%Y %H:%M') · moneta strana, saltata: $V" >> "$LOG"; continue ;; esac
+  if ! printf '%s' "$L" | grep -qE '^[0-9]{1,6}(\.[0-9]{1,4})?$'; then
+    echo "$(date '+%d/%m/%Y %H:%M') · numero strano per $V, saltato: $L" >> "$LOG"; continue
+  fi
   SQL="$SQL insert into public.cambi(giorno,valuta,lek,ricaduta) values ($DATA,'$V',$L,false)
        on conflict (giorno,valuta) do update set lek=excluded.lek, ricaduta=false, preso=now();"
 done
-RIGA=$(sudo -u postgres psql -p 5433 -d poilove -Atc "$SQL select to_char(max(giorno),'DD/MM/YYYY')||': '||string_agg(valuta||' '||lek,', ') from public.cambi where giorno=(select max(giorno) from public.cambi);" 2>&1 | tail -1)
+if [ -z "$SQL" ]; then
+  echo "$(date '+%d/%m/%Y %H:%M') · nessun valore utilizzabile nella pagina" >> "$LOG"; exit 1
+fi
+RIGA=$(sudo -u postgres psql -p 5433 -d poilove -v ON_ERROR_STOP=1 -Atc "$SQL select to_char(max(giorno),'DD/MM/YYYY')||': '||string_agg(valuta||' '||lek,', ') from public.cambi where giorno=(select max(giorno) from public.cambi);" 2>&1 | tail -1)
 echo "$(date '+%d/%m/%Y %H:%M') · $RIGA" >> "$LOG"
