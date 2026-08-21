@@ -27,6 +27,8 @@ POSTMORTEM.md
 
 # Cartella commerciale riservata (listini, modello di business, piano marketing): il repo e PUBBLICO
 *DOSSIER*/
+# materiale commerciale riservato: il repo e' pubblico, questa cartella no
+_marketing/
 
 # Cache e log
 .DS_Store
