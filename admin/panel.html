@@ -1743,9 +1743,10 @@ async function loadModeration(){
   loadOwnershipRequests();
   const box=document.getElementById('modTable'); loadingBox(box);
   try{
+    // Ordine per scadenza: davanti quelle che stanno per sforare le ventiquattro ore.
     const { data, error } = await sb.from('reports')
-      .select('id,reporter_id,target_type,target_id,reason,details,status,created_at')
-      .in('status',['open','reviewing']).order('created_at',{ascending:false}).limit(100);
+      .select('id,reporter_id,target_type,target_id,reason,details,status,created_at,scade_il')
+      .in('status',['open','reviewing']).order('scade_il',{ascending:true}).limit(100);
     if(error){ isBackendMissing(error)?backendOff(box):emptyBox(box,t('error'),null,'warning'); return; }
     if(!data || !data.length){ emptyBox(box,t('empty_reports'),t('empty_reports_h'),'bird'); return; }
 
@@ -1762,6 +1763,16 @@ async function loadModeration(){
       const tgtLabel = (isUser? t('type_user') : (r.target_type==='poi'? t('type_poi') : (r.target_type||'?')));
       const stChip = el('span',{class:'chip '+(r.status==='reviewing'?'gold':'red'),
         text: r.status==='reviewing'? t('st_reviewing') : t('st_open')});
+      // Quanto tempo resta delle ventiquattro ore promesse.
+      let tempo = null;
+      if(r.scade_il){
+        const restano = Math.round((new Date(r.scade_il) - Date.now())/3600000);
+        tempo = el('div',{class:'sm', text: restano >= 0
+          ? ('restano ' + restano + (restano===1?' ora':' ore'))
+          : ('in ritardo di ' + Math.abs(restano) + (Math.abs(restano)===1?' ora':' ore'))});
+        if(restano < 0) tempo.style.color = '#E06A6A';
+        else if(restano <= 6) tempo.style.color = '#D8A93B';
+      }
 
       // celle azioni
       const actions=el('div',{class:'btn-row'});
@@ -1781,7 +1792,7 @@ async function loadModeration(){
         el('td',null,[ el('div',{class:'ttl',text:tgtLabel}), el('div',{class:'sm',text:(r.target_id||'').toString().slice(0,8)}) ]),
         el('td',null,[ el('div',{text:r.reason||'—'}), r.details? el('div',{class:'sm',text:r.details}):null ]),
         el('td',null,stChip),
-        el('td',{text:fmtDate(r.created_at)}),
+        el('td',null,[ el('div',{text:fmtDate(r.created_at)}), tempo ]),
         el('td',null,actions)
       ]));
     });
