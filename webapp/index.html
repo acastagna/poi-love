@@ -5220,7 +5220,67 @@ async function toggleNotifPref(ev, ch, btn){
     if(ch==='browser' && next){
       try{ new Notification('POI•LOVE', { body: t('notif_browser_on','Avvisi del browser accesi: arriveranno cosi.'), icon: '/img/logo-completo.svg' }); }catch(_){ }
     }
+    // La levetta del browser governa anche le push ad app chiusa: accesa la
+    // prima volta iscrive questo dispositivo, spenta l'ultima lo cancella.
+    if(ch==='browser'){
+      if(next){ _iscriviPush().catch(function(){}); }
+      else{ _disiscriviSeNessuna().catch(function(){}); }
+    }
   }catch(e){ showToast(t('cons_err')); }
+}
+
+/* ═══ LE PUSH AD APP CHIUSA (mig 169) ═══
+   La macchina spedisce, il file di servizio sw.js riceve e mostra. Qui vive
+   solo l'iscrizione del dispositivo: endpoint e chiavi finiscono nel registro
+   push_iscrizioni, con la lingua dell'app perche' il testo arrivi giusto. */
+const VAPID_PUBLIC='BF8obJwgvjQ584TJd-GdaQ714uLFKLwL3xYwlYUmJ-Q1umvZ7Fh1_eq1v71QnuVoAlKJ0eqPr59waBb9IL0qkY0';
+function _vapidBytes(s){
+  const pad='='.repeat((4-s.length%4)%4);
+  const raw=atob((s+pad).replace(/-/g,'+').replace(/_/g,'/'));
+  return Uint8Array.from(raw, c=>c.charCodeAt(0));
+}
+async function _iscriviPush(){
+  if(!currentUser) return false;
+  if(!('serviceWorker' in navigator) || !('PushManager' in window)) return false;
+  if(!('Notification' in window) || Notification.permission!=='granted') return false;
+  try{
+    const reg=await navigator.serviceWorker.register('sw.js');
+    const sub=await reg.pushManager.subscribe({userVisibleOnly:true, applicationServerKey:_vapidBytes(VAPID_PUBLIC)});
+    const j=sub.toJSON();
+    const { error }=await sb.from('push_iscrizioni').upsert({
+      endpoint:sub.endpoint, user_id:currentUser.id,
+      p256dh:j.keys.p256dh, auth:j.keys.auth,
+      lingua:lang, user_agent:(navigator.userAgent||'').slice(0,200)
+    },{onConflict:'endpoint'});
+    if(error) throw error;
+    return true;
+  }catch(e){ console.warn('[push] iscrizione:', e && e.message); return false; }
+}
+async function _disiscriviSeNessuna(){
+  // Si cancella il dispositivo solo quando NESSUN tipo di avviso ha piu'
+  // la levetta del browser accesa: finche' una e' su, la push serve.
+  try{
+    const { count }=await sb.from('notification_prefs')
+      .select('event',{count:'exact',head:true}).eq('browser',true);
+    if(count && count>0) return;
+    const reg=await navigator.serviceWorker.getRegistration('sw.js');
+    const sub=reg && await reg.pushManager.getSubscription();
+    if(sub){
+      await sb.from('push_iscrizioni').delete().eq('endpoint', sub.endpoint);
+      await sub.unsubscribe();
+    }
+  }catch(_){}
+}
+async function _assicuraPush(){
+  // All'avvio, se il permesso c'e' e almeno una levetta browser e' accesa,
+  // l'iscrizione si rinnova da sola: cosi' sopravvive alla pulizia cache
+  // e tiene aggiornata la lingua del dispositivo.
+  try{
+    if(!currentUser || !('Notification' in window) || Notification.permission!=='granted') return;
+    const { count }=await sb.from('notification_prefs')
+      .select('event',{count:'exact',head:true}).eq('browser',true);
+    if(count && count>0) _iscriviPush();
+  }catch(_){}
 }
 
 function startNotifRealtime(){
@@ -5248,12 +5308,28 @@ function startNotifRealtime(){
   }catch(_){}
 }
 
+// Il ricontrollo periodico: dal 18/08 il canale realtime non esiste piu'
+// sulla macchina nostra (404), quindi a pagina aperta le novita' si vanno a
+// prendere ogni mezzo minuto. Il realtime resta agganciato: se un giorno il
+// campanello tornera', suonera' di nuovo da solo.
+let _notifPollTimer=null;
+function startNotifPolling(){
+  if(_notifPollTimer) return;
+  _notifPollTimer=setInterval(function(){
+    if(!currentUser || document.hidden) return;
+    updateNotifBadge();
+    const p=document.getElementById('notifPanel');
+    if(p && p.style.display==='block') loadNotifications();
+  }, 30000);
+}
+
 // Mostra campanella + badge + realtime quando c'e' un utente loggato.
 function initNotifications(){
   if(!currentUser) return;
   const bell=document.getElementById('notifBell'); if(bell) bell.style.display='inline-flex';
   const bellM=document.getElementById('notifBellMobile'); if(bellM) bellM.style.display='flex';
-  updateNotifBadge(); startNotifRealtime();
+  updateNotifBadge(); startNotifRealtime(); startNotifPolling();
+  _assicuraPush();
   initSupportChat();   // chat col team (amministratore/moderatore) dentro ILLI
 }
 
@@ -10009,7 +10085,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='5.62';
+const APP_VERSION='5.63';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){

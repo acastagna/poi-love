@@ -23,13 +23,32 @@ bandiera, dizionario di ~65 voci, un UPDATE per accenderlo. Porta di servizio
 vero: quarta bandiera comparsa da sola, dizionario caricato al volo, ripiego
 esatto, zero errori console; poi el rispento, tutto tornato a tre.
 
-**Guasto preesistente trovato durante la verifica**: `wss://poilove.com/db/realtime`
-risponde 404 dal passaggio alla macchina nostra (18/08): il servizio realtime
-non esiste sul nuovo impianto. L'app ritenta in silenzio e nulla si rompe, ma
-gli aggiornamenti istantanei a pagina aperta (notifiche live, bacheca) non
-viaggiano piu' via websocket. Da decidere: realtime self-hosted sul nostro
-Postgres, oppure togliere il canale e passare a un ricontrollo periodico.
-Segnato in TODO.
+**Guasto preesistente trovato e RISOLTO in giornata (v5.63, mig 169)**:
+`wss://poilove.com/db/realtime` rispondeva 404 dal passaggio alla macchina
+nostra (18/08): il servizio realtime non esiste sul nuovo impianto, e le
+novita' a pagina aperta non arrivavano piu' da sole. Deciso con Alessandro:
+niente campanello per ora, al suo posto la coppia che copre di piu'.
+
+**Le push web ad app chiusa.** La macchina spedisce da sola: registro
+`push_iscrizioni` (endpoint, chiavi del dispositivo, lingua), colonna
+`push_sent_at` sulla coda, postino `push-notifiche.php` ogni minuto (utente
+postgres via presa locale, come i fratelli). Chiavi VAPID solo sulla macchina
+(`/etc/poilove-vapid.env`, 0600); libreria web-push standard via composer
+(con guzzle e gmp). Il testo e' composto dal postino nella lingua del
+dispositivo con le STESSE parole dell'app; dispositivo dichiarato morto dal
+servizio push (404/410) = tolto dal registro. Nell'app: `sw.js` nuovo che fa
+solo push (niente cache: la trappola del 08/05 non puo' rinascere), levetta
+browser esistente che ora governa anche l'iscrizione, rinnovo automatico
+all'avvio, iscrizione cancellata quando l'ultima levetta si spegne.
+Collaudo con dispositivo finto: coda letta, filtro levette rispettato,
+firma VAPID accettata da Google, testo giusto, pulizia dei morti verificata.
+La consegna finale si prova col telefono di Alessandro (il browser di
+lavoro nega il permesso d'ufficio). Limite noto: su iPhone solo con l'app
+salvata in home; la copertura piena arriva col blocco 37 (app nativa).
+
+**Il ricontrollo periodico a pagina aperta.** Ogni 30 secondi, solo con la
+scheda visibile: campanella e pannello si aggiornano da soli. Il codice
+realtime resta agganciato: se un giorno il campanello tornera', suonera'.
 
 I blocchi rimasti (33-44) sono l'app nativa: servono le sessioni con lui.
 
