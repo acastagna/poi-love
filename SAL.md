@@ -1,5 +1,60 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
+## 22/08/2026 alba — La notte promessa: da 82,5 a 86 giornate su 113
+
+Webapp da v5.49 a **v5.59**, dieci deploy verificati, controllo sempre 19/19.
+Lo stato vivo: https://sal.poilove.com/avanzamento.html
+
+### Il lettore POI•VOICE, quattro passate coi suoi appunti (v5.49-5.55)
+Anello di avanzamento attorno al play, barra su cui saltare, velocita' su
+quattro passi, **le tre lingue sempre in vista** (quella che manca e' spenta e
+dice "in questa lingua arriva presto", nella sua lingua), Leggi il testo
+accanto alla velocita', firma POI•VOICE dentro la casa blu. Decisione del
+founder delle 04: **l'audioguida si ascolta ovunque, da chiunque**: la regola
+della distanza vivra' un giorno in un'app dedicata; il vantaggio di livello
+resta nel database per quel giorno.
+
+### La scheda del luogo, tre difetti veri suoi (v5.53-5.55)
+Il trattino al posto dell'indirizzo: ora indirizzo, o citta' e paese, o la riga
+sparisce; e i **13 luoghi ufficiali hanno l'indirizzo vero** (Nominatim, una
+richiesta al secondo). Un luogo ufficiale non porta piu' la carta di una
+persona con Segui e punti: **firma POI•LOVE con la mascotte ILLI**, "Luogo
+ufficiale, curato con ILLI" in tre lingue; il pennello che la ridipingeva
+sopra ora si fa da parte.
+
+### Blocco 29 chiuso: i quindici luoghi nascono da soli (mig 164)
+Grilletto sul profilo: chi diventa Sostenitore riceve quindici luoghi
+Ufficiali, i meno dedicati per primi, bollino "Ufficiale, per <nome>" (solo il
+nome). Riga di cartoline nel profilo, verificata viva con demo_sostenitore.
+
+### Blocco 47 chiuso: promemoria e ricevute (mig 165, v5.56-5.58)
+Avvisi PRIMA della scadenza a 30/7/1 giorni, nel lavoro della notte; la prova
+doppia ha stanato il riavviso a scala (ora le soglie COPRONO: provato
+5gg→1 avviso→0; 1g→1→0). Ricevute: l'amministrazione carica dalla scheda
+persona (numero anno-progressivo, importo con la nostra finestrella), il file
+vive FUORI dal web con nome non indovinabile, il cancello chiede al database
+col biglietto di chi bussa: proprietario 200, estraneo 403, strade dirette
+404. L'utente le trova nel profilo, tre lingue.
+
+### Blocco 50 chiuso: la porta unica del geocodificatore (v5.59)
+23 chiamate sparse → una porta: fila da una richiesta al secondo, cache di
+sessione, lingua sempre nell'intestazione, forma di risposta identica (nessun
+chiamante se n'e' accorto). Misurato: seconda richiesta in fila a 2,9s, la
+ripetuta a 0ms, la barra di ricerca trova Blloku.
+
+### Sbagli miei della notte, detti e chiusi
+- Due deploy con lo stesso numero di versione: il browser ha tenuto l'app.js
+  vecchio. Il numero esiste apposta: mai piu' riusato.
+- Un formatore di date locale a un'altra chiusura mandava le ricevute in un
+  catch muto: data fatta in casa e il catch ora parla.
+- Il riavviso a scala dei promemoria, preso dalla prova doppia prima di andare
+  in linea.
+
+### Restano dei 21 blocchi: 48-49-51 (lingue parametriche, categorie per
+lingua, formati locali), 46 (rapporto blockchain, da leggere il motore Top
+Market), 45-47 fatti, e il cantiere app 33-44 che aspetta Xcode o il giro
+insieme su Expo Go.
+
 ## 22/08/2026 notte — La prima audioguida vera, l'app sul telefono del founder, il backup che gira da solo
 
 Programma a **82,5 giornate su 113**. Lo stato vivo: https://sal.poilove.com/avanzamento.html
