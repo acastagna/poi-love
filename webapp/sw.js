@@ -12,13 +12,23 @@
  * la campanella, due squilli per lo stesso fatto sono uno di troppo.
  */
 
-self.addEventListener('install', function () { self.skipWaiting(); });
+/* La spia diagnostica (22/08): ogni fase viene segnata sul diario del
+   server, cosi' si vede DAL VIVO se la push arriva al telefono e cosa
+   le succede. Nessun dato personale: fase, versione, ora. */
+var SW_VER = '5.74';
+function _spia(fase) {
+  try { return fetch('https://poilove.com/sw-diario.php?fase=' + fase + '&v=' + SW_VER, { cache: 'no-store' }).catch(function(){}); }
+  catch (_) { return Promise.resolve(); }
+}
+
+self.addEventListener('install', function () { _spia('installato'); self.skipWaiting(); });
 self.addEventListener('activate', function (e) { e.waitUntil(self.clients.claim()); });
 
 self.addEventListener('push', function (event) {
   var d = {};
   try { d = event.data ? event.data.json() : {}; } catch (_) {}
   event.waitUntil((async function () {
+    await _spia(event.data ? 'ricevuta' : 'ricevuta_vuota');
     // REGOLA DI APPLE, imparata a spese nostre il 22/08: su iPhone ogni
     // push DEVE mostrare un avviso. Se il ricevitore ne zittisce qualcuna,
     // iOS conta i silenzi e stacca la spina al sito intero. Quindi sui
@@ -31,13 +41,19 @@ self.addEventListener('push', function (event) {
       var davanti = schede.some(function (c) { return c.focused === true; });
       if (davanti) return;
     }
-    await self.registration.showNotification(d.title || 'POI•LOVE', {
-      body: d.body || '',
-      icon: '/img/illi-trasparente-500.png',
-      badge: '/img/illi-trasparente-500.png',
-      tag: d.tag || 'poilove',
-      data: { url: d.url || '/' }
-    });
+    try {
+      await self.registration.showNotification(d.title || 'POI•LOVE', {
+        body: d.body || '',
+        icon: '/img/illi-trasparente-500.png',
+        badge: '/img/illi-trasparente-500.png',
+        tag: d.tag || 'poilove',
+        data: { url: d.url || '/' }
+      });
+      await _spia('mostrata');
+    } catch (e) {
+      await _spia('errore_mostra');
+      throw e;
+    }
   })());
 });
 
