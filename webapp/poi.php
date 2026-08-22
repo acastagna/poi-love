@@ -15,7 +15,7 @@ $id   = preg_replace('/[^A-Za-z0-9\-]/', '', isset($_GET['id']) ? $_GET['id'] : 
 $lang = seo_lang();
 
 $rows = $id ? seo_get('pois?id=eq.' . rawurlencode($id)
-  . '&visibility=eq.community&is_approved=eq.true&removed_at=is.null'
+  . '&visibility=in.(community,official)&is_approved=eq.true&removed_at=is.null'
   . '&select=id,title,description,photos,cover_photo,address,city,country,lat,lng,category,subcategory,categories,tags,love_count,created_at,updated_at') : array();
 $poi = count($rows) ? $rows[0] : null;
 $isPublic = ($poi !== null);
@@ -106,7 +106,7 @@ $lat = $poi ? $poi['lat'] : null; $lng = $poi ? $poi['lng'] : null;
 $nearby = array();
 if ($poi && $lat !== null && $lng !== null) {
   $dLat = 0.06; $dLng = 0.09;
-  $q = 'pois?visibility=eq.community&is_approved=eq.true&removed_at=is.null'
+  $q = 'pois?visibility=in.(community,official)&is_approved=eq.true&removed_at=is.null'
      . '&id=neq.' . rawurlencode($id)
      . '&lat=gte.' . ($lat - $dLat) . '&lat=lte.' . ($lat + $dLat)
      . '&lng=gte.' . ($lng - $dLng) . '&lng=lte.' . ($lng + $dLng)

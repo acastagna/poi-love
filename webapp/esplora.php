@@ -24,7 +24,7 @@ $T = array(
 $L = $T[$lang];
 
 // ── Dati pubblici ──────────────────────────────────────────────────────────────
-$poiQ = 'pois?visibility=eq.community&is_approved=eq.true&removed_at=is.null'
+$poiQ = 'pois?visibility=in.(community,official)&is_approved=eq.true&removed_at=is.null'
       . '&select=id,title,city,category,cover_photo,photos,love_count&order=love_count.desc&limit=1000';
 if ($city !== '') $poiQ .= '&city=eq.' . rawurlencode($city);
 // Sanitizzo q dai caratteri riservati ai filtri PostgREST (,()*.:%\) prima di comporre l'or() — difesa in profondità (oltre alla RLS).

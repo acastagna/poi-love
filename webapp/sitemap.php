@@ -29,7 +29,7 @@ function xurl($path, $params, $lastmod, $img) {
   return $out . '</url>';
 }
 
-$pois   = seo_get('pois?visibility=eq.community&is_approved=eq.true&removed_at=is.null&select=id,cover_photo,photos,updated_at,city&order=updated_at.desc&limit=5000');
+$pois   = seo_get('pois?visibility=in.(community,official)&is_approved=eq.true&removed_at=is.null&select=id,cover_photo,photos,updated_at,city&order=updated_at.desc&limit=5000');
 $routes = seo_get('trips?is_historic=eq.true&is_published=eq.true&select=id,cover_url,updated_at&order=updated_at.desc&limit=1000');
 $trips  = seo_get('trips?is_historic=eq.false&visibility=eq.pub&select=id,cover_url,updated_at&order=updated_at.desc&limit=1000');
 
