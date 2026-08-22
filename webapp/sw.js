@@ -20,7 +20,11 @@ self.addEventListener('push', function (event) {
   try { d = event.data ? event.data.json() : {}; } catch (_) {}
   event.waitUntil((async function () {
     var schede = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
-    var davanti = schede.some(function (c) { return c.visibilityState === 'visible'; });
+    // Tace SOLO se la finestra dell'app e' davanti e attiva: una scheda
+    // visibile ma senza fuoco (si sta lavorando altrove) deve suonare.
+    // La prima taratura zittiva ogni scheda visibile e sul computer non
+    // arrivava mai nulla (scoperto con Alessandro il 22/08).
+    var davanti = schede.some(function (c) { return c.focused === true; });
     if (davanti) return;
     await self.registration.showNotification(d.title || 'POI•LOVE', {
       body: d.body || '',
