@@ -106,7 +106,7 @@
     try{
       const [{ data:u }, { data:abb }, { data:ev }] = await Promise.all([
         sb.from('profiles').select('id,username,display_name,special_tier,livello_scadenza,is_admin,moderation_status').eq('id',id).maybeSingle(),
-        sb.from('abbonamenti').select('livello,inizio,scadenza,stato,riferimento').eq('user_id',id).order('scadenza',{ascending:false}).limit(10),
+        sb.from('abbonamenti').select('id,livello,inizio,scadenza,stato,riferimento').eq('user_id',id).order('scadenza',{ascending:false}).limit(10),
         sb.from('livello_eventi').select('cosa,livello,motivo,quando').eq('user_id',id).order('quando',{ascending:false}).limit(12),
       ]);
       if(!u){ c.innerHTML='<div class="panel">Persona non trovata.</div>'; return; }
@@ -136,9 +136,12 @@
         '<div id="livEsito" style="font-size:13px;font-weight:700;min-height:18px;margin-bottom:12px"></div>'+
         '<h4 style="margin:14px 0 6px;font-size:14px">Abbonamenti</h4>'+
         '<div style="font-size:13px">'+((abb&&abb.length)?abb.map(a=>
-          '<div style="padding:6px 0;border-bottom:1px solid var(--line,#2a2a2a)">'+
-          esc(a.livello)+' · dal '+new Date(a.inizio).toLocaleDateString('it-IT')+' al '+new Date(a.scadenza).toLocaleDateString('it-IT')+
-          ' · '+a.stato+(a.riferimento?(' · '+esc(a.riferimento)):'')+'</div>').join(''):'<span style="opacity:.6">nessuno</span>')+'</div>'+
+          '<div style="padding:6px 0;border-bottom:1px solid var(--line,#2a2a2a);display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+
+          '<span style="flex:1;min-width:220px">'+esc(a.livello)+' · dal '+new Date(a.inizio).toLocaleDateString('it-IT')+' al '+new Date(a.scadenza).toLocaleDateString('it-IT')+
+          ' · '+a.stato+(a.riferimento?(' · '+esc(a.riferimento)):'')+'</span>'+
+          '<button class="btn sm" data-ricevuta="'+esc(a.id)+'"><i class="ph-duotone ph-receipt"></i> Carica ricevuta</button>'+
+          '</div>').join(''):'<span style="opacity:.6">nessuno</span>')+'</div>'+
+        '<input type="file" id="livRicFile" accept="application/pdf,image/*" hidden>'+
         '<h4 style="margin:14px 0 6px;font-size:14px">Cosa e successo</h4>'+
         '<div style="font-size:13px">'+((ev&&ev.length)?ev.map(e=>
           '<div style="padding:6px 0;border-bottom:1px solid var(--line,#2a2a2a)">'+
@@ -146,6 +149,7 @@
           (e.motivo?(' · '+esc(e.motivo)):'')+'</div>').join(''):'<span style="opacity:.6">niente, per ora</span>')+'</div>'+
       '</div>';
       document.getElementById('livReg').onclick=registra;
+      agganciaRicevute(id);
     }catch(e){ c.innerHTML='<div class="panel">Non sono riuscito a leggere la scheda.</div>'; }
   }
 
@@ -181,5 +185,62 @@
     await carica();
     disegna();
   }
+  // La ricevuta: il documento va al server dei file (nome impossibile da
+  // indovinare, cartella fuori dal web), la riga nel registro la scrive il
+  // pannello con le sue regole. Il numero nasce progressivo per anno.
+  function agganciaRicevute(userId){
+    const fileIn=document.getElementById('livRicFile');
+    let perAbbonamento=null;
+    document.querySelectorAll('[data-ricevuta]').forEach(b=>b.onclick=()=>{
+      perAbbonamento=b.dataset.ricevuta; fileIn.click();
+    });
+    fileIn.onchange=async()=>{
+      const f=fileIn.files&&fileIn.files[0]; if(!f||!perAbbonamento) return;
+      const esito=document.getElementById('livEsito');
+      esito.textContent='Carico la ricevuta…'; esito.style.color='inherit';
+      try{
+        const importo=await chiedi('Importo in euro (vuoto per ometterlo)');
+        if(importo===null){ esito.textContent=''; return; }
+        const { data:{ session } } = await sb.auth.getSession();
+        const fd=new FormData(); fd.append('file', f);
+        const r=await fetch('https://media.poilove.com/ricevuta.php',{method:'POST',
+          headers:{ Authorization:'Bearer '+(session&&session.access_token||'') }, body:fd});
+        const j=await r.json();
+        if(!r.ok||j.error) throw new Error(j.error||('errore '+r.status));
+        // il numero: anno-progressivo, letto e incrementato qui
+        const anno=new Date().getFullYear();
+        const { data:ult } = await sb.from('ricevute').select('numero')
+          .like('numero', anno+'-%').order('numero',{ascending:false}).limit(1);
+        const prog=(ult&&ult[0])?(parseInt(ult[0].numero.split('-')[1],10)+1):1;
+        const numero=anno+'-'+String(prog).padStart(4,'0');
+        const { data:ins, error } = await sb.from('ricevute').insert({
+          abbonamento_id: perAbbonamento, user_id: userId, numero,
+          importo: importo===''?null:Number(importo),
+          file_nome: j.file_nome, caricata_da: (session&&session.user&&session.user.id)||null,
+        }).select('numero');
+        if(error) throw error;
+        if(!ins||!ins.length) throw new Error('il registro non ha accettato: serve la sessione col secondo fattore');
+        esito.textContent='Ricevuta '+numero+' caricata: la persona la trova nel suo profilo.';
+        esito.style.color='#5BBE7E';
+      }catch(e){ esito.textContent='Non sono riuscito: '+(e.message||''); esito.style.color='#E06A6A'; }
+      fileIn.value='';
+    };
+  }
+  // una domanda con la nostra finestrella, non col prompt del browser
+  function chiedi(testo){
+    return new Promise(risolvi=>{
+      const ov=document.createElement('div');
+      ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:900;display:flex;align-items:center;justify-content:center';
+      ov.innerHTML='<div class="panel" style="max-width:340px;width:92%"><div style="font-weight:800;margin-bottom:9px">'+testo+'</div>'+
+        '<input id="chiediVal" type="number" step="0.01" min="0" style="width:100%;box-sizing:border-box;margin-bottom:10px">'+
+        '<div class="btn-row"><button class="btn gold" id="chiediOk">Va bene</button>'+
+        '<button class="btn" id="chiediNo">Annulla</button></div></div>';
+      document.body.appendChild(ov);
+      ov.querySelector('#chiediVal').focus();
+      ov.querySelector('#chiediOk').onclick=()=>{ const v=ov.querySelector('#chiediVal').value.trim(); ov.remove(); risolvi(v); };
+      ov.querySelector('#chiediNo').onclick=()=>{ ov.remove(); risolvi(null); };
+    });
+  }
+
   window.LivelliAdmin = { load };
 })();
