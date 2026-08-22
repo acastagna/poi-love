@@ -118,7 +118,11 @@
   // Solo l'ultima richiesta vince: chi apre due profili di fila non deve
   // vedere la risposta lenta del primo scavalcare quella del secondo.
   let _gettone = 0;
-  function soldi(v, val){ return Number(v).toFixed(0) + ' ' + (val === 'ALL' ? 'Lek' : '€'); }
+  // I soldi come li scrive la lingua di chi guarda (formatori del blocco 51)
+  function soldi(v, val){
+    if (typeof fsoldi === 'function') return fsoldi(v, val);
+    return Number(v).toFixed(0) + ' ' + (val === 'ALL' ? 'Lek' : '€');
+  }
 
   // ── Stato ─────────────────────────────────────────────────────────────────
   let mioTier = null, mioId = null;

@@ -5272,8 +5272,8 @@ async function refreshSupportBadge(){
   }catch(_){}
 }
 function _supportTime(ts){
-  try{ const d=new Date(ts); const loc=lang==='en'?'en-GB':lang==='sq'?'sq-AL':'it-IT';
-    return d.toLocaleDateString(loc,{day:'2-digit',month:'2-digit'})+' '+d.toLocaleTimeString(loc,{hour:'2-digit',minute:'2-digit'}); }
+  try{ const d=new Date(ts);
+    return fdata(d,{day:'2-digit',month:'2-digit'})+' '+d.toLocaleTimeString(_locale(),{hour:'2-digit',minute:'2-digit'}); }
   catch(e){ return ''; }
 }
 function _renderSupportMsg(m){
@@ -6242,8 +6242,8 @@ async function _pittaRicevute(){
       data.map(r=>'<button class="ricevuta-riga" data-ric="'+_escHtml(r.file_nome)+'">'+
         '<i class="ph-duotone ph-receipt"></i>'+
         '<span style="flex:1;text-align:left"><b>'+_escHtml(r.numero)+'</b> · '+
-          new Date(r.emessa_il+'T12:00:00').toLocaleDateString('it-IT')+
-          (r.importo!=null?' · '+Number(r.importo).toFixed(2).replace('.',',')+' '+(r.valuta==='ALL'?'Lek':'€'):'')+'</span>'+
+          fdata(r.emessa_il+'T12:00:00')+
+          (r.importo!=null?' · '+fsoldi(r.importo, r.valuta):'')+'</span>'+
         '<i class="ph-bold ph-download-simple"></i></button>').join('');
     box.querySelectorAll('[data-ric]').forEach(b=>b.onclick=async()=>{
       b.disabled=true;
@@ -7750,7 +7750,7 @@ async function _pittaPatto(){
 
     // Le parole. Chi ha un livello ha pagato o si e' impegnato: si parla con
     // garbo e si spiega, non si ricorda un patto come fosse un richiamo.
-    const _d = x => x ? new Date(x).toLocaleDateString('it-IT') : '';
+    const _d = x => x ? fdata(x) : '';
     let riga='', nota='';
     if(c.regola==='luoghi'){
       const mancano = Math.max(0, Number(c.servono||0) - Number(c.fatti||0));
@@ -8341,6 +8341,24 @@ const T={
 
 /* Helper: t('key', fallback) — usato in JS dinamico */
 function t(key, fallback){ return (T[lang]&&T[lang][key]) || (T.it&&T.it[key]) || fallback || key; }
+
+/* ═══ I FORMATI LOCALI (blocco 51) ═══
+   Date, numeri e soldi si scrivono come li scrive la lingua di chi guarda,
+   non come li scrive l'Italia. Un solo posto decide: chi formatta a mano
+   con la virgola fissa sta sbagliando per due lingue su tre. */
+function _locale(){ return lang==='sq' ? 'sq-AL' : lang==='en' ? 'en-GB' : 'it-IT'; }
+function fdata(x, opz){
+  try{ return new Date(x).toLocaleDateString(_locale(), opz||{day:'2-digit',month:'2-digit',year:'numeric'}); }
+  catch(_){ return ''; }
+}
+function fnum(n, dec){
+  const v=Number(n); if(!isFinite(v)) return '';
+  return v.toLocaleString(_locale(), {minimumFractionDigits:dec==null?0:dec, maximumFractionDigits:dec==null?2:dec});
+}
+function fsoldi(n, valuta){
+  const v=Number(n); if(!isFinite(v)) return '';
+  return valuta==='ALL' ? fnum(Math.round(v),0)+' Lek' : fnum(v,2)+' €';
+}
 
 const LANGS=['sq','it','en'];
 let lang='sq';
@@ -9862,7 +9880,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='5.59';
+const APP_VERSION='5.60';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
@@ -12333,7 +12351,7 @@ async function _pittaProfiloPubblico(userId){
     const pd=g('ppPiede');
     if(pd){
       let da='';
-      try{ da=t('su_poilove_dal','Su POI-LOVE dal ')+new Date(u.created_at).toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'}); }catch(_){}
+      try{ da=t('su_poilove_dal','Su POI-LOVE dal ')+fdata(u.created_at); }catch(_){}
       pd.innerHTML='<div class="pf-righe"><img class="pf-logo" src="img/logo-steso.svg" alt="POI-LOVE">'+
                    '<span class="pf-claim">'+t('claim_mappa','la mappa fatta dalle persone')+'</span>'+
                    '<span class="pf-date">'+da+'</span></div>';
@@ -14270,10 +14288,7 @@ function _stelleDisegnate(v){
   }
   return h;
 }
-function _quandoBreve(iso){
-  try{ const d=new Date(iso); return d.toLocaleDateString(navigator.language||'it-IT',{day:'2-digit',month:'2-digit',year:'numeric'}); }
-  catch(_){ return ''; }
-}
+function _quandoBreve(iso){ return fdata(iso); }
 
 /* ═══════════════════════════════════════════════════════
    IL LOCALE
@@ -14288,10 +14303,10 @@ function _oraBreve(t){ return t ? String(t).slice(0,5) : ''; }
 function _prezzo(v, valuta){
   if(v==null) return '';
   const n=Number(v);
-  const testa = (valuta==='EUR') ? ('€ '+n.toFixed(2).replace('.',',')) : (Math.round(n)+' Lek');
+  const testa = (valuta==='EUR') ? fsoldi(n,'EUR') : fsoldi(n,'ALL');
   const cambio = window._CAMBIO_ALL_EUR;               // arriva col blocco del cambio
   if(!cambio) return testa;
-  const altra = (valuta==='EUR') ? Math.round(n*cambio)+' Lek' : '€ '+(n/cambio).toFixed(2).replace('.',',');
+  const altra = (valuta==='EUR') ? fsoldi(n*cambio,'ALL') : fsoldi(n/cambio,'EUR');
   return testa+' <small>'+altra+'</small>';
 }
 
@@ -15039,7 +15054,7 @@ async function _pittaLocale(p){
       menuBox.innerHTML=h;
       if(valBox){
         if(window._CAMBIO_ALL_EUR){
-          const g=window._CAMBIO_GIORNO ? new Date(window._CAMBIO_GIORNO).toLocaleDateString('it-IT') : '';
+          const g=window._CAMBIO_GIORNO ? fdata(window._CAMBIO_GIORNO) : '';
           valBox.textContent='Lek · € '+t('cambio_del','al cambio del')+' '+g+(window._CAMBIO_RICADUTA?' *':'');
           valBox.title=t('cambio_fonte','Cambio ufficiale della Banca d Albania')+(window._CAMBIO_RICADUTA?' · '+t('cambio_ricaduta','ultimo valore conosciuto'):'');
         } else {
@@ -15273,7 +15288,7 @@ function _frecciaGiu(){
 }
 function _pittaPiede(p){
   const e=document.getElementById('detailPiede'); if(!e) return;
-  const d=x=>{ try{ return new Date(x).toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'}); }catch(_){ return ''; } };
+  const d=x=>fdata(x);
   const nato=p.created_at?(t('creato_il','Creato il ')+d(p.created_at)):'';
   const agg =p.updated_at?(' · '+t('aggiornato_il','aggiornato il ')+d(p.updated_at)):'';
   e.innerHTML='<div class="pf-righe">'+
@@ -19596,7 +19611,7 @@ function _scegliCompagnia(id){ _stopCompId=id; renderStopCompSelector(); }
 async function _tappaInCompagnia(nome, data, categoria){
   if(!_stopCompId){ showToast(t('stop_comp_pick','Scegli prima la compagnia')); return false; }
   try{
-    const corpo = nome + (data ? (' · ' + new Date(data).toLocaleDateString('it-IT')) : '') +
+    const corpo = nome + (data ? (' · ' + fdata(data)) : '') +
                   (categoria ? (' · ' + categoria) : '');
     const r=await sb.from('companion_messages').insert({
       companion_id:_stopCompId, author_id:currentUser.id, kind:'tappa',
@@ -22011,6 +22026,6 @@ async function confirmPhotoPicker(){
   try{ new MutationObserver(function(muts){ muts.forEach(function(m){ (m.addedNodes||[]).forEach(function(n){ if(n.nodeType===1){ patch(n); scan(n); } }); }); }).observe(document.body,{childList:true,subtree:true}); }catch(_){}
 })();
 </script>
-<script src="mercato.js?v=5.59"></script>
+<script src="mercato.js?v=5.60"></script>
 </body>
 </html>
