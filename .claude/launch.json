@@ -2,10 +2,10 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "sal-preview",
+      "name": "webapp-locale",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8766", "--directory", "/Users/alessandrocastagna/AI (produzione)/• POI•LOVE"],
-      "port": 8766
+      "runtimeArgs": ["-m", "http.server", "8123", "--directory", "webapp"],
+      "port": 8123
     }
   ]
 }

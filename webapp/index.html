@@ -3333,8 +3333,9 @@ html[data-theme="dark"] .poiai-country{background:rgba(255,255,255,.04)}
     <span class="app-ver" style="opacity:.55;font-size:10px;font-weight:700;letter-spacing:.4px"></span>
   </div>
 
-  <!-- Selettore lingua — chip ultramoderni glassmorphism (EN · SQ · IT) -->
-  <div class="auth-lang-row" role="group" aria-label="Language selector">
+  <!-- Selettore lingua: i tre chip fissi partono subito, poi il registro
+       delle lingue sul database li ridipinge (una lingua accesa = un chip in piu') -->
+  <div class="auth-lang-row" id="authLangRow" role="group" aria-label="Language selector">
     <button class="auth-lang-chip" data-lang="sq" onclick="applyLang('sq')" aria-label="Shqip">
       <i class="ph-duotone ph-globe flag"></i> SQ
     </button>
@@ -8419,10 +8420,25 @@ function fsoldi(n, valuta){
   return valuta==='ALL' ? fnum(Math.round(v),0)+' Lek' : fnum(v,2)+' €';
 }
 
-const LANGS=['sq','it','en'];
+/* ═══ L'IMPIANTO DELLE LINGUE (blocco 48) ═══
+   Le lingue sono DATI, non codice: il registro vive nella tabella `lingue`
+   sul database. Le tre grandi viaggiano dentro l'app per partire all'istante;
+   ogni lingua in piu' e' una riga sul database piu' un file lingue/<codice>.json,
+   e la sua bandiera compare da sola nel selettore, senza rifare l'app. */
+let LINGUE=[
+  {codice:'sq', nome:'Shqip',    bandiera:'img/flags/al.svg'},
+  {codice:'it', nome:'Italiano', bandiera:'img/flags/it.svg'},
+  {codice:'en', nome:'English',  bandiera:'img/flags/gb.svg'}
+];
+let LANGS=LINGUE.map(x=>x.codice);
 let lang='sq';
+// La preferenza salvata si legge UNA volta qui: l'avvio la sovrascrive
+// (applyLang risalva), e se era una lingua del registro andrebbe persa
+// prima che il registro arrivi dal database.
+let _linguaSalvata=null;
+try{ _linguaSalvata=localStorage.getItem('poilove_lang'); }catch(_){}
 // 1) Preferenza utente salvata localmente
-try{ const saved=localStorage.getItem('poilove_lang'); if(saved && LANGS.includes(saved)) lang=saved; else throw 0; }
+try{ const saved=_linguaSalvata; if(saved && LANGS.includes(saved)) lang=saved; else throw 0; }
 catch(_){
   // 2) Lingua del dispositivo (navigator.language)
   const nl=(navigator.language||navigator.userLanguage||'').substring(0,2).toLowerCase();
@@ -8431,9 +8447,58 @@ catch(_){
   // apriva l'app e leggeva albanese. L'albanese resta per chi ha il telefono in albanese.
   if(nl==='it')lang='it'; else if(nl==='sq')lang='sq'; else lang='en';
 }
+// 3) La porta di servizio per chi traduce: ?lingua=el prova una lingua
+//    anche se non e' ancora accesa per tutti.
+try{ const q=new URLSearchParams(location.search).get('lingua'); if(q&&/^[a-z]{2}$/.test(q)) lang=q; }catch(_){}
 
-const LANG_FLAGS={it:'IT',sq:'SQ',en:'EN'};
+// I dizionari delle lingue oltre le tre grandi si caricano al bisogno,
+// come semplici file: lingue/<codice>.json.
+const _dizionariChiesti={};
+function _caricaDizionario(l){
+  if(T[l]) return Promise.resolve(true);
+  if(_dizionariChiesti[l]) return _dizionariChiesti[l];
+  _dizionariChiesti[l]=fetch('lingue/'+l+'.json?v='+(typeof APP_VERSION!=='undefined'?APP_VERSION:''))
+    .then(r=>r.ok?r.json():null)
+    .then(d=>{ if(d&&typeof d==='object'){ T[l]=d; return true; } delete _dizionariChiesti[l]; return false; })
+    .catch(()=>{ delete _dizionariChiesti[l]; return false; });
+  return _dizionariChiesti[l];
+}
+
+// Il selettore delle bandiere si costruisce dal registro: una lingua accesa
+// sul database e' un bottone in piu', senza toccare la pagina.
+function _pittaScelteLingue(){
+  const box=document.getElementById('langScelte');
+  if(box) box.innerHTML=LINGUE.map(x=>
+    '<button class="lang-scelta'+(x.codice===lang?' scelta-attiva':'')+'" data-l="'+x.codice+
+    '" onclick="scegliLingua(\''+x.codice+'\')" title="'+x.nome+'"><img src="'+x.bandiera+'" alt="'+x.nome+'"></button>'
+  ).join('');
+  // Anche i chip della schermata d'ingresso nascono dal registro.
+  const riga=document.getElementById('authLangRow');
+  if(riga) riga.innerHTML=LINGUE.map(x=>
+    '<button class="auth-lang-chip'+(x.codice===lang?' active':'')+'" data-lang="'+x.codice+
+    '" onclick="applyLang(\''+x.codice+'\')" aria-label="'+x.nome+'">'+
+    '<i class="ph-duotone ph-globe flag"></i> '+x.codice.toUpperCase()+'</button>'
+  ).join('');
+}
+async function _caricaRegistroLingue(){
+  try{
+    const r=await fetch(SUPABASE_URL+'/rest/v1/lingue?attiva=is.true&order=ordine&select=codice,nome,bandiera',{headers:{apikey:SUPABASE_ANON}});
+    if(!r.ok) return;
+    const righe=await r.json();
+    if(Array.isArray(righe)&&righe.length>=3){
+      LINGUE=righe; LANGS=LINGUE.map(x=>x.codice);
+      _pittaScelteLingue();
+      // La preferenza salvata in una lingua del registro ora vale:
+      // si usa quella letta all'avvio, non il valore gia' risovrascritto.
+      try{ if(_linguaSalvata&&LANGS.includes(_linguaSalvata)&&_linguaSalvata!==lang) applyLang(_linguaSalvata); }catch(_){}
+    }
+  }catch(_){}
+}
+setTimeout(_caricaRegistroLingue, 800);
+
 function applyLang(l){
+  // Lingua senza dizionario a bordo: si scarica il file e poi si applica.
+  if(!T[l]){ _caricaDizionario(l).then(ok=>{ if(ok) applyLang(l); }); return; }
   lang=l;
   try{ localStorage.setItem('poilove_lang', l); }catch(_){}
   // Se il biglietto di un luogo condiviso e' a schermo, si ridipinge: altrimenti
@@ -8463,17 +8528,20 @@ function applyLang(l){
   if(crTop&&tx)crTop.textContent=tx.cr_top;
   if(crBot&&tx)crBot.textContent=tx.cr_bot;
   document.documentElement.lang=l;
+  // Un dizionario parziale (lingua nuova) non deve lasciare pezzi nella
+  // lingua di prima: quello che manca ricade sull'italiano, che e' completo.
+  const _tv=k=>tx[k]!==undefined?tx[k]:(T.it?T.it[k]:undefined);
   // 1) Testo dei nodi: data-t="key"
   document.querySelectorAll('[data-t]').forEach(el=>{
-    const k=el.dataset.t;if(tx[k]!==undefined)el.innerHTML=emoToIcons(tx[k]);
+    const v=_tv(el.dataset.t);if(v!==undefined)el.innerHTML=emoToIcons(v);
   });
   // 2) Title/tooltip: data-tt="key"
   document.querySelectorAll('[data-tt]').forEach(el=>{
-    const k=el.dataset.tt;if(tx[k]!==undefined){el.setAttribute('title',tx[k]);el.setAttribute('aria-label',tx[k]);}
+    const v=_tv(el.dataset.tt);if(v!==undefined){el.setAttribute('title',v);el.setAttribute('aria-label',v);}
   });
   // 3) Placeholder: data-tp="key"
   document.querySelectorAll('[data-tp]').forEach(el=>{
-    const k=el.dataset.tp;if(tx[k]!==undefined)el.setAttribute('placeholder',tx[k]);
+    const v=_tv(el.dataset.tp);if(v!==undefined)el.setAttribute('placeholder',v);
   });
   // 4) Highlight chip lingua corrente (auth overlay)
   document.querySelectorAll('[data-lang]').forEach(el=>{
@@ -8493,13 +8561,15 @@ function applyLang(l){
 }
 function cycleLang(){applyLang(LANGS[(LANGS.indexOf(lang)+1)%LANGS.length])}
 
-// Bandiere disegnate a mano: riempiono il tondo e si vedono uguali ovunque
-// (le emoji su Windows diventano due lettere). Aggiunto il 19/08.
 // Bandiere vere (file ufficiali), non disegnate a mano: quella albanese
-// fatta da me era indegna (segnalato il 19/08).
-const BANDIERE = { sq:'img/flags/al.svg', it:'img/flags/it.svg', en:'img/flags/gb.svg' };
+// fatta da me era indegna (segnalato il 19/08). Dal blocco 48 la bandiera
+// viene dal registro delle lingue, non da un elenco fisso.
+function _bandieraDi(l){
+  const r=LINGUE.find(x=>x.codice===l);
+  return (r&&r.bandiera)||'img/flags/gb.svg';
+}
 function _mostraBandiera(l){
-  const f = BANDIERE[l] || BANDIERE.en;
+  const f = _bandieraDi(l);
   ['langFlag','langFlagDesktop'].forEach(id=>{
     const c=document.getElementById(id);
     if(c) c.innerHTML = '<img src="'+f+'" alt="'+l+'" style="width:100%;height:100%;object-fit:cover;display:block">';
@@ -9939,7 +10009,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='5.61';
+const APP_VERSION='5.62';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
@@ -14924,9 +14994,9 @@ async function _pittaAudioguida(p){
   const daLontano = true;
   const puo = true;
 
-  // Le tre lingue ci sono SEMPRE: quella che manca e' spenta e lo dice.
-  // Chi ha il telefono in inglese deve poter scegliere l'albanese con un tocco.
-  const lingue = '<div class="guida-lingue">'+['it','sq','en'].map(l=>{
+  // Le lingue della piattaforma ci sono SEMPRE: quella che manca e' spenta
+  // e lo dice. Chi ha il telefono in inglese sceglie l'albanese con un tocco.
+  const lingue = '<div class="guida-lingue">'+LANGS.map(l=>{
     const g=righe.find(x=>x.lingua===l);
     if(g) return '<button class="guida-ling'+(g.id===scelta.id?' on':'')+
       '" onclick="_pvLingua(\''+g.id+'\')">'+l.toUpperCase()+'</button>';
@@ -20725,7 +20795,7 @@ function _viaggiCitati(testo){
   const piatto = String(testo||'').toLowerCase()
     .normalize('NFD').replace(/[\u0300-\u036f]/g,'');
   return _VIAGGI.filter(function(v){
-    return ['it','sq','en'].some(function(l){
+    return LANGS.some(function(l){
       const n = (v.nomi[l]||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
       return n.length > 6 && piatto.indexOf(n) >= 0;
     });
