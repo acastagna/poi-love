@@ -31,6 +31,11 @@ if (!$env || empty($env['VAPID_PUBLIC']) || empty($env['VAPID_PRIVATE'])) {
 $pdo = new PDO('pgsql:host=/var/run/postgresql;port=5433;dbname=poilove', 'postgres');
 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
+/* Il lucchetto: se il giro precedente e' ancora in corso (rete lenta),
+   questo si fa da parte. Il lucchetto cade da solo a fine processo. */
+$libero = $pdo->query('select pg_try_advisory_lock(42421)')->fetchColumn();
+if (!$libero) exit(0);
+
 /* Le stesse parole dell'app, nelle tre lingue. Lingua sconosciuta -> inglese. */
 $TESTI = [
     'it' => [
@@ -115,21 +120,29 @@ $webPush = new WebPush([
 ]);
 $webPush->setDefaultOptions(['TTL' => 86400, 'urgency' => 'normal']);
 
+/* Gli avvisi "di conto" (promemoria abbonamento, livello, invito a
+   ricambiare) non hanno una levetta propria nel pannello: partono se
+   l'utente ha acceso il canale browser su QUALUNQUE tipo. Chi ha detto
+   si' agli avvisi non deve perdersi proprio quelli che contano. */
 $stDisp = $pdo->prepare(
     "select s.endpoint, s.p256dh, s.auth, s.lingua
        from push_iscrizioni s
       where s.user_id = ?
-        and exists (select 1 from notification_prefs np
-                     where np.user_id = s.user_id
-                       and np.event::text = ?
-                       and np.browser)"
+        and case when ? in ('segui_invito','abbonamento_promemoria','livello_avviso','livello_perso')
+             then exists (select 1 from notification_prefs np
+                           where np.user_id = s.user_id and np.browser)
+             else exists (select 1 from notification_prefs np
+                           where np.user_id = s.user_id
+                             and np.event::text = ?
+                             and np.browser)
+            end"
 );
 $stTimbro = $pdo->prepare("update notifications set push_sent_at = now() where id = ?");
 $stMorto  = $pdo->prepare("delete from push_iscrizioni where endpoint = ?");
 
 $spedite = 0; $morti = 0;
 foreach ($coda as $n) {
-    $stDisp->execute([$n['user_id'], $n['event']]);
+    $stDisp->execute([$n['user_id'], $n['event'], $n['event']]);
     $dispositivi = $stDisp->fetchAll(PDO::FETCH_ASSOC);
     $data = json_decode($n['data'] ?: '{}', true) ?: [];
     foreach ($dispositivi as $d) {
@@ -145,18 +158,29 @@ foreach ($coda as $n) {
             'keys'     => ['p256dh' => $d['p256dh'], 'auth' => $d['auth']],
         ]), $corpo);
     }
-    // Timbrata comunque: anche senza dispositivi iscritti la coda non rilegge.
+    // Timbrata PRIMA dell'invio, di proposito: se il processo muore tra il
+    // timbro e la spedizione si perde al massimo una push (che vive comunque
+    // nella campanella in-app), mentre il contrario, timbro dopo, potrebbe
+    // rispedire la stessa push a ogni giro su una riga avvelenata. Meglio
+    // una persa che cento doppie.
     $stTimbro->execute([$n['id']]);
 }
 
-foreach ($webPush->flush() as $rapporto) {
-    if ($rapporto->isSuccess()) { $spedite++; continue; }
-    if ($rapporto->isSubscriptionExpired()) {
-        $stMorto->execute([$rapporto->getEndpoint()]);
-        $morti++;
-        continue;
+try {
+    foreach ($webPush->flush() as $rapporto) {
+        if ($rapporto->isSuccess()) { $spedite++; continue; }
+        if ($rapporto->isSubscriptionExpired()) {
+            $stMorto->execute([$rapporto->getEndpoint()]);
+            $morti++;
+            continue;
+        }
+        fwrite(STDERR, date('c') . ' push respinta: ' . $rapporto->getReason() . "\n");
     }
-    fwrite(STDERR, date('c') . ' push respinta: ' . $rapporto->getReason() . "\n");
+} catch (Throwable $e) {
+    // Un errore di rete o della libreria non deve uccidere il giro in
+    // silenzio: si scrive nel diario e il prossimo minuto si riprova
+    // con le notifiche nuove (queste restano timbrate: vedi sopra).
+    fwrite(STDERR, date('c') . ' spedizione fallita: ' . $e->getMessage() . "\n");
 }
 if ($spedite || $morti) {
     echo date('c') . " notifiche " . count($coda) . ", push spedite $spedite, iscrizioni morte tolte $morti\n";
