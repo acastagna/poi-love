@@ -5327,7 +5327,9 @@ function _propostaPush(){
       if(!currentUser || document.getElementById('pushInvito')) return;
       const el=document.createElement('div');
       el.id='pushInvito';
-      el.style.cssText='position:fixed;left:12px;right:12px;bottom:84px;z-index:340;max-width:430px;margin:0 auto;background:var(--card,#fff);border-radius:16px;box-shadow:0 8px 30px rgba(0,0,0,.25);padding:14px 16px;display:flex;gap:12px;align-items:center';
+      // In alto a destra, vicino a dove il browser mostrera' il suo permesso
+      // (scelta di Alessandro, 22/08). Sul telefono resta dentro lo schermo.
+      el.style.cssText='position:fixed;top:14px;right:14px;z-index:340;width:min(430px,calc(100vw - 28px));background:var(--card,#fff);border-radius:16px;box-shadow:0 8px 30px rgba(0,0,0,.25);padding:14px 16px;display:flex;gap:12px;align-items:center';
       el.innerHTML=
         '<i class="ph-duotone ph-bell-ringing" style="font-size:28px;color:#D42B2B;flex-shrink:0"></i>'+
         '<div style="flex:1;font-size:13.5px;line-height:1.35">'+t('push_inv_testo','Vuoi gli avvisi anche su questo dispositivo? Ti avvisiamo quando succede qualcosa che ti riguarda.')+
@@ -10141,7 +10143,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='5.64';
+const APP_VERSION='5.65';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
