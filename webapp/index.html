@@ -5190,7 +5190,7 @@ async function renderNotifSettings(){
 // rifa' da zero, con un indirizzo nuovo. Serve quando il sistema (iOS in
 // testa) ha messo in castigo l'iscrizione vecchia: riusarla non guarisce
 // niente, va proprio ricreata (imparato il 22/08).
-async function _rinnovaPushDispositivo(){
+async function _rinnovaPushDispositivo(silente){
   try{
     const reg=await navigator.serviceWorker.getRegistration();
     const sub=reg && await reg.pushManager.getSubscription();
@@ -5199,9 +5199,10 @@ async function _rinnovaPushDispositivo(){
       await sub.unsubscribe();
     }
     const ok=await _iscriviPush();
-    showToast(ok ? t('push_rin_ok','Avvisi rinnovati: iscrizione nuova di zecca')
-                 : t('push_rin_ko','Non sono riuscito a rinnovare: controlla il permesso del browser'));
-  }catch(_){ showToast(t('push_rin_ko','Non sono riuscito a rinnovare: controlla il permesso del browser')); }
+    if(!silente) showToast(ok ? t('push_rin_ok','Avvisi rinnovati: iscrizione nuova di zecca')
+                              : t('push_rin_ko','Non sono riuscito a rinnovare: controlla il permesso del browser'));
+    return ok;
+  }catch(_){ if(!silente) showToast(t('push_rin_ko','Non sono riuscito a rinnovare: controlla il permesso del browser')); return false; }
 }
 
 async function toggleNotifPref(ev, ch, btn){
@@ -5297,6 +5298,11 @@ async function _disiscriviSeNessuna(){
     await _disiscriviQuestoDispositivo();
   }catch(_){}
 }
+// Alzare questo numero di 1 impone a OGNI dispositivo, alla prossima
+// apertura, di buttare l'iscrizione vecchia e rifarne una nuova di zecca.
+// Serve quando un cambio di regole lato ricevitore (o un castigo di iOS
+// sulle push zittite, 22/08) rende sospette le iscrizioni esistenti.
+const PUSH_GEN=2;
 async function _assicuraPush(){
   // All'avvio, se il permesso c'e' e almeno una levetta browser e' accesa,
   // l'iscrizione si rinnova da sola: cosi' sopravvive alla pulizia cache
@@ -5305,7 +5311,14 @@ async function _assicuraPush(){
     if(!currentUser || !('Notification' in window) || Notification.permission!=='granted') return;
     const { count }=await sb.from('notification_prefs')
       .select('event',{count:'exact',head:true}).eq('browser',true);
-    if(count && count>0) _iscriviPush();
+    if(!count || count<1) return;
+    let gen=0; try{ gen=parseInt(localStorage.getItem('poilove_push_gen')||'0',10); }catch(_){}
+    if(gen<PUSH_GEN){
+      const ok=await _rinnovaPushDispositivo(true);
+      if(ok){ try{ localStorage.setItem('poilove_push_gen', String(PUSH_GEN)); }catch(_){} }
+    }else{
+      _iscriviPush();
+    }
   }catch(_){}
 }
 
@@ -10178,7 +10191,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='5.71';
+const APP_VERSION='5.72';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
