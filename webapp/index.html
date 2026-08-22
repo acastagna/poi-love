@@ -5264,7 +5264,10 @@ async function _iscriviPush(){
   if(!('serviceWorker' in navigator) || !('PushManager' in window)) return false;
   if(!('Notification' in window) || Notification.permission!=='granted') return false;
   try{
-    const reg=await navigator.serviceWorker.register('sw.js');
+    // La versione nell'indirizzo: iOS teneva in cache il ricevitore vecchio
+    // (quello che zittiva ad app aperta) anche dopo l'aggiornamento della
+    // pagina. Con l'indirizzo versionato ogni versione ne scarica uno fresco.
+    const reg=await navigator.serviceWorker.register('sw.js?v='+(typeof APP_VERSION!=='undefined'?APP_VERSION:''));
     const sub=await reg.pushManager.subscribe({userVisibleOnly:true, applicationServerKey:_vapidBytes(VAPID_PUBLIC)});
     const j=sub.toJSON();
     const { error }=await sb.from('push_iscrizioni').upsert({
@@ -5302,7 +5305,7 @@ async function _disiscriviSeNessuna(){
 // apertura, di buttare l'iscrizione vecchia e rifarne una nuova di zecca.
 // Serve quando un cambio di regole lato ricevitore (o un castigo di iOS
 // sulle push zittite, 22/08) rende sospette le iscrizioni esistenti.
-const PUSH_GEN=2;
+const PUSH_GEN=3;
 async function _assicuraPush(){
   // All'avvio, se il permesso c'e' e almeno una levetta browser e' accesa,
   // l'iscrizione si rinnova da sola: cosi' sopravvive alla pulizia cache
@@ -10191,7 +10194,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='5.72';
+const APP_VERSION='5.73';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
