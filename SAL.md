@@ -40,10 +40,11 @@ servizio push (404/410) = tolto dal registro. Nell'app: `sw.js` nuovo che fa
 solo push (niente cache: la trappola del 08/05 non puo' rinascere), levetta
 browser esistente che ora governa anche l'iscrizione, rinnovo automatico
 all'avvio, iscrizione cancellata quando l'ultima levetta si spegne.
-Collaudo con dispositivo finto: coda letta, filtro levette rispettato,
-firma VAPID accettata da Google, testo giusto, pulizia dei morti verificata.
-La consegna finale si prova col telefono di Alessandro (il browser di
-lavoro nega il permesso d'ufficio). Limite noto: su iPhone solo con l'app
+Collaudo in due passi: prima con dispositivo finto (coda letta, filtro
+levette rispettato, firma VAPID accettata da Google, pulizia dei morti),
+poi CONSEGNA VERA sull'iPhone di Alessandro ad app chiusa, arrivata nel
+centro notifiche. Ad app aperta l'avviso di sistema tace apposta: suona
+solo la campanella in pagina. Limite noto: su iPhone solo con l'app
 salvata in home; la copertura piena arriva col blocco 37 (app nativa).
 
 **Il ricontrollo periodico a pagina aperta.** Ogni 30 secondi, solo con la
