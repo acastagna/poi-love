@@ -1376,25 +1376,54 @@ body.kb-open #lang-strip,body.kb-open #brand-strip{opacity:0;pointer-events:none
 .lp-paga{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px}
 .lp-paga span{border:1.5px solid var(--border);border-radius:11px;padding:4px 10px;font-size:12.5px;font-weight:800;
   display:inline-flex;align-items:center;gap:6px}
-.guida-box{margin:10px 16px 4px;padding:12px 13px;border-radius:16px;border:1.5px solid #C3D3EA;background:#EEF3FA}
-.guida-riga{display:flex;align-items:center;gap:11px}
-.guida-play{width:42px;height:42px;border-radius:50%;border:none;background:#285EA7;color:#fff;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;font-size:18px;flex:0 0 42px}
-.guida-play.spento{background:#A9BBD3;cursor:not-allowed}
-.guida-marchio{font-size:10.5px;font-weight:900;letter-spacing:.6px;color:#285EA7;text-transform:uppercase}
+/* ── Il lettore POI•VOICE: la casa blu dentro la scheda ── */
+.guida-box{margin:10px 16px 4px;padding:16px 15px 12px;border-radius:20px;border:1.5px solid #C3D3EA;
+  background:linear-gradient(165deg,#EEF3FA 0%,#E4EDF8 100%);position:relative;overflow:hidden}
+.guida-box::before{content:'';position:absolute;top:-70px;right:-70px;width:190px;height:190px;border-radius:50%;
+  background:radial-gradient(circle,rgba(40,94,167,.10),transparent 68%);pointer-events:none}
+.guida-marchio{font-size:10.5px;font-weight:900;letter-spacing:.7px;color:#285EA7;text-transform:uppercase}
 .guida-marchio span{color:#D42B2B}
-.guida-tit{font-weight:900;font-size:14px;margin-top:1px}
-.guida-dur{font-size:12px;color:var(--muted);font-weight:700}
-.guida-scaffale{border:none;background:none;cursor:pointer;font-size:20px;color:#285EA7;padding:4px}
-.guida-lingue{display:flex;gap:6px;margin-top:9px}
-.guida-ling{border:1.5px solid #C3D3EA;background:#fff;border-radius:9px;padding:3px 10px;font-size:11.5px;font-weight:900;
-  font-family:inherit;color:#285EA7;cursor:pointer}
+.guida-tit{font-weight:900;font-size:15.5px;margin-top:2px;line-height:1.25}
+.guida-dur{font-size:12px;color:#41618F;font-weight:700;margin-top:1px}
+.guida-scaffale{border:none;background:none;cursor:pointer;font-size:21px;color:#285EA7;padding:4px;flex-shrink:0}
+/* il play grande con l'anello che si riempie mentre parla */
+.pv-centro{display:flex;align-items:center;gap:14px;margin-top:13px}
+.pv-anello{width:66px;height:66px;border-radius:50%;flex:0 0 66px;padding:4px;position:relative;
+  background:conic-gradient(#285EA7 calc(var(--pv,0)*1%), rgba(40,94,167,.16) 0)}
+.pv-play{width:100%;height:100%;border-radius:50%;border:none;cursor:pointer;color:#fff;font-size:24px;
+  display:flex;align-items:center;justify-content:center;font-family:inherit;
+  background:linear-gradient(150deg,#3570C4,#1E4A85);box-shadow:0 6px 16px rgba(30,74,133,.35);
+  transition:transform .12s}
+.pv-play:active{transform:scale(.94)}
+.pv-play i{margin-left:2px}
+.pv-play.in-pausa i{margin-left:0}
+.pv-play.spento{background:#A9BBD3;box-shadow:none;cursor:not-allowed}
+.pv-destra{flex:1;min-width:0}
+/* la barra su cui si salta */
+.pv-barra{-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:99px;
+  background:linear-gradient(90deg,#285EA7 calc(var(--pv,0)*1%), rgba(40,94,167,.18) 0);outline:none;cursor:pointer;display:block}
+.pv-barra::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:50%;background:#fff;
+  border:3px solid #285EA7;box-shadow:0 2px 6px rgba(30,74,133,.35);cursor:grab}
+.pv-barra::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:#fff;border:3px solid #285EA7;cursor:grab}
+.pv-tempi{display:flex;justify-content:space-between;font-size:11px;font-weight:800;color:#41618F;
+  font-variant-numeric:tabular-nums;margin-top:5px}
+/* velocita' e lingue */
+.pv-riga2{display:flex;align-items:center;gap:8px;margin-top:11px;flex-wrap:wrap}
+.pv-vel{border:1.5px solid #C3D3EA;background:#fff;border-radius:99px;padding:5px 13px;font-size:12px;font-weight:900;
+  font-family:inherit;color:#285EA7;cursor:pointer;font-variant-numeric:tabular-nums;min-width:58px}
+.pv-vel.attiva{background:#285EA7;color:#fff;border-color:#285EA7}
+.guida-lingue{display:flex;gap:6px;margin-left:auto}
+.guida-ling{border:1.5px solid #C3D3EA;background:#fff;border-radius:99px;padding:5px 12px;font-size:11.5px;font-weight:900;
+  font-family:inherit;color:#285EA7;cursor:pointer;letter-spacing:.4px}
 .guida-ling.on{background:#285EA7;color:#fff;border-color:#285EA7}
-.guida-nota{margin-top:9px;font-size:12.5px;font-weight:700;color:#41618F;line-height:1.4;display:flex;gap:6px;align-items:flex-start}
-.guida-testo-btn{margin-top:9px;border:none;background:none;font-family:inherit;font-weight:900;font-size:12.5px;
+.guida-nota{margin-top:10px;font-size:12.5px;font-weight:700;color:#41618F;line-height:1.45;display:flex;gap:6px;align-items:flex-start}
+.guida-testo-btn{margin-top:10px;border:none;background:none;font-family:inherit;font-weight:900;font-size:12.5px;
   color:#285EA7;cursor:pointer;padding:0;display:flex;align-items:center;gap:6px}
-.guida-testo{display:none;margin-top:8px;font-size:13px;line-height:1.5;white-space:pre-wrap}
+.guida-testo{display:none;margin-top:8px;font-size:13px;line-height:1.55;white-space:pre-wrap}
 .guida-testo.on{display:block}
+/* il marchio in fondo, dentro la sua casa */
+.pv-firma{display:flex;justify-content:center;margin-top:13px;padding-top:11px;border-top:1px solid rgba(40,94,167,.14)}
+.pv-firma img{height:20px;width:auto;opacity:.85}
 .voce-box{margin:10px 16px 4px}
 .voce-riga{display:flex;align-items:center;gap:11px;padding:10px 12px;border:1.5px solid var(--border);border-radius:15px;background:var(--card)}
 .voce-play{width:40px;height:40px;border-radius:50%;border:none;background:var(--red);color:#fff;cursor:pointer;
@@ -9673,7 +9702,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='5.48';
+const APP_VERSION='5.49';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){
@@ -14635,17 +14664,20 @@ const _RAGGIO_GUIDA_M = 300;   // sul posto vuol dire entro trecento metri
 
 async function _pittaAudioguida(p){
   const box=document.getElementById('detailGuida'); if(!box || !p || !p.id) return;
+  _pvFerma();                                  // cambio scheda: l'audio di prima si spegne
   box.style.display='none'; box.innerHTML='';
   let righe=[];
   try{
     const { data } = await sb.from('audioguide')
-      .select('id,lingua,titolo,testo,url,secondi,voce').eq('poi_id',p.id);
+      .select('id,lingua,titolo,testo,url,secondi,voce').eq('poi_id',p.id).eq('pubblicata',true);
     righe=data||[];
   }catch(_){}
   if(!currentPOI || currentPOI.id!==p.id || !righe.length) return;
 
+  // la lingua: parte da quella del telefono, ma la scelta fatta a mano vince
   const mia=(typeof LANG!=='undefined'?LANG:'it');
-  const scelta = righe.find(x=>x.lingua===mia) || righe.find(x=>x.lingua==='it') || righe[0];
+  let scelta = (window._pvScelta && righe.find(x=>x.id===window._pvScelta))
+    || righe.find(x=>x.lingua===mia) || righe.find(x=>x.lingua==='it') || righe[0];
   window._GUIDE=righe; window._GUIDA=scelta;
 
   const daLontano = !!(_mioLivello().ascolta_audioguide);
@@ -14656,10 +14688,9 @@ async function _pittaAudioguida(p){
   const vicino = (distanza!=null && distanza<=_RAGGIO_GUIDA_M);
   const puo = daLontano || vicino;
 
-  const m=Math.floor(scelta.secondi/60), s=Math.round(scelta.secondi%60);
   const lingue = righe.length>1
     ? '<div class="guida-lingue">'+righe.map(x=>'<button class="guida-ling'+(x.id===scelta.id?' on':'')+
-        '" onclick="_cambiaLinguaGuida(\''+x.id+'\')">'+x.lingua.toUpperCase()+'</button>').join('')+'</div>'
+        '" onclick="_pvLingua(\''+x.id+'\')">'+x.lingua.toUpperCase()+'</button>').join('')+'</div>'
     : '';
   let stato='';
   if(!puo){
@@ -14670,38 +14701,90 @@ async function _pittaAudioguida(p){
         ' · '+t('guida_ovunque','da lontano la ascoltano Mecenate e Influencer')+'</div>';
   }
   box.innerHTML=
-    '<div class="guida-riga">'+
-      '<button class="guida-play'+(puo?'':' spento')+'" '+(puo?'onclick="_suonaGuida(this)"':'disabled')+
-        ' data-url="'+_escHtml(scelta.url)+'"><i class="ph-fill ph-'+(puo?'play':'lock-simple')+'"></i></button>'+
+    '<div style="display:flex;align-items:flex-start;gap:10px;position:relative">'+
       '<div style="flex:1;min-width:0">'+
         '<div class="guida-marchio">POI<span>•</span>VOICE · '+t('guida_ufficiale','audioguida ufficiale')+'</div>'+
         '<div class="guida-tit">'+_escHtml(scelta.titolo)+'</div>'+
-        '<div class="guida-dur">'+m+':'+String(s).padStart(2,'0')+(scelta.voce?' · '+_escHtml(scelta.voce):'')+'</div>'+
+        '<div class="guida-dur">'+_pvMmss(scelta.secondi)+(scelta.voce?' · '+_escHtml(scelta.voce):'')+'</div>'+
       '</div>'+
       (daLontano?'<button class="guida-scaffale" onclick="_scaffale(\''+scelta.id+'\',this)" title="'+
         t('guida_tieni','Tienila nel tuo scaffale')+'"><i class="ph-duotone ph-bookmark-simple"></i></button>':'')+
-    '</div>'+lingue+stato+
+    '</div>'+
+    '<div class="pv-centro">'+
+      '<div class="pv-anello" id="pvAnello">'+
+        '<button class="pv-play'+(puo?'':' spento')+'" id="pvPlay" '+(puo?'onclick="_pvPlayPausa()"':'disabled')+'>'+
+          '<i class="ph-fill ph-'+(puo?'play':'lock-simple')+'"></i></button>'+
+      '</div>'+
+      '<div class="pv-destra">'+
+        '<input type="range" class="pv-barra" id="pvBarra" min="0" max="'+Math.round(scelta.secondi||0)+'" value="0" step="1"'+
+          (puo?' oninput="_pvSalta(this.value)"':' disabled')+'>'+
+        '<div class="pv-tempi"><span id="pvOra">0:00</span><span>'+_pvMmss(scelta.secondi)+'</span></div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="pv-riga2">'+
+      '<button class="pv-vel'+((window._pvRate||1)!==1?' attiva':'')+'" id="pvVel" '+(puo?'onclick="_pvVelocita()"':'disabled')+'>'+
+        (window._pvRate||1).toString().replace('.',',')+'×</button>'+
+      lingue+
+    '</div>'+stato+
     (scelta.testo?'<button class="guida-testo-btn" onclick="document.getElementById(\'guidaTesto\').classList.toggle(\'on\')">'+
       '<i class="ph-duotone ph-text-align-left"></i> '+t('guida_leggi','Leggi il testo')+'</button>'+
-      '<div class="guida-testo" id="guidaTesto">'+_escHtml(scelta.testo)+'</div>':'');
+      '<div class="guida-testo" id="guidaTesto">'+_escHtml(scelta.testo)+'</div>':'')+
+    '<div class="pv-firma"><img src="img/logo-poivoice.svg" alt="POI•VOICE" '+
+      'onerror="this.parentNode.style.display=\'none\'"></div>';
   box.style.display='block';
 }
-function _cambiaLinguaGuida(id){
+
+/* ── Il motore del lettore: un solo audio, anello e barra che respirano ── */
+function _pvMmss(sec){ const v=Math.max(0,Math.round(Number(sec)||0)); return Math.floor(v/60)+':'+String(v%60).padStart(2,'0'); }
+function _pvFerma(){
+  if(window._guidaAudio){ try{ window._guidaAudio.pause(); }catch(_){} window._guidaAudio=null; }
+}
+function _pvDisegna(pct, secondi){
+  const a=document.getElementById('pvAnello'), b=document.getElementById('pvBarra'), o=document.getElementById('pvOra');
+  if(a) a.style.setProperty('--pv', pct);
+  if(b && !b.matches(':active')){ b.style.setProperty('--pv', pct); b.value=Math.round(secondi); }
+  if(o) o.textContent=_pvMmss(secondi);
+}
+function _pvPlayPausa(){
+  const g=window._GUIDA; if(!g) return;
+  const btn=document.getElementById('pvPlay');
+  if(window._guidaAudio){
+    if(window._guidaAudio.paused){ window._guidaAudio.play(); btn.innerHTML='<i class="ph-fill ph-pause"></i>'; btn.classList.add('in-pausa'); }
+    else { window._guidaAudio.pause(); btn.innerHTML='<i class="ph-fill ph-play"></i>'; btn.classList.remove('in-pausa'); }
+    return;
+  }
+  const a=new Audio(g.url); window._guidaAudio=a;
+  a.playbackRate=window._pvRate||1;
+  a.ontimeupdate=()=>{ const d=a.duration||g.secondi||1; _pvDisegna(Math.min(100,a.currentTime/d*100), a.currentTime); };
+  a.onended=()=>{ _pvDisegna(0,0); btn.innerHTML='<i class="ph-fill ph-play"></i>'; btn.classList.remove('in-pausa'); window._guidaAudio=null; };
+  btn.innerHTML='<i class="ph-fill ph-pause"></i>'; btn.classList.add('in-pausa');
+  a.play().catch(()=>{ showToast(t('cv_play_err','Audio non disponibile'));
+    btn.innerHTML='<i class="ph-fill ph-play"></i>'; btn.classList.remove('in-pausa'); window._guidaAudio=null; });
+}
+function _pvSalta(sec){
+  const g=window._GUIDA; if(!g) return;
+  if(!window._guidaAudio){ _pvPlayPausa(); }         // saltare a lettore fermo = partire da li'
+  if(window._guidaAudio){ try{ window._guidaAudio.currentTime=Number(sec)||0; }catch(_){} }
+  const d=(window._guidaAudio&&window._guidaAudio.duration)||g.secondi||1;
+  _pvDisegna(Math.min(100,(Number(sec)||0)/d*100), Number(sec)||0);
+}
+// La velocita' gira su quattro passi: chi cammina rallenta, chi ripassa accelera.
+function _pvVelocita(){
+  const passi=[1,1.25,1.5,0.75];
+  const ora=passi.indexOf(window._pvRate||1);
+  window._pvRate=passi[(ora+1)%passi.length];
+  if(window._guidaAudio) window._guidaAudio.playbackRate=window._pvRate;
+  const b=document.getElementById('pvVel');
+  if(b){ b.textContent=window._pvRate.toString().replace('.',',')+'×'; b.classList.toggle('attiva', window._pvRate!==1); }
+}
+// La lingua scelta a mano vince sulla lingua del telefono, e resta finche' la cambia lui.
+function _pvLingua(id){
   const x=(window._GUIDE||[]).find(g=>g.id===id); if(!x) return;
-  window._GUIDA=x;
-  const salva=(typeof LANG!=='undefined')?LANG:null;
-  try{ window.LANG=x.lingua; }catch(_){}
-  _pittaAudioguida(currentPOI).finally(()=>{ if(salva!=null){ try{ window.LANG=salva; }catch(_){} } });
+  window._pvScelta=id;
+  _pvFerma();
+  _pittaAudioguida(currentPOI);
 }
-function _suonaGuida(btn){
-  const url=btn.getAttribute('data-url');
-  if(window._guidaAudio && !window._guidaAudio.paused){ window._guidaAudio.pause(); window._guidaAudio=null;
-    btn.innerHTML='<i class="ph-fill ph-play"></i>'; return; }
-  window._guidaAudio=new Audio(url);
-  btn.innerHTML='<i class="ph-fill ph-pause"></i>';
-  window._guidaAudio.onended=()=>{ btn.innerHTML='<i class="ph-fill ph-play"></i>'; };
-  window._guidaAudio.play().catch(()=>{ showToast(t('cv_play_err','Audio non disponibile')); btn.innerHTML='<i class="ph-fill ph-play"></i>'; });
-}
+
 async function _scaffale(id, btn){
   if(!currentUser){ showToast(t('guida_entra','Entra per tenerla da parte')); return; }
   try{
@@ -21771,6 +21854,6 @@ async function confirmPhotoPicker(){
   try{ new MutationObserver(function(muts){ muts.forEach(function(m){ (m.addedNodes||[]).forEach(function(n){ if(n.nodeType===1){ patch(n); scan(n); } }); }); }).observe(document.body,{childList:true,subtree:true}); }catch(_){}
 })();
 </script>
-<script src="mercato.js?v=5.48"></script>
+<script src="mercato.js?v=5.49"></script>
 </body>
 </html>
