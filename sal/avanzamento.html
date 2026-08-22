@@ -97,6 +97,9 @@
 <h2>I cantieri</h2>
 <div id="cantieri"><p class="vuoto">Sto leggendo il programma…</p></div>
 
+<h2>I due traguardi</h2>
+<div id="traguardi"><p class="vuoto">Sto leggendo il programma…</p></div>
+
 <div class="piede">
   POI•LOVE è un prodotto 321, ingegnerizzato da Alessandro Castagna.<br>
   NIPT M52411017N · Tiranë · la pagina si ricarica da sola ogni minuto
@@ -236,6 +239,52 @@ async function leggi(){
         '</div><span class="n">'+(Number(x.giornate)?String(x.giornate).replace('.',',')+' gg':'—')+'</span></div>').join('')+
       '</div>';
   }).join('');
+
+  /* ── I DUE TRAGUARDI (coda voluta dal founder il 22/08) ──
+     Il lavoro corre su due binari con due arrivi diversi: tutto quello che
+     NON e' l'app (il prodotto web, l'amministrazione, i contenuti, le voci)
+     ha il suo traguardo; l'app per iPhone e Android (cantiere D) viene
+     costruita nel tempo, con la meta fissata a Natale 2026. */
+  const app  = righe.filter(x=>x.cantiere==='D');
+  const resto= righe.filter(x=>x.cantiere!=='D');
+  const somma=(r)=>r.reduce((a,x)=>a+Number(x.giornate||0),0);
+  const rTot=somma(resto), rFatte=somma(resto.filter(x=>x.stato==='fatto'));
+  const aTot=somma(app),   aFatte=somma(app.filter(x=>x.stato==='fatto'));
+  const rPerc=rTot?Math.round(rFatte/rTot*100):0;
+  const aPerc=aTot?Math.round(aFatte/aTot*100):0;
+  const gg=n=>String(n).replace('.',',');
+  /* la data in cui il binario senza app ha tagliato il traguardo */
+  const ultimaResto = resto.filter(x=>x.stato==='fatto'&&x.aggiornato).map(x=>x.aggiornato).sort().pop();
+  const dataIT = s=>s? new Date(s).toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'}) : '';
+  /* la previsione dell'app al ritmo del suo cantiere, confrontata col Natale */
+  const rD = ritmi['D'] || {al_giorno:1, giorni_fermi:0};
+  const giorniApp = Math.ceil((aTot-aFatte)/Number(rD.al_giorno||1)) + Number(rD.giorni_fermi||0);
+  const previstaApp = new Date(); previstaApp.setDate(previstaApp.getDate()+giorniApp);
+  const natale = new Date('2026-12-25');
+  const margine = Math.round((natale - previstaApp)/86400000);
+  const passi = app.sort((a,b)=>a.ordine-b.ordine).map(x=>
+    '<div class="riga"><span class="pallina '+x.stato+'"></span><div><b>'+testo(x.blocco)+'</b>'+
+    (x.stato==='in_corso'?'<span class="eti c">in corso</span>':'')+
+    (x.stato==='in_attesa'?'<span class="eti a">aspetta te</span>':'')+
+    '</div><span class="n">'+(Number(x.giornate)?gg(x.giornate)+' gg':'—')+'</span></div>').join('');
+  document.getElementById('traguardi').innerHTML =
+    '<div class="cant"><div class="cima"><div class="lett" style="background:var(--verde)">1</div>'+
+      '<div class="nome">Fine lavori, senza app</div>'+
+      '<div class="gg">'+rPerc+'% · '+gg(rFatte)+' su '+gg(rTot)+' giornate</div></div>'+
+      '<div class="barra"><i style="width:'+rPerc+'%"></i></div>'+
+      (rPerc>=100
+        ? '<div style="font-size:14px;font-weight:800;color:var(--verde);padding:8px 2px">Traguardo raggiunto'+(ultimaResto?' il '+dataIT(ultimaResto):'')+': il prodotto web, l\'amministrazione, i contenuti e le audioguide sono completi e vivi.</div>'
+        : '<div style="font-size:13.5px;color:var(--tenue);padding:6px 2px">Mancano '+gg(Math.round((rTot-rFatte)*10)/10)+' giornate.</div>')+
+    '</div>'+
+    '<div class="cant"><div class="cima"><div class="lett" style="background:var(--blu)">2</div>'+
+      '<div class="nome">L\'app per iPhone e Android, costruita nel tempo</div>'+
+      '<div class="gg">'+aPerc+'% · '+gg(aFatte)+' su '+gg(aTot)+' giornate</div></div>'+
+      '<div class="barra"><i style="width:'+aPerc+'%;background:linear-gradient(90deg,var(--blu),#4a7fc9)"></i></div>'+
+      '<div style="font-size:13.5px;color:var(--tenue);padding:6px 2px 10px"><b style="color:var(--testo)">Meta: Natale 2026 (25/12).</b> '+
+        'Al ritmo del cantiere la fine cade il <b>'+previstaApp.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit'})+'</b>'+
+        (margine>=0?', con '+margine+' giorni di margine sul Natale.':', cioe\' '+Math.abs(margine)+' giorni oltre il Natale: o si alza il ritmo o si sposta la meta.')+
+      '</div>'+passi+
+    '</div>';
 }
 leggi();
 setInterval(leggi,60000);
