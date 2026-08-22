@@ -51,6 +51,14 @@ salvata in home; la copertura piena arriva col blocco 37 (app nativa).
 scheda visibile: campanella e pannello si aggiornano da soli. Il codice
 realtime resta agganciato: se un giorno il campanello tornera', suonera'.
 
+**L'invito garbato (v5.64, chiesto da Alessandro).** Ogni dispositivo va
+iscritto per conto suo: se sul dispositivo il permesso non e' mai stato
+chiesto, dopo il login una tessera propone di accendere gli avvisi. Il
+popup del browser arriva solo dopo il si' sulla tessera, mai a freddo; un
+no la fa tacere sette giorni; le scelte gia' fatte su campanella ed email
+non vengono toccate. Tre lingue. Consegna vera confermata: le quattro push
+di prova arrivate sull'iPhone di Alessandro ad app chiusa.
+
 I blocchi rimasti (33-44) sono l'app nativa: servono le sessioni con lui.
 
 ## 22/08/2026 alba — La notte promessa: da 82,5 a 86 giornate su 113
