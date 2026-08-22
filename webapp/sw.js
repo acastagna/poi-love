@@ -19,13 +19,18 @@ self.addEventListener('push', function (event) {
   var d = {};
   try { d = event.data ? event.data.json() : {}; } catch (_) {}
   event.waitUntil((async function () {
-    var schede = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
-    // Tace SOLO se la finestra dell'app e' davanti e attiva: una scheda
-    // visibile ma senza fuoco (si sta lavorando altrove) deve suonare.
-    // La prima taratura zittiva ogni scheda visibile e sul computer non
-    // arrivava mai nulla (scoperto con Alessandro il 22/08).
-    var davanti = schede.some(function (c) { return c.focused === true; });
-    if (davanti) return;
+    // REGOLA DI APPLE, imparata a spese nostre il 22/08: su iPhone ogni
+    // push DEVE mostrare un avviso. Se il ricevitore ne zittisce qualcuna,
+    // iOS conta i silenzi e stacca la spina al sito intero. Quindi sui
+    // dispositivi Apple si mostra SEMPRE; il silenziatore (niente doppio
+    // squillo quando l'app e' davanti) resta solo dove e' tollerato.
+    var sub = await self.registration.pushManager.getSubscription();
+    var apple = sub && sub.endpoint.indexOf('web.push.apple.com') >= 0;
+    if (!apple) {
+      var schede = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+      var davanti = schede.some(function (c) { return c.focused === true; });
+      if (davanti) return;
+    }
     await self.registration.showNotification(d.title || 'POI•LOVE', {
       body: d.body || '',
       icon: '/img/illi-trasparente-500.png',
