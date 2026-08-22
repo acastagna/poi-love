@@ -51,6 +51,19 @@ salvata in home; la copertura piena arriva col blocco 37 (app nativa).
 scheda visibile: campanella e pannello si aggiornano da soli. Il codice
 realtime resta agganciato: se un giorno il campanello tornera', suonera'.
 
+**Revisione avversariale del codice di giornata (v5.69, mig 170).** Un
+revisore indipendente ha passato tutto il lavoro del 22/08: 1 bloccante e
+4 rilievi seri, tutti fondati, tutti chiusi in giornata. Il bloccante: il
+logout non staccava le push del dispositivo, su un telefono passato di
+mano l'utente uscito avrebbe continuato a ricevere i SUOI avvisi (e il
+nuovo non si sarebbe mai iscritto, in silenzio). Ora signOut stacca il
+dispositivo finche' la sessione e' viva. Gli avvisi "di conto" (promemoria
+abbonamento, livello, invito a ricambiare) non avevano levetta e non
+partivano mai: il postino li manda a chi ha acceso il canale browser su
+qualunque tipo. Cancellare l'etichetta di una lingua grande ora e' vietato
+dal database (provato); il timbro-prima-dell'invio e' documentato e la
+spedizione protetta; lucchetto contro i giri sovrapposti del cron.
+
 **L'invito garbato (v5.64, chiesto da Alessandro).** Ogni dispositivo va
 iscritto per conto suo: se sul dispositivo il permesso non e' mai stato
 chiesto, dopo il login una tessera propone di accendere gli avvisi. Il
