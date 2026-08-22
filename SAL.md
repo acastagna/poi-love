@@ -1,6 +1,6 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
-## 22/08/2026 mattina — Blocchi 49 e 48: le lingue diventano dati (89,5 su 113)
+## 22/08/2026 mattina — Blocchi 49 e 48: le lingue diventano dati (91 su 113)
 
 **Blocco 49, categorie per lingua (mig 167, fatto).** Le etichette delle
 categorie escono dalle tre colonne fisse ed entrano in una tabella per lingua
@@ -10,8 +10,8 @@ Lettura del futuro: `categorie_per_lingua(lingua)` con scala di ripiego
 lingua, sq, en, it, chiave. Provato dal vivo in una transazione: il greco
 entra come righe semplici, il ripiego funziona, la sincronia vale nei due sensi.
 
-**Blocco 48, impianto delle lingue parametrico (mig 168, v5.62 PRONTA, non
-ancora online: il deploy lo fa Alessandro).** Registro `lingue` sul database;
+**Blocco 48, impianto delle lingue parametrico (mig 168, v5.62 ONLINE sui due
+server, verificata dal vivo).** Registro `lingue` sul database;
 le tre grandi viaggiano dentro l'app, ogni lingua in piu' e' una riga sul
 database piu' un file `lingue/<codice>.json`. I due selettori (chip d'ingresso
 e bandiere) si ridipingono dal registro: lingua accesa = bottone in piu',
@@ -22,6 +22,14 @@ bandiera, dizionario di ~65 voci, un UPDATE per accenderlo. Porta di servizio
 `?lingua=xx` per chi traduce. Collaudo su server locale contro il database
 vero: quarta bandiera comparsa da sola, dizionario caricato al volo, ripiego
 esatto, zero errori console; poi el rispento, tutto tornato a tre.
+
+**Guasto preesistente trovato durante la verifica**: `wss://poilove.com/db/realtime`
+risponde 404 dal passaggio alla macchina nostra (18/08): il servizio realtime
+non esiste sul nuovo impianto. L'app ritenta in silenzio e nulla si rompe, ma
+gli aggiornamenti istantanei a pagina aperta (notifiche live, bacheca) non
+viaggiano piu' via websocket. Da decidere: realtime self-hosted sul nostro
+Postgres, oppure togliere il canale e passare a un ricontrollo periodico.
+Segnato in TODO.
 
 I blocchi rimasti (33-44) sono l'app nativa: servono le sessioni con lui.
 

@@ -7,6 +7,7 @@
 >
 > Quando un blocco cambia stato si scrive nel database, non nei file: la pagina si aggiorna da sola.
 
+- [ ] **Canale realtime rotto dal 18/08** (trovato il 22/08 verificando la v5.62): `wss://poilove.com/db/realtime` risponde 404, il servizio realtime non esiste sulla macchina nostra. Nulla si rompe (l'app ritenta in silenzio) ma notifiche live e bacheca a pagina aperta non si aggiornano da sole. Decidere: realtime self-hosted sul nostro Postgres, oppure ricontrollo periodico al posto del websocket.
 - [ ] **Profilo Plus dei locali** (prossimo lavoro): 20 foto, listino/menu, sistemi di pagamento, orari di apertura, QR del locale, statistiche avanzate. Da costruire uno alla volta.
 - [ ] **Controllo automatico dei livelli**: oggi la condizione (30 POI al mese per Influencer, rinnovo per Professionista e Plus) e' scritta nella pagina ma non la verifica nessuno. Serve un lavoro automatico che tolga i vantaggi a chi non la rispetta.
 - [ ] **Sitemap dei livelli da mandare a Google Search Console e Bing**: https://project.poilove.com/sitemap.xml (lo fa Alessandro).
