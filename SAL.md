@@ -1,5 +1,30 @@
 # SAL — Stato Avanzamento Lavori · POI•LOVE
 
+## 22/08/2026 mattina — Blocchi 49 e 48: le lingue diventano dati (89,5 su 113)
+
+**Blocco 49, categorie per lingua (mig 167, fatto).** Le etichette delle
+categorie escono dalle tre colonne fisse ed entrano in una tabella per lingua
+(`categoria_etichette`); le colonne storiche restano vive e si tengono
+allineate da sole in entrambe le direzioni (due grilletti con sentinella).
+Lettura del futuro: `categorie_per_lingua(lingua)` con scala di ripiego
+lingua, sq, en, it, chiave. Provato dal vivo in una transazione: il greco
+entra come righe semplici, il ripiego funziona, la sincronia vale nei due sensi.
+
+**Blocco 48, impianto delle lingue parametrico (mig 168, v5.62 PRONTA, non
+ancora online: il deploy lo fa Alessandro).** Registro `lingue` sul database;
+le tre grandi viaggiano dentro l'app, ogni lingua in piu' e' una riga sul
+database piu' un file `lingue/<codice>.json`. I due selettori (chip d'ingresso
+e bandiere) si ridipingono dal registro: lingua accesa = bottone in piu',
+senza rifare l'app. Dizionario parziale ricade sull'italiano chiave per
+chiave; la preferenza salvata in una lingua da registro sopravvive al reload
+(difetto trovato e corretto in prova). Il greco e' a bordo spento come prova:
+bandiera, dizionario di ~65 voci, un UPDATE per accenderlo. Porta di servizio
+`?lingua=xx` per chi traduce. Collaudo su server locale contro il database
+vero: quarta bandiera comparsa da sola, dizionario caricato al volo, ripiego
+esatto, zero errori console; poi el rispento, tutto tornato a tre.
+
+I blocchi rimasti (33-44) sono l'app nativa: servono le sessioni con lui.
+
 ## 22/08/2026 alba — La notte promessa: da 82,5 a 86 giornate su 113
 
 Webapp da v5.49 a **v5.59**, dieci deploy verificati, controllo sempre 19/19.
