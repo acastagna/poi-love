@@ -42,6 +42,7 @@ $daControllare = $pdo->query("select id, impronta, ricevute from rapporti where 
 foreach ($daControllare as $r) {
     $digest = hex2bin($r['impronta']);
     $ricevute = json_decode((string) $r['ricevute'], true) ?: [];
+    if (isset($ricevute['risposte'])) { $ricevute = $ricevute['risposte']; }
     $bin = [];
     foreach ($ricevute as $x) {
         if (!empty($x['ok']) && !empty($x['b64'])) {
@@ -52,8 +53,10 @@ foreach ($daControllare as $r) {
     if (!$bin) { continue; }
     $up = tm_ots_controlla($digest, $bin);
     if (!empty($up['ancorata']) && !empty($up['height'])) {
-        $st = $pdo->prepare("update rapporti set stato = 'ancorata', blocco = ?, ancorato_il = now() where id = ?");
-        $st->execute([(int) $up['height'], $r['id']]);
+        // le ricevute si arricchiscono degli upgrade: servono al file .ots completo
+        $tutte = ['risposte' => $ricevute, 'upgrades' => $up['upgrades'] ?? []];
+        $st = $pdo->prepare("update rapporti set stato = 'ancorata', blocco = ?, ancorato_il = now(), ricevute = ? where id = ?");
+        $st->execute([(int) $up['height'], json_encode($tutte, JSON_UNESCAPED_UNICODE), $r['id']]);
         echo $r['id'], ': ANCORATA nel blocco ', (int) $up['height'], "\n";
     } else {
         echo $r['id'], ': in attesa del blocco', "\n";
