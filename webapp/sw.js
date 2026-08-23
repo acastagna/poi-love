@@ -15,7 +15,7 @@
 /* La spia diagnostica (22/08): ogni fase viene segnata sul diario del
    server, cosi' si vede DAL VIVO se la push arriva al telefono e cosa
    le succede. Nessun dato personale: fase, versione, ora. */
-var SW_VER = '5.74';
+var SW_VER = '5.75';
 function _spia(fase) {
   try { return fetch('https://poilove.com/sw-diario.php?fase=' + fase + '&v=' + SW_VER, { cache: 'no-store' }).catch(function(){}); }
   catch (_) { return Promise.resolve(); }
@@ -28,14 +28,19 @@ self.addEventListener('push', function (event) {
   var d = {};
   try { d = event.data ? event.data.json() : {}; } catch (_) {}
   event.waitUntil((async function () {
-    await _spia(event.data ? 'ricevuta' : 'ricevuta_vuota');
+    // La spia NON si aspetta (revisione 22/08): un diario lento non deve
+    // ritardare l'avviso, e su iPhone il ritardo costa la spina staccata.
+    _spia(event.data ? 'ricevuta' : 'ricevuta_vuota');
     // REGOLA DI APPLE, imparata a spese nostre il 22/08: su iPhone ogni
     // push DEVE mostrare un avviso. Se il ricevitore ne zittisce qualcuna,
     // iOS conta i silenzi e stacca la spina al sito intero. Quindi sui
     // dispositivi Apple si mostra SEMPRE; il silenziatore (niente doppio
     // squillo quando l'app e' davanti) resta solo dove e' tollerato.
-    var sub = await self.registration.pushManager.getSubscription();
-    var apple = sub && sub.endpoint.indexOf('web.push.apple.com') >= 0;
+    // Iscrizione non leggibile = ci si comporta da Apple: mostrare e' il
+    // ramo che non fa mai danni (revisione 22/08).
+    var sub = null;
+    try { sub = await self.registration.pushManager.getSubscription(); } catch (_) {}
+    var apple = !sub || sub.endpoint.indexOf('web.push.apple.com') >= 0;
     if (!apple) {
       var schede = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
       var davanti = schede.some(function (c) { return c.focused === true; });

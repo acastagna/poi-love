@@ -21,6 +21,11 @@ import { Colors, Typography, Radius, Shadow } from '@/constants/theme';
 const LENTE_PHOSPHOR =
   'M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,' +
   '11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z';
+/* La X di Phosphor, per pulire il campo. */
+const X_PHOSPHOR =
+  'M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32' +
+  'L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,' +
+  '11.32,11.32L139.31,128Z';
 
 export interface RisultatoRicerca {
   tipo:   'poi' | 'posto';
@@ -42,6 +47,9 @@ export default function RicercaMappa({ onScegli }: Props) {
   const [risultati, setRisultati] = useState<RisultatoRicerca[]>([]);
   const [cerco, setCerco]         = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  /* Il numero del giro: una risposta lenta di un giro vecchio non deve
+     scrivere sopra i risultati del giro nuovo (revisione 22/08). */
+  const giro = useRef(0);
 
   function cambia(t: string) {
     setTesto(t);
@@ -51,11 +59,16 @@ export default function RicercaMappa({ onScegli }: Props) {
   }
 
   async function cerca(q: string) {
+    const mio = ++giro.current;
     setCerco(true);
     const trovati: RisultatoRicerca[] = [];
     // 1) I nostri luoghi, in tutte le lingue del titolo.
     try {
-      const like = `%${q.replace(/[%_]/g, '')}%`;
+      // Virgole, parentesi e virgolette sono sintassi del filtro or() di
+      // PostgREST: nel testo cercato diventano spazi, altrimenti perfino
+      // l'esempio del segnaposto ("Blloku, Tirana") rompeva la ricerca
+      // (revisione 22/08). Il resto della frase cerca uguale.
+      const like = `%${q.replace(/[%_(),."\\]/g, ' ').trim()}%`;
       const { data } = await db
         .from('pois')
         .select('id,title,title_it,title_sq,title_en,city,lat,lng,love_count')
@@ -88,6 +101,7 @@ export default function RicercaMappa({ onScegli }: Props) {
         }));
       }
     } catch {}
+    if (mio !== giro.current) return;   // giro superato: risultati vecchi, via
     setRisultati(trovati);
     setCerco(false);
   }
@@ -116,8 +130,10 @@ export default function RicercaMappa({ onScegli }: Props) {
         />
         {cerco && <ActivityIndicator size="small" color={Colors.red} />}
         {!cerco && testo.length > 0 && (
-          <TouchableOpacity onPress={() => { setTesto(''); setRisultati([]); }} hitSlop={10}>
-            <Text style={styles.pulisci}>✕</Text>
+          <TouchableOpacity onPress={() => { setTesto(''); setRisultati([]); }} hitSlop={10} accessibilityLabel="Pulisci">
+            <Svg width={16} height={16} viewBox="0 0 256 256">
+              <Path d={X_PHOSPHOR} fill="#9A9187" />
+            </Svg>
           </TouchableOpacity>
         )}
       </View>

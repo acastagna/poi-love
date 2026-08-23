@@ -53,7 +53,9 @@ export default function PinCuore({ titolo, love, selected, tier, ufficiale, inEv
   const maxNome = piccolo ? 8 : 11;
   const nome = titolo.length > maxNome ? titolo.substring(0, maxNome) + '…' : titolo;
   return (
-    <View style={[styles.tutto, selected && styles.scelto]}>
+    /* Il nome del luogo lo dice gia' il Marker (title): il disegno dentro
+       e' solo figura, per gli screen reader non esiste. */
+    <View style={[styles.tutto, selected && styles.scelto]} accessible={false} importantForAccessibility="no-hide-descendants">
       <View style={styles.pin}>
         <Svg width={w} height={h} viewBox="0 0 80 96">
           <Path d={GOCCIA} fill={colore} stroke="#fff" strokeWidth={4} />

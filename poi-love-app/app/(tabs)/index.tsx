@@ -28,6 +28,10 @@ import POIMarker from '@/components/POIMarker';
 import AddPOISheet from '@/components/AddPOISheet';
 import POIDetailCard from '@/components/POIDetailCard';
 import RicercaMappa, { RisultatoRicerca } from '@/components/RicercaMappa';
+import Svg, { Path } from 'react-native-svg';
+
+/* Il piu' di Phosphor per il tasto Aggiungi (niente caratteri al posto delle icone). */
+const PIU_PHOSPHOR = 'M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z';
 
 export default function MapScreen() {
   const mapRef       = useRef<MapView>(null);
@@ -78,11 +82,13 @@ export default function MapScreen() {
       );
       setPois(result as POI[]);
       setMappaErrore(false);
+      return result as POI[];
     } catch (err) {
       // La mappa che tace su un errore mostra un mondo vuoto e sembra vera:
       // un avviso discreto, e i marcatori gia' scaricati restano al loro posto.
       console.warn('fetchPOIs error:', err);
       setMappaErrore(true);
+      return [] as POI[];
     } finally {
       setLoading(false);
     }
@@ -154,8 +160,9 @@ export default function MapScreen() {
           if (r.tipo === 'poi' && r.id) {
             const p = pois.find(x => x.id === r.id);
             if (p) setSelectedPOI(p);
-            else fetchPOIs(dove).then(() => {
-              setPois(prev => { const t = prev.find(x => x.id === r.id); if (t) setSelectedPOI(t); return prev; });
+            else fetchPOIs(dove).then(scaricati => {
+              const t = (scaricati || []).find(x => x.id === r.id);
+              if (t) setSelectedPOI(t);
             });
           }
         }}
@@ -194,7 +201,9 @@ export default function MapScreen() {
           onPress={handleAddButtonPress}
           activeOpacity={0.85}
         >
-          <Text style={styles.fabIcon}>+</Text>
+          <Svg width={26} height={26} viewBox="0 0 256 256">
+            <Path d={PIU_PHOSPHOR} fill={Colors.white} />
+          </Svg>
         </TouchableOpacity>
       )}
 

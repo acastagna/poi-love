@@ -5195,8 +5195,9 @@ async function _rinnovaPushDispositivo(silente){
     const reg=await navigator.serviceWorker.getRegistration();
     const sub=reg && await reg.pushManager.getSubscription();
     if(sub){
-      try{ await sb.from('push_iscrizioni').delete().eq('endpoint', sub.endpoint); }catch(_){}
+      const endpoint=sub.endpoint;
       await sub.unsubscribe();
+      try{ await sb.from('push_iscrizioni').delete().eq('endpoint', endpoint); }catch(_){}
     }
     const ok=await _iscriviPush();
     if(!silente) showToast(ok ? t('push_rin_ok','Avvisi rinnovati: iscrizione nuova di zecca')
@@ -5280,14 +5281,18 @@ async function _iscriviPush(){
   }catch(e){ console.warn('[push] iscrizione:', e && e.message); return false; }
 }
 async function _disiscriviQuestoDispositivo(){
-  // Stacca QUESTO dispositivo: via la riga dal registro (finche' la sessione
-  // e' viva) e via l'iscrizione dal browser. Usata dal logout.
+  // Stacca QUESTO dispositivo: prima l'iscrizione dal browser, POI la riga
+  // dal registro (revisione 22/08: nell'ordine inverso, se lo stacco dal
+  // browser falliva restava un'iscrizione viva senza riga, cioe' un
+  // dispositivo che riceve senza risultare; una riga orfana invece la
+  // ripulisce il postino coi 410). Usata dal logout, a sessione ancora viva.
   try{
     const reg=await navigator.serviceWorker.getRegistration();
     const sub=reg && await reg.pushManager.getSubscription();
     if(sub){
-      await sb.from('push_iscrizioni').delete().eq('endpoint', sub.endpoint);
+      const endpoint=sub.endpoint;
       await sub.unsubscribe();
+      try{ await sb.from('push_iscrizioni').delete().eq('endpoint', endpoint); }catch(_){}
     }
   }catch(_){}
 }
@@ -10194,7 +10199,7 @@ const photoData=[null,null,null];
 const photoFiles=[null,null,null]; // File object reali per upload Supabase
 // Versione dell'app: la 2.00 e' il punto di partenza ufficiale (deciso il 04/07/2026).
 // Unica fonte di verita': questa costante riempie tutti gli elementi .app-ver.
-const APP_VERSION='5.74';
+const APP_VERSION='5.75';
 // ── REGOLA DI CASA (18/08/2026): un salvataggio che fallisce NON tace MAI. ──
 // Contenuto dell'utente: avviso a schermo + registro. Servizio: solo registro, ma a voce alta.
 function salvataggioFallito(cosa, err, soloRegistro){

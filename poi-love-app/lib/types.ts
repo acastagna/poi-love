@@ -48,6 +48,7 @@ export interface POI {
   // Badge e assegnazione (decisi dall'amministrazione)
   badge_official:   boolean;
   badge_essential:  boolean;
+  is_featured:      boolean;   // messo in evidenza dall'amministrazione (stella d'oro)
   badge_tier:       string | null;
   badge_ids:        string[] | null;
   assigned_user_id: string | null;
@@ -72,7 +73,7 @@ export interface POI {
 // fra una mappa che vola e una che scarica mezzo database.
 export const POI_CAMPI_MAPPA =
   'id,title,title_it,title_sq,title_en,lat,lng,category,subcategory,categories,' +
-  'cover_photo,love_count,visibility,is_approved,badge_official,badge_essential,city';
+  'cover_photo,love_count,visibility,is_approved,badge_official,badge_essential,is_featured,city';
 
 // ─── Il profilo ─────────────────────────────────────────────────────────────
 export interface Profile {

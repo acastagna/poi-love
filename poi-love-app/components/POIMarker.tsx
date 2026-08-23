@@ -26,6 +26,7 @@ export default function POIMarker({ poi, onPress, selected, mioUserId }: Props) 
       coordinate={{ latitude: poi.lat, longitude: poi.lng }}
       onPress={onPress}
       anchor={{ x: 0.5, y: 0.78 }}
+      title={poi.title_it || poi.title}
       tracksViewChanges={selected} // performance: non re-renderizza se non selezionato
     >
       <PinCuore
@@ -34,6 +35,7 @@ export default function POIMarker({ poi, onPress, selected, mioUserId }: Props) 
         selected={selected}
         tier={tier}
         ufficiale={poi.visibility === 'official' || !!poi.badge_official}
+        inEvidenza={!!poi.is_featured}
       />
     </Marker>
   );
