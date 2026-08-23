@@ -27,6 +27,7 @@ import { Colors, Spacing, Radius, Typography, Shadow } from '@/constants/theme';
 import POIMarker from '@/components/POIMarker';
 import AddPOISheet from '@/components/AddPOISheet';
 import POIDetailCard from '@/components/POIDetailCard';
+import RicercaMappa, { RisultatoRicerca } from '@/components/RicercaMappa';
 
 export default function MapScreen() {
   const mapRef       = useRef<MapView>(null);
@@ -37,6 +38,14 @@ export default function MapScreen() {
   const [loading,      setLoading]      = useState(false);
   const [newPOICoord,  setNewPOICoord]  = useState<{ latitude: number; longitude: number } | null>(null);
   const [region,       setRegion]       = useState<Region>(Config.defaultRegion);
+  const [mioUserId,    setMioUserId]    = useState<string | null>(null);
+
+  // Chi sono: serve per colorare di rosso i MIEI luoghi sulla mappa
+  useEffect(() => {
+    import('@/lib/supabase').then(({ db }) =>
+      db.auth.getSession().then(({ data }) => setMioUserId(data.session?.user?.id ?? null))
+    ).catch(() => {});
+  }, []);
 
   // GPS al primo avvio
   useEffect(() => {
@@ -129,9 +138,28 @@ export default function MapScreen() {
             poi={poi}
             onPress={() => setSelectedPOI(poi)}
             selected={selectedPOI?.id === poi.id}
+            mioUserId={mioUserId}
           />
         ))}
       </MapView>
+
+      {/* La barra di ricerca, come nella webapp: nostri luoghi + indirizzi */}
+      <RicercaMappa
+        onScegli={(r: RisultatoRicerca) => {
+          const dove: Region = {
+            latitude: r.lat, longitude: r.lng,
+            latitudeDelta: 0.015, longitudeDelta: 0.015,
+          };
+          mapRef.current?.animateToRegion(dove, 700);
+          if (r.tipo === 'poi' && r.id) {
+            const p = pois.find(x => x.id === r.id);
+            if (p) setSelectedPOI(p);
+            else fetchPOIs(dove).then(() => {
+              setPois(prev => { const t = prev.find(x => x.id === r.id); if (t) setSelectedPOI(t); return prev; });
+            });
+          }
+        }}
+      />
 
       {/* Loading indicator */}
       {loading && (
@@ -203,7 +231,7 @@ const styles = StyleSheet.create({
   },
   loadingBadge: {
     position:        'absolute',
-    top:             60,
+    top:             112,
     alignSelf:       'center',
     backgroundColor: Colors.background,
     borderRadius:    Radius.full,
@@ -212,7 +240,7 @@ const styles = StyleSheet.create({
   },
   erroreBadge: {
     position: 'absolute',
-    top: 58,
+    top: 112,
     alignSelf: 'center',
     backgroundColor: 'rgba(212,43,43,0.92)',
     paddingHorizontal: 14,
