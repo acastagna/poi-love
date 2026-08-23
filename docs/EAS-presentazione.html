@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<!--
+  © Alessandro Castagna — 321.al / EVOLAB
+  Tutti i diritti riservati. Uso non autorizzato vietato.
+  info@321.it · https://321.al
+-->
+<html lang="it"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>La strada per gli store</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{--rosso:#D42B2B;--terra:#A5624E;--ink:#221c18;--carta:#faf8f4;--bordo:#e4ddd2;
+        --testo:#241d18;--tenue:#6b6157;--verde:#0B7A38;--oro:#B45309;--blu:#285EA7}
+  body{background:#f2eee8;color:var(--testo);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,Helvetica,Arial,sans-serif;
+       font-size:16px;line-height:1.5;padding-bottom:60px}
+  .foglio{max-width:1020px;margin:0 auto;padding:0 26px}
+  header{padding:44px 0 26px;border-bottom:4px solid var(--rosso);margin-bottom:30px}
+  .kicker{font-size:12px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;color:var(--rosso)}
+  h1{font-size:38px;font-weight:900;letter-spacing:-1px;line-height:1.08;margin:8px 0 10px}
+  .sotto{font-size:17px;color:var(--tenue);max-width:640px}
+  .verdetto{display:inline-block;margin-top:16px;background:var(--verde);color:#fff;font-weight:900;
+            border-radius:999px;padding:9px 20px;font-size:14.5px}
+  h2{font-size:22px;font-weight:900;margin:38px 0 16px;letter-spacing:-.3px}
+  .griglia{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+  .card{background:var(--carta);border:1px solid var(--bordo);border-radius:16px;padding:18px 20px}
+  .card b.titolo{display:block;font-size:15.5px;margin-bottom:6px}
+  .card p{font-size:14px;color:var(--tenue)}
+  .num{font-size:34px;font-weight:900;line-height:1;letter-spacing:-1px}
+  .num small{font-size:14px;font-weight:700;color:var(--tenue);letter-spacing:0}
+  table{width:100%;border-collapse:collapse;background:var(--carta);border:1px solid var(--bordo);
+        border-radius:16px;overflow:hidden;font-size:14.5px}
+  th{background:var(--ink);color:#fff;text-align:left;padding:11px 14px;font-size:12.5px;
+     text-transform:uppercase;letter-spacing:.08em}
+  td{padding:11px 14px;border-top:1px solid var(--bordo);vertical-align:top}
+  td.euro{font-weight:900;white-space:nowrap}
+  .ok{color:var(--verde);font-weight:800}
+  .nota{background:#FFF7E6;border-left:4px solid #E8C169;border-radius:10px;padding:13px 16px;
+        font-size:14px;margin:14px 0;color:#5c4300}
+  .flusso{display:flex;gap:0;align-items:stretch;flex-wrap:wrap;margin-top:6px}
+  .passo{flex:1;min-width:150px;background:var(--carta);border:1px solid var(--bordo);padding:14px;
+         text-align:center;position:relative}
+  .passo:first-child{border-radius:14px 0 0 14px}
+  .passo:last-child{border-radius:0 14px 14px 0}
+  .passo b{display:block;font-size:14px;margin-bottom:3px}
+  .passo span{font-size:12.5px;color:var(--tenue)}
+  .passo .chi{display:inline-block;margin-top:8px;font-size:10.5px;font-weight:900;letter-spacing:.1em;
+              text-transform:uppercase;border-radius:99px;padding:3px 10px}
+  .chi.io{background:#f3e3df;color:var(--terra)} .chi.tu{background:#e3ebf5;color:var(--blu)}
+  .chi.nube{background:#e8f3ed;color:var(--verde)}
+  .due{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:760px){.due{grid-template-columns:1fr}}
+  .piede{margin-top:52px;border-top:1px solid var(--bordo);padding-top:14px;font-size:12px;
+         color:var(--tenue);text-align:center}
+  .fonte{font-size:11.5px;color:var(--tenue);margin-top:8px}
+</style></head><body>
+<div class="foglio">
+
+<header>
+  <div class="kicker">Decisione tecnica · 22/08/2026</div>
+  <h1>La strada per portare le app negli store</h1>
+  <p class="sotto">Come si costruisce, si prova e si pubblica l'app di POI•LOVE (e le prossime) senza cambiare computer, con il ritmo di lavoro che teniamo sul web.</p>
+  <span class="verdetto">VERDETTO: Xcode 16.4 per gli occhi + EAS in nuvola per pubblicare</span>
+</header>
+
+<h2>Perché questa strada</h2>
+<div class="griglia">
+  <div class="card"><b class="titolo">🖥️ Niente computer nuovo adesso</b>
+    <p>Il pacchetto per gli store lo confeziona la nuvola, su strumenti Apple sempre aggiornati. L'iMac Pro serve solo per il simulatore (Xcode 16.4, che ci gira bene). Il Mac nuovo a gennaio è comodità, non necessità.</p></div>
+  <div class="card"><b class="titolo">⚡ Correzioni senza aspettare Apple</b>
+    <p>Con gli aggiornamenti al volo (EAS Update) le correzioni arrivano all'app già pubblicata in pochi minuti, senza revisione dello store. Lo stesso ritmo dei nostri deploy web quotidiani.</p></div>
+  <div class="card"><b class="titolo">🔓 Cadono i recinti di Expo Go</b>
+    <p>Le costruzioni di sviluppo sbloccano i pezzi nativi che oggi non possiamo provare: geofence in sottofondo, notifiche native, mappe più ricche. Sono i blocchi 37 e 38 del programma.</p></div>
+  <div class="card"><b class="titolo">🔏 La firma la gestisce lui</b>
+    <p>Certificati e profili Apple (la parte più fragile del mestiere) vengono creati, custoditi e rinnovati in automatico. Con Xcode a mano sono la prima fonte di errori.</p></div>
+  <div class="card"><b class="titolo">🤖 Tutto comandabile da Claude</b>
+    <p>Si governa da riga di comando con una chiave, come il resto dei nostri impianti: costruzioni, prove sul telefono, invii agli store partono in autonomia. Niente passaggi a mano.</p></div>
+  <div class="card"><b class="titolo">📦 Stessa app, identica al bit</b>
+    <p>Il risultato finale è lo stesso che uscirebbe da un Mac nuovo con Xcode: stessi strumenti Apple, stessa firma, stessa professionalità. Cambia solo dove avviene il lavoro pesante.</p></div>
+</div>
+
+<h2>Il costo dello strumento (listino ufficiale Expo, letto oggi)</h2>
+<div class="due">
+  <div class="card">
+    <b class="titolo">Con 1 app pubblicata (POI•LOVE)</b>
+    <div class="num">0 → 19 <small>$ / mese</small></div>
+    <p style="margin-top:8px">Piano gratuito: 15 costruzioni iPhone + 15 Android al mese e aggiornamenti al volo fino a <b>1.000 utenti attivi</b>. Nelle settimane di costruzione intensa e fino a <b>3.000 utenti</b>: piano Starter a 19 $/mese (con 45 $ di credito costruzioni inclusi). Si accende e si spegne quando serve.</p>
+  </div>
+  <div class="card">
+    <b class="titolo">Con 10 app pubblicate</b>
+    <div class="num">19 → 199 <small>$ / mese</small></div>
+    <p style="margin-top:8px">Il piano è UNICO per tutto l'account, non si paga per app. Dieci app con pubblico piccolo stanno nello Starter (19 $ + costruzioni extra a 1-4 $ l'una). Il gradino a 199 $/mese (Production) serve solo quando gli aggiornamenti al volo raggiungono <b>50.000 utenti attivi</b> al mese: a quel punto è un costo da azienda avviata.</p>
+  </div>
+</div>
+<div class="nota"><b>La leva vera del prezzo non è il numero di app: sono gli utenti che ricevono gli aggiornamenti al volo.</b> Sotto i mille utenti si lavora gratis; e si può sempre restare su un piano basso pubblicando gli aggiornamenti grossi via store, come fanno tutti.</div>
+
+<h2>I costi obbligatori degli store (uguali per qualunque strada)</h2>
+<table>
+  <tr><th>Voce</th><th>Costo</th><th>Vale per</th></tr>
+  <tr><td>Apple Developer Program</td><td class="euro">99 $ / anno</td><td><b>Tutte le app dell'account</b>, non per app: 1 o 10 app, sempre 99 $</td></tr>
+  <tr><td>Google Play Console</td><td class="euro">25 $ una volta sola</td><td><b>Per sempre, tutte le app</b></td></tr>
+  <tr><td>Commissione sulle vendite in app (abbonamenti Sostenitore, Mecenate...)</td><td class="euro">15%</td><td>Sotto il milione di dollari l'anno di ricavi (Small Business Program di Apple e l'equivalente Google). Sopra: 30%</td></tr>
+</table>
+
+<h2>Il conto tutto insieme, primo anno</h2>
+<table>
+  <tr><th>Scenario</th><th>Una volta sola</th><th>All'anno</th><th>Al mese (solo nei mesi caldi)</th></tr>
+  <tr><td><b>1 app</b> (POI•LOVE fino a 3.000 utenti)</td><td class="euro">25 $</td><td class="euro">99 $</td><td class="euro">0-19 $</td></tr>
+  <tr><td><b>10 app</b> (pubblico piccolo/medio)</td><td class="euro">25 $</td><td class="euro">99 $</td><td class="euro">19-40 $ circa</td></tr>
+  <tr><td><b>10 app</b> con decine di migliaia di utenti aggiornati al volo</td><td class="euro">25 $</td><td class="euro">99 $</td><td class="euro">199 $</td></tr>
+</table>
+<div class="nota">Per confronto: il Mac nuovo che NON serve comprare adesso costa 2.500-5.000 €. Due anni di strumento, anche nello scenario più caro, costano meno del computer che sostituirebbe solo in parte.</div>
+
+<h2>Come scorre il lavoro</h2>
+<div class="flusso">
+  <div class="passo"><b>Costruisco e guardo</b><span>Simulatore iPhone sul tuo Mac (Xcode 16.4)</span><br><span class="chi io">Claude</span></div>
+  <div class="passo"><b>Confeziona e firma</b><span>La nuvola EAS, strumenti Apple aggiornati</span><br><span class="chi nube">Nuvola</span></div>
+  <div class="passo"><b>Provi sul telefono</b><span>Link o QR, poi TestFlight</span><br><span class="chi tu">Tu</span></div>
+  <div class="passo"><b>Negli store</b><span>Invio e revisione Apple/Google (1-3 giorni)</span><br><span class="chi io">Claude</span></div>
+  <div class="passo"><b>Correzioni al volo</b><span>In pochi minuti, senza ripassare dalla revisione</span><br><span class="chi io">Claude</span></div>
+</div>
+
+<h2>Cosa NON fa (per onestà)</h2>
+<div class="griglia">
+  <div class="card"><b class="titolo">Non controlla la qualità del codice</b><p>Compila e segnala se la costruzione fallisce, ma la revisione del codice resta nostra: controlli, revisioni avversariali, verifiche dal vivo. Quel presidio ce l'abbiamo già.</p></div>
+  <div class="card"><b class="titolo">Non migliora le funzioni da solo</b><p>La mappa, i marcatori, tutto ciò che l'app fa vive nel nostro codice: è identico ovunque venga confezionato. Lo strumento toglie ostacoli, il valore lo mettiamo noi.</p></div>
+</div>
+
+<p class="fonte">Fonti: listino expo.dev/pricing e developer.apple.com, letti il 22/08/2026. Documento in italiano; versione trilingue con temi (standard 321) su richiesta.</p>
+
+<div class="piede">Documento interno EVOLAB · 321 · Ingegnerizzato da Alessandro Castagna · NIPT M52411017N · Tiranë</div>
+</div>
+</body></html>
