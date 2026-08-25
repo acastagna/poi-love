@@ -10,6 +10,11 @@
 -- La distinzione: dentro una cascata la profondita' dei grilletti e'
 -- maggiore di 1 (la cascata stessa e' un grilletto di sistema); la
 -- cancellazione diretta di una singola etichetta sta a profondita' 1.
+-- AVVISO per il futuro (ripasso del 23/08): il criterio non e' specifico
+-- della cascata FK. Un domani, un ALTRO grilletto utente che cancellasse
+-- righe di categoria_etichette dal proprio corpo passerebbe anche lui
+-- sotto la protezione senza errore. Oggi non ne esiste nessuno: se se ne
+-- scrive uno, ripensare questa guardia (per esempio con una sentinella).
 -- Nota: il collaudo qui sotto usa la categoria 'ristorante' del seed
 -- (migrazioni delle categorie): se un giorno sparisse, adattare il test.
 

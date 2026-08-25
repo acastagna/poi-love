@@ -54,7 +54,15 @@ export default function RicercaMappa({ onScegli }: Props) {
   function cambia(t: string) {
     setTesto(t);
     if (timer.current) clearTimeout(timer.current);
-    if (t.trim().length < 3) { setRisultati([]); return; }
+    if (t.trim().length < 3) {
+      // Anche una ricerca GIA' in volo diventa carta straccia: senza questo
+      // avanzamento del giro, la risposta lenta ridipingeva risultati sopra
+      // un campo appena svuotato (ripasso del 23/08).
+      giro.current++;
+      setRisultati([]);
+      setCerco(false);
+      return;
+    }
     timer.current = setTimeout(() => cerca(t.trim()), 450);
   }
 
@@ -67,8 +75,12 @@ export default function RicercaMappa({ onScegli }: Props) {
       // Virgole, parentesi e virgolette sono sintassi del filtro or() di
       // PostgREST: nel testo cercato diventano spazi, altrimenti perfino
       // l'esempio del segnaposto ("Blloku, Tirana") rompeva la ricerca
-      // (revisione 22/08). Il resto della frase cerca uguale.
-      const like = `%${q.replace(/[%_(),."\\]/g, ' ').trim()}%`;
+      // (revisione 22/08). Gli spazi doppi si richiudono, e se della frase
+      // non resta NIENTE (sola punteggiatura) i nostri luoghi si saltano:
+      // un like vuoto scaricava i cinque piu' amati (ripasso del 23/08).
+      const pulito = q.replace(/[%_(),."\\]/g, ' ').replace(/\s+/g, ' ').trim();
+      if (pulito.length < 2) throw new Error('niente da cercare da noi');
+      const like = `%${pulito}%`;
       const { data } = await db
         .from('pois')
         .select('id,title,title_it,title_sq,title_en,city,lat,lng,love_count')
@@ -180,11 +192,6 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: Typography.sm ?? 14,
     color: '#333',
-  },
-  pulisci: {
-    fontSize: 16,
-    color: '#9A9187',
-    paddingHorizontal: 4,
   },
   tendina: {
     marginTop: 6,
