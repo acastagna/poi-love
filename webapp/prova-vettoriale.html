@@ -67,7 +67,6 @@
   <div class="gruppo"><em>Prodigi</em>
     <button id="b3d" onclick="flip('tre3d')">3D</button>
     <button id="bCalore" onclick="flip('calore')">Calore</button>
-    <button onclick="volo()">Volo</button>
   </div>
 </div>
 <div id="mappa"></div>
@@ -107,7 +106,15 @@ const mappa = new maplibregl.Map({
   attributionControl: true,
 });
 mappa.addControl(new maplibregl.NavigationControl(), 'bottom-right');
-mappa.on('load', () => mappa.resize());
+mappa.on('load', () => {
+  mappa.resize();
+  /* La lingua dei nomi parte DA SOLA dalla lingua del dispositivo
+     (ordine del 27/08): it e sq restano loro, tutto il resto inglese.
+     I bottoni restano come scelta manuale. */
+  const nl = (navigator.language || '').substring(0, 2).toLowerCase();
+  const auto = nl === 'it' ? 'it' : nl === 'sq' ? 'sq' : 'en';
+  if (!S.lingua) setLingua(auto);
+});
 setTimeout(() => mappa.resize(), 400);
 new ResizeObserver(() => mappa.resize()).observe(document.getElementById('mappa'));
 
@@ -234,24 +241,6 @@ function applicaCalore(anima) {
   if (anima) mappa.easeTo({ pitch: 0, duration: 600 });
 }
 
-/* Il volo DA PUNTO A PUNTO (chiesto dal founder): si parte da un luogo,
-   ci si alza, si vola, si atterra sull'altro. Nell'app vera sara' il volo
-   dal punto in cui sei al luogo scelto, o di tappa in tappa lungo un
-   itinerario. */
-function volo() {
-  const ordinati = luoghi.slice().sort((a, b) => (b.love_count || 0) - (a.love_count || 0));
-  const da = ordinati[1], a = ordinati[0];
-  if (!a) return;
-  const zoomGiu = Math.min(17.5, S.vista === 'satellite' ? 18.3 : 17.5);
-  const inclina = S.vista === 'satellite' ? 0 : 55;
-  if (da) {
-    mappa.jumpTo({ center: [da.lng, da.lat], zoom: zoomGiu, pitch: inclina, bearing: 0 });
-    setTimeout(() => mappa.flyTo({ center: [a.lng, a.lat], zoom: zoomGiu,
-      pitch: inclina, bearing: 25, duration: 7000, essential: true }), 700);
-  } else {
-    mappa.flyTo({ center: [a.lng, a.lat], zoom: zoomGiu, pitch: inclina, bearing: 25, duration: 6000, essential: true });
-  }
-}
 
 /* ── I luoghi VERI, con la goccia della webapp ── */
 function pinHtml(nome, love, colore) {
