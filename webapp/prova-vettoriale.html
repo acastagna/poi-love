@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<!--
+  © Alessandro Castagna — 321.al / EVOLAB
+  Tutti i diritti riservati. Uso non autorizzato vietato.
+  info@321.it · https://321.al
+
+  PROVA del vettoriale (27/08/2026): la stessa mappa Voyager, ma disegnata
+  dal motore MapLibre sulle tegole vettoriali di Carto, come consigliano
+  loro (il raster andra' in pensione). Pagina di assaggio VOLUTA dal
+  founder: la mappa di produzione resta su Leaflet finche' non si decide.
+  I luoghi sono VERI, letti dal database come fa l'app.
+-->
+<html lang="it"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>POI•LOVE · Prova della mappa vettoriale</title>
+<link rel="icon" href="/img/favicon.svg">
+<link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body,#mappa{height:100%;width:100%}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif}
+  .fascia{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:10;
+    background:#16130f;color:#fff;border-radius:24px;padding:9px 18px;font-size:13px;
+    font-weight:800;display:flex;gap:12px;align-items:center;box-shadow:0 6px 20px rgba(0,0,0,.3)}
+  .fascia b{color:#f3b3a5}
+  .fascia a{color:#fff;opacity:.8;text-decoration:underline}
+  /* Il marcatore definitivo, identico alla webapp: goccia col cuore inciso */
+  .pin{display:flex;flex-direction:column;align-items:center;cursor:pointer}
+  .pin svg.goccia{width:42px;height:50px;filter:drop-shadow(0 3px 6px rgba(0,0,0,.3))}
+  .pin .nome{margin-top:3px;background:rgba(0,0,0,.72);color:#fff;font-size:11px;
+    font-weight:700;border-radius:6px;padding:2px 6px;max-width:104px;overflow:hidden;
+    text-overflow:ellipsis;white-space:nowrap;letter-spacing:.2px}
+  .pin .love{position:absolute;top:-2px;right:-2px;min-width:18px;height:18px;
+    display:flex;align-items:center;justify-content:center;background:#fff;color:#111;
+    font-size:10px;font-weight:900;border-radius:99px;border:1.5px solid #D42B2B;
+    padding:0 4px;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+  .pin .corpo{position:relative}
+</style></head>
+<body>
+<div class="fascia">PROVA <b>vettoriale</b> (MapLibre + Voyager GL) · <a href="https://poilove.com/">l'app vera, raster</a></div>
+<div id="mappa"></div>
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script>
+const mappa = new maplibregl.Map({
+  container: 'mappa',
+  style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+  center: [19.8187, 41.3275],   // Tirana
+  zoom: 13,
+  attributionControl: true,
+});
+mappa.addControl(new maplibregl.NavigationControl(), 'bottom-right');
+
+/* Il telo segue SEMPRE la misura vera del contenitore: senza questo, se la
+   finestra prende forma dopo l'avvio la mappa resta un francobollo. */
+mappa.on('load', () => mappa.resize());
+setTimeout(() => mappa.resize(), 400);
+new ResizeObserver(() => mappa.resize()).observe(document.getElementById('mappa'));
+
+/* La goccia col cuore, stessi tracciati della webapp. */
+function pinHtml(nome, love, colore){
+  const n = nome.length > 11 ? nome.substring(0, 11) + '…' : nome;
+  const badge = love > 0 ? '<div class="love">' + (love > 999 ? Math.round(love/100)/10 + 'k' : love) + '</div>' : '';
+  return '<div class="pin"><div class="corpo">' +
+    '<svg class="goccia" viewBox="0 0 80 96"><path d="M40 90C37 88 8 66 8 40 8 22 21 8 40 8s32 14 32 32c0 26-29 48-32 50z" fill="' + colore + '" stroke="#fff" stroke-width="4"/>' +
+    '<path d="M40 30c-5-6-15-4.5-17 3-2 7 4.5 12 17 22 12.5-10 19-15 17-22-2-7.5-12-9-17-3z" fill="#fff"/></svg>' + badge +
+    '</div><div class="nome"></div></div>';
+}
+
+/* I luoghi VERI, letti come fa l'app (stessa vetrina pubblica). */
+const DB = 'https://poilove.com/db/rest/v1';
+const CHIAVE_PUBBLICA = 'sb_publishable_PC1xQ8XiQK9jpzwsAlFLxw_E-PKN40V';
+fetch(DB + '/pois?select=title,title_it,lat,lng,love_count,visibility,badge_official' +
+      '&visibility=in.(community,official)&is_approved=is.true&removed_at=is.null' +
+      '&order=love_count.desc&limit=200', { headers: { apikey: CHIAVE_PUBBLICA } })
+  .then(r => r.json())
+  .then(luoghi => {
+    (luoghi || []).forEach(p => {
+      const ufficiale = p.visibility === 'official' || p.badge_official;
+      const el = document.createElement('div');
+      el.innerHTML = pinHtml(p.title_it || p.title || '', p.love_count || 0, ufficiale ? '#285EA7' : '#D42B2B');
+      const dentro = el.firstChild;
+      dentro.querySelector('.nome').textContent = (p.title_it || p.title || '').substring(0, 11);
+      new maplibregl.Marker({ element: dentro, anchor: 'bottom' })
+        .setLngLat([p.lng, p.lat]).addTo(mappa);
+    });
+  })
+  .catch(() => {});
+</script>
+</body></html>
