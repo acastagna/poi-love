@@ -45,6 +45,7 @@
 <div class="viste">
   <button id="vStrade" class="on" onclick="vista('strade')">Stradale</button>
   <button id="vSat" onclick="vista('satellite')">Satellite</button>
+  <button id="vVie" class="on" onclick="toggleVie()" style="display:none">Vie</button>
 </div>
 <div id="mappa"></div>
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
@@ -92,15 +93,31 @@ const STILE_SATELLITE = {
     { id: 'nomi', type: 'raster', source: 'nomi' },
   ],
 };
+/* La levetta "Vie": compare solo sul satellite. Accesa = ibrido (strade coi
+   nomi sopra le foto), spenta = foto pulite. Comodita' voluta dal founder. */
+let vieAccese = true;
+function applicaVie() {
+  for (const id of ['strade', 'nomi']) {
+    try { mappa.setLayoutProperty(id, 'visibility', vieAccese ? 'visible' : 'none'); } catch (_) {}
+  }
+  document.getElementById('vVie').classList.toggle('on', vieAccese);
+}
+function toggleVie() {
+  vieAccese = !vieAccese;
+  applicaVie();
+}
 function vista(quale) {
-  mappa.setStyle(quale === 'satellite' ? STILE_SATELLITE : STILE_STRADE);
-  mappa.setMaxZoom(quale === 'satellite' ? 18.4 : 20);
-  /* Anche il cambio di vestito restringe il telo: si rimisura ad abito indossato. */
-  mappa.once('styledata', () => mappa.resize());
+  const sat = quale === 'satellite';
+  mappa.setStyle(sat ? STILE_SATELLITE : STILE_STRADE);
+  mappa.setMaxZoom(sat ? 18.4 : 20);
+  /* Anche il cambio di vestito restringe il telo: si rimisura ad abito
+     indossato. E sul satellite si riapplica la scelta delle vie. */
+  mappa.once('styledata', () => { mappa.resize(); if (sat) applicaVie(); });
   setTimeout(() => mappa.resize(), 300);
-  setTimeout(() => mappa.resize(), 1000);
-  document.getElementById('vStrade').classList.toggle('on', quale !== 'satellite');
-  document.getElementById('vSat').classList.toggle('on', quale === 'satellite');
+  setTimeout(() => { mappa.resize(); if (sat) applicaVie(); }, 1000);
+  document.getElementById('vStrade').classList.toggle('on', !sat);
+  document.getElementById('vSat').classList.toggle('on', sat);
+  document.getElementById('vVie').style.display = sat ? '' : 'none';
 }
 
 /* La goccia col cuore, stessi tracciati della webapp. */
