@@ -47,10 +47,12 @@ aperto, e non e' "fatta" finche' il confronto non regge all'occhio del founder.
 ## 4. Il linguaggio visivo da copiare (webapp di oggi)
 
 - Colori: rosso #D42B2B, blu POI•VOICE #285EA7, sfondo caldo #EAE4D8. Font Montserrat.
-- **Cartografia**: la webapp usa le tile CartoDB Voyager
-  (`https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png`).
-  Sull'app si montano con UrlTile di react-native-maps: e' il singolo cambio che
-  avvicina di piu' l'occhio. Satellite: ArcGIS World Imagery (gia' nella webapp).
+- **Cartografia**: dal 23/08 la webapp usa le tegole OpenStreetMap standard
+  (Carto/Voyager ha messo la chiave obbligatoria); nomi sul satellite dal
+  livello Reference di Esri. Sull'app si montano le STESSE con UrlTile di
+  react-native-maps: l'occhio deve restare identico alla webapp. Satellite:
+  ArcGIS World Imagery (gia' nella webapp). Vestito definitivo in valutazione
+  (voce in TODO.md).
 - **Marcatore definitivo** (variante A del founder, 18/08, gia' portato nell'app in
   `components/PinCuore.tsx`): goccia paffuta col cuore bianco inciso; i MIEI luoghi
   rossi, chi seguo verde #1a7f45, la community grigia #8a8a8a e piu' piccola
