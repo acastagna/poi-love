@@ -69,12 +69,16 @@ new ResizeObserver(() => mappa.resize()).observe(document.getElementById('mappa'
    Esri per le immagini e i nomi sopra, come nell'app vera. I marcatori
    sopravvivono al cambio di vestito: sono sopra il telo, non dentro. */
 const STILE_STRADE = 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json';
+/* Le foto di Esri finiscono intorno all'ingrandimento 18: oltre, senza
+   cinture, comparivano i cartelli "map data not yet available" (visto da
+   Alessandro il 27/08). Due cinture: maxzoom sulla sorgente (oltre il 18
+   le foto si allargano invece di sparire) e tetto dello zoom sulla vista. */
 const STILE_SATELLITE = {
   version: 8,
   sources: {
-    foto: { type: 'raster', tileSize: 256, attribution: '&copy; Esri',
+    foto: { type: 'raster', tileSize: 256, maxzoom: 18, attribution: '&copy; Esri',
       tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'] },
-    nomi: { type: 'raster', tileSize: 256,
+    nomi: { type: 'raster', tileSize: 256, maxzoom: 18,
       tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}'] },
   },
   layers: [
@@ -84,6 +88,7 @@ const STILE_SATELLITE = {
 };
 function vista(quale) {
   mappa.setStyle(quale === 'satellite' ? STILE_SATELLITE : STILE_STRADE);
+  mappa.setMaxZoom(quale === 'satellite' ? 18.4 : 20);
   /* Anche il cambio di vestito restringe il telo: si rimisura ad abito indossato. */
   mappa.once('styledata', () => mappa.resize());
   setTimeout(() => mappa.resize(), 300);
