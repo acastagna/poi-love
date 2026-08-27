@@ -24,6 +24,10 @@
     font-weight:800;display:flex;gap:12px;align-items:center;box-shadow:0 6px 20px rgba(0,0,0,.3)}
   .fascia b{color:#f3b3a5}
   .fascia a{color:#fff;opacity:.8;text-decoration:underline}
+  .viste{position:fixed;top:12px;left:12px;z-index:10;display:flex;gap:6px}
+  .viste button{background:#fff;border:none;border-radius:18px;padding:8px 14px;font-size:12.5px;
+    font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 3px 12px rgba(0,0,0,.2)}
+  .viste button.on{background:#16130f;color:#fff}
   /* Il marcatore definitivo, identico alla webapp: goccia col cuore inciso */
   .pin{display:flex;flex-direction:column;align-items:center;cursor:pointer}
   .pin svg.goccia{width:42px;height:50px;filter:drop-shadow(0 3px 6px rgba(0,0,0,.3))}
@@ -38,6 +42,10 @@
 </style></head>
 <body>
 <div class="fascia">PROVA <b>vettoriale</b> (MapLibre + Voyager GL) · <a href="https://poilove.com/">l'app vera, raster</a></div>
+<div class="viste">
+  <button id="vStrade" class="on" onclick="vista('strade')">Stradale</button>
+  <button id="vSat" onclick="vista('satellite')">Satellite</button>
+</div>
 <div id="mappa"></div>
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <script>
@@ -55,6 +63,34 @@ mappa.addControl(new maplibregl.NavigationControl(), 'bottom-right');
 mappa.on('load', () => mappa.resize());
 setTimeout(() => mappa.resize(), 400);
 new ResizeObserver(() => mappa.resize()).observe(document.getElementById('mappa'));
+
+/* Le due viste. Il satellite resta FOTOGRAFIE (le foto sono raster per
+   natura, non si vettorializzano): dentro MapLibre convivono benissimo,
+   Esri per le immagini e i nomi sopra, come nell'app vera. I marcatori
+   sopravvivono al cambio di vestito: sono sopra il telo, non dentro. */
+const STILE_STRADE = 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json';
+const STILE_SATELLITE = {
+  version: 8,
+  sources: {
+    foto: { type: 'raster', tileSize: 256, attribution: '&copy; Esri',
+      tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'] },
+    nomi: { type: 'raster', tileSize: 256,
+      tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}'] },
+  },
+  layers: [
+    { id: 'foto', type: 'raster', source: 'foto' },
+    { id: 'nomi', type: 'raster', source: 'nomi' },
+  ],
+};
+function vista(quale) {
+  mappa.setStyle(quale === 'satellite' ? STILE_SATELLITE : STILE_STRADE);
+  /* Anche il cambio di vestito restringe il telo: si rimisura ad abito indossato. */
+  mappa.once('styledata', () => mappa.resize());
+  setTimeout(() => mappa.resize(), 300);
+  setTimeout(() => mappa.resize(), 1000);
+  document.getElementById('vStrade').classList.toggle('on', quale !== 'satellite');
+  document.getElementById('vSat').classList.toggle('on', quale === 'satellite');
+}
 
 /* La goccia col cuore, stessi tracciati della webapp. */
 function pinHtml(nome, love, colore){
