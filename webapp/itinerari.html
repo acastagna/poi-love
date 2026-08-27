@@ -873,7 +873,7 @@ const STOPS=[
 
 function initMap(){
   const map=L.map('map',{zoomControl:false}).setView(CENTER,14.5);
-  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key=cb1_2b26_1_902b9cb06a1ccd6e2a9ac61b',{maxZoom:19,subdomains:'abcd',attribution:'&copy; OpenStreetMap &copy; CARTO'}).addTo(map);
 
   // Polyline itinerario
   const pts=STOPS.map(s=>[s.lat,s.lng]);
