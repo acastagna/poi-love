@@ -7,9 +7,10 @@
   IL PARCO GIOCHI DEL VETTORIALE (27/08/2026, voluto dal founder: "me li
   puoi far arrivare tutti nella pagina di prova?"). Tutte le funzioni che
   il motore MapLibre apre, toccabili una per una, su dati VERI:
-  viste, tema scuro, nomi in tre lingue, edifici 3D, mappa di calore dei
-  love, volo cinematografico, globo. La mappa di produzione resta com'e'
-  finche' il blocco 71 non porta il motore anche li'.
+  viste, tema scuro, nomi in tre lingue, edifici 3D, densita' di persone
+  amplificata, volo da punto a punto. Il globo e' stato tolto su ordine
+  del founder (27/08). La mappa di produzione resta com'e' finche' il
+  blocco 71 non porta il motore anche li'.
 -->
 <html lang="it"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -66,7 +67,6 @@
   <div class="gruppo"><em>Prodigi</em>
     <button id="b3d" onclick="flip('tre3d')">3D</button>
     <button id="bCalore" onclick="flip('calore')">Calore</button>
-    <button id="bGlobo" onclick="flip('globo')">Globo</button>
     <button onclick="volo()">Volo</button>
   </div>
 </div>
@@ -95,7 +95,7 @@ const STILE_SATELLITE = {
 };
 
 /* ── Lo stato del parco giochi ── */
-const S = { vista: 'strade', tema: 'chiaro', lingua: null, vie: true, tre3d: false, calore: false, globo: false };
+const S = { vista: 'strade', tema: 'chiaro', lingua: null, vie: true, tre3d: false, calore: false };
 let luoghi = [];        // i luoghi VERI dal database
 let marcatori = [];     // i cuori sopra la mappa
 
@@ -143,15 +143,14 @@ function setLingua(l) {
 }
 function flip(quale) {
   S[quale] = !S[quale];
-  bott({ vie: 'bVie', tre3d: 'b3d', calore: 'bCalore', globo: 'bGlobo' }[quale], S[quale]);
+  bott({ vie: 'bVie', tre3d: 'b3d', calore: 'bCalore' }[quale], S[quale]);
   if (quale === 'vie') applicaVie();
   if (quale === 'tre3d') applica3d(true);
   if (quale === 'calore') applicaCalore(true);
-  if (quale === 'globo') applicaGlobo(true);
 }
 
 /* Dopo OGNI cambio di vestito si riapplica quello che era acceso. */
-function applicaTutto() { applicaVie(); applicaLingua(); applica3d(); applicaCalore(); applicaGlobo(); }
+function applicaTutto() { applicaVie(); applicaLingua(); applica3d(); applicaCalore(); }
 
 /* Le vie sopra il satellite. */
 function applicaVie() {
@@ -218,32 +217,40 @@ function applicaCalore(anima) {
     features: luoghi.map(p => ({ type: 'Feature', properties: { w: (p.love_count || 0) + 1 },
       geometry: { type: 'Point', coordinates: [p.lng, p.lat] } })),
   }});
+  /* Il peso e' la DENSITA' DI PERSONE: quante persone amano quel luogo
+     (i love sono persone, uno a testa). Effetto amplificato su ordine del
+     founder: raggio largo e intensita' alta, si deve VEDERE dove batte. */
   mappa.addLayer({ id: 'prova-calore', type: 'heatmap', source: 'prova-calore',
     paint: {
-      'heatmap-weight': ['get', 'w'],
-      'heatmap-radius': ['interpolate', ['linear'], ['zoom'], 10, 22, 16, 55],
-      'heatmap-intensity': 1.1,
+      'heatmap-weight': ['^', ['get', 'w'], 0.8],
+      'heatmap-radius': ['interpolate', ['linear'], ['zoom'], 10, 34, 16, 110],
+      'heatmap-intensity': 2.4,
+      'heatmap-opacity': 0.9,
       'heatmap-color': ['interpolate', ['linear'], ['heatmap-density'],
-        0, 'rgba(212,43,43,0)', 0.25, 'rgba(240,150,90,.45)',
-        0.55, 'rgba(230,90,60,.7)', 1, 'rgba(212,43,43,.95)'],
+        0, 'rgba(212,43,43,0)', 0.15, 'rgba(250,190,110,.5)',
+        0.4, 'rgba(240,120,70,.8)', 0.7, 'rgba(220,60,45,.92)',
+        1, 'rgba(180,20,25,.98)'],
     }});
   if (anima) mappa.easeTo({ pitch: 0, duration: 600 });
 }
 
-/* Il globo: da Tirana alla Terra intera. */
-function applicaGlobo(anima) {
-  try { mappa.setProjection({ type: S.globo ? 'globe' : 'mercator' }); } catch (_) {}
-  if (!anima) return;
-  if (S.globo) mappa.flyTo({ center: [19.8187, 41.3275], zoom: 1.6, pitch: 0, duration: 3500, essential: true });
-  else mappa.flyTo({ center: [19.8187, 41.3275], zoom: 13, duration: 3000, essential: true });
-}
-
-/* Il volo cinematografico sul luogo piu' amato. */
+/* Il volo DA PUNTO A PUNTO (chiesto dal founder): si parte da un luogo,
+   ci si alza, si vola, si atterra sull'altro. Nell'app vera sara' il volo
+   dal punto in cui sei al luogo scelto, o di tappa in tappa lungo un
+   itinerario. */
 function volo() {
-  const meta = luoghi.slice().sort((a, b) => (b.love_count || 0) - (a.love_count || 0))[0];
-  if (!meta) return;
-  mappa.flyTo({ center: [meta.lng, meta.lat], zoom: Math.min(17.5, S.vista === 'satellite' ? 18.3 : 17.5),
-    pitch: S.vista === 'satellite' ? 0 : 55, bearing: 25, duration: 6000, essential: true });
+  const ordinati = luoghi.slice().sort((a, b) => (b.love_count || 0) - (a.love_count || 0));
+  const da = ordinati[1], a = ordinati[0];
+  if (!a) return;
+  const zoomGiu = Math.min(17.5, S.vista === 'satellite' ? 18.3 : 17.5);
+  const inclina = S.vista === 'satellite' ? 0 : 55;
+  if (da) {
+    mappa.jumpTo({ center: [da.lng, da.lat], zoom: zoomGiu, pitch: inclina, bearing: 0 });
+    setTimeout(() => mappa.flyTo({ center: [a.lng, a.lat], zoom: zoomGiu,
+      pitch: inclina, bearing: 25, duration: 7000, essential: true }), 700);
+  } else {
+    mappa.flyTo({ center: [a.lng, a.lat], zoom: zoomGiu, pitch: inclina, bearing: 25, duration: 6000, essential: true });
+  }
 }
 
 /* ── I luoghi VERI, con la goccia della webapp ── */
