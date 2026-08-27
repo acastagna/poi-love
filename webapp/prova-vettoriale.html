@@ -78,11 +78,17 @@ const STILE_SATELLITE = {
   sources: {
     foto: { type: 'raster', tileSize: 256, maxzoom: 18, attribution: '&copy; Esri',
       tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'] },
+    /* Le strade coi NOMI DELLE VIE sopra le foto (chiesto da Alessandro il
+       27/08: il solo livello quartieri era avaro). Fatto da Esri apposta
+       per la vista ibrida sulle sue foto. */
+    strade: { type: 'raster', tileSize: 256, maxzoom: 18,
+      tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}'] },
     nomi: { type: 'raster', tileSize: 256, maxzoom: 18,
       tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}'] },
   },
   layers: [
     { id: 'foto', type: 'raster', source: 'foto' },
+    { id: 'strade', type: 'raster', source: 'strade' },
     { id: 'nomi', type: 'raster', source: 'nomi' },
   ],
 };
