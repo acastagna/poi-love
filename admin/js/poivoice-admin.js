@@ -296,12 +296,32 @@
       faseTre();
   }
 
+  /* I modelli che sanno fare la voce, dal piu' economico. I nomi sono quelli
+     di Google: qui non si inventano, si copiano dal loro elenco. */
+  const MODELLI_VOCE = [
+    { id: 'gemini-2.5-flash-preview-tts', nome: 'Flash 2.5', nota: 'il piu\' economico' },
+    { id: 'gemini-2.5-pro-preview-tts', nome: 'Pro 2.5 (prova)', nota: 'recita meglio, costa di piu\'' },
+    { id: 'gemini-2.5-pro-tts', nome: 'Pro 2.5', nota: 'la versione stabile del Pro' },
+  ];
+
   function faseTre(){
     return '<div class="panel">'+
       '<div style="font-size:14px;font-weight:900;margin-bottom:4px">3 · Le voci</div>'+
       '<div class="sm" style="margin-bottom:10px">Due voci, una femminile e una maschile: sono i due che parlano nel '+
-      'copione. Valgono per tutte e tre le lingue, perche\' il modello riconosce la lingua dal testo. Il modello e\' '+
-      '<b>'+esc(imp.modello||'gemini-2.5-pro-preview-tts')+'</b>.</div>'+
+      'copione. Valgono per tutte e tre le lingue, perche\' il modello riconosce la lingua dal testo.</div>'+
+
+      /* Il modello si sceglie, non si subisce (29/08/2026, ordine di
+         Alessandro). Il primo della fila e\' il piu\' economico ed e\' quello
+         di serie: si sale solo se la voce non convince. */
+      '<div class="field" style="margin-bottom:12px"><label>Il modello che fa la voce</label>'+
+        '<select id="pvModello">'+
+          MODELLI_VOCE.map(function(m){
+            return '<option value="'+esc(m.id)+'"'+((imp.modello||MODELLI_VOCE[0].id)===m.id?' selected':'')+'>'+
+              esc(m.nome)+' \u00b7 '+esc(m.nota)+'</option>';
+          }).join('')+
+        '</select>'+
+        '<div class="sm" style="margin-top:4px;opacity:.7">Il primo della fila costa meno. Si cambia solo se la voce non convince.</div>'+
+      '</div>'+
 
       '<div style="display:flex;gap:14px;flex-wrap:wrap">'+
         [['femminile','Speaker 1'],['maschile','Speaker 2']].map(function(g){
@@ -852,7 +872,9 @@
         if(!messa.data || !messa.data.length) throw new Error('il database non ha accettato la voce '+g);
       }
       const credito = document.getElementById('pvCredito').value.trim();
+      const selMod = document.getElementById('pvModello');
       const { data, error } = await sb.from('voce_impostazioni').update({
+        modello: (selMod && selMod.value) || MODELLI_VOCE[0].id,
         regia: document.getElementById('pvRegia').value.trim() || null,
         a_lotti: !!(lottiSw && lottiSw.checked),
         credito_caricato: credito === '' ? null : Number(credito),

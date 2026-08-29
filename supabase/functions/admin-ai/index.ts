@@ -61,8 +61,11 @@ const ANTHROPIC_KEY = Deno.env.get("ANTHROPIC_KEY") ?? "";
 const LOCALE_TOKEN = Deno.env.get("LOCALE_TOKEN") ?? "";
 const OPENAI_KEY = Deno.env.get("OPENAI_KEY") ?? "";
 
-const ANTHROPIC_MODEL = Deno.env.get("ANTHROPIC_MODEL") ?? "claude-sonnet-4-6";
-const OPENAI_MODEL = Deno.env.get("OPENAI_MODEL") ?? "gpt-4o";
+// Il modello di serie e' il piu' economico della sua marca (29/08/2026,
+// ordine di Alessandro). Chi vuole di piu' lo cambia dal pannello admin:
+// la tendina dei modelli sta in ai-connessione.js e scrive su ai_fornitori.
+const ANTHROPIC_MODEL = Deno.env.get("ANTHROPIC_MODEL") ?? "claude-haiku-4-5";
+const OPENAI_MODEL = Deno.env.get("OPENAI_MODEL") ?? "gpt-5-nano";
 
 // Tetto di spesa giornaliero per-admin, in euro. Default 5.
 const DAILY_EUR_CAP = (() => {
@@ -83,31 +86,31 @@ const MAX_OUTPUT_TOKENS = 1500;
 const MAX_ROUNDS = 4;
 
 // ── Whitelist modelli ─────────────────────────────────────────────────────────
+// In ordine di prezzo, dal piu' economico. Il primo e' quello di serie.
 const ANTHROPIC_ALLOWED = new Set<string>([
+  "claude-haiku-4-5",
+  "claude-sonnet-5",
+  "claude-opus-5",
   "claude-sonnet-4-6",
-  "claude-sonnet-4-5",
-  "claude-3-5-sonnet-latest",
-  "claude-3-5-haiku-latest",
-  "claude-opus-4-1",
 ]);
 const OPENAI_ALLOWED = new Set<string>([
-  "gpt-4o",
+  "gpt-5-nano",
+  "gpt-5.6-luna",
+  "gpt-5.4-nano",
   "gpt-4o-mini",
-  "gpt-4.1",
-  "gpt-4.1-mini",
 ]);
 
-// Prezzi per milione di token (USD). Sonnet: ~3$/M in, ~15$/M out.
+// Prezzi per milione di token (USD), letti dai listini ufficiali il
+// 29/08/2026. Se cambiano si cambiano qui e basta.
 const PRICE_USD_PER_MTOK: Record<string, { in: number; out: number }> = {
+  "claude-haiku-4-5": { in: 1, out: 5 },
+  "claude-sonnet-5": { in: 2, out: 10 },
+  "claude-opus-5": { in: 5, out: 25 },
   "claude-sonnet-4-6": { in: 3, out: 15 },
-  "claude-sonnet-4-5": { in: 3, out: 15 },
-  "claude-3-5-sonnet-latest": { in: 3, out: 15 },
-  "claude-3-5-haiku-latest": { in: 0.8, out: 4 },
-  "claude-opus-4-1": { in: 15, out: 75 },
-  "gpt-4o": { in: 2.5, out: 10 },
+  "gpt-5-nano": { in: 0.05, out: 0.4 },
+  "gpt-5.6-luna": { in: 0.2, out: 1.2 },
+  "gpt-5.4-nano": { in: 0.2, out: 1.25 },
   "gpt-4o-mini": { in: 0.15, out: 0.6 },
-  "gpt-4.1": { in: 2, out: 8 },
-  "gpt-4.1-mini": { in: 0.4, out: 1.6 },
 };
 
 function costEur(model: string, tokIn: number, tokOut: number): number {

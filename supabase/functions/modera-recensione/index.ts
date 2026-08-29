@@ -37,7 +37,9 @@ const ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
 const SERVICE_ROLE_KEY = Deno.env.get("POILOVE_SERVICE_JWT") ?? Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 const ANTHROPIC_KEY = Deno.env.get("ANTHROPIC_KEY") ?? "";
 const OPENAI_KEY = Deno.env.get("OPENAI_KEY") ?? "";
-const ANTHROPIC_MODEL = Deno.env.get("ANTHROPIC_MODEL") ?? "claude-sonnet-4-6";
+// Il piu' economico della marca (29/08/2026): giudicare una recensione
+// contro direttive scritte non ha bisogno del modello grosso.
+const ANTHROPIC_MODEL = Deno.env.get("ANTHROPIC_MODEL") ?? "claude-haiku-4-5";
 
 /* Il giudizio. Sta in un posto solo, cosi' la prova a vuoto che fa
    l'amministrazione e la moderazione vera usano le stesse identiche parole. */
@@ -83,7 +85,7 @@ Rispondi SOLO con un oggetto JSON, senza altro testo:
         method: "POST",
         headers: { "content-type": "application/json", authorization: `Bearer ${OPENAI_KEY}` },
         signal: AbortSignal.timeout(25000),
-        body: JSON.stringify({ model: "gpt-4o-mini", max_tokens: 300, messages: [
+        body: JSON.stringify({ model: "gpt-5-nano", max_tokens: 300, messages: [
           { role: "system", content: sistema }, { role: "user", content: domanda }] }),
       });
       if (!r.ok) console.error("modera-recensione: OpenAI ha risposto", r.status);

@@ -158,7 +158,8 @@ Deno.serve(async (req) => {
     const testo = String(copione.testo || "");
     const dueVoci = /^\s*Speaker\s*2\s*:/im.test(testo);
     const regia = String(impo[0]?.regia || "").trim();
-    const modello = String(impo[0]?.modello || "gemini-2.5-pro-preview-tts");
+    // Se il pannello non ha scelto si prende il piu' economico dei tre.
+    const modello = String(impo[0]?.modello || "gemini-2.5-flash-preview-tts");
 
     const parlato = {
       ...(dueVoci

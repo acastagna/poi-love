@@ -91,8 +91,9 @@ const ANTHROPIC_KEY = Deno.env.get("ANTHROPIC_KEY") ?? "";
 const LOCALE_TOKEN = Deno.env.get("LOCALE_TOKEN") ?? "";
 
 // ── Costanti ──────────────────────────────────────────────────────────────────
-const DEFAULT_MODEL = "gpt-4o-mini";
-const DEFAULT_ANTHROPIC_MODEL = "claude-3-5-haiku-latest";
+// I due di serie sono i piu' economici della loro marca (29/08/2026).
+const DEFAULT_MODEL = "gpt-5-nano";
+const DEFAULT_ANTHROPIC_MODEL = "claude-haiku-4-5";
 
 // Difese di default se la config non c'e o e incompleta (tier free).
 const DEFAULT_DAILY_MESSAGES = 10;
